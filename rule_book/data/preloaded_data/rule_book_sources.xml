@@ -1,0 +1,92 @@
+<odoo>
+    <data noupdate="1">
+        <!-- Central Bank of Nigeria (CBN) -->
+        <record id="rulebook_source_cbn" model="rulebook.sources">
+            <field name="name">Central Bank of Nigeria (CBN)</field>
+            <field name="description">The Central Bank of Nigeria (CBN) is the apex financial
+                institution in Nigeria, responsible for the regulation and supervision of the
+                banking sector.</field>
+            <field name="url_link">https://www.cbn.gov.ng</field>
+        </record>
+
+        <!-- Nigeria Deposit Insurance Corporation (NDIC) -->
+        <record id="rulebook_source_ndic" model="rulebook.sources">
+            <field name="name">Nigeria Deposit Insurance Corporation (NDIC)</field>
+            <field name="description">The Nigeria Deposit Insurance Corporation (NDIC) provides
+                deposit insurance coverage for bank depositors and promotes public confidence in the
+                Nigerian banking system.</field>
+            <field name="url_link">https://www.ndic.gov.ng</field>
+        </record>
+
+        <!-- Securities and Exchange Commission (SEC Nigeria) -->
+        <record id="rulebook_source_sec" model="rulebook.sources">
+            <field name="name">Securities and Exchange Commission (SEC Nigeria)</field>
+            <field name="description">The Securities and Exchange Commission (SEC) is the regulator
+                of the Nigerian capital market, ensuring that the market is fair, transparent, and
+                efficient.</field>
+            <field name="url_link">https://www.sec.gov.ng</field>
+        </record>
+
+        <!-- National Insurance Commission (NAICOM) -->
+        <record id="rulebook_source_naicom" model="rulebook.sources">
+            <field name="name">National Insurance Commission (NAICOM)</field>
+            <field name="description">The National Insurance Commission (NAICOM) regulates the
+                insurance sector in Nigeria, ensuring the protection of policyholders and the
+                stability of the insurance market.</field>
+            <field name="url_link">https://www.naicom.gov.ng</field>
+        </record>
+
+        <!-- Financial Reporting Council of Nigeria (FRCN) -->
+        <record id="rulebook_source_frcn" model="rulebook.sources">
+            <field name="name">Financial Reporting Council of Nigeria (FRCN)</field>
+            <field name="description">The Financial Reporting Council of Nigeria (FRCN) sets
+                accounting and financial reporting standards in Nigeria, ensuring the accuracy and
+                reliability of financial information.</field>
+            <field name="url_link">https://www.financialreportingcouncil.gov.ng</field>
+        </record>
+
+        <!-- Economic and Financial Crimes Commission (EFCC) -->
+        <record id="rulebook_source_efcc" model="rulebook.sources">
+            <field name="name">Economic and Financial Crimes Commission (EFCC)</field>
+            <field name="description">The Economic and Financial Crimes Commission (EFCC) is
+                responsible for investigating and prosecuting financial crimes, including fraud,
+                money laundering, and corruption in Nigeria.</field>
+            <field name="url_link">https://www.efcc.gov.ng</field>
+        </record>
+
+        <!-- Nigerian Communications Commission (NCC) -->
+        <record id="rulebook_source_ncc" model="rulebook.sources">
+            <field name="name">Nigerian Communications Commission (NCC)</field>
+            <field name="description">The Nigerian Communications Commission (NCC) regulates the
+                telecommunications industry in Nigeria, ensuring fair competition and protecting
+                consumer rights.</field>
+            <field name="url_link">https://www.ncc.gov.ng</field>
+        </record>
+
+        <!-- Corporate Affairs Commission (CAC) -->
+        <record id="rulebook_source_cac" model="rulebook.sources">
+            <field name="name">Corporate Affairs Commission (CAC)</field>
+            <field name="description">The Corporate Affairs Commission (CAC) is responsible for the
+                regulation and management of companies in Nigeria, including registration and
+                oversight of corporate entities.</field>
+            <field name="url_link">https://www.cac.gov.ng</field>
+        </record>
+
+        <!-- Federal Inland Revenue Service (FIRS) -->
+        <record id="rulebook_source_firs" model="rulebook.sources">
+            <field name="name">Federal Inland Revenue Service (FIRS)</field>
+            <field name="description">The Federal Inland Revenue Service (FIRS) is responsible for
+                the assessment, collection, and accounting of federal taxes in Nigeria.</field>
+            <field name="url_link">https://www.firs.gov.ng</field>
+        </record>
+
+        <!-- Nigerian Financial Intelligence Unit (NFIU) -->
+        <record id="rulebook_source_nfiu" model="rulebook.sources">
+            <field name="name">Nigerian Financial Intelligence Unit (NFIU)</field>
+            <field name="description">The Nigerian Financial Intelligence Unit (NFIU) is the central
+                agency responsible for receiving, analyzing, and disseminating financial
+                intelligence to combat money laundering and terrorist financing.</field>
+            <field name="url_link">https://www.nfiu.gov.ng</field>
+        </record>
+    </data>
+</odoo>

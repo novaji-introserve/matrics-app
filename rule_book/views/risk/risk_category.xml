@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Risk Category View -->
+    <record id="view_risk_category_tree" model="ir.ui.view">
+        <field name="name">risk.category.tree</field>
+        <field name="model">rulebook.risk_category</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="risk_priority" />
+                <field name="risk_score" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_risk_category_form" model="ir.ui.view">
+        <field name="name">risk.category.form</field>
+        <field name="model">rulebook.risk_category</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name" />
+                    <field name="risk_priority" />
+                    <field name="risk_score" />
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search Panel -->
+    <record id="view_risk_category_search" model="ir.ui.view">
+        <field name="name">risk.category.search</field>
+        <field name="model">rulebook.risk_category</field>
+        <field name="arch" type="xml">
+            <search>
+                <searchpanel class="account_root">
+                    <field name="risk_priority" icon="fa-filter" limit="0" />
+                </searchpanel>
+            </search>
+           
+        </field>
+    </record>
+
+</odoo>

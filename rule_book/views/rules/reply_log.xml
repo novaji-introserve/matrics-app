@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_reply_log_tree" model="ir.ui.view">
+        <field name="name">reply.log.tree</field>
+        <field name="model">reply.log</field>
+        <field name="arch" type="xml">
+            <tree string="Reply Log" create="false">
+                <field name="rulebook_id" />
+                <field name="rulebook_compute_date" widget="date" />
+                <field name="reply_date" widget="date" />
+                <field name="submission_timing" widget="badge"
+                    decoration-info="submission_timing == 'on_time'"
+                    decoration-success="submission_timing == 'early'"
+                    decoration-danger="submission_timing == 'late'"
+                />
+                <field name="rulebook_status" widget="badge"
+                    decoration-muted="rulebook_status == 'pending'"
+                    decoration-info="rulebook_status == 'submitted'"
+                    decoration-warning="rulebook_status == 'reviewed'"
+                    decoration-success="rulebook_status == 'completed'"
+                />
+                <field name="reporter" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_reply_log_form" model="ir.ui.view">
+        <field name="name">reply.log.form</field>
+        <field name="model">reply.log</field>
+        <field name="arch" type="xml">
+            <form string="Reply Log" class="oe_form_custom">
+                <sheet>
+                  <header>
+                        <field name="rulebook_status" widget="statusbar"
+                            statusbar_visible="pending,submitted,reviewed,completed"
+                            options="{'clickable': 'True'}" />
+                  </header>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="rulebook_id" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="reply_date" readonly="1" />
+                            <field name="reply_content" widget="html" />
+                            <field name="document" widget="binary"
+                                string="Attached Document" />
+
+                           
+                        </group>
+                        <group>
+                            <field name="reporter" readonly="1" />
+                            <field name="rulebook_compute_date" readonly="1"/>
+                           
+                           
+                        </group>
+                        <group>
+                            <field name="submission_timing" string="Submission Timing" />
+                          
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_reply_log_search" model="ir.ui.view">
+        <field name="name">reply.log.search</field>
+        <field name="model">reply.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="rulebook_id" />
+                <field name="submission_timing" />
+                <searchpanel>
+                    <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1"
+                        options='{"counters": true}' />
+                    <field name="submission_timing" icon="fa-clock" string="Submission Timing"
+                        enable_counters="1"
+                        options='{"counters": true}' />
+                </searchpanel>
+                <field name="reply_content" string="Reply Content" />
+
+            </search>
+        </field>
+    </record>
+
+
+</odoo>

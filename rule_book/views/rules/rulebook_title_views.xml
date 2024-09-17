@@ -1,0 +1,69 @@
+<odoo>
+    <record id="view_rulebook_title_tree" model="ir.ui.view">
+        <field name="name">rulebook.title.tree</field>
+        <field name="model">rulebook.title</field>
+        <field name="arch" type="xml">
+            <tree
+                decoration-success="status=='active'"
+                decoration-warning="status == 'inactive'"
+                decoration-danger="status == 'deleted'"
+            >
+                <field name="name" />
+                <field name="file_name" />
+                <field name="ref_number" />
+                <field name="released_date" />
+                <field name="status" />
+                <field name="source_id" />
+                <field name="created_on" />
+                <field name="created_by" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_rulebook_title_form" model="ir.ui.view">
+        <field name="name">rulebook.title.form</field>
+        <field name="model">rulebook.title</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="file" filename="file_name" widget="pdf_viewer"
+                            options="{'preview_image': 'file'}" />
+                        <field name="ref_number" />
+                        <field name="released_date" />
+                        <field name="status" />
+                        <field name="source_id" />
+                    </group>
+                    <group>
+                        <field name="created_on" readonly="1" />
+                        <field name="created_by" readonly="1" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_rulebook_title_search_" model="ir.ui.view">
+        <field name="name">rulebook.title.search</field>
+        <field name="model">rulebook.title</field>
+        <field name="arch" type="xml">
+            <search string="Rulebook Titles">
+                <field name="name" />
+                <field name="status" />
+                <field name="source_id" />
+                <group expand="1" string="Group By">
+                    <filter string="Created By" name="created_by" />
+                    <filter string="Source" name="source_id" />
+                    <filter string="Status" name="status" />
+                </group>
+                <searchpanel>
+                    <!-- <field name="created_by" icon="fa-user" enable_counters="1" string="Created By"
+                        /> -->
+                    <field name="source_id" icon="fa-cog" enable_counters="1" string="Source" />
+                    <field name="status" icon="fa-check" enable_counters="1" string="Status" />
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+</odoo>

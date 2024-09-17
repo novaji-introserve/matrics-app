@@ -1,0 +1,90 @@
+<odoo>
+    <data>
+        <!-- Email Template for Rulebook Due Dates -->
+        <record id="rulebook_due_date_email_template" model="mail.template">
+            <field name="name">Rulebook Due Date Notification</field>
+            <field name="email_to">Komolafeezekiel123@gmail.com</field>
+            <field name="model_id" ref="rule_book.model_rulebook" />
+            <field name="subject">Reminder: Rulebook Due Date for ${object.name}</field>
+            <field name="email_from">komolafeezekieldare@gmail.com</field>
+            <field name="body_html" type="html">
+
+                <div>
+                    <p>Dear User,</p>
+
+                    <p>Best Regards,<br />Your Team <t
+                            t-out="object.data()['name']" />
+                    </p>
+                </div>
+
+            </field>
+            <field name="auto_delete" eval="False" />
+        </record>
+
+        <!-- First Line Escalation Template -->
+        <record id="email_template_first_line_escalation" model="mail.template">
+            <field name="name">First Line Escalation for Rulebook</field>
+            <field name="email_from">{{object.data()['email_from']}}</field>
+            <field name="email_cc">{{object.data()['email_from']}}</field>
+            <field name="email_to">{{object.data()['email_to']}}</field>
+            <field name="subject">Escalation Due Date for {{object.data()['title']}}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>Dear <t
+                            t-out="object.data()['name']" /></p>
+                    <p>The user has not yet uploaded the regulatory document for <strong>
+                            <t
+                                t-out="object.data()['title']" />
+                        </strong>.</p>
+                    <p>Escalation Due Date: <t
+                            t-out="object.data()['due_date']" /></p>
+
+                    <p>You can check the regulatory details here: <a
+                            t-attf-href="#{object.data()['record_link']}">Check Details</a>.</p>
+                    <p>You can upload the document at the following link: <a
+                            t-attf-href="#{object.data()['upload_link']}">Submit Document</a>.</p>
+                    <p>Thank you.</p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False" />
+        </record>
+
+
+        <!-- Internal Due Date Reminder -->
+        <record id="email_template_internal_due_date_" model="mail.template">
+            <field name="name">Internal Due Date Reminder for Rulebook</field>
+            <field name="email_from">{{object.data()['email_from']}}</field>
+            <field name="model_id" ref="rule_book.model_rulebook" />
+            <field
+                name="email_cc">{{object.data()['email_from']}}</field>
+            <field name="email_to">
+                {{object.data()['email_to']}}</field>
+            <field name="subject">Internal Due Date for {{object.data()['title']}}</field>
+            <field name="body_html" type="html">
+                <div>
+
+                    <p>Dear <t
+                            t-out="object.data()['name']"></t>,</p>
+                    <p>The internal due date for submitting the document for <strong>
+                            <t
+                                t-out="object.data()['title']" />
+                        </strong>
+                        is approaching. (<t
+                            t-out="object.data()['due_date']" />)</p>
+                    <p>Please upload the document before the due date.</p>
+                    <p>You can upload the document here:<a
+                            t-attf-href="#{object.data()['upload_link']}">Submit Document</a>.</p>
+                    <p>Thank you.</p>
+
+                </div>
+
+            </field>
+            <field name="auto_delete" eval="False" />
+        </record>
+  
+    </data>
+</odoo>
+
+<!-- <p>This is a reminder that the rulebook <strong>${object.name}</strong> is due today.</p>
+<p>Internal Due Date: ${object.internal_due_date}</p>
+<p>Escalation Date: ${object.escalation_date}</p> -->

@@ -1,0 +1,53 @@
+.section-group {
+     background-color: #F9F9F9;
+     /* Light background for sections */
+     border: 1px solid #DDDDDD;
+     /* Light gray border */
+     border-radius: 10px;
+     /* Rounded corners */
+     padding: 20px;
+     /* Space inside the section */
+     margin-bottom: 20px;
+     /* Space between sections */
+ }
+
+ #description,#sanction{
+    border-width: 0px;
+    resize:vertical;
+ }
+ .o_input,
+ .o_field_html {
+     border: 1px solid #8E8787;
+     /* Gray border for input fields */
+     padding: 10px;
+     /* Inner padding for input fields */
+     border-radius: 8px;
+     /* Rounded corners for input fields */
+     background-color: #FFFFFF;
+     /* White background for inputs */
+ }
+
+ .risk-category-field {
+     color: #FF5733;
+     /* Orange color for risk category */
+     font-weight: bold;
+     /* Bold text for emphasis */
+ }
+
+ .readonly-field {
+     background-color: #EFEFEF;
+     /* Light gray background for read-only fields */
+     color: #555555;
+     /* Darker gray text color */
+     border: 1px solid #CCCCCC;
+     /* Gray border */
+ }
+
+ .section-group h2 {
+     font-size: 16px;
+     /* Larger font size for section titles */
+     color: #333333;
+     /* Dark text color for section titles */
+     margin-bottom: 10px;
+     /* Space below section titles */
+ }

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_external_resource_tree" model="ir.ui.view">
+        <field name="name">external.resource.tree</field>
+        <field name="model">external.resource</field>
+        <field name="arch" type="xml">
+            <tree string="External Resources">
+                <field name="name" />
+                <field name="ref_number" />
+                <field name="release_date" />
+                <field name="source_id" />
+                <field name="channel" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_external_resource_form" model="ir.ui.view">
+        <field name="name">external.resource.form</field>
+        <field name="model">external.resource</field>
+        <field name="arch" type="xml">
+            <form string="External Resource">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="mime_type" />
+                        <field name="filename" />
+                        <field name="ref_number" />
+                        <field name="release_date" />
+                        <field name="source_id" options="{'no_create': True}" />
+                        <field name="created_by" options="{'no_create': True, 'no_edit': True}" />
+                        <field name="channel" />
+                        <field name="external_resource_url" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_external_resource_search_" model="ir.ui.view">
+        <field name="name">>external.resource.search</field>
+        <field name="model">external.resource</field>
+        <field name="arch" type="xml">
+            <search >
+                <field name="name" />
+                <field name="source_id" />
+                <group expand="1" string="Group By">
+                    <filter string="Created By" name="created_by" />
+                    <filter string="Source" name="source_id" />
+                    <filter string="Status" name="status" />
+                </group>
+                <searchpanel>
+                    <!-- <field name="created_by" icon="fa-user" enable_counters="1" string="Created
+                    By"
+                        /> -->
+                    <field name="source_id" icon="fa-cog" enable_counters="1" string="Source" />
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+  
+</odoo>

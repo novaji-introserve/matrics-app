@@ -1,0 +1,14 @@
+/* Example to change the background color of odd rows */
+.o_list_view tr:nth-child(odd) {
+    /* background-color: yellow; */
+}
+
+/* Change the text color of the tree view header */  .o_field_badge,
+  .badge {
+      padding: 10px;
+  }
+  .o_data_cell,.o_list_record_selector,.o_column_sortable{
+    align-items: 'center';
+    vertical-align: middle;
+    /* text-align: center; */
+  }

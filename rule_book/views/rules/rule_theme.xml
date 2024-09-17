@@ -1,0 +1,58 @@
+<!-- views/rulebook_theme_view.xml -->
+<odoo>
+    <record id="view_rulebook_theme_tree" model="ir.ui.view">
+        <field name="name">rulebook.theme.tree</field>
+        <field name="model">rulebook.theme</field>
+        <field name="arch" type="xml">
+            <tree
+            
+            >
+
+              
+                <field name="name" />
+                <field name="description" />
+                <field name="source" widget='badge'
+                    decoration-success="source=='ai'" decoration-warning="source == 'manual'"
+                />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_rulebook_theme_form" model="ir.ui.view">
+        <field name="name">rulebook.theme.form</field>
+        <field name="model">rulebook.theme</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="description" />
+                        <field name="source" readonly="1" />
+                        <field name="create_uid" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rulebook_theme_search" model="ir.ui.view">
+        <field name="name">rulebook.theme.search</field>
+        <field name="model">rulebook.theme</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="source" />
+                <!-- Add custom filters here -->
+                <filter string="AI Generated" name="ai_filter" domain="[('source', '=', 'ai')]" />
+                <filter string="Manual Input" name="manual_filter"
+                    domain="[('source', '=', 'manual')]" />
+                <searchpanel>
+                    <field name="source" icon="fa-cogs" enable_counters="1"
+                        options='{"counters": true}' string="Source" />
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    
+</odoo>
