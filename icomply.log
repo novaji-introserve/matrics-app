@@ -1,0 +1,1389 @@
+2024-09-17 10:58:45,724 383663 INFO ? odoo: Odoo version 16.0 
+2024-09-17 10:58:45,724 383663 INFO ? odoo: Using configuration file at /home/gbemi/odoo/addons/icomply_odoo/icomply_live.conf 
+2024-09-17 10:58:45,724 383663 INFO ? odoo: addons paths: ['/home/gbemi/odoo/odoo/addons', '/root/.local/share/Odoo/addons/16.0', '/home/gbemi/odoo/addons', '/home/gbemi/odoo/addons/icomply_odoo'] 
+2024-09-17 10:58:45,725 383663 INFO ? odoo: database: magpora_user@localhost:default 
+2024-09-17 10:58:45,878 383663 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at /usr/local/bin/wkhtmltopdf 
+2024-09-17 10:58:46,197 383663 INFO ? odoo.service.server: HTTP service (werkzeug) running on novaji-php-cloud:8077 
+2024-09-17 10:58:46,210 383663 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 10:58:46,219 383663 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 10:58:46,223 383663 INFO icomply_odoo odoo.modules.loading: loading 8 modules... 
+2024-09-17 10:58:46,289 383663 INFO icomply_odoo odoo.modules.loading: 8 modules loaded in 0.06s, 0 queries (+0 extra) 
+2024-09-17 10:58:46,324 383663 INFO icomply_odoo odoo.modules.loading: Modules loaded. 
+2024-09-17 10:58:46,326 383663 INFO icomply_odoo odoo.modules.registry: Registry loaded in 0.131s 
+2024-09-17 11:00:46,886 383663 WARNING ? odoo.modules.module: Missing `license` key in manifest for 'loan_calculator', defaulting to LGPL-3 
+2024-09-17 11:00:46,913 383663 WARNING ? odoo.modules.module: Missing `license` key in manifest for 'alert_managment', defaulting to LGPL-3 
+2024-09-17 11:00:46,914 383663 WARNING ? odoo.modules.module: Missing `license` key in manifest for 'rule_book', defaulting to LGPL-3 
+2024-09-17 11:00:46,916 383663 INFO icomply_odoo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2024-09-17 11:00:47,138 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/database/selector HTTP/1.1" 200 - 8 0.005 0.440
+2024-09-17 11:00:47,367 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/src/libs/fontawesome/css/font-awesome.css HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:00:47,538 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/lib/bootstrap/dist/css/bootstrap.css HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:47,570 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/lib/jquery/jquery.js HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:47,575 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/lib/bootstrap/js/dist/dom/event-handler.js HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:00:47,577 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/lib/bootstrap/js/dist/dom/selector-engine.js HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:47,596 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/lib/bootstrap/js/dist/dom/data.js HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:47,846 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/lib/bootstrap/js/dist/base-component.js HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:00:47,849 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/lib/bootstrap/js/dist/modal.js HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:47,851 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/src/public/database_manager.js HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:47,868 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/img/logo2.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:47,903 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:47] "GET /web/static/lib/bootstrap/js/dist/dom/manipulator.js HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:48,425 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:48] "GET /web/static/img/favicon.ico HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:55,383 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:55] "GET /web?db=icomply_odoo HTTP/1.1" 303 - 1 0.000 0.002
+2024-09-17 11:00:57,141 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:57] "GET /web/login HTTP/1.1" 200 - 67 0.036 1.517
+2024-09-17 11:00:57,733 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:57] "GET /web/static/src/libs/fontawesome/fonts/fontawesome-webfont.woff2?v=4.7.0 HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:00:57,902 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:57] "GET /web/assets/15-c3e66c5/web.assets_frontend.min.css HTTP/1.1" 200 - 6 0.003 0.007
+2024-09-17 11:00:57,907 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:57] "GET /web/binary/company_logo HTTP/1.1" 200 - 2 0.003 0.008
+2024-09-17 11:00:58,356 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:58] "GET /web/assets/16-696d3dd/web.assets_frontend_minimal.min.js HTTP/1.1" 200 - 5 0.001 0.003
+2024-09-17 11:00:58,617 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:58] "GET /web/assets/17-dbee0aa/web.assets_frontend_lazy.min.js HTTP/1.1" 200 - 5 0.001 0.003
+2024-09-17 11:00:59,737 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:59] "GET /web/webclient/translations/1726570859160 HTTP/1.1" 200 - 3 0.001 0.004
+2024-09-17 11:00:59,915 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:00:59] "GET /web/webclient/translations/1726570859364 HTTP/1.1" 200 - 3 0.001 0.003
+2024-09-17 11:01:50,519 383663 INFO icomply_odoo odoo.addons.base.models.res_users: Login successful for db:icomply_odoo login:ezekiel.k@novajii.com from 127.0.0.1 
+2024-09-17 11:01:50,532 383663 INFO icomply_odoo odoo.modules.registry: At least one model cache has been invalidated, signaling through the database. 
+2024-09-17 11:01:50,533 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:50] "POST /web/login HTTP/1.1" 303 - 48 0.021 0.281
+2024-09-17 11:01:53,707 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:53] "GET /web HTTP/1.1" 200 - 110 0.069 2.919
+2024-09-17 11:01:53,942 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:53] "GET /web/assets/18-676efe0/web.assets_common.min.css HTTP/1.1" 200 - 4 0.001 0.004
+2024-09-17 11:01:54,101 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:54] "GET /web/assets/22-168b29a/web.assets_backend_prod_only.min.js HTTP/1.1" 200 - 4 0.001 0.003
+2024-09-17 11:01:54,106 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:54] "GET /web/webclient/load_menus/3b5665afdb76f0b35edca6c8b7486724a31b5c9e8fd5a2aa71a636993cb1dd9b HTTP/1.1" 200 - 2 0.002 0.002
+2024-09-17 11:01:54,109 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:54] "GET /web/assets/20-676efe0/web.assets_common.min.js HTTP/1.1" 200 - 4 0.001 0.004
+2024-09-17 11:01:54,117 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:54] "GET /web/assets/21-919ae25/web.assets_backend.min.js HTTP/1.1" 200 - 4 0.001 0.004
+2024-09-17 11:01:54,129 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:54] "GET /web/assets/19-919ae25/web.assets_backend.min.css HTTP/1.1" 200 - 4 0.012 0.004
+2024-09-17 11:01:54,308 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:54] "GET /web/webclient/translations/65607f58d5469d51a5b051eb66c57db2c3d405a5?lang=en_US HTTP/1.1" 200 - 3 0.001 0.003
+2024-09-17 11:01:55,549 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:55] "GET /web/webclient/locale/en_US HTTP/1.1" 200 - 1 0.000 0.002
+2024-09-17 11:01:55,593 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:55] "GET /bus/websocket_worker_bundle?v=1.0.5 HTTP/1.1" 200 - 9 0.003 0.015
+2024-09-17 11:01:55,786 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:55] "GET /web/static/lib/odoo_ui_icons/fonts/odoo_ui_icons.woff2 HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:55,806 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:55] "POST /web/action/load HTTP/1.1" 200 - 11 0.008 0.013
+2024-09-17 11:01:55,807 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:55] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 200 - 15 0.013 0.011
+2024-09-17 11:01:55,979 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:01:55,980 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:55] "GET /websocket HTTP/1.1" 400 - 1 0.004 0.003
+2024-09-17 11:01:56,026 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /web/image/res.company/1/favicon HTTP/1.1" 200 - 10 0.005 0.006
+2024-09-17 11:01:56,032 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 43 0.020 0.020
+2024-09-17 11:01:56,258 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.003 0.006
+2024-09-17 11:01:56,277 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 40 0.015 0.013
+2024-09-17 11:01:56,601 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /loan_calculator/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:56,610 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /crm/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:56,612 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /base/static/img/icons/mrp_workorder.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:56,614 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /account/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:56,616 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /base/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:56,618 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /sale_management/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:56,803 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /website/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:56,804 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /mass_mailing/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.003
+2024-09-17 11:01:56,807 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /base/static/img/icons/account_accountant.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:56,810 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /purchase/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:56,811 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /point_of_sale/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:56,812 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /project/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.003
+2024-09-17 11:01:56,985 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /hr_expense/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:56,995 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /mrp/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:56,995 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /base/static/img/icons/knowledge.png HTTP/1.1" 200 - 0 0.000 0.003
+2024-09-17 11:01:56,998 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:56] "GET /base/static/img/icons/timesheet_grid.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,001 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /website_sale/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:57,002 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /stock/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:57,177 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /hr_holidays/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,202 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/industry_fsm.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,206 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /hr/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,210 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /hr_recruitment/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,213 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/web_studio.png HTTP/1.1" 200 - 0 0.000 0.003
+2024-09-17 11:01:57,409 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base_accounting_kit/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:57,411 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/sale_subscription.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:57,414 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/helpdesk.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,418 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /maintenance/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:57,419 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/sign.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:57,421 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /data_recycle/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:57,602 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/quality_control.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,609 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /website_slides/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,616 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/planning.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,624 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /website_event/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,637 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /mail/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,640 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /contacts/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,811 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/social.png HTTP/1.1" 200 - 0 0.000 0.003
+2024-09-17 11:01:57,812 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /calendar/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:57,818 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/mrp_plm.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:57,819 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/hr_appraisal.png HTTP/1.1" 200 - 0 0.000 0.003
+2024-09-17 11:01:57,820 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /fleet/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.003
+2024-09-17 11:01:57,829 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/marketing_automation.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,857 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:01:57,857 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /websocket HTTP/1.1" 400 - 1 0.001 0.002
+2024-09-17 11:01:57,988 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /im_livechat/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:57,996 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:57] "GET /base/static/img/icons/appointment.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:58,000 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /base/static/img/icons/web_mobile.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:58,008 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /survey/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:58,021 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /hr_attendance/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:58,024 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /repair/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:58,178 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /hr_skills/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:58,179 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /base/static/img/icons/stock_barcode.png HTTP/1.1" 200 - 0 0.000 0.003
+2024-09-17 11:01:58,185 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /mass_mailing_sms/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:58,186 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /note/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:58,231 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /lunch/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:58,233 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /base/static/img/icons/voip.png HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:01:58,369 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /website_hr_recruitment/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:58,377 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /base/static/img/icons/sale_ebay.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:58,392 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:58] "GET /hr_contract/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:01:59,466 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:01:59,466 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:01:59] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:02:03,895 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:02:03,895 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:03] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:02:09,207 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:02:09,208 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:09] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:02:18,364 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:18] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 37 0.013 0.010
+2024-09-17 11:02:18,569 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:18] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:02:18,790 383663 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:18] "GET /web/static/img/empty_folder.svg HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:02:19,027 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:02:19,027 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:19] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:02:20,768 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:20] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 37 0.018 0.010
+2024-09-17 11:02:20,970 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:20] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.002 0.003
+2024-09-17 11:02:22,870 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:22] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 37 0.009 0.009
+2024-09-17 11:02:23,020 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:23] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.002 0.005
+2024-09-17 11:02:31,751 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:02:31,752 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:31] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.016
+2024-09-17 11:02:53,226 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:02:53,227 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:02:53] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:03:23,354 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:03:23,355 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:03:23] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:03:54,455 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:03:54,456 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:03:54] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:04:24,615 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:04:24,615 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:04:24] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:04:55,434 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:04:55,434 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:04:55] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:05:25,031 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:05:25,032 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:05:25] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:06:00,209 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:06:00,210 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:06:00] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:06:26,302 383663 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:06:26,302 383663 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:06:26] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.004
+2024-09-17 11:07:00,041 383663 INFO icomply_odoo odoo.service.server: Initiating shutdown 
+2024-09-17 11:07:00,041 383663 INFO icomply_odoo odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2024-09-17 11:07:00,335 383663 INFO icomply_odoo odoo.sql_db: ConnectionPool(used=0/count=0/max=64): Closed 4 connections  
+2024-09-17 11:07:00,904 385754 INFO ? odoo: Odoo version 16.0 
+2024-09-17 11:07:00,904 385754 INFO ? odoo: Using configuration file at /home/gbemi/odoo/addons/icomply_odoo/icomply_live.conf 
+2024-09-17 11:07:00,905 385754 INFO ? odoo: addons paths: ['/home/gbemi/odoo/odoo/addons', '/root/.local/share/Odoo/addons/16.0', '/home/gbemi/odoo/addons', '/home/gbemi/odoo/addons/icomply_odoo'] 
+2024-09-17 11:07:00,905 385754 INFO ? odoo: database: magpora_user@localhost:default 
+2024-09-17 11:07:00,997 385754 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at /usr/local/bin/wkhtmltopdf 
+2024-09-17 11:07:01,147 385754 INFO ? odoo.service.server: HTTP service (werkzeug) running on novaji-php-cloud:8077 
+2024-09-17 11:07:01,158 385754 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 11:07:01,163 385754 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 11:07:01,166 385754 INFO icomply_odoo odoo.modules.loading: loading 8 modules... 
+2024-09-17 11:07:01,196 385754 INFO icomply_odoo odoo.modules.loading: 8 modules loaded in 0.03s, 0 queries (+0 extra) 
+2024-09-17 11:07:01,219 385754 INFO icomply_odoo odoo.modules.loading: Modules loaded. 
+2024-09-17 11:07:01,220 385754 INFO icomply_odoo odoo.modules.registry: Registry loaded in 0.074s 
+2024-09-17 11:07:08,670 385754 INFO icomply_odoo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2024-09-17 11:07:08,945 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:08] "GET /web HTTP/1.1" 200 - 86 0.036 0.241
+2024-09-17 11:07:09,703 385754 WARNING ? odoo.modules.module: Missing `license` key in manifest for 'loan_calculator', defaulting to LGPL-3 
+2024-09-17 11:07:09,716 385754 WARNING ? odoo.modules.module: Missing `license` key in manifest for 'alert_managment', defaulting to LGPL-3 
+2024-09-17 11:07:09,717 385754 WARNING ? odoo.modules.module: Missing `license` key in manifest for 'rule_book', defaulting to LGPL-3 
+2024-09-17 11:07:09,728 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:09] "POST /web/action/load HTTP/1.1" 200 - 13 0.005 0.126
+2024-09-17 11:07:09,775 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:09] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 15 0.007 0.011
+2024-09-17 11:07:09,781 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:09] "GET /bus/websocket_worker_bundle?v=1.0.5 HTTP/1.1" 200 - 6 0.003 0.014
+2024-09-17 11:07:09,989 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:09] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 44 0.014 0.025
+2024-09-17 11:07:10,013 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:10] "GET /web/image/res.company/1/favicon HTTP/1.1" 304 - 10 0.003 0.005
+2024-09-17 11:07:10,205 385754 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:07:10,205 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:10] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:07:10,371 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:10] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.003 0.005
+2024-09-17 11:07:10,390 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:10] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 40 0.011 0.012
+2024-09-17 11:07:12,746 385754 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:07:12,747 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:12] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:07:13,609 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:13] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.005 0.006
+2024-09-17 11:07:13,622 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:13] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 37 0.016 0.010
+2024-09-17 11:07:14,140 385754 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:07:14,141 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:14] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:07:15,466 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:15] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 37 0.018 0.011
+2024-09-17 11:07:15,653 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:15] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.002 0.003
+2024-09-17 11:07:19,328 385754 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:07:19,329 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:19] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:07:22,885 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:22] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.004 0.006
+2024-09-17 11:07:22,899 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:22] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 37 0.012 0.009
+2024-09-17 11:07:24,445 385754 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:07:24,446 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:24] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:07:34,607 385754 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:07:34,608 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:34] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:07:47,629 385754 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:07:47,630 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:07:47] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:08:10,104 385754 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:08:10,105 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:08:10] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:08:41,490 385754 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:08:41,491 385754 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:08:41] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.004
+2024-09-17 11:09:04,933 385754 INFO icomply_odoo odoo.service.server: Initiating shutdown 
+2024-09-17 11:09:04,933 385754 INFO icomply_odoo odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2024-09-17 11:09:05,014 385754 INFO icomply_odoo odoo.sql_db: ConnectionPool(used=0/count=0/max=64): Closed 4 connections  
+2024-09-17 11:09:05,802 386675 INFO ? odoo: Odoo version 16.0 
+2024-09-17 11:09:05,802 386675 INFO ? odoo: Using configuration file at /home/gbemi/odoo/addons/icomply_odoo/icomply_live.conf 
+2024-09-17 11:09:05,803 386675 INFO ? odoo: addons paths: ['/home/gbemi/odoo/odoo/addons', '/root/.local/share/Odoo/addons/16.0', '/home/gbemi/odoo/addons', '/home/gbemi/odoo/addons/icomply_odoo/rule_book'] 
+2024-09-17 11:09:05,803 386675 INFO ? odoo: database: magpora_user@localhost:default 
+2024-09-17 11:09:05,914 386675 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at /usr/local/bin/wkhtmltopdf 
+2024-09-17 11:09:06,082 386675 INFO ? odoo.service.server: HTTP service (werkzeug) running on novaji-php-cloud:8077 
+2024-09-17 11:09:06,096 386675 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 11:09:06,108 386675 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 11:09:06,117 386675 INFO icomply_odoo odoo.modules.loading: loading 8 modules... 
+2024-09-17 11:09:06,177 386675 INFO icomply_odoo odoo.modules.loading: 8 modules loaded in 0.06s, 0 queries (+0 extra) 
+2024-09-17 11:09:06,223 386675 INFO icomply_odoo odoo.modules.loading: Modules loaded. 
+2024-09-17 11:09:06,225 386675 INFO icomply_odoo odoo.modules.registry: Registry loaded in 0.143s 
+2024-09-17 11:09:11,360 386675 INFO icomply_odoo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2024-09-17 11:09:11,451 386675 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:09:11,452 386675 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:11] "GET /websocket HTTP/1.1" 400 - 7 0.006 0.088
+2024-09-17 11:09:16,863 386675 INFO icomply_odoo odoo.service.server: Initiating shutdown 
+2024-09-17 11:09:16,863 386675 INFO icomply_odoo odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2024-09-17 11:09:16,865 386675 INFO icomply_odoo odoo.sql_db: ConnectionPool(used=0/count=0/max=64): Closed 3 connections  
+2024-09-17 11:09:17,580 386831 INFO ? odoo: Odoo version 16.0 
+2024-09-17 11:09:17,581 386831 INFO ? odoo: Using configuration file at /home/gbemi/odoo/addons/icomply_odoo/icomply_live.conf 
+2024-09-17 11:09:17,581 386831 INFO ? odoo: addons paths: ['/home/gbemi/odoo/odoo/addons', '/root/.local/share/Odoo/addons/16.0', '/home/gbemi/odoo/addons', '/home/gbemi/odoo/addons/icomply_odoo'] 
+2024-09-17 11:09:17,582 386831 INFO ? odoo: database: magpora_user@localhost:default 
+2024-09-17 11:09:17,745 386831 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at /usr/local/bin/wkhtmltopdf 
+2024-09-17 11:09:17,975 386831 INFO ? odoo.service.server: HTTP service (werkzeug) running on novaji-php-cloud:8077 
+2024-09-17 11:09:17,993 386831 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 11:09:18,002 386831 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 11:09:18,006 386831 INFO icomply_odoo odoo.modules.loading: loading 8 modules... 
+2024-09-17 11:09:18,049 386831 INFO icomply_odoo odoo.modules.loading: 8 modules loaded in 0.04s, 0 queries (+0 extra) 
+2024-09-17 11:09:18,080 386831 INFO icomply_odoo odoo.modules.loading: Modules loaded. 
+2024-09-17 11:09:18,082 386831 INFO icomply_odoo odoo.modules.registry: Registry loaded in 0.107s 
+2024-09-17 11:09:32,165 386831 WARNING ? odoo.modules.module: Missing `license` key in manifest for 'loan_calculator', defaulting to LGPL-3 
+2024-09-17 11:09:32,186 386831 WARNING ? odoo.modules.module: Missing `license` key in manifest for 'alert_managment', defaulting to LGPL-3 
+2024-09-17 11:09:32,187 386831 WARNING ? odoo.modules.module: Missing `license` key in manifest for 'rule_book', defaulting to LGPL-3 
+2024-09-17 11:09:32,189 386831 INFO icomply_odoo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2024-09-17 11:09:32,314 386831 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:32] "POST /web/action/load HTTP/1.1" 200 - 34 0.018 0.301
+2024-09-17 11:09:32,622 386831 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:32] "POST /web/dataset/call_kw/res.users/get_views HTTP/1.1" 200 - 56 0.032 0.067
+2024-09-17 11:09:33,224 386831 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:33] "POST /web/dataset/call_kw/res.users/web_search_read HTTP/1.1" 200 - 13 0.006 0.007
+2024-09-17 11:09:33,385 386831 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:33] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 2 0.001 0.002
+2024-09-17 11:09:39,922 386831 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:39] "POST /web/dataset/call_kw/res.users/web_search_read HTTP/1.1" 200 - 6 0.003 0.005
+2024-09-17 11:09:42,673 386831 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:09:42,673 386831 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:42] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:09:47,769 386831 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:47] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 39 0.016 0.027
+2024-09-17 11:09:48,185 386831 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:48] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 41 0.016 0.011
+2024-09-17 11:09:48,339 386831 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:09:48] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.002 0.006
+2024-09-17 11:10:11,522 386831 INFO icomply_odoo odoo.service.server: Initiating shutdown 
+2024-09-17 11:10:11,523 386831 INFO icomply_odoo odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2024-09-17 11:10:11,862 386831 INFO icomply_odoo odoo.sql_db: ConnectionPool(used=0/count=0/max=64): Closed 3 connections  
+2024-09-17 11:10:12,624 387157 INFO ? odoo: Odoo version 16.0 
+2024-09-17 11:10:12,624 387157 INFO ? odoo: Using configuration file at /home/gbemi/odoo/addons/icomply_odoo/icomply_live.conf 
+2024-09-17 11:10:12,624 387157 INFO ? odoo: addons paths: ['/home/gbemi/odoo/odoo/addons', '/root/.local/share/Odoo/addons/16.0', '/home/gbemi/odoo/addons', '/home/gbemi/odoo/addons/icomply_odoo'] 
+2024-09-17 11:10:12,625 387157 INFO ? odoo: database: magpora_user@localhost:default 
+2024-09-17 11:10:12,753 387157 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at /usr/local/bin/wkhtmltopdf 
+2024-09-17 11:10:12,999 387157 INFO ? odoo.service.server: HTTP service (werkzeug) running on novaji-php-cloud:8077 
+2024-09-17 11:10:13,013 387157 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 11:10:13,019 387157 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 11:10:13,026 387157 INFO icomply_odoo odoo.modules.loading: loading 8 modules... 
+2024-09-17 11:10:13,079 387157 INFO icomply_odoo odoo.modules.loading: 8 modules loaded in 0.05s, 0 queries (+0 extra) 
+2024-09-17 11:10:13,106 387157 INFO icomply_odoo odoo.modules.loading: Modules loaded. 
+2024-09-17 11:10:13,108 387157 INFO icomply_odoo odoo.modules.registry: Registry loaded in 0.109s 
+2024-09-17 11:10:31,316 387157 INFO icomply_odoo odoo.service.server: Initiating shutdown 
+2024-09-17 11:10:31,317 387157 INFO icomply_odoo odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2024-09-17 11:10:31,525 387157 INFO icomply_odoo odoo.sql_db: ConnectionPool(used=0/count=0/max=64): Closed 3 connections  
+2024-09-17 11:10:32,980 388320 INFO ? odoo: Odoo version 16.0 
+2024-09-17 11:10:32,981 388320 INFO ? odoo: Using configuration file at /home/gbemi/odoo/addons/icomply_odoo/icomply_live.conf 
+2024-09-17 11:10:32,981 388320 INFO ? odoo: addons paths: ['/home/gbemi/odoo/odoo/addons', '/root/.local/share/Odoo/addons/16.0', '/home/gbemi/odoo/addons', '/home/gbemi/odoo/addons/icomply_odoo'] 
+2024-09-17 11:10:32,981 388320 INFO ? odoo: database: magpora_user@localhost:default 
+2024-09-17 11:10:33,250 388320 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at /usr/local/bin/wkhtmltopdf 
+2024-09-17 11:10:33,843 388320 INFO ? odoo.service.server: HTTP service (werkzeug) running on novaji-php-cloud:8077 
+2024-09-17 11:10:33,869 388320 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 11:10:33,869 388320 INFO icomply_odoo odoo.modules.loading: Loading module base (1/1) 
+2024-09-17 11:10:33,928 388320 INFO icomply_odoo odoo.modules.registry: module base: creating or updating database tables 
+2024-09-17 11:10:34,765 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/res_bank.xml 
+2024-09-17 11:10:34,768 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/res.lang.csv 
+2024-09-17 11:10:35,037 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/res_lang_data.xml 
+2024-09-17 11:10:35,065 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/res_partner_data.xml 
+2024-09-17 11:10:35,089 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/res_currency_data.xml 
+2024-09-17 11:10:35,221 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/res_company_data.xml 
+2024-09-17 11:10:35,224 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/res_users_data.xml 
+2024-09-17 11:10:35,229 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/report_paperformat_data.xml 
+2024-09-17 11:10:35,233 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/res_country_data.xml 
+2024-09-17 11:10:35,425 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_demo_data.xml 
+2024-09-17 11:10:35,446 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_config_parameter_data.xml 
+2024-09-17 11:10:35,451 388320 INFO icomply_odoo odoo.modules.loading: loading base/security/base_groups.xml 
+2024-09-17 11:10:35,718 388320 INFO icomply_odoo odoo.modules.loading: loading base/security/base_security.xml 
+2024-09-17 11:10:35,746 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/base_menus.xml 
+2024-09-17 11:10:35,856 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/decimal_precision_views.xml 
+2024-09-17 11:10:35,892 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/res_config_views.xml 
+2024-09-17 11:10:35,910 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/res.country.state.csv 
+2024-09-17 11:10:37,377 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_actions_views.xml 
+2024-09-17 11:10:37,578 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_asset_views.xml 
+2024-09-17 11:10:37,612 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_config_parameter_views.xml 
+2024-09-17 11:10:37,647 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_cron_views.xml 
+2024-09-17 11:10:37,743 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_cron_trigger_views.xml 
+2024-09-17 11:10:37,777 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_filters_views.xml 
+2024-09-17 11:10:37,833 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_mail_server_views.xml 
+2024-09-17 11:10:37,883 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_model_views.xml 
+2024-09-17 11:10:38,238 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_attachment_views.xml 
+2024-09-17 11:10:38,283 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_rule_views.xml 
+2024-09-17 11:10:38,386 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_sequence_views.xml 
+2024-09-17 11:10:38,427 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_ui_menu_views.xml 
+2024-09-17 11:10:38,462 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_ui_view_views.xml 
+2024-09-17 11:10:38,542 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_default_views.xml 
+2024-09-17 11:10:38,573 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_cron_data.xml 
+2024-09-17 11:10:38,583 388320 INFO icomply_odoo odoo.modules.loading: loading base/report/ir_model_report.xml 
+2024-09-17 11:10:38,588 388320 INFO icomply_odoo odoo.modules.loading: loading base/report/ir_model_templates.xml 
+2024-09-17 11:10:38,611 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_logging_views.xml 
+2024-09-17 11:10:38,640 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_qweb_widget_templates.xml 
+2024-09-17 11:10:38,663 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_module_views.xml 
+2024-09-17 11:10:38,758 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_module_category_data.xml 
+2024-09-17 11:10:38,954 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_module_module.xml 
+2024-09-17 11:10:38,998 388320 INFO icomply_odoo odoo.modules.loading: loading base/report/ir_module_reports.xml 
+2024-09-17 11:10:39,004 388320 INFO icomply_odoo odoo.modules.loading: loading base/report/ir_module_report_templates.xml 
+2024-09-17 11:10:39,023 388320 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_module_update_views.xml 
+2024-09-17 11:10:39,043 388320 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_language_install_views.xml 
+2024-09-17 11:10:39,064 388320 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_import_language_views.xml 
+2024-09-17 11:10:39,086 388320 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_module_upgrade_views.xml 
+2024-09-17 11:10:39,142 388320 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_module_uninstall_views.xml 
+2024-09-17 11:10:39,157 388320 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_export_language_views.xml 
+2024-09-17 11:10:39,186 388320 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_partner_merge_views.xml 
+2024-09-17 11:10:39,220 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_actions_data.xml 
+2024-09-17 11:10:39,225 388320 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_demo_failure_data.xml 
+2024-09-17 11:10:39,246 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_profile_views.xml 
+2024-09-17 11:10:39,294 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/res_company_views.xml 
+2024-09-17 11:10:39,343 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/res_lang_views.xml 
+2024-09-17 11:10:39,399 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/res_partner_views.xml 
+2024-09-17 11:10:39,644 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/res_bank_views.xml 
+2024-09-17 11:10:39,759 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/res_country_views.xml 
+2024-09-17 11:10:39,823 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/res_currency_views.xml 
+2024-09-17 11:10:40,001 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/res_users_views.xml 
+2024-09-17 11:10:40,251 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_property_views.xml 
+2024-09-17 11:10:40,291 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/res_config_settings_views.xml 
+2024-09-17 11:10:40,301 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/report_paperformat_views.xml 
+2024-09-17 11:10:40,337 388320 INFO icomply_odoo odoo.modules.loading: loading base/views/onboarding_views.xml 
+2024-09-17 11:10:40,387 388320 INFO icomply_odoo odoo.modules.loading: loading base/security/ir.model.access.csv 
+2024-09-17 11:10:40,699 388320 INFO icomply_odoo odoo.modules.loading: Module base loaded in 6.83s, 7198 queries (+7198 other) 
+2024-09-17 11:10:40,699 388320 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 6.83s, 7198 queries (+7198 extra) 
+2024-09-17 11:10:40,722 388320 INFO icomply_odoo odoo.modules.loading: updating modules list 
+2024-09-17 11:10:40,724 388320 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2024-09-17 11:10:40,842 388320 WARNING icomply_odoo odoo.modules.module: Missing `license` key in manifest for 'rule_book', defaulting to LGPL-3 
+2024-09-17 11:10:40,865 388320 WARNING icomply_odoo odoo.modules.module: Missing `license` key in manifest for 'alert_managment', defaulting to LGPL-3 
+2024-09-17 11:10:41,523 388320 WARNING icomply_odoo odoo.modules.module: Missing `license` key in manifest for 'loan_calculator', defaulting to LGPL-3 
+2024-09-17 11:10:41,635 388320 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['Base'] to user __system__ #1 via n/a 
+2024-09-17 11:10:41,635 388320 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['Base'] to user __system__ #1 via n/a 
+2024-09-17 11:10:42,258 388320 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2024-09-17 11:10:42,314 388320 INFO icomply_odoo odoo.modules.loading: loading 8 modules... 
+2024-09-17 11:10:42,315 388320 INFO icomply_odoo odoo.modules.loading: Loading module web (2/8) 
+2024-09-17 11:10:42,365 388320 INFO icomply_odoo odoo.modules.registry: module web: creating or updating database tables 
+2024-09-17 11:10:42,892 388320 INFO icomply_odoo odoo.modules.loading: loading web/security/ir.model.access.csv 
+2024-09-17 11:10:42,902 388320 INFO icomply_odoo odoo.modules.loading: loading web/views/webclient_templates.xml 
+2024-09-17 11:10:43,014 388320 INFO icomply_odoo odoo.modules.loading: loading web/views/report_templates.xml 
+2024-09-17 11:10:43,180 388320 INFO icomply_odoo odoo.modules.loading: loading web/views/base_document_layout_views.xml 
+2024-09-17 11:10:43,197 388320 INFO icomply_odoo odoo.modules.loading: loading web/views/speedscope_template.xml 
+2024-09-17 11:10:43,207 388320 INFO icomply_odoo odoo.modules.loading: loading web/views/lazy_assets.xml 
+2024-09-17 11:10:43,216 388320 INFO icomply_odoo odoo.modules.loading: loading web/views/neutralize_views.xml 
+2024-09-17 11:10:43,228 388320 INFO icomply_odoo odoo.modules.loading: loading web/data/ir_attachment.xml 
+2024-09-17 11:10:43,231 388320 INFO icomply_odoo odoo.modules.loading: loading web/data/report_layout.xml 
+2024-09-17 11:10:43,311 388320 INFO icomply_odoo odoo.modules.loading: Module web loaded in 1.00s, 1100 queries (+1100 other) 
+2024-09-17 11:10:43,312 388320 INFO icomply_odoo odoo.modules.loading: Loading module auth_totp (3/8) 
+2024-09-17 11:10:43,365 388320 INFO icomply_odoo odoo.modules.registry: module auth_totp: creating or updating database tables 
+2024-09-17 11:10:43,406 388320 INFO icomply_odoo odoo.modules.loading: loading auth_totp/security/security.xml 
+2024-09-17 11:10:43,427 388320 INFO icomply_odoo odoo.modules.loading: loading auth_totp/security/ir.model.access.csv 
+2024-09-17 11:10:43,438 388320 INFO icomply_odoo odoo.modules.loading: loading auth_totp/data/ir_action_data.xml 
+2024-09-17 11:10:43,444 388320 INFO icomply_odoo odoo.modules.loading: loading auth_totp/views/res_users_views.xml 
+2024-09-17 11:10:43,490 388320 INFO icomply_odoo odoo.modules.loading: loading auth_totp/views/templates.xml 
+2024-09-17 11:10:43,503 388320 INFO icomply_odoo odoo.modules.loading: loading auth_totp/wizard/auth_totp_wizard_views.xml 
+2024-09-17 11:10:43,535 388320 INFO icomply_odoo odoo.modules.loading: Module auth_totp loaded in 0.22s, 178 queries (+178 other) 
+2024-09-17 11:10:43,535 388320 INFO icomply_odoo odoo.modules.loading: Loading module base_import (4/8) 
+2024-09-17 11:10:43,596 388320 INFO icomply_odoo odoo.modules.registry: module base_import: creating or updating database tables 
+2024-09-17 11:10:44,208 388320 INFO icomply_odoo odoo.modules.loading: loading base_import/security/ir.model.access.csv 
+2024-09-17 11:10:44,258 388320 INFO icomply_odoo odoo.modules.loading: Module base_import loaded in 0.72s, 728 queries (+728 other) 
+2024-09-17 11:10:44,258 388320 INFO icomply_odoo odoo.modules.loading: Loading module bus (5/8) 
+2024-09-17 11:10:44,316 388320 INFO icomply_odoo odoo.modules.registry: module bus: creating or updating database tables 
+2024-09-17 11:10:44,382 388320 INFO icomply_odoo odoo.modules.loading: loading bus/security/ir.model.access.csv 
+2024-09-17 11:10:44,417 388320 INFO icomply_odoo odoo.modules.loading: Module bus loaded in 0.16s, 88 queries (+88 other) 
+2024-09-17 11:10:44,417 388320 INFO icomply_odoo odoo.modules.loading: Loading module web_kanban_gauge (6/8) 
+2024-09-17 11:10:44,488 388320 INFO icomply_odoo odoo.modules.loading: Module web_kanban_gauge loaded in 0.07s, 15 queries (+15 other) 
+2024-09-17 11:10:44,488 388320 INFO icomply_odoo odoo.modules.loading: Loading module web_tour (7/8) 
+2024-09-17 11:10:44,534 388320 INFO icomply_odoo odoo.modules.registry: module web_tour: creating or updating database tables 
+2024-09-17 11:10:44,561 388320 INFO icomply_odoo odoo.modules.loading: loading web_tour/security/ir.model.access.csv 
+2024-09-17 11:10:44,572 388320 INFO icomply_odoo odoo.modules.loading: loading web_tour/security/ir.rule.csv 
+2024-09-17 11:10:44,580 388320 INFO icomply_odoo odoo.modules.loading: loading web_tour/views/tour_views.xml 
+2024-09-17 11:10:44,619 388320 INFO icomply_odoo odoo.modules.loading: Module web_tour loaded in 0.13s, 100 queries (+100 other) 
+2024-09-17 11:10:44,619 388320 INFO icomply_odoo odoo.modules.loading: Loading module web_editor (8/8) 
+2024-09-17 11:10:44,694 388320 INFO icomply_odoo odoo.modules.registry: module web_editor: creating or updating database tables 
+2024-09-17 11:10:45,369 388320 INFO icomply_odoo odoo.modules.loading: loading web_editor/security/ir.model.access.csv 
+2024-09-17 11:10:45,380 388320 INFO icomply_odoo odoo.modules.loading: loading web_editor/data/editor_assets.xml 
+2024-09-17 11:10:45,385 388320 INFO icomply_odoo odoo.modules.loading: loading web_editor/views/editor.xml 
+2024-09-17 11:10:45,427 388320 INFO icomply_odoo odoo.modules.loading: loading web_editor/views/snippets.xml 
+2024-09-17 11:10:45,537 388320 INFO icomply_odoo odoo.modules.loading: Module web_editor loaded in 0.92s, 860 queries (+860 other) 
+2024-09-17 11:10:45,537 388320 INFO icomply_odoo odoo.modules.loading: 8 modules loaded in 3.22s, 3069 queries (+3069 extra) 
+2024-09-17 11:10:45,815 388320 INFO icomply_odoo odoo.modules.loading: Modules loaded. 
+2024-09-17 11:10:45,820 388320 INFO icomply_odoo odoo.modules.registry: Registry loaded in 11.978s 
+2024-09-17 11:10:45,848 388320 INFO icomply_odoo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2024-09-17 11:10:45,849 388320 INFO icomply_odoo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2024-09-17 11:10:46,043 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:10:46,045 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:46] "GET /websocket HTTP/1.1" 400 - 6 0.010 2.966
+2024-09-17 11:10:46,358 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:46] "GET /web HTTP/1.1" 200 - 83 0.049 9.462
+2024-09-17 11:10:47,028 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:47] "POST /web/action/load HTTP/1.1" 200 - 13 0.005 0.015
+2024-09-17 11:10:47,237 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:47] "GET /bus/websocket_worker_bundle?v=1.0.5 HTTP/1.1" 200 - 5 0.003 0.006
+2024-09-17 11:10:47,264 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:47] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 15 0.023 0.011
+2024-09-17 11:10:47,298 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:47] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 44 0.018 0.031
+2024-09-17 11:10:47,531 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:47] "GET /web/image/res.company/1/favicon HTTP/1.1" 304 - 10 0.004 0.007
+2024-09-17 11:10:47,710 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:10:47,710 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:47] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:10:47,835 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:47] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.004 0.007
+2024-09-17 11:10:47,856 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:47] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 40 0.022 0.013
+2024-09-17 11:10:50,302 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:10:50,303 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:50] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:10:52,157 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:10:52,158 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:52] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:10:56,785 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:10:56,786 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:10:56] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:11:02,668 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:11:02,669 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:11:02] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:11:12,449 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:11:12,450 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:11:12] "GET /websocket HTTP/1.1" 400 - 1 0.001 0.003
+2024-09-17 11:11:26,993 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:11:26,994 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:11:26] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:11:28,862 388320 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_immediate_install on ['Rule Book'] to user ezekiel.k@novajii.com #2 via 127.0.0.1 
+2024-09-17 11:11:28,863 388320 INFO icomply_odoo odoo.addons.base.models.ir_module: User #2 triggered module installation 
+2024-09-17 11:11:28,863 388320 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_install on ['Rule Book'] to user ezekiel.k@novajii.com #2 via 127.0.0.1 
+2024-09-17 11:11:28,932 388320 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 11:11:28,939 388320 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 11:11:28,953 388320 INFO icomply_odoo odoo.modules.loading: updating modules list 
+2024-09-17 11:11:28,954 388320 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via 127.0.0.1 
+2024-09-17 11:11:29,393 388320 INFO icomply_odoo odoo.modules.loading: loading 8 modules... 
+2024-09-17 11:11:29,399 388320 INFO icomply_odoo odoo.modules.loading: 8 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 11:11:29,401 388320 INFO icomply_odoo odoo.modules.loading: loading 26 modules... 
+2024-09-17 11:11:29,401 388320 INFO icomply_odoo odoo.modules.loading: Loading module base_setup (5/26) 
+2024-09-17 11:11:29,426 388320 INFO icomply_odoo odoo.modules.registry: module base_setup: creating or updating database tables 
+2024-09-17 11:11:29,473 388320 INFO icomply_odoo odoo.modules.loading: loading base_setup/data/base_setup_data.xml 
+2024-09-17 11:11:29,479 388320 INFO icomply_odoo odoo.modules.loading: loading base_setup/views/res_config_settings_views.xml 
+2024-09-17 11:11:29,512 388320 INFO icomply_odoo odoo.modules.loading: loading base_setup/views/res_partner_views.xml 
+2024-09-17 11:11:29,536 388320 INFO icomply_odoo odoo.modules.loading: Module base_setup loaded in 0.14s, 153 queries (+153 other) 
+2024-09-17 11:11:29,536 388320 INFO icomply_odoo odoo.modules.loading: Loading module iap (9/26) 
+2024-09-17 11:11:29,554 388320 INFO icomply_odoo odoo.modules.registry: module iap: creating or updating database tables 
+2024-09-17 11:11:29,609 388320 INFO icomply_odoo odoo.modules.loading: loading iap/security/ir.model.access.csv 
+2024-09-17 11:11:29,617 388320 INFO icomply_odoo odoo.modules.loading: loading iap/security/ir_rule.xml 
+2024-09-17 11:11:29,624 388320 INFO icomply_odoo odoo.modules.loading: loading iap/views/iap_views.xml 
+2024-09-17 11:11:29,643 388320 INFO icomply_odoo odoo.modules.loading: loading iap/views/res_config_settings.xml 
+2024-09-17 11:11:29,671 388320 INFO icomply_odoo odoo.modules.loading: Module iap loaded in 0.13s, 145 queries (+145 other) 
+2024-09-17 11:11:29,671 388320 INFO icomply_odoo odoo.modules.loading: Loading module mail (10/26) 
+2024-09-17 11:11:29,751 388320 INFO icomply_odoo odoo.modules.registry: module mail: creating or updating database tables 
+2024-09-17 11:11:30,116 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.partner_ids 
+2024-09-17 11:11:30,117 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.template_id 
+2024-09-17 11:11:30,117 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.activity_type_id 
+2024-09-17 11:11:30,117 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.activity_date_deadline_range 
+2024-09-17 11:11:30,117 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.activity_user_id 
+2024-09-17 11:11:30,118 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.mail_post_method 
+2024-09-17 11:11:30,118 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.activity_summary 
+2024-09-17 11:11:30,118 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.activity_date_deadline_range_type 
+2024-09-17 11:11:30,118 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.activity_user_type 
+2024-09-17 11:11:30,118 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.activity_user_field_name 
+2024-09-17 11:11:30,118 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.activity_note 
+2024-09-17 11:11:30,119 388320 INFO icomply_odoo odoo.models: Prepare computation of ir.actions.server.mail_post_autofollow 
+2024-09-17 11:11:30,168 388320 INFO icomply_odoo odoo.models: Prepare computation of res.partner.email_normalized 
+2024-09-17 11:11:30,175 388320 INFO icomply_odoo odoo.models: Prepare computation of res.users.notification_type 
+2024-09-17 11:11:31,450 388320 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_groups.xml 
+2024-09-17 11:11:31,554 388320 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_blacklist_remove_views.xml 
+2024-09-17 11:11:31,560 388320 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_compose_message_views.xml 
+2024-09-17 11:11:31,574 388320 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_resend_message_views.xml 
+2024-09-17 11:11:31,583 388320 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_template_preview_views.xml 
+2024-09-17 11:11:31,592 388320 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_wizard_invite_views.xml 
+2024-09-17 11:11:31,597 388320 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_template_reset_views.xml 
+2024-09-17 11:11:31,605 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/fetchmail_views.xml 
+2024-09-17 11:11:31,621 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_message_subtype_views.xml 
+2024-09-17 11:11:31,632 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_tracking_views.xml 
+2024-09-17 11:11:31,642 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_notification_views.xml 
+2024-09-17 11:11:31,653 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_message_views.xml 
+2024-09-17 11:11:31,678 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_message_schedule_views.xml 
+2024-09-17 11:11:31,692 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_mail_views.xml 
+2024-09-17 11:11:31,716 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_followers_views.xml 
+2024-09-17 11:11:31,727 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_ice_server_views.xml 
+2024-09-17 11:11:31,737 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_channel_member_views.xml 
+2024-09-17 11:11:31,749 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_channel_rtc_session_views.xml 
+2024-09-17 11:11:31,764 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_link_preview_views.xml 
+2024-09-17 11:11:31,771 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_channel_views.xml 
+2024-09-17 11:11:31,793 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_shortcode_views.xml 
+2024-09-17 11:11:31,803 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_activity_views.xml 
+2024-09-17 11:11:31,849 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/res_config_settings_views.xml 
+2024-09-17 11:11:31,874 388320 INFO icomply_odoo odoo.modules.loading: loading mail/data/res_partner_data.xml 
+2024-09-17 11:11:31,892 388320 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_message_subtype_data.xml 
+2024-09-17 11:11:31,901 388320 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_templates_chatter.xml 
+2024-09-17 11:11:31,916 388320 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_templates_email_layouts.xml 
+2024-09-17 11:11:31,934 388320 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_templates_mailgateway.xml 
+2024-09-17 11:11:31,945 388320 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_channel_data.xml 
+2024-09-17 11:11:31,966 388320 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_activity_data.xml 
+2024-09-17 11:11:31,983 388320 INFO icomply_odoo odoo.modules.loading: loading mail/data/ir_cron_data.xml 
+2024-09-17 11:11:32,011 388320 INFO icomply_odoo odoo.modules.loading: loading mail/security/mail_security.xml 
+2024-09-17 11:11:32,098 388320 INFO icomply_odoo odoo.modules.loading: loading mail/security/ir.model.access.csv 
+2024-09-17 11:11:32,101 388320 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:11:32] "GET /web/static/img/spin.svg HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:11:32,147 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/discuss_public_templates.xml 
+2024-09-17 11:11:32,156 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_alias_views.xml 
+2024-09-17 11:11:32,172 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_gateway_allowed_views.xml 
+2024-09-17 11:11:32,181 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_guest_views.xml 
+2024-09-17 11:11:32,189 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_message_reaction_views.xml 
+2024-09-17 11:11:32,198 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/res_users_views.xml 
+2024-09-17 11:11:32,216 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/res_users_settings_views.xml 
+2024-09-17 11:11:32,227 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_template_views.xml 
+2024-09-17 11:11:32,245 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/ir_actions_server_views.xml 
+2024-09-17 11:11:32,254 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/ir_model_views.xml 
+2024-09-17 11:11:32,275 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/res_partner_views.xml 
+2024-09-17 11:11:32,323 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_blacklist_views.xml 
+2024-09-17 11:11:32,338 388320 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_menus.xml 
+2024-09-17 11:11:32,480 388320 INFO icomply_odoo odoo.modules.loading: Module mail loaded in 2.81s, 3397 queries (+3397 other) 
+2024-09-17 11:11:32,481 388320 INFO icomply_odoo odoo.modules.loading: Loading module auth_signup (12/26) 
+2024-09-17 11:11:32,509 388320 INFO icomply_odoo odoo.modules.registry: module auth_signup: creating or updating database tables 
+2024-09-17 11:11:32,571 388320 INFO icomply_odoo odoo.modules.loading: loading auth_signup/data/ir_config_parameter_data.xml 
+2024-09-17 11:11:32,578 388320 INFO icomply_odoo odoo.modules.loading: loading auth_signup/data/ir_cron_data.xml 
+2024-09-17 11:11:32,587 388320 INFO icomply_odoo odoo.modules.loading: loading auth_signup/data/mail_template_data.xml 
+2024-09-17 11:11:32,600 388320 INFO icomply_odoo odoo.modules.loading: loading auth_signup/views/res_config_settings_views.xml 
+2024-09-17 11:11:32,615 388320 INFO icomply_odoo odoo.modules.loading: loading auth_signup/views/res_users_views.xml 
+2024-09-17 11:11:32,636 388320 INFO icomply_odoo odoo.modules.loading: loading auth_signup/views/auth_signup_login_templates.xml 
+2024-09-17 11:11:32,654 388320 INFO icomply_odoo odoo.modules.loading: loading auth_signup/views/webclient_templates.xml 
+2024-09-17 11:11:32,675 388320 INFO icomply_odoo odoo.modules.loading: Module auth_signup loaded in 0.19s, 191 queries (+191 other) 
+2024-09-17 11:11:32,675 388320 INFO icomply_odoo odoo.modules.loading: Loading module auth_totp_mail (13/26) 
+2024-09-17 11:11:32,725 388320 INFO icomply_odoo odoo.modules.registry: module auth_totp_mail: creating or updating database tables 
+2024-09-17 11:11:32,759 388320 INFO icomply_odoo odoo.modules.loading: loading auth_totp_mail/data/ir_action_data.xml 
+2024-09-17 11:11:32,783 388320 INFO icomply_odoo odoo.modules.loading: loading auth_totp_mail/data/mail_template_data.xml 
+2024-09-17 11:11:32,790 388320 INFO icomply_odoo odoo.modules.loading: loading auth_totp_mail/views/res_users_views.xml 
+2024-09-17 11:11:32,839 388320 INFO icomply_odoo odoo.modules.loading: Module auth_totp_mail loaded in 0.16s, 92 queries (+92 other) 
+2024-09-17 11:11:32,839 388320 INFO icomply_odoo odoo.modules.loading: Loading module base_install_request (14/26) 
+2024-09-17 11:11:32,887 388320 INFO icomply_odoo odoo.modules.registry: module base_install_request: creating or updating database tables 
+2024-09-17 11:11:33,003 388320 INFO icomply_odoo odoo.modules.loading: loading base_install_request/security/ir.model.access.csv 
+2024-09-17 11:11:33,017 388320 INFO icomply_odoo odoo.modules.loading: loading base_install_request/wizard/base_module_install_request_views.xml 
+2024-09-17 11:11:33,036 388320 INFO icomply_odoo odoo.modules.loading: loading base_install_request/data/mail_template_data.xml 
+2024-09-17 11:11:33,043 388320 INFO icomply_odoo odoo.modules.loading: loading base_install_request/data/mail_templates_module_install.xml 
+2024-09-17 11:11:33,047 388320 INFO icomply_odoo odoo.modules.loading: loading base_install_request/views/ir_module_module_views.xml 
+2024-09-17 11:11:33,063 388320 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_install on ['Project', 'Email Marketing', 'Employees', 'Surveys'] to user __system__ #1 via 127.0.0.1 
+2024-09-17 11:11:33,127 388320 INFO icomply_odoo odoo.modules.loading: Module base_install_request loaded in 0.29s, 203 queries (+203 other) 
+2024-09-17 11:11:33,127 388320 INFO icomply_odoo odoo.modules.loading: Loading module calendar (15/26) 
+2024-09-17 11:11:33,207 388320 INFO icomply_odoo odoo.modules.registry: module calendar: creating or updating database tables 
+2024-09-17 11:11:33,490 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/security/ir.model.access.csv 
+2024-09-17 11:11:33,505 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/security/calendar_security.xml 
+2024-09-17 11:11:33,522 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/data/calendar_cron.xml 
+2024-09-17 11:11:33,530 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/data/mail_template_data.xml 
+2024-09-17 11:11:33,543 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/data/calendar_data.xml 
+2024-09-17 11:11:33,557 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/data/mail_activity_type_data.xml 
+2024-09-17 11:11:33,563 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/data/mail_message_subtype_data.xml 
+2024-09-17 11:11:33,567 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/views/mail_activity_views.xml 
+2024-09-17 11:11:33,577 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/views/calendar_templates.xml 
+2024-09-17 11:11:33,583 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/views/calendar_views.xml 
+2024-09-17 11:11:33,674 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/views/res_partner_views.xml 
+2024-09-17 11:11:33,695 388320 INFO icomply_odoo odoo.modules.loading: loading calendar/wizard/calendar_provider_config.xml 
+2024-09-17 11:11:33,728 388320 INFO icomply_odoo odoo.modules.loading: Module calendar loaded in 0.60s, 629 queries (+629 other) 
+2024-09-17 11:11:33,728 388320 INFO icomply_odoo odoo.modules.loading: Loading module google_gmail (16/26) 
+2024-09-17 11:11:33,757 388320 INFO icomply_odoo odoo.modules.registry: module google_gmail: creating or updating database tables 
+2024-09-17 11:11:33,801 388320 INFO icomply_odoo odoo.modules.loading: loading google_gmail/views/fetchmail_server_views.xml 
+2024-09-17 11:11:33,814 388320 INFO icomply_odoo odoo.modules.loading: loading google_gmail/views/ir_mail_server_views.xml 
+2024-09-17 11:11:33,822 388320 INFO icomply_odoo odoo.modules.loading: loading google_gmail/views/res_config_settings_views.xml 
+2024-09-17 11:11:33,854 388320 INFO icomply_odoo odoo.modules.loading: Module google_gmail loaded in 0.13s, 123 queries (+123 other) 
+2024-09-17 11:11:33,854 388320 INFO icomply_odoo odoo.modules.loading: Loading module iap_mail (17/26) 
+2024-09-17 11:11:33,882 388320 INFO icomply_odoo odoo.modules.registry: module iap_mail: creating or updating database tables 
+2024-09-17 11:11:33,897 388320 INFO icomply_odoo odoo.modules.loading: loading iap_mail/data/mail_templates.xml 
+2024-09-17 11:11:33,921 388320 INFO icomply_odoo odoo.modules.loading: Module iap_mail loaded in 0.07s, 36 queries (+36 other) 
+2024-09-17 11:11:33,922 388320 INFO icomply_odoo odoo.modules.loading: Loading module mail_bot (18/26) 
+2024-09-17 11:11:33,948 388320 INFO icomply_odoo odoo.modules.registry: module mail_bot: creating or updating database tables 
+2024-09-17 11:11:34,018 388320 INFO icomply_odoo odoo.modules.loading: loading mail_bot/views/res_users_views.xml 
+2024-09-17 11:11:34,039 388320 INFO icomply_odoo odoo.modules.loading: loading mail_bot/data/mailbot_data.xml 
+2024-09-17 11:11:34,059 388320 INFO icomply_odoo odoo.modules.loading: Module mail_bot loaded in 0.14s, 144 queries (+144 other) 
+2024-09-17 11:11:34,059 388320 INFO icomply_odoo odoo.modules.loading: Loading module phone_validation (19/26) 
+2024-09-17 11:11:34,088 388320 INFO icomply_odoo odoo.modules.registry: module phone_validation: creating or updating database tables 
+2024-09-17 11:11:34,186 388320 INFO icomply_odoo odoo.modules.loading: loading phone_validation/security/ir.model.access.csv 
+2024-09-17 11:11:34,194 388320 INFO icomply_odoo odoo.modules.loading: loading phone_validation/views/phone_blacklist_views.xml 
+2024-09-17 11:11:34,220 388320 INFO icomply_odoo odoo.modules.loading: loading phone_validation/wizard/phone_blacklist_remove_view.xml 
+2024-09-17 11:11:34,240 388320 INFO icomply_odoo odoo.modules.loading: Module phone_validation loaded in 0.18s, 163 queries (+163 other) 
+2024-09-17 11:11:34,241 388320 INFO icomply_odoo odoo.modules.loading: Loading module privacy_lookup (20/26) 
+2024-09-17 11:11:34,269 388320 INFO icomply_odoo odoo.modules.registry: module privacy_lookup: creating or updating database tables 
+2024-09-17 11:11:34,377 388320 INFO icomply_odoo odoo.modules.loading: loading privacy_lookup/wizard/privacy_lookup_wizard_views.xml 
+2024-09-17 11:11:34,408 388320 INFO icomply_odoo odoo.modules.loading: loading privacy_lookup/views/privacy_log_views.xml 
+2024-09-17 11:11:34,469 388320 INFO icomply_odoo odoo.modules.loading: loading privacy_lookup/security/ir.model.access.csv 
+2024-09-17 11:11:34,479 388320 INFO icomply_odoo odoo.modules.loading: loading privacy_lookup/data/ir_actions_server_data.xml 
+2024-09-17 11:11:34,502 388320 INFO icomply_odoo odoo.modules.loading: Module privacy_lookup loaded in 0.26s, 227 queries (+227 other) 
+2024-09-17 11:11:34,503 388320 INFO icomply_odoo odoo.modules.loading: Loading module web_unsplash (21/26) 
+2024-09-17 11:11:34,531 388320 INFO icomply_odoo odoo.modules.registry: module web_unsplash: creating or updating database tables 
+2024-09-17 11:11:34,575 388320 INFO icomply_odoo odoo.modules.loading: loading web_unsplash/views/res_config_settings_view.xml 
+2024-09-17 11:11:34,613 388320 INFO icomply_odoo odoo.modules.loading: Module web_unsplash loaded in 0.11s, 95 queries (+95 other) 
+2024-09-17 11:11:34,613 388320 INFO icomply_odoo odoo.modules.loading: Loading module partner_autocomplete (22/26) 
+2024-09-17 11:11:34,645 388320 INFO icomply_odoo odoo.modules.registry: module partner_autocomplete: creating or updating database tables 
+2024-09-17 11:11:34,723 388320 INFO icomply_odoo odoo.modules.loading: loading partner_autocomplete/security/ir.model.access.csv 
+2024-09-17 11:11:34,733 388320 INFO icomply_odoo odoo.modules.loading: loading partner_autocomplete/views/res_partner_views.xml 
+2024-09-17 11:11:34,751 388320 INFO icomply_odoo odoo.modules.loading: loading partner_autocomplete/views/res_company_views.xml 
+2024-09-17 11:11:34,759 388320 INFO icomply_odoo odoo.modules.loading: loading partner_autocomplete/views/res_config_settings_views.xml 
+2024-09-17 11:11:34,772 388320 INFO icomply_odoo odoo.modules.loading: loading partner_autocomplete/data/cron.xml 
+2024-09-17 11:11:34,798 388320 INFO icomply_odoo odoo.modules.loading: Module partner_autocomplete loaded in 0.18s, 176 queries (+176 other) 
+2024-09-17 11:11:34,798 388320 INFO icomply_odoo odoo.modules.loading: Loading module rule_book (23/26) 
+2024-09-17 11:11:34,823 388320 WARNING icomply_odoo odoo.api.create: The model odoo.addons.rule_book.models.rules.rule_theme is not overriding the create method in batch 
+2024-09-17 11:11:34,826 388320 WARNING icomply_odoo odoo.api.create: The model odoo.addons.rule_book.models.rules.rulebook_title is not overriding the create method in batch 
+2024-09-17 11:11:34,831 388320 WARNING icomply_odoo odoo.api.create: The model odoo.addons.rule_book.models.rules.rule_book is not overriding the create method in batch 
+2024-09-17 11:11:34,835 388320 CRITICAL icomply_odoo odoo.modules.module: Couldn't load module rule_book 
+2024-09-17 11:11:34,835 388320 CRITICAL icomply_odoo odoo.modules.module: No module named 'dotenv' 
+2024-09-17 11:11:34,837 388320 WARNING icomply_odoo odoo.modules.loading: Transient module states were reset 
+2024-09-17 11:11:34,839 388320 ERROR icomply_odoo odoo.modules.registry: Failed to load registry 
+Traceback (most recent call last):
+  File "/home/gbemi/odoo/odoo/modules/registry.py", line 90, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "/home/gbemi/odoo/odoo/modules/loading.py", line 488, in load_modules
+    processed_modules += load_marked_modules(cr, graph,
+  File "/home/gbemi/odoo/odoo/modules/loading.py", line 372, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "/home/gbemi/odoo/odoo/modules/loading.py", line 188, in load_module_graph
+    load_openerp_module(package.name)
+  File "/home/gbemi/odoo/odoo/modules/module.py", line 468, in load_openerp_module
+    __import__('odoo.addons.' + module_name)
+  File "/home/gbemi/odoo/addons/icomply_odoo/rule_book/__init__.py", line 4, in <module>
+    from . import models
+  File "/home/gbemi/odoo/addons/icomply_odoo/rule_book/models/__init__.py", line 3, in <module>
+    from . import rules
+  File "/home/gbemi/odoo/addons/icomply_odoo/rule_book/models/rules/__init__.py", line 6, in <module>
+    from . import web_scraping
+  File "/home/gbemi/odoo/addons/icomply_odoo/rule_book/models/rules/web_scraping.py", line 7, in <module>
+    from dotenv import load_dotenv
+ModuleNotFoundError: No module named 'dotenv'
+2024-09-17 11:11:34,844 388320 ERROR icomply_odoo odoo.http: Exception during request handling. 
+Traceback (most recent call last):
+  File "/home/gbemi/odoo/odoo/http.py", line 2003, in __call__
+    response = request._serve_db()
+  File "/home/gbemi/odoo/odoo/http.py", line 1589, in _serve_db
+    return service_model.retrying(self._serve_ir_http, self.env)
+  File "/home/gbemi/odoo/odoo/service/model.py", line 133, in retrying
+    result = func()
+  File "/home/gbemi/odoo/odoo/http.py", line 1616, in _serve_ir_http
+    response = self.dispatcher.dispatch(rule.endpoint, args)
+  File "/home/gbemi/odoo/odoo/http.py", line 1820, in dispatch
+    result = self.request.registry['ir.http']._dispatch(endpoint)
+  File "/home/gbemi/odoo/odoo/addons/base/models/ir_http.py", line 154, in _dispatch
+    result = endpoint(**request.params)
+  File "/home/gbemi/odoo/odoo/http.py", line 697, in route_wrapper
+    result = endpoint(self, *args, **params_ok)
+  File "/home/gbemi/odoo/addons/web/controllers/dataset.py", line 46, in call_button
+    action = self._call_kw(model, method, args, kwargs)
+  File "/home/gbemi/odoo/addons/web/controllers/dataset.py", line 33, in _call_kw
+    return call_kw(request.env[model], method, args, kwargs)
+  File "/home/gbemi/odoo/odoo/api.py", line 466, in call_kw
+    result = _call_kw_multi(method, model, args, kwargs)
+  File "/home/gbemi/odoo/odoo/api.py", line 453, in _call_kw_multi
+    result = method(recs, *args, **kwargs)
+  File "<decorator-gen-76>", line 2, in button_immediate_install
+  File "/home/gbemi/odoo/odoo/addons/base/models/ir_module.py", line 74, in check_and_log
+    return method(self, *args, **kwargs)
+  File "/home/gbemi/odoo/odoo/addons/base/models/ir_module.py", line 468, in button_immediate_install
+    return self._button_immediate_function(type(self).button_install)
+  File "/home/gbemi/odoo/odoo/addons/base/models/ir_module.py", line 592, in _button_immediate_function
+    registry = modules.registry.Registry.new(self._cr.dbname, update_module=True)
+  File "<decorator-gen-16>", line 2, in new
+  File "/home/gbemi/odoo/odoo/tools/func.py", line 87, in locked
+    return func(inst, *args, **kwargs)
+  File "/home/gbemi/odoo/odoo/modules/registry.py", line 90, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "/home/gbemi/odoo/odoo/modules/loading.py", line 488, in load_modules
+    processed_modules += load_marked_modules(cr, graph,
+  File "/home/gbemi/odoo/odoo/modules/loading.py", line 372, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "/home/gbemi/odoo/odoo/modules/loading.py", line 188, in load_module_graph
+    load_openerp_module(package.name)
+  File "/home/gbemi/odoo/odoo/modules/module.py", line 468, in load_openerp_module
+    __import__('odoo.addons.' + module_name)
+  File "/home/gbemi/odoo/addons/icomply_odoo/rule_book/__init__.py", line 4, in <module>
+    from . import models
+  File "/home/gbemi/odoo/addons/icomply_odoo/rule_book/models/__init__.py", line 3, in <module>
+    from . import rules
+  File "/home/gbemi/odoo/addons/icomply_odoo/rule_book/models/rules/__init__.py", line 6, in <module>
+    from . import web_scraping
+  File "/home/gbemi/odoo/addons/icomply_odoo/rule_book/models/rules/web_scraping.py", line 7, in <module>
+    from dotenv import load_dotenv
+ModuleNotFoundError: No module named 'dotenv'
+2024-09-17 11:11:34,844 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:11:34] "POST /web/dataset/call_button HTTP/1.1" 200 - 6963 3.617 2.370
+2024-09-17 11:11:49,035 388320 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 11:11:49,041 388320 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 11:11:49,042 388320 INFO icomply_odoo odoo.modules.loading: loading 21 modules... 
+2024-09-17 11:11:49,054 388320 INFO icomply_odoo odoo.modules.loading: 21 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 11:11:49,090 388320 INFO icomply_odoo odoo.modules.loading: Modules loaded. 
+2024-09-17 11:11:49,092 388320 INFO icomply_odoo odoo.modules.registry: Registry loaded in 0.062s 
+2024-09-17 11:11:49,093 388320 INFO icomply_odoo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2024-09-17 11:11:49,164 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:11:49,164 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:11:49] "GET /websocket HTTP/1.1" 400 - 22 0.010 0.125
+2024-09-17 11:12:22,209 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:12:22,210 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:12:22] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:12:50,065 388320 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:12:50,066 388320 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:12:50] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:12:50,227 388320 INFO icomply_odoo odoo.service.server: Initiating shutdown 
+2024-09-17 11:12:50,227 388320 INFO icomply_odoo odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2024-09-17 11:12:50,563 388320 INFO icomply_odoo odoo.sql_db: ConnectionPool(used=0/count=0/max=64): Closed 4 connections  
+2024-09-17 11:12:51,659 389209 INFO ? odoo: Odoo version 16.0 
+2024-09-17 11:12:51,660 389209 INFO ? odoo: Using configuration file at /home/gbemi/odoo/addons/icomply_odoo/icomply_live.conf 
+2024-09-17 11:12:51,660 389209 INFO ? odoo: addons paths: ['/home/gbemi/odoo/odoo/addons', '/root/.local/share/Odoo/addons/16.0', '/home/gbemi/odoo/addons', '/home/gbemi/odoo/addons/icomply_odoo'] 
+2024-09-17 11:12:51,661 389209 INFO ? odoo: database: magpora_user@localhost:default 
+2024-09-17 11:12:51,871 389209 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at /usr/local/bin/wkhtmltopdf 
+2024-09-17 11:12:52,086 389209 INFO ? odoo.service.server: HTTP service (werkzeug) running on novaji-php-cloud:8077 
+2024-09-17 11:12:52,106 389209 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 11:12:52,107 389209 INFO icomply_odoo odoo.modules.loading: Loading module base (1/1) 
+2024-09-17 11:12:52,148 389209 INFO icomply_odoo odoo.modules.registry: module base: creating or updating database tables 
+2024-09-17 11:12:52,854 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/res_bank.xml 
+2024-09-17 11:12:52,862 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/res.lang.csv 
+2024-09-17 11:12:53,125 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/res_lang_data.xml 
+2024-09-17 11:12:53,145 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/res_partner_data.xml 
+2024-09-17 11:12:53,167 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/res_currency_data.xml 
+2024-09-17 11:12:53,337 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/res_company_data.xml 
+2024-09-17 11:12:53,341 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/res_users_data.xml 
+2024-09-17 11:12:53,351 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/report_paperformat_data.xml 
+2024-09-17 11:12:53,355 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/res_country_data.xml 
+2024-09-17 11:12:53,627 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_demo_data.xml 
+2024-09-17 11:12:53,659 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_config_parameter_data.xml 
+2024-09-17 11:12:53,665 389209 INFO icomply_odoo odoo.modules.loading: loading base/security/base_groups.xml 
+2024-09-17 11:12:53,918 389209 INFO icomply_odoo odoo.modules.loading: loading base/security/base_security.xml 
+2024-09-17 11:12:53,939 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/base_menus.xml 
+2024-09-17 11:12:54,047 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/decimal_precision_views.xml 
+2024-09-17 11:12:54,076 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/res_config_views.xml 
+2024-09-17 11:12:54,094 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/res.country.state.csv 
+2024-09-17 11:12:55,194 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_actions_views.xml 
+2024-09-17 11:12:55,410 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_asset_views.xml 
+2024-09-17 11:12:55,447 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_config_parameter_views.xml 
+2024-09-17 11:12:55,479 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_cron_views.xml 
+2024-09-17 11:12:55,527 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_cron_trigger_views.xml 
+2024-09-17 11:12:55,560 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_filters_views.xml 
+2024-09-17 11:12:55,591 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_mail_server_views.xml 
+2024-09-17 11:12:55,625 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_model_views.xml 
+2024-09-17 11:12:55,865 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_attachment_views.xml 
+2024-09-17 11:12:55,904 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_rule_views.xml 
+2024-09-17 11:12:55,976 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_sequence_views.xml 
+2024-09-17 11:12:56,011 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_ui_menu_views.xml 
+2024-09-17 11:12:56,048 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_ui_view_views.xml 
+2024-09-17 11:12:56,125 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_default_views.xml 
+2024-09-17 11:12:56,155 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_cron_data.xml 
+2024-09-17 11:12:56,164 389209 INFO icomply_odoo odoo.modules.loading: loading base/report/ir_model_report.xml 
+2024-09-17 11:12:56,168 389209 INFO icomply_odoo odoo.modules.loading: loading base/report/ir_model_templates.xml 
+2024-09-17 11:12:56,191 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_logging_views.xml 
+2024-09-17 11:12:56,224 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_qweb_widget_templates.xml 
+2024-09-17 11:12:56,245 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_module_views.xml 
+2024-09-17 11:12:56,355 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_module_category_data.xml 
+2024-09-17 11:12:56,532 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_module_module.xml 
+2024-09-17 11:12:56,572 389209 INFO icomply_odoo odoo.modules.loading: loading base/report/ir_module_reports.xml 
+2024-09-17 11:12:56,575 389209 INFO icomply_odoo odoo.modules.loading: loading base/report/ir_module_report_templates.xml 
+2024-09-17 11:12:56,592 389209 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_module_update_views.xml 
+2024-09-17 11:12:56,609 389209 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_language_install_views.xml 
+2024-09-17 11:12:56,628 389209 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_import_language_views.xml 
+2024-09-17 11:12:56,645 389209 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_module_upgrade_views.xml 
+2024-09-17 11:12:56,700 389209 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_module_uninstall_views.xml 
+2024-09-17 11:12:56,712 389209 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_export_language_views.xml 
+2024-09-17 11:12:56,731 389209 INFO icomply_odoo odoo.modules.loading: loading base/wizard/base_partner_merge_views.xml 
+2024-09-17 11:12:56,752 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_actions_data.xml 
+2024-09-17 11:12:56,756 389209 INFO icomply_odoo odoo.modules.loading: loading base/data/ir_demo_failure_data.xml 
+2024-09-17 11:12:56,776 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_profile_views.xml 
+2024-09-17 11:12:56,815 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/res_company_views.xml 
+2024-09-17 11:12:56,852 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/res_lang_views.xml 
+2024-09-17 11:12:56,892 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/res_partner_views.xml 
+2024-09-17 11:12:57,088 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/res_bank_views.xml 
+2024-09-17 11:12:57,143 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/res_country_views.xml 
+2024-09-17 11:12:57,208 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/res_currency_views.xml 
+2024-09-17 11:12:57,300 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/res_users_views.xml 
+2024-09-17 11:12:57,555 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/ir_property_views.xml 
+2024-09-17 11:12:57,591 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/res_config_settings_views.xml 
+2024-09-17 11:12:57,602 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/report_paperformat_views.xml 
+2024-09-17 11:12:57,638 389209 INFO icomply_odoo odoo.modules.loading: loading base/views/onboarding_views.xml 
+2024-09-17 11:12:57,723 389209 INFO icomply_odoo odoo.modules.loading: loading base/security/ir.model.access.csv 
+2024-09-17 11:12:58,035 389209 INFO icomply_odoo odoo.modules.loading: Module base loaded in 5.93s, 7217 queries (+7217 other) 
+2024-09-17 11:12:58,036 389209 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 5.93s, 7217 queries (+7217 extra) 
+2024-09-17 11:12:58,056 389209 INFO icomply_odoo odoo.modules.loading: updating modules list 
+2024-09-17 11:12:58,058 389209 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2024-09-17 11:12:58,250 389209 WARNING icomply_odoo odoo.modules.module: Missing `license` key in manifest for 'rule_book', defaulting to LGPL-3 
+2024-09-17 11:12:58,450 389209 WARNING icomply_odoo odoo.modules.module: Missing `license` key in manifest for 'loan_calculator', defaulting to LGPL-3 
+2024-09-17 11:12:58,716 389209 WARNING icomply_odoo odoo.modules.module: Missing `license` key in manifest for 'alert_managment', defaulting to LGPL-3 
+2024-09-17 11:12:58,969 389209 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['Base'] to user __system__ #1 via n/a 
+2024-09-17 11:12:58,970 389209 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['Base'] to user __system__ #1 via n/a 
+2024-09-17 11:12:59,644 389209 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2024-09-17 11:12:59,749 389209 INFO icomply_odoo odoo.modules.loading: loading 21 modules... 
+2024-09-17 11:12:59,749 389209 INFO icomply_odoo odoo.modules.loading: Loading module web (2/21) 
+2024-09-17 11:12:59,799 389209 INFO icomply_odoo odoo.modules.registry: module web: creating or updating database tables 
+2024-09-17 11:13:00,386 389209 INFO icomply_odoo odoo.modules.loading: loading web/security/ir.model.access.csv 
+2024-09-17 11:13:00,399 389209 INFO icomply_odoo odoo.modules.loading: loading web/views/webclient_templates.xml 
+2024-09-17 11:13:00,520 389209 INFO icomply_odoo odoo.modules.loading: loading web/views/report_templates.xml 
+2024-09-17 11:13:00,691 389209 INFO icomply_odoo odoo.modules.loading: loading web/views/base_document_layout_views.xml 
+2024-09-17 11:13:00,709 389209 INFO icomply_odoo odoo.modules.loading: loading web/views/speedscope_template.xml 
+2024-09-17 11:13:00,718 389209 INFO icomply_odoo odoo.modules.loading: loading web/views/lazy_assets.xml 
+2024-09-17 11:13:00,728 389209 INFO icomply_odoo odoo.modules.loading: loading web/views/neutralize_views.xml 
+2024-09-17 11:13:00,739 389209 INFO icomply_odoo odoo.modules.loading: loading web/data/ir_attachment.xml 
+2024-09-17 11:13:00,743 389209 INFO icomply_odoo odoo.modules.loading: loading web/data/report_layout.xml 
+2024-09-17 11:13:00,821 389209 INFO icomply_odoo odoo.modules.loading: Module web loaded in 1.07s, 1101 queries (+1101 other) 
+2024-09-17 11:13:00,822 389209 INFO icomply_odoo odoo.modules.loading: Loading module auth_totp (3/21) 
+2024-09-17 11:13:00,879 389209 INFO icomply_odoo odoo.modules.registry: module auth_totp: creating or updating database tables 
+2024-09-17 11:13:00,922 389209 INFO icomply_odoo odoo.modules.loading: loading auth_totp/security/security.xml 
+2024-09-17 11:13:00,943 389209 INFO icomply_odoo odoo.modules.loading: loading auth_totp/security/ir.model.access.csv 
+2024-09-17 11:13:00,954 389209 INFO icomply_odoo odoo.modules.loading: loading auth_totp/data/ir_action_data.xml 
+2024-09-17 11:13:00,961 389209 INFO icomply_odoo odoo.modules.loading: loading auth_totp/views/res_users_views.xml 
+2024-09-17 11:13:01,022 389209 INFO icomply_odoo odoo.modules.loading: loading auth_totp/views/templates.xml 
+2024-09-17 11:13:01,050 389209 INFO icomply_odoo odoo.modules.loading: loading auth_totp/wizard/auth_totp_wizard_views.xml 
+2024-09-17 11:13:01,086 389209 INFO icomply_odoo odoo.modules.loading: Module auth_totp loaded in 0.26s, 179 queries (+179 other) 
+2024-09-17 11:13:01,086 389209 INFO icomply_odoo odoo.modules.loading: Loading module base_import (4/21) 
+2024-09-17 11:13:01,149 389209 INFO icomply_odoo odoo.modules.registry: module base_import: creating or updating database tables 
+2024-09-17 11:13:02,228 389209 INFO icomply_odoo odoo.modules.loading: loading base_import/security/ir.model.access.csv 
+2024-09-17 11:13:02,352 389209 INFO icomply_odoo odoo.modules.loading: Module base_import loaded in 1.27s, 728 queries (+728 other) 
+2024-09-17 11:13:02,352 389209 INFO icomply_odoo odoo.modules.loading: Loading module base_setup (5/21) 
+2024-09-17 11:13:02,415 389209 INFO icomply_odoo odoo.modules.registry: module base_setup: creating or updating database tables 
+2024-09-17 11:13:02,467 389209 INFO icomply_odoo odoo.modules.loading: loading base_setup/data/base_setup_data.xml 
+2024-09-17 11:13:02,471 389209 INFO icomply_odoo odoo.modules.loading: loading base_setup/views/res_config_settings_views.xml 
+2024-09-17 11:13:02,535 389209 INFO icomply_odoo odoo.modules.loading: loading base_setup/views/res_partner_views.xml 
+2024-09-17 11:13:02,569 389209 INFO icomply_odoo odoo.modules.loading: Module base_setup loaded in 0.22s, 116 queries (+116 other) 
+2024-09-17 11:13:02,569 389209 INFO icomply_odoo odoo.modules.loading: Loading module bus (6/21) 
+2024-09-17 11:13:02,634 389209 INFO icomply_odoo odoo.modules.registry: module bus: creating or updating database tables 
+2024-09-17 11:13:02,707 389209 INFO icomply_odoo odoo.modules.loading: loading bus/security/ir.model.access.csv 
+2024-09-17 11:13:02,737 389209 INFO icomply_odoo odoo.modules.loading: Module bus loaded in 0.17s, 88 queries (+88 other) 
+2024-09-17 11:13:02,737 389209 INFO icomply_odoo odoo.modules.loading: Loading module web_kanban_gauge (7/21) 
+2024-09-17 11:13:02,814 389209 INFO icomply_odoo odoo.modules.loading: Module web_kanban_gauge loaded in 0.08s, 15 queries (+15 other) 
+2024-09-17 11:13:02,815 389209 INFO icomply_odoo odoo.modules.loading: Loading module web_tour (8/21) 
+2024-09-17 11:13:02,942 389209 INFO icomply_odoo odoo.modules.registry: module web_tour: creating or updating database tables 
+2024-09-17 11:13:02,981 389209 INFO icomply_odoo odoo.modules.loading: loading web_tour/security/ir.model.access.csv 
+2024-09-17 11:13:02,993 389209 INFO icomply_odoo odoo.modules.loading: loading web_tour/security/ir.rule.csv 
+2024-09-17 11:13:03,002 389209 INFO icomply_odoo odoo.modules.loading: loading web_tour/views/tour_views.xml 
+2024-09-17 11:13:03,045 389209 INFO icomply_odoo odoo.modules.loading: Module web_tour loaded in 0.23s, 100 queries (+100 other) 
+2024-09-17 11:13:03,045 389209 INFO icomply_odoo odoo.modules.loading: Loading module iap (9/21) 
+2024-09-17 11:13:03,103 389209 INFO icomply_odoo odoo.modules.registry: module iap: creating or updating database tables 
+2024-09-17 11:13:03,142 389209 INFO icomply_odoo odoo.modules.loading: loading iap/security/ir.model.access.csv 
+2024-09-17 11:13:03,155 389209 INFO icomply_odoo odoo.modules.loading: loading iap/security/ir_rule.xml 
+2024-09-17 11:13:03,160 389209 INFO icomply_odoo odoo.modules.loading: loading iap/views/iap_views.xml 
+2024-09-17 11:13:03,184 389209 INFO icomply_odoo odoo.modules.loading: loading iap/views/res_config_settings.xml 
+2024-09-17 11:13:03,222 389209 INFO icomply_odoo odoo.modules.loading: Module iap loaded in 0.18s, 141 queries (+141 other) 
+2024-09-17 11:13:03,222 389209 INFO icomply_odoo odoo.modules.loading: Loading module mail (10/21) 
+2024-09-17 11:13:03,318 389209 INFO icomply_odoo odoo.modules.registry: module mail: creating or updating database tables 
+2024-09-17 11:13:03,964 389209 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_groups.xml 
+2024-09-17 11:13:03,969 389209 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_blacklist_remove_views.xml 
+2024-09-17 11:13:03,977 389209 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_compose_message_views.xml 
+2024-09-17 11:13:03,993 389209 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_resend_message_views.xml 
+2024-09-17 11:13:04,005 389209 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_template_preview_views.xml 
+2024-09-17 11:13:04,016 389209 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_wizard_invite_views.xml 
+2024-09-17 11:13:04,024 389209 INFO icomply_odoo odoo.modules.loading: loading mail/wizard/mail_template_reset_views.xml 
+2024-09-17 11:13:04,033 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/fetchmail_views.xml 
+2024-09-17 11:13:04,058 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_message_subtype_views.xml 
+2024-09-17 11:13:04,072 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_tracking_views.xml 
+2024-09-17 11:13:04,087 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_notification_views.xml 
+2024-09-17 11:13:04,101 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_message_views.xml 
+2024-09-17 11:13:04,134 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_message_schedule_views.xml 
+2024-09-17 11:13:04,154 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_mail_views.xml 
+2024-09-17 11:13:04,182 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_followers_views.xml 
+2024-09-17 11:13:04,196 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_ice_server_views.xml 
+2024-09-17 11:13:04,210 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_channel_member_views.xml 
+2024-09-17 11:13:04,224 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_channel_rtc_session_views.xml 
+2024-09-17 11:13:04,243 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_link_preview_views.xml 
+2024-09-17 11:13:04,252 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_channel_views.xml 
+2024-09-17 11:13:04,281 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_shortcode_views.xml 
+2024-09-17 11:13:04,296 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_activity_views.xml 
+2024-09-17 11:13:04,357 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/res_config_settings_views.xml 
+2024-09-17 11:13:04,389 389209 INFO icomply_odoo odoo.modules.loading: loading mail/data/res_partner_data.xml 
+2024-09-17 11:13:04,393 389209 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_message_subtype_data.xml 
+2024-09-17 11:13:04,396 389209 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_templates_chatter.xml 
+2024-09-17 11:13:04,428 389209 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_templates_email_layouts.xml 
+2024-09-17 11:13:04,463 389209 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_templates_mailgateway.xml 
+2024-09-17 11:13:04,485 389209 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_channel_data.xml 
+2024-09-17 11:13:04,490 389209 INFO icomply_odoo odoo.modules.loading: loading mail/data/mail_activity_data.xml 
+2024-09-17 11:13:04,495 389209 INFO icomply_odoo odoo.modules.loading: loading mail/data/ir_cron_data.xml 
+2024-09-17 11:13:04,500 389209 INFO icomply_odoo odoo.modules.loading: loading mail/security/mail_security.xml 
+2024-09-17 11:13:04,509 389209 INFO icomply_odoo odoo.modules.loading: loading mail/security/ir.model.access.csv 
+2024-09-17 11:13:04,614 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/discuss_public_templates.xml 
+2024-09-17 11:13:04,628 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_alias_views.xml 
+2024-09-17 11:13:04,650 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_gateway_allowed_views.xml 
+2024-09-17 11:13:04,662 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_guest_views.xml 
+2024-09-17 11:13:04,671 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_message_reaction_views.xml 
+2024-09-17 11:13:04,679 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/res_users_views.xml 
+2024-09-17 11:13:04,703 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/res_users_settings_views.xml 
+2024-09-17 11:13:04,717 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_template_views.xml 
+2024-09-17 11:13:04,744 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/ir_actions_server_views.xml 
+2024-09-17 11:13:04,762 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/ir_model_views.xml 
+2024-09-17 11:13:04,793 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/res_partner_views.xml 
+2024-09-17 11:13:04,850 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_blacklist_views.xml 
+2024-09-17 11:13:04,871 389209 INFO icomply_odoo odoo.modules.loading: loading mail/views/mail_menus.xml 
+2024-09-17 11:13:05,010 389209 INFO icomply_odoo odoo.modules.loading: Module mail loaded in 1.79s, 2574 queries (+2574 other) 
+2024-09-17 11:13:05,011 389209 INFO icomply_odoo odoo.modules.loading: Loading module web_editor (11/21) 
+2024-09-17 11:13:05,087 389209 INFO icomply_odoo odoo.modules.registry: module web_editor: creating or updating database tables 
+2024-09-17 11:13:05,774 389209 INFO icomply_odoo odoo.modules.loading: loading web_editor/security/ir.model.access.csv 
+2024-09-17 11:13:05,783 389209 INFO icomply_odoo odoo.modules.loading: loading web_editor/data/editor_assets.xml 
+2024-09-17 11:13:05,787 389209 INFO icomply_odoo odoo.modules.loading: loading web_editor/views/editor.xml 
+2024-09-17 11:13:05,821 389209 INFO icomply_odoo odoo.modules.loading: loading web_editor/views/snippets.xml 
+2024-09-17 11:13:05,914 389209 INFO icomply_odoo odoo.modules.loading: Module web_editor loaded in 0.90s, 1115 queries (+1115 other) 
+2024-09-17 11:13:05,915 389209 INFO icomply_odoo odoo.modules.loading: Loading module auth_signup (12/21) 
+2024-09-17 11:13:05,977 389209 INFO icomply_odoo odoo.modules.registry: module auth_signup: creating or updating database tables 
+2024-09-17 11:13:06,034 389209 INFO icomply_odoo odoo.modules.loading: loading auth_signup/data/ir_config_parameter_data.xml 
+2024-09-17 11:13:06,035 389209 INFO icomply_odoo odoo.modules.loading: loading auth_signup/data/ir_cron_data.xml 
+2024-09-17 11:13:06,048 389209 INFO icomply_odoo odoo.modules.loading: loading auth_signup/data/mail_template_data.xml 
+2024-09-17 11:13:06,057 389209 INFO icomply_odoo odoo.modules.loading: loading auth_signup/views/res_config_settings_views.xml 
+2024-09-17 11:13:06,090 389209 INFO icomply_odoo odoo.modules.loading: loading auth_signup/views/res_users_views.xml 
+2024-09-17 11:13:06,123 389209 INFO icomply_odoo odoo.modules.loading: loading auth_signup/views/auth_signup_login_templates.xml 
+2024-09-17 11:13:06,156 389209 INFO icomply_odoo odoo.modules.loading: loading auth_signup/views/webclient_templates.xml 
+2024-09-17 11:13:06,185 389209 INFO icomply_odoo odoo.modules.loading: Module auth_signup loaded in 0.27s, 240 queries (+240 other) 
+2024-09-17 11:13:06,186 389209 INFO icomply_odoo odoo.modules.loading: Loading module auth_totp_mail (13/21) 
+2024-09-17 11:13:06,234 389209 INFO icomply_odoo odoo.modules.registry: module auth_totp_mail: creating or updating database tables 
+2024-09-17 11:13:06,263 389209 INFO icomply_odoo odoo.modules.loading: loading auth_totp_mail/data/ir_action_data.xml 
+2024-09-17 11:13:06,272 389209 INFO icomply_odoo odoo.modules.loading: loading auth_totp_mail/data/mail_template_data.xml 
+2024-09-17 11:13:06,274 389209 INFO icomply_odoo odoo.modules.loading: loading auth_totp_mail/views/res_users_views.xml 
+2024-09-17 11:13:06,320 389209 INFO icomply_odoo odoo.modules.loading: Module auth_totp_mail loaded in 0.13s, 103 queries (+103 other) 
+2024-09-17 11:13:06,320 389209 INFO icomply_odoo odoo.modules.loading: Loading module base_install_request (14/21) 
+2024-09-17 11:13:06,368 389209 INFO icomply_odoo odoo.modules.registry: module base_install_request: creating or updating database tables 
+2024-09-17 11:13:06,400 389209 INFO icomply_odoo odoo.modules.loading: loading base_install_request/security/ir.model.access.csv 
+2024-09-17 11:13:06,413 389209 INFO icomply_odoo odoo.modules.loading: loading base_install_request/wizard/base_module_install_request_views.xml 
+2024-09-17 11:13:06,430 389209 INFO icomply_odoo odoo.modules.loading: loading base_install_request/data/mail_template_data.xml 
+2024-09-17 11:13:06,432 389209 INFO icomply_odoo odoo.modules.loading: loading base_install_request/data/mail_templates_module_install.xml 
+2024-09-17 11:13:06,442 389209 INFO icomply_odoo odoo.modules.loading: loading base_install_request/views/ir_module_module_views.xml 
+2024-09-17 11:13:06,471 389209 INFO icomply_odoo odoo.modules.loading: Module base_install_request loaded in 0.15s, 131 queries (+131 other) 
+2024-09-17 11:13:06,472 389209 INFO icomply_odoo odoo.modules.loading: Loading module calendar (15/21) 
+2024-09-17 11:13:06,537 389209 INFO icomply_odoo odoo.modules.registry: module calendar: creating or updating database tables 
+2024-09-17 11:13:06,629 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/security/ir.model.access.csv 
+2024-09-17 11:13:06,652 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/security/calendar_security.xml 
+2024-09-17 11:13:06,662 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/data/calendar_cron.xml 
+2024-09-17 11:13:06,665 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/data/mail_template_data.xml 
+2024-09-17 11:13:06,669 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/data/calendar_data.xml 
+2024-09-17 11:13:06,674 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/data/mail_activity_type_data.xml 
+2024-09-17 11:13:06,676 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/data/mail_message_subtype_data.xml 
+2024-09-17 11:13:06,678 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/views/mail_activity_views.xml 
+2024-09-17 11:13:06,690 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/views/calendar_templates.xml 
+2024-09-17 11:13:06,700 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/views/calendar_views.xml 
+2024-09-17 11:13:06,806 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/views/res_partner_views.xml 
+2024-09-17 11:13:06,835 389209 INFO icomply_odoo odoo.modules.loading: loading calendar/wizard/calendar_provider_config.xml 
+2024-09-17 11:13:06,865 389209 INFO icomply_odoo odoo.modules.loading: Module calendar loaded in 0.39s, 465 queries (+465 other) 
+2024-09-17 11:13:06,865 389209 INFO icomply_odoo odoo.modules.loading: Loading module google_gmail (16/21) 
+2024-09-17 11:13:06,916 389209 INFO icomply_odoo odoo.modules.registry: module google_gmail: creating or updating database tables 
+2024-09-17 11:13:06,953 389209 INFO icomply_odoo odoo.modules.loading: loading google_gmail/views/fetchmail_server_views.xml 
+2024-09-17 11:13:06,967 389209 INFO icomply_odoo odoo.modules.loading: loading google_gmail/views/ir_mail_server_views.xml 
+2024-09-17 11:13:06,981 389209 INFO icomply_odoo odoo.modules.loading: loading google_gmail/views/res_config_settings_views.xml 
+2024-09-17 11:13:07,019 389209 INFO icomply_odoo odoo.modules.loading: Module google_gmail loaded in 0.15s, 115 queries (+115 other) 
+2024-09-17 11:13:07,020 389209 INFO icomply_odoo odoo.modules.loading: Loading module iap_mail (17/21) 
+2024-09-17 11:13:07,072 389209 INFO icomply_odoo odoo.modules.registry: module iap_mail: creating or updating database tables 
+2024-09-17 11:13:07,094 389209 INFO icomply_odoo odoo.modules.loading: loading iap_mail/data/mail_templates.xml 
+2024-09-17 11:13:07,121 389209 INFO icomply_odoo odoo.modules.loading: Module iap_mail loaded in 0.10s, 46 queries (+46 other) 
+2024-09-17 11:13:07,121 389209 INFO icomply_odoo odoo.modules.loading: Loading module mail_bot (18/21) 
+2024-09-17 11:13:07,175 389209 INFO icomply_odoo odoo.modules.registry: module mail_bot: creating or updating database tables 
+2024-09-17 11:13:07,242 389209 INFO icomply_odoo odoo.modules.loading: loading mail_bot/views/res_users_views.xml 
+2024-09-17 11:13:07,271 389209 INFO icomply_odoo odoo.modules.loading: loading mail_bot/data/mailbot_data.xml 
+2024-09-17 11:13:07,286 389209 INFO icomply_odoo odoo.modules.loading: Module mail_bot loaded in 0.16s, 148 queries (+148 other) 
+2024-09-17 11:13:07,286 389209 INFO icomply_odoo odoo.modules.loading: Loading module phone_validation (19/21) 
+2024-09-17 11:13:07,345 389209 INFO icomply_odoo odoo.modules.registry: module phone_validation: creating or updating database tables 
+2024-09-17 11:13:07,399 389209 INFO icomply_odoo odoo.modules.loading: loading phone_validation/security/ir.model.access.csv 
+2024-09-17 11:13:07,410 389209 INFO icomply_odoo odoo.modules.loading: loading phone_validation/views/phone_blacklist_views.xml 
+2024-09-17 11:13:07,442 389209 INFO icomply_odoo odoo.modules.loading: loading phone_validation/wizard/phone_blacklist_remove_view.xml 
+2024-09-17 11:13:07,464 389209 INFO icomply_odoo odoo.modules.loading: Module phone_validation loaded in 0.18s, 156 queries (+156 other) 
+2024-09-17 11:13:07,464 389209 INFO icomply_odoo odoo.modules.loading: Loading module privacy_lookup (20/21) 
+2024-09-17 11:13:07,518 389209 INFO icomply_odoo odoo.modules.registry: module privacy_lookup: creating or updating database tables 
+2024-09-17 11:13:07,610 389209 INFO icomply_odoo odoo.modules.loading: loading privacy_lookup/wizard/privacy_lookup_wizard_views.xml 
+2024-09-17 11:13:07,641 389209 INFO icomply_odoo odoo.modules.loading: loading privacy_lookup/views/privacy_log_views.xml 
+2024-09-17 11:13:07,663 389209 INFO icomply_odoo odoo.modules.loading: loading privacy_lookup/security/ir.model.access.csv 
+2024-09-17 11:13:07,682 389209 INFO icomply_odoo odoo.modules.loading: loading privacy_lookup/data/ir_actions_server_data.xml 
+2024-09-17 11:13:07,705 389209 INFO icomply_odoo odoo.modules.loading: Module privacy_lookup loaded in 0.24s, 206 queries (+206 other) 
+2024-09-17 11:13:07,705 389209 INFO icomply_odoo odoo.modules.loading: Loading module web_unsplash (21/21) 
+2024-09-17 11:13:07,761 389209 INFO icomply_odoo odoo.modules.registry: module web_unsplash: creating or updating database tables 
+2024-09-17 11:13:07,802 389209 INFO icomply_odoo odoo.modules.loading: loading web_unsplash/views/res_config_settings_view.xml 
+2024-09-17 11:13:07,842 389209 INFO icomply_odoo odoo.modules.loading: Module web_unsplash loaded in 0.14s, 95 queries (+95 other) 
+2024-09-17 11:13:07,842 389209 INFO icomply_odoo odoo.modules.loading: 21 modules loaded in 8.09s, 7862 queries (+7862 extra) 
+2024-09-17 11:13:07,968 389209 INFO icomply_odoo odoo.modules.loading: Model iap.autocomplete.api is declared but cannot be loaded! (Perhaps a module was partially removed or renamed) 
+2024-09-17 11:13:07,968 389209 INFO icomply_odoo odoo.modules.loading: Model res.partner.autocomplete.sync is declared but cannot be loaded! (Perhaps a module was partially removed or renamed) 
+2024-09-17 11:13:08,118 389209 INFO icomply_odoo odoo.modules.loading: Modules loaded. 
+2024-09-17 11:13:08,122 389209 INFO icomply_odoo odoo.modules.registry: Registry loaded in 16.038s 
+2024-09-17 11:13:08,138 389209 INFO icomply_odoo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2024-09-17 11:13:12,133 389209 INFO icomply_odoo odoo.modules.registry: At least one model cache has been invalidated, signaling through the database. 
+2024-09-17 11:13:12,141 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:12] "GET /web HTTP/1.1" 200 - 171 0.090 17.406
+2024-09-17 11:13:12,360 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:12] "GET /web/assets/31-244c264/web.assets_common.min.css HTTP/1.1" 200 - 10 0.004 0.009
+2024-09-17 11:13:12,508 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:12] "GET /web/assets/32-f08ffec/web.assets_backend.min.css HTTP/1.1" 200 - 4 0.002 0.004
+2024-09-17 11:13:12,510 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:12] "GET /web/assets/33-244c264/web.assets_common.min.js HTTP/1.1" 200 - 4 0.003 0.005
+2024-09-17 11:13:12,537 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:12] "GET /web/webclient/translations/85f4634e3ec9471a9f62399812d3e3811f417056?lang=en_US HTTP/1.1" 200 - 2 0.008 0.004
+2024-09-17 11:13:12,567 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:12] "GET /web/webclient/load_menus/d850abeafd0346229edca8b759d2bdda00fbe853cb62ff57efd2479dfc01f56b HTTP/1.1" 200 - 24 0.019 0.022
+2024-09-17 11:13:12,735 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:12] "GET /web/assets/34-f08ffec/web.assets_backend.min.js HTTP/1.1" 200 - 4 0.001 0.004
+2024-09-17 11:13:13,274 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:13] "GET /web/assets/35-3270b12/web.assets_backend_prod_only.min.js HTTP/1.1" 200 - 4 0.001 0.003
+2024-09-17 11:13:14,766 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:14] "GET /bus/websocket_worker_bundle?v=1.0.5 HTTP/1.1" 200 - 5 0.003 0.005
+2024-09-17 11:13:14,779 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:14] "POST /web/action/load HTTP/1.1" 200 - 13 0.007 0.008
+2024-09-17 11:13:14,891 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:14] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 11 0.006 0.008
+2024-09-17 11:13:14,967 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:14] "POST /mail/init_messaging HTTP/1.1" 200 - 100 0.046 0.050
+2024-09-17 11:13:15,152 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:15,152 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:15] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:13:15,162 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:15] "POST /mail/load_message_failures HTTP/1.1" 200 - 3 0.002 0.003
+2024-09-17 11:13:17,783 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:17,784 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:17] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:13:19,228 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:19,229 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:19] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:13:23,753 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:23,754 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:23] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:13:26,688 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:26] "GET /web/image/res.company/1/favicon HTTP/1.1" 304 - 5 0.003 0.005
+2024-09-17 11:13:26,707 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:26] "GET /mail/static/src/audio/ting.ogg HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:13:26,726 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:26] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 47 0.015 0.026
+2024-09-17 11:13:26,754 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:26] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 8 0.003 0.005
+2024-09-17 11:13:26,907 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:26] "GET /web/image/res.company/1/favicon HTTP/1.1" 304 - 5 0.002 0.004
+2024-09-17 11:13:27,099 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:27] "GET /web/image/res.company/1/favicon HTTP/1.1" 304 - 5 0.002 0.004
+2024-09-17 11:13:27,144 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:27] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.006 0.007
+2024-09-17 11:13:27,158 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:27] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 40 0.017 0.010
+2024-09-17 11:13:28,688 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:28,689 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:28] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:13:30,241 389209 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_immediate_install on ['Rule Book'] to user ezekiel.k@novajii.com #2 via 127.0.0.1 
+2024-09-17 11:13:30,242 389209 INFO icomply_odoo odoo.addons.base.models.ir_module: User #2 triggered module installation 
+2024-09-17 11:13:30,243 389209 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_install on ['Rule Book'] to user ezekiel.k@novajii.com #2 via 127.0.0.1 
+2024-09-17 11:13:30,291 389209 INFO icomply_odoo odoo.modules.loading: loading 1 modules... 
+2024-09-17 11:13:30,299 389209 INFO icomply_odoo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-09-17 11:13:30,317 389209 INFO icomply_odoo odoo.modules.loading: updating modules list 
+2024-09-17 11:13:30,318 389209 INFO icomply_odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via 127.0.0.1 
+2024-09-17 11:13:30,943 389209 INFO icomply_odoo odoo.modules.loading: loading 21 modules... 
+2024-09-17 11:13:30,960 389209 INFO icomply_odoo odoo.modules.loading: 21 modules loaded in 0.02s, 0 queries (+0 extra) 
+2024-09-17 11:13:30,961 389209 INFO icomply_odoo odoo.modules.loading: loading 22 modules... 
+2024-09-17 11:13:30,961 389209 INFO icomply_odoo odoo.modules.loading: Loading module rule_book (22/22) 
+2024-09-17 11:13:30,989 389209 WARNING icomply_odoo odoo.api.create: The model odoo.addons.rule_book.models.rules.rule_theme is not overriding the create method in batch 
+2024-09-17 11:13:30,991 389209 WARNING icomply_odoo odoo.api.create: The model odoo.addons.rule_book.models.rules.rulebook_title is not overriding the create method in batch 
+2024-09-17 11:13:30,992 389209 WARNING icomply_odoo odoo.api.create: The model odoo.addons.rule_book.models.rules.rule_book is not overriding the create method in batch 
+2024-09-17 11:13:31,066 389209 WARNING icomply_odoo odoo.fields: Field rulebook.risk_category.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,066 389209 WARNING icomply_odoo odoo.fields: Field rulebook.risk_category.risk_priority: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,066 389209 WARNING icomply_odoo odoo.fields: Field rulebook.risk_category.risk_score: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,067 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,067 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.exception_type_id: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,067 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.expectation: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,067 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.sanction: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,067 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_type.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,067 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,068 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.email: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,068 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.cc: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,068 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.bc: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,076 389209 INFO icomply_odoo odoo.modules.registry: module rule_book: creating or updating database tables 
+2024-09-17 11:13:31,228 389209 WARNING icomply_odoo odoo.addons.base.models.ir_model: Two fields (module_mgmtsystem_quality, module_document_page) of res.config.settings() have the same label: Enable Document Pages. [Modules: rule_book and rule_book] 
+2024-09-17 11:13:31,228 389209 WARNING icomply_odoo odoo.addons.base.models.ir_model: Two fields (module_mgmtsystem_environment, module_document_page) of res.config.settings() have the same label: Enable Document Pages. [Modules: rule_book and rule_book] 
+2024-09-17 11:13:31,504 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/menu.xml 
+2024-09-17 11:13:31,598 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/rules/rule_theme.xml 
+2024-09-17 11:13:31,613 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/rules/rulebook_sources_views.xml 
+2024-09-17 11:13:31,622 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/rules/rulebook_title_views.xml 
+2024-09-17 11:13:31,635 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/security/ir.model.access.csv 
+2024-09-17 11:13:31,656 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/risk/risk_category.xml 
+2024-09-17 11:13:31,668 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/department.xml 
+2024-09-17 11:13:31,678 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/responsible.xml 
+2024-09-17 11:13:31,688 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/exception/exception_process.xml 
+2024-09-17 11:13:31,697 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/exception/exception_type.xml 
+2024-09-17 11:13:31,705 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/rules/rule_book.xml 
+2024-09-17 11:13:31,721 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/data/email_templates/rule_book.xml 
+2024-09-17 11:13:31,737 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/data/schedules/rule_book.xml 
+2024-09-17 11:13:31,755 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/dashboard.xml 
+2024-09-17 11:13:31,763 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/data/settings/email_smtp.xml 
+2024-09-17 11:13:31,768 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/data/preloaded_data/risk_categories.xml 
+2024-09-17 11:13:31,847 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/data/preloaded_data/rule_book_sources.xml 
+2024-09-17 11:13:31,867 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/public/rule_book_submission.xml 
+2024-09-17 11:13:31,875 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/data/email_templates/escalation_email.xml 
+2024-09-17 11:13:31,880 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/rules/reply_log.xml 
+2024-09-17 11:13:31,899 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/views/rules/web_scaping.xml 
+2024-09-17 11:13:31,915 389209 INFO icomply_odoo odoo.modules.loading: loading rule_book/data/schedules/web_scraping.xml 
+2024-09-17 11:13:31,946 389209 INFO icomply_odoo odoo.modules.loading: Module rule_book loaded in 0.98s, 844 queries (+844 other) 
+2024-09-17 11:13:31,946 389209 INFO icomply_odoo odoo.modules.loading: 22 modules loaded in 0.98s, 844 queries (+844 extra) 
+2024-09-17 11:13:31,972 389209 WARNING icomply_odoo odoo.fields: Field rulebook.risk_category.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,972 389209 WARNING icomply_odoo odoo.fields: Field rulebook.risk_category.risk_priority: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,973 389209 WARNING icomply_odoo odoo.fields: Field rulebook.risk_category.risk_score: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,973 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,973 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.exception_type_id: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,973 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.expectation: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,973 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.sanction: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,973 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_type.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,974 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,974 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.email: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,974 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.cc: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:31,974 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.bc: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,012 389209 WARNING icomply_odoo odoo.fields: Field rulebook.risk_category.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,012 389209 WARNING icomply_odoo odoo.fields: Field rulebook.risk_category.risk_priority: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,012 389209 WARNING icomply_odoo odoo.fields: Field rulebook.risk_category.risk_score: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,012 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,013 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.exception_type_id: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,013 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.expectation: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,013 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_process.sanction: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,013 389209 WARNING icomply_odoo odoo.fields: Field rulebook.exception_type.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,013 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.name: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,013 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.email: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,013 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.cc: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,013 389209 WARNING icomply_odoo odoo.fields: Field rulebook.responsible.bc: unknown parameter 'tracking', if this is an actual parameter you may want to override the method _valid_field_parameter on the relevant model in order to allow it 
+2024-09-17 11:13:32,139 389209 INFO icomply_odoo odoo.modules.loading: Model iap.autocomplete.api is declared but cannot be loaded! (Perhaps a module was partially removed or renamed) 
+2024-09-17 11:13:32,140 389209 INFO icomply_odoo odoo.modules.loading: Model res.partner.autocomplete.sync is declared but cannot be loaded! (Perhaps a module was partially removed or renamed) 
+2024-09-17 11:13:32,361 389209 INFO icomply_odoo odoo.modules.loading: Modules loaded. 
+2024-09-17 11:13:32,367 389209 INFO icomply_odoo odoo.modules.registry: Registry loaded in 2.081s 
+2024-09-17 11:13:32,367 389209 INFO icomply_odoo odoo.addons.base.models.ir_module: getting next ir.actions.todo() 
+2024-09-17 11:13:32,370 389209 INFO icomply_odoo odoo.modules.registry: Registry changed, signaling through the database 
+2024-09-17 11:13:32,372 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:32] "POST /web/dataset/call_button HTTP/1.1" 200 - 2424 1.290 0.847
+2024-09-17 11:13:32,572 389209 INFO icomply_odoo odoo.addons.base.models.ir_http: Generating routing map for key None 
+2024-09-17 11:13:37,192 389209 INFO icomply_odoo odoo.modules.registry: At least one model cache has been invalidated, signaling through the database. 
+2024-09-17 11:13:37,193 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:37] "GET /web HTTP/1.1" 200 - 133 0.093 4.530
+2024-09-17 11:13:37,425 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:37] "GET /web/assets/36-4694ed5/web.assets_backend.min.css HTTP/1.1" 200 - 7 0.002 0.004
+2024-09-17 11:13:37,584 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:37] "GET /web/assets/37-4694ed5/web.assets_backend.min.js HTTP/1.1" 200 - 4 0.001 0.004
+2024-09-17 11:13:37,638 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:37] "GET /web/webclient/translations/414f3519ed0c0063b01b146c5feddf855bae3135?lang=en_US HTTP/1.1" 200 - 2 0.004 0.003
+2024-09-17 11:13:37,643 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:37] "GET /web/webclient/load_menus/dd188f8cad5de0bada66b37fca3869a31d07f0e606c79fced35112eec5881a74 HTTP/1.1" 200 - 24 0.017 0.023
+2024-09-17 11:13:38,765 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:38] "GET /rule_book/static/src/css/tree_view.css HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:13:39,132 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "GET /bus/websocket_worker_bundle?v=1.0.5 HTTP/1.1" 200 - 5 0.002 0.005
+2024-09-17 11:13:39,206 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 12 0.014 0.012
+2024-09-17 11:13:39,222 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 8 0.007 0.015
+2024-09-17 11:13:39,247 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "POST /mail/init_messaging HTTP/1.1" 200 - 57 0.043 0.026
+2024-09-17 11:13:39,313 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "POST /web/action/load HTTP/1.1" 200 - 8 0.003 0.005
+2024-09-17 11:13:39,439 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "POST /mail/load_message_failures HTTP/1.1" 200 - 3 0.002 0.003
+2024-09-17 11:13:39,487 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:39,487 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:13:39,504 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "POST /mail/inbox/messages HTTP/1.1" 200 - 7 0.003 0.003
+2024-09-17 11:13:39,537 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "GET /web/image/res.partner/2/avatar_128 HTTP/1.1" 200 - 7 0.004 0.008
+2024-09-17 11:13:39,539 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:39] "GET /web/image/mail.channel/1/avatar_128?unique=927c670d4950e1b8daefc6d6f75edd7079dd8c1cbf84f3a97b9770100da291a979bee8ba6e0e8bb82c995a63f6e61ab44f6daded85a5732613ea1adbb9ba708f HTTP/1.1" 200 - 4 0.002 0.007
+2024-09-17 11:13:41,902 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:41,903 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:41] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.004
+2024-09-17 11:13:43,117 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:43,118 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:43] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:13:43,755 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:43] "POST /web/action/load HTTP/1.1" 200 - 13 0.005 0.011
+2024-09-17 11:13:44,011 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/rulebook/get_views HTTP/1.1" 200 - 34 0.020 0.028
+2024-09-17 11:13:44,448 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 3 0.005 0.020
+2024-09-17 11:13:44,459 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.004 0.027
+2024-09-17 11:13:44,464 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.009 0.023
+2024-09-17 11:13:44,466 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.008 0.025
+2024-09-17 11:13:44,466 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.009 0.027
+2024-09-17 11:13:44,586 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:13:44,625 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:13:44,650 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/rulebook/web_search_read HTTP/1.1" 200 - 2 0.001 0.005
+2024-09-17 11:13:44,672 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:44] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:13:47,389 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:47,389 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:47] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:13:48,681 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:48] "POST /web/action/load HTTP/1.1" 200 - 12 0.004 0.010
+2024-09-17 11:13:48,897 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:48] "POST /web/dataset/call_kw/rulebook.title/get_views HTTP/1.1" 200 - 14 0.010 0.013
+2024-09-17 11:13:49,083 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:49] "POST /web/dataset/call_kw/rulebook.title/web_search_read HTTP/1.1" 200 - 3 0.002 0.003
+2024-09-17 11:13:49,090 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:49] "POST /web/dataset/call_kw/rulebook.title/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.005
+2024-09-17 11:13:49,091 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:49] "POST /web/dataset/call_kw/rulebook.title/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.005
+2024-09-17 11:13:51,321 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:13:51,322 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:51] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:13:52,321 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:52] "POST /web/action/load HTTP/1.1" 200 - 10 0.003 0.007
+2024-09-17 11:13:52,554 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:52] "POST /web/dataset/call_kw/res.config.settings/get_views HTTP/1.1" 200 - 15 0.008 0.028
+2024-09-17 11:13:53,133 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:53] "POST /web/dataset/call_kw/res.config.settings/onchange HTTP/1.1" 200 - 32 0.010 0.013
+2024-09-17 11:13:53,387 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:53] "POST /base_setup/demo_active HTTP/1.1" 200 - 3 0.002 0.003
+2024-09-17 11:13:53,406 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:53] "POST /base_setup/data HTTP/1.1" 200 - 6 0.002 0.002
+2024-09-17 11:13:53,591 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:53] "GET /web/static/img/transparent.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:13:53,596 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:53] "GET /base/static/description/settings.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:13:53,660 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:53] "GET /base_setup/static/src/img/google_play.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:13:53,799 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:53] "GET /base_setup/static/src/img/app_store.png HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:13:56,649 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:56] "POST /web/action/load HTTP/1.1" 200 - 10 0.006 0.008
+2024-09-17 11:13:56,900 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:13:56] "POST /web/dataset/call_kw/res.company/get_views HTTP/1.1" 200 - 29 0.014 0.027
+2024-09-17 11:14:00,302 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:14:00,303 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:00] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:14:11,165 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:14:11,166 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:11] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:14:18,545 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:18] "POST /web/action/load HTTP/1.1" 200 - 25 0.009 0.013
+2024-09-17 11:14:18,822 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:18] "POST /web/dataset/call_kw/res.users/get_views HTTP/1.1" 200 - 66 0.023 0.050
+2024-09-17 11:14:19,438 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:19] "POST /web/dataset/call_kw/res.users/web_search_read HTTP/1.1" 200 - 13 0.006 0.008
+2024-09-17 11:14:21,970 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:21] "POST /web/dataset/call_kw/res.company/get_views HTTP/1.1" 200 - 2 0.001 0.007
+2024-09-17 11:14:31,632 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:14:31,633 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:31] "GET /websocket HTTP/1.1" 400 - 1 0.001 0.003
+2024-09-17 11:14:44,472 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.005 0.008
+2024-09-17 11:14:44,473 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.011
+2024-09-17 11:14:44,478 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.003 0.013
+2024-09-17 11:14:44,480 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.015
+2024-09-17 11:14:44,497 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.006
+2024-09-17 11:14:44,499 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.004 0.006
+2024-09-17 11:14:44,638 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:44] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:14:44,654 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:44] "POST /web/dataset/call_kw/rulebook/web_search_read HTTP/1.1" 200 - 2 0.001 0.002
+2024-09-17 11:14:46,676 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:46] "POST /web/action/load HTTP/1.1" 200 - 10 0.003 0.007
+2024-09-17 11:14:46,900 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:46] "POST /web/dataset/call_kw/rulebook.responsible/get_views HTTP/1.1" 200 - 11 0.008 0.017
+2024-09-17 11:14:47,103 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:47] "POST /web/dataset/call_kw/rulebook.responsible/web_search_read HTTP/1.1" 200 - 3 0.002 0.003
+2024-09-17 11:14:48,564 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:48] "POST /web/action/load HTTP/1.1" 200 - 12 0.008 0.012
+2024-09-17 11:14:48,776 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:48] "POST /web/dataset/call_kw/rulebook.risk_category/get_views HTTP/1.1" 200 - 14 0.005 0.008
+2024-09-17 11:14:48,962 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:48] "POST /web/dataset/call_kw/rulebook.risk_category/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.006
+2024-09-17 11:14:48,963 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:48] "POST /web/dataset/call_kw/rulebook.risk_category/web_search_read HTTP/1.1" 200 - 4 0.003 0.005
+2024-09-17 11:14:50,773 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:50] "POST /web/action/load HTTP/1.1" 200 - 10 0.003 0.008
+2024-09-17 11:14:50,980 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:50] "POST /web/dataset/call_kw/rulebook.department/get_views HTTP/1.1" 200 - 33 0.012 0.024
+2024-09-17 11:14:51,328 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:51] "POST /web/dataset/call_kw/rulebook.department/web_search_read HTTP/1.1" 200 - 3 0.002 0.003
+2024-09-17 11:14:51,515 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:51] "GET /web/static/img/smiling_face.svg HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:14:54,276 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:54] "POST /web/action/load HTTP/1.1" 200 - 10 0.003 0.007
+2024-09-17 11:14:54,474 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:54] "POST /web/dataset/call_kw/rulebook.sources/get_views HTTP/1.1" 200 - 11 0.005 0.010
+2024-09-17 11:14:54,674 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:54] "POST /web/dataset/call_kw/rulebook.sources/web_search_read HTTP/1.1" 200 - 6 0.003 0.005
+2024-09-17 11:14:55,336 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:14:55,337 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:55] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:14:57,966 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:57] "POST /web/action/load HTTP/1.1" 200 - 12 0.004 0.008
+2024-09-17 11:14:58,227 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:58] "POST /web/dataset/call_kw/external.resource/get_views HTTP/1.1" 200 - 12 0.005 0.012
+2024-09-17 11:14:58,449 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:58] "POST /web/dataset/call_kw/external.resource/search_panel_select_range HTTP/1.1" 200 - 4 0.002 0.005
+2024-09-17 11:14:58,609 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:14:58] "POST /web/dataset/call_kw/external.resource/web_search_read HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:15:01,480 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:01] "POST /web/action/load HTTP/1.1" 200 - 10 0.004 0.010
+2024-09-17 11:15:01,675 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:01] "POST /web/dataset/call_kw/rulebook.exception_type/get_views HTTP/1.1" 200 - 11 0.006 0.010
+2024-09-17 11:15:01,890 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:01] "POST /web/dataset/call_kw/rulebook.exception_type/web_search_read HTTP/1.1" 200 - 3 0.003 0.005
+2024-09-17 11:15:04,871 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:04] "POST /web/action/load HTTP/1.1" 200 - 10 0.004 0.009
+2024-09-17 11:15:05,089 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:05] "POST /web/dataset/call_kw/rulebook.exception_process/get_views HTTP/1.1" 200 - 11 0.005 0.009
+2024-09-17 11:15:05,280 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:05] "POST /web/dataset/call_kw/rulebook.exception_process/web_search_read HTTP/1.1" 200 - 3 0.002 0.004
+2024-09-17 11:15:06,506 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:06] "POST /web/action/load HTTP/1.1" 200 - 24 0.009 0.198
+2024-09-17 11:15:06,771 389209 INFO icomply_odoo odoo.models.unlink: User #2 deleted custom.tree.model records with IDs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] 
+2024-09-17 11:15:06,850 389209 INFO icomply_odoo odoo.models.unlink: User #2 deleted custom.tree.model records with IDs: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] 
+2024-09-17 11:15:06,909 389209 INFO icomply_odoo odoo.models.unlink: User #2 deleted custom.tree.model records with IDs: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30] 
+2024-09-17 11:15:06,922 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:06] "POST /web/dataset/call_kw/custom.tree.model/get_views HTTP/1.1" 200 - 69 0.027 0.189
+2024-09-17 11:15:07,153 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:07] "POST /web/dataset/call_kw/custom.tree.model/web_search_read HTTP/1.1" 200 - 3 0.002 0.004
+2024-09-17 11:15:11,203 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:11] "POST /web/dataset/call_kw/rulebook.sources/web_search_read HTTP/1.1" 200 - 5 0.003 0.006
+2024-09-17 11:15:14,279 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:14] "POST /web/action/load HTTP/1.1" 200 - 12 0.004 0.008
+2024-09-17 11:15:14,495 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:14] "POST /web/dataset/call_kw/rulebook.theme/get_views HTTP/1.1" 200 - 15 0.019 0.016
+2024-09-17 11:15:14,703 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:14] "POST /web/dataset/call_kw/rulebook.theme/search_panel_select_range HTTP/1.1" 200 - 3 0.001 0.003
+2024-09-17 11:15:14,857 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:14] "POST /web/dataset/call_kw/rulebook.theme/web_search_read HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:15:16,523 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:16] "POST /web/dataset/call_kw/rulebook.title/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:15:16,528 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:16] "POST /web/dataset/call_kw/rulebook.title/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.002
+2024-09-17 11:15:16,721 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:16] "POST /web/dataset/call_kw/rulebook.title/web_search_read HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:15:17,945 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:17] "POST /web/action/load HTTP/1.1" 200 - 12 0.004 0.008
+2024-09-17 11:15:18,142 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:18] "POST /web/dataset/call_kw/reply.log/get_views HTTP/1.1" 200 - 17 0.005 0.011
+2024-09-17 11:15:18,330 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:18] "POST /web/dataset/call_kw/reply.log/search_panel_select_range HTTP/1.1" 200 - 3 0.001 0.003
+2024-09-17 11:15:18,337 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:18] "POST /web/dataset/call_kw/reply.log/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:15:18,350 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:18] "POST /web/dataset/call_kw/reply.log/web_search_read HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:15:19,547 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:19] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:15:19,552 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:19] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:15:19,556 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:19] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:15:19,684 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:19] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:15:19,709 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:19] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:15:19,727 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:19] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:15:19,761 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:19] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.004
+2024-09-17 11:15:19,764 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:19] "POST /web/dataset/call_kw/rulebook/web_search_read HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:15:24,517 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:24] "POST /web/dataset/call_kw/res.config.settings/onchange HTTP/1.1" 200 - 7 0.004 0.008
+2024-09-17 11:15:27,214 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:27] "GET /web?debug=1 HTTP/1.1" 200 - 62 0.023 0.283
+2024-09-17 11:15:27,438 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:27] "GET /web/webclient/load_menus/b4e523f59e67ca0da1466b5f006b492072b9fb482675b0393d4880baefc02780 HTTP/1.1" 200 - 1 0.000 0.003
+2024-09-17 11:15:28,038 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:28] "GET /bus/websocket_worker_bundle?v=1.0.5 HTTP/1.1" 200 - 4 0.004 0.008
+2024-09-17 11:15:28,268 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:28] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 5 0.007 0.025
+2024-09-17 11:15:28,283 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:28] "POST /web/action/load HTTP/1.1" 200 - 8 0.018 0.024
+2024-09-17 11:15:28,314 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:28] "POST /mail/init_messaging HTTP/1.1" 200 - 30 0.052 0.023
+2024-09-17 11:15:28,323 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:28] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 8 0.018 0.013
+2024-09-17 11:15:28,563 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:28] "POST /mail/inbox/messages HTTP/1.1" 200 - 4 0.004 0.004
+2024-09-17 11:15:28,572 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:28] "POST /mail/load_message_failures HTTP/1.1" 200 - 3 0.006 0.007
+2024-09-17 11:15:28,580 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:28] "GET /web/image/res.partner/2/avatar_128 HTTP/1.1" 304 - 7 0.005 0.008
+2024-09-17 11:15:32,127 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:32] "POST /web/action/load HTTP/1.1" 200 - 9 0.003 0.006
+2024-09-17 11:15:32,348 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:32] "POST /web/dataset/call_kw/res.config.settings/get_views HTTP/1.1" 200 - 1 0.000 0.006
+2024-09-17 11:15:32,407 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:15:32,408 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:32] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.004
+2024-09-17 11:15:32,966 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:32] "POST /web/dataset/call_kw/res.config.settings/onchange HTTP/1.1" 200 - 9 0.006 0.010
+2024-09-17 11:15:33,225 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:33] "POST /base_setup/demo_active HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:15:33,251 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:33] "POST /base_setup/data HTTP/1.1" 200 - 5 0.002 0.003
+2024-09-17 11:15:36,042 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:36] "POST /web/action/load HTTP/1.1" 200 - 11 0.004 0.008
+2024-09-17 11:15:36,286 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:36] "POST /web/dataset/call_kw/mail.mail/get_views HTTP/1.1" 200 - 32 0.014 0.035
+2024-09-17 11:15:36,682 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:36] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 1 0.000 0.003
+2024-09-17 11:15:36,691 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:36] "POST /web/dataset/call_kw/mail.mail/web_search_read HTTP/1.1" 200 - 4 0.002 0.003
+2024-09-17 11:15:39,017 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:15:39,017 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:39] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:15:39,283 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:39] "POST /web/action/load HTTP/1.1" 200 - 12 0.005 0.008
+2024-09-17 11:15:39,507 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:39] "POST /web/dataset/call_kw/ir.mail_server/get_views HTTP/1.1" 200 - 17 0.008 0.021
+2024-09-17 11:15:39,883 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:39] "POST /web/dataset/call_kw/ir.mail_server/web_search_read HTTP/1.1" 200 - 4 0.002 0.003
+2024-09-17 11:15:43,761 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:15:43,762 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:43] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.004
+2024-09-17 11:15:44,270 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:44] "POST /web/dataset/call_kw/ir.mail_server/read HTTP/1.1" 200 - 2 0.002 0.005
+2024-09-17 11:15:51,327 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:15:51,328 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:15:51] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:16:02,720 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:16:02,721 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:16:02] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:16:20,272 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:16:20,273 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:16:20] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:16:33,950 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:16:33] "POST /web/dataset/call_kw/ir.mail_server/onchange HTTP/1.1" 200 - 1 0.000 0.003
+2024-09-17 11:16:41,395 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:16:41] "POST /web/dataset/call_kw/ir.mail_server/write HTTP/1.1" 200 - 5 0.002 0.006
+2024-09-17 11:16:41,583 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:16:41] "POST /web/dataset/call_kw/ir.mail_server/read HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:16:46,768 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:16:46,769 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:16:46] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:16:47,037 389209 WARNING icomply_odoo odoo.http: Server replied with following exception:
+ 5.7.1 Authentication failed 
+2024-09-17 11:16:47,038 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:16:47] "POST /web/dataset/call_button HTTP/1.1" 200 - 2 0.001 5.250
+2024-09-17 11:17:27,036 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:17:27,037 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:17:27] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:18:27,325 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:18:27,327 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:18:27] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.004
+2024-09-17 11:18:30,092 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:18:30] "POST /web/dataset/call_kw/ir.mail_server/write HTTP/1.1" 200 - 4 0.001 0.007
+2024-09-17 11:18:30,288 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:18:30] "POST /web/dataset/call_kw/ir.mail_server/read HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:18:36,271 389209 WARNING icomply_odoo odoo.http: Server replied with following exception:
+ 5.7.1 Authentication failed 
+2024-09-17 11:18:36,272 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:18:36] "POST /web/dataset/call_button HTTP/1.1" 200 - 2 0.001 5.795
+2024-09-17 11:18:42,078 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:18:42] "POST /web/dataset/call_kw/ir.mail_server/onchange HTTP/1.1" 200 - 1 0.000 0.003
+2024-09-17 11:18:46,753 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:18:46] "POST /web/dataset/call_kw/ir.mail_server/write HTTP/1.1" 200 - 4 0.001 0.005
+2024-09-17 11:18:46,960 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:18:46] "POST /web/dataset/call_kw/ir.mail_server/read HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:19:28,542 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:19:28,542 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:19:28] "GET /websocket HTTP/1.1" 400 - 1 0.001 0.003
+2024-09-17 11:19:47,233 389209 WARNING icomply_odoo odoo.http: The server has closed the connection unexpectedly. Check configuration served on this port number.
+ None 
+2024-09-17 11:19:47,234 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:19:47] "POST /web/dataset/call_button HTTP/1.1" 200 - 2 0.001 60.070
+2024-09-17 11:20:21,150 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:21] "POST /web/dataset/call_kw/ir.mail_server/onchange HTTP/1.1" 200 - 1 0.000 0.003
+2024-09-17 11:20:29,425 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:20:29,426 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:29] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:20:30,529 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:30] "POST /web/dataset/call_kw/ir.mail_server/write HTTP/1.1" 200 - 4 0.001 0.005
+2024-09-17 11:20:30,720 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:30] "POST /web/dataset/call_kw/ir.mail_server/read HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:20:31,461 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:31] "POST /web/dataset/call_button HTTP/1.1" 200 - 4 0.001 0.516
+2024-09-17 11:20:38,392 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:38] "POST /web/action/load HTTP/1.1" 200 - 9 0.004 0.008
+2024-09-17 11:20:38,598 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:38] "POST /web/dataset/call_kw/rulebook/get_views HTTP/1.1" 200 - 2 0.002 0.009
+2024-09-17 11:20:38,959 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:38] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:20:39,148 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:20:39,168 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.007
+2024-09-17 11:20:39,168 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.006
+2024-09-17 11:20:39,176 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.005
+2024-09-17 11:20:39,176 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.008
+2024-09-17 11:20:39,180 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:20:39,343 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:39] "POST /web/dataset/call_kw/rulebook/web_search_read HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:20:45,084 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:45] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.003 0.004
+2024-09-17 11:20:45,085 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:45] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.005
+2024-09-17 11:20:45,089 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:45] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.002
+2024-09-17 11:20:45,097 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:45] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.002
+2024-09-17 11:20:45,103 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:45] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:20:45,104 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:45] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:20:45,243 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:45] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:20:45,261 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:20:45] "POST /web/dataset/call_kw/rulebook/web_search_read HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:21:29,792 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:21:29,793 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:21:29] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:22:30,669 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:22:30,670 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:22:30] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:22:39,734 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:22:39] "POST /web/dataset/call_kw/rulebook/get_views HTTP/1.1" 200 - 11 0.004 0.013
+2024-09-17 11:22:40,122 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:22:40] "POST /web/dataset/call_kw/rulebook/onchange HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:22:40,793 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:22:40] "GET /web/bundle/web_editor.assets_wysiwyg?lang=en_US&debug=1 HTTP/1.1" 200 - 22 0.013 0.423
+2024-09-17 11:22:41,065 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:22:41] "GET /web/assets/38-62686b6/web_editor.assets_wysiwyg.min.css HTTP/1.1" 200 - 4 0.001 0.003
+2024-09-17 11:22:41,212 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:22:41] "GET /web/assets/39-62686b6/web_editor.assets_wysiwyg.min.js HTTP/1.1" 200 - 4 0.001 0.004
+2024-09-17 11:23:31,104 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:23:31,105 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:23:31] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:24:31,789 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:24:31,790 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:24:31] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:25:32,844 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:25:32,845 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:25:32] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:26:33,725 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:26:33,726 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:26:33] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:27:34,849 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:27:34,849 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:27:34] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:28:35,422 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:28:35,422 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:28:35] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:29:35,961 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:29:35,962 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:29:35] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:30:37,097 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:30:37,098 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:30:37] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:31:38,352 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:31:38,353 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:31:38] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:32:17,342 389209 INFO icomply_odoo odoo.modules.registry: At least one model cache has been invalidated, signaling through the database. 
+2024-09-17 11:32:17,343 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:17] "GET /web/login?db%3Ddb12_wellnessliving HTTP/1.1" 200 - 74 0.052 1.632
+2024-09-17 11:32:17,590 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:17] "GET /web/static/src/libs/fontawesome/fonts/fontawesome-webfont.woff2?v=4.7.0 HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:32:17,737 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:17] "GET /web/assets/40-35b2ddc/web.assets_frontend.min.css HTTP/1.1" 200 - 12 0.005 0.005
+2024-09-17 11:32:17,745 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:17] "GET /web/binary/company_logo HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:32:18,160 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:18] "GET /web/assets/16-696d3dd/web.assets_frontend_minimal.min.js HTTP/1.1" 200 - 5 0.001 0.004
+2024-09-17 11:32:18,787 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:18] "GET /web/assets/41-bd9e707/web.assets_frontend_lazy.min.js HTTP/1.1" 200 - 5 0.002 0.004
+2024-09-17 11:32:18,924 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:18] "GET /web/static/img/favicon.ico HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:32:22,354 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:22] "GET /web/webclient/translations/1726572741791 HTTP/1.1" 200 - 3 0.001 0.003
+2024-09-17 11:32:22,546 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:22] "GET /web/webclient/translations/1726572741990 HTTP/1.1" 200 - 3 0.001 0.004
+2024-09-17 11:32:30,960 389209 INFO icomply_odoo odoo.addons.base.models.res_users: Login successful for db:icomply_odoo login:ezekiel.k@novajii.com from 127.0.0.1 
+2024-09-17 11:32:30,970 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:30] "POST /web/login HTTP/1.1" 303 - 44 0.015 0.316
+2024-09-17 11:32:31,417 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:31] "GET /web HTTP/1.1" 200 - 79 0.025 0.242
+2024-09-17 11:32:31,612 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:31] "GET /web/assets/31-244c264/web.assets_common.min.css HTTP/1.1" 200 - 4 0.001 0.004
+2024-09-17 11:32:31,632 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:31] "GET /web/assets/36-4694ed5/web.assets_backend.min.css HTTP/1.1" 200 - 4 0.001 0.004
+2024-09-17 11:32:31,787 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:31] "GET /web/assets/37-4694ed5/web.assets_backend.min.js HTTP/1.1" 200 - 4 0.001 0.003
+2024-09-17 11:32:31,796 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:31] "GET /web/assets/33-244c264/web.assets_common.min.js HTTP/1.1" 200 - 4 0.001 0.004
+2024-09-17 11:32:31,821 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:31] "GET /web/assets/35-3270b12/web.assets_backend_prod_only.min.js HTTP/1.1" 200 - 4 0.004 0.012
+2024-09-17 11:32:31,827 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:31] "GET /web/webclient/load_menus/dd188f8cad5de0bada66b37fca3869a31d07f0e606c79fced35112eec5881a74 HTTP/1.1" 200 - 1 0.000 0.003
+2024-09-17 11:32:31,986 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:31] "GET /web/webclient/translations/414f3519ed0c0063b01b146c5feddf855bae3135?lang=en_US HTTP/1.1" 200 - 3 0.001 0.003
+2024-09-17 11:32:33,543 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:33] "GET /rule_book/static/src/css/tree_view.css HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:32:33,881 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:33] "GET /web/webclient/locale/en_US HTTP/1.1" 200 - 1 0.000 0.002
+2024-09-17 11:32:33,892 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:33] "GET /bus/websocket_worker_bundle?v=1.0.5 HTTP/1.1" 200 - 5 0.002 0.004
+2024-09-17 11:32:33,948 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:33] "GET /mail/static/src/audio/ting.ogg HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:32:33,984 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:33] "POST /mail/init_messaging HTTP/1.1" 200 - 48 0.019 0.015
+2024-09-17 11:32:34,144 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "POST /web/action/load HTTP/1.1" 200 - 8 0.003 0.007
+2024-09-17 11:32:34,153 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 200 - 8 0.005 0.008
+2024-09-17 11:32:34,162 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 11 0.010 0.009
+2024-09-17 11:32:34,163 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "GET /web/image/res.company/1/favicon HTTP/1.1" 200 - 5 0.003 0.005
+2024-09-17 11:32:34,164 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "GET /web/static/lib/odoo_ui_icons/fonts/odoo_ui_icons.woff2 HTTP/1.1" 200 - 0 0.000 0.004
+2024-09-17 11:32:34,227 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "POST /mail/load_message_failures HTTP/1.1" 200 - 3 0.002 0.003
+2024-09-17 11:32:34,349 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:32:34,351 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.004
+2024-09-17 11:32:34,364 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "GET /web/image/res.company/1/favicon HTTP/1.1" 304 - 5 0.005 0.009
+2024-09-17 11:32:34,370 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "POST /mail/inbox/messages HTTP/1.1" 200 - 7 0.008 0.011
+2024-09-17 11:32:34,375 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "GET /web/image/res.partner/2/avatar_128 HTTP/1.1" 200 - 7 0.004 0.010
+2024-09-17 11:32:34,377 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "GET /web/image/mail.channel/1/avatar_128?unique=927c670d4950e1b8daefc6d6f75edd7079dd8c1cbf84f3a97b9770100da291a979bee8ba6e0e8bb82c995a63f6e61ab44f6daded85a5732613ea1adbb9ba708f HTTP/1.1" 200 - 4 0.003 0.011
+2024-09-17 11:32:34,549 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "GET /web/image/res.company/1/favicon HTTP/1.1" 304 - 5 0.002 0.005
+2024-09-17 11:32:34,755 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:34] "GET /web/image/res.company/1/favicon HTTP/1.1" 304 - 5 0.001 0.004
+2024-09-17 11:32:36,989 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:32:36,990 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:36] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.002
+2024-09-17 11:32:38,528 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:32:38,528 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:38] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:32:38,554 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:38] "POST /web/action/load HTTP/1.1" 200 - 13 0.005 0.008
+2024-09-17 11:32:38,776 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:38] "POST /web/dataset/call_kw/rulebook/get_views HTTP/1.1" 200 - 31 0.010 0.017
+2024-09-17 11:32:39,147 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 3 0.001 0.003
+2024-09-17 11:32:39,155 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.005
+2024-09-17 11:32:39,156 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.005
+2024-09-17 11:32:39,161 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.002 0.007
+2024-09-17 11:32:39,165 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.004
+2024-09-17 11:32:39,167 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.008
+2024-09-17 11:32:39,326 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "POST /web/dataset/call_kw/rulebook/search_panel_select_range HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:32:39,337 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "POST /web/dataset/call_kw/rulebook/web_search_read HTTP/1.1" 200 - 2 0.001 0.003
+2024-09-17 11:32:39,344 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 2 0.001 0.002
+2024-09-17 11:32:39,474 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:32:39,474 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "GET /websocket HTTP/1.1" 400 - 2 0.001 0.003
+2024-09-17 11:32:39,707 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:39] "GET /web/image/res.company/1/favicon HTTP/1.1" 304 - 5 0.001 0.004
+2024-09-17 11:32:44,141 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:32:44,142 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:44] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:32:49,112 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:32:49,113 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:32:49] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:33:00,688 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:33:00,689 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:00] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:33:09,831 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:09] "GET / HTTP/1.1" 303 - 1 0.000 0.002
+2024-09-17 11:33:10,281 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:10] "GET /web HTTP/1.1" 303 - 1 0.000 0.002
+2024-09-17 11:33:10,829 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:10] "GET /web/login HTTP/1.1" 200 - 34 0.010 0.087
+2024-09-17 11:33:11,280 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:11] "GET /web/static/img/favicon.ico HTTP/1.1" 200 - 0 0.000 0.001
+2024-09-17 11:33:13,761 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:33:13,761 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:13] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:33:38,243 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:33:38,244 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:38] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.004
+2024-09-17 11:33:40,237 389209 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-17 11:33:40,238 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:40] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-17 11:33:52,567 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:52] "GET / HTTP/1.1" 303 - 1 0.000 0.004
+2024-09-17 11:33:52,756 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:52] "GET /web HTTP/1.1" 303 - 1 0.000 0.004
+2024-09-17 11:33:52,956 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:52] "GET /web/login HTTP/1.1" 200 - 3 0.003 0.009
+2024-09-17 11:33:53,174 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:53] "GET /web/static/src/libs/fontawesome/fonts/fontawesome-webfont.woff2?v=4.7.0 HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:33:53,197 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:53] "GET /web/assets/40-35b2ddc/web.assets_frontend.min.css HTTP/1.1" 200 - 10 0.008 0.011
+2024-09-17 11:33:53,377 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:53] "GET /web/binary/company_logo HTTP/1.1" 200 - 2 0.002 0.006
+2024-09-17 11:33:54,206 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:54] "GET /web/assets/16-696d3dd/web.assets_frontend_minimal.min.js HTTP/1.1" 200 - 8 0.005 0.007
+2024-09-17 11:33:54,418 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:54] "GET /web/static/img/favicon.ico HTTP/1.1" 200 - 0 0.000 0.002
+2024-09-17 11:33:54,437 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:54] "GET /web/assets/41-bd9e707/web.assets_frontend_lazy.min.js HTTP/1.1" 200 - 8 0.006 0.009
