@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from odoo import fields, models, api
 from dotenv import load_dotenv
+import base64
 
 load_dotenv()
 
@@ -45,7 +46,6 @@ class ExternalResource(models.Model):
     external_resource_url = fields.Char(
         string="External Resource URL", help="URL linking to the external resource."
     )
-  
 
     # Optional: Adding auto-generated timestamp fields
     create_date = fields.Datetime(string="Created On", readonly=True)
@@ -56,19 +56,11 @@ class ExternalResource(models.Model):
         print('web scrapper run sucessfully')
         self.process()
 
-    def convert_date_format(self,date_str):
-        try:
-            # Convert the incoming date from 'MM/DD/YYYY' to 'YYYY-MM-DD'
-            parsed_date = datetime.strptime(date_str, '%m/%d/%Y')
-            formatted_date = parsed_date.strftime('%Y-%m-%d')
-            return formatted_date
-        except ValueError as e:
-            raise ValueError(f"Error processing date '{date_str}': {e}")    
 
     @api.model
     def process(self):
         print("CBN Scraper processing")
-        url = "https://www.cbn.gov.ng/documents/circulars.asp?beginrec=1&endrec=20&keyword=&from=&tod="
+        url = os.getenv("CBN_URL")
 
         # Send a GET request to the URL
         response = requests.get(url)
@@ -121,43 +113,50 @@ class ExternalResource(models.Model):
                     download_url = self.store(reference, resource_url, download)
 
                     # Create the record in the external.resource model
-                    if len(reference.strip()) > 0:
-                        self.env["external.resource"].create(
-                            {
-                                "mime_type": "application/pdf",
-                                "name": title,
-                                "filename": reference,
-                                "ref_number": reference,
-                                "release_date": (
-                                    self.convert_date_format(published_date)
-                                    if published_date
-                                    else None
-                                ),
-                                "source_id": None,  # Set to the appropriate partner ID if needed
-                                "created_by": self.env.user.id,
-                                "channel": "CBN Website",
-                                "external_resource_url": resource_url,
-                            }
-                        )
+                    # if len(reference.strip()) > 0:
+                        # self.env["external.resource"].create(
+                        #     {
+                        #         "mime_type": "application/pdf",
+                        #         "name": title,
+                        #         "filename": reference,
+                        #         "ref_number": reference,
+                        #         "release_date": (
+                        #             self.convert_date_format(published_date)
+                        #             if published_date
+                        #             else None
+                        #         ),
+                        #         "source_id": None,  # Set to the appropriate partner ID if needed
+                        #         "created_by": self.env.user.id,
+                        #         "channel": "CBN Website",
+                        #         "external_resource_url": resource_url,
+                        #     }
+                        # )
                     # Create the record for rulebook title
                     if len(reference.strip()) > 0:
-                        self.env["rulebook.title"].create(
-                            {
-                                "mime_type": "application/pdf",
-                                "name": title,
-                                "filename": reference,
-                                "ref_number": reference,
-                                "release_date": (
-                                    self.convert_date_format(published_date)
-                                    if published_date
-                                    else None
-                                ),
-                                "source_id": None,  # Set to the appropriate partner ID if needed
-                                "created_by": self.env.user.id,
-                                "channel": "CBN Website",
-                                "external_resource_url": resource_url,
-                            }
-                        )
+                        # Fetch the source_id where the rulebook.sources.name is like 'CBN'
+                            source = self.env['rulebook.sources'].search([('name', 'ilike', 'CBN')], limit=1)
+
+                            if not source:
+                                raise ValueError("Source 'CBN' not found in the rulebook.sources.")
+
+                            
+                            # Download the file from resource_url and convert it to binary
+                            file_binary_data = self.download_file_as_binary(resource_url)    
+
+                            # Create the record in rulebook.title
+                            self.env["rulebook.title"].create({
+                                "name": title,  # Corresponds to the 'Title' field
+                                "file": file_binary_data,  # Assuming file_binary_data is the file content in binary
+                                "file_name": reference,  # Use reference as the file name
+                                "ref_number": reference,  # Reference number
+                                "released_date": (
+                                    self.convert_date_format(published_date) if published_date else None
+                                ),  # Released Date
+                                "status": "active",  # Default status to 'active'
+                                "source_id": source.id,  # Source ID (from rulebook.sources where name like 'CBN')
+                                "created_on": fields.Datetime.now(),  # Current timestamp
+                                "created_by": self.env.user.id,  # Created by the current user
+                            })
 
         else:
             print(f"Failed to retrieve the page. Status code: {response.status_code}")
@@ -209,3 +208,24 @@ class ExternalResource(models.Model):
     def make_file_name(self, reference):
         # Create a valid file name from the reference by removing special characters
         return re.sub(r"[^a-zA-Z0-9_]", "_", reference)
+
+    def download_file_as_binary(self,url):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+
+            # Convert the file content to base64-encoded binary data
+            file_binary_data = base64.b64encode(response.content)
+            return file_binary_data
+        except requests.exceptions.RequestException as e:
+            raise ValueError(f"Failed to download file from {url}: {str(e)}")
+
+
+    def convert_date_format(self,date_str):
+        try:
+            # Convert the incoming date from 'MM/DD/YYYY' to 'YYYY-MM-DD'
+            parsed_date = datetime.strptime(date_str, '%m/%d/%Y')
+            formatted_date = parsed_date.strftime('%Y-%m-%d')
+            return formatted_date
+        except ValueError as e:
+            raise ValueError(f"Error processing date '{date_str}': {e}")            

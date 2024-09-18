@@ -42,7 +42,8 @@
             <form>
                 <header>
                     <button type="object" class="oe_highlight oe_right mx-auto px-2 py-2"
-                        name="open_reply_log" string="View Reply Log" />
+                        name="open_reply_log" string="View Reply Log"
+                        attrs="{'invisible': [('id', '=', False)]}" />
                 </header>
                 <!-- Add Custom Styles for Form Elements  -->
                 <!-- <link rel="stylesheet" type="text/css"
@@ -109,7 +110,7 @@
                         <field name="type_of_return" />
                         <field name="regulatory_agency_id" />
                         <field name="responsible_id" />
-                        <field name="status" />
+                        <field name="status" attrs="{'invisible': [('id', '=', False)]}" />
                     </group>
                 </group>
 

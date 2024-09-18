@@ -50,7 +50,6 @@
     </record>
 
 
-
     <!-- rule book -->
     <record id="action_rulebook" model="ir.actions.act_window">
       <field name="name">RuleBook</field>
@@ -69,7 +68,7 @@
       <field name="name">Exception Types</field>
       <field name="res_model">rulebook.exception_type</field>
       <field name="view_mode">tree,form</field>
-     
+
     </record>
 
     <!-- Reply log -->
@@ -87,79 +86,48 @@
       </field>
     </record>
 
-    <!-- Action to open the tree view -->
-    <record id="action_external_resource" model="ir.actions.act_window">
-      <field name="name">External Resources</field>
-      <field name="res_model">external.resource</field>
-      <field name="view_mode">tree,form</field>
-      <field name="help" type="html">
-        <p class="oe_view_nocontent_create">
-          Click to See all new document from external regulatory bodies.
-        </p>
-      </field>
-    </record>
-
-
-
 
     <!-- Menu Item -->
 
 
-    <!-- Menu Item -->
-    <menuitem id="menu_rulebook_theme_root" name="Rulebook" sequence="10"
-      action="action_rulebook" />
-    <menuitem id="menu_reply_log" name="Reply Logs" parent="menu_rulebook_theme_root"
-      action="action_reply_log" sequence="1" />
-    <menuitem id="menu_rulebook_title_root" name="Rulebook Titles"
-      parent="menu_rulebook_theme_root"
-      action="action_rulebook_title" />
-    <!-- rule book them -->
-    <menuitem id="menu_rulebook_theme" name="Rulebook Themes" parent="menu_rulebook_theme_root"
-      action="action_rulebook_theme" />
-    <!-- rule book source -->
-    <menuitem id="menu_rulebook_sources" name="Rulebook Sources"
-      parent="menu_rulebook_theme_root" action="action_rulebook_sources" />
-    <menuitem id="menu_regulatory_sources" name="Regulatory Sources"
-      parent="menu_rulebook_sources" action="action_rulebook_sources" />
-    <!-- Menu item to access the external resources -->
-    <menuitem id="menu_external_resource" name="Rulebook Resources" sequence="10"
-      parent="menu_rulebook_sources" action="action_external_resource" />
-    <!-- Titles -->
-    <!-- <menuitem id="menu_rulebook_title" name="Titles" parent="menu_rulebook_theme_root"
-     sequence="2" /> -->
+    <!-- Main Rulebook Menu -->
+    <menuitem id="menu_rulebook_theme_root" name="Rulebook" sequence="1" action="action_rulebook" />
 
+    <!-- Submenu for Rulebook Details (Title, Theme, Rulebook, Reply Logs) -->
+    <menuitem id="menu_rulebook_details" name="Details" parent="menu_rulebook_theme_root"
+      sequence="1" />
+    <menuitem id="menu_rulebook_title" name="Titles" parent="menu_rulebook_details"
+      action="action_rulebook_title" sequence="1" />
+    <menuitem id="menu_rulebook_theme" name="Themes" parent="menu_rulebook_details"
+      action="action_rulebook_theme" sequence="2" />
+    <menuitem id="menu_reply_log" name="Reply Logs" parent="menu_rulebook_details"
+      action="action_reply_log" sequence="3" />
 
-    <!--set
-    up menu  -->
-    <menuitem id="menu_rulebook_configuration" name="Rulebook Configuration"
-      parent="menu_rulebook_theme_root" />
-
-
-    <!-- Responsible -->
+    <!-- Submenu for Sources (Regulatory Source and Regulatory Records) -->
+    <menuitem id="menu_rulebook_sources_root" name="Sources" parent="menu_rulebook_theme_root"
+      sequence="2" />
+    <!-- Submenu for Configuration (with Exception Management) -->
+    <menuitem id="menu_rulebook_configuration" name="Configuration"
+      parent="menu_rulebook_theme_root" sequence="3" />
     <menuitem id="menu_rulebook_responsible" name="Email Group" parent="menu_rulebook_configuration"
       action="action_rulebook_responsible" sequence="4" />
-
-    <!-- Departments -->
     <menuitem id="menu_rulebook_department" name="Departments" parent="menu_rulebook_configuration"
       action="action_rulebook_department" sequence="8" />
-    <!-- Risk Categories -->
     <menuitem id="menu_rulebook_risk_category" name="Risk Categories"
-      parent="menu_rulebook_configuration"
-      action="action_rulebook_risk_category" sequence="7" />
+      parent="menu_rulebook_configuration" action="action_rulebook_risk_category" sequence="7" />
 
-    <!-- Exception Processes -->
-    <menuitem id="menu_rulebook_exception" name="Rulebook Exception"
-      parent="menu_rulebook_theme_root" />
+    <!-- Exception Management under Configuration -->
+    <menuitem id="menu_rulebook_exception" name="Exception Management"
+      parent="menu_rulebook_configuration" sequence="5" />
     <menuitem id="menu_rulebook_exception_process" name="Exception Processes"
       parent="menu_rulebook_exception" action="action_rulebook_exception_process" sequence="6" />
-    <!-- Exception Types -->
     <menuitem id="menu_rulebook_exception_type" name="Exception Types"
-      parent="menu_rulebook_exception"
-      action="action_rulebook_exception_type" sequence="5" />
+      parent="menu_rulebook_exception" action="action_rulebook_exception_type" sequence="5" />
+    <menuitem id="menu_regulatory_sources" name="Regulatory Sources"
+      parent="menu_rulebook_configuration" action="action_rulebook_sources" />
 
-   
 
-    <record id="action_custom_tree" model="ir.actions.act_window">
+    <!-- <record id="action_custom_tree" model="ir.actions.act_window">
       <field name="name">Custom Tree View</field>
       <field name="res_model">custom.tree.model</field>
       <field name="view_mode">tree,form</field>
@@ -169,7 +137,7 @@
     <menuitem id="menu_custom_tree"
       name="Custom Tree"
       action="action_custom_tree"
-      parent="menu_rulebook_theme_root" />
+      parent="menu_rulebook_theme_root" /> -->
 
   </data>
 
