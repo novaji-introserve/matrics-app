@@ -40,7 +40,8 @@
          "data/email_templates/escalation_email.xml",
          "views/rules/reply_log.xml",
          "views/rules/web_scaping.xml",
-         "data/schedules/web_scraping.xml"
+         "data/schedules/web_scraping.xml",
+         "views/public/thank_you.xml"
          
     ],
     # only loaded in demonstration mode

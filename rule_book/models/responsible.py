@@ -16,3 +16,4 @@ class ResCompany(models.Model):
     _inherit = "res.company"
 
     partner_gid = fields.Char(string="Partner GID")
+    iap_enrich_auto_done = fields.Boolean(string='Automatic Enrichment Done')

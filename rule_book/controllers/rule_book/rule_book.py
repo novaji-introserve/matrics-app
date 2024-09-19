@@ -149,7 +149,9 @@ class RuleBookController(http.Controller):
     def thank_you_page(self):
 
         # Decrypt the rulebook ID from the URL
-        return "report submitted Successfully"
+         return request.render(
+            "rule_book.thank_you"
+        )
 
     @http.route("/get_stored_document", type="http", auth="public", website=True)
     def get_stored_document(self):
