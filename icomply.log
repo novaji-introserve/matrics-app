@@ -1387,3 +1387,6 @@ ModuleNotFoundError: No module named 'dotenv'
 2024-09-17 11:33:54,206 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:54] "GET /web/assets/16-696d3dd/web.assets_frontend_minimal.min.js HTTP/1.1" 200 - 8 0.005 0.007
 2024-09-17 11:33:54,418 389209 INFO ? werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:54] "GET /web/static/img/favicon.ico HTTP/1.1" 200 - 0 0.000 0.002
 2024-09-17 11:33:54,437 389209 INFO icomply_odoo werkzeug: 127.0.0.1 - - [17/Sep/2024 11:33:54] "GET /web/assets/41-bd9e707/web.assets_frontend_lazy.min.js HTTP/1.1" 200 - 8 0.006 0.009
+2024-09-19 10:12:04,345 397501 ERROR icomply_odoo odoo.addons.bus.websocket: 400 Bad Request: Empty or missing header(s): upgrade 
+2024-09-19 10:12:04,346 397501 INFO icomply_odoo werkzeug: 127.0.0.1 - - [19/Sep/2024 10:12:04] "GET /websocket HTTP/1.1" 400 - 1 0.000 0.003
+2024-09-19 10:12:04,765 397501 INFO icomply_odoo werkzeug: 127.0.0.1 - - [19/Sep/2024 10:12:04] "POST /web/dataset/call_kw/rulebook/onchange HTTP/1.1" 200 - 1 0.000 0.004

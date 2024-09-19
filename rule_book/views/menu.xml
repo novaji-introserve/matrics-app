@@ -132,9 +132,9 @@
       <field name="res_model">custom.tree.model</field>
       <field name="view_mode">tree,form</field>
       <field name="target">current</field>
-    </record>
+    </record> -->
 
-    <menuitem id="menu_custom_tree"
+    <!-- <menuitem id="menu_custom_tree"
       name="Custom Tree"
       action="action_custom_tree"
       parent="menu_rulebook_theme_root" /> -->

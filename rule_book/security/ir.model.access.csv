@@ -13,5 +13,4 @@ access_rulebook_report_user,access_rulebook_report_user,model_rulebook_report,ba
 access_reply_log_user,access_reply_log_user,model_reply_log,,1,1,1,1
 access_rulebook_report_manager,access_rulebook_report_manager,model_rulebook_report,base.group_system,1,1,1,1
 access_reply_log_manager,access_reply_log_manager,model_reply_log,base.group_system,1,1,1,1
-access_custom_tree_model,access_custom_tree_model,model_custom_tree_model,,1,1,1,1
 access_external_resource,access_external_resource,model_external_resource,,1,1,1,1
