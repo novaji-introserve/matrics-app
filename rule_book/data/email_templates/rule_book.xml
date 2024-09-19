@@ -55,33 +55,47 @@
             <field name="name">Internal Due Date Reminder for Rulebook</field>
             <field name="email_from">{{object.data()['email_from']}}</field>
             <field name="model_id" ref="rule_book.model_rulebook" />
-            <field
-                name="email_cc">{{object.data()['email_from']}}</field>
-            <field name="email_to">
-                {{object.data()['email_to']}}</field>
+            <field name="email_cc">{{object.data()['email_from']}}</field>
+            <field name="email_to">{{object.data()['email_to']}}</field>
             <field name="subject">Internal Due Date for {{object.data()['title']}}</field>
             <field name="body_html" type="html">
-                <div>
-
-                    <p>Dear <t
-                            t-out="object.data()['name']"></t>,</p>
-                    <p>The internal due date for submitting the document for <strong>
-                            <t
-                                t-out="object.data()['title']" />
-                        </strong>
-                        is approaching. (<t
-                            t-out="object.data()['due_date']" />)</p>
-                    <p>Please upload the document before the due date.</p>
-                    <p>You can upload the document here:<a
-                            t-attf-href="#{object.data()['upload_link']}">Submit Document</a>.</p>
-                    <p>Thank you.</p>
-
+                <div
+                    style="font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0;">
+                    <div
+                        style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border: 1px solid #E0E0E0; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                        <div style="text-align: center; padding: 10px 0;">
+                            <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg"
+                                style="max-width: 150px;" />
+                        </div>
+                        <div style="padding: 20px;">
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong
+                                    style="color: #006400;">{{object.data()['name']}}</strong>,</p>
+                            <div
+                                style="background-color: #f0fff0; padding: 15px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
+                                <p style="font-size: 16px; color: #333333; line-height: 1.6;">The
+                                    internal due date for submitting the document for <strong
+                                        style="color: #006400;">{{object.data()['title']}}</strong>
+                                    is approaching. The due date is <strong style="color: #006400;">
+                                    {{object.data()['due_date']}}</strong>.</p>
+                                <p style="font-size: 16px; color: #333333; line-height: 1.6;">Please
+                                    ensure that the document is uploaded before the due date.</p>
+                            </div>
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can
+                                upload the document here: <a href="{{object.data()['upload_link']}}"
+                                    style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
+                                Document</a></p>
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">Thank you.</p>
+                        </div>
+                        <div
+                            style="text-align: center; margin-top: 30px; font-size: 12px; color: #999999;">
+                            <p>&amp;copy; 2024 Bank of Industry. All rights reserved.</p>
+                        </div>
+                    </div>
                 </div>
-
             </field>
             <field name="auto_delete" eval="False" />
         </record>
-  
+
     </data>
 </odoo>
 
