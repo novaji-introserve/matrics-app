@@ -554,8 +554,8 @@ class Rulebook(models.Model):
         events = self.env["calendar.event"].search(
             [
                 ("name", "ilike", "Escalation Due Date for"),
-                ("start", "<=", end_window_str),
-                ("start", ">=", start_window_str),
+                # ("start", "<=", end_window_str),
+                # ("start", ">=", start_window_str),
             ]
         )
         for event in events:
