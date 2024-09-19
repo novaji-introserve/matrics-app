@@ -5,7 +5,10 @@
             <div class="logo">
                 <img src="/rule_book/static/src/img/boi.jpeg" alt="Bank of Industry"/>
             </div>
-            <h2>Submit Your Report</h2>
+            <h2>Submit Your Report for </h2>
+            <h3 style="text-align: center;">
+                <t t-out="rulebook" />
+            </h3>
             <div class="highlight-box">
                 <form action="/submit_external_report" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="rulebook_id" t-att-value="rulebook_id" /> 
@@ -29,9 +32,7 @@
                     </p>
                 </form>
             </div>
-            <footer>
-                &amp;copy; 2024 Bank of Industry. All rights reserved.
-            </footer>
+            <footer> &amp;copy; <t t-out="current_year" /> Bank of Industry. All rights reserved. </footer>
         </div>
 
         <style type="text/css">

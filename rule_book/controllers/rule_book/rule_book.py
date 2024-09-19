@@ -6,6 +6,7 @@ from werkzeug.datastructures import FileStorage
 import base64
 import logging
 import os
+from datetime import datetime
 
 _logger = logging.getLogger(__name__)
 
@@ -62,12 +63,13 @@ class RuleBookController(http.Controller):
             # get the rule book data
             # Fetch the rulebook record using the provided ID
             rulebook = request.env["rulebook"].sudo().browse(int(rulebook_id))
+            reporter=kwargs.get("reporter")
             # Create the reply log record
             report = ReplyLog.sudo().create(
                 {
                     "rulebook_id": rulebook_id,
                     "reply_content": kwargs.get("reply_content"),
-                    "reporter": kwargs.get("reporter"),
+                    "reporter": reporter,
                     "document": document,
                     "rulebook_status": "submitted",
                     "rulebook_compute_date": rulebook.computed_date,
@@ -80,22 +82,23 @@ class RuleBookController(http.Controller):
             #
             url = f"{base_url}/web#id={report.id}&cids=1&menu_id=108&action=302&model=reply.log&view_type=form"
             # global data
+            current_year = datetime.now().year
             report.set_global_data(
                 {
-                "email_from": "icomply@bio.ng",
-                "email_to": rulebook.first_line_escalation.email,
-                "name": rulebook.name.name,
-                "content": kwargs.get("reply_content"),
-                "url_link": url,
-            }
-            ) 
+                    "email_from": "icomply@bio.ng",
+                    "email_to": rulebook.first_line_escalation.email,
+                    "name": rulebook.name.name,
+                    "content": kwargs.get("reply_content"),
+                    "url_link": url,
+                    "current_year": current_year,
+                }
+            )
 
             # Trigger alert to escalation officer
             self.trigger_escalation_alert(report)
 
             # Redirect to a thank-you page or another action
-            return request.redirect("/thank_you")
-
+            return request.redirect(f"/thank_you?reporter={reporter}")
         except ValueError as e:
             # Handle specific ValueErrors (e.g., missing rulebook_id)
             _logger.error(f"ValueError in submit_external_report: {str(e)}")
@@ -124,10 +127,17 @@ class RuleBookController(http.Controller):
 
         # Decrypt the rulebook ID from the URL
         rulebook_id = decrypt_id(encrypted_id)
+        rulebook = request.env["rulebook"].sudo().browse(int(rulebook_id))
+        if not rulebook:
+            error_message="The Rulebook No longer exist on the system"
+            return request.redirect(f"/error?message={error_message}")
+        current_year = datetime.now().year
         return request.render(
             "rule_book.external_submission_template",
             {
                 "rulebook_id": rulebook_id,
+                "current_year": current_year,
+                "rulebook": rulebook.name.name if rulebook.name else "",
             },
         )
 
@@ -147,10 +157,13 @@ class RuleBookController(http.Controller):
 
     @http.route("/thank_you", type="http", auth="public", website=True)
     def thank_you_page(self):
-
+        current_year = datetime.now().year
+        reporter = request.params.get("reporter")
         # Decrypt the rulebook ID from the URL
-         return request.render(
-            "rule_book.thank_you"
+        return request.render(
+            "rule_book.thank_you_page_template",
+            {"current_year": current_year,
+             "report_submitter": reporter},
         )
 
     @http.route("/get_stored_document", type="http", auth="public", website=True)
