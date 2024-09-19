@@ -1,0 +1,190 @@
+// // Define color variables
+$primary-color: #00984C; // Green
+$danger-color: #FF0000; // Red
+$background-color: #FFFFFF; // White
+// $input-border-color: lighten($primary-color, 30%); // Light Green for input borders
+
+// // General adjustments for Odoo backend
+// .o_control_panel {
+//     background-color: white !important;
+//     color: $background-color !important;
+// }
+
+// .o_main_navbar {
+//     background-color: $primary-color !important;
+//     color: $background-color !important;
+
+//     .o_user_menu a {
+//         color: $background-color !important;
+//     }
+
+//     .dropdown-menu {
+//         background-color: darken($primary-color, 10%) !important;
+//         color: $background-color !important;
+//     }
+// }
+
+// // List View adjustments
+// .o_list_view th,
+// .o_list_view td {
+//     border-bottom: 1px solid $primary-color !important;
+// }
+
+//  $o-community-color: pink !default;
+// // Form styling
+// .o_form_view {
+//     background-color: $background-color !important;
+
+//     .o_form_label {
+//         color: $primary-color !important;
+//     }
+
+//     // Styling input fields
+//     .o_field_widget.o_field_char,
+//     .o_field_widget.o_field_many2one,
+//     .o_field_widget.o_field_selection {
+//         background-color: $background-color !important;
+//         border: 1px solid $input-border-color !important;
+//         border-radius: 8px !important; // Box-like with rounded corners
+//         padding: 10px !important;
+//         margin-bottom: 15px !important;
+//         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important; // Subtle shadow for depth
+//     }
+
+//     // Ensure input fields are properly aligned and spaced
+//     .o_form_sheet {
+//         display: grid;
+//         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+//         grid-gap: 20px;
+//     }
+
+//     // Style text areas and HTML fields similarly
+//     .o_field_widget.o_field_text,
+//     .o_field_widget.o_field_html {
+//         border: 1px solid $input-border-color !important;
+//         border-radius: 8px !important;
+//         padding: 10px !important;
+//         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+//         min-height: 150px;
+//     }
+// }
+
+// // Button styling
+// .o_form_button {
+//     background-color: $primary-color !important;
+//     border: 1px solid $primary-color !important;
+//     color: $background-color !important;
+//     border-radius: 5px !important;
+//     padding: 10px 20px !important;
+//     font-weight: bold;
+
+//     &:hover {
+//         background-color: darken($primary-color, 10%) !important;
+//         border-color: darken($primary-color, 10%) !important;
+//     }
+// }
+
+// // Danger buttons or warnings
+// .btn-danger {
+//     background-color: $danger-color !important;
+//     border-color: $danger-color !important;
+//     color: $background-color !important;
+
+//     &:hover {
+//         background-color: darken($danger-color, 10%) !important;
+//         border-color: darken($danger-color, 10%) !important;
+//     }
+// }
+
+// // Sidebar adjustments
+// .o_app {
+//     background-color: $primary-color !important;
+//     color: $background-color !important;
+
+//     &:hover {
+//         background-color: darken($primary-color, 10%) !important;
+//     }
+// }
+
+// // Card View adjustments
+// .o_kanban_view .o_kanban_record {
+//     background-color: $background-color !important;
+//     border-radius: 10px !important;
+//     border: 1px solid $input-border-color !important;
+//     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+//     padding: 15px;
+// }
+
+
+// List View adjustments
+.o_list_view th,
+.o_list_view td {
+    border-bottom: 1px solid $primary-color !important;
+}
+
+$o-community-color: #00847C !default;
+
+// Form styling
+.o_form_view {
+    background-color: $background-color !important;
+
+    .o_form_label {
+        color: $primary-color !important;
+    }
+
+    // Styling input fields
+    .o_field_widget.o_field_char,
+    .o_field_widget.o_field_many2one,
+    .o_field_widget.o_field_selection {
+        background-color: $background-color !important;
+        border: 1px solid $input-border-color !important;
+        border-radius: 8px !important; // Box-like with rounded corners
+        padding: 10px !important;
+        margin-bottom: 15px !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important; // Subtle shadow for depth
+    }
+
+    // Ensure input fields are properly aligned and spaced
+    .o_form_sheet {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-gap: 20px;
+    }
+
+    // Style text areas and HTML fields similarly
+    .o_field_widget.o_field_text,
+    .o_field_widget.o_field_html {
+        border: 1px solid $input-border-color !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+        min-height: 150px;
+    }
+}
+
+// Button styling
+.o_form_button {
+    background-color: $primary-color !important;
+    border: 1px solid $primary-color !important;
+    color: $background-color !important;
+    border-radius: 5px !important;
+    padding: 10px 20px !important;
+    font-weight: bold;
+
+    &:hover {
+        background-color: darken($primary-color, 10%) !important;
+        border-color: darken($primary-color, 10%) !important;
+    }
+}
+
+// Danger buttons or warnings
+.btn-danger {
+    background-color: $danger-color !important;
+    border-color: $danger-color !important;
+    color: $background-color !important;
+
+    &:hover {
+        background-color: darken($danger-color, 10%) !important;
+        border-color: darken($danger-color, 10%) !important;
+    }
+}

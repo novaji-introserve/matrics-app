@@ -271,9 +271,10 @@ class Rulebook(models.Model):
         return f"{base_url}/report_submission/{appendedValue}"
 
     def _record_link(self, id):
+        print(id)
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         #
-        return f"{base_url}/web#id={id}&cids=1&menu_id=108&action=149&model=rulebook&view_type=form"
+        return f"{base_url}/web#id={id}&cids=1&menu_id=108&action=306&model=rulebook&view_type=form"
 
     @api.depends("risk_category")
     def _compute_risk_rating(self):
@@ -435,6 +436,7 @@ class Rulebook(models.Model):
 
             # send out email if the record frequency is immediate
         if record.frequency_type == "immediate":
+            current_year = datetime.now().year
             global global_data
             global_data = {
                 "email_to": record.responsible_id.email,
@@ -444,6 +446,7 @@ class Rulebook(models.Model):
                 "email_from": os.getenv("EMAIL_FROM"),
                 "email_cc": record.responsible_id.cc,
                 "due_date": record.internal_due_date,
+                "current_year": current_year,
             }
 
             print(record)
@@ -451,14 +454,12 @@ class Rulebook(models.Model):
             # Ensure rulebook_id is active and frequency_type is not "immediate"
 
             template_id = self.env.ref("rule_book.email_template_internal_due_date_").id
-            print(template_id)
             template = self.env["mail.template"].browse(template_id)
-            print(template)
 
             if template.exists():
                 # Send the email immediately
                 print("i was called here ")
-                return template.send_mail(record.id, force_send=True)
+                template.send_mail(record.id, force_send=True)
             else:
                 print(f"Mail template with ID {template_id} not found.")
 
@@ -491,6 +492,7 @@ class Rulebook(models.Model):
         if "frequency_type" in vals and vals["frequency_type"] == "immediate":
             print("it came here")
             record = self.env["rulebook"].browse(self.id)
+            current_year = datetime.now().year
             global global_data
             global_data = {
                 "email_to": record.responsible_id.email,
@@ -500,6 +502,7 @@ class Rulebook(models.Model):
                 "email_from": os.getenv("EMAIL_FROM"),
                 "email_cc": record.responsible_id.cc,
                 "due_date": record.internal_due_date,
+                "current_year": current_year,
             }
 
             print(record)
@@ -535,7 +538,7 @@ class Rulebook(models.Model):
         day = dt.day
         month = dt.strftime("%B")
         year = dt.year
-        hour = dt.strftime("%I")
+        hour = dt.strftime("%-I")  # Remove leading zero from the hour
         minute = dt.strftime("%M")
         am_pm = dt.strftime("%p").lower()
 
@@ -558,22 +561,22 @@ class Rulebook(models.Model):
         for record in self:
             # Ensure any existing events are removed
             events = self.env["calendar.event"].search(
-                [("name", "ilike", f"Regulatory Due Date for {record.name}")]
+                [("name", "ilike", f"Regulatory Due Date for {record.id}")]
             )
             events.unlink()
             events = self.env["calendar.event"].search(
-                [("name", "ilike", f"Internal Due Date for {record.name}")]
+                [("name", "ilike", f"Internal Due Date for {record.id}")]
             )
             events.unlink()
             events = self.env["calendar.event"].search(
-                [("name", "ilike", f"Escalation Due Date for {record.name}")]
+                [("name", "ilike", f"Escalation Due Date for {record.id}")]
             )
             events.unlink()
 
             if record.computed_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Regulatory Due Date for {record.name}",
+                        "name": f"Regulatory Due Date for {record.id}",
                         "start": record.computed_date,
                         "stop": record.computed_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -584,7 +587,7 @@ class Rulebook(models.Model):
             if record.internal_due_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Internal Due Date for {record.name}",
+                        "name": f"Internal Due Date for {record.id}",
                         "start": record.internal_due_date,
                         "stop": record.internal_due_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -595,7 +598,7 @@ class Rulebook(models.Model):
             if record.escalation_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Escalation Due Date for {record.name}",
+                        "name": f"Escalation Due Date for {record.id}",
                         "start": record.escalation_date,
                         "stop": record.escalation_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -614,6 +617,7 @@ class Rulebook(models.Model):
         # Convert to Odoo Datetime format
         start_window_str = fields.Datetime.to_string(start_window)
         end_window_str = fields.Datetime.to_string(end_window)
+        current_year = datetime.now().year
 
         # regulatory due date
         # Find events related to rulebooks that are within the 29-minute window
@@ -626,21 +630,33 @@ class Rulebook(models.Model):
         )
         for event in events:
 
-            print(self.get_record_name(event.name.split(" ")[-1]))
-
             global_data = {
                 "name": self.get_record_name(event.name.split(" ")[-1]),
             }
             rulebook_id = self.env["rulebook"].search(
-                [("name", "=", self.get_record_name(event.name.split(" ")[-1]))]
+                [("id", "=", event.name.split(" ")[-1])]
             )
+            print(event.name.split(" ")[-1])
+            print(rulebook_id)
+            global_data = {
+                "email_to": rulebook_id.first_line_escalation.email, 
+                "first_line_escalation": rulebook_id.first_line_escalation.name,
+                "rulebook_name": rulebook_id.name.name,
+                "upload_link": self._compute_upload_link(rulebook_id.id),
+                "email_from":  os.getenv("EMAIL_FROM"),
+                "email_cc": rulebook_id.second_line_escalation.email,
+                "regulatory_name":rulebook_id.regulatory_agency_id.name,
+                "risk_category": rulebook_id.risk_category.name,
+                "record_link": self._record_link(rulebook_id.id),
+                "current_year": current_year,
+            }
             if (
                 rulebook_id
                 and rulebook_id.status == "active"
                 and rulebook_id.frequency_type != "immediate"
             ):
                 template_id = self.env.ref(
-                    "rule_book.rulebook_due_date_email_template"
+                    "rule_book.rulebook_due_date_notification_template"
                 ).id
                 self.env["mail.template"].browse(template_id).send_mail(
                     rulebook_id.id, force_send=True
@@ -650,26 +666,28 @@ class Rulebook(models.Model):
         events = self.env["calendar.event"].search(
             [
                 ("name", "ilike", "Escalation Due Date for"),
-                # ("start", "<=", end_window_str),
-                # ("start", ">=", start_window_str),
+                ("start", "<=", end_window_str),
+                ("start", ">=", start_window_str),
             ]
         )
         for event in events:
 
-            print(self.get_record_name(event.name.split(" ")[-1]))
+            # print(self.get_record_name(event.name.split(" ")[-1]))
 
             rulebook_id = self.env["rulebook"].search(
-                [("name", "=", self.get_record_name(event.name.split(" ")[-1]))]
+                [("id", "=", event.name.split(" ")[-1])]
             )
+
             global_data = {
                 "email_to": rulebook_id.first_line_escalation.email,
                 "name": rulebook_id.first_line_escalation.name,
                 "title": rulebook_id.name.name,
                 "upload_link": self._compute_upload_link(rulebook_id.id),
-                "email_from": "icomply@boi.com.ng",
+                "email_from":  os.getenv("EMAIL_FROM"),
                 "email_cc": rulebook_id.second_line_escalation.email,
                 "due_date": self._compute_formatted_date(rulebook_id.escalation_date),
                 "record_link": self._record_link(rulebook_id.id),
+                "current_year": current_year,
             }
             if (
                 rulebook_id
@@ -697,16 +715,17 @@ class Rulebook(models.Model):
             print(self.get_record_name(event.name.split(" ")[-1]))
 
             rulebook_id = self.env["rulebook"].search(
-                [("name", "=", self.get_record_name(event.name.split(" ")[-1]))]
+                [("id", "=", event.name.split(" ")[-1])]
             )
             global_data = {
                 "email_to": rulebook_id.responsible_id.email,
                 "name": rulebook_id.first_line_escalation.name,
                 "title": rulebook_id.name.name,
                 "upload_link": self._compute_upload_link(rulebook_id.id),
-                "email_from": "icomply@boi.com.ng",
+                "email_from":  os.getenv("EMAIL_FROM"),
                 "email_cc": rulebook_id.responsible_id.cc,
                 "due_date": self._compute_formatted_date(rulebook_id.internal_due_date),
+                "current_year": current_year,
             }
             print(rulebook_id)
             if (
