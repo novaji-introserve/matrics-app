@@ -61,9 +61,9 @@ class RuleBookController(http.Controller):
 
             # get the rule book data
             # Fetch the rulebook record using the provided ID
-            rulebook = request.env["rulebook"].browse(int(rulebook_id))
+            rulebook = request.env["rulebook"].sudo().browse(int(rulebook_id))
             # Create the reply log record
-            report = ReplyLog.create(
+            report = ReplyLog.sudo().create(
                 {
                     "rulebook_id": rulebook_id,
                     "reply_content": kwargs.get("reply_content"),
@@ -112,7 +112,7 @@ class RuleBookController(http.Controller):
         # Logic for sending email to escalation officers
 
         template = request.env.ref("rule_book.email_template_escalation")
-        template.send_mail(report.id, force_send=True)
+        template.sudo().send_mail(report.id, force_send=True)
 
     @http.route(
         "/report_submission/<string:encrypted_id>",
@@ -152,7 +152,7 @@ class RuleBookController(http.Controller):
         return "report submitted Successfully"
 
     @http.route("/get_stored_document", type="http", auth="public", website=True)
-    def thank_you_page(self):
+    def get_stored_document(self):
 
         # Decrypt the rulebook ID from the URL
         return "report submitted Successfully"

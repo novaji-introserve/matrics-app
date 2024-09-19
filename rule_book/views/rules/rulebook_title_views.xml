@@ -38,6 +38,7 @@
                     <group>
                         <field name="created_on" readonly="1" />
                         <field name="created_by" readonly="1" />
+                        <field name="external_resource_url" readonly="1" />
                     </group>
                 </sheet>
             </form>

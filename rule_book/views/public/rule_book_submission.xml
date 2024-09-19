@@ -1,27 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="external_submission_template" name="External Submission">
-        <!-- <t t-call="website.layout"> -->
         <div class="container">
+            <div class="logo">
+                <img src="/rule_book/static/src/img/boi.jpeg" alt="Bank of Industry"/>
+            </div>
             <h2>Submit Your Report</h2>
-            <form action="/submit_external_report" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="rulebook_id" t-att-value="rulebook_id" /> <!-- Hidden
-                input for rulebook_id -->
-                <div class="form-group">
-                    <label for="reply_content">Description</label>
-                    <textarea name="reply_content" class="form-control" required="True"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="reporter">Inputer Name</label>
-                    <input type="text" name="reporter" class="form-control" required="True" />
-                </div>
-                <div class="form-group">
-                    <label for="document">Attach Document</label>
-                    <input type="file" name="document" class="form-control" required="True" />
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            <div class="highlight-box">
+                <form action="/submit_external_report" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="rulebook_id" t-att-value="rulebook_id" /> 
+                    <p>
+                        <label for="reply_content">Description</label>
+                        <textarea name="reply_content" id="reply_content" rows="3"
+                            class="form-control" required="True"></textarea>
+                    </p>
+                    <p>
+                        <label for="reporter">Inputer Name</label>
+                        <input type="text" name="reporter" id="reporter" class="form-control"
+                            required="True"/>
+                    </p>
+                    <p>
+                        <label for="document">Attach Document</label>
+                        <input type="file" name="document" id="document" class="form-control"
+                            required="True"/>
+                    </p>
+                    <p style="text-align: center;">
+                        <input type="submit" value="Submit Report" class="btn btn-primary"/>
+                    </p>
+                </form>
+            </div>
+            <footer>
+                &amp;copy; 2024 Bank of Industry. All rights reserved.
+            </footer>
         </div>
-        <!-- </t> -->
+
+        <style type="text/css">
+            body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* Light blue background */
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            }
+            .container {
+            background-color: #ffffff;
+            margin: 40px auto;
+            padding: 30px;
+            max-width: 600px;
+            border: 1px solid #dddddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #f6f8f9 30%, #ffffff); /* Gradient for extra style
+            */
+            }
+            h2 {
+            color: #006400; /* Bank of Industry Green */
+            text-align: center;
+            font-family: "Lucida Sans", sans-serif;
+            font-size: 26px;
+            margin-bottom: 20px;
+            }
+            label {
+            font-size: 16px;
+            color: #FF0000; /* Red labels */
+            }
+            input[type="text"], textarea, input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background-color: #f9f9f9;
+            }
+            input[type="submit"] {
+            background-color: #FF8C00; /* Bright orange button */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            }
+            input[type="submit"]:hover {
+            background-color: #FF4500; /* Darker orange on hover */
+            }
+            .logo {
+            display: block;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            }
+            .logo img {
+            width: 180px;
+            }
+            .highlight-box {
+            background-color: #f0fff0; /* Pale green background for content areas */
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #006400;
+            }
+            footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666666;
+            }
+        </style>
     </template>
+
 </odoo>
+
+
+<!-- <template id="external_submission_template" name="External Submission">
+
+    <div class="container">
+        <h2>Submit Your Report</h2>
+        <form action="/submit_external_report" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="rulebook_id" t-att-value="rulebook_id" /> 
+            <div class="form-group">
+                <label for="reply_content">Description</label>
+                <textarea name="reply_content" class="form-control" required="True"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="reporter">Inputer Name</label>
+                <input type="text" name="reporter" class="form-control" required="True" />
+            </div>
+            <div class="form-group">
+                <label for="document">Attach Document</label>
+                <input type="file" name="document" class="form-control" required="True" />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+</template> -->

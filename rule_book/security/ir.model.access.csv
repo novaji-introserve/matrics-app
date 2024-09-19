@@ -1,7 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_rulebook_theme_user,access_rulebook_theme_user,model_rulebook_theme,base.group_user,1,1,1,1
 access_rulebook_sources,access_rulebook_sources,model_rulebook_sources,,1,1,1,0
-access_rulebook_title,rulebook.title access,model_rulebook_title,base.group_user,1,1,1,0
+access_rulebook_title,rulebook.title access,model_rulebook_title,base.group_user,1,1,1,1
 access_rulebook_theme,access.rulebook.theme,model_rulebook_theme,,1,1,1,1
 access_rulebook,access.rulebook,model_rulebook,,1,1,1,1
 access_responsible,access.responsible,model_rulebook_responsible,,1,1,1,1
@@ -10,7 +10,7 @@ access_exception_process,access.exception.process,model_rulebook_exception_proce
 access_risk_category,access.risk.category,model_rulebook_risk_category,,1,1,1,1
 access_department,access.department,model_rulebook_department,,1,1,1,1
 access_rulebook_report_user,access_rulebook_report_user,model_rulebook_report,base.group_user,1,1,1,1
-access_reply_log_user,access_reply_log_user,model_reply_log,base.group_user,1,1,1,1
+access_reply_log_user,access_reply_log_user,model_reply_log,,1,1,1,1
 access_rulebook_report_manager,access_rulebook_report_manager,model_rulebook_report,base.group_system,1,1,1,1
 access_reply_log_manager,access_reply_log_manager,model_reply_log,base.group_system,1,1,1,1
 access_external_resource,access_external_resource,model_external_resource,,1,1,1,1

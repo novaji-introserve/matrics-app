@@ -7,6 +7,10 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # Rulebook Title Model
 class Rulebook(models.Model):
@@ -393,6 +397,36 @@ class Rulebook(models.Model):
         record = super(Rulebook, self).create(vals)
         if record.internal_due_date and record.escalation_date:
             record._schedule_due_dates()
+
+            # send out email if the record frequency is immediate
+        if record.frequency_type=="immediate":
+            global global_data
+            global_data = {
+                "email_to": record.responsible_id.email,
+                "name": record.first_line_escalation.name,
+                "title": record.name.name,
+                "upload_link": self._compute_upload_link(record.id),
+                "email_from": os.getenv("EMAIL_FROM"),
+                "email_cc": record.responsible_id.cc,
+                "due_date": record.internal_due_date,
+            }
+
+            print(record)
+
+            # Ensure rulebook_id is active and frequency_type is not "immediate"
+
+            template_id = self.env.ref("rule_book.email_template_internal_due_date_").id
+            print(template_id)
+            template = self.env['mail.template'].browse(template_id)
+            print(template)
+
+            if template.exists():
+                # Send the email immediately
+                print('i was called here ')
+                return template.send_mail(record.id, force_send=True)
+            else:
+                print(f"Mail template with ID {template_id} not found.")
+
         return record
 
     # editing the record
@@ -419,7 +453,35 @@ class Rulebook(models.Model):
         if "internal_due_date" in vals and "escalation_date" in vals:
             if hasattr(self, '_schedule_due_dates'):
                 self._schedule_due_dates()
+        if "frequency_type" in vals and vals["frequency_type"] == "immediate":
+            print('it came here')
+            record = self.env["rulebook"].browse(self.id)
+            global global_data
+            global_data = {
+                "email_to": record.responsible_id.email,
+                "name": record.first_line_escalation.name,
+                "title": record.name.name,
+                "upload_link": self._compute_upload_link(record.id),
+                "email_from": os.getenv("EMAIL_FROM"),
+                "email_cc": record.responsible_id.cc,
+                "due_date": record.internal_due_date,
+            }
 
+            print(record)
+
+            # Ensure rulebook_id is active and frequency_type is not "immediate"
+
+            template_id = self.env.ref("rule_book.email_template_internal_due_date_").id
+            print(template_id)
+            template = self.env['mail.template'].browse(template_id)
+            print(template)
+
+            if template.exists():
+                # Send the email immediately
+                print('i was called here ')
+                return template.send_mail(record.id, force_send=True)
+            else:
+                print(f"Mail template with ID {template_id} not found.")
         # Return the result of the write operation
         return result
 
@@ -480,7 +542,11 @@ class Rulebook(models.Model):
                 "name": self.get_record_name(event.name.split(' ')[-1]),
         }
             rulebook_id = self.env['rulebook'].search([('name', '=', self.get_record_name(event.name.split(' ')[-1]))])
-            if rulebook_id and rulebook_id.status=="active":
+            if (
+                rulebook_id
+                and rulebook_id.status == "active"
+                and rulebook_id.frequency_type != "immediate"
+            ):
                 template_id = self.env.ref('rule_book.rulebook_due_date_email_template').id
                 self.env['mail.template'].browse(template_id).send_mail(rulebook_id.id, force_send=True)
         # escalation due date
@@ -488,8 +554,8 @@ class Rulebook(models.Model):
         events = self.env["calendar.event"].search(
             [
                 ("name", "ilike", "Escalation Due Date for"),
-                ("start", "<=", end_window_str),
-                ("start", ">=", start_window_str),
+                # ("start", "<=", end_window_str),
+                # ("start", ">=", start_window_str),
             ]
         )
         for event in events:
@@ -507,7 +573,11 @@ class Rulebook(models.Model):
                 "due_date": rulebook_id.escalation_date,
                 "record_link": self._record_link(rulebook_id.id),
             }
-            if rulebook_id and rulebook_id.status == "active":
+            if (
+                rulebook_id
+                and rulebook_id.status == "active"
+                and rulebook_id.frequency_type != "immediate"
+            ):
                 template_id = self.env.ref(
                     "rule_book.email_template_first_line_escalation"
                 ).id
@@ -537,7 +607,11 @@ class Rulebook(models.Model):
                 "due_date": rulebook_id.internal_due_date,
             }
             print(rulebook_id)
-            if rulebook_id and rulebook_id.status == "active":
+            if (
+                rulebook_id
+                and rulebook_id.status == "active"
+                and rulebook_id.frequency_type != "immediate"
+            ):
                 template_id = self.env.ref(
                     "rule_book.email_template_internal_due_date_"
                 ).id
