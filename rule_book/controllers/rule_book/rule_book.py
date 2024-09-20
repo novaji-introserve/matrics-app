@@ -67,7 +67,7 @@ class RuleBookController(http.Controller):
             # Create the reply log record
             report = ReplyLog.sudo().create(
                 {
-                    "rulebook_id": rulebook_id,
+                    "rulebook_id": rulebook.id,
                     "reply_content": kwargs.get("reply_content"),
                     "reporter": reporter,
                     "document": document,

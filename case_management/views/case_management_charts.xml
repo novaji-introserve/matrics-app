@@ -1,0 +1,64 @@
+<odoo>
+    <!-- Case By Status Bar Chart -->
+    <record id="view_case_by_status_chart" model="ir.ui.view">
+        <field name="name">case.by.status.chart</field>
+        <field name="model">case.management</field>
+        <field name="arch" type="xml">
+            <graph string="Cases By Status">
+                <!-- <field name="status_id"/> -->
+                <field name="id" type="many2one"/>
+                <field name="title"/>
+                <field name="count" type="integer" />
+                <group>
+                    <!-- <field name="status_id" filter_domain="[('status_id', '!=', False)]" /> -->
+                </group>
+                <graph>
+                    <field name="count" type="integer" />
+                    <!-- <field name="status_id" type="many2one"/> -->
+                </graph>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Case By Severity Bar Chart -->
+    <record id="view_case_by_severity_chart" model="ir.ui.view">
+        <field name="name">case.by.severity.chart</field>
+        <field name="model">case.management</field>
+        <field name="arch" type="xml">
+            <graph string="Cases By Severity">
+                <field name="rating_id"/>
+                <field name="id" type="many2one"/>
+                <field name="title"/>
+                <field name="count" type="integer" />
+                <group>
+                    <field name="rating_id" filter_domain="[('rating_id', '!=', False)]" />
+                </group>
+                <graph>
+                    <field name="count" type="integer" />
+                    <field name="rating_id" type="many2one"/>
+                </graph>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Case By Category Bar Chart -->
+    <record id="view_case_by_category_chart" model="ir.ui.view">
+        <field name="name">case.by.category.chart</field>
+        <field name="model">case.management</field>
+        <field name="arch" type="xml">
+            <graph string="Cases By Category">
+                <!-- <field name="category_id"/> -->
+                <field name="id" type="many2one"/>
+                <field name="title"/>
+                <field name="count" type="integer" />
+                <group>
+                    <!-- <field name="category_id" filter_domain="[('category_id', '!=', False)]" /> -->
+                </group>
+                <graph>
+                    <field name="count" type="integer" />
+                    <!-- <field name="category_id" type="many2one"/> -->
+                </graph>
+            </graph>
+        </field>
+    </record>
+</odoo>

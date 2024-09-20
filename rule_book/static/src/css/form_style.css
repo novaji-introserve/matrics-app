@@ -1,0 +1,101 @@
+/* Add some basic styling to form elements */
+
+/* Form sections */
+/* .section-group {
+    background-color: #f7f7f7;
+    padding: 20px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+} */
+
+/* :root {
+    --primary-color: #0DA75E;
+    --white: white
+}
+  form {
+      margin: 10% auto 0 auto;
+      padding: 30px;
+      width: 400px;
+      height: auto;
+      overflow: hidden;
+      background: white;
+      border-radius: 10px;
+  }
+
+  form label {
+      font-size: 14px;
+      color: darkgray;
+      cursor: pointer;
+  }
+
+  form label,
+  form input {
+      float: left;
+      clear: both;
+  }
+
+ .o_input {
+      margin: 15px 0 !important;
+      padding: 15px 10px !important;
+      width: 100% !important;
+      outline: none !important;
+      border: 1px solid #bbb !important;
+      border-radius: 20px !important;
+      display: inline-block !important;
+      -webkit-box-sizing: border-box !important;
+      -moz-box-sizing: border-box !important;
+      box-sizing: border-box !important;
+      -webkit-transition: 0.2s ease all !important;
+      -moz-transition: 0.2s ease all !important;
+      -ms-transition: 0.2s ease all !important;
+      -o-transition: 0.2s ease all !important;
+      transition: 0.2s ease all !important;
+  }
+
+  form input[type=text]:focus,
+  form input[type="password"]:focus {
+      border-color: cornflowerblue;
+  }
+
+  .btn-primary {
+      padding: 15px 40px !important;
+      width: auto !important;
+      background: var(--primary-color) !important;
+      border-radius: 15px;
+      border: none;
+      color: white !important;
+      cursor: pointer !important;
+      display: inline-block !important;
+      clear: right !important;
+      -webkit-transition: 0.2s ease all !important;
+      -moz-transition: 0.2s ease all !important;
+      -ms-transition: 0.2s ease all !important;
+      -o-transition: 0.2s ease all !important;
+      transition: 0.2s ease all !important;
+  }
+  .btn-outline-primary {
+      padding: 10px 15px !important;
+      width: auto !important;
+      background: var(--white) !important;
+      border-radius: 15px;
+      border:1px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+      cursor: pointer !important;
+      display: inline-block !important;
+      clear: right !important;
+      -webkit-transition: 0.2s ease all !important;
+      -moz-transition: 0.2s ease all !important;
+      -ms-transition: 0.2s ease all !important;
+      -o-transition: 0.2s ease all !important;
+      transition: 0.2s ease all !important;
+  }
+
+  input[type=submit]:hover {
+      opacity: 0.8;
+  }
+
+  input[type="submit"]:active {
+      opacity: 0.4;
+  } */

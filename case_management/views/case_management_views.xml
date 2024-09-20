@@ -1,0 +1,166 @@
+<odoo>
+    <!-- Form View -->
+    <record id="view_case_form" model="ir.ui.view">
+        <field name="name">case.management.form</field>
+        <field name="model">case.management</field>
+        <field name="arch" type="xml">
+            <form string="Case Management">
+                <sheet>
+                    <group>
+                        <field name="title"/>
+                        <field name="description"/>
+                        <field name="created_at" readonly="1"/>
+                        <field name="updated_at" readonly="1"/>
+                        <!-- <field name="status_id"/>
+                        <field name="alert_id"/>
+                        <field name="team_id"/>
+                        <field name="staff_id"/> -->
+                        <field name="action"/>
+                        <field name="user_id"/>
+                        <field name="event_date"/>
+                        <field name="rating_id"/>
+                        <!-- <field name="exception_process_id"/> -->
+                        <field name="response_note"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <!-- <button name="action_confirm" type="object" string="Confirm" class="btn-primary"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"/> -->
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_case_tree" model="ir.ui.view">
+        <field name="name">case.management.tree</field>
+        <field name="model">case.management</field>
+        <field name="arch" type="xml">
+            <tree string="Case Management">
+                <field name="title"/>
+                <!-- <field name="status_id"/> -->
+                <field name="event_date"/>
+                <!-- <field name="staff_id"/> -->
+                <field name="action"/>
+                <field name="updated_at"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Exceptions Logs Form View -->
+    <record id="view_exceptions_logs_form" model="ir.ui.view">
+        <field name="name">exceptions.logs.form</field>
+        <field name="model">exceptions.logs</field>
+        <field name="arch" type="xml">
+            <form string="Exception Logs">
+                <sheet>
+                    <group>
+                        <field name="title"/>
+                        <field name="user_id"/>
+                        <field name="rating_id"/>
+                        <field name="event_date"/>
+                        <field name="category_id"/>
+                        <field name="status_id"/>
+                        <field name="action"/>
+                        <field name="created_at" readonly="1"/>
+                        <field name="rule_id"/>
+                        <field name="transaction_id"/>
+                        <field name="process_id"/>
+                        <field name="staff_id"/>
+                        <field name="team_id"/>
+                        <field name="alert_id"/>
+                        <field name="closed_date"/>
+                        <field name="direct_supervisor"/>
+                        <field name="group_head"/>
+                        <field name="divisional_head"/>
+                        <field name="close_remarks"/>
+                        <field name="attachment"/>
+                        <field name="attachment_mime_type"/>
+                        <field name="attachment_last_updated"/>
+                        <field name="attachment_filename"/>
+                        <field name="attachment_charset"/>
+                        <field name="response_note"/>
+                        <field name="customer_id"/>
+                        <field name="exception_process_id"/>
+                        <field name="description"/>
+                        <field name="transaction_ref"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Exceptions Logs Tree View -->
+    <record id="view_exceptions_logs_tree" model="ir.ui.view">
+        <field name="name">exceptions.logs.tree</field>
+        <field name="model">exceptions.logs</field>
+        <field name="arch" type="xml">
+            <tree string="Exception Logs">
+                <field name="title"/>
+                <field name="user_id"/>
+                <field name="rating_id"/>
+                <field name="event_date"/>
+                <field name="category_id"/>
+                <field name="status_id"/>
+                <field name="action"/>
+                <field name="created_at"/>
+                <field name="closed_date"/>
+                <field name="transaction_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Case Statistics Dashboard -->
+    <record id="view_case_statistics_dashboard" model="ir.ui.view">
+        <field name="name">case.statistics.dashboard</field>
+        <field name="model">case.management</field>
+        <field name="arch" type="xml">
+            <dashboard>
+                <group>
+                    <!-- <widget name="case_statistics" type="graph">
+                        <field name="all_cases"/>
+                        <field name="open_cases"/>
+                        <field name="close_cases"/>
+                        <field name="overdue_cases"/>
+                        <field name="closed_case_rate"/>
+                        <field name="open_case_rate"/>
+                    </widget> -->
+                </group>
+                <group>
+                    <widget name="case_by_status" type="graph">
+                        <!-- <field name="status_id"/> -->
+                    </widget>
+                    <widget name="case_by_severity" type="graph">
+                        <field name="rating_id"/>
+                    </widget>
+                    <widget name="case_by_category" type="graph">
+                        <!-- <field name="category_id"/> -->
+                    </widget>
+                </group>
+                <group>
+                    <widget name="staff_open_cases" type="list">
+                        <!-- <field name="staff_id"/> -->
+                        <field name="open_cases"/>
+                    </widget>
+                    <widget name="staff_avg_resolution_time" type="list">
+                        <!-- <field name="staff_id"/> -->
+                        <field name="avg_resolution_time"/>
+                    </widget>
+                    <widget name="top_5_overdue_cases" type="list">
+                        <!-- <field name="staff_id"/> -->
+                        <!-- <field name="overdue_cases"/> -->
+                    </widget>
+                    <widget name="top_5_case_by_category" type="list">
+                        <!-- <field name="category_id"/> -->
+                        <field name="case_count"/>
+                    </widget>
+                </group>
+            </dashboard>
+        </field>
+    </record>
+
+</odoo>

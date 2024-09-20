@@ -445,7 +445,7 @@ class Rulebook(models.Model):
                 "upload_link": self._compute_upload_link(record.id),
                 "email_from": os.getenv("EMAIL_FROM"),
                 "email_cc": record.responsible_id.cc,
-                "due_date": record.internal_due_date,
+                "due_date": self._compute_formatted_date(rulebook_id.internal_due_date),
                 "current_year": current_year,
             }
 
@@ -501,11 +501,11 @@ class Rulebook(models.Model):
                 "upload_link": self._compute_upload_link(record.id),
                 "email_from": os.getenv("EMAIL_FROM"),
                 "email_cc": record.responsible_id.cc,
-                "due_date": record.internal_due_date,
+                "due_date": self._compute_formatted_date(rulebook_id.internal_due_date),
                 "current_year": current_year,
             }
 
-            print(record)
+            print(record.responsible_id.cc)
 
             # Ensure rulebook_id is active and frequency_type is not "immediate"
 

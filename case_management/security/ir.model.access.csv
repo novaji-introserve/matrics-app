@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_case_management_user,access.case.management.user,model_case_management,base.group_user,1,1,1,1
+access_case_management_user,access.case.chart,model_case_chart,base.group_user,1,1,1,1
+access_case_rating_user,access.case.rating.user,model_case_rating,base.group_user,1,1,1,1
+access_case_statistics_user,access.case.statistics.user,model_case_statistics,base.group_user,1,1,1,1
+access_ctl_branch_user,access.ctl.branch.user,model_ctl_branch,base.group_user,1,1,1,1
+access_exceptions_logs_user,access.exceptions.logs.user,model_exceptions_logs,base.group_user,1,1,1,1
+access_case_statistics_user,access.case.statistics.user,model_case_statistics,base.group_user,1,1,1,1
+

@@ -40,81 +40,96 @@
         <field name="model">rulebook</field>
         <field name="arch" type="xml">
             <form>
-                <header>
+                <!-- <link rel="stylesheet" type="text/css"
+                    href="/rule_book/static/src/css/form_style.css" /> -->
+
+                <!-- Header Section -->
+                <header
+                    style="background-color: #f0f0f0; padding: 10px; border-bottom: 1px solid #ddd;">
                     <button type="object" class="oe_highlight oe_right mx-auto px-2 py-2"
                         name="open_reply_log" string="View Reply Log"
                         attrs="{'invisible': [('id', '=', False)]}" />
                 </header>
-                <!-- Add Custom Styles for Form Elements  -->
-                <!-- <link rel="stylesheet" type="text/css"
-                    href="/rule_book/static/src/css/my_styles.css" /> -->
 
                 <!-- Basic Information Section -->
-                <group string="Basic Information" class="section-group">
+                <group string="Basic Information" class="section-group" style="margin-top: 20px;">
                     <group>
-                        <field name="name" />
-                        <field name="theme_id" />
-                        <field name="description" widget="html" />
-                        <field name="section" />
+                        <field name="name" class="input" placeholder="Select rulebook title" />
+                        <field name="theme_id" placeholder="Select a theme" />
+                        <field name="description" widget="html"
+                            placeholder="Describe the issue or project" />
+                        <field name="section" placeholder="Specify the section" />
                     </group>
                 </group>
 
                 <!-- Risk and Reminders Section -->
-                <group string="Risk and Reminders" class="section-group">
+                <group string="Risk and Reminders" class="section-group" style="margin-top: 20px;">
                     <group>
-                        <field name="risk_category" on_change="1" class="risk-category-field" />
-                        <field name="risk_rating" readonly="1" />
+                        <field name="risk_category" on_change="1" placeholder="Select risk category" />
+                        <field name="risk_rating" readonly="1"
+                            placeholder="Risk rating will be displayed here" />
                     </group>
                 </group>
 
                 <!-- Due Dates Section -->
-                <group string="Due Dates" class="section-group">
+                <group string="Due Dates" class="section-group" style="margin-top: 20px;">
                     <group>
-                        <field name="frequency_type" />
-                        <field name="is_recurring" />
+                        <field name="frequency_type" placeholder="Select frequency type" />
+                        <field name="is_recurring" placeholder="Is this recurring?" />
                         <field name="date_value"
-                            attrs="{'invisible': [('frequency_type', 'not in', ['date'])]}" />
+                            attrs="{'invisible': [('frequency_type', 'not in', ['date'])]}"
+                            placeholder="Enter date value" />
                         <field name="day_value"
-                            attrs="{'invisible': [('frequency_type', 'not in', ['day_of_month', 'day_every_month'])]}" />
+                            attrs="{'invisible': [('frequency_type', 'not in', ['day_of_month', 'day_every_month'])]}"
+                            placeholder="Enter day value" />
                         <field name="month_value"
-                            attrs="{'invisible': [('frequency_type', '!=', 'day_of_month')]}" />
-                        <field name="computed_date" readonly="1" />
+                            attrs="{'invisible': [('frequency_type', '!=', 'day_of_month')]}"
+                            placeholder="Enter month value" />
+                        <field name="computed_date" readonly="1"
+                            placeholder="Computed date will be shown here" />
                     </group>
                 </group>
 
                 <!-- Escalation Details Section -->
-                <group string="Escalation Details" class="section-group">
+                <group string="Escalation Details" class="section-group" style="margin-top: 20px;">
                     <group>
-                        <field name="first_line_escalation" />
-                        <field name="second_line_escalation" />
-                        <field name="escalation_date_value" />
-                        <field name="escalation_date_unit" />
-                        <field name="escalation_date" readonly="1" />
-                    </group>
-                </group>
-                <!-- Escalation Details Section -->
-                <group string="Internal Due Date" class="section-group">
-                    <group>
-                        <field name="internal_due_date_value" />
-                        <field name="internal_due_date_unit" />
-                        <field name="internal_due_date" readonly="1" />
+                        <field name="first_line_escalation"
+                            placeholder="First line escalation contact" />
+                        <field name="second_line_escalation"
+                            placeholder="Second line escalation contact" />
+                        <field name="escalation_date_value"
+                            placeholder="Enter escalation date value" />
+                        <field name="escalation_date_unit" placeholder="Select escalation date unit" />
+                        <field name="escalation_date" readonly="1"
+                            placeholder="Escalation date will be displayed here" />
                     </group>
                 </group>
 
+                <!-- Internal Due Date Section -->
+                <group string="Internal Due Date" class="section-group" style="margin-top: 20px;">
+                    <group>
+                        <field name="internal_due_date_value"
+                            placeholder="Enter internal due date value" />
+                        <field name="internal_due_date_unit"
+                            placeholder="Select internal due date unit" />
+                        <field name="internal_due_date" readonly="1"
+                            placeholder="Internal due date will be shown here" />
+                    </group>
+                </group>
 
                 <!-- Return and Agency Information Section -->
-                <group string="Return and Agency Information" class="section-group">
+                <group string="Return and Agency Information" class="section-group"
+                    style="margin-top: 20px;">
                     <group>
                         <field name="sanction" widget="html"
                             placeholder="List sanctions here with proper formatting." />
-                        <field name="type_of_return" />
-                        <field name="regulatory_agency_id" />
-                        <field name="responsible_id" />
-                        <field name="status" attrs="{'invisible': [('id', '=', False)]}" />
+                        <field name="type_of_return" placeholder="Specify type of return" />
+                        <field name="regulatory_agency_id" placeholder="Select regulatory agency" />
+                        <field name="responsible_id" placeholder="Enter responsible person's name" />
+                        <field name="status" attrs="{'invisible': [('id', '=', False)]}"
+                            placeholder="Status will be displayed here" />
                     </group>
                 </group>
-
-              
             </form>
         </field>
     </record>
