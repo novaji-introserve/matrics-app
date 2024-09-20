@@ -24,7 +24,7 @@ $one__button-padding: auto;
 $transition-normal: all 0.4s linear !default;
 $transition-fast: all 0.2s linear !default;
 //Paths
-$dots_menu_toggled: url('/vista_backend_theme/static/src/img/icons/dots-menu-primary.png');
+$dots_menu_toggled: url('/custom_backend_theme/static/src/img/icons/dots-menu-primary.png');
 
 
 //Misc
@@ -813,7 +813,7 @@ tr:nth-child(even){
     display: none !important;
 }
 .c_dots_menu{
-    background-image: url('/vista_backend_theme/static/src/img/icons/dots-menu.png');
+    background-image: url('/custom_backend_theme/static/src/img/icons/dots-menu.png');
     width: 18px;
     height: 18px;
     background-repeat: no-repeat;

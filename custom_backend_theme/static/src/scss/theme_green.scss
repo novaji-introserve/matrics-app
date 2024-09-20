@@ -74,7 +74,7 @@ $transition-fast: all 0.2s linear !default;
 
 
 //Paths
-$dots_menu_toggled: url('/vista_backend_theme/static/src/img/icons/dots-menu-green.png');
+$dots_menu_toggled: url('/custom_backend_theme/static/src/img/icons/dots-menu-green.png');
 
 
 
@@ -857,7 +857,7 @@ tr:nth-child(even){
     display: none !important;
 }
 .c_dots_menu{
-    background-image: url('/vista_backend_theme/static/src/img/icons/dots-menu.png');
+    background-image: url('/custom_backend_theme/static/src/img/icons/dots-menu.png');
     width: 18px;
     height: 18px;
     background-repeat: no-repeat;

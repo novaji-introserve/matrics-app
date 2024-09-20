@@ -96,14 +96,14 @@
 
     <t t-inherit="mail.MessagingMenu" t-inherit-mode="extension" owl="1">
         <xpath expr="//i[hasclass('o_MessagingMenu_icon')]" position="replace">
-             <img src="/vista_backend_theme/static/src/img/icons/speech-bubble.png" width="22" height="22"
+             <img src="/custom_backend_theme/static/src/img/icons/speech-bubble.png" width="22" height="22"
                   aria-label="Messages"/>
         </xpath>
     </t>
 
     <t t-inherit="mail.ActivityMenuView" t-inherit-mode="extension" owl="1">
             <xpath expr="//i[hasclass('fa-clock-o')]" position="replace">
-                <img src="/vista_backend_theme/static/src/img/icons/bell.png" width="22" height="22"
+                <img src="/custom_backend_theme/static/src/img/icons/bell.png" width="22" height="22"
                      aria-label="Activities"/>
             </xpath>
     </t>

@@ -1,11 +1,11 @@
-odoo.define('vista_backend_theme.SideBar', function (require) {
+odoo.define('custom_backend_theme.SideBar', function (require) {
     "use strict";
     var Widget = require('web.Widget');
     var SideBar = Widget.extend({
         events: _.extend({}, Widget.prototype.events, {
             'click .nav-link': '_onAppsMenuItemClicked',
         }),
-        template: "vista_backend_theme.Sidebar",
+        template: "custom_backend_theme.Sidebar",
 
         init: function (parent, menuData) {
             this._super.apply(this, arguments);

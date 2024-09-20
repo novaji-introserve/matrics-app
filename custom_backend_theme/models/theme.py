@@ -54,6 +54,7 @@ class Theme(models.TransientModel):
         }
 
     def icon_change_theme_default(self):
+        # ensure the menus have no parent items
         menu_item = self.env['ir.ui.menu'].sudo().search([('parent_id', '=', False)])
         for menu in menu_item:
             if menu.name == 'Rulebook':
