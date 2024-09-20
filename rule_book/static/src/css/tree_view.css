@@ -5,11 +5,11 @@
 
 /* Change the text color of the tree view header */  .o_field_badge,
   .badge {
-      padding: 10px;
+      padding: 10px !important;
   }
   .o_data_cell,.o_list_record_selector,.o_column_sortable{
-    align-items: 'center';
-    vertical-align: middle;
+    align-items: 'center' !important;
+    vertical-align: middle !important;
     /* text-align: center; */
   }
 
