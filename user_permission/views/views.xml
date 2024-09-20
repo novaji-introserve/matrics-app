@@ -1,0 +1,12 @@
+<odoo>
+  <menuitem id="menu_custom_permission_root" name="User Permissions" sequence="code " />
+
+  <record id="action_user_permissions" model="ir.actions.act_window">
+    <field name="name">User Permissions</field>
+    <field name="res_model">user.permission</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+  <menuitem id="menu_user_permission" name="Permissions" parent="menu_custom_permission_root"
+    action="action_user_permissions" sequence="1" />
+</odoo>

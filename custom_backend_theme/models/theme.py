@@ -1,4 +1,3 @@
-
 import base64
 
 from odoo import models, fields, api
@@ -61,6 +60,12 @@ class Theme(models.TransientModel):
                 img_path = get_module_resource(
                     'custom_backend_theme', 'static', 'src', 'img', 'icons',
                     'rules.png')
+                menu.write({'web_icon_data': base64.b64encode(
+                    open(img_path, "rb").read())})
+            if menu.name == 'User Permissions':
+                img_path = get_module_resource(
+                    'custom_backend_theme', 'static', 'src', 'img', 'icons',
+                    'lock.png')
                 menu.write({'web_icon_data': base64.b64encode(
                     open(img_path, "rb").read())})
             if menu.name == 'Contacts':
@@ -282,6 +287,17 @@ class Theme(models.TransientModel):
                     'custom_backend_theme', 'static', 'src', 'img',
                     'icons_green',
                     'rules.png')
+                menu.write({'web_icon_data': base64.b64encode(
+                    open(img_path, "rb").read())})
+            if menu.name == "User Permissions":
+                img_path = get_module_resource(
+                    "custom_backend_theme",
+                    "static",
+                    "src",
+                    "img",
+                    "icons_green",
+                    "lock.png",
+                )
                 menu.write({'web_icon_data': base64.b64encode(
                     open(img_path, "rb").read())})
             if menu.name == 'Contacts':

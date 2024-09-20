@@ -1,0 +1,41 @@
+<odoo>
+    <record id="view_user_permission_form" model="ir.ui.view">
+        <field name="name">user.permission.form</field>
+        <field name="model">user.permission</field>
+        <field name="arch" type="xml">
+            <form string="User Permission">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="user_id" />
+                        <field name="model_id" />
+                        <field name="can_create" />
+                        <field name="can_read" />
+                        <field name="can_write" />
+                        <field name="can_delete" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_user_permission_tree" model="ir.ui.view">
+        <field name="name">user.permission.tree</field>
+        <field name="model">user.permission</field>
+        <field name="arch" type="xml">
+            <tree string="User Permission">
+                <field name="name" />
+                <field name="user_id" />
+                <field name="model_id" />
+                <field name="can_create" />
+                <field name="can_read" />
+                <field name="can_write" />
+                <field name="can_delete" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Add the menu item to access user permissions -->
+    <menuitem id="menu_user_permissions" name="User Permissions" sequence="10"
+        parent="base.menu_custom" action="action_user_permissions" />
+</odoo>

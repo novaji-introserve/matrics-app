@@ -2,7 +2,7 @@
     "name": "Custom Backend Theme",
     "version": "1.0",
     "summary": "Customizes the look and feel of the Odoo backend.",
-    "category": "Themes/Backend",
+    "category": "Icomply/Theme",
     "author": "Ked",
     "depends": ["web"],
     "data": [

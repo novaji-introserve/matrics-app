@@ -13,7 +13,7 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
-    "category": "Uncategorized",
+    "category": "icomply",
     "version": "0.1",
     # any module necessary for this one to work correctly
     "depends": ["base", "mail", "calendar"],
@@ -33,16 +33,18 @@
         "data/email_templates/rule_book.xml",
         "data/schedules/rule_book.xml",
         "views/dashboard.xml",
-         'data/settings/email_smtp.xml',
-         "data/preloaded_data/risk_categories.xml",
-         "data/preloaded_data/rule_book_sources.xml",
-         "views/public/rule_book_submission.xml",
-         "data/email_templates/escalation_email.xml",
-         "views/rules/reply_log.xml",
-         "views/rules/web_scaping.xml",
-         "data/schedules/web_scraping.xml",
-         "views/public/thank_you.xml"
-         
+        "data/settings/email_smtp.xml",
+        "data/preloaded_data/risk_categories.xml",
+        "data/preloaded_data/rule_book_sources.xml",
+        "views/public/rule_book_submission.xml",
+        "data/email_templates/escalation_email.xml",
+        "views/rules/reply_log.xml",
+        "views/rules/web_scaping.xml",
+        "data/schedules/web_scraping.xml",
+        "views/public/thank_you.xml",
+        "security/security_group.xml",
+        "security/access_control_list.xml",
+        "security/group_action.xml",
     ],
     # only loaded in demonstration mode
     "demo": [
