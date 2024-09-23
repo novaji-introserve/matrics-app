@@ -7,7 +7,7 @@
                 <sheet>
                     <group>
                         <field name="name" />
-                        <field name="user_id" />
+                        <field name="user" />
                         <field name="model_id" />
                         <field name="can_create" />
                         <field name="can_read" />
@@ -25,13 +25,31 @@
         <field name="arch" type="xml">
             <tree string="User Permission">
                 <field name="name" />
-                <field name="user_id" />
+                <field name="user" />
                 <field name="model_id" />
                 <field name="can_create" />
                 <field name="can_read" />
                 <field name="can_write" />
                 <field name="can_delete" />
             </tree>
+        </field>
+    </record>
+
+    <record id="view_user_permission__search" model="ir.ui.view">
+        <field name="name">user.permission.search</field>
+        <field name="model">user.permission</field>
+        <field name="arch" type="xml">
+            <search>
+                <searchpanel>
+
+                    <field name="partner" icon="fa-user-tie" enable_counters="1"
+                        options='{"counters": true}' string="User" />
+                    <field name="model_id" icon="fa-building" enable_counters="1"
+                        options='{"counters": true}' string="Model" />
+                  
+                </searchpanel>
+
+            </search>
         </field>
     </record>
 

@@ -1,5 +1,5 @@
 <odoo>
-  <menuitem id="menu_custom_permission_root" name="User Permissions" sequence="code " />
+  <menuitem id="menu_custom_permission_root" name="User Permissions" sequence="2" />
 
   <record id="action_user_permissions" model="ir.actions.act_window">
     <field name="name">User Permissions</field>

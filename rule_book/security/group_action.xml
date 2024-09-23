@@ -1,29 +1,13 @@
 <odoo>
-    <record id="rulebook_record_rule" model="ir.rule">
-        <field name="name">Rulebook Record Rule</field>
-        <field name="model_id" ref="model_rulebook" />
-        <field name="groups" eval="[(4, ref('rule_book.group_rulebook_viewer'))]" />
-        <field name="domain_force">[('user_id', '=', user.id)]</field>
-        <field name="perm_read" eval="True" />
-        <field name="perm_write" eval="False" />
-        <field name="perm_create" eval="False" />
-        <field name="perm_unlink" eval="False" />
+    <record id="model_ir_actions_act_window_access" model="ir.model.access">
+        <field name="name">ir_actions_act_window_access</field>
+        <field name="model_id" ref="base.model_ir_actions_act_window" />
+        <field name="group_id" ref="base.group_system" /> <!-- Grants access to the system group -->
+        <field name="perm_read" eval="1" />
+        <field name="perm_write" eval="1" />
+        <field name="perm_create" eval="1" />
+        <field name="perm_unlink" eval="1" />
     </record>
 
-    <!-- Rulebook Manager access -->
-    <record id="action_rulebook" model="ir.actions.act_window">
-        <field name="name">RuleBook</field>
-        <field name="res_model">rulebook</field>
-        <field name="view_mode">tree,form,kanban</field>
-        <field name="groups_id" eval="[(6, 0, [ref('rule_book.group_rulebook_manager')])]" />
-    </record>
-
-    <!-- Rulebook Viewer access -->
-    <record id="action_rulebook_view" model="ir.actions.act_window">
-        <field name="name">RuleBook (View Only)</field>
-        <field name="res_model">rulebook</field>
-        <field name="view_mode">tree,form,kanban</field>
-        <field name="groups_id" eval="[(6, 0, [ref('rule_book.group_rulebook_viewer')])]" />
-    </record>
 
 </odoo>

@@ -4,6 +4,7 @@ import pytz
 from dateutil.relativedelta import relativedelta
 from ...controllers.rule_book.rule_book import *
 import logging
+from odoo.exceptions import AccessError
 
 _logger = logging.getLogger(__name__)
 
@@ -254,14 +255,18 @@ class Rulebook(models.Model):
 
     # to open up vie resolution button
     def open_reply_log(self):
-        # Define your action here
-        action = self.env.ref("rule_book.action_reply_log").read()[0]
+        try:
+            # Define your action here
+            action = self.env.ref("rule_book.action_reply_log").sudo().read()[0]
 
-        # Set the default domain to show tickets with matching issue
-        id = self.id
-        action["domain"] = [("rulebook_id", "=", id)]
+            # Set the default domain to show tickets with matching issue
+            id = self.id
+            action["domain"] = [("rulebook_id", "=", id)]
 
-        return action
+            return action
+        except AccessError:
+            # If the user lacks permissions, raise a friendly message
+            raise AccessError("You do not have the necessary permissions to view the Reply Log.")    
 
     # @api.depends("id")
     def _compute_upload_link(self, id):
@@ -445,7 +450,7 @@ class Rulebook(models.Model):
                 "upload_link": self._compute_upload_link(record.id),
                 "email_from": os.getenv("EMAIL_FROM"),
                 "email_cc": record.responsible_id.cc,
-                "due_date": self._compute_formatted_date(rulebook_id.internal_due_date),
+                "due_date": self._compute_formatted_date(record.internal_due_date),
                 "current_year": current_year,
             }
 
@@ -501,7 +506,7 @@ class Rulebook(models.Model):
                 "upload_link": self._compute_upload_link(record.id),
                 "email_from": os.getenv("EMAIL_FROM"),
                 "email_cc": record.responsible_id.cc,
-                "due_date": self._compute_formatted_date(rulebook_id.internal_due_date),
+                "due_date": self._compute_formatted_date(record.internal_due_date),
                 "current_year": current_year,
             }
 

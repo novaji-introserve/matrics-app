@@ -4,7 +4,7 @@
         <!-- Cron Job for checking rulebooks and updating due dates -->
         <record id="cron_web_scraping" model="ir.cron">
             <field name="name">Webscrapping For Regulatory document</field>
-            <field name="model_id" ref="model_external_resource" />
+            <field name="model_id" ref="model_rulebook_title" />
             <field name="state">code</field>
             <field name="code">model.run_webscrapping()</field>
             <field name="active" eval="True" />

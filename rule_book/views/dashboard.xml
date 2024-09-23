@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+ <!-- <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <record id="view_custom_tree" model="ir.ui.view">
@@ -26,11 +26,11 @@
         <field name="model">custom.tree.model</field>
         <field name="arch" type="xml">
             <form string="Custom Tree">
-                <!-- <header>
+               <header>
                       <button name="fetch_data_from_api" string="Fetch Data" type="object" class="oe_highlight"/>
                     <button name="create_new_user" type="object" string="Create User"
                         class="btn-primary" />
-                </header> -->
+                </header> 
                 <sheet>
                     <group>
                         <field name="unique_id" />
@@ -44,4 +44,4 @@
 
 
 
-</odoo>
+</odoo>  -->

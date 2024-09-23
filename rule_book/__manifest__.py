@@ -32,7 +32,7 @@
         "views/rules/rule_book.xml",
         "data/email_templates/rule_book.xml",
         "data/schedules/rule_book.xml",
-        "views/dashboard.xml",
+        # "views/dashboard.xml",
         "data/settings/email_smtp.xml",
         "data/preloaded_data/risk_categories.xml",
         "data/preloaded_data/rule_book_sources.xml",
@@ -42,8 +42,6 @@
         "views/rules/web_scaping.xml",
         "data/schedules/web_scraping.xml",
         "views/public/thank_you.xml",
-        "security/security_group.xml",
-        "security/access_control_list.xml",
         "security/group_action.xml",
     ],
     # only loaded in demonstration mode
