@@ -10,6 +10,8 @@ import base64
 from urllib.parse import unquote, urlparse
 from os.path import basename
 import json
+import time
+import threading
 
 load_dotenv()
 
@@ -34,6 +36,25 @@ class RulebookTitle(models.Model):
     # Add the external_resource_url field if it's not already defined
     external_resource_url = fields.Char("External Resource URL")
 
+    def action_ndic_scrapper(self):
+        """Method to run the NDIC Scrapper when button is clicked"""
+        success = self.NDICScrapper()
+        if success:
+            return {
+                "type": "ir.actions.client",
+                "tag": "reload",  # Reload the view to reflect any changes
+            }
+        else:
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": "Error",
+                    "message": "NDIC Scrapper failed to create records.",
+                    "type": "danger",
+                },
+            }
+
     # @api.model
     @api.model
     def create(self, vals):
@@ -50,8 +71,6 @@ class RulebookTitle(models.Model):
 
         # Print/log the newly created record details
         print(f"New record created with ID: {record.id}")
-        created_record = self.env['rulebook.title'].sudo().search([('id', '=', 59)])
-        print(f"Record found: {created_record}")
 
         return record
 
@@ -59,8 +78,8 @@ class RulebookTitle(models.Model):
     def run_webscrapping(self):
         print("web scrapper run sucessfully")
         # self.CBNScrapper()
-        self.NDICScrapper()
-        # self.NFIUScraper()
+        # self.NDICScrapper()
+        self.NFIUScraper()
 
     @api.model
     def CBNScrapper(self):
@@ -156,10 +175,9 @@ class RulebookTitle(models.Model):
             print(f"Failed to retrieve the page. Status code: {response.status_code}")
 
     def NDICScrapper(self):
-        print("running ndic")
+        print("Running NDIC Scraper")
         url = os.getenv("NDIC_SCRAPE_URL")
         base_url = os.getenv("NDIC_BASE_URL")
-        html_tags = os.getenv("NDIC_HTML_TAGS").split(",")
         storage_path = os.getenv("NDIC_STORAGE_DIR")
         source = self.env["rulebook.sources"].search([("name", "ilike", "NDIC")], limit=1)
 
@@ -167,89 +185,124 @@ class RulebookTitle(models.Model):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
         }
 
-        response = requests.get(url, headers=user_agent)
+        try:
+            response = requests.get(url, headers=user_agent, timeout=10)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            print(f"Error fetching data from {url}: {str(e)}")
+            return False
+        print(response.text)
         soup = BeautifulSoup(response.text, "html.parser")
+        pdf_links = [
+            link for link in soup.select("ul li a[href]")
+        ]
+        file_names = soup.select("li a")
+        print(len(pdf_links))
 
-        pdf_links = soup.select("ul li a[href]")  # Assuming the first tag selects the PDF link
-        file_names = soup.select("li a")  # Assuming the second tag selects the file names
+        return len(pdf_links)
 
-        success_count = 0  # To track successful inserts
-        error_count = 0  # To track any errors
+        batch_size = 5
+        num_batches = len(pdf_links) // batch_size + (1 if len(pdf_links) % batch_size else 0)
+
+        success_count = 0
+        error_count = 0
+        threads = []
+
+        for batch_index in range(num_batches):
+            start_index = batch_index * batch_size
+            end_index = start_index + batch_size
+
+            # Create and start a thread for each batch
+            thread = threading.Thread(target=self._process_batch, args=(
+                pdf_links[start_index:end_index],
+                file_names[start_index:end_index],
+                base_url,
+                storage_path,
+                source
+            ))
+            threads.append(thread)
+            thread.start()
+
+        # Wait for all threads to finish
+        for thread in threads:
+            thread.join()
+
+        print(f"NDIC Scraper finished: {success_count} records created, {error_count} errors.")
+        return success_count > 0
+
+    def _process_batch(self, pdf_links, file_names, base_url, storage_path, source):
+        """ Process a batch of PDFs and save to Odoo """
+        success_count = 0
+        error_count = 0
+        records_to_create = []
 
         for link, file_name in zip(pdf_links, file_names):
-            try:
-                pdf_url = link["href"]
-                file_name = self.clean_filename(file_name.text.strip())
-                if not pdf_url.startswith(base_url):
-                    pdf_url = base_url + pdf_url
+            pdf_url = link["href"]
+            file_name = self.clean_filename(file_name.text.strip())
+            if not pdf_url.startswith(base_url):
+                pdf_url = base_url + pdf_url
 
-                if pdf_url.endswith(".pdf"):
-                    filename = basename(urlparse(pdf_url).path)[:-4]  # Strip '.pdf' extension
-                    date_string = self.get_date_from_url(unquote(pdf_url))
+            filename = basename(urlparse(pdf_url).path)[:-4]
+            date_string = self.get_date_from_url(unquote(pdf_url))
+            spaced_name = file_name.replace("_", " ")
+            filename = f"{unquote(file_name)[:-len(date_string) - 1]}_{date_string}.pdf"
 
-                    spaced_name = file_name.replace("_", " ")
-                    filename = f"{unquote(file_name)[:-len(date_string)-1]}_{date_string}.pdf"
+            for attempt in range(3):
+                try:
+                    pdf_response = requests.get(pdf_url, timeout=10)
+                    pdf_response.raise_for_status()
 
-                    pdf_response = requests.get(pdf_url)
-                    if not os.path.exists(storage_path):
-                        os.makedirs(storage_path)
-
+                    os.makedirs(storage_path, exist_ok=True)
                     filepath = os.path.join(storage_path, filename)
 
-                    # Save the PDF file locally if it doesn't already exist
                     if not os.path.exists(filepath):
                         with open(filepath, "wb") as f:
                             f.write(pdf_response.content)
 
-                    # Convert the downloaded file to base64 binary
                     file_binary_data = self.download_file_as_binary(pdf_url)
-
-                    # Parse the date from the filename (or elsewhere)
                     released_date = self.parse_date(date_string)
 
-                    # Prepare data for storing in the rulebook.title model
                     record_data = {
-                        "name": spaced_name,  # Title
-                        "file": file_binary_data,  # Binary data
-                        "file_name": filename,  # File name for saving
-                        "ref_number": None,  # Reference number (optional)
-                        "status": "active",  # Status
-                        "source_id": source.id,  # Source ID (from rulebook.sources)
-                        "created_on": fields.Datetime.now(),  # Timestamp
-                        "created_by": self.env.user.id,  # Created by user
-                        "external_resource_url": pdf_url,  # URL of file
+                        "name": spaced_name,
+                        "file": file_binary_data,
+                        "file_name": filename,
+                        "ref_number": None,
+                        "status": "active",
+                        "source_id": source.id,
+                        "created_on": fields.Datetime.now(),
+                        "created_by": self.env.user.id,
+                        "external_resource_url": pdf_url,
                     }
 
-                    # Create the record in Odoo
-                    self.sudo().create(record_data)
-                    success_count += 1  # Increment success counter
+                    records_to_create.append(record_data)
+                    success_count += 1
+                    break  # Exit the retry loop after success
 
+                except requests.RequestException as e:
+                    print(f"Attempt {attempt + 1} failed for {pdf_url}: {str(e)}")
+                    time.sleep(2)
+            else:
+                error_count += 1
+
+        # Commit the records for this batch
+        if records_to_create:
+            try:
+                self.sudo().create(records_to_create)
             except Exception as e:
-                error_count += 1  # Increment error counter
-                print(f"Error processing file '{filename}': {str(e)}")
-                # Optionally, log the error or handle it differently depending on your use case
+                print(f"Error creating records for batch: {str(e)}")
+                error_count += len(records_to_create)
 
-        # Final return after the loop completes
-        print(f"NDIC Scrapper finished: {success_count} records created, {error_count} errors.")
-        return True if success_count > 0 else False
+        print(f"Batch processed: {success_count} records created, {error_count} errors.")
 
-    @api.model
     def NFIUScraper(self):
-
-        # Get the string from the .env file
+        # Get the scrape configuration
         scrape_config_string = os.getenv("NFUI_SCRAPE_CONFIG")
-
-        # Parse the JSON string back into a Python list of dictionaries
         scrape_config = json.loads(scrape_config_string)
 
         file_types = scrape_config
         NfiuBaseUrl = os.getenv("NFIU_BASE_URL")
-        # pdfLinks = "CBN (AML CFT) (Amendment) Regulation, 2019"
-        # return file_types
 
-        # hekp=helper.get_date_from_url(unquote(pdfLinks))
-        # return hekp
-        fileNmaes = []
+        all_records_to_create = []  # Collect records from all threads
 
         for file_type in file_types:
             urls = file_type["urls"]
@@ -259,106 +312,141 @@ class RulebookTitle(models.Model):
 
             for url, html_tag in zip(urls, html_tags):
                 response = requests.get(url)
-                # return response.text
-
                 soup = BeautifulSoup(response.text, "html.parser")
                 pdf_links = soup.select(html_tag)
                 file_names = soup.select(nameTag)
 
-                # return pdf_links
+                source = self.env["rulebook.sources"].search([("name", "ilike", "NFIU")], limit=1)
+                if not source:
+                    raise ValueError("Source 'NFIU' not found in the rulebook.sources.")
 
-                for link, file_name in zip(pdf_links, file_names):
-                    pdf_url = link["href"]
+                batch_size = 5
+                num_batches = len(pdf_links) // batch_size + (1 if len(pdf_links) % batch_size else 0)
 
-                    title = file_name.get("title", "")
-                    if title:
-                        # continue
-                        file_name = title
+                threads = []
+                thread_results = []
 
-                    else:
-                        # return "a tag entered"
-                        file_name = file_name.get_text().strip()
-                    file_name = file_name.replace("Download", "").replace(".pdf", "")
+                for batch_index in range(num_batches):
+                    start_index = batch_index * batch_size
+                    end_index = min(start_index + batch_size, len(pdf_links))
 
-                    # fileNmaes.append(pdf_url)
+                    # Create and start a thread for each batch
+                    thread = threading.Thread(
+                        target=self.process_nfiu_batch,
+                        args=(
+                            pdf_links,
+                            file_names,
+                            storage_path,
+                            NfiuBaseUrl,
+                            source.id,
+                            start_index,
+                            end_index,
+                            thread_results,
+                        ),
+                    )
+                    threads.append(thread)
+                    thread.start()
 
-                    # pdfLinks.append(pdf_url)
+                # Wait for all threads to finish
+                for thread in threads:
+                    thread.join()
 
-                    if not pdf_url.startswith(NfiuBaseUrl):
-                        pdf_url = NfiuBaseUrl + pdf_url
+                # Collect records from all threads
+                for result in thread_results:
+                    all_records_to_create.extend(result["records"])
 
-                    if pdf_url:
-                        filename = basename(urlparse(pdf_url).path)
-                        filename = filename[:-4]
+        # Create all records in a single batch outside of threading
+        if all_records_to_create:
+            try:
+                self.sudo().create(all_records_to_create)
+            except Exception as e:
+                print(f"Error creating records in bulk: {str(e)}")
 
-                        date_string = self.get_date_from_url(unquote(pdf_url))
-                        noSpaceFileName = (
-                            self.clean_filename(file_name)
-                            .removeprefix("_")
-                            .removesuffix("_")
-                        )
-                        filename = f"{unquote(noSpaceFileName)[:-len(date_string)-1]}{date_string}.pdf"
-                        # return filename
-                        pdf_response = requests.get(pdf_url)
+        return "Nfiu Scrape was successful!"    
 
-                        if not os.path.exists(storage_path):
-                            os.makedirs(storage_path)
+    def process_nfiu_batch(
+        self,
+        pdf_links,
+        file_names,
+        storage_path,
+        NfiuBaseUrl,
+        source_id,
+        batch_start,
+        batch_end,
+        thread_results,  # List to store results
+    ):
+        success_count = 0
+        error_count = 0
+        records_to_create = []
 
-                        filepath = os.path.join(storage_path, filename)
+        for link, file_name in zip(
+            pdf_links[batch_start:batch_end], file_names[batch_start:batch_end]
+        ):
+            pdf_url = link["href"]
+            title = file_name.get("title", "")
 
-                        # Save the PDF file locally
-                        if not os.path.exists(filepath):
-                            with open(filepath, "wb") as f:
-                                f.write(pdf_response.content)
+            if title:
+                file_name = title
+            else:
+                file_name = file_name.get_text().strip()
+            file_name = file_name.replace("Download", "").replace(".pdf", "")
 
-                        # Prepare data for storing in the rulebook.title model
-                        try:
-                            # Fetch the source_id where rulebook.sources.name is like 'CBN'
-                            source = self.env["rulebook.sources"].search(
-                                [("name", "ilike", "NFIU")], limit=1
-                            )
-                            print(source)
-                            if not source:
-                                raise ValueError(
-                                    "Source 'CBN' not found in the rulebook.sources."
-                                )
+            if not pdf_url.startswith(NfiuBaseUrl):
+                pdf_url = NfiuBaseUrl + pdf_url
 
-                                # Convert the downloaded file to base64 binary
-                                # with open(filepath, "rb") as pdf_file:
-                                #     file_binary_data = base64.b64encode(pdf_file.read())
-                                # Download the file from resource_url and convert it to binary
-                            file_binary_data = self.download_file_as_binary(pdf_url)
-                            date_string = self.get_date_from_url(unquote(pdf_url))
-                            released_date = (
-                                self.parse_date(date_string) if date_string else None
-                            )
+            filename = basename(urlparse(pdf_url).path)[:-4]
+            date_string = self.get_date_from_url(unquote(pdf_url))
+            noSpaceFileName = (
+                self.clean_filename(file_name).removeprefix("_").removesuffix("_")
+            )
+            filename = (
+                f"{unquote(noSpaceFileName)[:-len(date_string)-1]}_{date_string}.pdf"
+            )
 
-                            # Create record in Odoo model 'rulebook.title'
-                            spaced_name = file_name.replace("_", " ")
-                            self.sudo().create(
-                                {
-                                    "name": spaced_name,  # Corresponds to the 'Title' field
-                                    "file": file_binary_data,  # Binary data from the downloaded file
-                                    "file_name": filename,  # File name used for saving the file
-                                    "ref_number": None,  # You can set the reference number later if needed
-                                    "released_date": fields.Datetime.now(),  # Release date from the filename
-                                    "status": "active",  # Default status to 'active'
-                                    "source_id": source.id,  # Source ID (rulebook.sources where name like 'CBN')
-                                    "created_on": fields.Datetime.now(),  # Current timestamp
-                                    "created_by": self.env.user.id,  # Created by the current user
-                                    "external_resource_url": pdf_url,  # URL where the file was downloaded from
-                                }
-                            )
+            for attempt in range(3):
+                try:
+                    pdf_response = requests.get(pdf_url, timeout=10)
+                    pdf_response.raise_for_status()
 
-                        except Exception as e:
-                            raise ValueError(f"Error : {str(e)}")
+                    if not os.path.exists(storage_path):
+                        os.makedirs(storage_path)
 
-                    else:
-                        return "something went wrong"
+                    filepath = os.path.join(storage_path, filename)
 
-        # return fileNmaes
+                    if not os.path.exists(filepath):
+                        with open(filepath, "wb") as f:
+                            f.write(pdf_response.content)
 
-        return "Nfiu Scrape was successful!"
+                    file_binary_data = self.download_file_as_binary(pdf_url)
+                    released_date = self.parse_date(date_string)
+
+                    record_data = {
+                        "name": file_name.replace("_", " "),
+                        "file": file_binary_data,
+                        "file_name": filename,
+                        "ref_number": None,
+                        "released_date": fields.Datetime.now(),
+                        "status": "active",
+                        "source_id": source_id,
+                        "created_on": fields.Datetime.now(),
+                        "created_by": self.env.user.id,
+                        "external_resource_url": pdf_url,
+                    }
+
+                    records_to_create.append(record_data)
+                    success_count += 1
+                    break
+
+                except requests.RequestException as e:
+                    print(f"Attempt {attempt + 1} failed for {pdf_url}: {str(e)}")
+                    time.sleep(2)
+            else:
+                error_count += 1
+
+        # Append the results to the shared thread_results list
+        thread_results.append({"records": records_to_create, "success": success_count, "errors": error_count})
+
+        return success_count, error_count
 
     def clean_filename(self, filename):
         # Replace invalid characters with underscores
@@ -547,4 +635,5 @@ class RulebookTitle(models.Model):
                 continue  # If format doesn't match, try the next one
 
         # If none of the formats work, raise an error
-        raise ValueError(f"Date format for '{date_string}' is not supported")
+        # raise ValueError(f"Date format for '{date_string}' is not supported")
+        return ""
