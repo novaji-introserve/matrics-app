@@ -18,10 +18,10 @@
         <field name="model">rulebook.risk_category</field>
         <field name="arch" type="xml">
             <form>
-                <group>
+                <group style="width: 50%;">
                     <field name="name" />
                     <field name="risk_priority" />
-                    <field name="risk_score" />
+                    <field name="risk_score" widget="slider" step="5" min="0" max="25" />
                 </group>
             </form>
         </field>

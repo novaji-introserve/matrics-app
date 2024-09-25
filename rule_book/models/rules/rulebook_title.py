@@ -33,6 +33,12 @@ class RulebookTitle(models.Model):
     source_id = fields.Many2one('rulebook.sources', string='Source', required=True)
     created_on = fields.Datetime(string='Created On', default=fields.Datetime.now, required=True)
     created_by = fields.Many2one('res.users', string='Created By', default=lambda self: self.env.user, readonly=True)
+    input_type = fields.Selection(
+        [('manual', 'Manual Input'), ('ai', 'AI Generated')],
+        string='Source',
+        default='manual',
+        tracking=True
+    )
     # Add the external_resource_url field if it's not already defined
     external_resource_url = fields.Char("External Resource URL")
 
@@ -76,10 +82,123 @@ class RulebookTitle(models.Model):
 
     # general webscrapping functino
     def run_webscrapping(self):
+        
         print("web scrapper run sucessfully")
-        # self.CBNScrapper()
-        # self.NDICScrapper()
-        self.NFIUScraper()
+        self.CBNScrapper()
+
+
+    def secScrapper(self):
+        sec_files = []
+
+        laws_and_rules = {
+            "name": os.getenv("SEC_FILES_LAWS_AND_RULES_NAME"),
+            "urls": json.loads(os.getenv("SEC_FILES_LAWS_AND_RULES_URLS")),
+            "storage_path": os.getenv("SEC_FILES_LAWS_AND_RULES_STORAGE_PATH"),
+            "html_tags": json.loads(os.getenv("SEC_FILES_LAWS_AND_RULES_HTML_TAGS")),
+        }
+
+        codes = {
+            "name": os.getenv("SEC_FILES_CODES_NAME"),
+            "urls": json.loads(os.getenv("SEC_FILES_CODES_URLS")),
+            "storage_path": os.getenv("SEC_FILES_CODES_STORAGE_PATH"),
+            "html_tags": json.loads(os.getenv("SEC_FILES_CODES_HTML_TAGS")),
+        }
+
+        guidelines = {
+            "name": os.getenv("SEC_FILES_GUIDELINES_NAME"),
+            "urls": json.loads(os.getenv("SEC_FILES_GUIDELINES_URLS")),
+            "storage_path": os.getenv("SEC_FILES_GUIDELINES_STORAGE_PATH"),
+            "html_tags": json.loads(os.getenv("SEC_FILES_GUIDELINES_HTML_TAGS")),
+        }
+
+        # Append the reassembled sections into the array
+        sec_files.append(laws_and_rules)
+        sec_files.append(codes)
+        sec_files.append(guidelines)
+          # Create a thread for each file type
+        threads = []
+     
+      
+
+
+        for file_type in sec_files:
+            print(file_type)
+            thread = threading.Thread(target=self.sec_scrape_file_type, args=(file_type,))
+            threads.append(thread)
+            thread.start()
+
+        # Wait for all threads to complete
+        for thread in threads:
+            thread.join()
+
+        return "Scrape successful!"
+        
+    def sec_scrape_file_type(self, file_type):
+        secBaseUrl= os.getenv("SEC_BASE_URL")
+        print(file_type)
+        urls = file_type["urls"]
+        storage_path = file_type["storage_path"]
+        html_tags = file_type["html_tags"]
+
+        for url, html_tag in zip(urls, html_tags):
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, "html.parser")
+            pdf_links = soup.select(html_tag)
+
+            for link in pdf_links:
+                pdf_url = link["href"]
+                if not pdf_url.startswith(secBaseUrl):
+                    pdf_url = secBaseUrl + pdf_url
+
+                if pdf_url.endswith(".pdf"):
+                    self.sec_process_pdf(pdf_url, url, storage_path)
+
+    def sec_process_pdf(self, pdf_url, external_resource_url, storage_path):
+        filename = basename(urlparse(pdf_url).path)[:-4]
+        date_string = self.get_date_from_url(unquote(pdf_url))
+        filename_title = self.get_filename(unquote(filename))
+        filename = f"{unquote(filename_title)[:-len(date_string)-1]}{date_string}.pdf"
+        
+        pdf_response = requests.get(pdf_url)
+
+        if not os.path.exists(storage_path):
+            os.makedirs(storage_path)
+
+        filepath = os.path.join(storage_path, filename)
+        source = self.env["rulebook.sources"].search(
+                            [("name", "ilike", "SEC")], limit=1
+                        )
+         # Download the file from resource_url and convert it to binary
+        file_binary_data = self.download_file_as_binary(pdf_url)
+        # Prepare the data for saving
+       
+
+        existing_title = self.env["rulebook.title"].search(
+                        [("file_name", "=", filename_title)], limit=1
+                    )
+        if existing_title:
+            print(f"Skipping, file '{filename_title}' already exists.")
+                    
+        else:
+             # Write the PDF file and save the data to the database
+            if not os.path.exists(filepath):
+                with open(filepath, "wb") as f:
+                    f.write(pdf_response.content)
+            self.env["rulebook.title"].create(
+                            {
+                                "name": filename_title,  # Corresponds to the 'Title' field
+                                "file": file_binary_data,
+                                "file_name": filename,  # Use reference as the file name
+                                "ref_number": None,  # Reference number
+                                "released_date":date_string,  # Released Date
+                                "status": "active",  # Default status to 'active'
+                                "source_id": source.id,  # Source ID (from rulebook.sources where name like 'CBN')
+                                "created_on": fields.Datetime.now(),  # Current timestamp
+                                "created_by": self.env.user.id,  # Created by the current user
+                                "external_resource_url": external_resource_url,  # URL where the file was downloaded from
+                                "input_type": "ai"
+                            }
+                        )    
 
     @api.model
     def CBNScrapper(self):
@@ -131,6 +250,14 @@ class RulebookTitle(models.Model):
                         published_tokens = re.split(" ", published)
                         published_date = published_tokens[0].strip()
 
+                    # Check if the reference already exists in the rulebook.title model
+                    existing_title = self.env["rulebook.title"].search(
+                        [("file_name", "=", reference)], limit=1
+                    )
+                    if existing_title:
+                        print(f"Skipping, file '{reference}' already exists.")
+                        continue  # Skip the current iteration if the file already exists
+
                     # Download the resource
                     download = requests.get(resource_url)
                     print(download)
@@ -155,7 +282,7 @@ class RulebookTitle(models.Model):
                         self.env["rulebook.title"].create(
                             {
                                 "name": title,  # Corresponds to the 'Title' field
-                                # "file": file_binary_data,
+                                "file": file_binary_data,
                                 "file_name": reference,  # Use reference as the file name
                                 "ref_number": reference,  # Reference number
                                 "released_date": (
@@ -168,9 +295,9 @@ class RulebookTitle(models.Model):
                                 "created_on": fields.Datetime.now(),  # Current timestamp
                                 "created_by": self.env.user.id,  # Created by the current user
                                 "external_resource_url": resource_url,  # URL where the file was downloaded from
+                                "input_type": "ai"
                             }
                         )
-
         else:
             print(f"Failed to retrieve the page. Status code: {response.status_code}")
 
@@ -198,8 +325,6 @@ class RulebookTitle(models.Model):
         ]
         file_names = soup.select("li a")
         print(len(pdf_links))
-
-        return len(pdf_links)
 
         batch_size = 5
         num_batches = len(pdf_links) // batch_size + (1 if len(pdf_links) % batch_size else 0)
@@ -259,24 +384,32 @@ class RulebookTitle(models.Model):
                         with open(filepath, "wb") as f:
                             f.write(pdf_response.content)
 
-                    file_binary_data = self.download_file_as_binary(pdf_url)
-                    released_date = self.parse_date(date_string)
+                    existing_title = self.env["rulebook.title"].search(
+                        [("file_name", "=", spaced_name)], limit=1
+                    )
+                    if existing_title:
+                        print(f"Skipping, file '{spaced_name}' already exists.")  
+                    else:          
 
-                    record_data = {
-                        "name": spaced_name,
-                        "file": file_binary_data,
-                        "file_name": filename,
-                        "ref_number": None,
-                        "status": "active",
-                        "source_id": source.id,
-                        "created_on": fields.Datetime.now(),
-                        "created_by": self.env.user.id,
-                        "external_resource_url": pdf_url,
-                    }
+                        file_binary_data = self.download_file_as_binary(pdf_url)
+                        released_date = self.parse_date(date_string)
+                        record_data = {
+                            "name": spaced_name,
+                            "file": file_binary_data,
+                            "file_name": filename,
+                            "ref_number": None,
+                            "status": "active",
+                            "source_id": source.id,
+                            "created_on": fields.Datetime.now(),
+                            "created_by": self.env.user.id, 
+                            "external_resource_url": pdf_url,
+                            "input_type":"ai"
+                            
+                        }
 
-                    records_to_create.append(record_data)
-                    success_count += 1
-                    break  # Exit the retry loop after success
+                        records_to_create.append(record_data)
+                        success_count += 1
+                        break  # Exit the retry loop after success
 
                 except requests.RequestException as e:
                     print(f"Attempt {attempt + 1} failed for {pdf_url}: {str(e)}")
@@ -412,30 +545,37 @@ class RulebookTitle(models.Model):
                         os.makedirs(storage_path)
 
                     filepath = os.path.join(storage_path, filename)
+                    existing_title = self.env["rulebook.title"].search(
+                        [("file_name", "=", file_name.replace("_", " "))], limit=1
+                    )
+                    if existing_title:
+                        print(f"Skipping, file already exists.")
 
-                    if not os.path.exists(filepath):
-                        with open(filepath, "wb") as f:
-                            f.write(pdf_response.content)
+                    else:    
+                        if not os.path.exists(filepath):
+                            with open(filepath, "wb") as f:
+                                f.write(pdf_response.content)
 
-                    file_binary_data = self.download_file_as_binary(pdf_url)
-                    released_date = self.parse_date(date_string)
+                        file_binary_data = self.download_file_as_binary(pdf_url)
+                        released_date = self.parse_date(date_string)
 
-                    record_data = {
-                        "name": file_name.replace("_", " "),
-                        "file": file_binary_data,
-                        "file_name": filename,
-                        "ref_number": None,
-                        "released_date": fields.Datetime.now(),
-                        "status": "active",
-                        "source_id": source_id,
-                        "created_on": fields.Datetime.now(),
-                        "created_by": self.env.user.id,
-                        "external_resource_url": pdf_url,
-                    }
+                        record_data = {
+                            "name": file_name.replace("_", " "),
+                            "file": file_binary_data,
+                            "file_name": filename,
+                            "ref_number": None,
+                            "released_date": fields.Datetime.now(),
+                            "status": "active",
+                            "source_id": source_id,
+                            "created_on": fields.Datetime.now(),
+                            "created_by": self.env.user.id, 
+                            "external_resource_url": pdf_url,
+                            "input_type":"ai"
+                        }
 
-                    records_to_create.append(record_data)
-                    success_count += 1
-                    break
+                        records_to_create.append(record_data)
+                        success_count += 1
+                        break
 
                 except requests.RequestException as e:
                     print(f"Attempt {attempt + 1} failed for {pdf_url}: {str(e)}")
@@ -637,3 +777,13 @@ class RulebookTitle(models.Model):
         # If none of the formats work, raise an error
         # raise ValueError(f"Date format for '{date_string}' is not supported")
         return ""
+
+    def get_filename(self, string):
+        # filename_title = re.sub(r"\d{4} \d{2} \d{2}(?=\.|$)", "", string)
+        # filename_title = re.sub(r"\.[^.]*$", "", filename_title)
+
+        # return filename_title
+        parsed_url = urlparse(string)
+        filename = os.path.basename(parsed_url.path)
+        filename_without_extension = os.path.splitext(filename)[0]
+        return filename_without_extension

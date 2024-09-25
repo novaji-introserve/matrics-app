@@ -14,4 +14,5 @@ function loadCSS(filename) {
 // Usage
 loadCSS("rule_book/static/src/css/tree_view.css");
 
+
 // The above code is suppose to change the whole team of the whole application

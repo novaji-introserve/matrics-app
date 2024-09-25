@@ -51,5 +51,7 @@
     "installable": True,
     "application": True,
     "auto_install": False,
-    "assets": {"web.assets_backend": ["rule_book/static/src/js/my_script.js"]},
+    "assets": {"web.assets_backend": ["rule_book/static/src/js/my_script.js", 
+                                       'rule_book/static/src/slider_field.xml',
+            'rule_book/static/src/slider_field.js',]},
 }
