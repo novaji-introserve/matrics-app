@@ -1,5 +1,5 @@
 function hello() {
-    console.log("hello, from uche");
+    console.log("hello, from olumide");
 
 }
 hello()
@@ -13,6 +13,7 @@ function loadCSS(filename) {
 
 // Usage
 loadCSS("rule_book/static/src/css/tree_view.css");
+// loadCSS("rule_book/static/src/css/form_style.css");
 
 
 // The above code is suppose to change the whole team of the whole application

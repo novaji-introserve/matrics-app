@@ -13,6 +13,7 @@
     /* text-align: center; */
   }
 
+   
     /* Custom styles for module */
     /* .o_web_client {
       background-color: #f0f8ff !important;
@@ -49,7 +50,7 @@
             /* Define the primary color */
         }
     
-        /* form {
+        form {
           margin: 10% auto 0 auto;
           padding: 30px;
           width: 400px;
@@ -59,19 +60,19 @@
           border-radius: 10px;
         } */
     
-        /* form label {
+        form label {
           font-size: 14px;
           color: darkgray;
           cursor: pointer;
-        } */
+        }
     
-        /* form label,
+        form label,
         form input {
           float: left;
           clear: both;
-        } */
+        }
 
-        /* .o_input {
+        .o_input {
           margin: 15px 0 !important;
           padding: 15px 10px !important;
           width: 100% !important;
@@ -88,12 +89,12 @@
           -ms-transition: 0.2s ease all !important;
           -o-transition: 0.2s ease all !important;
           transition: 0.2s ease all !important;
-        } */
+        }
 /*     
         form input[type=text]:focus,
         form input[type="password"]:focus {
           border-color: cornflowerblue;
-        } */
+        }
     
         /* .btn-primary {
           padding: 15px 20px !important;

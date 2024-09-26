@@ -10,7 +10,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 } */
 
-/* :root {
+:root {
     --primary-color: #0DA75E;
     --white: white
 }
@@ -98,4 +98,12 @@
 
   input[type="submit"]:active {
       opacity: 0.4;
-  } */
+  }
+
+.text-odoo {
+    color: #F90398 !important;
+}
+
+.o_calendar_renderer .o_calendar_widget .fc-timeGridWeek-view .fc-widget-header.fc-today {
+    background-color: #F90398 !important;
+}
