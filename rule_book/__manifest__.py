@@ -43,6 +43,7 @@
         "data/schedules/web_scraping.xml",
         "views/public/thank_you.xml",
         "security/group_action.xml",
+        "views/pdf_chat.xml"
     ],
     # only loaded in demonstration mode
     "demo": [

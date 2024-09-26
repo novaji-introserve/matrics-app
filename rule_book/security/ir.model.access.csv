@@ -14,3 +14,5 @@ access_reply_log_user,access_reply_log_user,model_reply_log,,1,1,1,1
 access_rulebook_report_manager,access_rulebook_report_manager,model_rulebook_report,,1,1,1,1
 access_reply_log_manager,access_reply_log_manager,model_reply_log,,1,1,1,1
 access_external_resource,access_external_resource,model_external_resource,,1,1,1,1
+access_pdf_chat,access_pdf_chat,model_pdf_chat,,1,1,1,1
+access_pdf_chat_log,access_pdf_chat_log,model_pdf_chat_log,,1,1,1,1

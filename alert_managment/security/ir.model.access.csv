@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_alert_managment_alert_managment,alert_managment.alert_managment,model_alert_managment_alert_managment,base.group_user,1,1,1,1

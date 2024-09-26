@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Preload data for Process Categories -->
+    <record id="process_category_1" model="utility.process_category">
+        <field name="name">Compliance Review</field>
+    </record>
+    <record id="process_category_2" model="utility.process_category">
+        <field name="name">Fraud Detection</field>
+    </record>
+    <record id="process_category_3" model="utility.process_category">
+        <field name="name">Transaction Monitoring</field>
+    </record>
+    <record id="process_category_4" model="utility.process_category">
+        <field name="name">AML Checks</field>
+    </record>
+    <record id="process_category_5" model="utility.process_category">
+        <field name="name">Risk Assessment</field>
+    </record>
+    <record id="process_category_6" model="utility.process_category">
+        <field name="name">Audit Trail Review</field>
+    </record>
+    <record id="process_category_7" model="utility.process_category">
+        <field name="name">Regulatory Compliance</field>
+    </record>
+    <record id="process_category_8" model="utility.process_category">
+        <field name="name">Loan Management</field>
+    </record>
+    <record id="process_category_9" model="utility.process_category">
+        <field name="name">Credit Card Screening</field>
+    </record>
+    <record id="process_category_10" model="utility.process_category">
+        <field name="name">Fraud Reporting</field>
+    </record>
+    <record id="process_category_11" model="utility.process_category">
+        <field name="name">Customer Identification</field>
+    </record>
+    <record id="process_category_12" model="utility.process_category">
+        <field name="name">Due Diligence</field>
+    </record>
+    <record id="process_category_13" model="utility.process_category">
+        <field name="name">Internal Control Checks</field>
+    </record>
+    <record id="process_category_14" model="utility.process_category">
+        <field name="name">Policy Enforcement</field>
+    </record>
+    <record id="process_category_15" model="utility.process_category">
+        <field name="name">Anti-Bribery</field>
+    </record>
+    <record id="process_category_16" model="utility.process_category">
+        <field name="name">Whistleblower Investigation</field>
+    </record>
+    <record id="process_category_17" model="utility.process_category">
+        <field name="name">Risk Management</field>
+    </record>
+    <record id="process_category_18" model="utility.process_category">
+        <field name="name">Capital Monitoring</field>
+    </record>
+    <record id="process_category_19" model="utility.process_category">
+        <field name="name">Cashflow Compliance</field>
+    </record>
+    <record id="process_category_20" model="utility.process_category">
+        <field name="name">Asset Auditing</field>
+    </record>
+
+</odoo>

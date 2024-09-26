@@ -1,0 +1,48 @@
+<!-- views/pdf_chat_views.xml -->
+<odoo>
+    <record id="view_pdf_chat_page" model="ir.ui.view">
+        <field name="name">pdf.chat.page</field>
+        <field name="model">pdf.chat</field>
+        <field name="arch" type="xml">
+            <form string="PDF Chat">
+                <sheet>
+                    <!-- Select Rulebook and Display PDF File -->
+                    <group>
+                        <field name="rulebook_id" required="1" options="{'no_create': True}" />
+                        <field name="pdf_file_name" readonly="1" />
+                    </group>
+                    <!-- Display Chat Logs -->
+                    <group string="Chat Logs">
+                        <field name="chat_logs" widget="one2many">
+                            <tree>
+                                <field name="question" />
+                                <field name="response" />
+                                <field name="timestamp" />
+                            </tree>
+                        </field>
+                    </group>
+                    <!-- User Input Section -->
+                    <group>
+                        <field name="user_question" placeholder="Type your question here..." />
+                        <button name="chat_with_pdf" string="Ask" type="object"
+                            class="btn-primary ask-question-btn" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View for PDF Chat -->
+    <record id="view_pdf_chat_tree" model="ir.ui.view">
+        <field name="name">pdf.chat.tree</field>
+        <field name="model">pdf.chat</field>
+        <field name="arch" type="xml">
+            <tree string="PDF Chats" default_order="create_date desc">
+                <field name="rulebook_id" />
+                <field name="pdf_file_name" />
+                <field name="user_id" />
+                <field name="create_date" string="Chat Date" />
+            </tree>
+        </field>
+    </record>
+</odoo>

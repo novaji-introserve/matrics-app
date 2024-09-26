@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_process_category,access_process_category,model_process_category,,1,1,1,1
+access_sla_severity,access_sla_severity,model_sla_severity,,1,1,1,1
+access_process,access_process,model_process,,1,1,1,1

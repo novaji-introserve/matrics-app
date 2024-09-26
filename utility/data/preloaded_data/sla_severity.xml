@@ -1,0 +1,19 @@
+<odoo noupdate="1">
+    <!-- Preload data for SLA Severity -->
+    <record id="sla_severity_1" model="utility.sla_severity">
+        <field name="name">Low</field>
+        <field name="severity_level">1</field>
+    </record>
+    <record id="sla_severity_2" model="utility.sla_severity">
+        <field name="name">Medium</field>
+        <field name="severity_level">2</field>
+    </record>
+    <record id="sla_severity_3" model="utility.sla_severity">
+        <field name="name">High</field>
+        <field name="severity_level">3</field>
+    </record>
+    <record id="sla_severity_4" model="utility.sla_severity">
+        <field name="name">Critical</field>
+        <field name="severity_level">4</field>
+    </record>
+</odoo>

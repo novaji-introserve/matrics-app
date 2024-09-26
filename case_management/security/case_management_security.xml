@@ -1,6 +1,6 @@
 <odoo>
-    <record id="case_management_group_user" model="res.groups">
-        <field name="name">Case Management User</field>
+    <!-- <record id="case_management_group_user" model="res.groups"> -->
+        <!-- <field name="name">Case Management User</field>
     </record>
     <record id="case_management_group_manager" model="res.groups">
         <field name="name">Case Management Manager</field>
@@ -17,6 +17,6 @@
         <field name="name">Case Management Manager Rule</field>
         <field name="model_id" ref="model_case_management" />
         <field name="groups" eval="[(4, ref('case_management_group_manager'))]" />
-    </record>
+    </record> -->
 
 </odoo>
