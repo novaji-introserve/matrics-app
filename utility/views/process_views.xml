@@ -5,14 +5,11 @@
         <field name="model">process</field>
         <field name="arch" type="xml">
             <tree
-               
             >
                 <field name="name" />
                 <field name="category_id" />
                 <field name="sla_severity_id"
-                    decoration-danger="severity_level == 'Critical'"
-                    decoration-warning="severity_level == 'Medium'"
-                    decoration-muted="severity_level == 'Low'" />
+                   />
             </tree>
 
         </field>

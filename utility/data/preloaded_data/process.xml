@@ -6,31 +6,31 @@
     <record id="process_1" model="process">
         <field name="name">KYC Verification</field>
         <field name="category_id" ref="process_category_1" />
-     <field name="sla_severity_id" >Low</field>
+        <field name="sla_severity_id" ref="sla_severity_1" />
         <field name="description">Verification of customer identity to comply with KYC regulations.</field>
     </record>
     <record id="process_2" model="process">
         <field name="name">AML Compliance Review</field>
         <field name="category_id" ref="process_category_1" />
-     <field name="sla_severity_id" >Medium</field>
+        <field name="sla_severity_id" ref="sla_severity_2" />
         <field name="description">Reviewing procedures to ensure compliance with AML laws.</field>
     </record>
     <record id="process_3" model="process">
         <field name="name">Audit Compliance Check</field>
         <field name="category_id" ref="process_category_1" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Conducting checks to ensure adherence to audit standards.</field>
     </record>
     <record id="process_4" model="process">
         <field name="name">Regulatory Compliance Assessment</field>
         <field name="category_id" ref="process_category_1" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Assessing compliance with applicable regulations.</field>
     </record>
     <record id="process_5" model="process">
         <field name="name">Internal Compliance Monitoring</field>
         <field name="category_id" ref="process_category_1" />
-     <field name="sla_severity_id" >Low</field>
+        <field name="sla_severity_id" ref="sla_severity_1" />
         <field name="description">Monitoring internal processes for compliance adherence.</field>
     </record>
 
@@ -38,31 +38,31 @@
     <record id="process_6" model="process">
         <field name="name">Transaction Fraud Monitoring</field>
         <field name="category_id" ref="process_category_2" />
-     <field name="sla_severity_id" >Medium</field>
+        <field name="sla_severity_id" ref="sla_severity_2" />
         <field name="description">Monitoring transactions to detect potential fraud.</field>
     </record>
     <record id="process_7" model="process">
         <field name="name">Fraud Prevention Strategy</field>
         <field name="category_id" ref="process_category_2" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Developing strategies to prevent fraudulent activities.</field>
     </record>
     <record id="process_8" model="process">
         <field name="name">Fraud Investigation Review</field>
         <field name="category_id" ref="process_category_2" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Reviewing investigations of suspected fraud cases.</field>
     </record>
     <record id="process_9" model="process">
         <field name="name">Automated Fraud Alerts</field>
         <field name="category_id" ref="process_category_2" />
-     <field name="sla_severity_id" >Low</field>
+        <field name="sla_severity_id" ref="sla_severity_1" />
         <field name="description">Setting up automated alerts for potential fraud indicators.</field>
     </record>
     <record id="process_10" model="process">
         <field name="name">Fraud Case Management</field>
         <field name="category_id" ref="process_category_2" />
-     <field name="sla_severity_id" >Medium</field>
+        <field name="sla_severity_id" ref="sla_severity_2" />
         <field name="description">Managing cases of fraud from detection to resolution.</field>
     </record>
 
@@ -70,31 +70,31 @@
     <record id="process_11" model="process">
         <field name="name">Real-Time Transaction Monitoring</field>
         <field name="category_id" ref="process_category_3" />
-     <field name="sla_severity_id" >Low</field>
+        <field name="sla_severity_id" ref="sla_severity_1" />
         <field name="description">Monitoring transactions in real-time for anomalies.</field>
     </record>
     <record id="process_12" model="process">
         <field name="name">Transaction Screening</field>
         <field name="category_id" ref="process_category_3" />
-     <field name="sla_severity_id" >Medium</field>
+        <field name="sla_severity_id" ref="sla_severity_2" />
         <field name="description">Screening transactions against risk criteria.</field>
     </record>
     <record id="process_13" model="process">
         <field name="name">Transaction Risk Assessment</field>
         <field name="category_id" ref="process_category_3" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Assessing the risk level of transactions.</field>
     </record>
     <record id="process_14" model="process">
         <field name="name">Automated Transaction Audits</field>
         <field name="category_id" ref="process_category_3" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Conducting audits of transactions automatically.</field>
     </record>
     <record id="process_15" model="process">
         <field name="name">Suspicious Transaction Flagging</field>
         <field name="category_id" ref="process_category_3" />
-     <field name="sla_severity_id" >Low</field>
+        <field name="sla_severity_id" ref="sla_severity_1" />
         <field name="description">Flagging transactions deemed suspicious for review.</field>
     </record>
 
@@ -102,31 +102,31 @@
     <record id="process_16" model="process">
         <field name="name">Quarterly Internal Audits</field>
         <field name="category_id" ref="process_category_4" />
-     <field name="sla_severity_id" >Medium</field>
+        <field name="sla_severity_id" ref="sla_severity_2" />
         <field name="description">Conducting internal audits on a quarterly basis.</field>
     </record>
     <record id="process_17" model="process">
         <field name="name">Internal Controls Review</field>
         <field name="category_id" ref="process_category_4" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Reviewing internal controls for effectiveness.</field>
     </record>
     <record id="process_18" model="process">
         <field name="name">Internal Audit Findings Report</field>
         <field name="category_id" ref="process_category_4" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Reporting findings from internal audits.</field>
     </record>
     <record id="process_19" model="process">
         <field name="name">Risk-Based Audit Framework</field>
         <field name="category_id" ref="process_category_4" />
-     <field name="sla_severity_id" >Low</field>
+        <field name="sla_severity_id" ref="sla_severity_1" />
         <field name="description">Framework for conducting audits based on risk assessment.</field>
     </record>
     <record id="process_20" model="process">
         <field name="name">Audit Report Analysis</field>
         <field name="category_id" ref="process_category_4" />
-     <field name="sla_severity_id" >Medium</field>
+        <field name="sla_severity_id" ref="sla_severity_2" />
         <field name="description">Analyzing audit reports for insights and improvements.</field>
     </record>
 
@@ -134,31 +134,31 @@
     <record id="process_21" model="process">
         <field name="name">Enterprise Risk Assessment</field>
         <field name="category_id" ref="process_category_5" />
-     <field name="sla_severity_id" >Low</field>
+        <field name="sla_severity_id" ref="sla_severity_1" />
         <field name="description">Assessing risks at the enterprise level.</field>
     </record>
     <record id="process_22" model="process">
         <field name="name">Operational Risk Monitoring</field>
         <field name="category_id" ref="process_category_5" />
-     <field name="sla_severity_id" >Medium</field>
+        <field name="sla_severity_id" ref="sla_severity_2" />
         <field name="description">Monitoring operational risks across the organization.</field>
     </record>
     <record id="process_23" model="process">
         <field name="name">Credit Risk Analysis</field>
         <field name="category_id" ref="process_category_5" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Analyzing credit risks associated with clients.</field>
     </record>
     <record id="process_24" model="process">
         <field name="name">Market Risk Assessment</field>
         <field name="category_id" ref="process_category_5" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Assessing market risks impacting the organization.</field>
     </record>
     <record id="process_25" model="process">
         <field name="name">Liquidity Risk Management</field>
         <field name="category_id" ref="process_category_5" />
-     <field name="sla_severity_id" >Low</field>
+        <field name="sla_severity_id" ref="sla_severity_1" />
         <field name="description">Managing risks related to liquidity.</field>
     </record>
 
@@ -166,31 +166,31 @@
     <record id="process_26" model="process">
         <field name="name">Daily Compliance Checks</field>
         <field name="category_id" ref="process_category_6" />
-     <field name="sla_severity_id" >Medium</field>
+        <field name="sla_severity_id" ref="sla_severity_2" />
         <field name="description">Conducting daily checks to ensure compliance.</field>
     </record>
     <record id="process_27" model="process">
         <field name="name">Regulatory Filing Review</field>
         <field name="category_id" ref="process_category_6" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Reviewing regulatory filings for accuracy and compliance.</field>
     </record>
     <record id="process_28" model="process">
         <field name="name">Policy Compliance Assessment</field>
         <field name="category_id" ref="process_category_6" />
-     <field name="sla_severity_id" >Critical</field>
+        <field name="sla_severity_id" ref="sla_severity_4" />
         <field name="description">Assessing compliance with internal policies.</field>
     </record>
     <record id="process_29" model="process">
         <field name="name">AML Transaction Monitoring</field>
         <field name="category_id" ref="process_category_6" />
-     <field name="sla_severity_id" >Low</field>
+        <field name="sla_severity_id" ref="sla_severity_1" />
         <field name="description">Monitoring transactions for AML compliance.</field>
     </record>
     <record id="process_30" model="process">
         <field name="name">Securities Compliance Review</field>
         <field name="category_id" ref="process_category_6" />
-     <field name="sla_severity_id" >Medium</field>
+        <field name="sla_severity_id" ref="sla_severity_2" />
         <field name="description">Reviewing compliance with securities regulations.</field>
     </record>
 

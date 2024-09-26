@@ -8,24 +8,19 @@
     """,
     "author": "Novaji Introserve",
     "website": "https://novajii.com",
-    "sequence": -10001,
+    "sequence": -10008,
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     "category": "Uncategorized",
     "version": "0.1",
     # any module necessary for this one to work correctly
-    "depends": ["base", ],
+    "depends": ["base",'utility','mail' ],
     # always loaded
     "data": [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         "views/views.xml",
         "views/templates.xml",
-        "security/case_management_security.xml",
-        "security/ir.model.access.csv",
-        "views/case_management_actions.xml",
-        "views/case_management_dashboard.xml",
-        "views/case_management_menus.xml",
         "views/case_management_views.xml",
     ],
     # only loaded in demonstration mode
