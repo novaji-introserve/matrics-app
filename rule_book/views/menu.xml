@@ -93,17 +93,23 @@
     </record>
 
 
+    <record id="action_cusotomer_details_js" model="ir.actions.client">
+      <field name="name">Dashboard</field>
+      <field name="tag">rule_book.action_cusotomer_details_js</field>
+    </record>
+
+
     <!-- Menu Item -->
 
 
     <!-- Main Rulebook Menu -->
-    <menuitem id="menu_rulebook_theme_root" name="Rulebook" sequence="1"  />
+    <menuitem id="menu_rulebook_theme_root" name="Rulebook" sequence="1" />
 
     <!-- Submenu for Rulebook Details (Title, Theme, Rulebook, Reply Logs) -->
     <menuitem id="menu_rulebook_details" name="Rulebook" parent="menu_rulebook_theme_root"
       sequence="1" />
     <menuitem id="menu_rulebook_rulebook" name="Rulebook" parent="menu_rulebook_details"
-     action="action_rulebook" sequence="1"  />
+      action="action_rulebook" sequence="1" />
     <menuitem id="menu_rulebook_title" name="Titles" parent="menu_rulebook_details"
       action="action_rulebook_title" sequence="2" />
     <menuitem id="menu_pdf_chat" name="AI Assistance" parent="menu_rulebook_details"
@@ -135,6 +141,14 @@
       parent="menu_rulebook_exception" action="action_rulebook_exception_type" sequence="5" />
     <menuitem id="menu_regulatory_sources" name="Regulatory Sources"
       parent="menu_rulebook_configuration" action="action_rulebook_sources" />
+
+    <menuitem
+      id="helpdesk_rule_book_dashbaord"
+      name="Dashboard"
+      parent="menu_rulebook_theme_root"
+      action="action_cusotomer_details_js"
+      sequence="-1"
+    />
 
 
     <!-- <record id="action_custom_tree" model="ir.actions.act_window">

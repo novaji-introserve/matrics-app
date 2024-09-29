@@ -1,0 +1,41 @@
+/* static/src/css/custom_menu.css */
+
+/* Style for Themes menu item */
+a[data-menu-xmlid="rule_book.menu_rulebook_theme"] {
+    color: #A833FF !important;
+    /* Purple */
+}
+
+/* Style for Rulebook menu item */
+a[data-menu-xmlid="rule_book.menu_rulebook_rulebook"] {
+    color: #3357FF !important;
+    /* Blue */
+}
+
+/* Style for Titles menu item */
+a[data-menu-xmlid="rule_book.menu_rulebook_title"] {
+    color: #FF33A8 !important;
+    /* Pink */
+}
+
+/* Style for AI Assistance menu item */
+a[data-menu-xmlid="rule_book.menu_pdf_chat"] {
+    color: #33FFF5 !important;
+    /* Cyan */
+}
+
+/* Style for Reply Logs menu item */
+a[data-menu-xmlid="rule_book.menu_reply_log"] {
+    color: #FFA533 !important;
+    /* Amber */
+}
+.o-dropdown-menu a,
+.dropdown-menu .dropdown-item {
+    color: #FFA533 !important;
+    background-color: #FFA533 !important;
+    /* Amber */
+}
+
+
+/* Add styles for other menu items similarly */
+

@@ -56,14 +56,31 @@ class Theme(models.TransientModel):
         # ensure the menus have no parent items
         menu_item = self.env['ir.ui.menu'].sudo().search([('parent_id', '=', False)])
         for menu in menu_item:
+            if menu.name == 'iComply Utility':
+                img_path = get_module_resource(
+                    'custom_backend_theme', 'static', 'src', 'img',
+                    'icons_green',
+                    'utility.png')
+                menu.write({'web_icon_data': base64.b64encode(
+                    open(img_path, "rb").read())})
+            if menu.name == 'Case Management':
+                img_path = get_module_resource(
+                    'custom_backend_theme', 'static', 'src', 'img', 'icons',
+                    'case_management.png')
+                menu.write({'web_icon_data': base64.b64encode(
+                    open(img_path, "rb").read())})
             if menu.name == 'Alert Managment':
                 img_path = get_module_resource(
                     'custom_backend_theme', 'static', 'src', 'img', 'icons',
                     'alert.png')
+                menu.write({'web_icon_data': base64.b64encode(
+                    open(img_path, "rb").read())})
             if menu.name == 'iComply Utility':
                 img_path = get_module_resource(
                     'custom_backend_theme', 'static', 'src', 'img', 'icons',
                     'utility.png')
+                menu.write({'web_icon_data': base64.b64encode(
+                    open(img_path, "rb").read())})
             if menu.name == 'Rulebook':
                 img_path = get_module_resource(
                     'custom_backend_theme', 'static', 'src', 'img', 'icons',
@@ -295,6 +312,13 @@ class Theme(models.TransientModel):
                     'custom_backend_theme', 'static', 'src', 'img',
                     'icons_green',
                     'utility.png')
+                menu.write({'web_icon_data': base64.b64encode(
+                    open(img_path, "rb").read())})
+            if menu.name == 'Case Management':
+                img_path = get_module_resource(
+                    'custom_backend_theme', 'static', 'src', 'img',
+                    'icons_green',
+                    'case_management.png')
                 menu.write({'web_icon_data': base64.b64encode(
                     open(img_path, "rb").read())})
             if menu.name == 'Alert Managment':
