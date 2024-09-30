@@ -57,15 +57,18 @@
                     <group string="Basic Information" class="section-group"
                         style="margin-top: 20px;">
                         <group col="2">
-                            <field name="name" class="input" placeholder="Select rulebook title" />
-                            <field name="theme_id" placeholder="Select a theme" />
+                        <field name="name" class="input" placeholder="Select rulebook title" />
+                        <field name="theme_id" placeholder="Select a theme" />
+                        <field name="type_of_return" placeholder="Specify type of return"
+                            class="html_field"
+                            widget="html" />
                         </group>
                         <group col="1" style="grid-column: span 2;">
                             <field name="description" widget="html"
-                                placeholder="Describe the issue or project"
-                                style="height: 100px; border: 1px solid #ddd; padding: 10px;" />
+                            placeholder="Describe the issue or project"
+                            class="html_field" />
                             <field name="section" widget="html" placeholder="Specify the section"
-                                style="height: 100px; border: 1px solid #ddd; padding: 10px;" />
+                            class="html_field" />
                         </group>
                     </group>
 
@@ -144,9 +147,9 @@
                         style="margin-top: 20px;">
                         <group col="2">
                             <field name="sanction" widget="html"
-                                placeholder="List sanctions here with proper formatting."
-                                style="height: 120px; border: 1px solid #ddd; padding: 10px;" />
-                            <field name="type_of_return" placeholder="Specify type of return" />
+                            placeholder="List sanctions here with proper formatting."
+                            class="html_field" />
+                         
                         </group>
                         <group col="2">
                             <field name="regulatory_agency_id"
@@ -172,21 +175,22 @@
         <field name="arch" type="xml">
             <search>
                 <searchpanel>
-                
-                    <field name="theme_id" icon="fa-book" enable_counters="1"
-                        options='{"counters": true}' string="Theme" />
+                    <field name="responsible_id" icon="fa-user-tie" enable_counters="1"
+                        options='{"counters": true}' string="Responsible" />
+                    <field name="regulatory_agency_id" icon="fa-building" enable_counters="1"
+                        options='{"counters": true}' string="Regulatory Agency" />
+
                     <field name="risk_category" icon="fa-exclamation-triangle" enable_counters="1"
                         options='{"counters": true}' string="Risk Category" />
                     <field name="risk_rating" icon="fa-thermometer-half" enable_counters="1"
                         options='{"counters": true}' string="Risk Rating" />
-                    <field name="regulatory_agency_id" icon="fa-building" enable_counters="1"
-                        options='{"counters": true}' string="Regulatory Agency" />
-                    <field name="responsible_id" icon="fa-user-tie" enable_counters="1"
-                        options='{"counters": true}' string="Responsible" />
                     <field name="frequency_type" icon="fa-calendar-alt" enable_counters="1"
                         options='{"counters": true}' string="Frequency Type" />
+                    <field name="theme_id" icon="fa-book" enable_counters="1"
+                        options='{"counters": true}' string="Theme" />
                     <field name="status" icon="fa-toggle-on" enable_counters="1"
                         options='{"counters": true}' string="Status" />
+
                 </searchpanel>
                 <!-- Standard search fields -->
                 <field name="name" string="Title" />

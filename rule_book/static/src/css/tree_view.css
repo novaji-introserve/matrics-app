@@ -13,6 +13,14 @@
     /* text-align: center; */
   }
 
+  .html_field{
+    appearance:none;
+    height: 120px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+  }
+
    
     /* Custom styles for module */
     /* .o_web_client {
@@ -44,10 +52,10 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     } */
     
-        :root {
+        /* :root {
           --primary-color: #009872;
           --white: white
-            /* Define the primary color */
+          
         }
     
         form {
@@ -58,15 +66,15 @@
           overflow: hidden;
           background: white;
           border-radius: 10px;
-        } */
+        } 
     
         form label {
           font-size: 14px;
           color: darkgray;
           cursor: pointer;
         }
-    
-        form label,
+     */
+        /* form label,
         form input {
           float: left;
           clear: both;
@@ -89,7 +97,7 @@
           -ms-transition: 0.2s ease all !important;
           -o-transition: 0.2s ease all !important;
           transition: 0.2s ease all !important;
-        }
+        } */
 /*     
         form input[type=text]:focus,
         form input[type="password"]:focus {

@@ -92,6 +92,14 @@
       <field name="view_mode">tree,form</field>
     </record>
 
+    <!-- <record id="action_rulebook_dashboard" model="ir.actions.act_window">
+      <field name="name">Rulebook Dashboard</field>
+      <field name="res_model">rulebook.dashboard</field>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="view_rulebook_dashboard_form" />
+      <field name="target">current</field>
+    </record> -->
+
 
     <record id="action_cusotomer_details_js" model="ir.actions.client">
       <field name="name">Dashboard</field>
@@ -142,6 +150,10 @@
     <menuitem id="menu_regulatory_sources" name="Regulatory Sources"
       parent="menu_rulebook_configuration" action="action_rulebook_sources" />
 
+    <!-- <menuitem id="menu_rulebook_dashboard" name="Dashboard" parent="menu_rulebook_theme_root"
+      action="action_rulebook_dashboard" sequence="1" groups="base.group_user" /> -->
+
+    
     <menuitem
       id="helpdesk_rule_book_dashbaord"
       name="Dashboard"

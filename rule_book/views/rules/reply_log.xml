@@ -41,6 +41,9 @@
                         <h1>
                             <field name="rulebook_id" />
                         </h1>
+                        <h1>
+                            <field name="rulebook_name" readonly="1" widget="text" />
+                        </h1>
                     </div>
                     <group>
                         <group>

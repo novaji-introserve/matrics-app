@@ -1,8 +1,12 @@
+import re
 from odoo import models, fields, api,_
 from datetime import timedelta, datetime
 import pytz
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class ReplyLog(models.Model):
     _name = "reply.log"
@@ -14,6 +18,57 @@ class ReplyLog(models.Model):
     rulebook_id = fields.Many2one(
         "rulebook", string="Rulebook", help="Reference to the related Rulebook"
     )
+
+    rulebook_name = fields.Char(
+        string="Rulebook Name",
+        compute='_compute_rulebook_name_stripped',
+        store=False  # Not stored in the database
+    )
+
+    @api.model
+    def get_awaiting_replies(self):
+        _logger.info("Fetching awaiting replies...")
+
+        # Fetch completed replies
+        completed_replies = self.search([('rulebook_status', '=', 'completed')])
+        completed_grouped = {}
+
+        for reply in completed_replies:
+            key = (reply.rulebook_id.id, reply.next_due_date)
+            if key not in completed_grouped:
+                completed_grouped[key] = reply.id
+
+        _logger.info(f"Completed replies grouped: {completed_grouped}")
+
+        # Search for awaiting replies
+        awaiting_replies = self.search([
+            ('rulebook_status', '!=', 'completed'),
+            ('next_due_date', 'not in', list(completed_grouped.values())),
+            ('rulebook_id', 'not in', [k[0] for k in completed_grouped.keys()]),
+        ])
+
+        _logger.info(f"Awaiting replies found: {awaiting_replies.ids}")
+
+        # Prepare the result with required fields
+        result = []
+        for reply in awaiting_replies:
+            result.append({
+                'id': reply.id,
+                'rulebook_name': reply.rulebook_name,  # Assuming rulebook_id has a 'name' field
+                'status': reply.rulebook_status,
+                'reply_date': reply.reply_date,
+                'form_link': f"/web#id={reply.id}&model=reply.log&view_type=form"  # Link to the form view
+            })
+
+        return result
+
+    def _compute_rulebook_name_stripped(self):
+        for record in self:
+            if record.rulebook_id:
+                # Strip HTML tags
+                record.rulebook_name = re.sub(r'<[^>]+>', '', record.rulebook_id.type_of_return )
+            else:
+                record.rulebook_name = ''
 
     # The date the reply was submitted, auto-set to the current date, and readonly
     reply_date = fields.Date(
