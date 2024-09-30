@@ -725,7 +725,7 @@ class Rulebook(models.Model):
             )
             global_data = {
                 "email_to": rulebook_id.responsible_id.email,
-                "name": rulebook_id.first_line_escalation.name,
+                "name": rulebook_id.responsible_id.officer_responsible if  rulebook_id.responsible_id.officer_responsible else rulebook_id.responsible_id.email,
                 "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
                 "upload_link": self._compute_upload_link(rulebook_id.id),
                 "email_from":  os.getenv("EMAIL_FROM"),

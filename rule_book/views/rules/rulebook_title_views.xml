@@ -80,6 +80,7 @@
                     By"
                         /> -->
                     <field name="source_id" icon="fa-cog" enable_counters="1" string="Source" />
+                    <field name="input_type" icon="fa-user-tie" enable_counters="1" string="Input Type" />
                     <field name="status" icon="fa-check" enable_counters="1" string="Status" />
                 </searchpanel>
             </search>

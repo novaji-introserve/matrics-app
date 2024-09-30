@@ -15,8 +15,7 @@ class CaseManagement(models.Model):
         ('overdue', 'Overdue'),
     ], string="Process Status", required=True)
     
-    root_category = fields.Char(string="Root Category", required=True)
-    root_category_processes = fields.Text(string="Root Category Processes")
+
     event_date = fields.Date(string="Event Date", required=True)
     narration = fields.Text(string="Narration")
     data_source = fields.Char(string="Data Source", default="default")
@@ -50,6 +49,7 @@ class CaseManagement(models.Model):
 
   
     def action_reply_log(self):
+        print(self.branch_staff_responsible_id)
         """ This method will open the reply log related to the case """
         self.ensure_one()
         return {

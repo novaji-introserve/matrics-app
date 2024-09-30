@@ -81,7 +81,7 @@ class RuleBookController(http.Controller):
                 request.env["ir.config_parameter"].sudo().get_param("web.base.url")
             )
             #
-            url = f"{base_url}/web#id={report.id}&cids=1&menu_id=108&action=302&model=reply.log&view_type=form"
+            url = f"{base_url}/web#id={report.id}&cids=1&menu_id=277&action=423&model=reply.log&view_type=form"
             # global data
             current_year = datetime.now().year
             report.set_global_data(

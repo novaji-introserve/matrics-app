@@ -7,6 +7,7 @@ class Responsible(models.Model):
     _rec_name = 'name'
 
     name = fields.Char(string='Name', required=True, tracking=True)
+    officer_responsible = fields.Char(string='Officer Responsible', required=True, tracking=True)
     email = fields.Char(string='Email', required=True, tracking=True)
     cc = fields.Char(string='CC (Email List)', tracking=True)
     bc = fields.Char(string='BC (Email List)', tracking=True)

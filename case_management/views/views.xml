@@ -36,7 +36,7 @@
     <field name="name">Cases Assigned to Me</field>
     <field name="res_model">case.management</field>
     <field name="view_mode">tree,form</field>
-    <field name="domain">[('branch_staff_responsible_id.user_id', '=', uid)]</field>
+    <field name="domain">[('branch_staff_responsible_id', '=', uid)]</field>
   </record>
 
   <record id="action_my_alerts" model="ir.actions.act_window">

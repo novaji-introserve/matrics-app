@@ -9,14 +9,15 @@
             <tree >
 
                 <field name="name" />
-                <field name="theme_id" />
+                <field name="type_of_return"  widget="html"/>
+                <field name="theme_id" optional="hide" />
                 <field name="risk_category" />
                 <field name="first_line_escalation" />
                 <field name="computed_date" string="Current Regulatory Date" widget="date" />
                 <field name="second_line_escalation" optional="hide" />
-                <field name="type_of_return" optional="hide" />
-                <field name="regulatory_agency_id" />
-                <field name="responsible_id" />
+               
+                <field name="regulatory_agency_id" optional="show" />
+                <field name="responsible_id"  optional="show" />
                 <field name="frequency_type" optional="hide" />
             
                 <field name="risk_rating"

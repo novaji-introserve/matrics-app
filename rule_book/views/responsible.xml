@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
+                <field name="officer_responsible" />
                 <field name="email" />
                 <field name="cc" />
                 <field name="bc" />
@@ -22,6 +23,7 @@
             <form>
                 <group>
                     <field name="name" />
+                    <field name="officer_responsible" />
                     <field name="email" />
                     <field name="cc" />
                     <field name="bc" />

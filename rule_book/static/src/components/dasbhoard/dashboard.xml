@@ -17,8 +17,7 @@
 			-->
       <!-- <link rel="stylesheet" href="rule_book/static/assets/css/demo.css" /> -->
       <!-- Vendors CSS -->
-			<link rel="stylesheet" href="rule_book/static/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
-			<link rel="stylesheet" href="rule_book/static/assets/vendor/libs/apex-charts/apex-charts.css" />
+		
       <!-- Page CSS -->
       <!-- Helpers -->
       <!-- <script src="rule_book/static/assets/vendor/js/helpers.js"></script> -->
@@ -584,13 +583,11 @@
 			</div>
 			<script src="rule_book/static/assets/vendor/js/bootstrap.js">
 			</script>
-			<script src="rule_book/static/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js">
-			</script>
+			
       <!-- <script src="rule_book/static/assets/vendor/js/menu.js"></script> -->
       <!-- endbuild -->
       <!-- Page JS -->
-			<script src="rule_book/static/assets/js/dashboards-analytics.js">
-			</script>
+			
       <!-- Place this tag before closing body tag for github widget button. -->
 			<script src="https://buttons.github.io/buttons.js">
 			</script>
