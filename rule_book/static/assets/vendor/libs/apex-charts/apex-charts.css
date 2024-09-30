@@ -13,6 +13,10 @@
   width: 6px;
 }
 
+.custom-purple {
+  color: #a58cd3;
+  /* Example purple color */
+}
 .apexcharts-canvas ::-webkit-scrollbar-thumb {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.5);

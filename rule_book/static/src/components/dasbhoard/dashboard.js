@@ -25,6 +25,8 @@ export class Dashboard extends Component {
             totalChatLogs : 0,
             newChatLogsToday: 0,
             awaitingReplies: [],
+            newlyUploadedTitle: [],
+            mostAskedQuestion: [],
         });
 
         // Initialize the orm service
@@ -34,6 +36,8 @@ export class Dashboard extends Component {
             await this.fetchCounts();
             await this.fetchData();
             await this.fetchAwaitingReplies()
+            await this.fetchNewlyUploadedTitle()
+            await this.fetchMostAskedAiQuestion()
         });
     }
 
@@ -45,6 +49,26 @@ export class Dashboard extends Component {
             console.log(replies); // Print the replies
         } catch (error) {
             console.error('Failed to fetch awaiting replies:', error);
+        }
+    }
+    async fetchNewlyUploadedTitle() {
+        try {
+            // Using the ORM to fetch awaiting replies
+            const newlyUploadedTitle = await this.orm.call('rulebook.title', 'fetch_new_ai_titles', []);
+            this.state.newlyUploadedTitle = newlyUploadedTitle;
+            console.log(newlyUploadedTitle); // Print the replies
+        } catch (error) {
+            console.error('Failed to fetch newly uploaded title:', error);
+        }
+    }
+    async fetchMostAskedAiQuestion() {
+        try {
+            // Using the ORM to fetch awaiting replies
+            const mostAskedQuestion = await this.orm.call('pdf.chat.log', 'get_most_asked_questions', []);
+            this.state.mostAskedQuestion = mostAskedQuestion;
+            console.log(mostAskedQuestion); // Print the replies
+        } catch (error) {
+            console.error('Failed to fetch newly uploaded title:', error);
         }
     }
     async fetchCounts() {

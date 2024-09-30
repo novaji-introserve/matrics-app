@@ -1,6 +1,7 @@
 # models/pdf_chat.py
 import base64
 import io
+from collections import Counter
 from odoo import models, fields, api
 import PyPDF2
 import ollama
@@ -143,3 +144,29 @@ class PdfChatLog(models.Model):
     question = fields.Text(string='Question', )
     response = fields.Text(string='Response')
     timestamp = fields.Datetime(string='Timestamp', default=fields.Datetime.now)
+
+
+    @api.model
+    def get_most_asked_questions(self):
+        # Fetch all records where the question field is not empty
+        logs = self.search([('question', '!=', False)])
+
+        # Count occurrences of each question
+        question_counter = Counter(logs.mapped('question'))
+
+        # Get the top 5 most asked questions
+        most_asked_questions = question_counter.most_common(5)
+
+        # Prepare the result with questions and their counts
+        result = []
+        for question, count in most_asked_questions:
+            result.append({
+                'question': question,
+                'count': count,
+            })
+
+        # For debugging or logging
+        print(result)
+        print("i am result")
+
+        return result

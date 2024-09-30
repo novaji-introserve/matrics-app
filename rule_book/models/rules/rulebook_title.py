@@ -12,6 +12,8 @@ from os.path import basename
 import json
 import time
 import threading
+from datetime import datetime, timedelta
+from odoo.tools import html_escape
 
 load_dotenv()
 
@@ -41,6 +43,38 @@ class RulebookTitle(models.Model):
     )
     # Add the external_resource_url field if it's not already defined
     external_resource_url = fields.Char("External Resource URL")
+
+    @api.model
+    def fetch_new_ai_titles(self):
+        # Get the start and end of the current week
+        today = datetime.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+
+        # Fetch the most recent 5 titles for the current week
+        titles = self.env['rulebook.title'].search([
+            ('create_date', '>=', start_of_week),
+            ('create_date', '<=', end_of_week),
+            ('input_type', '=', 'ai'),
+            ('status', '=', 'active')
+        ], order='create_date desc', limit=5)
+        # Prepare the results
+        results = []
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        
+        for title in titles:
+            # Construct the URL to the form view of each record
+            form_url = f"{base_url}/web#id={title.id}&model=rulebook.title&view_type=form"
+            
+            results.append({
+                'name': title.name,
+                'source': title.source_id.name if title.source_id else 'N/A',
+                'created_on': title.created_on,
+                'created_by': title.created_by.name if title.created_by else 'N/A',
+                'form_link': html_escape(form_url),  # HTML escaped link to form view
+            })
+        print(results)
+        return results
 
     def action_ndic_scrapper(self):
         """Method to run the NDIC Scrapper when button is clicked"""
