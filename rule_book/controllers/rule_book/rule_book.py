@@ -1,3 +1,4 @@
+import re
 from odoo import http
 from odoo.http import request
 from cryptography.fernet import Fernet
@@ -87,7 +88,7 @@ class RuleBookController(http.Controller):
                 {
                     "email_from": "icomply@bio.ng",
                     "email_to": rulebook.first_line_escalation.email,
-                    "name": rulebook.name.name,
+                    "name":re.sub(r'<[^>]+>', '', rulebook.type_of_return if rulebook.type_of_return else ""),
                     "content": kwargs.get("reply_content"),
                     "url_link": url,
                     "current_year": current_year,
@@ -137,7 +138,7 @@ class RuleBookController(http.Controller):
             {
                 "rulebook_id": rulebook_id,
                 "current_year": current_year,
-                "rulebook": rulebook.name.name if rulebook.name else "",
+                "rulebook":  re.sub(r'<[^>]+>', '', rulebook.type_of_return if rulebook.type_of_return else ""),
             },
         )
 

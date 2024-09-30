@@ -1,3 +1,4 @@
+import re
 from odoo import models, fields, api
 from datetime import timedelta, datetime
 import pytz
@@ -646,7 +647,7 @@ class Rulebook(models.Model):
             global_data = {
                 "email_to": rulebook_id.first_line_escalation.email, 
                 "first_line_escalation": rulebook_id.first_line_escalation.name,
-                "rulebook_name": rulebook_id.name.name,
+                "rulebook_name":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
                 "upload_link": self._compute_upload_link(rulebook_id.id),
                 "email_from":  os.getenv("EMAIL_FROM"),
                 "email_cc": rulebook_id.second_line_escalation.email,
@@ -686,7 +687,7 @@ class Rulebook(models.Model):
             global_data = {
                 "email_to": rulebook_id.first_line_escalation.email,
                 "name": rulebook_id.first_line_escalation.name,
-                "title": rulebook_id.name.name,
+                "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
                 "upload_link": self._compute_upload_link(rulebook_id.id),
                 "email_from":  os.getenv("EMAIL_FROM"),
                 "email_cc": rulebook_id.second_line_escalation.email,
@@ -725,7 +726,7 @@ class Rulebook(models.Model):
             global_data = {
                 "email_to": rulebook_id.responsible_id.email,
                 "name": rulebook_id.first_line_escalation.name,
-                "title": rulebook_id.name.name,
+                "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
                 "upload_link": self._compute_upload_link(rulebook_id.id),
                 "email_from":  os.getenv("EMAIL_FROM"),
                 "email_cc": rulebook_id.responsible_id.cc,

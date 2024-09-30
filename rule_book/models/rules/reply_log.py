@@ -5,6 +5,7 @@ import pytz
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
 import logging
+from odoo.tools import format_date
 
 _logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ class ReplyLog(models.Model):
         # Search for awaiting replies
         awaiting_replies = self.search([
             ('rulebook_status', '!=', 'completed'),
+            ('rulebook_status', '!=', 'reviewed'),
             ('next_due_date', 'not in', list(completed_grouped.values())),
             ('rulebook_id', 'not in', [k[0] for k in completed_grouped.keys()]),
         ])
@@ -52,11 +54,14 @@ class ReplyLog(models.Model):
         # Prepare the result with required fields
         result = []
         for reply in awaiting_replies:
+            formatted_date = format_date(self.env, reply.reply_date) if reply.reply_date else 'No date'
+            print(reply.rulebook_status.title())
+            print("testing")
             result.append({
                 'id': reply.id,
                 'rulebook_name': reply.rulebook_name,  # Assuming rulebook_id has a 'name' field
-                'status': reply.rulebook_status,
-                'reply_date': reply.reply_date,
+                'status': reply.rulebook_status.title(),
+                'reply_date': formatted_date,
                 'form_link': f"/web#id={reply.id}&model=reply.log&view_type=form"  # Link to the form view
             })
 
