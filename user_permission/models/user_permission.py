@@ -5,6 +5,7 @@ from odoo.exceptions import ValidationError
 
 
 class UserPermission(models.Model):
+    # ! overrdie the res.user to add this when adding a user directly
     _name = "user.permission"
     _description = "Custom User Permissions"
 

@@ -27,8 +27,6 @@
         "views/risk/risk_category.xml",
         "views/department.xml",
         "views/responsible.xml",
-        "views/exception/exception_process.xml",
-        "views/exception/exception_type.xml",
         "views/rules/rule_book.xml",
         "data/email_templates/rule_book.xml",
         "data/schedules/rule_book.xml",

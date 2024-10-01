@@ -68,10 +68,10 @@
                         <field name="section" widget="html" placeholder="Specify the section"
                             class="html_field" />
                     </group>
-                    <group col="1" style="grid-column: span 2; margin-top: 20px;">
+                    <!-- <group col="1" style="grid-column: span 2; margin-top: 20px;">
                         <field name="name" filename="name" widget="pdf_viewer"
                             options="{'preview_image': 'file'}" placeholder="Upload a PDF" />
-                    </group>
+                    </group> -->
                 </group>
                 <!-- Risk and Reminders Section -->
                     <group string="Risk and Reminders" class="section-group"

@@ -32,4 +32,20 @@
         </field>
     </record>
 
+    <!-- addoimg department id to a new user -->
+    <record id="view_users_form" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.department</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group>
+                    <field name="department_ids" widget="many2many_tags"
+                        options="{'no_create': True}" required="1"
+                        help="Every user must be added to at least one department." />
+                </group>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

@@ -35,13 +35,7 @@
       <field name="res_model">rulebook.risk_category</field>
       <field name="view_mode">tree,form</field>
     </record>
-    <!-- Exception Processes -->
-    <record id="action_rulebook_exception_process" model="ir.actions.act_window">
-      <field name="name">Exception Processes</field>
-      <field name="res_model">rulebook.exception_process</field>
-      <field name="view_mode">tree,form</field>
-
-    </record>
+ 
     <!-- Responsible -->
     <record id="action_rulebook_responsible" model="ir.actions.act_window">
       <field name="name">Responsibles</field>
@@ -63,13 +57,7 @@
       </field>
     </record>
 
-    <!-- Exception Types -->
-    <record id="action_rulebook_exception_type" model="ir.actions.act_window">
-      <field name="name">Exception Types</field>
-      <field name="res_model">rulebook.exception_type</field>
-      <field name="view_mode">tree,form</field>
 
-    </record>
 
     <!-- Reply log -->
     <record id="action_reply_log" model="ir.actions.act_window">
@@ -140,13 +128,7 @@
     <menuitem id="menu_rulebook_risk_category" name="Risk Categories"
       parent="menu_rulebook_configuration" action="action_rulebook_risk_category" sequence="7" />
 
-    <!-- Exception Management under Configuration -->
-    <menuitem id="menu_rulebook_exception" name="Exception Management"
-      parent="menu_rulebook_configuration" sequence="5" />
-    <menuitem id="menu_rulebook_exception_process" name="Exception Processes"
-      parent="menu_rulebook_exception" action="action_rulebook_exception_process" sequence="6" />
-    <menuitem id="menu_rulebook_exception_type" name="Exception Types"
-      parent="menu_rulebook_exception" action="action_rulebook_exception_type" sequence="5" />
+
     <menuitem id="menu_regulatory_sources" name="Regulatory Sources"
       parent="menu_rulebook_configuration" action="action_rulebook_sources" />
 

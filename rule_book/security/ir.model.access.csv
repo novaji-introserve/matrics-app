@@ -5,8 +5,6 @@ access_rulebook_title,rulebook.title access,model_rulebook_title,,1,1,1,1
 access_rulebook_theme,access.rulebook.theme,model_rulebook_theme,,1,1,1,1
 access_rulebook,access.rulebook,model_rulebook,,1,1,1,1
 access_responsible,access.responsible,model_rulebook_responsible,,1,1,1,1
-access_exception_type,access.exception.type,model_rulebook_exception_type,,1,1,1,1
-access_exception_process,access.exception.process,model_rulebook_exception_process,,1,1,1,1
 access_risk_category,access.risk.category,model_rulebook_risk_category,,1,1,1,1
 access_department,access.department,model_rulebook_department,,1,1,1,1
 access_rulebook_report_user,access_rulebook_report_user,model_rulebook_report,,1,1,1,1

@@ -25,3 +25,22 @@ class ResConfigSettings(models.TransientModel):
         string="Enable Document Page Approval",
         help="Check this box to enable document page approval feature."
     )
+
+
+# inherit the user class to ensure every new user is added to a department
+from odoo import models, api, _
+from odoo.exceptions import ValidationError
+
+class ResUsers(models.Model):
+    _inherit = 'res.users'
+    department_ids = fields.Many2many('rulebook.department', string='Departments',required=True,  help="Every user must be added to at least one department.")
+    
+    @api.model
+    def create(self, vals):
+        
+        # Check if department_ids are provided
+        if 'department_ids' not in vals or not vals.get('department_ids'):
+            raise ValidationError(_("You must assign the user to at least one department before creating them."))
+
+        user = super(ResUsers, self).create(vals)
+        return user
