@@ -37,7 +37,6 @@ class Rulebook(models.Model):
         tracking=True,
         help="Select the theme associated with this rulebook.",
     )
-
     risk_rating = fields.Selection(
         [("low", "Low"), ("medium", "Medium"), ("critical", "Critical")],
         string="Risk Rating",

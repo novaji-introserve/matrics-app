@@ -2,6 +2,10 @@
 import base64
 import io
 from collections import Counter
+import os
+
+import requests
+
 from odoo import models, fields, api
 import PyPDF2
 import ollama
@@ -11,6 +15,11 @@ from PIL import Image
 import pytesseract
 from pdf2image import convert_from_bytes
 from odoo.exceptions import UserError
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 class PdfChat(models.Model):
     _name = 'pdf.chat'
     _description = 'PDF Chat'
@@ -119,7 +128,7 @@ class PdfChat(models.Model):
             print('i was called')
             # Construct the prompt based on the PDF content and user's question
             prompt = f"Based on the following document content: {record.extracted_text}\n\nUser question: {record.user_question}"
-            response = self.query_llama_model(prompt)
+            response = self.query_gemini_api(prompt)
 
             # Save the question and response as chat logs
             self.env['pdf.chat.log'].create({
@@ -135,7 +144,50 @@ class PdfChat(models.Model):
                 'type': 'ir.actions.client',
                 'tag': 'reload',
             }
+    
+  
+    def query_gemini_api(self,prompt):
+        apikey = os.getenv("GEMINI_API")
+        """Function to send the prompt to the Gemini API and return the response."""
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={apikey}"
+        headers = {
+            'Content-Type': 'application/json',
+        }
 
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ]
+        }
+
+        try:
+            response = requests.post(api_url, headers=headers, json=payload)
+            response.raise_for_status()  # Raise an error for bad responses
+            
+            # Extract the text from the response
+            candidates = response.json().get('candidates', [])
+            if candidates:
+                # Assuming you want the text from the first candidate
+                text_parts = candidates[0].get('content', {}).get('parts', [])
+                if text_parts:
+                    return ''.join(part['text'] for part in text_parts)
+
+        except requests.exceptions.HTTPError as http_err:
+            print(f"HTTP error occurred: {http_err}")  # Handle HTTP errors
+        except requests.exceptions.ConnectionError as conn_err:
+            print(f"Connection error occurred: {conn_err}")  # Handle connection errors
+        except requests.exceptions.Timeout as timeout_err:
+            print(f"Timeout error occurred: {timeout_err}")  # Handle timeout errors
+        except requests.exceptions.RequestException as req_err:
+            print(f"An error occurred: {req_err}")  # Handle any other request errors
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")  # Handle unexpected errors
+
+        return "An unexpected error occurred: {e}"  # Return None or an appropriate value in case of an errorresponses
 class PdfChatLog(models.Model):
     _name = 'pdf.chat.log'
     _description = 'PDF Chat Log'
@@ -170,3 +222,4 @@ class PdfChatLog(models.Model):
         print("i am result")
 
         return result
+

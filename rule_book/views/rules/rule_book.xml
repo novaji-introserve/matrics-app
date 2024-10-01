@@ -55,25 +55,25 @@
                 <!-- Basic Information Section -->
                 
                     <!-- Basic Information Section -->
-                    <group string="Basic Information" class="section-group"
-                        style="margin-top: 20px;">
-                        <group col="2">
+                <group string="Basic Information" class="section-group" style="margin-top: 20px;">
+                    <group col="2">
                         <field name="name" class="input" placeholder="Select rulebook title" />
                         <field name="theme_id" placeholder="Select a theme" />
                         <field name="type_of_return" placeholder="Specify type of return"
-                            class="html_field"
-                            widget="html" />
-                        </group>
-                        <group col="1" style="grid-column: span 2;">
-                            <field name="description" widget="html"
-                            placeholder="Describe the issue or project"
-                            class="html_field" />
-                            <field name="section" widget="html" placeholder="Specify the section"
-                            class="html_field" />
-                        </group>
+                            class="html_field" widget="html" />
                     </group>
-
-                    <!-- Risk and Reminders Section -->
+                    <group col="1" style="grid-column: span 2;">
+                        <field name="description" widget="html"
+                            placeholder="Describe the issue or project" class="html_field" />
+                        <field name="section" widget="html" placeholder="Specify the section"
+                            class="html_field" />
+                    </group>
+                    <group col="1" style="grid-column: span 2; margin-top: 20px;">
+                        <field name="name" filename="name" widget="pdf_viewer"
+                            options="{'preview_image': 'file'}" placeholder="Upload a PDF" />
+                    </group>
+                </group>
+                <!-- Risk and Reminders Section -->
                     <group string="Risk and Reminders" class="section-group"
                         style="margin-top: 20px;">
                         <group col="2">
@@ -84,7 +84,7 @@
                         </group>
                     </group>
 
-                    <!-- Due Dates Section -->
+                <!-- Due Dates Section -->
                     <group string="Due Dates" class="section-group" style="margin-top: 20px;">
                         <group col="2">
                             <field name="frequency_type" placeholder="Select frequency type" />
@@ -107,7 +107,7 @@
                         </group>
                     </group>
 
-                    <!-- Escalation Details Section -->
+                <!-- Escalation Details Section -->
                     <group string="Escalation Details" class="section-group"
                         style="margin-top: 20px;">
                         <group col="2">
@@ -128,7 +128,7 @@
                         </group>
                     </group>
 
-                    <!-- Internal Due Date Section -->
+                <!-- Internal Due Date Section -->
                     <group string="Internal Due Date" class="section-group"
                         style="margin-top: 20px;">
                         <group col="2">
@@ -143,7 +143,7 @@
                         </group>
                     </group>
 
-                    <!-- Return and Agency Information Section -->
+                <!-- Return and Agency Information Section -->
                     <group string="Return and Agency Information" class="section-group"
                         style="margin-top: 20px;">
                         <group col="2">
