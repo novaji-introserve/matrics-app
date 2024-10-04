@@ -160,14 +160,14 @@ export class Dashboard extends Component {
 
             // Fetch first 10 Internal Due Dates
             const internalDueDates = await this.orm.searchRead('rulebook',
-                [['internal_due_date', '!=', false]],
+                [['internal_due_date', '!=', false],  ["status", '=', "active"]],
                 ['id', 'type_of_return', 'internal_due_date', 'responsible_id'],
                 { limit: 5, order: 'internal_due_date asc' }
            );
 
             // Fetch first 10 Regulatory Due Dates (computed_date)
             const regulatoryDueDates = await this.orm.searchRead('rulebook',
-                [['computed_date', '!=', false]],
+                [['computed_date', '!=', false],  ["status", '=', "active"]],
                 ['id', 'type_of_return', 'computed_date', 'responsible_id'],
                 { limit: 5, order: 'computed_date asc' }
                 );

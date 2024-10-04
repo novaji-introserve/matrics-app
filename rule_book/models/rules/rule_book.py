@@ -279,7 +279,7 @@ class Rulebook(models.Model):
         print(id)
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         #
-        return f"{base_url}/web#id={id}&cids=1&menu_id=108&action=306&model=rulebook&view_type=form"
+        return f"{base_url}/web#id={id}&cids=1&menu_id=277&action=423&model=rulebook&view_type=form"
 
     @api.depends("risk_category")
     def _compute_risk_rating(self):
@@ -774,7 +774,7 @@ class Rulebook(models.Model):
 
         rulebooks = self.env["reply.log"].search(
             [
-                ("rulebook_compute_date", "=", current_date),
+                ("rulebook_compute_date", "<=", current_date),
                 ("rulebook_id.is_recurring", "=", True),
             ]
         )

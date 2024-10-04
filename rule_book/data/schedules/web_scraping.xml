@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
-    <data noupdate="1">
+    <data>
         <!-- Cron Job for checking rulebooks and updating due dates -->
         <record id="cron_web_scraping" model="ir.cron">
             <field name="name">Webscrapping For Regulatory document</field>
