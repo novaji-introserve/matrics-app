@@ -8,7 +8,7 @@ import requests
 
 from odoo import models, fields, api
 import PyPDF2
-import ollama
+# import ollama
 from odoo.exceptions import ValidationError, UserError
 import PyPDF2
 from PIL import Image
@@ -110,14 +110,14 @@ class PdfChat(models.Model):
             raise UserError(f"Error extracting text from image-based PDF: {str(e)}")
         
         return extracted_text
-    def query_llama_model(self, prompt):
-        """Query the LLaMA model using the extracted text and user prompt."""
-        model = "llama3.1"
-        messages = [{"role": "user", "content": prompt}]
-        response = ollama.chat(model=model, messages=messages)
+    # def query_llama_model(self, prompt):
+    #     """Query the LLaMA model using the extracted text and user prompt."""
+    #     model = "llama3.1"
+    #     messages = [{"role": "user", "content": prompt}]
+    #     response = ollama.chat(model=model, messages=messages)
 
-        # Extract only the 'message.content' part from the response
-        response_content = response.get('message', {}).get('content', '')
+    #     # Extract only the 'message.content' part from the response
+    #     response_content = response.get('message', {}).get('content', '')
         return response_content
 
     def chat_with_pdf(self):
