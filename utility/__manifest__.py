@@ -31,7 +31,7 @@
         # preloaded data
         "data/preloaded_data/process_category.xml",
         "data/preloaded_data/sla_severity.xml",
-         "data/preloaded_data/process.xml"
+        "data/preloaded_data/process.xml"
     ],
     
     'demo': [
