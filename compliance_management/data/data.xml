@@ -1,4 +1,9 @@
 <odoo noupdate="1">
+<!-- Head office Branch -->
+<record id="res_branch_ho" model="res.branch">
+        <field name="name">Head Office</field>
+        <field name="code">100</field>
+</record>
 <!-- Account Types -->
 <record id="res_partner_account_type_100" model="res.partner.account.type">
         <field name="name">Internal Account</field>
