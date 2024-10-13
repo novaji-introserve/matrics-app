@@ -6,7 +6,7 @@ from odoo import models, fields, api, _
 class RiskAssessmentLine(models.Model):
     _name = 'res.risk.assessment.line'
     _description = 'Risk Assessment Line'
-    sql_constraints = [
+    _sql_constraints = [
         ('uniq_risk_assessment_line_name', 'unique(name)',
          "Risk Assessment Name already exists. Value must be unique!")
     ]
