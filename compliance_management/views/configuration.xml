@@ -59,7 +59,7 @@
         name="Configuration" 
         groups="group_compliance_compliance_officer"
         parent="menu_compliance_root"
-        sequence="0"/>
+        sequence="100"/>
     <menuitem
         id="menu_compliance_sector"
         action="action_list_customer_sector"

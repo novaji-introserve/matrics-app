@@ -1,0 +1,15 @@
+<odoo>
+<menuitem
+        id="menu_compliance_kyc"
+        name="KYC" 
+        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
+        parent="compliance_management.menu_compliance_root"
+        sequence="10"/>
+    <menuitem
+        id="menu_compliance_sector"
+        action="compliance_management.action_list_customer"
+        parent="menu_compliance_configuration" 
+        name="Customers"
+        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" 
+        sequence="10"/>
+</odoo>
