@@ -1,0 +1,15 @@
+# -*- coding: utf-8 -*-
+
+from odoo import models, fields, api, _
+
+
+class CustomerRegion(models.Model):
+    _name = 'res.partner.region'
+    _description = 'Customer Region'
+    _sql_constraints = [
+        ('uniq_customer_region_code', 'unique(name)',
+         "Customer region code already exists. Value must be unique!"),
+    ]
+
+    name = fields.Char(string="Name", required=True)
+    code = fields.Char(string="Code", required=True)
