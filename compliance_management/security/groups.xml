@@ -1,0 +1,177 @@
+<odoo noupdate="1">
+<record model="ir.module.category" id="module_category_compliance">
+  <field name="name">Compliance</field>
+  <field name="sequence">200</field>
+</record>
+<!-- Activate only compliance groups for now -->
+<!--
+<record id="group_compliance_aml_regulations" model="res.groups">
+  <field name="name">Aml Regulations</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+-->
+<record id="group_compliance_branch_compliance_officer" model="res.groups">
+  <field name="name">Branch Compliance Officer</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+  <field name="comment">Manage compliance for a Branch</field>
+  <field name="category_id" ref="module_category_compliance"/>
+</record>
+<record id="group_compliance_branch_control_officer" model="res.groups">
+  <field name="name">Branch Control Officer</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+  <field name="comment">Manage internal control for a Branch</field>
+  <field name="category_id" ref="module_category_compliance"/>
+</record>
+<!-- 
+<record id="group_compliance_case_response" model="res.groups">
+  <field name="name">Case Response</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+--> 
+<record id="group_compliance_compliance_officer" model="res.groups">
+  <field name="name">Compliance Officer</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user')),Command.link(ref('group_compliance_branch_compliance_officer'))]"/>
+  <field name="comment">Reports to CCO not limited to branch activities</field>
+  <field name="category_id" ref="module_category_compliance"/>
+</record>
+<record id="group_compliance_compliance_risk_manager" model="res.groups">
+  <field name="name">Compliance Risk Manager</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+  <field name="category_id" ref="module_category_compliance"/>
+</record>
+<record id="group_compliance_chief_compliance_officer" model="res.groups">
+  <field name="name">Chief Compliance Officer</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user')),Command.link(ref('group_compliance_compliance_officer')),Command.link(ref('group_compliance_compliance_risk_manager'))]"/>
+  <field name="comment">CCO oversees all branch compliance officers</field>
+  <field name="category_id" ref="module_category_compliance"/>
+</record>
+<!--
+<record id="group_compliance_close_case" model="res.groups">
+  <field name="name">Close Case</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+-->
+
+<!-- 
+<record id="group_compliance_create_case" model="res.groups">
+  <field name="name">Create Case</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_create_compliance_report" model="res.groups">
+  <field name="name">Create Compliance Report</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+-->
+<!--
+<record id="group_compliance_internal_control_create_callover" model="res.groups">
+  <field name="name">Internal Control Create Callover</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_internal_control_head_office" model="res.groups">
+  <field name="name">Internal Control Head Office</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_internal_control_user" model="res.groups">
+  <field name="name">Internal Control User</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+-->
+<!--
+<record id="group_compliance_internal_control_view__weekly_reports" model="res.groups">
+  <field name="name">Internal Control View  Weekly Reports</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+-->
+<!--
+<record id="group_compliance_internal_control_view_all_callover" model="res.groups">
+  <field name="name">Internal Control View All Callover</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_internal_control_view_daily_reports" model="res.groups">
+  <field name="name">Internal Control View Daily Reports</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_internal_control_view_dormant_accounts_report" model="res.groups">
+  <field name="name">Internal Control View Dormant Accounts Report</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_internal_control_view_gl_reports" model="res.groups">
+  <field name="name">Internal Control View Gl Reports</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_internal_control_view_general_ledger_reports" model="res.groups">
+  <field name="name">Internal Control View General Ledger Reports</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_internal_control_view_overdrawn_accounts_report" model="res.groups">
+  <field name="name">Internal Control View Overdrawn Accounts Report</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_manage_regulatory_support" model="res.groups">
+  <field name="name">Manage Regulatory Support</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_nifu_reporting" model="res.groups">
+  <field name="name">Nifu Reporting</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_reassign_case" model="res.groups">
+  <field name="name">Reassign Case</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_super_admin" model="res.groups">
+  <field name="name">Super Admin</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+-->
+<!--
+<record id="group_compliance_view_account_reports" model="res.groups">
+  <field name="name">View Account Reports</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_all_cases" model="res.groups">
+  <field name="name">View All Cases</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_all_compliance_reports" model="res.groups">
+  <field name="name">View All Compliance Reports</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_customer_profile" model="res.groups">
+  <field name="name">View Customer Profile</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_customers" model="res.groups">
+  <field name="name">View Customers</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_fx" model="res.groups">
+  <field name="name">View Fx</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_pep" model="res.groups">
+  <field name="name">View Pep</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_pta" model="res.groups">
+  <field name="name">View Pta</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_public_reports" model="res.groups">
+  <field name="name">View Public Reports</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_regulatory_support" model="res.groups">
+  <field name="name">View Regulatory Support</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_reports" model="res.groups">
+  <field name="name">View Reports</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+<record id="group_compliance_view_echannels" model="res.groups">
+  <field name="name">View Echannels</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+</record>
+-->
+</odoo>
