@@ -22,13 +22,14 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','contacts','hr'],
+    'depends': ['base','contacts','hr','access_apps','muk_web_theme_default_sidebar_invisible','edit_save_button'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'security/groups.xml',
         'views/configuration.xml',
+        'views/kyc.xml',
         'views/templates.xml',
         'data/data.xml'
     ],
