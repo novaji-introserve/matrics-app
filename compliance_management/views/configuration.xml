@@ -252,6 +252,57 @@
     </field>
  </record>
 
+ <!-- Customer Regions Tree View -->
+<record id="customer_region_tree_view" model="ir.ui.view">
+    <field name="name">res.partner.region.tree</field>
+    <field name="model">res.partner.region</field>
+    <field name="arch" type="xml">
+        <tree string="Customer Regions" delete="False">
+            <field name="name" string="Name"/>
+            <field name="code" string="Code"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Customer Regions Form View -->
+<record id="customer_region_form_view" model="ir.ui.view">
+    <field name="name">res.partner.region.form</field>
+    <field name="model">res.partner.region</field>
+    <field name="arch" type="xml">
+        <form class="o_form_document" delete="False">
+            <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </div>
+                <group>
+                    <group string="Details">
+                        <field name="code"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<!-- Customer Regions Action -->
+<record id="action_list_customer_region" model="ir.actions.act_window">
+    <field name="name">Customer Regions</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.partner.region</field>
+    <field name="view_id" ref="customer_region_tree_view"/>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Add a Customer Region
+        </p>
+        <p>
+            Regions categorize customers based on geographical areas.
+        </p>
+    </field>
+ </record>
+
      <!-- Menu Items -->    
     <menuitem
         id="menu_compliance_root"
@@ -300,6 +351,13 @@
         name="Customer Tiers"
         groups="group_compliance_compliance_officer"
         sequence="50"/>
+    <menuitem
+        id="menu_compliance_customer_region"
+        action="action_list_customer_region"
+        parent="menu_compliance_configuration"
+        name="Customer Regions"
+        groups="group_compliance_compliance_officer"
+        sequence="60"/>
 
   </data>
 </odoo>
