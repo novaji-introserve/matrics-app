@@ -98,6 +98,59 @@
             </p>
         </field>
     </record>
+
+    <!-- Account Products Tree View -->
+<record id="account_product_tree_view" model="ir.ui.view">
+    <field name="name">res.partner.account.product.tree</field>
+    <field name="model">res.partner.account.product</field>
+    <field name="arch" type="xml">
+        <tree string="Account Products" delete="False">
+            <field name="name" string="Name"/>
+            <field name="code" string="Code"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Account Products Form View -->
+<record id="account_product_form_view" model="ir.ui.view">
+    <field name="name">res.partner.account.product.form</field>
+    <field name="model">res.partner.account.product</field>
+    <field name="arch" type="xml">
+        <form class="o_form_document" delete="False">
+            <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </div>
+                <group>
+                    <group string="Details">
+                        <field name="code"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<!-- Account Products Action -->
+<record id="action_list_account_product" model="ir.actions.act_window">
+    <field name="name">Account Products</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.partner.account.product</field>
+    <field name="view_id" ref="account_product_tree_view"/>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Add an Account Product
+        </p>
+        <p>
+            Account products are listed here.
+        </p>
+    </field>
+</record>
+
+
      <!-- Menu Items -->    
     <menuitem
         id="menu_compliance_root"
@@ -125,5 +178,13 @@
         name="Customer Sectors"
         groups="group_compliance_compliance_officer" 
         sequence="20"/>
+    <menuitem
+        id="menu_compliance_account_product"
+        action="action_list_account_product"
+        parent="menu_compliance_configuration"
+        name="Account Products"
+        groups="group_compliance_compliance_officer"
+        sequence="30"/>
+
   </data>
 </odoo>
