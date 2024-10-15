@@ -303,6 +303,59 @@
     </field>
  </record>
 
+ <!-- Risk Categories Tree View -->
+<record id="risk_category_tree_view" model="ir.ui.view">
+    <field name="name">res.risk.category.tree</field>
+    <field name="model">res.risk.category</field>
+    <field name="arch" type="xml">
+        <tree string="Risk Categories" delete="False">
+            <field name="name" string="Name"/>
+            <field name="code" string="Code"/>
+            <field name="user_id" string="User"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Risk Categories Form View -->
+<record id="risk_category_form_view" model="ir.ui.view">
+    <field name="name">res.risk.category.form</field>
+    <field name="model">res.risk.category</field>
+    <field name="arch" type="xml">
+        <form class="o_form_document" delete="False">
+            <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </div>
+                <group>
+                    <group string="Details">
+                        <field name="code"/>
+                        <field name="user_id"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<!-- Risk Categories Action -->
+<record id="action_list_risk_category" model="ir.actions.act_window">
+    <field name="name">Risk Categories</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.risk.category</field>
+    <field name="view_id" ref="risk_category_tree_view"/>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Add a Risk Category
+        </p>
+        <p>
+            Risk Categories help group risks for better management.
+        </p>
+    </field>
+ </record>
+
      <!-- Menu Items -->    
     <menuitem
         id="menu_compliance_root"
@@ -358,6 +411,13 @@
         name="Customer Regions"
         groups="group_compliance_compliance_officer"
         sequence="60"/>
+    <menuitem
+        id="menu_compliance_risk_category"
+        action="action_list_risk_category"
+        parent="menu_compliance_configuration"
+        name="Risk Categories"
+        groups="group_compliance_compliance_officer"
+        sequence="70"/>
 
   </data>
 </odoo>
