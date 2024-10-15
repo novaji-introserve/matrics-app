@@ -150,6 +150,57 @@
     </field>
 </record>
 
+<!-- Education Levels Tree View -->
+<record id="education_level_tree_view" model="ir.ui.view">
+    <field name="name">res.education.level.tree</field>
+    <field name="model">res.education.level</field>
+    <field name="arch" type="xml">
+        <tree string="Education Levels" delete="False">
+            <field name="name" string="Education Level"/>
+            <field name="code" string="Code"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Education Levels Form View -->
+<record id="education_level_form_view" model="ir.ui.view">
+    <field name="name">res.education.level.form</field>
+    <field name="model">res.education.level</field>
+    <field name="arch" type="xml">
+        <form class="o_form_document" delete="False">
+            <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </div>
+                <group>
+                    <group string="Details">
+                        <field name="code"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<!-- Education Levels Action -->
+<record id="action_list_education_level" model="ir.actions.act_window">
+    <field name="name">Education Levels</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.education.level</field>
+    <field name="view_id" ref="education_level_tree_view"/>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Add an Education Level
+        </p>
+        <p>
+            Education levels are defined here.
+        </p>
+    </field>
+</record>
+
 
      <!-- Menu Items -->    
     <menuitem
@@ -185,6 +236,13 @@
         name="Account Products"
         groups="group_compliance_compliance_officer"
         sequence="30"/>
+    <menuitem
+        id="menu_compliance_education_level"
+        action="action_list_education_level"
+        parent="menu_compliance_configuration"
+        name="Education Levels"
+        groups="group_compliance_compliance_officer"
+        sequence="40"/>
 
   </data>
 </odoo>
