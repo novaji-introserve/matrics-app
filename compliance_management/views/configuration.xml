@@ -409,6 +409,59 @@
     </field>
  </record>
 
+ <!-- Risk Subject Tree View -->
+<record id="risk_subject_tree_view" model="ir.ui.view">
+    <field name="name">res.risk.subject.tree</field>
+    <field name="model">res.risk.subject</field>
+    <field name="arch" type="xml">
+        <tree string="Risk Subject" delete="False">
+            <field name="name" string="Name"/>
+            <field name="code" string="Code"/>
+            <field name="universe_id" string="Risk Universe"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Risk Subject Form View -->
+<record id="risk_subject_form_view" model="ir.ui.view">
+    <field name="name">res.risk.subject.form</field>
+    <field name="model">res.risk.subject</field>
+    <field name="arch" type="xml">
+        <form class="o_form_document" delete="False">
+            <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </div>
+                <group>
+                    <group string="Details">
+                        <field name="code"/>
+                        <field name="universe_id"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<!-- Risk Subject Action -->
+<record id="action_list_risk_subject" model="ir.actions.act_window">
+    <field name="name">Risk Subjects</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.risk.subject</field>
+    <field name="view_id" ref="risk_subject_tree_view"/>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Add a Risk Subject
+        </p>
+        <p>
+            Risk Subjects represent specific topics or areas related to risk within a universe.
+        </p>
+    </field>
+ </record>
+
      <!-- Menu Items -->    
     <menuitem
         id="menu_compliance_root"
@@ -478,6 +531,14 @@
         name="Risk Universe"
         groups="group_compliance_compliance_officer"
         sequence="80"/>
+    <menuitem
+        id="menu_compliance_risk_subject"
+        action="action_list_risk_subject"
+        parent="menu_compliance_configuration"
+        name="Risk Subjects"
+        groups="group_compliance_compliance_officer"
+        sequence="90"/>
+
 
   </data>
 </odoo>
