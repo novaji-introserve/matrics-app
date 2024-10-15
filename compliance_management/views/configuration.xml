@@ -356,6 +356,59 @@
     </field>
  </record>
 
+ <!-- Risk Universe Tree View -->
+<record id="risk_universe_tree_view" model="ir.ui.view">
+    <field name="name">res.risk.universe.tree</field>
+    <field name="model">res.risk.universe</field>
+    <field name="arch" type="xml">
+        <tree string="Risk Universe" delete="False">
+            <field name="name" string="Name"/>
+            <field name="code" string="Code"/>
+            <field name="user_id" string="User"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Risk Universe Form View -->
+<record id="risk_universe_form_view" model="ir.ui.view">
+    <field name="name">res.risk.universe.form</field>
+    <field name="model">res.risk.universe</field>
+    <field name="arch" type="xml">
+        <form class="o_form_document" delete="False">
+            <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </div>
+                <group>
+                    <group string="Details">
+                        <field name="code"/>
+                        <field name="user_id"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<!-- Risk Universe Action -->
+<record id="action_list_risk_universe" model="ir.actions.act_window">
+    <field name="name">Risk Universe</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.risk.universe</field>
+    <field name="view_id" ref="risk_universe_tree_view"/>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Add a Risk Universe
+        </p>
+        <p>
+            The Risk Universe encompasses all potential risks faced by the organization.
+        </p>
+    </field>
+ </record>
+
      <!-- Menu Items -->    
     <menuitem
         id="menu_compliance_root"
@@ -368,7 +421,7 @@
         name="Configuration" 
         groups="group_compliance_compliance_officer"
         parent="menu_compliance_root"
-        sequence="100"/>
+        sequence="150"/>
     <menuitem
         id="menu_compliance_account_type"
         action="action_list_customer_account_type"
@@ -418,6 +471,13 @@
         name="Risk Categories"
         groups="group_compliance_compliance_officer"
         sequence="70"/>
+    <menuitem
+        id="menu_compliance_risk_universe"
+        action="action_list_risk_universe"
+        parent="menu_compliance_configuration"
+        name="Risk Universe"
+        groups="group_compliance_compliance_officer"
+        sequence="80"/>
 
   </data>
 </odoo>
