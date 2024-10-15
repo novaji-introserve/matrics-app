@@ -462,6 +462,59 @@
     </field>
  </record>
 
+ <!-- Risk Type Tree View -->
+<record id="risk_type_tree_view" model="ir.ui.view">
+    <field name="name">res.risk.type.tree</field>
+    <field name="model">res.risk.type</field>
+    <field name="arch" type="xml">
+        <tree string="Risk Types" delete="False">
+            <field name="name" string="Name"/>
+            <field name="code" string="Code"/>
+            <field name="user_id" string="User"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Risk Type Form View -->
+<record id="risk_type_form_view" model="ir.ui.view">
+    <field name="name">res.risk.type.form</field>
+    <field name="model">res.risk.type</field>
+    <field name="arch" type="xml">
+        <form class="o_form_document" delete="False">
+            <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </div>
+                <group>
+                    <group string="Details">
+                        <field name="code"/>
+                        <field name="user_id"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<!-- Risk Type Action -->
+<record id="action_list_risk_type" model="ir.actions.act_window">
+    <field name="name">Risk Types</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.risk.type</field>
+    <field name="view_id" ref="risk_type_tree_view"/>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Add a Risk Type
+        </p>
+        <p>
+            Risk Types represent different categories or kinds of risks managed within the system.
+        </p>
+    </field>
+ </record>
+
      <!-- Menu Items -->    
     <menuitem
         id="menu_compliance_root"
@@ -538,6 +591,13 @@
         name="Risk Subjects"
         groups="group_compliance_compliance_officer"
         sequence="90"/>
+    <menuitem
+        id="menu_compliance_risk_type"
+        action="action_list_risk_type"
+        parent="menu_compliance_configuration"
+        name="Risk Types"
+        groups="group_compliance_compliance_officer"
+        sequence="100"/>
 
 
   </data>
