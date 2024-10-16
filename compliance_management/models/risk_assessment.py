@@ -28,3 +28,9 @@ class RiskAssessment(models.Model):
     partner_id = fields.Many2one(comodel_name='res.partner', string='Partner')
     line_ids = fields.One2many(comodel_name='res.risk.assessment.line',
                                inverse_name='risk_assessment_id', string='Risk Assessment Lines')
+    
+     # filter subject based on universe
+    @api.onchange('universe_id')
+    def filter_subjects(self):
+        for rec in self:
+            return {'domain': {'subject_id': [('universe_id', '=', rec.universe_id.id)]}}
