@@ -22,14 +22,15 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','contacts','hr','access_apps','muk_web_theme_default_sidebar_invisible','edit_save_button'],
+    'depends': ['base','contacts','hr','access_apps','muk_web_theme_default_sidebar_invisible','web_field_slider','spreadsheet_dashboard','hide_powered_by_odoo','hide_menu_user'],
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
         'security/groups.xml',
+        'security/ir.model.access.csv',
         'views/configuration.xml',
         'views/kyc.xml',
+        'views/risk_assessment.xml',
         'views/templates.xml',
         'data/data.xml'
     ],
