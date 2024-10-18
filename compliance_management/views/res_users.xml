@@ -1,0 +1,18 @@
+<odoo>
+  <data>
+    <record id="user_branch_menu" model="ir.ui.view">
+      <field name="name">user_branch_menu</field>
+      <field name="model">res.users</field>
+      <field name="inherit_id" ref="base.view_users_form"/>
+      <field name="arch" type="xml">
+          <xpath expr="//notebook" position="inside">
+              <page string="Branch Access">
+                  <tree>
+                      <field name="branches_id"/>
+                  </tree>
+              </page>
+          </xpath>
+      </field>
+  </record>
+  </data>
+</odoo>
