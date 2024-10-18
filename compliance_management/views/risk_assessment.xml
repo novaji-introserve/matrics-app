@@ -15,7 +15,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="residual_risk_probability" />
+                            <field name="residual_risk_probability" string="% Residual Risk Probability" />
                         </group>
                         <group>
                             <field name="residual_risk_score" />
@@ -25,6 +25,9 @@
                         <group>
                             <field name="category_id"/>
                         </group>
+                        <group>
+                            <field name="inherent_risk_score" widget="numeric_step" options="{'step': 0.5, 'min': 1, 'max': 25}" />
+                        </group>
                     </group>
                     <group>
                         <group colspan="2">
@@ -33,22 +36,15 @@
                     </group>
                     <group>
                         <group colspan="2">
-                            <field name="inherent_risk_score" widget="slider" min="1" max="25" step="1" />
-                        </group>
-                    </group>
-                    <group>
-                        <group colspan="2">
                             <field name="existing_controls"/>
                         </group>
                     </group>
                     <group>
-                        <group colspan="2">
-                            <field name="control_effectiveness_score" widget="slider" min="1" max="25" step="1" />
+                        <group>
+                            <field name="control_effectiveness_score"  widget="numeric_step" options="{'step': 0.5, 'min': 1, 'max': 25}"  />
                         </group>
-                    </group>
-                    <group>
-                        <group colspan="2">
-                            <field name="residual_risk_impact" widget="slider" min="1" max="25" step="1" />
+                        <group>
+                            <field name="residual_risk_impact"  widget="numeric_step" options="{'step': 0.5, 'min': 1, 'max': 25}" />
                         </group>
                     </group>
                     <group>
@@ -98,12 +94,12 @@
                             <field name="name"/>
                         </h1>
                     </div>
-                    <group>
+                    <!--<group>
                         <group>
 
                             <field name="risk_rating" widget="slider" min="1" max="25" step="1" />
                         </group>
-                    </group>
+                    </group>-->
                     <group>
                         <group>
                             <field name="universe_id"/>

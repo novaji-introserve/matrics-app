@@ -18,14 +18,14 @@ class RiskAssessmentLine(models.Model):
     risk_assessment_id = fields.Many2one(
         comodel_name='res.risk.assessment', string='Risk Assessment', ondelete="cascade")
     implication = fields.Text(string='Implication', required=True)
-    inherent_risk_score = fields.Integer(
+    inherent_risk_score = fields.Float(
         string='Inherent Risk Score', required=True, tracking=True)
     existing_controls = fields.Text(string='Existing Controls', required=True)
-    control_effectiveness_score = fields.Integer(
+    control_effectiveness_score = fields.Float(
         string='Control Effectiveness Score', required=True, tracking=True)
     residual_risk_probability = fields.Float(
-        string='Residual Risk Probability', digits=(10, 2), required=True, tracking=True)
-    residual_risk_impact = fields.Integer(
+        string='Residual Risk Probability', required=True, compute='_compute_risk_probability', tracking=True, store=True)
+    residual_risk_impact = fields.Float(
         string='Residual Risk Impact', required=True, tracking=True)
     planned_mitigation = fields.Text(
         string='Planned Mitigation', required=True)
@@ -34,19 +34,31 @@ class RiskAssessmentLine(models.Model):
     implementation_date = fields.Date(
         string='Implementation Deadline', help="Recurring deadline for implementation")
     residual_risk_score = fields.Float(
-        string='Residual Risk Score', digits=(10, 2), required=True)
+        string='Residual Risk Score', required=True, compute='_compute_risk_score', store=True, tracking=True)
 
-    @api.onchange('inherent_risk_score')
-    def _onchange_inherent_risk_score(self):
-        # self.compute_residual_risk_probability()
-        self.residual_risk_probability = (
-            1 - (self.control_effectiveness_score /25)) * 100
-    '''
-    @api.depends('inherent_risk_score','control_effectiveness_score','residual_risk_impact')
-    def _compute_risk_scores(self):
-        self.residual_risk_probability = (1 - (self.control_effectiveness_score / CONTROL_EFFECTIVENESS_MAX_SCORE)) * 100
+    @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact')
+    def _compute_risk_score(self):
+        for record in self:
+            probability = self._compute_risk_probability(
+                record.control_effectiveness_score)
+            score = self._compute_residual_risk_score(
+                probability, record.residual_risk_impact)
+            record.residual_risk_probability = probability
+            record.residual_risk_score = score
 
-    def compute_residual_risk_probability(self):
-        self.residual_risk_probability = (
-            1 - (self.control_effectiveness_score / CONTROL_EFFECTIVENESS_MAX_SCORE)) * 100
-    '''
+    @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact')
+    def _compute_risk_probability(self):
+        for record in self:
+            probability = self._compute_risk_probability(
+                record.control_effectiveness_score)
+            score = self._compute_residual_risk_score(
+                probability, record.residual_risk_impact)
+            record.residual_risk_probability = probability
+            record.residual_risk_score = score
+
+    def _compute_risk_probability(self, control_effectiveness_score):
+        return (
+            1 - (control_effectiveness_score / CONTROL_EFFECTIVENESS_MAX_SCORE)) * 100
+
+    def _compute_residual_risk_score(self, probability, impact):
+        return (probability/100) * impact
