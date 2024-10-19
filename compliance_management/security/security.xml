@@ -4,13 +4,19 @@
     <!-- User Access -->
     <record id="User_see_branch_customeers" model="ir.rule">
         <field name="name">User see only branch customers</field>
-        <field name="model_id" ref="base.model_res_partner" />
-        <field name="domain_force">[('branch_id', 'in', [ e.id for e in user.branches_id])]</field>
+        <field name="model_id" ref="model_res_partner" />
+        <!--<field name="domain_force">['&amp;',('type','!=',False), ('branch_id', 'in', [ e.id for e in user.branches_id])]</field>-->
+        <!--<field name="domain_force">[('branch_id','=',1)] </field>-->
+        <field name="domain_force">[('type', '!=', False),('branch_id', 'in', [e.id for e in user.branches_id]),('user_id','=',False)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]" />
         <field name="perm_create" eval="0" />
         <field name="perm_write" eval="0" />
         <field name="perm_unlink" eval="0" />
         <field name="perm_read" eval="1" />
+        <field name="active" eval="True"/> 
+    </record>
+    <record id="base.res_partner_rule_private_employee" model="ir.rule">
+        <field name="active" eval="False" />
     </record>
 
 </odoo>
