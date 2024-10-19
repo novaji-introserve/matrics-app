@@ -88,18 +88,17 @@
         <field name="arch" type="xml">
             <form>
                 <sheet string="Risk Assessment">
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_total_risk_lines" icon="fa-star">
+                            <field string="Risk Rating" name="risk_rating" widget="statinfo"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" />
                         <h1>
                             <field name="name"/>
                         </h1>
                     </div>
-                    <!--<group>
-                        <group>
-
-                            <field name="risk_rating" widget="slider" min="1" max="25" step="1" />
-                        </group>
-                    </group>-->
                     <group>
                         <group>
                             <field name="universe_id"/>
@@ -122,16 +121,7 @@
                         <separator />
                     </group>
                     <notebook colspan="4">
-                        <page name='internal_notes' string="Internal Notes">
-                            <field name="narration" placeholder="Narration..." />
-                        </page>
-                        <page name='recommendation' string="Recommendation">
-                            <field name="recommendation" placeholder="Recommendation..." />
-                        </page>
                         <page name='assessment_lines' string="FCRA Risk Assessment" autofocus="autofocus">
-                            <h1>
-                                <label for="line_ids" class="oe_edit_only" />
-                            </h1>
                             <field name="line_ids" string="Risk Assessment Lines">
                                 <tree string="Risk Assessment Lines">
                                     <field name="name" string="Name" />
@@ -140,6 +130,12 @@
                                     <field name="residual_risk_score"/>
                                 </tree>
                             </field>
+                        </page>
+                        <page name='recommendation' string="Recommendation">
+                            <field name="recommendation" placeholder="Recommendation..." />
+                        </page>
+                        <page name='internal_notes' string="Internal Notes">
+                            <field name="narration" placeholder="Narration..." />
                         </page>
                     </notebook>
                 </sheet>
