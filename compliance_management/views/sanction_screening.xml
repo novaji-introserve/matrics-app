@@ -339,7 +339,7 @@
             id="menu_sanction_screening_root"
             name="Sanction screening"
             groups="group_compliance_compliance_officer"
-            parent="menu_compliance_root"
+            parent="contacts.menu_contacts"
             sequence="150"/>
 
         <menuitem
