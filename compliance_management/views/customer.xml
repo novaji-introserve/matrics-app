@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Customer Tree -->
+    <record id="compl_cust_tree_inherit_res_partner" model="ir.ui.view">
+        <field name="name">model_res_partner_tree_inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="before">
+                <field name="customer_id"/>
+                <field name="branch_id"/>
+                <field name="registration_date"/>
+                <field name="tier_id" />
+            </xpath>
+        </field>
+    </record>
     <record id="customer_actions_inherit_res_partner" model="ir.ui.view">
         <field name="name">res_partner_compliance_actions</field>
         <field name="model">res.partner</field>
