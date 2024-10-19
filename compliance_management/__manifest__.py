@@ -32,7 +32,8 @@
         'views/kyc.xml',
         'views/risk_assessment.xml',
         'views/templates.xml',
-        'data/data.xml'
+        'data/data.xml',
+        'security/security.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
