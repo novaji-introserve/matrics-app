@@ -50,3 +50,21 @@ class Customer(models.Model):
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
     edd_ids = fields.One2many(comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines')
+    
+    def action_initiate_edd(self):
+        print('Initiate edd')
+    
+    def action_add_pep(self):
+        print('Add to PEP list')
+    
+    def action_add_fep(self):
+        print('Add to FEP list')
+    
+    def action_blacklist(self):
+        print('blacklist')
+    
+    def action_watchlist(self):
+        print('Add to watchlist')
+    
+    def action_conduct_risk_assessment(self):
+        print('Risk assessment')
