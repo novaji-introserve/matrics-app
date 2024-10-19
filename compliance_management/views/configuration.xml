@@ -515,7 +515,13 @@
     </field>
  </record>
 
-     <!-- Menu Items -->    
+     <!-- Menu Items -->
+     <menuitem name="Settings"
+     id="base.menu_administration"
+     web_icon="compliance_management,static/description/icon-settings.png"
+     sequence="550"
+     groups="base.group_erp_manager"/>
+    <menuitem id="base.menu_management" name="Apps" sequence="500" web_icon="compliance_management,static/description/icon-apps.png" groups="base.group_system"/>    
     <menuitem
         id="menu_compliance_root"
         name="Compliance"
