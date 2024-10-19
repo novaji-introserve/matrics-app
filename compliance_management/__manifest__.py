@@ -32,6 +32,7 @@
         'views/kyc.xml',
         'views/risk_assessment.xml',
         'views/res_users.xml',
+        'views/sanction_screening.xml',
         'data/data.xml',
         'security/security.xml'
     ],

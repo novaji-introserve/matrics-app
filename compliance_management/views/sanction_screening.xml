@@ -1,0 +1,387 @@
+<odoo>
+  <data>
+
+      <!-- Views for Watchlist -->
+        <record id="view_res_partner_watchlist_tree" model="ir.ui.view">
+            <field name="name">res.partner.watchlist.tree</field>
+            <field name="model">res.partner.watchlist</field>
+            <field name="arch" type="xml">
+                <tree string="Watchlist">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="create_date"/>
+                    <field name="write_date"/>
+                </tree>
+            </field>
+        </record>
+
+          <!--  Form for Watchlist    -->
+        <record id="view_res_partner_watchlist_form" model="ir.ui.view">
+            <field name="name">res.partner.watchlist.form</field>
+            <field name="model">res.partner.watchlist</field>
+            <field name="arch" type="xml">
+                <form string="Watchlist">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="customer_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+          <!-- Action for Watchlist-->
+       <record id="action_res_partner_watchlist" model="ir.actions.act_window">
+            <field name="name">Watchlist</field>
+            <field name="res_model">res.partner.watchlist</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <!-- Views for PEP -->
+        <record id="view_res_pep_tree" model="ir.ui.view">
+            <field name="name">res.pep.tree</field>
+            <field name="model">res.pep</field>
+            <field name="arch" type="xml">
+                <tree string="PEP List">
+                    <field name="name"/>
+                    <field name="surname"/>
+                    <field name="first_name"/>
+                    <field name="title"/>
+                    <field name="status"/>
+                    <field name="pep_classification"/>
+                    <field name="present_position"/>
+                    <field name="createdon"/>
+                    <field name="lastmodifiedon"/>
+                </tree>
+            </field>
+        </record>
+      <!-- Form for PEP -->
+
+        <record id="view_res_pep_form" model="ir.ui.view">
+            <field name="name">res.pep.form</field>
+            <field name="model">res.pep</field>
+            <field name="arch" type="xml">
+                <form string="PEP">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" placeholder="Name"/></h1>
+                        </div>
+                        <group>
+                            <group string="Personal Information">
+                                <field name="surname"/>
+                                <field name="first_name"/>
+                                <field name="middle_name"/>
+                                <field name="title"/>
+                                <field name="aka"/>
+                                <field name="sex"/>
+                                <field name="date_of_birth"/>
+                                <field name="age"/>
+                                <field name="email"/>
+                                <field name="place_of_birth"/>
+                                <field name="pob"/>
+                                <field name="state_of_origin"/>
+                            </group>
+                            <group string="Professional Information">
+                                <field name="present_position"/>
+                                <field name="previous_position"/>
+                                <field name="pep_classification"/>
+                                <field name="profession"/>
+                                <field name="status"/>
+                                <field name="business_interest"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Contact Information">
+                                <field name="official_address"/>
+                                <field name="residential_address"/>
+                            </group>
+                            <group string="Family Information">
+                                <field name="spouse"/>
+                                <field name="children"/>
+                                <field name="sibling"/>
+                                <field name="parents"/>
+                                <field name="mothers_maden_name"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Additional Details">
+                                <group>
+                                    <field name="associates__business_political_social_"/>
+                                    <field name="associate_business_politics"/>
+                                    <field name="bankers"/>
+                                    <field name="account_details"/>
+                                    <field name="unique_identifier"/>
+                                </group>
+                            </page>
+                            <page string="Reports &amp; Remarks">
+                                <group>
+                                    <field name="press_report"/>
+                                    <field name="date_report"/>
+                                    <field name="remarks"/>
+                                    <field name="narration"/>
+                                    <field name="additional_info"/>
+                                </group>
+                            </page>
+                            <page string="Audit Information">
+                                <group>
+                                    <field name="createdby"/>
+                                    <field name="createdon"/>
+                                    <field name="createdbyemail"/>
+                                    <field name="lastmodifiedby"/>
+                                    <field name="lastmodifiedon"/>
+                                    <field name="lastmodifiedbyemail"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+      <!-- Action for PEP -->
+      <record id="action_res_pep" model="ir.actions.act_window">
+            <field name="name">PEP List</field>
+            <field name="res_model">res.pep</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <!-- Views for FEP List -->
+        <record id="view_res_partner_fep_tree" model="ir.ui.view">
+            <field name="name">res.partner.fep.tree</field>
+            <field name="model">res.partner.fep</field>
+            <field name="arch" type="xml">
+                <tree string="FEP List">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="create_date"/>
+                    <field name="write_date"/>
+                </tree>
+            </field>
+        </record>
+
+      <!-- Form View for FEP -->
+        <record id="view_res_partner_fep_form" model="ir.ui.view">
+            <field name="name">res.partner.fep.form</field>
+            <field name="model">res.partner.fep</field>
+            <field name="arch" type="xml">
+                <form string="FEP">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="customer_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+      <!-- Action for FEP -->
+       <record id="action_res_partner_fep" model="ir.actions.act_window">
+            <field name="name">FEP List</field>
+            <field name="res_model">res.partner.fep</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Views for Blacklist -->
+        <record id="view_res_partner_blacklist_tree" model="ir.ui.view">
+            <field name="name">res.partner.blacklist.tree</field>
+            <field name="model">res.partner.blacklist</field>
+            <field name="arch" type="xml">
+                <tree string="Blacklist">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="create_date"/>
+                    <field name="write_date"/>
+                </tree>
+            </field>
+        </record>
+
+      <!-- Form Views for Blacklist -->
+        <record id="view_res_partner_blacklist_form" model="ir.ui.view">
+            <field name="name">res.partner.blacklist.form</field>
+            <field name="model">res.partner.blacklist</field>
+            <field name="arch" type="xml">
+                <form string="Blacklist">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="customer_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Actions for Blacklist-->
+        <record id="action_res_partner_blacklist" model="ir.actions.act_window">
+            <field name="name">Blacklist</field>
+            <field name="res_model">res.partner.blacklist</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+         <!-- Views for Global PEP List-->
+        <record id="view_res_global_pep_tree" model="ir.ui.view">
+            <field name="name">res.pep.tree</field>
+            <field name="model">res.pep</field>
+            <field name="arch" type="xml">
+                <tree string="Global PEP List">
+                    <field name="name"/>
+                    <field name="surname"/>
+                    <field name="first_name"/>
+                    <field name="title"/>
+                    <field name="status"/>
+                    <field name="pep_classification"/>
+                    <field name="present_position"/>
+                    <field name="createdon"/>
+                    <field name="lastmodifiedon"/>
+                </tree>
+            </field>
+        </record>
+
+       <!-- Form Views for Global PEP -->
+        <record id="view_res_global_pep_form" model="ir.ui.view">
+            <field name="name">res.pep.form</field>
+            <field name="model">res.pep</field>
+            <field name="arch" type="xml">
+                <form string="Global PEP List">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" placeholder="Name"/></h1>
+                        </div>
+                        <group>
+                            <group string="Personal Information">
+                                <field name="surname"/>
+                                <field name="first_name"/>
+                                <field name="middle_name"/>
+                                <field name="title"/>
+                                <field name="aka"/>
+                                <field name="sex"/>
+                                <field name="date_of_birth"/>
+                                <field name="age"/>
+                                <field name="email"/>
+                                <field name="place_of_birth"/>
+                                <field name="pob"/>
+                                <field name="state_of_origin"/>
+                            </group>
+                            <group string="Professional Information">
+                                <field name="present_position"/>
+                                <field name="previous_position"/>
+                                <field name="pep_classification"/>
+                                <field name="profession"/>
+                                <field name="status"/>
+                                <field name="business_interest"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Contact Information">
+                                <field name="official_address"/>
+                                <field name="residential_address"/>
+                            </group>
+                            <group string="Family Information">
+                                <field name="spouse"/>
+                                <field name="children"/>
+                                <field name="sibling"/>
+                                <field name="parents"/>
+                                <field name="mothers_maden_name"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Additional Details">
+                                <group>
+                                    <field name="associates__business_political_social_"/>
+                                    <field name="associate_business_politics"/>
+                                    <field name="bankers"/>
+                                    <field name="account_details"/>
+                                    <field name="unique_identifier"/>
+                                </group>
+                            </page>
+                            <page string="Reports &amp; Remarks">
+                                <group>
+                                    <field name="press_report"/>
+                                    <field name="date_report"/>
+                                    <field name="remarks"/>
+                                    <field name="narration"/>
+                                    <field name="additional_info"/>
+                                </group>
+                            </page>
+                            <page string="Audit Information">
+                                <group>
+                                    <field name="createdby"/>
+                                    <field name="createdon"/>
+                                    <field name="createdbyemail"/>
+                                    <field name="lastmodifiedby"/>
+                                    <field name="lastmodifiedon"/>
+                                    <field name="lastmodifiedbyemail"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+      <!--  Action For Global PEP-->
+        <record id="action_res_global_pep" model="ir.actions.act_window">
+            <field name="name">Global PEP List</field>
+            <field name="res_model">res.pep</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_res_global_pep_tree"/>
+        </record>
+
+
+        <!-- Menu Items -->
+        <menuitem
+            id="menu_sanction_screening_root"
+            name="Sanction screening"
+            groups="group_compliance_compliance_officer"
+            parent="menu_compliance_root"
+            sequence="150"/>
+
+        <menuitem
+            id="menu_is_pep"
+            action="action_res_pep"
+            parent="menu_sanction_screening_root"
+            name="PEP List"
+            groups="group_compliance_compliance_officer"
+            sequence="10"/>
+
+        <menuitem
+            id="menu_is_fep"
+            action="action_res_partner_fep"
+            parent="menu_sanction_screening_root"
+            name="FEP List"
+            groups="group_compliance_compliance_officer"
+            sequence="20"/>
+
+        <menuitem
+            id="menu_watchlist"
+            action="action_res_partner_watchlist"
+            parent="menu_sanction_screening_root"
+            name="Watchlist"
+            groups="group_compliance_compliance_officer"
+            sequence="30"/>
+
+        <menuitem
+            id="menu_blacklist"
+            action="action_res_partner_blacklist"
+            parent="menu_sanction_screening_root"
+            name="Blacklist"
+            groups="group_compliance_compliance_officer"
+            sequence="40"/>
+
+        <menuitem
+            id="menu_global_pep_list"
+            action="action_res_global_pep"
+            parent="menu_sanction_screening_root"
+            name="Global PEP List"
+            groups="group_compliance_compliance_officer"
+            sequence="50"/>
+
+
+  </data>
+</odoo>
