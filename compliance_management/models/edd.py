@@ -16,7 +16,9 @@ class CustomerEDD(models.Model):
         comodel_name='res.partner', string='Customer',required=True,index=True)
     responsible_id = fields.Many2one(
         comodel_name='res.users', string='Responsible User',required=True,index=True)
-    risk_score = fields.Float(string='Risk Score', digits=(10, 2))
+    # risk_score = fields.Float(string='Risk Score', digits=(10, 2))
+    risk_score = fields.Float(
+        string='Risk Score', required=True, tracking=True)
     date_approved = fields.Date(string="Date Approved",required=True)
     approving_officer_id = fields.Many2one(
         comodel_name='res.users', string='Approving Officer')
@@ -26,7 +28,7 @@ class CustomerEDD(models.Model):
     last_kyc_date = fields.Date(string="Last Kyc Date")
     was_kyc_comprehensive = fields.Boolean(string="Was Kyc Comprehensive")
     has_initiated_new_kyc = fields.Boolean(string="Has Initiated New Kyc")
-    visitation_observation = fields.Boolean(string="Visitation Observation")
+    visitation_observation = fields.Text(string="Visitation Observation")
     overall_kyc_outcome = fields.Text(string="Overall Kyc Outcome")
     is_foreigner = fields.Boolean(string="Is Foreigner")
     is_pep = fields.Boolean(string="Is PEP")

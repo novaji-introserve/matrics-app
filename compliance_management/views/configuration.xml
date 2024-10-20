@@ -461,7 +461,7 @@
         </p>
     </field>
  </record>
-
+ 
  <!-- Risk Type Tree View -->
 <record id="risk_type_tree_view" model="ir.ui.view">
     <field name="name">res.risk.type.tree</field>
