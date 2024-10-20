@@ -22,9 +22,9 @@ class RiskAssessmentLine(models.Model):
         string='Inherent Risk Score', required=True, tracking=True)
     existing_controls = fields.Text(string='Existing Controls', required=True)
     control_effectiveness_score = fields.Float(
-        string='Control Effectiveness Score', required=True, tracking=True)
+        string='Control Effectiveness Score', tracking=True)
     residual_risk_probability = fields.Float(
-        string='Residual Risk Probability', required=True, compute='_compute_risk_probability', tracking=True, store=True)
+        string='Residual Risk Probability', compute='_compute_risk_probability', store=True)
     residual_risk_impact = fields.Float(
         string='Residual Risk Impact', required=True, tracking=True)
     planned_mitigation = fields.Text(
@@ -34,7 +34,7 @@ class RiskAssessmentLine(models.Model):
     implementation_date = fields.Date(
         string='Implementation Deadline', help="Recurring deadline for implementation")
     residual_risk_score = fields.Float(
-        string='Residual Risk Score', required=True, compute='_compute_risk_score', store=True, tracking=True)
+        string='Residual Risk Score',compute='_compute_risk_score', store=True, tracking=True)
 
     @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact')
     def _compute_risk_score(self):
