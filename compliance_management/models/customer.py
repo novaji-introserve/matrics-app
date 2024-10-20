@@ -50,7 +50,7 @@ class Customer(models.Model):
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
     edd_ids = fields.One2many(comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines')
-
+    risk_assessment_ids = fields.One2many(comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
     is_pep = fields.Boolean(string="Is PEP",default=False)
     is_watchlist = fields.Boolean(string="Is Watchlist",default=False)
     is_fep = fields.Boolean(string="Is FEP",default=False)
