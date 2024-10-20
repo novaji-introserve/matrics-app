@@ -36,6 +36,7 @@
         'views/customer.xml',
         'data/data.xml',
         'data/res.country.state.csv',
+        'data/res.branch.csv',
         'security/security.xml'
     ],
     # only loaded in demonstration mode
