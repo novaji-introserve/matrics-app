@@ -47,6 +47,7 @@
     </record>
 
     <!-- Add EDD Page to Customer Form -->
+
     <record id="customer_form_view_edd_page_inherit" model="ir.ui.view">
         <field name="name">res.partner.form.edd.inherit</field>
         <field name="model">res.partner</field>
