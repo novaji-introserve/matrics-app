@@ -51,7 +51,11 @@ class Customer(models.Model):
     account_ids = fields.One2many(comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
     edd_ids = fields.One2many(comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines')
 
-    
+    is_pep = fields.Boolean(string="Is PEP",default=False)
+    is_watchlist = fields.Boolean(string="Is Watchlist",default=False)
+    is_fep = fields.Boolean(string="Is FEP",default=False)
+    is_blacklist = fields.Boolean(string="Is Blacklist",default=False)
+    global_pep = fields.Boolean(string="Global PEP",default=False)
    
     def action_initiate_edd(self):
         print('Initiate edd')
