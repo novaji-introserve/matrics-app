@@ -533,7 +533,7 @@
         name="Configuration" 
         groups="group_compliance_compliance_officer"
         parent="menu_compliance_root"
-        sequence="150"/>
+        sequence="1500"/>
     <menuitem
         id="menu_compliance_account_type"
         action="action_list_customer_account_type"
