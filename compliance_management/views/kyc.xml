@@ -1,201 +1,407 @@
 <odoo>
-<record id="contacts.action_contacts" model="ir.actions.act_window">
+    <record id="contacts.action_contacts" model="ir.actions.act_window">
         <field name="name">Customers</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">kanban,tree,form,activity</field>
-        <field name="search_view_id" ref="base.view_res_partner_filter"/>
+        <field name="search_view_id" ref="base.view_res_partner_filter" />
         <field name="context">{'default_is_company': True}</field>
         <field name="help" type="html">
-          <p class="o_view_nocontent_smiling_face">
-            Create a Customer
-          </p><p>
-            Track all activities related to you customers
-          </p>
+            <p class="o_view_nocontent_smiling_face">
+                Create a Customer
+            </p>
+            <p>
+                Track all activities related to your customers
+            </p>
         </field>
     </record>
-<record model="ir.ui.view" id="partner_inherit_form_view">
-            <field name="name">compliance.customer.form.view</field>
-            <field name="model">res.partner</field>
-            <field name="priority">1500</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
-            <field name="arch" type="xml">
+    <record model="ir.ui.view" id="partner_inherit_form_view">
+        <field name="name">compliance.customer.form.view</field>
+        <field name="model">res.partner</field>
+        <field name="priority">1500</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
             <xpath expr="//page[@name='contact_addresses']" position="replace">
-               <page string="Contacts &amp; Addresses" name="contact_addresses">
-                            <field name="child_ids" mode="kanban" context="{'default_parent_id': active_id, 'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_lang': lang, 'default_user_id': user_id, 'default_type': 'other'}">
-                                <kanban>
-                                    <field name="id"/>
-                                    <field name="color"/>
-                                    <field name="name"/>
-                                    <field name="title"/>
-                                    <field name="type"/>
-                                    <field name="email"/>
-                                    <field name="parent_id"/>
-                                    <field name="is_company"/>
-                                    <field name="function"/>
-                                    <field name="phone"/>
-                                    <field name="street"/>
-                                    <field name="street2"/>
-                                    <field name="zip"/>
-                                    <field name="city"/>
-                                    <field name="country_id"/>
-                                    <field name="mobile"/>
-                                    <field name="state_id"/>
-                                    <field name="image_128"/>
-                                    <field name="avatar_128"/>
-                                    <field name="lang"/>
-                                    <!-- fields in form x2many view to diminish requests -->
-                                    <field name="comment"/>
-                                    <field name="display_name"/>
-                                    <templates>
-                                        <t t-name="kanban-box">
-                                            <t t-set="color" t-value="kanban_color(record.color.raw_value)"/>
-                                            <div t-att-class="color + (record.title.raw_value == 1 ? ' oe_kanban_color_alert' : '') + ' oe_kanban_global_click'">
-                                                <div class="o_kanban_image">
-                                                    <img alt="Contact image" t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)"/>
-                                                </div>
-                                                <div class="oe_kanban_details">
-                                                    <field name="name"/>
-                                                    <div t-if="record.function.raw_value"><field name="function"/></div>
-                                                    <div t-if="record.email.raw_value"><field name="email" widget="email"/></div>
-                                                    <div t-if="record.type.raw_value != 'contact'">
-                                                        <div>
-                                                            <field name="zip"/><t t-if="record.city"> </t>
-                                                            <field name="city"/>
-                                                        </div>
-                                                        <field t-if="record.state_id.raw_value" name="state_id"/><t t-if="record.country_id"> </t>
-                                                        <field name="country_id"/>
-                                                    </div>
-                                                    <div t-if="record.phone.raw_value">Phone: <t t-esc="record.phone.value"/></div>
-                                                    <div t-if="record.mobile.raw_value">Mobile: <t t-esc="record.mobile.value"/></div>
-                                                </div>
-                                            </div>
-                                        </t>
-                                    </templates>
-                                </kanban>
-                                <form string="Contact / Address">
-                                    <sheet>
-                                        <field name="type" required="1" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="parent_id" invisible="1"/>
-                                        <div class="text-muted oe_edit_only">
-                                            <p class="mb-0" attrs="{'invisible': [('type', '!=', 'contact')]}">
-                                                <span>Use this to organize the contact details of employees of a given company (e.g. CEO, CFO, ...).</span>
-                                            </p>
-                                            <p class="mb-0" attrs="{'invisible': [('type', '!=', 'invoice')]}">
-                                                <span>Preferred address for all invoices. Selected by default when you invoice an order that belongs to this company.</span>
-                                            </p>
-                                            <p class="mb-0" attrs="{'invisible': [('type', '!=', 'delivery')]}">
-                                                <span>Preferred address for all deliveries. Selected by default when you deliver an order that belongs to this company.</span>
-                                            </p>
-                                            <p class="mb-0" attrs="{'invisible': [('type', '!=', 'private')]}">
-                                                <span>Private addresses are only visible by authorized users and contain sensitive data (employee home addresses, ...).</span>
-                                            </p>
-                                            <p class="mb-0" attrs="{'invisible': [('type', '!=', 'other')]}">
-                                                <span>Other address for the company (e.g. subsidiary, ...)</span>
-                                            </p>
+                <page string="Contacts &amp; Addresses" name="contact_addresses">
+                    <field name="child_ids" mode="kanban"
+                        context="{'default_parent_id': active_id, 'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_lang': lang, 'default_user_id': user_id, 'default_type': 'other'}">
+                        <kanban>
+                            <field name="id" />
+                            <field name="color" />
+                            <field name="name" />
+                            <field name="title" />
+                            <field name="type" />
+                            <field name="email" />
+                            <field name="parent_id" />
+                            <field name="is_company" />
+                            <field name="function" />
+                            <field name="phone" />
+                            <field name="street" />
+                            <field name="street2" />
+                            <field name="zip" />
+                            <field name="city" />
+                            <field name="country_id" />
+                            <field name="mobile" />
+                            <field name="state_id" />
+                            <field name="image_128" />
+                            <field name="avatar_128" />
+                            <field name="lang" />
+                            <!-- fields in form x2many view to diminish requests -->
+                            <field name="comment" />
+                            <field name="display_name" />
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <t t-set="color" t-value="kanban_color(record.color.raw_value)" />
+                                    <div
+                                        t-att-class="color + (record.title.raw_value == 1 ? ' oe_kanban_color_alert' : '') + ' oe_kanban_global_click'">
+                                        <div class="o_kanban_image">
+                                            <img alt="Contact image"
+                                                t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" />
                                         </div>
-                                        <hr/>
-                                        <group>
-                                            <group>
-                                                <field name="name" string="Contact Name" attrs="{'required' : [('type', '=', 'contact')]}"/>
-                                                <field name="title" options="{'no_open': True}" placeholder="e.g. Mr."
-                                                    attrs="{'invisible': [('type','!=', 'contact')]}"/>
-                                                <field name="function" placeholder="e.g. Sales Director"
-                                                    attrs="{'invisible': [('type','!=', 'contact')]}"/>
-                                                <label for="street" string="Address" attrs="{'invisible': [('type','=', 'contact')]}"/>
-                                                <div attrs="{'invisible': [('type','=', 'contact')]}">
-                                                    <div class="o_address_format" name="div_address">
-                                                        <field name="street" placeholder="Street..." class="o_address_street"/>
-                                                        <field name="street2" placeholder="Street 2..." class="o_address_street"/>
-                                                        <field name="city" placeholder="City" class="o_address_city"/>
-                                                        <field name="state_id" class="o_address_state" placeholder="State" options="{'no_open': True, 'no_quick_create': True}" context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}"/>
-                                                        <field name="zip" placeholder="ZIP" class="o_address_zip"/>
-                                                        <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
-                                                    </div>
+                                        <div class="oe_kanban_details">
+                                            <field name="name" />
+                                            <div t-if="record.function.raw_value">
+                                                <field name="function" />
+                                            </div>
+                                            <div t-if="record.email.raw_value">
+                                                <field name="email" widget="email" />
+                                            </div>
+                                            <div t-if="record.type.raw_value != 'contact'">
+                                                <div>
+                                                    <field name="zip" />
+                                                    <t t-if="record.city"> </t>
+                                                    <field name="city" />
                                                 </div>
-                                            </group>
-                                            <group>
-                                                <field name="email" widget="email"/>
-                                                <field name="phone" widget="phone"/>
-                                                <field name="mobile" widget="phone"/>
-                                                <field name="company_id" invisible="1"/>
-                                            </group>
-                                        </group>
-                                        <group>
-                                            <field name="comment" placeholder="Internal notes..." nolabel="1" colspan="2"/>
-                                        </group>
-                                        <field name="lang" invisible="True"/>
-                                        <field name="user_id" invisible="True"/>
-                                    </sheet>
-                                </form>
-                            </field>
-                        </page>
+                                                <field t-if="record.state_id.raw_value"
+                                                    name="state_id" />
+                                                <t t-if="record.country_id"> </t>
+                                                <field name="country_id" />
+                                            </div>
+                                            <div t-if="record.phone.raw_value">Phone: <t
+                                                    t-esc="record.phone.value" /></div>
+                                            <div t-if="record.mobile.raw_value">Mobile: <t
+                                                    t-esc="record.mobile.value" /></div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                        <form string="Contact / Address">
+                            <sheet>
+                                <field name="type" required="1" widget="radio"
+                                    options="{'horizontal': true}" />
+                                <field name="parent_id" invisible="1" />
+                                <div class="text-muted oe_edit_only">
+                                    <p class="mb-0"
+                                        attrs="{'invisible': [('type', '!=', 'contact')]}">
+                                        <span>Use this to organize the contact details of employees
+                                            of a given company (e.g. CEO, CFO, ...).</span>
+                                    </p>
+                                    <p class="mb-0"
+                                        attrs="{'invisible': [('type', '!=', 'invoice')]}">
+                                        <span>Preferred address for all invoices. Selected by
+                                            default when you invoice an order that belongs to this
+                                            company.</span>
+                                    </p>
+                                    <p class="mb-0"
+                                        attrs="{'invisible': [('type', '!=', 'delivery')]}">
+                                        <span>Preferred address for all deliveries. Selected by
+                                            default when you deliver an order that belongs to this
+                                            company.</span>
+                                    </p>
+                                    <p class="mb-0"
+                                        attrs="{'invisible': [('type', '!=', 'private')]}">
+                                        <span>Private addresses are only visible by authorized users
+                                            and contain sensitive data (employee home addresses,
+                                            ...).</span>
+                                    </p>
+                                    <p class="mb-0" attrs="{'invisible': [('type', '!=', 'other')]}">
+                                        <span>Other address for the company (e.g. subsidiary, ...)</span>
+                                    </p>
+                                </div>
+                                <hr />
+                                <group>
+                                    <group>
+                                        <field name="name" string="Contact Name"
+                                            attrs="{'required' : [('type', '=', 'contact')]}" />
+                                        <field name="title" options="{'no_open': True}"
+                                            placeholder="e.g. Mr."
+                                            attrs="{'invisible': [('type','!=', 'contact')]}" />
+                                        <field name="function" placeholder="e.g. Sales Director"
+                                            attrs="{'invisible': [('type','!=', 'contact')]}" />
+                                        <label for="street" string="Address"
+                                            attrs="{'invisible': [('type','=', 'contact')]}" />
+                                        <div attrs="{'invisible': [('type','=', 'contact')]}">
+                                            <div class="o_address_format" name="div_address">
+                                                <field name="street" placeholder="Street..."
+                                                    class="o_address_street" />
+                                                <field name="street2" placeholder="Street 2..."
+                                                    class="o_address_street" />
+                                                <field name="city" placeholder="City"
+                                                    class="o_address_city" />
+                                                <field name="state_id" class="o_address_state"
+                                                    placeholder="State"
+                                                    options="{'no_open': True, 'no_quick_create': True}"
+                                                    context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}" />
+                                                <field name="zip" placeholder="ZIP"
+                                                    class="o_address_zip" />
+                                                <field name="country_id" placeholder="Country"
+                                                    class="o_address_country"
+                                                    options='{"no_open": True, "no_create": True}' />
+                                            </div>
+                                        </div>
+                                    </group>
+                                    <group>
+                                        <field name="email" widget="email" />
+                                        <field name="phone" widget="phone" />
+                                        <field name="mobile" widget="phone" />
+                                        <field name="company_id" invisible="1" />
+                                    </group>
+                                </group>
+                                <group>
+                                    <field name="comment" placeholder="Internal notes..."
+                                        nolabel="1" colspan="2" />
+                                </group>
+                                <field name="lang" invisible="True" />
+                                <field name="user_id" invisible="True" />
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
             </xpath>
             <xpath expr="//page[@name='contact_addresses']" position="before">
                 <page name='compliance' string="Compliance" autofocus="autofocus">
                     <group name="container_row_2">
                         <group string="Personal Details" name="personal" priority="1">
-                            <field name="customer_id"/>
-                            <field name="branch_id"/>
-                            <field name="bvn"/>
+                            <field name="customer_id" />
+                            <field name="branch_id" />
+                            <field name="bvn" />
                         </group>
                         <group string="Risk Assessment" name="risk" priority="2">
                         </group>
                         <group name="sanction" string="Sanction Screening">
-                        <!--
+                            <!--
                             <field name="company_registry" attrs="{'invisible': [('parent_id','!=',False)]}"/>
                             <field name="ref" string="Reference"/>
-                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" attrs="{'readonly': [('parent_id', '!=', False)]}" force_save="1"/>
-                            <field name="industry_id" attrs="{'invisible': [('is_company', '=', False)]}" options="{'no_create': True}"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"
+                            attrs="{'readonly': [('parent_id', '!=', False)]}" force_save="1"/>
+                            <field name="industry_id" attrs="{'invisible': [('is_company', '=', False)]}"
+                            options="{'no_create': True}"/>
                         -->
                         </group>
                     </group>
                 </page>
             </xpath>
-            </field>
-        </record>
-<menuitem id="base.menu_board_root" name="Dashboards" sequence="260" web_icon="compliance_management,static/description/icon-dashboard.png" groups="base.group_user"/>
-<menuitem
+        </field>
+    </record>
+
+
+    <!-- Edd Tree View -->
+    <record id="edd_tree_view" model="ir.ui.view">
+        <field name="name">res.partner.edd.tree</field>
+        <field name="model">res.partner.edd</field>
+        <field name="arch" type="xml">
+            <tree string="Enhanced Due Diligence">
+                <field name="customer_id" />
+                <field name="responsible_id" string = "Responsible" />
+                <field name="user_id" string = "Initiated By" />
+                <field name="risk_score" />
+                <field name="approved_by" string = "Approved By" />
+                <field name="date_approved" />
+                <field name="status" 
+                    decoration-info="status == 'draft'"
+                    decoration-success="status == 'approved'"
+                    decoration-warning="status == 'cancelled'"
+                    decoration-danger="status == 'deleted'"
+                    decoration-primary="status == 'completed'"
+                    widget="badge"/>
+                <field name="last_kyc_date" />
+                <field name="create_date"  string = "Created On"/>
+            </tree>
+        </field>
+    </record>
+    
+
+
+    <!-- Edd Form View -->
+    <record id="edd_form_view" model="ir.ui.view">
+        <field name="name">res.partner.edd.form</field>
+        <field name="model">res.partner.edd</field>
+        <field name="arch" type="xml">
+            <form string="Manage Enhanced Due Diligence">
+                <header>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="draft,completed,approved,cancelled,deleted,archived" />
+                </header>
+                <sheet>
+                    <group>
+                        <group colspan="2">
+                            <field name="name" />
+                        </group>
+                        <group colspan="2">
+                            <field name="description" placeholder="Reason Initiated" />
+                        </group>
+                        <group>
+                            <field name="customer_id" />
+                            <field name="responsible_id" string="Officer in Charge" />
+                        </group>
+                        <group>
+                            <field name="status" />
+                            <field name="user_id" string="Initiated By" />
+                        </group>
+                        <group>
+                            <field name="approved_by" />
+                        </group>
+                        <group>
+                            <field name="date_approved" />
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Complete Enhanced Due Diligence">
+                            <group>
+                                <group>
+                                    <field name="risk_score" widget="numeric_step" options="{'step': 0.5, 'min': 1, 'max': 25}" />
+                                    <field name="has_initiated_new_kyc" />
+                                </group>
+                                <group>
+                                    <field name="was_kyc_comprehensive" />
+                                    <field name="last_kyc_date" />
+                                </group>
+                                <group>
+                                    <field name="account_status" />
+                                </group>
+                                <group>
+                                    <field name="documentation_status" />
+                                </group>
+                                <group>
+                                    <field name="approving_officer_id" />
+                                </group>
+                            </group>
+                            <separator string="" />
+                            <group string="Customer Assessment">
+                                <group colspan="2">
+                                    <field name="visitation_observation"/>
+                                </group>
+                                <group colspan="2">
+                                    <field name="overall_kyc_outcome" placeholder="overall kyc outcome" />
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="is_foreigner" string="Is Customer a Foreigner?" />
+                                    <field name="is_pep" string="Is Customer a PEP?" />
+                                </group>
+                                <group>
+                                    <field name="id_expired" string="Customer ID still valid" />
+                                    <field name="activity_level_matches_business"
+                                        string="Does Activity Level Reflect Customer's Business" />
+                                </group>
+                            </group>
+                            <separator string="" />
+                            <group string="Additional Information">
+                                <group colspan = "2">
+                                    <field name="main_cash_purpose" />
+                                </group>
+                                <group colspan = "2">
+                                    <field name="main_inflow_purpose"/>
+                                </group>
+                                <group colspan = "2">
+                                    <field name="main_fund_remitters"/>
+                                </group>
+                                <group colspan = "2">
+                                    <field name="inflow_sources"/>
+                                </group>
+                                <group colspan = "2">
+                                    <field name="other_related_accounts"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group colspan = "2">
+                                    <field name="occupation" string="Occupation/Employment Profile" />
+                                </group>
+                                <group>
+                                    <field name="is_current_from_normal"
+                                    string="Is Current Inflow From Normal Business" />
+                                </group>
+                                <group>
+                                    <field name="does_business_support_volume"
+                                        string="Does Nature of Business Support Volume and Velocity Of Inflows" />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_res_partner_edd" model="ir.actions.act_window">
+        <field name="name">Enhanced Due Diligence</field>
+        <field name="res_model">res.partner.edd</field>
+        <field name="view_id" ref="edd_tree_view" />
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Conduct EDD for a Customer
+            </p>
+            <p>
+                Customer Enhanced Due Diligence is conducted here
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="base.menu_board_root" name="Dashboards" sequence="260"
+        web_icon="compliance_management,static/description/icon-dashboard.png"
+        groups="base.group_user" />
+    <menuitem
         id="spreadsheet_dashboard.spreadsheet_dashboard_menu_root"
         name="Dashboards"
         action="spreadsheet_dashboard.ir_actions_dashboard_action"
         web_icon="compliance_management,static/description/icon-dashboard.png"
-        sequence="37"/>
-<menuitem name="Customers"
+        sequence="37" />
+    <menuitem name="Customers"
         id="contacts.menu_contacts"
         sequence="20"
         web_icon="compliance_management,static/description/icons-contact.png"
-        groups="base.group_user,base.group_partner_manager,group_compliance_compliance_officer"/>
-<menuitem id="contacts.res_partner_menu_contacts"
+        groups="base.group_user,base.group_partner_manager,group_compliance_compliance_officer" />
+    <menuitem id="contacts.res_partner_menu_contacts"
         name="Customers"
         action="contacts.action_contacts"
         parent="contacts.menu_contacts"
-        sequence="2"/>
-<menuitem
-            id="hr.menu_hr_root"
-            name="Employees"
-            groups="hr.group_hr_manager,hr.group_hr_user"
-            web_icon="compliance_management,static/description/icon-employee.png"
-            sequence="75"/>
-<menuitem
+        sequence="2" />
+    <menuitem
+        id="hr.menu_hr_root"
+        name="Employees"
+        groups="hr.group_hr_manager,hr.group_hr_user"
+        web_icon="compliance_management,static/description/icon-employee.png"
+        sequence="75" />
+    <menuitem
         id="mail.menu_root_discuss"
         name="Messaging"
         action="mail.action_discuss"
         web_icon="compliance_management,static/description/icon-chat.png"
         groups="base.group_user"
-        sequence="1"/>
-<menuitem
+        sequence="1" />
+    <menuitem
         id="menu_compliance_kyc"
-        name="KYC" 
+        name="KYC"
         groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
         parent="menu_compliance_root"
-        sequence="10"/>
+        sequence="10" />
     <menuitem
         id="menu_compliance_customer"
         action="contacts.action_contacts"
-        parent="menu_compliance_kyc" 
+        parent="menu_compliance_kyc"
         name="Customers"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" 
-        sequence="10"/>
-        
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+        sequence="10" />
+    <menuitem id="menu_compliance_enhanced_due_deligence"
+        action="action_res_partner_edd"
+        parent="menu_compliance_kyc"
+        name="Enhanced Due Diligence"
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+        sequence="20" />
+
 </odoo>
