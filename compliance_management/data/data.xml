@@ -1,7 +1,7 @@
 <odoo noupdate="1">
     <!-- Head office Branch -->
     <record id="res_branch_ho" model="res.branch">
-        <field name="name">Head Office</field>
+        <field name="name">Test Branch</field>
         <field name="code">100</field>
     </record>
     <!-- Account Types -->

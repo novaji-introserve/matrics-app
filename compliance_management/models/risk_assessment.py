@@ -28,8 +28,45 @@ class RiskAssessment(models.Model):
     partner_id = fields.Many2one(comodel_name='res.partner', string='Partner')
     line_ids = fields.One2many(comodel_name='res.risk.assessment.line',
                                inverse_name='risk_assessment_id', string='Risk Assessment Lines')
+    total_risk_lines = fields.Integer(
+        string='Total Risk Lines', _compute='_compute_total_risk_lines',store=True)
+
+    @api.model
+    def create(self, vals):
+        record = super(RiskAssessment, self).create(vals)
+        print(record.id)
+        score = record.compute_risk_score_from_lines()
+        record.write({"risk_rating": score})
+        return record
     
-     # filter subject based on universe
+    def _compute_total_risk_lines(self):
+        self.total_risk_lines = len(self.line_ids)
+
+    def write(self, vals):
+        vals['risk_rating'] = self.compute_risk_score_from_lines()
+        record = super(RiskAssessment, self).write(vals)
+        return record
+
+    def compute_risk_score_from_lines(self):
+        self.env.cr.execute(
+            "SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
+        rec = self.env.cr.fetchone()
+        return rec[0] if rec is not None else 0.0
+
+    @api.depends('line_ids')
+    def _compute_risk_score(self):
+        score = self.compute_risk_score_from_lines()
+        for rec in self:
+            rec.risk_rating = score
+
+    def action_total_risk_lines(self):
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            "compliance_management.action_list_risk_assessment")
+        action['context'] = {}
+        return action
+
+    # filter subject based on universe
+
     @api.onchange('universe_id')
     def filter_subjects(self):
         for rec in self:

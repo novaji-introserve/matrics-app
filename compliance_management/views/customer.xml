@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Customer Tree -->
+    <record id="compl_cust_tree_inherit_res_partner" model="ir.ui.view">
+        <field name="name">model_res_partner_tree_inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="before">
+                <field name="customer_id"/>
+                <field name="branch_id"/>
+                <field name="registration_date"/>
+                <field name="tier_id" />
+            </xpath>
+        </field>
+    </record>
+    <record id="customer_actions_inherit_res_partner" model="ir.ui.view">
+        <field name="name">res_partner_compliance_actions</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="priority">1600</field>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_initiate_edd" class="oe_highlight" type="object" string="Initiate EDD"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="This will trigger a request to carry out EDD on this customer. Are you sure?" />
+                        <button name="action_add_pep" class="oe_highlight" type="object" string="Add to PEP List"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Add Customer to PEP List. Are you sure?" />
+                        <button name="action_add_fep" class="oe_highlight" type="object" string="Add to FEP List"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Add Customer to FEP List. Are you sure?" />
+                        <button name="action_blacklist" class="oe_highlight" type="object" string="Add to Blacklist"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Add Customer to Blacklist. Are you sure?" />
+                        <button name="action_watchlist" class="oe_highlight" type="object" string="Add to Watchlist"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Add Customer to Watchlist. Are you sure?" />
+                        <button name="action_conduct_risk_assessment" class="oe_highlight" type="object" string="Conduct Risk Assessment"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Conduct Risk Assessment. Are you sure?" />
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -169,7 +169,7 @@
                     </field>
                 </page>
             </xpath>
-            <xpath expr="//page[@name='contact_addresses']" position="after">
+            <xpath expr="//page[@name='contact_addresses']" position="before">
                 <page name='compliance' string="Compliance" autofocus="autofocus">
                     <group name="container_row_2">
                         <group string="Personal Details" name="personal" priority="1">

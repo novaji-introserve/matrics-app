@@ -15,8 +15,4 @@
         <field name="perm_read" eval="1" />
         <field name="active" eval="True"/> 
     </record>
-    <record id="base.res_partner_rule_private_employee" model="ir.rule">
-        <field name="active" eval="False" />
-    </record>
-
 </odoo>

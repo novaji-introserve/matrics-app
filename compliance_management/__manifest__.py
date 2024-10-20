@@ -32,7 +32,11 @@
         'views/kyc.xml',
         'views/risk_assessment.xml',
         'views/res_users.xml',
+        'views/sanction_screening.xml',
+        'views/customer.xml',
         'data/data.xml',
+        'data/res.country.state.csv',
+        'data/res.branch.csv',
         'security/security.xml'
     ],
     # only loaded in demonstration mode
