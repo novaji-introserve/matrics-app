@@ -32,11 +32,8 @@
         'views/kyc.xml',
         'views/risk_assessment.xml',
         'views/res_users.xml',
-<<<<<<< HEAD
         'views/sanction_screening.xml',
-=======
         'views/customer.xml',
->>>>>>> main
         'data/data.xml',
         'security/security.xml'
     ],
