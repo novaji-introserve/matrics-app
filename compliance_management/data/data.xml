@@ -1,9 +1,43 @@
 <odoo noupdate="1">
-    <!-- Head office Branch -->
-    <record id="res_branch_ho" model="res.branch">
-        <field name="name">Test Branch</field>
-        <field name="code">100</field>
+    <!-- Compliance Stats  -->
+    <record id="res_compl_stat_1" model="res.compliance.stat">
+        <field name="name">Avg. Customer Risk Score</field>
+        <field name="code">avg_cust_risk_score</field>
+        <field name="scope">bank</field>
+        <field name="sql_query">select avg(risk_score) from res_partner</field>
     </record>
+    <record id="res_compl_stat_2" model="res.compliance.stat">
+        <field name="name">Total Customers</field>
+        <field name="code">total_cust</field>
+        <field name="scope">bank</field>
+        <field name="sql_query">select count(id) from res_partner</field>
+    </record>
+    <record id="res_compl_stat_3" model="res.compliance.stat">
+        <field name="name">Customers without BVN</field>
+        <field name="code">customers_no_bvn</field>
+        <field name="scope">regulatory</field>
+        <field name="sql_query">select count(id) from res_partner where bvn is null</field>
+    </record>
+    <record id="res_compl_stat_4" model="res.compliance.stat">
+        <field name="name">PEP Customers</field>
+        <field name="code">pep_customers</field>
+        <field name="scope">regulatory</field>
+        <field name="sql_query">select count(id) from res_partner where is_pep is true</field>
+    </record>
+    <record id="res_compl_stat_5" model="res.compliance.stat">
+        <field name="name">Branches</field>
+        <field name="code">branch_tot</field>
+        <field name="scope">branch</field>
+        <field name="sql_query">select count(id) from res_branch</field>
+    </record>
+    <record id="res_compl_stat_6" model="res.compliance.stat">
+        <field name="name">Risk Universe</field>
+        <field name="code">risk_univ_cnt</field>
+        <field name="scope">risk</field>
+        <field name="sql_query">select count(id) from res_risk_universe</field>
+    </record>
+    
+
     <!-- Account Types -->
     <record id="res_partner_account_type_100" model="res.partner.account.type">
         <field name="name">Internal Account</field>
