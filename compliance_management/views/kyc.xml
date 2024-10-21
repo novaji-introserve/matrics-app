@@ -244,7 +244,7 @@
                         </group>
                         <group>
                             <field name="status"  invisible="1"/>
-                            <field name="user_id" string="Initiated By" />
+                            <!-- <field name="user_id" string="Initiated By" /> -->
                         </group>
                         <group>
                             <field name="approved_by" />
