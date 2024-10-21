@@ -243,7 +243,7 @@
                             <field name="responsible_id" string="Officer in Charge" />
                         </group>
                         <group>
-                            <field name="status" />
+                            <field name="status"  invisible="1"/>
                             <field name="user_id" string="Initiated By" />
                         </group>
                         <group>
