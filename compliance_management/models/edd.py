@@ -11,7 +11,7 @@ class CustomerEDD(models.Model):
     description = fields.Text(string='Description')
     user_id = fields.Many2one(comodel_name='res.users', string='User',
                               required=True, index=True, default=lambda self: self.env.user.id)
-    approved_by = fields.Many2one(comodel_name='res.users', string='Approver')
+    approved_by = fields.Many2one(comodel_name='res.users', string='Approver', readonly=True)
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer',required=True,index=True)
     responsible_id = fields.Many2one(
@@ -19,7 +19,7 @@ class CustomerEDD(models.Model):
     # risk_score = fields.Float(string='Risk Score', digits=(10, 2))
     risk_score = fields.Float(
         string='Risk Score', required=True, tracking=True)
-    date_approved = fields.Date(string="Date Approved",required=True)
+    date_approved = fields.Date(string="Date Approved",required=True, readonly=True)
     approving_officer_id = fields.Many2one(
         comodel_name='res.users', string='Approving Officer')
     account_status = fields.Selection(string='Account Status', selection=[
