@@ -34,8 +34,9 @@
           <!-- Action for Watchlist-->
        <record id="action_res_partner_watchlist" model="ir.actions.act_window">
             <field name="name">Watchlist</field>
-            <field name="res_model">res.partner.watchlist</field>
+            <field name="res_model">res.partner</field>
             <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_watchlist', '=', True)]</field>
         </record>
 
 
@@ -143,8 +144,9 @@
       <!-- Action for PEP -->
       <record id="action_res_pep" model="ir.actions.act_window">
             <field name="name">PEP List</field>
-            <field name="res_model">res.pep</field>
-            <field name="view_mode">tree,form</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('is_pep', '=', True)]</field>
         </record>
 
 
@@ -181,8 +183,9 @@
       <!-- Action for FEP -->
        <record id="action_res_partner_fep" model="ir.actions.act_window">
             <field name="name">FEP List</field>
-            <field name="res_model">res.partner.fep</field>
-            <field name="view_mode">tree,form</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('is_fep', '=', True)]</field>
         </record>
 
         <!-- Views for Blacklist -->
@@ -218,8 +221,9 @@
         <!-- Actions for Blacklist-->
         <record id="action_res_partner_blacklist" model="ir.actions.act_window">
             <field name="name">Blacklist</field>
-            <field name="res_model">res.partner.blacklist</field>
-            <field name="view_mode">tree,form</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('is_blacklist', '=', True)]</field>
         </record>
 
 
