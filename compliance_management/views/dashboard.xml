@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="compliance_dashboard_view_kanban" model="ir.ui.view">
+        <field name="name">rec.compliance.stat.view.kanban</field>
+        <field name="model">res.compliance.stat</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="scope" create="false">
+                <field name="name" />
+                <field name="val" />
+                <field name="write_date" />
+                <field name="scope" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="d-flex mb-2" style="justify-content: space-between;">
+                            <field name="name" class="fw-bolder fs-5" /><br/>
+                            <field name="val" widget="badge" decoration-info="1"  />
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="action_dashboard_compliance" model="ir.actions.act_window">
+        <field name="name">Compliance Dashboard</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.compliance.stat</field>
+        <field name="view_id" ref="compliance_dashboard_view_kanban" />
+        <field name="view_mode">kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Compliance Statistics
+            </p>
+            <p>
+                No records yet
+            </p>
+        </field>
+    </record>
+    <menuitem id="menu_compliance_dashboard" name="Dashboard" action="action_dashboard_compliance"
+        parent="compliance_management.menu_compliance_root" sequence="-1" />
+
+</odoo>

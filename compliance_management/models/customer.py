@@ -57,42 +57,42 @@ class Customer(models.Model):
 
     def action_initiate_edd(self):
         return {
-        'name': _('Enhanced Due Diligence'),
-        'type': 'ir.actions.act_window',
-        'res_model': 'res.partner.edd',
-        'view_mode': 'form',
-        'context': {"default_customer_id": self.id},
+            'name': _('Enhanced Due Diligence'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner.edd',
+            'view_mode': 'form',
+            'context': {"default_customer_id": self.id},
         }
 
     def action_add_pep(self):
         self.write({'is_pep': True})
 
     def action_remove_pep(self):
-        self.write({'is_pep':False})
-    
+        self.write({'is_pep': False})
+
     def action_add_fep(self):
-        self.write({'is_fep':True})
-        
+        self.write({'is_fep': True})
+
     def action_remove_fep(self):
-        self.write({'is_fep':False})
-    
+        self.write({'is_fep': False})
+
     def action_blacklist(self):
-        self.write({'is_blacklist':True})
-    
+        self.write({'is_blacklist': True})
+
     def action_remove_blacklist(self):
-        self.write({'is_blacklist':False})
-    
+        self.write({'is_blacklist': False})
+
     def action_watchlist(self):
-        self.write({'is_watchlist':True})
-    
+        self.write({'is_watchlist': True})
+
     def action_remove_watchlist(self):
-        self.write({'is_watchlist':False})
-    
+        self.write({'is_watchlist': False})
+
     def action_conduct_risk_assessment(self):
         return {
-        'name': _('Risk Assessment'),
-        'type': 'ir.actions.act_window',
-        'res_model': 'res.risk.assessment',
-        'view_mode': 'form',
-        'context': {"default_partner_id": self.id},
+            'name': _('Risk Assessment'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.risk.assessment',
+            'view_mode': 'form',
+            'context': {"default_partner_id": self.id},
         }
