@@ -95,6 +95,11 @@
                         confirm="Conduct Risk Assessment. Are you sure?" />
                 </header>
             </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
+                    <field string="Risk Rating" name="risk_score" widget="statinfo"/>
+                </button>
+            </xpath>
         </field>
     </record>
 

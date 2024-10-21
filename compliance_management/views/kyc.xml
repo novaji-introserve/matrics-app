@@ -181,10 +181,10 @@
                            
                         </group>
                         <group name="sanction" string="Sanction Screening">
-                            <field name="is_pep" attrs="{'readonly': True}"/>
-                            <field name="is_fep" attrs="{'readonly': True}"/>
+                            <field name="is_pep" attrs="{'readonly': True}" />
+                            <field name="is_fep" attrs="{'readonly': True}" />
                             <field name="is_blacklist" attrs="{'readonly': True}"/>
-                            <field name="is_watchlist" attrs="{'readonly': True}"/>
+                            <field name="is_watchlist" attrs="{'readonly': True}" />
                         </group>
                     </group>
                 </page>
