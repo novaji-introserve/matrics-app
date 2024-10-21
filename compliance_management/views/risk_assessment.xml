@@ -87,6 +87,10 @@
         <field name="model">res.risk.assessment</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="action_update_risk_score" class="oe_highlight" type="object" string="Update Risk Score"
+                    groups="compliance_management.group_compliance_branch_compliance_officer" />  
+                </header>
                 <sheet string="Risk Assessment">
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" type="object" name="action_total_risk_lines" icon="fa-star">

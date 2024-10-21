@@ -34,7 +34,18 @@ class RiskAssessmentLine(models.Model):
     implementation_date = fields.Date(
         string='Implementation Deadline', help="Recurring deadline for implementation")
     residual_risk_score = fields.Float(
-        string='Residual Risk Score',compute='_compute_risk_score', store=True, tracking=True)
+        string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
+
+    @api.model
+    def create(self, vals):
+        record = super(RiskAssessmentLine, self).create(vals)
+        record.update_aggregate_risk_score()
+        return record
+
+    def write(self, vals):
+        record = super(RiskAssessmentLine, self).write(vals)
+        self.update_aggregate_risk_score()
+        return record
 
     @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact')
     def _compute_risk_score(self):
@@ -62,3 +73,8 @@ class RiskAssessmentLine(models.Model):
 
     def _compute_residual_risk_score(self, probability, impact):
         return (probability/100) * impact
+
+    def update_aggregate_risk_score(self):
+        risk_assessment_id = self.risk_assessment_id.id
+        self.env.cr.execute('update res_risk_assessment set risk_rating = (SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s) where id =%s',
+                            (risk_assessment_id, risk_assessment_id))

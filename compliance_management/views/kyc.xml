@@ -178,16 +178,13 @@
                             <field name="bvn" />
                         </group>
                         <group string="Risk Assessment" name="risk" priority="2">
+                           
                         </group>
                         <group name="sanction" string="Sanction Screening">
-                            <!--
-                            <field name="company_registry" attrs="{'invisible': [('parent_id','!=',False)]}"/>
-                            <field name="ref" string="Reference"/>
-                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"
-                            attrs="{'readonly': [('parent_id', '!=', False)]}" force_save="1"/>
-                            <field name="industry_id" attrs="{'invisible': [('is_company', '=', False)]}"
-                            options="{'no_create': True}"/>
-                        -->
+                            <field name="is_pep" attrs="{'readonly': True}"/>
+                            <field name="is_fep" attrs="{'readonly': True}"/>
+                            <field name="is_blacklist" attrs="{'readonly': True}"/>
+                            <field name="is_watchlist" attrs="{'readonly': True}"/>
                         </group>
                     </group>
                 </page>
