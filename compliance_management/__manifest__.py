@@ -39,6 +39,7 @@
         'data/res.branch.csv',
         'security/security.xml',
         'views/statistics.xml',
+        'data/email_templates.xml', 
         'views/dashboard.xml'
     ],
     # only loaded in demonstration mode
