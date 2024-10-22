@@ -126,6 +126,8 @@ class CustomerEDD(models.Model):
         self.ensure_one()
         self.write({
             'status': 'cancelled',
+            'approved_by': "",
+            'date_approved': False,
         })
         return {
             'type': 'ir.actions.act_window',
@@ -149,6 +151,8 @@ class CustomerEDD(models.Model):
         self.ensure_one()
         self.write({
             'status': 'draft',
+            'approved_by': "",
+            'date_approved': False,
         })
         return {
             'type': 'ir.actions.act_window',
