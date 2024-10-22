@@ -96,3 +96,6 @@ class Customer(models.Model):
             'view_mode': 'form',
             'context': {"default_partner_id": self.id},
         }
+    
+    def get_risk_score(self):
+         return self.risk_score

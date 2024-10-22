@@ -36,6 +36,12 @@
         <field name="scope">risk</field>
         <field name="sql_query">select count(id) from res_risk_universe</field>
     </record>
+    <record id="res_compl_stat_7" model="res.compliance.stat">
+        <field name="name">Global PEP List</field>
+        <field name="code">global_pep</field>
+        <field name="scope">regulatory</field>
+        <field name="sql_query">select count(id) from res_pep</field>
+    </record>
     
 
     <!-- Account Types -->
