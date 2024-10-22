@@ -37,6 +37,7 @@
         'data/data.xml',
         'data/res.country.state.csv',
         'data/res.branch.csv',
+        'data/email_templates.xml', 
         'security/security.xml'
     ],
     # only loaded in demonstration mode
