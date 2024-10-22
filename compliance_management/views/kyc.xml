@@ -249,7 +249,7 @@
                         type="object"
                         string="Approve"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        attrs="{'invisible': [ '|' , ('status', '!=', 'completed'), ('is_current_user_approver', '=', False)]}"
+                        attrs="{'invisible': [ '|', ('status', '!=', 'completed'), ('is_current_user_responsible', '=', False)]}"
                                  />
 
                         <button name="action_cancel"
