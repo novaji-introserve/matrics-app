@@ -265,7 +265,7 @@
                         type="object"
                         string="Send Back"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        attrs="{'invisible': ['|', ('status', '=', 'draft'), ('is_current_user_approver', '=', False)]}"
+                        attrs="{'invisible': ['|', ('status', '=', 'draft'), ('is_current_user_approver', '=', False), ('status', '!=', 'archived'),]}"
                              />
                                         
                     <field name="status" widget="statusbar"
