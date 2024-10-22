@@ -228,14 +228,6 @@
             <form string="Manage Enhanced Due Diligence" delete="false">
                 <header>
 
-                        <!-- <button
-                        name="action_submit_for_review"
-                        class="oe_highlight"
-                        type="object"
-                        string="Submit for Review"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        attrs="{'invisible': [('responsible_id', '!=', uid)]}" /> -->
-
                         <button
                         name="action_submit_for_review"
                         class="oe_highlight"
