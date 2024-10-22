@@ -28,3 +28,4 @@ from . import edd
 from . import feplist
 from . import blacklist
 from . import watchlist
+from . import statistic
