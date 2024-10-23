@@ -45,7 +45,6 @@ class Customer(models.Model):
         comodel_name='res.user', string='Account Officer', index=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
-<<<<<<< HEAD
     account_ids = fields.One2many(comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
     edd_ids = fields.One2many(comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines')
     risk_assessment_ids = fields.One2many(comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
@@ -55,18 +54,6 @@ class Customer(models.Model):
     is_blacklist = fields.Boolean(string="Is Blacklist",default=False)
     global_pep = fields.Boolean(string="Global PEP",default=False)
    
-=======
-    account_ids = fields.One2many(
-        comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
-    edd_ids = fields.One2many(
-        comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines')
-    is_pep = fields.Boolean(string="Is PEP", default=False)
-    is_watchlist = fields.Boolean(string="Is Watchlist", default=False)
-    is_fep = fields.Boolean(string="Is FEP", default=False)
-    is_blacklist = fields.Boolean(string="Is Blacklist", default=False)
-    global_pep = fields.Boolean(string="Global PEP", default=False)
-
->>>>>>> main
     def action_initiate_edd(self):
         return {
             'name': _('Enhanced Due Diligence'),
