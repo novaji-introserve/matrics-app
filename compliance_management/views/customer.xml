@@ -21,6 +21,10 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_tree" />
         <field name="arch" type="xml">
+            <tree position="attributes">
+                <attribute name="create">false</attribute>
+            </tree>
+
             <xpath expr="//field[@name='phone']" position="before">
                 <field name="customer_id" />
                 <field name="risk_score" widget="badge" decoration-info="1"/>
@@ -104,8 +108,46 @@
         </field>
     </record>
 
-    <!-- Add EDD Page to Customer Form -->
+    <!-- Inherit and modify the action_contacts -->
+    <record id="contacts_action_contacts_inherit" model="ir.actions.act_window">
+        <field name="name">Contacts</field>
+        <field name="res_model">res.partner</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="context">{'create': False}</field>
+        <field name="search_view_id" ref="base.view_res_partner_filter"/>
+    </record>
 
+    <!-- Override the menu item to use the new action -->
+    <record id="contacts.res_partner_menu_contacts" model="ir.ui.menu">
+        <field name="action" ref="contacts_action_contacts_inherit"/>
+    </record>
+
+    <!-- Disable create in tree view -->
+    <record id="view_partner_tree_no_create" model="ir.ui.view">
+        <field name="name">res.partner.tree.no.create</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <tree position="attributes">
+                <attribute name="create">false</attribute>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Disable create in kanban view -->
+    <record id="view_partner_kanban_no_create" model="ir.ui.view">
+        <field name="name">res.partner.kanban.no.create</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+        <field name="arch" type="xml">
+            <kanban position="attributes">
+                <attribute name="create">false</attribute>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Add EDD Page to Customer Form -->
     <record id="customer_form_view_edd_page_inherit" model="ir.ui.view">
         <field name="name">res.partner.form.edd.inherit</field>
         <field name="model">res.partner</field>
@@ -195,5 +237,7 @@
             </notebook>
         </field>
     </record>
+
+
 
 </odoo>
