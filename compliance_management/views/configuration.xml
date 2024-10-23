@@ -588,83 +588,95 @@
         groups="group_compliance_compliance_officer"
         parent="menu_compliance_root"
         sequence="1500"/>
+
+        <menuitem id="menu_accounts" name="Accounts"
+        parent="menu_compliance_configuration" sequence="80"/>
+
     <menuitem
         id="menu_compliance_account_type"
         action="action_list_customer_account_type"
-        parent="menu_compliance_configuration" 
+        parent="menu_accounts" 
         name="Account Types"
         groups="group_compliance_compliance_officer" 
-        sequence="10"/>
-    <menuitem
-        id="menu_compliance_sector"
-        action="action_list_customer_sector"
-        parent="menu_compliance_configuration" 
-        name="Customer Sectors"
-        groups="group_compliance_compliance_officer" 
-        sequence="20"/>
+        sequence="1"/>
     <menuitem
         id="menu_compliance_account_product"
         action="action_list_account_product"
-        parent="menu_compliance_configuration"
+        parent="menu_accounts"
         name="Account Products"
         groups="group_compliance_compliance_officer"
-        sequence="30"/>
-    <menuitem
-        id="menu_compliance_education_level"
-        action="action_list_education_level"
-        parent="menu_compliance_configuration"
-        name="Education Levels"
-        groups="group_compliance_compliance_officer"
-        sequence="40"/>
-    <menuitem
-        id="menu_compliance_customer_tier"
-        action="action_list_customer_tier"
-        parent="menu_compliance_configuration"
-        name="Customer Tiers"
-        groups="group_compliance_compliance_officer"
-        sequence="50"/>
-    <menuitem
-        id="menu_compliance_customer_region"
-        action="action_list_customer_region"
-        parent="menu_compliance_configuration"
-        name="Customer Regions"
-        groups="group_compliance_compliance_officer"
-        sequence="60"/>
+        sequence="2"/>
     <menuitem
         id="menu_compliance_branch"
         action="action_list_branch"
         parent="menu_compliance_configuration"
         name="Branches"
         groups="group_compliance_compliance_officer"
-        sequence="70"/>
+        sequence="90"/>
+
+        <menuitem id="menu_customer" name="Customer"
+        parent="menu_compliance_configuration" sequence="90"/>
+
+    <menuitem
+        id="menu_compliance_sector"
+        action="action_list_customer_sector"
+        parent="menu_customer" 
+        name="Customer Sectors"
+        groups="group_compliance_compliance_officer" 
+        sequence="1"/>
+    <menuitem
+        id="menu_compliance_customer_tier"
+        action="action_list_customer_tier"
+        parent="menu_customer"
+        name="Customer Tiers"
+        groups="group_compliance_compliance_officer"
+        sequence="2"/>
+    <menuitem
+        id="menu_compliance_customer_region"
+        action="action_list_customer_region"
+        parent="menu_customer"
+        name="Customer Regions"
+        groups="group_compliance_compliance_officer"
+        sequence="3"/>
+    <menuitem
+        id="menu_compliance_education_level"
+        action="action_list_education_level"
+        parent="menu_customer"
+        name="Education Levels"
+        groups="group_compliance_compliance_officer"
+        sequence="4"/>
+
+        <menuitem id="menu_risk_assessment" name="Risk Management"
+        parent="menu_compliance_configuration" sequence="100"/>
+
     <menuitem
         id="menu_compliance_risk_category"
         action="action_list_risk_category"
-        parent="menu_compliance_configuration"
+        parent="menu_risk_assessment"
         name="Risk Categories"
         groups="group_compliance_compliance_officer"
-        sequence="80"/>
+        sequence="1"/>
     <menuitem
         id="menu_compliance_risk_universe"
         action="action_list_risk_universe"
-        parent="menu_compliance_configuration"
+        parent="menu_risk_assessment"
         name="Risk Universe"
         groups="group_compliance_compliance_officer"
-        sequence="90"/>
+        sequence="2"/>
     <menuitem
         id="menu_compliance_risk_subject"
         action="action_list_risk_subject"
-        parent="menu_compliance_configuration"
+        parent="menu_risk_assessment"
         name="Risk Subjects"
         groups="group_compliance_compliance_officer"
-        sequence="100"/>
+        sequence="3"/>
     <menuitem
         id="menu_compliance_risk_type"
         action="action_list_risk_type"
-        parent="menu_compliance_configuration"
+        parent="menu_risk_assessment"
         name="Risk Types"
         groups="group_compliance_compliance_officer"
-        sequence="110"/>
+        sequence="4"/>
 
 
   </data>
