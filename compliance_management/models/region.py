@@ -13,3 +13,6 @@ class CustomerRegion(models.Model):
 
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string="Code", required=True)
+    risk_assessment = fields.Char(string="Risk Assessment")
+    status = fields.Selection(string='Status', selection=[(
+        'active', 'Active'), ('inactive', 'Inactive')], default='active',index=True)

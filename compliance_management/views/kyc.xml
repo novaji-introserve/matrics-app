@@ -181,24 +181,32 @@
                            
                         </group>
                         <group name="sanction" string="Sanction Screening">
-                            <field name="is_pep" attrs="{'readonly': True}"/>
-                            <field name="is_fep" attrs="{'readonly': True}"/>
+                            <field name="is_pep" attrs="{'readonly': True}" />
+                            <field name="is_fep" attrs="{'readonly': True}" />
                             <field name="is_blacklist" attrs="{'readonly': True}"/>
-                            <field name="is_watchlist" attrs="{'readonly': True}"/>
+                            <field name="is_watchlist" attrs="{'readonly': True}" />
                         </group>
                     </group>
                 </page>
             </xpath>
+
+            <xpath expr="//page[@name='contact_addresses']" position="before">
+                <page name='risk_assessment' string="Risk Assessment">
+                    <field name="risk_assessment_ids" 
+                           view_ref="compliance_customer_risk_assessment_tree"
+                           context="{'default_partner_id': active_id}"/>
+                </page>
+            </xpath>
+
         </field>
     </record>
-
 
     <!-- Edd Tree View -->
     <record id="edd_tree_view" model="ir.ui.view">
         <field name="name">res.partner.edd.tree</field>
         <field name="model">res.partner.edd</field>
         <field name="arch" type="xml">
-            <tree string="Enhanced Due Diligence">
+            <tree string="Enhanced Due Diligence " delete="false">
                 <field name="customer_id" />
                 <field name="responsible_id" string = "Responsible" />
                 <field name="user_id" string = "Initiated By" />
@@ -225,11 +233,53 @@
         <field name="name">res.partner.edd.form</field>
         <field name="model">res.partner.edd</field>
         <field name="arch" type="xml">
-            <form string="Manage Enhanced Due Diligence">
+            <form string="Manage Enhanced Due Diligence" delete="false">
                 <header>
+
+                        <button
+                        name="action_submit_for_review"
+                        class="oe_highlight"
+                        type="object"
+                        string="Submit for Review"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        attrs="{'invisible': ['|', ('status', '!=', 'draft'), ('is_current_user_responsible', '=', False)]}" />
+                    
+                        <button name="action_approve"
+                        class="oe_highlight" 
+                        type="object"
+                        string="Approve"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        attrs="{'invisible': [ '|', ('status', '!=', 'completed'), ('is_current_user_responsible', '=', False)]}"
+                                 />
+
+                        <button name="action_cancel"
+                        class="oe_highlight" 
+                        type="object"
+                        string="Cancel"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        attrs="{'invisible': ['|' , ('status', '=', 'cancelled'), ('is_current_user_approver', '=', False)]}"
+                                />
+
+                        <button name="action_archive"
+                        class="oe_highlight" 
+                        type="object"
+                        string="Archive"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        attrs="{'invisible': [('status', 'not in', ('approved', 'cancelled'))]}"
+                        />
+
+                        <button name="action_send_back"
+                        class="oe_highlight" 
+                        type="object"
+                        string="Send Back"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        attrs="{'invisible': ['|', ('status', '=', 'draft'), ('is_current_user_approver', '=', False), ('status', '!=', 'archived'),]}"
+                             />
+                                        
                     <field name="status" widget="statusbar"
                         statusbar_visible="draft,completed,approved,cancelled,deleted,archived" />
                 </header>
+
                 <sheet>
                     <group>
                         <group colspan="2">
@@ -240,14 +290,18 @@
                         </group>
                         <group>
                             <field name="customer_id" />
-                            <field name="responsible_id" string="Officer in Charge" />
                         </group>
                         <group>
+                            <field name="responsible_id" string="Officer in Charge" />
+                            <field name="is_current_user_responsible" invisible="1" />
+                        </group>
+                        <!-- <group>
                             <field name="status" />
                             <field name="user_id" string="Initiated By" />
-                        </group>
+                        </group> -->
                         <group>
                             <field name="approved_by" />
+                            <field name="is_current_user_approver" invisible="1" />
                         </group>
                         <group>
                             <field name="date_approved" />

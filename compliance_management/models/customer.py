@@ -45,54 +45,56 @@ class Customer(models.Model):
         comodel_name='res.user', string='Account Officer', index=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
-    account_ids = fields.One2many(
-        comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
-    edd_ids = fields.One2many(
-        comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines')
-    is_pep = fields.Boolean(string="Is PEP", default=False)
-    is_watchlist = fields.Boolean(string="Is Watchlist", default=False)
-    is_fep = fields.Boolean(string="Is FEP", default=False)
-    is_blacklist = fields.Boolean(string="Is Blacklist", default=False)
-    global_pep = fields.Boolean(string="Global PEP", default=False)
-
+    account_ids = fields.One2many(comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
+    edd_ids = fields.One2many(comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines')
+    risk_assessment_ids = fields.One2many(comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
+    is_pep = fields.Boolean(string="Is PEP",default=False)
+    is_watchlist = fields.Boolean(string="Is Watchlist",default=False)
+    is_fep = fields.Boolean(string="Is FEP",default=False)
+    is_blacklist = fields.Boolean(string="Is Blacklist",default=False)
+    global_pep = fields.Boolean(string="Global PEP",default=False)
+   
     def action_initiate_edd(self):
         return {
-        'name': _('Enhanced Due Diligence'),
-        'type': 'ir.actions.act_window',
-        'res_model': 'res.partner.edd',
-        'view_mode': 'form',
-        'context': {"default_customer_id": self.id},
+            'name': _('Enhanced Due Diligence'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner.edd',
+            'view_mode': 'form',
+            'context': {"default_customer_id": self.id},
         }
 
     def action_add_pep(self):
         self.write({'is_pep': True})
 
     def action_remove_pep(self):
-        self.write({'is_pep':False})
-    
+        self.write({'is_pep': False})
+
     def action_add_fep(self):
-        self.write({'is_fep':True})
-        
+        self.write({'is_fep': True})
+
     def action_remove_fep(self):
-        self.write({'is_fep':False})
-    
+        self.write({'is_fep': False})
+
     def action_blacklist(self):
-        self.write({'is_blacklist':True})
-    
+        self.write({'is_blacklist': True})
+
     def action_remove_blacklist(self):
-        self.write({'is_blacklist':False})
-    
+        self.write({'is_blacklist': False})
+
     def action_watchlist(self):
-        self.write({'is_watchlist':True})
-    
+        self.write({'is_watchlist': True})
+
     def action_remove_watchlist(self):
-        self.write({'is_watchlist':False})
-    
+        self.write({'is_watchlist': False})
+
     def action_conduct_risk_assessment(self):
         return {
-        'name': _('Risk Assessment'),
-        'type': 'ir.actions.act_window',
-        'res_model': 'res.risk.assessment',
-        'view_mode': 'form',
-        'context': {"default_partner_id": self.id},
+            'name': _('Risk Assessment'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.risk.assessment',
+            'view_mode': 'form',
+            'context': {"default_partner_id": self.id},
         }
+    
+    def get_risk_score(self):
+         return self.risk_score
