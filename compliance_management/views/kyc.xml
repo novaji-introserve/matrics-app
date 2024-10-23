@@ -189,9 +189,17 @@
                     </group>
                 </page>
             </xpath>
+
+            <xpath expr="//page[@name='contact_addresses']" position="before">
+                <page name='risk_assessment' string="Risk Assessment">
+                    <field name="risk_assessment_ids" 
+                           view_ref="compliance_customer_risk_assessment_tree"
+                           context="{'default_partner_id': active_id}"/>
+                </page>
+            </xpath>
+
         </field>
     </record>
-
 
     <!-- Edd Tree View -->
     <record id="edd_tree_view" model="ir.ui.view">
