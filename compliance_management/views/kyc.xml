@@ -15,6 +15,7 @@
             </p>
         </field>
     </record>
+
     <record model="ir.ui.view" id="partner_inherit_form_view">
         <field name="name">compliance.customer.form.view</field>
         <field name="model">res.partner</field>
@@ -86,6 +87,7 @@
                                 </t>
                             </templates>
                         </kanban>
+
                         <form string="Contact / Address">
                             <sheet>
                                 <field name="type" required="1" widget="radio"
@@ -120,6 +122,7 @@
                                     </p>
                                 </div>
                                 <hr />
+
                                 <group>
                                     <group>
                                         <field name="name" string="Contact Name"
@@ -151,6 +154,7 @@
                                             </div>
                                         </div>
                                     </group>
+
                                     <group>
                                         <field name="email" widget="email" />
                                         <field name="phone" widget="phone" />
@@ -158,6 +162,7 @@
                                         <field name="company_id" invisible="1" />
                                     </group>
                                 </group>
+
                                 <group>
                                     <field name="comment" placeholder="Internal notes..."
                                         nolabel="1" colspan="2" />
@@ -169,6 +174,7 @@
                     </field>
                 </page>
             </xpath>
+
             <xpath expr="//page[@name='contact_addresses']" position="before">
                 <page name='compliance' string="Compliance" autofocus="autofocus">
                     <group name="container_row_2">
