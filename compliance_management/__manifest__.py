@@ -19,7 +19,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'iComply',
-    'version': '0.1',
+    'version': '0.3',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step'],
@@ -37,7 +37,10 @@
         'data/data.xml',
         'data/res.country.state.csv',
         'data/res.branch.csv',
-        'security/security.xml'
+        'security/security.xml',
+        'views/statistics.xml',
+        'data/email_templates.xml', 
+        'views/dashboard.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

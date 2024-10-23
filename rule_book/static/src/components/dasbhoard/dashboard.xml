@@ -92,7 +92,7 @@
 											</div>
 										</div>
 										<p class="mb-1">
-											Themes
+											Rulebook Themes
 										</p>
 										<h4 class="card-title mb-3">
 											<t t-out="state.totalThemes" />
