@@ -302,6 +302,60 @@
         </p>
     </field>
  </record>
+ 
+<!-- Branch Tree View -->
+<record id="view_branch_tree" model="ir.ui.view">
+    <field name="name">res.branch.tree</field>
+    <field name="model">res.branch</field>
+    <field name="arch" type="xml">
+        <tree string="Branches" delete="False">
+            <field name="name" string="Branch Name"/>
+            <field name="code" string="Branch Code"/>
+            <field name="users" string="Users"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Branch Form View -->
+<record id="view_branch_form" model="ir.ui.view">
+    <field name="name">res.branch.form</field>
+    <field name="model">res.branch</field>
+    <field name="arch" type="xml">
+        <form class="o_form_document" delete="False">
+            <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name" string="Branch"/>
+                    </h1>
+                </div>
+                <group>
+                    <group string="Details">
+                        <field name="code" string="Branch Code"/>
+                        <field name="users" widget="many2many_tags" string="Users"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+ <!-- Branch Action -->
+ <record id="action_list_branch" model="ir.actions.act_window">
+    <field name="name">Branches</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.branch</field>
+    <field name="view_mode">tree,form</field>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Add a Branch
+        </p>
+        <p>
+            Manage all company branches here.
+        </p>
+    </field>
+</record>
+
 
  <!-- Risk Categories Tree View -->
 <record id="risk_category_tree_view" model="ir.ui.view">
@@ -516,7 +570,7 @@
  </record>
 
      <!-- Menu Items -->
-     <menuitem name="Settings"
+    <menuitem name="Settings"
      id="base.menu_administration"
      web_icon="compliance_management,static/description/icon-settings.png"
      sequence="550"
@@ -533,7 +587,7 @@
         name="Configuration" 
         groups="group_compliance_compliance_officer"
         parent="menu_compliance_root"
-        sequence="150"/>
+        sequence="1500"/>
     <menuitem
         id="menu_compliance_account_type"
         action="action_list_customer_account_type"
@@ -577,33 +631,40 @@
         groups="group_compliance_compliance_officer"
         sequence="60"/>
     <menuitem
+        id="menu_compliance_branch"
+        action="action_list_branch"
+        parent="menu_compliance_configuration"
+        name="Branches"
+        groups="group_compliance_compliance_officer"
+        sequence="70"/>
+    <menuitem
         id="menu_compliance_risk_category"
         action="action_list_risk_category"
         parent="menu_compliance_configuration"
         name="Risk Categories"
         groups="group_compliance_compliance_officer"
-        sequence="70"/>
+        sequence="80"/>
     <menuitem
         id="menu_compliance_risk_universe"
         action="action_list_risk_universe"
         parent="menu_compliance_configuration"
         name="Risk Universe"
         groups="group_compliance_compliance_officer"
-        sequence="80"/>
+        sequence="90"/>
     <menuitem
         id="menu_compliance_risk_subject"
         action="action_list_risk_subject"
         parent="menu_compliance_configuration"
         name="Risk Subjects"
         groups="group_compliance_compliance_officer"
-        sequence="90"/>
+        sequence="100"/>
     <menuitem
         id="menu_compliance_risk_type"
         action="action_list_risk_type"
         parent="menu_compliance_configuration"
         name="Risk Types"
         groups="group_compliance_compliance_officer"
-        sequence="100"/>
+        sequence="110"/>
 
 
   </data>

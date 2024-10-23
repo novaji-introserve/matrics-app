@@ -34,7 +34,6 @@ class RiskAssessment(models.Model):
     @api.model
     def create(self, vals):
         record = super(RiskAssessment, self).create(vals)
-        print(record.id)
         score = record.compute_risk_score_from_lines()
         record.write({"risk_rating": score})
         return record
@@ -46,6 +45,12 @@ class RiskAssessment(models.Model):
         vals['risk_rating'] = self.compute_risk_score_from_lines()
         record = super(RiskAssessment, self).write(vals)
         return record
+    
+    def action_update_risk_score(self):
+        for rec in self:
+            score = self.compute_risk_score_from_lines()
+            rec.write({"risk_rating": score})
+            
 
     def compute_risk_score_from_lines(self):
         self.env.cr.execute(
@@ -60,10 +65,19 @@ class RiskAssessment(models.Model):
             rec.risk_rating = score
 
     def action_total_risk_lines(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "res.risk.assessment",
+            "views": [[False, "tree"], [False, "form"]],
+            "domain": [["id", "=", self.id]],
+        }
+        '''
         action = self.env["ir.actions.actions"]._for_xml_id(
             "compliance_management.action_list_risk_assessment")
         action['context'] = {}
         return action
+        '''
 
     # filter subject based on universe
 

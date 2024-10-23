@@ -1,17 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="contacts.action_contacts" model="ir.actions.act_window">
+        <field name="name">Customers</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="search_view_id" ref="base.view_res_partner_filter"/>
+        <field name="context">{'default_is_company': True}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No customers
+          </p><p>
+           Track all activities related to your customers
+          </p>
+        </field>
+    </record>
     <!-- Customer Tree -->
     <record id="compl_cust_tree_inherit_res_partner" model="ir.ui.view">
         <field name="name">model_res_partner_tree_inherit</field>
         <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="inherit_id" ref="base.view_partner_tree" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='phone']" position="before">
-                <field name="customer_id"/>
-                <field name="branch_id"/>
-                <field name="registration_date"/>
+                <field name="customer_id" />
+                <field name="risk_score" widget="badge" decoration-info="1"/>
+                <field name="branch_id" />
+                <field name="registration_date" />
                 <field name="tier_id" />
             </xpath>
+            <xpath expr="//field[@name='activity_ids']" position="replace">
+                <field name="activity_ids" invisible="1" widget="list_activity"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="replace">
+                <field name="user_id" optional="show" invisible="1" widget="many2one_avatar_user" domain="[('share', '=', False)]"/>
+            </xpath>
+            
         </field>
     </record>
     <record id="customer_actions_inherit_res_partner" model="ir.ui.view">
@@ -22,25 +45,60 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
                 <header>
-                    <button name="action_initiate_edd" class="oe_highlight" type="object" string="Initiate EDD"
+                    <button name="action_initiate_edd" class="oe_highlight" type="object"
+                        string="Initiate EDD"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="This will trigger a request to carry out EDD on this customer. Are you sure?" />
-                        <button name="action_add_pep" class="oe_highlight" type="object" string="Add to PEP List"
+                    <button name="action_add_pep" class="oe_highlight" type="object"
+                        string="Add to PEP List"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Add Customer to PEP List. Are you sure?" />
-                        <button name="action_add_fep" class="oe_highlight" type="object" string="Add to FEP List"
+                        confirm="Add Customer to PEP List. Are you sure?"
+                        attrs="{'invisible': [('is_pep', '=',True)]}" />
+                    <button name="action_remove_pep" type="object"
+                        string="Remove From PEP List"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Add Customer to FEP List. Are you sure?" />
-                        <button name="action_blacklist" class="oe_highlight" type="object" string="Add to Blacklist"
+                        confirm="Remove Customer from PEP List. Are you sure?"
+                        attrs="{'invisible': [('is_pep', '!=',True)]}" />
+                    <button name="action_add_fep" class="oe_highlight" type="object"
+                        string="Add to FEP List"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Add Customer to Blacklist. Are you sure?" />
-                        <button name="action_watchlist" class="oe_highlight" type="object" string="Add to Watchlist"
+                        confirm="Add Customer to FEP List. Are you sure?"
+                        attrs="{'invisible': [('is_fep', '=',True)]}" />
+                    <button name="action_remove_fep" type="object"
+                        string="Remove from FEP List"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Add Customer to Watchlist. Are you sure?" />
-                        <button name="action_conduct_risk_assessment" class="oe_highlight" type="object" string="Conduct Risk Assessment"
+                        confirm="Remove from FEP List. Are you sure?"
+                        attrs="{'invisible': [('is_fep', '!=',True)]}" />
+                    <button name="action_blacklist" class="oe_highlight" type="object"
+                        string="Add to Blacklist"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Add Customer to Blacklist. Are you sure?"
+                        attrs="{'invisible': [('is_blacklist', '=',True)]}" />
+                    <button name="action_remove_blacklist" type="object"
+                        string="Remove from Blacklist"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Remove from Blacklist. Are you sure?"
+                        attrs="{'invisible': [('is_blacklist', '!=',True)]}" />
+                    <button name="action_watchlist" class="oe_highlight" type="object"
+                        string="Add to Watchlist"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Add Customer to Watchlist. Are you sure?"
+                        attrs="{'invisible': [('is_watchlist', '=',True)]}" />
+                    <button name="action_remove_watchlist" type="object"
+                        string="From from Watchlist"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Remove from Watchlist. Are you sure?"
+                        attrs="{'invisible': [('is_watchlist', '!=',True)]}" />
+                    <button name="action_conduct_risk_assessment" class="oe_highlight" type="object"
+                        string="Conduct Risk Assessment"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Conduct Risk Assessment. Are you sure?" />
                 </header>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
+                    <field string="Risk Rating" name="risk_score" widget="statinfo"/>
+                </button>
             </xpath>
         </field>
     </record>

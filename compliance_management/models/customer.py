@@ -16,7 +16,6 @@ class Customer(models.Model):
         comodel_name='res.branch', string='Branch', index=True)
     education_level_id = fields.Many2one(
         comodel_name='res.education.level', string='Education Level', index=True)
-    #lang_id = fields.Many2one(comodel_name='res.lang', string='Language')
     kyc_limit_id = fields.Many2one(
         comodel_name='res.partner.kyc.limit', string='KYC Limit')
     tier_id = fields.Many2one(
@@ -26,9 +25,8 @@ class Customer(models.Model):
     identification_number = fields.Char(string='Identification Number')
     identification_expiry_date = fields.Date(
         string='Identification Expiry Date', index=True)
-    vat = fields.Char(string='Tax ID/TIN', index=True, help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.")
-    #marital_status_id = fields.Many2one(
-    #    comodel_name='res.marital.status', string='Marital Status', index=True)
+    vat = fields.Char(string='Tax ID/TIN', index=True,
+                      help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.")
     region_id = fields.Many2one(
         comodel_name='res.partner.region', string='Region')
     sector_id = fields.Many2one(
@@ -40,7 +38,6 @@ class Customer(models.Model):
     middlename = fields.Char(string='Middle Name')
     othername = fields.Char(string='Other Name')
     town = fields.Char(string='Town')
-    #dob = fields.Date(string='Date of Birth', index=True)
     registration_date = fields.Date(string='Registration Date')
     company_reg_date = fields.Date(string='Company Registration Date')
     risk_score = fields.Float(string='Risk Score', digits=(10, 5))
@@ -48,6 +45,7 @@ class Customer(models.Model):
         comodel_name='res.user', string='Account Officer', index=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
+<<<<<<< HEAD
     account_ids = fields.One2many(comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
     edd_ids = fields.One2many(comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines')
     risk_assessment_ids = fields.One2many(comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
@@ -57,20 +55,59 @@ class Customer(models.Model):
     is_blacklist = fields.Boolean(string="Is Blacklist",default=False)
     global_pep = fields.Boolean(string="Global PEP",default=False)
    
+=======
+    account_ids = fields.One2many(
+        comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
+    edd_ids = fields.One2many(
+        comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines')
+    is_pep = fields.Boolean(string="Is PEP", default=False)
+    is_watchlist = fields.Boolean(string="Is Watchlist", default=False)
+    is_fep = fields.Boolean(string="Is FEP", default=False)
+    is_blacklist = fields.Boolean(string="Is Blacklist", default=False)
+    global_pep = fields.Boolean(string="Global PEP", default=False)
+
+>>>>>>> main
     def action_initiate_edd(self):
-        print('Initiate edd')
-    
+        return {
+            'name': _('Enhanced Due Diligence'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner.edd',
+            'view_mode': 'form',
+            'context': {"default_customer_id": self.id},
+        }
+
     def action_add_pep(self):
-        print('Add to PEP list')
-    
+        self.write({'is_pep': True})
+
+    def action_remove_pep(self):
+        self.write({'is_pep': False})
+
     def action_add_fep(self):
-        print('Add to FEP list')
-    
+        self.write({'is_fep': True})
+
+    def action_remove_fep(self):
+        self.write({'is_fep': False})
+
     def action_blacklist(self):
-        print('blacklist')
-    
+        self.write({'is_blacklist': True})
+
+    def action_remove_blacklist(self):
+        self.write({'is_blacklist': False})
+
     def action_watchlist(self):
-        print('Add to watchlist')
-    
+        self.write({'is_watchlist': True})
+
+    def action_remove_watchlist(self):
+        self.write({'is_watchlist': False})
+
     def action_conduct_risk_assessment(self):
-        print('Risk assessment')
+        return {
+            'name': _('Risk Assessment'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.risk.assessment',
+            'view_mode': 'form',
+            'context': {"default_partner_id": self.id},
+        }
+    
+    def get_risk_score(self):
+         return self.risk_score
