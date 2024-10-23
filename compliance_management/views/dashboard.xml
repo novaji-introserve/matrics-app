@@ -12,9 +12,29 @@
                 <field name="scope" />
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="d-flex mb-2" style="justify-content: space-between;">
-                            <field name="name" class="fw-bolder fs-5" /><br/>
-                            <field name="val" widget="badge" decoration-info="1"  />
+                        
+                        <div t-att-class="oe_kanban_global_click" style="justify-content: space-between;">
+                            <div class="o_kanban_image">
+                                <img alt="Stat Image" src="compliance_management/static/description/icons-compliance.png" class="o_kanban_image"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <h5><field name="name"/></h5>
+                                <div><field name="val" widget="badge" decoration-info="1"/></div>
+                                <!--<div t-if="record.function.raw_value"><field name="function"/></div>
+                                <div t-if="record.email.raw_value"><field name="email" widget="email"/></div>
+                                <div t-if="record.type.raw_value != 'contact'">
+                                    <div>
+                                        <field name="zip"/><t t-if="record.city"> </t>
+                                        <field name="city"/>
+                                    </div>
+                                    <field t-if="record.state_id.raw_value" name="state_id"/><t t-if="record.country_id"> </t>
+                                    <field name="country_id"/>
+                                </div>
+                                <div t-if="record.phone.raw_value">Phone: <t t-esc="record.phone.value"/></div>
+                                <div t-if="record.mobile.raw_value">Mobile: <t t-esc="record.mobile.value"/></div>-->
+                            </div>
+                          <!--  <field name="name" class="fw-bolder fs-5" /><br/>
+                            <field name="val" widget="badge" decoration-info="1"/> -->
                         </div>
                     </t>
                 </templates>
