@@ -151,8 +151,7 @@ class RulebookTitle(models.Model):
         sec_files.append(guidelines)
           # Create a thread for each file type
         threads = []
-     
-      
+
 
 
         for file_type in sec_files:

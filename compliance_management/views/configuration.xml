@@ -8,6 +8,7 @@
             <tree string="Account Types" delete="False">
                 <field name="name" string="Name"/>
                 <field name="code"/>
+                <field name="status" string="Status"/>
             </tree>
         </field>
     </record>
@@ -27,6 +28,9 @@
                     <group>
                         <group string="Details">
                             <field name="code"/>
+                        </group>
+                        <group string="Status">
+                            <field name="status"/>
                         </group>
                     </group>
                 </sheet>
@@ -58,6 +62,7 @@
             <tree string="Customer Sectors" delete="False">
                 <field name="name" string="Name"/>
                 <field name="code"/>
+                <field name="status" string="Status"/>
             </tree>
         </field>
     </record> 
@@ -78,11 +83,15 @@
                         <group string="Details">
                             <field name="code"/>
                         </group>
+                         <group string="Status">
+                            <field name="status"/>
+                        </group>
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
+
     <!-- Customer Sectors Action -->
    <record id="action_list_customer_sector" model="ir.actions.act_window">
         <field name="name">Customer Sectors</field>
@@ -158,6 +167,7 @@
         <tree string="Education Levels" delete="False">
             <field name="name" string="Education Level"/>
             <field name="code" string="Code"/>
+            <field name="status" string="Status"/>
         </tree>
     </field>
 </record>
@@ -179,6 +189,9 @@
                     <group string="Details">
                         <field name="code"/>
                     </group>
+                     <group string="Status">
+                            <field name="status"/>
+                     </group>
                 </group>
             </sheet>
         </form>
@@ -209,6 +222,7 @@
         <tree string="Customer Tiers" delete="False">
             <field name="name" string="Name"/>
             <field name="code" string="Code"/>
+            <field name="status" string="Status"/>
         </tree>
     </field>
 </record>
@@ -230,6 +244,9 @@
                     <group string="Details">
                         <field name="code"/>
                     </group>
+                     <group string="Status">
+                            <field name="status"/>
+                     </group>
                 </group>
             </sheet>
         </form>
@@ -260,6 +277,7 @@
         <tree string="Customer Regions" delete="False">
             <field name="name" string="Name"/>
             <field name="code" string="Code"/>
+            <field name="status" string="Status"/>
         </tree>
     </field>
 </record>
@@ -281,6 +299,9 @@
                     <group string="Details">
                         <field name="code"/>
                     </group>
+                     <group string="Status">
+                            <field name="status"/>
+                     </group>
                 </group>
             </sheet>
         </form>
@@ -302,6 +323,60 @@
         </p>
     </field>
  </record>
+ 
+<!-- Branch Tree View -->
+<record id="view_branch_tree" model="ir.ui.view">
+    <field name="name">res.branch.tree</field>
+    <field name="model">res.branch</field>
+    <field name="arch" type="xml">
+        <tree string="Branches" delete="False">
+            <field name="name" string="Branch Name"/>
+            <field name="code" string="Branch Code"/>
+            <field name="users" string="Users"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Branch Form View -->
+<record id="view_branch_form" model="ir.ui.view">
+    <field name="name">res.branch.form</field>
+    <field name="model">res.branch</field>
+    <field name="arch" type="xml">
+        <form class="o_form_document" delete="False">
+            <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name" string="Branch"/>
+                    </h1>
+                </div>
+                <group>
+                    <group string="Details">
+                        <field name="code" string="Branch Code"/>
+                        <field name="users" widget="many2many_tags" string="Users"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+ <!-- Branch Action -->
+ <record id="action_list_branch" model="ir.actions.act_window">
+    <field name="name">Branches</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.branch</field>
+    <field name="view_mode">tree,form</field>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Add a Branch
+        </p>
+        <p>
+            Manage all company branches here.
+        </p>
+    </field>
+</record>
+
 
  <!-- Risk Categories Tree View -->
 <record id="risk_category_tree_view" model="ir.ui.view">
@@ -516,7 +591,7 @@
  </record>
 
      <!-- Menu Items -->
-     <menuitem name="Settings"
+    <menuitem name="Settings"
      id="base.menu_administration"
      web_icon="compliance_management,static/description/icon-settings.png"
      sequence="550"
@@ -533,77 +608,96 @@
         name="Configuration" 
         groups="group_compliance_compliance_officer"
         parent="menu_compliance_root"
-        sequence="150"/>
+        sequence="1500"/>
+
+        <menuitem id="menu_accounts" name="Accounts"
+        parent="menu_compliance_configuration" sequence="80"/>
+
     <menuitem
         id="menu_compliance_account_type"
         action="action_list_customer_account_type"
-        parent="menu_compliance_configuration" 
+        parent="menu_accounts" 
         name="Account Types"
         groups="group_compliance_compliance_officer" 
-        sequence="10"/>
-    <menuitem
-        id="menu_compliance_sector"
-        action="action_list_customer_sector"
-        parent="menu_compliance_configuration" 
-        name="Customer Sectors"
-        groups="group_compliance_compliance_officer" 
-        sequence="20"/>
+        sequence="1"/>
     <menuitem
         id="menu_compliance_account_product"
         action="action_list_account_product"
-        parent="menu_compliance_configuration"
+        parent="menu_accounts"
         name="Account Products"
         groups="group_compliance_compliance_officer"
-        sequence="30"/>
+        sequence="2"/>
     <menuitem
-        id="menu_compliance_education_level"
-        action="action_list_education_level"
+        id="menu_compliance_branch"
+        action="action_list_branch"
         parent="menu_compliance_configuration"
-        name="Education Levels"
+        name="Branches"
         groups="group_compliance_compliance_officer"
-        sequence="40"/>
+        sequence="90"/>
+
+        <menuitem id="menu_customer" name="Customer"
+        parent="menu_compliance_configuration" sequence="90"/>
+
+    <menuitem
+        id="menu_compliance_sector"
+        action="action_list_customer_sector"
+        parent="menu_customer" 
+        name="Customer Sectors"
+        groups="group_compliance_compliance_officer" 
+        sequence="1"/>
     <menuitem
         id="menu_compliance_customer_tier"
         action="action_list_customer_tier"
-        parent="menu_compliance_configuration"
+        parent="menu_customer"
         name="Customer Tiers"
         groups="group_compliance_compliance_officer"
-        sequence="50"/>
+        sequence="2"/>
     <menuitem
         id="menu_compliance_customer_region"
         action="action_list_customer_region"
-        parent="menu_compliance_configuration"
+        parent="menu_customer"
         name="Customer Regions"
         groups="group_compliance_compliance_officer"
-        sequence="60"/>
+        sequence="3"/>
+    <menuitem
+        id="menu_compliance_education_level"
+        action="action_list_education_level"
+        parent="menu_customer"
+        name="Education Levels"
+        groups="group_compliance_compliance_officer"
+        sequence="4"/>
+
+        <menuitem id="menu_risk_assessment" name="Risk Management"
+        parent="menu_compliance_configuration" sequence="100"/>
+
     <menuitem
         id="menu_compliance_risk_category"
         action="action_list_risk_category"
-        parent="menu_compliance_configuration"
+        parent="menu_risk_assessment"
         name="Risk Categories"
         groups="group_compliance_compliance_officer"
-        sequence="70"/>
+        sequence="1"/>
     <menuitem
         id="menu_compliance_risk_universe"
         action="action_list_risk_universe"
-        parent="menu_compliance_configuration"
+        parent="menu_risk_assessment"
         name="Risk Universe"
         groups="group_compliance_compliance_officer"
-        sequence="80"/>
+        sequence="2"/>
     <menuitem
         id="menu_compliance_risk_subject"
         action="action_list_risk_subject"
-        parent="menu_compliance_configuration"
+        parent="menu_risk_assessment"
         name="Risk Subjects"
         groups="group_compliance_compliance_officer"
-        sequence="90"/>
+        sequence="3"/>
     <menuitem
         id="menu_compliance_risk_type"
         action="action_list_risk_type"
-        parent="menu_compliance_configuration"
+        parent="menu_risk_assessment"
         name="Risk Types"
         groups="group_compliance_compliance_officer"
-        sequence="100"/>
+        sequence="4"/>
 
 
   </data>
