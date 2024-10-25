@@ -96,7 +96,7 @@
     <menuitem
         id="menu_compliance_risk_assessment_plan"
         action="action_list_risk_assessment_plan"
-        parent="menu_compliance_configuration"
+        parent="menu_risk_assessment"
         name="Risk Assessment Plan"
         groups="group_compliance_compliance_risk_manager"
         sequence="100" />
