@@ -5,6 +5,7 @@ from odoo.exceptions import ValidationError, UserError
 class CustomerEDD(models.Model):
     _name = 'res.partner.edd'
     _description = 'Enhanced Due Diligence'
+    _inherit = ['mail.thread']
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
 
