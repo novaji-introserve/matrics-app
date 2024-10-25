@@ -40,7 +40,9 @@
         'security/security.xml',
         'views/statistics.xml',
         'data/email_templates.xml', 
-        'views/dashboard.xml'
+        'views/dashboard.xml',
+        'views/risk_assessment_plan.xml',
+        'views/settings.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

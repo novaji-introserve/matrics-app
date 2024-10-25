@@ -46,7 +46,7 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.compliance.stat</field>
         <field name="view_id" ref="compliance_dashboard_view_kanban" />
-        <field name="view_mode">kanban</field>
+        <field name="view_mode">kanban,tree</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Compliance Statistics

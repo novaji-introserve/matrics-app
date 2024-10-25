@@ -40,7 +40,7 @@ class Customer(models.Model):
     town = fields.Char(string='Town')
     registration_date = fields.Date(string='Registration Date')
     company_reg_date = fields.Date(string='Company Registration Date')
-    risk_score = fields.Float(string='Risk Score', digits=(10, 5))
+    risk_score = fields.Float(string='Risk Score', digits=(10, 2))
     account_officer_id = fields.Many2one(
         comodel_name='res.user', string='Account Officer', index=True)
     risk_level_id = fields.Many2one(
@@ -98,3 +98,33 @@ class Customer(models.Model):
     
     def get_risk_score(self):
          return self.risk_score
+    
+    def action_compute_risk_score_with_plan(self):
+        self.env.cr.execute('select risk_assessment_plan from res_config_settings order by id desc limit 1')
+        rec = self.env.cr.fetchone()
+        plan_setting = rec[0]
+        for r in self:
+            record_id = self.id
+            scores = []
+            print(plan_setting)
+            plans = self.env['res.compliance.risk.assessment.plan'].search([('state', '=','active')],order='priority')
+            if plans:
+                for pl in plans:
+                    try:
+                        self.env.cr.execute(pl.sql_query, (record_id,))
+                        rec = self.env.cr.fetchone()
+                        if rec is not None:
+                            # we have a hit
+                            if pl.compute_score_from == 'dynamic':
+                                scores.append(float(rec[0])) if rec is not None else None
+                            else:
+                                # static
+                                scores.append(float(pl.risk_score))
+                    except:
+                        pass
+            if len(scores) > 0:
+                if plan_setting == 'avg':
+                    r.write({'risk_score':(sum(scores) / len(scores))})
+                if plan_setting == 'max':
+                    r.write({'risk_score':max(scores)})
+        

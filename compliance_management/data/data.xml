@@ -4,7 +4,7 @@
         <field name="name">Avg. Customer Risk Score</field>
         <field name="code">avg_cust_risk_score</field>
         <field name="scope">bank</field>
-        <field name="sql_query">select avg(risk_score) from res_partner</field>
+        <field name="sql_query">select round(avg(risk_score),2) from res_partner</field>
     </record>
     <record id="res_compl_stat_2" model="res.compliance.stat">
         <field name="name">Total Customers</field>
@@ -42,7 +42,7 @@
         <field name="scope">regulatory</field>
         <field name="sql_query">select count(id) from res_pep</field>
     </record>
-    
+
 
     <!-- Account Types -->
     <record id="res_partner_account_type_100" model="res.partner.account.type">
@@ -406,6 +406,11 @@
     <record id="compliance_inst_fc_risk_subject_23" model="res.risk.subject">
         <field name="name">South East</field>
         <field name="code">south_east</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_ne23" model="res.risk.subject">
+        <field name="name">North East</field>
+        <field name="code">north_east</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
     </record>
     <record id="compliance_inst_fc_risk_subject_41" model="res.risk.subject">
@@ -1330,6 +1335,170 @@
         <field name="name">Regular Individual Account</field>
         <field name="code">regular_individual_account</field>
     </record>
-
-
+    <!--Departments -->
+    <record id="hr_department_agric_business" model="hr.department">
+        <field name="name">Agric Business</field>
+    </record>
+    <record id="hr_department_application_development" model="hr.department">
+        <field name="name">Application Development</field>
+    </record>
+    <record id="hr_department_business_banking" model="hr.department">
+        <field name="name">Business Banking</field>
+    </record>
+    <record id="hr_department_business_development" model="hr.department">
+        <field name="name">Business Development</field>
+    </record>
+    <record id="hr_department_compliance" model="hr.department">
+        <field name="name">Compliance</field>
+    </record>
+    <record id="hr_department_contact_center" model="hr.department">
+        <field name="name">Contact Center</field>
+    </record>
+    <record id="hr_department_corporate_services" model="hr.department">
+        <field name="name">Corporate Services</field>
+    </record>
+    <record id="hr_department_corporate_treasury" model="hr.department">
+        <field name="name">Corporate Treasury</field>
+    </record>
+    <record id="hr_department_customer_service" model="hr.department">
+        <field name="name">Customer Service</field>
+    </record>
+    <record id="hr_department_development_finance" model="hr.department">
+        <field name="name">Development Finance</field>
+    </record>
+    <record id="hr_department_domestic_operations" model="hr.department">
+        <field name="name">Domestic Operations</field>
+    </record>
+    <record id="hr_department_e-banking_operations" model="hr.department">
+        <field name="name">E-Banking Operations</field>
+    </record>
+    <record id="hr_department_e_business" model="hr.department">
+        <field name="name">E-Business</field>
+    </record>
+    <record id="hr_department_financial_control" model="hr.department">
+        <field name="name">Financial Control</field>
+    </record>
+    <record id="hr_department_foreign_operations" model="hr.department">
+        <field name="name">Foreign Operations</field>
+    </record>
+    <record id="hr_department_human_resources" model="hr.department">
+        <field name="name">Human Resources</field>
+    </record>
+    <record id="hr_department_information_security" model="hr.department">
+        <field name="name">Information Security</field>
+    </record>
+    <record id="hr_department_information_technonology" model="hr.department">
+        <field name="name">Information Technonology</field>
+    </record>
+    <record id="hr_department_internal_audit" model="hr.department">
+        <field name="name">Internal Audit</field>
+    </record>
+    <record id="hr_department_internal_control" model="hr.department">
+        <field name="name">Internal Control</field>
+    </record>
+    <record id="hr_department_international_operations" model="hr.department">
+        <field name="name">International Operations</field>
+    </record>
+    <record id="hr_department_legal" model="hr.department">
+        <field name="name">Legal</field>
+    </record>
+    <record id="hr_department_marketing" model="hr.department">
+        <field name="name">Marketing</field>
+    </record>
+    <record id="hr_department_marketing_communications" model="hr.department">
+        <field name="name">Marketing Communications</field>
+    </record>
+    <record id="hr_department_operations" model="hr.department">
+        <field name="name">Operations</field>
+    </record>
+    <record id="hr_department_operations_kano" model="hr.department">
+        <field name="name">Operations-Kano</field>
+    </record>
+    <record id="hr_department_operations_lagos" model="hr.department">
+        <field name="name">Operations-Lagos</field>
+    </record>
+    <record id="hr_department_operations-nass" model="hr.department">
+        <field name="name">Operations-Nass</field>
+    </record>
+    <record id="hr_department_private_banking" model="hr.department">
+        <field name="name">Private Banking</field>
+    </record>
+    <record id="hr_department_procurement" model="hr.department">
+        <field name="name">Procurement</field>
+    </record>
+    <record id="hr_department_public_sector" model="hr.department">
+        <field name="name">Public Sector</field>
+    </record>
+    <record id="hr_department_retail_banking" model="hr.department">
+        <field name="name">Retail Banking</field>
+    </record>
+    <record id="hr_department_risk_management" model="hr.department">
+        <field name="name">Risk Management</field>
+    </record>
+    <record id="hr_department_shariah_department" model="hr.department">
+        <field name="name">Shariah Department</field>
+    </record>
+    <record id="hr_department_transformation" model="hr.department">
+        <field name="name">Transformation</field>
+    </record>
+    <record id="hr_department_treasury" model="hr.department">
+        <field name="name">Treasury</field>
+    </record>
+    <record id="hr_department_treasury_operations" model="hr.department">
+        <field name="name">Treasury Operations</field>
+    </record>
+    <!-- Default Risk Assessment -->
+    <record id="res_risk_assessment_1" model="res.risk.assessment">
+        <field name="name">Customer Engaged In Human Trafficking in the North</field>
+        <field name="narration">Assessing the risks associated with onboarding customers associated
+            with human trafficking in the North East and its impact on the bank</field>
+        <field name="recommendation">Put customers on PND, Carry out EDD</field>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_ne23" />
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+        <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst" />
+        <field name="type_id" ref="compliance_inst_risk_type_3" />
+    </record>
+    <record id="res_risk_assessment_line_1" model="res.risk.assessment.line">
+        <field name="name">Money Laundering</field>
+        <field name="implication">Regulatory Fine</field>
+        <field name="existing_controls">Put Accounts on PND</field>
+        <field name="planned_mitigation">Customers will be charged accordingly</field>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_1" />
+        <field name="department_id" ref="hr_department_compliance" />
+        <field name="risk_assessment_id" ref="res_risk_assessment_1" />
+        <field name="inherent_risk_score">23.51</field>
+        <field name="control_effectiveness_score">16.51</field>
+        <field name="residual_risk_impact">73.03</field>
+        <field name="residual_risk_score">16.51</field>
+    </record>
+    <record id="risk_plan_1" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers without BVN</field>
+        <field name="risk_score">16</field>
+        <field name="code">cust_no_bvn</field>
+        <field name="sql_query">select 16 from res_partner where id=%s and bvn is null</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">dynamic</field>
+        <field name="narration">Customers without BVN pose high risk</field>
+    </record>
+    <record id="risk_plan_2" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers without Phone</field>
+        <field name="risk_score">16</field>
+        <field name="code">cust_no_phone</field>
+        <field name="sql_query">select 16 from res_partner where id=%s and mobile is null and phone is null</field>
+        <field name="priority">2</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">dynamic</field>
+        <field name="narration">Customers without mobile phone are medium risk</field>
+    </record>
+    <record id="risk_plan_3" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers on Blacklist</field>
+        <field name="risk_score">25</field>
+        <field name="code">cust_blacklist</field>
+        <field name="sql_query">select 25 from res_partner where id=%s and is_blacklist=true</field>
+        <field name="priority">3</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">dynamic</field>
+        <field name="narration">Customers on blacklist are significantly high</field>
+    </record>
 </odoo>

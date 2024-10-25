@@ -12,6 +12,7 @@ class Statistic(models.Model):
         ('uniq_stats_name', 'unique(name)',
          "Name already exists. Value must be unique!")
     ]
+    _inherit = ['mail.thread','mail.activity.mixin']
 
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string="Code", required=True)
@@ -20,8 +21,8 @@ class Statistic(models.Model):
         'bank', 'Bank Wide'), ('branch', 'Branch'), ('compliance', 'Compliance'),
         ('regulatory', 'Regulatory'),('risk','Risk Assessment')], default='bank')
     state = fields.Selection(string='State', selection=[(
-        'active', 'Active'), ('key', 'Inactive')], default='active')
-    val = fields.Float(string='Value', required=True, default=0.0)
+        'active', 'Active'), ('inactive', 'Inactive')], default='active')
+    val = fields.Char(string='Value', required=True)
     narration = fields.Text(string='Narration')
     
     def compute_stat(self):

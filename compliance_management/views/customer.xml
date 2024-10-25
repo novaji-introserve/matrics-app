@@ -98,6 +98,10 @@
                         string="Conduct Risk Assessment"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Conduct Risk Assessment. Are you sure?" />
+                    <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object"
+                        string="Compute Risk Score With Plan"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Compute Risk Score From Risk Assessment Plan. Are you sure?" />
                 </header>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">

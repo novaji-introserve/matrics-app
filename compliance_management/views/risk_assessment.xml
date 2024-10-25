@@ -26,7 +26,7 @@
                             <field name="category_id"/>
                         </group>
                         <group>
-                            <field name="inherent_risk_score" widget="numeric_step" options="{'step': 0.5, 'min': 1, 'max': 25}" />
+                            <field name="inherent_risk_score" widget="slider" step="1" min="1" max="25" />
                         </group>
                     </group>
                     <group>
@@ -41,10 +41,10 @@
                     </group>
                     <group>
                         <group>
-                            <field name="control_effectiveness_score"  widget="numeric_step" options="{'step': 0.5, 'min': 1, 'max': 25}"  />
+                            <field name="control_effectiveness_score"  widget="slider" step="1" min="1" max="25"  />
                         </group>
                         <group>
-                            <field name="residual_risk_impact"  widget="numeric_step" options="{'step': 0.5, 'min': 1, 'max': 25}" />
+                            <field name="residual_risk_impact"  widget="slider" step="1" min="1" max="25" />
                         </group>
                     </group>
                     <group>
@@ -143,6 +143,11 @@
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>

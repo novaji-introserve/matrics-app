@@ -47,7 +47,7 @@ class RiskAssessmentLine(models.Model):
         self.update_aggregate_risk_score()
         return record
 
-    @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact')
+    @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact','residual_risk_score','residual_risk_probability','residual_risk_score')
     def _compute_risk_score(self):
         for record in self:
             probability = self._compute_risk_probability(
@@ -57,7 +57,7 @@ class RiskAssessmentLine(models.Model):
             record.residual_risk_probability = probability
             record.residual_risk_score = score
 
-    @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact')
+    @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact','residual_risk_score','residual_risk_probability','residual_risk_score')
     def _compute_risk_probability(self):
         for record in self:
             probability = self._compute_risk_probability(

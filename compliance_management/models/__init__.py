@@ -29,3 +29,5 @@ from . import feplist
 from . import blacklist
 from . import watchlist
 from . import statistic
+from . import risk_assessment_plan
+from . import settings
