@@ -1,0 +1,28 @@
+id,code,name
+res_department_0020010,10,Administration
+res_department_0020020,20,Compliance
+res_department_0020030,30,Purchasing
+res_department_0020040,40,Human Resources
+res_department_0020050,50,Shipping
+res_department_0020060,60,IT
+res_department_0020070,70,Public Relations
+res_department_0020080,80,Sales
+res_department_0020090,90,Executive
+res_department_00200100,100,Finance
+res_department_00200110,110,Accounting
+res_department_00200120,120,Treasury
+res_department_00200130,130,Corporate Tax
+res_department_00200140,140,Control And Credit
+res_department_00200150,150,Shareholder Services
+res_department_00200160,160,Benefits
+res_department_00200170,170,Manufacturing
+res_department_00200180,180,Construction
+res_department_00200190,190,Contracting
+res_department_00200200,200,Operations
+res_department_00200210,210,IT Support
+res_department_00200220,220,NOC
+res_department_00200230,230,IT Helpdesk
+res_department_0020028,240,Government Sales
+res_department_0020028,250,Retail Sales
+res_department_0020028,260,Recruiting
+res_department_0020028,270,Payroll
