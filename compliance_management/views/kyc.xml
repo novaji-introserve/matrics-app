@@ -22,175 +22,40 @@
         <field name="priority">1500</field>
         <field name="inherit_id" ref="base.view_partner_form" />
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='contact_addresses']" position="replace">
-                <page string="Contacts &amp; Addresses" name="contact_addresses">
-                    <field name="child_ids" mode="kanban"
-                        context="{'default_parent_id': active_id, 'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_lang': lang, 'default_user_id': user_id, 'default_type': 'other'}">
-                        <kanban>
-                            <field name="id" />
-                            <field name="color" />
-                            <field name="name" />
-                            <field name="title" />
-                            <field name="type" />
-                            <field name="email" />
-                            <field name="parent_id" />
-                            <field name="is_company" />
-                            <field name="function" />
-                            <field name="phone" />
-                            <field name="street" />
-                            <field name="street2" />
-                            <field name="zip" />
-                            <field name="city" />
-                            <field name="country_id" />
-                            <field name="mobile" />
-                            <field name="state_id" />
-                            <field name="image_128" />
-                            <field name="avatar_128" />
-                            <field name="lang" />
-                            <!-- fields in form x2many view to diminish requests -->
-                            <field name="comment" />
-                            <field name="display_name" />
-                            <templates>
-                                <t t-name="kanban-box">
-                                    <t t-set="color" t-value="kanban_color(record.color.raw_value)" />
-                                    <div
-                                        t-att-class="color + (record.title.raw_value == 1 ? ' oe_kanban_color_alert' : '') + ' oe_kanban_global_click'">
-                                        <div class="o_kanban_image">
-                                            <img alt="Contact image"
-                                                t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" />
-                                        </div>
-                                        <div class="oe_kanban_details">
-                                            <field name="name" />
-                                            <div t-if="record.function.raw_value">
-                                                <field name="function" />
-                                            </div>
-                                            <div t-if="record.email.raw_value">
-                                                <field name="email" widget="email" />
-                                            </div>
-                                            <div t-if="record.type.raw_value != 'contact'">
-                                                <div>
-                                                    <field name="zip" />
-                                                    <t t-if="record.city"> </t>
-                                                    <field name="city" />
-                                                </div>
-                                                <field t-if="record.state_id.raw_value"
-                                                    name="state_id" />
-                                                <t t-if="record.country_id"> </t>
-                                                <field name="country_id" />
-                                            </div>
-                                            <div t-if="record.phone.raw_value">Phone: <t
-                                                    t-esc="record.phone.value" /></div>
-                                            <div t-if="record.mobile.raw_value">Mobile: <t
-                                                    t-esc="record.mobile.value" /></div>
-                                        </div>
-                                    </div>
-                                </t>
-                            </templates>
-                        </kanban>
-
-                        <form string="Contact / Address">
-                            <sheet>
-                                <field name="type" required="1" widget="radio"
-                                    options="{'horizontal': true}" />
-                                <field name="parent_id" invisible="1" />
-                                <div class="text-muted oe_edit_only">
-                                    <p class="mb-0"
-                                        attrs="{'invisible': [('type', '!=', 'contact')]}">
-                                        <span>Use this to organize the contact details of employees
-                                            of a given company (e.g. CEO, CFO, ...).</span>
-                                    </p>
-                                    <p class="mb-0"
-                                        attrs="{'invisible': [('type', '!=', 'invoice')]}">
-                                        <span>Preferred address for all invoices. Selected by
-                                            default when you invoice an order that belongs to this
-                                            company.</span>
-                                    </p>
-                                    <p class="mb-0"
-                                        attrs="{'invisible': [('type', '!=', 'delivery')]}">
-                                        <span>Preferred address for all deliveries. Selected by
-                                            default when you deliver an order that belongs to this
-                                            company.</span>
-                                    </p>
-                                    <p class="mb-0"
-                                        attrs="{'invisible': [('type', '!=', 'private')]}">
-                                        <span>Private addresses are only visible by authorized users
-                                            and contain sensitive data (employee home addresses,
-                                            ...).</span>
-                                    </p>
-                                    <p class="mb-0" attrs="{'invisible': [('type', '!=', 'other')]}">
-                                        <span>Other address for the company (e.g. subsidiary, ...)</span>
-                                    </p>
-                                </div>
-                                <hr />
-
-                                <group>
-                                    <group>
-                                        <field name="name" string="Contact Name"
-                                            attrs="{'required' : [('type', '=', 'contact')]}" />
-                                        <field name="title" options="{'no_open': True}"
-                                            placeholder="e.g. Mr."
-                                            attrs="{'invisible': [('type','!=', 'contact')]}" />
-                                        <field name="function" placeholder="e.g. Sales Director"
-                                            attrs="{'invisible': [('type','!=', 'contact')]}" />
-                                        <label for="street" string="Address"
-                                            attrs="{'invisible': [('type','=', 'contact')]}" />
-                                        <div attrs="{'invisible': [('type','=', 'contact')]}">
-                                            <div class="o_address_format" name="div_address">
-                                                <field name="street" placeholder="Street..."
-                                                    class="o_address_street" />
-                                                <field name="street2" placeholder="Street 2..."
-                                                    class="o_address_street" />
-                                                <field name="city" placeholder="City"
-                                                    class="o_address_city" />
-                                                <field name="state_id" class="o_address_state"
-                                                    placeholder="State"
-                                                    options="{'no_open': True, 'no_quick_create': True}"
-                                                    context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}" />
-                                                <field name="zip" placeholder="ZIP"
-                                                    class="o_address_zip" />
-                                                <field name="country_id" placeholder="Country"
-                                                    class="o_address_country"
-                                                    options='{"no_open": True, "no_create": True}' />
-                                            </div>
-                                        </div>
-                                    </group>
-
-                                    <group>
-                                        <field name="email" widget="email" />
-                                        <field name="phone" widget="phone" />
-                                        <field name="mobile" widget="phone" />
-                                        <field name="company_id" invisible="1" />
-                                    </group>
-                                </group>
-
-                                <group>
-                                    <field name="comment" placeholder="Internal notes..."
-                                        nolabel="1" colspan="2" />
-                                </group>
-                                <field name="lang" invisible="True" />
-                                <field name="user_id" invisible="True" />
-                            </sheet>
-                        </form>
-                    </field>
-                </page>
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="sector_id"/>
+                <field name="region_id"/>
+                <field name="registration_date" />
+                <field name="company_reg_date" />
+            </xpath>
+            <xpath expr="//page[@name='contact_addresses']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//page[@name='sales_purchases']" position="attributes">
+                <attribute name="invisible">True</attribute>
             </xpath>
 
             <xpath expr="//page[@name='contact_addresses']" position="before">
-                <page name='compliance' string="Compliance" autofocus="autofocus">
-                    <group name="container_row_2">
-                        <group string="Personal Details" name="personal" priority="1">
+                <page name='compliance' string="Personal Information" autofocus="autofocus">
+                    <group>
+                        <group string="Personal Information" name="personal" priority="1">
+                            <field name="firstname" />
+                            <field name="lastname" />
+                            <field name="middlename" />
+                            <field name="othername" />
+                            <field name="dob" />
+                            <field name="education_level_id" />
+                            <field name="sex_id" />
+                            <field name="town" />
+                        </group>
+                        <group string="Identification" name="identification">
                             <field name="customer_id" />
                             <field name="branch_id" />
+                            <field name="account_officer_id" />
                             <field name="bvn" />
-                        </group>
-                        <group string="Risk Assessment" name="risk" priority="2">
-                           
-                        </group>
-                        <group name="sanction" string="Sanction Screening">
-                            <field name="is_pep" attrs="{'readonly': True}" />
-                            <field name="is_fep" attrs="{'readonly': True}" />
-                            <field name="is_blacklist" attrs="{'readonly': True}"/>
-                            <field name="is_watchlist" attrs="{'readonly': True}" />
+                            <field name="identification_type_id" />
+                            <field name="identification_number" />
+                            <field name="identification_expiry_date" />
                         </group>
                     </group>
                 </page>
@@ -198,97 +63,106 @@
 
             <xpath expr="//page[@name='contact_addresses']" position="before">
                 <page name='risk_assessment' string="Risk Assessment">
-                    <field name="risk_assessment_ids" 
-                           view_ref="compliance_customer_risk_assessment_tree"
-                           context="{'default_partner_id': active_id}"/>
+                    <field name="risk_assessment_ids"
+                        view_ref="compliance_customer_risk_assessment_tree"
+                        context="{'default_partner_id': active_id}" />
+                </page>
+                <page name='sanction_screening' string="Sanction Screening">
+                    <group name="sanction" string="Sanction Screening">
+                        <field name="is_pep" attrs="{'readonly': True}" />
+                        <field name="is_fep" attrs="{'readonly': True}" />
+                        <field name="is_blacklist" attrs="{'readonly': True}" />
+                        <field name="is_watchlist" attrs="{'readonly': True}" />
+                        <field name="global_pep" attrs="{'readonly': True}" />
+                    </group>
                 </page>
             </xpath>
 
             <!-- Add EDD Page to Customer Form -->
-               <xpath expr="//page[@name='contact_addresses']" position="before">
+            <xpath expr="//page[@name='contact_addresses']" position="before">
                 <!-- <notebook position="inside"> -->
-                    <page string="EDD Record" name="edd_record">
-                        <field name="edd_ids" nolabel="1">
-                            <tree string="EDD Record">
-                                <field name="name"/>
-                                <field name="status"/>
-                                <field name="customer_id"/>
-                                <field name="responsible_id"/>
-                                <field name="user_id"/>
-                                <field name="approved_by"/>
-                                <field name="date_approved"/>
-                                <field name="risk_score"/>
-                                <field name="account_status"/>
-                                <field name="documentation_status"/>
-                            </tree>
-                            <form string="EDD Record">
-                                <sheet>
+                <page string="Enhanced Due Diligence" name="edd_record">
+                    <field name="edd_ids" nolabel="1">
+                        <tree string="EDD Record">
+                            <field name="name" />
+                            <field name="status" />
+                            <field name="customer_id" />
+                            <field name="responsible_id" />
+                            <field name="user_id" />
+                            <field name="approved_by" />
+                            <field name="date_approved" />
+                            <field name="risk_score" />
+                            <field name="account_status" />
+                            <field name="documentation_status" />
+                        </tree>
+                        <form string="EDD Record">
+                            <sheet>
+                                <group>
                                     <group>
-                                        <group>
-                                            <field name="name"/>
-                                            <field name="status"/>
-                                            <field name="customer_id"/>
-                                            <field name="responsible_id"/>
-                                            <field name="user_id"/>
-                                            <field name="approved_by"/>
-                                            <field name="date_approved"/>
-                                            <field name="risk_score"/>
-                                            <field name="account_status"/>
-                                            <field name="documentation_status"/>
-                                        </group>
-                                        <group>
-                                            <field name="is_foreigner"/>
-                                            <field name="is_pep"/>
-                                            <field name="id_expired"/>
-                                            <field name="activity_level_matches_business"/>
-                                            <field name="was_kyc_comprehensive"/>
-                                            <field name="has_initiated_new_kyc"/>
-                                            <field name="is_current_from_normal"/>
-                                            <field name="does_business_support_volume"/>
-                                            <field name="last_kyc_date"/>
-                                        </group>
+                                        <field name="name" />
+                                        <field name="status" />
+                                        <field name="customer_id" />
+                                        <field name="responsible_id" />
+                                        <field name="user_id" />
+                                        <field name="approved_by" />
+                                        <field name="date_approved" />
+                                        <field name="risk_score" />
+                                        <field name="account_status" />
+                                        <field name="documentation_status" />
                                     </group>
-                                    <notebook>
-                                        <page string="Details">
-                                            <group>
-                                                <group string="Description">
-                                                    <field name="description" nolabel="1"/>
-                                                </group>
-                                                <group string="Visitation Observation">
-                                                    <field name="visitation_observation" nolabel="1"/>
-                                                </group>
+                                    <group>
+                                        <field name="is_foreigner" />
+                                        <field name="is_pep" />
+                                        <field name="id_expired" />
+                                        <field name="activity_level_matches_business" />
+                                        <field name="was_kyc_comprehensive" />
+                                        <field name="has_initiated_new_kyc" />
+                                        <field name="is_current_from_normal" />
+                                        <field name="does_business_support_volume" />
+                                        <field name="last_kyc_date" />
+                                    </group>
+                                </group>
+                                <notebook>
+                                    <page string="Details">
+                                        <group>
+                                            <group string="Description">
+                                                <field name="description" nolabel="1" />
                                             </group>
-                                            <group>
-                                                <group string="KYC Information">
-                                                    <field name="overall_kyc_outcome" nolabel="1"/>
-                                                </group>
+                                            <group string="Visitation Observation">
+                                                <field name="visitation_observation" nolabel="1" />
                                             </group>
-                                        </page>
-                                        <page string="Transaction Information">
-                                            <group>
-                                                <group string="Cash Information">
-                                                    <field name="main_cash_purpose" nolabel="1"/>
-                                                </group>
-                                                <group string="Inflow Information">
-                                                    <field name="main_inflow_purpose" nolabel="1"/>
-                                                    <field name="main_fund_remitters" nolabel="1"/>
-                                                    <field name="inflow_sources" nolabel="1"/>
-                                                </group>
+                                        </group>
+                                        <group>
+                                            <group string="KYC Information">
+                                                <field name="overall_kyc_outcome" nolabel="1" />
                                             </group>
-                                            <group>
-                                                <group string="Additional Information">
-                                                    <field name="other_related_accounts" nolabel="1"/>
-                                                    <field name="occupation" nolabel="1"/>
-                                                </group>
+                                        </group>
+                                    </page>
+                                    <page string="Transaction Information">
+                                        <group>
+                                            <group string="Cash Information">
+                                                <field name="main_cash_purpose" nolabel="1" />
                                             </group>
-                                        </page>
-                                    </notebook>
-                                </sheet>
-                            </form>
-                        </field>
-                    </page>
+                                            <group string="Inflow Information">
+                                                <field name="main_inflow_purpose" nolabel="1" />
+                                                <field name="main_fund_remitters" nolabel="1" />
+                                                <field name="inflow_sources" nolabel="1" />
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <group string="Additional Information">
+                                                <field name="other_related_accounts" nolabel="1" />
+                                                <field name="occupation" nolabel="1" />
+                                            </group>
+                                        </group>
+                                    </page>
+                                </notebook>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
                 <!-- </notebook> -->
-    </xpath>
+            </xpath>
 
         </field>
     </record>
@@ -300,24 +174,23 @@
         <field name="arch" type="xml">
             <tree string="Enhanced Due Diligence " delete="false">
                 <field name="customer_id" />
-                <field name="responsible_id" string = "Responsible" />
-                <field name="user_id" string = "Initiated By" />
+                <field name="responsible_id" string="Responsible" />
+                <field name="user_id" string="Initiated By" />
                 <field name="risk_score" />
-                <field name="approved_by" string = "Approved By" />
+                <field name="approved_by" string="Approved By" />
                 <field name="date_approved" />
-                <field name="status" 
+                <field name="status"
                     decoration-info="status == 'draft'"
                     decoration-success="status == 'approved'"
                     decoration-warning="status == 'cancelled'"
                     decoration-danger="status == 'deleted'"
                     decoration-primary="status == 'completed'"
-                    widget="badge"/>
+                    widget="badge" />
                 <field name="last_kyc_date" />
-                <field name="create_date"  string = "Created On"/>
+                <field name="create_date" string="Created On" />
             </tree>
         </field>
     </record>
-    
 
 
     <!-- Edd Form View -->
@@ -328,46 +201,46 @@
             <form string="Manage Enhanced Due Diligence" delete="false">
                 <header>
 
-                        <button
+                    <button
                         name="action_submit_for_review"
                         class="oe_highlight"
                         type="object"
                         string="Submit for Review"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         attrs="{'invisible': ['|', ('status', '!=', 'draft'), ('is_current_user_responsible', '=', False)]}" />
-                    
-                        <button name="action_approve"
-                        class="oe_highlight" 
+
+                    <button name="action_approve"
+                        class="oe_highlight"
                         type="object"
                         string="Approve"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         attrs="{'invisible': [ '|', ('status', '!=', 'completed'), ('is_current_user_responsible', '=', False)]}"
-                                 />
+                    />
 
-                        <button name="action_cancel"
-                        class="oe_highlight" 
+                    <button name="action_cancel"
+                        class="oe_highlight"
                         type="object"
                         string="Cancel"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         attrs="{'invisible': ['|' , ('status', '=', 'cancelled'), ('is_current_user_approver', '=', False)]}"
-                                />
+                    />
 
-                        <button name="action_archive"
-                        class="oe_highlight" 
+                    <button name="action_archive"
+                        class="oe_highlight"
                         type="object"
                         string="Archive"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         attrs="{'invisible': [('status', 'not in', ('approved', 'cancelled'))]}"
-                        />
+                    />
 
-                        <button name="action_send_back"
-                        class="oe_highlight" 
+                    <button name="action_send_back"
+                        class="oe_highlight"
                         type="object"
                         string="Send Back"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         attrs="{'invisible': ['|', ('status', '=', 'draft'), ('is_current_user_approver', '=', False), ('status', '!=', 'archived'),]}"
-                             />
-                                        
+                    />
+
                     <field name="status" widget="statusbar"
                         statusbar_visible="draft,completed,approved,cancelled,deleted,archived" />
                 </header>
@@ -404,7 +277,8 @@
                         <page string="Complete Enhanced Due Diligence">
                             <group>
                                 <group>
-                                    <field name="risk_score" widget="numeric_step" options="{'step': 0.5, 'min': 1, 'max': 25}" />
+                                    <field name="risk_score" widget="numeric_step"
+                                        options="{'step': 0.5, 'min': 1, 'max': 25}" />
                                     <field name="has_initiated_new_kyc" />
                                 </group>
                                 <group>
@@ -424,10 +298,11 @@
                             <separator string="" />
                             <group string="Customer Assessment">
                                 <group colspan="2">
-                                    <field name="visitation_observation"/>
+                                    <field name="visitation_observation" />
                                 </group>
                                 <group colspan="2">
-                                    <field name="overall_kyc_outcome" placeholder="overall kyc outcome" />
+                                    <field name="overall_kyc_outcome"
+                                        placeholder="overall kyc outcome" />
                                 </group>
                             </group>
                             <group>
@@ -443,29 +318,29 @@
                             </group>
                             <separator string="" />
                             <group string="Additional Information">
-                                <group colspan = "2">
+                                <group colspan="2">
                                     <field name="main_cash_purpose" />
                                 </group>
-                                <group colspan = "2">
-                                    <field name="main_inflow_purpose"/>
+                                <group colspan="2">
+                                    <field name="main_inflow_purpose" />
                                 </group>
-                                <group colspan = "2">
-                                    <field name="main_fund_remitters"/>
+                                <group colspan="2">
+                                    <field name="main_fund_remitters" />
                                 </group>
-                                <group colspan = "2">
-                                    <field name="inflow_sources"/>
+                                <group colspan="2">
+                                    <field name="inflow_sources" />
                                 </group>
-                                <group colspan = "2">
-                                    <field name="other_related_accounts"/>
+                                <group colspan="2">
+                                    <field name="other_related_accounts" />
                                 </group>
                             </group>
                             <group>
-                                <group colspan = "2">
+                                <group colspan="2">
                                     <field name="occupation" string="Occupation/Employment Profile" />
                                 </group>
                                 <group>
                                     <field name="is_current_from_normal"
-                                    string="Is Current Inflow From Normal Business" />
+                                        string="Is Current Inflow From Normal Business" />
                                 </group>
                                 <group>
                                     <field name="does_business_support_volume"
@@ -476,9 +351,9 @@
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
                 </div>
             </form>
         </field>
@@ -500,6 +375,14 @@
         </field>
     </record>
 
+    <record id="open_customers" model="ir.actions.server">
+        <field name="name">Open customers</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_customers()</field>
+    </record>
+
     <menuitem id="base.menu_board_root" name="Dashboards" sequence="260"
         web_icon="compliance_management,static/description/icon-dashboard.png"
         groups="base.group_user" />
@@ -513,10 +396,11 @@
         id="contacts.menu_contacts"
         sequence="20"
         web_icon="compliance_management,static/description/icons-contact.png"
-        groups="base.group_user,base.group_partner_manager,group_compliance_compliance_officer" />
+        groups="base.group_system" />
     <menuitem id="contacts.res_partner_menu_contacts"
         name="Customers"
         action="contacts.action_contacts"
+        groups="base.group_system"
         parent="contacts.menu_contacts"
         sequence="2" />
     <menuitem
@@ -540,7 +424,7 @@
         sequence="10" />
     <menuitem
         id="menu_compliance_customer"
-        action="contacts.action_contacts"
+        action="open_customers"
         parent="menu_compliance_kyc"
         name="Customers"
         groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
