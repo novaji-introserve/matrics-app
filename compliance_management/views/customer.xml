@@ -7,6 +7,7 @@
         <field name="view_mode">kanban,tree,form,activity</field>
         <field name="search_view_id" ref="base.view_res_partner_filter"/>
         <field name="context">{'default_is_company': True}</field>
+       <!-- <field name="domain">[('branch_id','=',[168])]</field>-->
         <field name="help" type="html">
           <p class="o_view_nocontent_smiling_face">
             No customers
@@ -22,12 +23,18 @@
         <field name="inherit_id" ref="base.view_partner_tree" />
         <field name="arch" type="xml">
             <tree position="attributes">
-                <attribute name="create">false</attribute>
+                <attribute name="create">true</attribute>
             </tree>
 
             <xpath expr="//field[@name='phone']" position="before">
                 <field name="customer_id" />
                 <field name="risk_score" widget="badge" decoration-info="1"/>
+                <field name="risk_level" 
+                widget="badge"
+                decoration-danger="risk_level == 'high'"
+                decoration-warning="risk_level in ('medium')"
+                decoration-success="risk_level in ('lowel')"
+                />
                 <field name="branch_id" />
                 <field name="registration_date" />
                 <field name="tier_id" />
@@ -99,27 +106,65 @@
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Conduct Risk Assessment. Are you sure?" />
                     <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object"
-                        string="Compute Risk Score With Plan"
+                        string="Compute Risk Score"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Compute Risk Score From Risk Assessment Plan. Are you sure?" />
+                        confirm="Compute Risk Score: Using your defined Risk Plan, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
                 </header>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
-                    <field string="Risk Rating" name="risk_score" widget="statinfo"/>
+                <button class="oe_stat_button" type="string" name="get_risk_level_name" icon="fa-thermometer-0">
+                    <span>Risk 
+                    <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
+                    decoration-warning="risk_level in ('medium')"
+                    decoration-success="risk_level in ('lowel')"/>
+                    </span>
+                   
                 </button>
+                <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
+                    <field string="Risk Score"  name="risk_score" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_customer_search" model="ir.ui.view">
+        <field name="name">Customer Search Custom</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="priority" eval="1000"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="replace">
+                <search string="Search Customer">
+                    <field name="name"
+                       filter_domain="['|', '|', '|', '|', ('display_name', 'ilike', self), ('ref', 'ilike', self), ('email', 'ilike', self), ('vat', 'ilike', self), ('company_registry', 'ilike', self)]"/>
+                    <field name="parent_id" domain="[('is_company', '=', True)]" operator="child_of"/>
+                    <field name="email" filter_domain="[('email', 'ilike', self)]"/>
+                    <field name="phone" filter_domain="['|', ('phone', 'ilike', self), ('mobile', 'ilike', self)]"/>
+                    <field name="category_id" string="Tag" operator="child_of"/>
+                    <field name="customer_id" filter_domain="[('customer_id', 'ilike', self)]"/>
+                    <separator/>
+                    <filter string="Individuals" name="type_person" domain="[('is_company', '=', False)]"/>
+                    <filter string="Companies" name="type_company" domain="[('is_company', '=', True)]"/>
+                    <separator/>
+                    <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                    <separator/>
+                    <group expand="0" name="group_by" string="Group By">
+                        <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" />
+                        <filter name="group_company" string="Company" context="{'group_by': 'parent_id'}"/>
+                        <filter name="group_tier" string="Tier" context="{'group_by': 'tier_id'}"/>
+                    </group>
+                </search>
             </xpath>
         </field>
     </record>
 
     <!-- Inherit and modify the action_contacts -->
     <record id="contacts_action_contacts_inherit" model="ir.actions.act_window">
-        <field name="name">Contacts</field>
+        <field name="name">Customers</field>
         <field name="res_model">res.partner</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="view_mode">kanban,tree,form,activity</field>
-        <field name="context">{'create': False}</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
         <field name="search_view_id" ref="base.view_res_partner_filter"/>
+        <field name="context">{'search_default_group_branch': 1}</field>
     </record>
 
     <!-- Override the menu item to use the new action -->
@@ -134,7 +179,7 @@
         <field name="inherit_id" ref="base.view_partner_tree"/>
         <field name="arch" type="xml">
             <tree position="attributes">
-                <attribute name="create">false</attribute>
+                <attribute name="create">true</attribute>
             </tree>
         </field>
     </record>
@@ -146,9 +191,8 @@
         <field name="inherit_id" ref="base.res_partner_kanban_view"/>
         <field name="arch" type="xml">
             <kanban position="attributes">
-                <attribute name="create">false</attribute>
+                <attribute name="create">true</attribute>
             </kanban>
         </field>
     </record>
-
 </odoo>

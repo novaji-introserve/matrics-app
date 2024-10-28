@@ -22,7 +22,7 @@ class Statistic(models.Model):
         ('regulatory', 'Regulatory'),('risk','Risk Assessment')], default='bank')
     state = fields.Selection(string='State', selection=[(
         'active', 'Active'), ('inactive', 'Inactive')], default='active')
-    val = fields.Char(string='Value', required=True)
+    val = fields.Char(string='Value')
     narration = fields.Text(string='Narration')
     
     def compute_stat(self):
