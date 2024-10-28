@@ -274,10 +274,11 @@
     <field name="name">res.partner.region.tree</field>
     <field name="model">res.partner.region</field>
     <field name="arch" type="xml">
-        <tree string="Customer Regions" delete="False">
+        <tree string="Customer Regions">
             <field name="name" string="Name"/>
             <field name="code" string="Code"/>
             <field name="status" string="Status"/>
+            <field name="risk_assessment" />
         </tree>
     </field>
 </record>
@@ -287,7 +288,7 @@
     <field name="name">res.partner.region.form</field>
     <field name="model">res.partner.region</field>
     <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
+        <form class="o_form_document">
             <sheet>
                 <div class="oe_title">
                     <label for="name" class="oe_edit_only"/>
@@ -302,6 +303,9 @@
                      <group string="Status">
                             <field name="status"/>
                      </group>
+                </group>
+                <group>
+                    <field name="risk_assessment" />
                 </group>
             </sheet>
         </form>
@@ -636,7 +640,7 @@
     <menuitem
         id="menu_compliance_configuration"
         name="Configuration" 
-        groups="group_compliance_compliance_officer"
+        groups="group_compliance_compliance_officer,base.group_system"
         parent="menu_compliance_root"
         sequence="1500"/>
 

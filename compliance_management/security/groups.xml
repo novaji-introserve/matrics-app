@@ -41,7 +41,7 @@
 </record>
 <record id="group_compliance_chief_compliance_officer" model="res.groups">
   <field name="name">Chief Compliance Officer</field>
-  <field name="implied_ids" eval="[Command.link(ref('base.group_user')),Command.link(ref('group_compliance_compliance_officer')),Command.link(ref('group_compliance_compliance_risk_manager'))]"/>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_erp_manager')),Command.link(ref('base.group_user')),Command.link(ref('group_compliance_compliance_officer')),Command.link(ref('group_compliance_compliance_risk_manager'))]"/>
   <field name="comment">CCO oversees all branch compliance officers</field>
   <field name="category_id" ref="module_category_compliance"/>
 </record>
