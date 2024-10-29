@@ -6,3 +6,4 @@ class ResConfigSettings(models.TransientModel):
     # mail send configurator
     risk_assessment_plan = fields.Selection(
         string='Compute Risk Assessment', selection=[('avg', 'Using Average Score'), ('max', 'Using Maximum Score')], default='avg')
+
