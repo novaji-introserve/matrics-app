@@ -9,48 +9,51 @@ class CustomerEDD(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
 
-    name = fields.Char(string="Name", required=True)
+    name = fields.Char(string="Name")
     status = fields.Selection(string='Status', selection=[(
-        'draft', 'Draft'), ('completed', 'Completed'), ('approved', 'Approved'), ('cancelled', 'Cancelled'), ('deleted', 'Deleted'), ('archived', 'Archived')], default='draft', required=True)
-    description = fields.Text(string='Description', required=True)
+        'draft', 'Draft'), ('completed', 'Completed'), ('approved', 'Approved'), ('cancelled', 'Cancelled'), ('deleted', 'Deleted'), ('archived', 'Archived')], default='draft')
+    description = fields.Text(string='Description')
     user_id = fields.Many2one(comodel_name='res.users', string='User',
                             required=True, index=True, default=lambda self: self.env.user.id)
     current_user_id = fields.Many2one(comodel_name='res.users', string='Current User',
                                     required=True, index=True, default=lambda self: self.env.user.id)
     approved_by = fields.Many2one(comodel_name='res.users', string='Approver', readonly=True)
     customer_id = fields.Many2one(
-        comodel_name='res.partner', string='Customer', required=True, index=True)
+        comodel_name='res.partner', string='Customer', index=True)
     responsible_id = fields.Many2one(
-        comodel_name='res.users', string='Responsible User', required=True, index=True)
+        comodel_name='res.users', string='Responsible User', index=True)
     risk_score = fields.Float(
-        string='Risk Score', required=True, tracking=True)
+        string='Risk Score', tracking=True)
     date_approved = fields.Date(string="Date Approved", readonly=True)
     approving_officer_id = fields.Many2one(
-        comodel_name='res.users', string='Approving Officer', required=True)
+        comodel_name='res.users', string='Approving Officer')
     account_status = fields.Selection(string='Account Status', selection=[
-                                    ('active', 'Active'), ('dormant', 'Dormant')], required=True)
-    documentation_status = fields.Char(string="Documentation Status", required=True)
-    last_kyc_date = fields.Date(string="Last Kyc Date", required=True)
-    was_kyc_comprehensive = fields.Boolean(string="Was Kyc Comprehensive", required=True)
-    has_initiated_new_kyc = fields.Boolean(string="Has Initiated New Kyc", required=True)
-    visitation_observation = fields.Text(string="Visitation Observation", required=True)
-    overall_kyc_outcome = fields.Text(string="Overall Kyc Outcome", required=True)
-    is_foreigner = fields.Boolean(string="Is Foreigner", required=True)
-    is_pep = fields.Boolean(string="Is PEP", required=True)
-    id_expired = fields.Boolean(string="Id Expired", required=True)
+                                    ('active', 'Active'), ('dormant', 'Dormant')])
+    documentation_status = fields.Selection(string='Documentation Status', selection=[
+                                    ( 'incomplete', 'Incomplete'), ('complete', 'Complete')])
+    last_kyc_date = fields.Date(string="Last Kyc Date")
+    was_kyc_comprehensive = fields.Boolean(string="Was Kyc Comprehensive")
+    has_initiated_new_kyc = fields.Boolean(string="Has Initiated New Kyc")
+    visitation_observation = fields.Text(string="Visitation Observation")
+    overall_kyc_outcome = fields.Text(string="Overall Kyc Outcome")
+    is_foreigner = fields.Boolean(string="Is Foreigner")
+    is_pep = fields.Boolean(string="Is PEP")
+    id_expired = fields.Boolean(string="Id Expired")
     activity_level_matches_business = fields.Boolean(
-        string="Activity Level Matches Business", required=True)
-    main_cash_purpose = fields.Text(string="Main Cash Purpose", required=True)
-    main_inflow_purpose = fields.Text(string="Main Inflow Purpose", required=True)
-    main_fund_remitters = fields.Text(string="Main Fund Remitters", required=True)
-    inflow_sources = fields.Text(string="Inflow Sources", required=True)
-    other_related_accounts = fields.Text(string="Other Related Accounts", required=True)
-    occupation = fields.Text(string="Occupation", required=True)
-    is_current_from_normal = fields.Boolean(string="Is Current From Normal", required=True)
+        string="Activity Level Matches Business")
+    main_cash_purpose = fields.Text(string="Main Cash Purpose")
+    main_inflow_purpose = fields.Text(string="Main Inflow Purpose")
+    main_fund_remitters = fields.Text(string="Main Fund Remitters")
+    inflow_sources = fields.Text(string="Inflow Sources")
+    other_related_accounts = fields.Text(string="Other Related Accounts")
+    occupation = fields.Text(string="Occupation")
+    is_current_from_normal = fields.Boolean(string="Is Current From Normal")
     does_business_support_volume = fields.Boolean(
-        string="Does Business Support Volume", required=True)
+        string="Does Business Support Volume")
     is_current_user_responsible = fields.Boolean(compute='_compute_is_current_user_responsible')
     is_current_user_approver = fields.Boolean(compute='_compute_is_current_user_approver')
+    is_current_user_approving_officer = fields.Boolean(compute='_compute_is_current_user_approving_officer')
+
 
 
     @api.depends('responsible_id')
@@ -64,6 +67,12 @@ class CustomerEDD(models.Model):
         for record in self:
             # Check if the approved_by matches the current user ID
             record.is_current_user_approver = (record.approved_by.id == self.env.user.id)
+            
+    @api.depends('approving_officer_id')
+    def _compute_is_current_user_approving_officer(self):
+        for record in self:
+            # Check if the approved_by matches the current user ID
+            record.is_current_user_approving_officer = (record.approving_officer_id.id == self.env.user.id)
 
     def action_submit_for_review(self):
         self.ensure_one()
