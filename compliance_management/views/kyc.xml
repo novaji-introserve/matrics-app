@@ -50,6 +50,7 @@
                             <field name="education_level_id" />
                             <field name="sex_id" />
                             <field name="town" />
+                            <field name="internal_category" invisible="1" />
                         </group>
                         <group string="Identification" name="identification">
                             <field name="customer_id" />
