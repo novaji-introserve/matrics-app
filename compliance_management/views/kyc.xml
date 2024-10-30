@@ -172,7 +172,8 @@
         <field name="name">res.partner.edd.tree</field>
         <field name="model">res.partner.edd</field>
         <field name="arch" type="xml">
-            <tree string="Enhanced Due Diligence " delete="false">
+            <!-- <tree string="Enhanced Due Diligence " delete="false"> -->
+           <tree string="Enhanced Due Diligence ">
                 <field name="customer_id" />
                 <field name="responsible_id" string="Responsible" />
                 <field name="user_id" string="Initiated By" />
@@ -253,9 +254,13 @@
                         <group colspan="2">
                             <field name="description" placeholder="Reason Initiated" />
                         </group>
-                        <group>
+                        <group colspan="2">
                             <field name="customer_id" />
                         </group>
+                        <group>
+                            <field name="approving_officer_id" />
+                             <field name="is_current_user_approving_officer" invisible="1"/>
+                         </group>
                         <group>
                             <field name="responsible_id" string="Officer in Charge" />
                             <field name="is_current_user_responsible" invisible="1" />
@@ -277,8 +282,8 @@
                         <page string="Complete Enhanced Due Diligence">
                             <group>
                                 <group>
-                                    <field name="risk_score" widget="numeric_step"
-                                        options="{'step': 0.5, 'min': 1, 'max': 25}" />
+                                    <field name="risk_score" widget="slider"
+                                           step="0.5" min="0.5" max="25" />
                                     <field name="has_initiated_new_kyc" />
                                 </group>
                                 <group>
@@ -290,9 +295,6 @@
                                 </group>
                                 <group>
                                     <field name="documentation_status" />
-                                </group>
-                                <group>
-                                    <field name="approving_officer_id" />
                                 </group>
                             </group>
                             <separator string="" />
