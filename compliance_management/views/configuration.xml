@@ -8,7 +8,7 @@
             <tree string="Account Types" delete="False">
                 <field name="name" string="Name"/>
                 <field name="code"/>
-                <field name="status" string="Status"/>
+                <field name="risk_assessment" string="Risk Assessment"/>
             </tree>
         </field>
     </record>
@@ -29,8 +29,8 @@
                         <group string="Details">
                             <field name="code"/>
                         </group>
-                        <group string="Status">
-                            <field name="status"/>
+                        <group string="Risk Assessment">
+                            <field name="risk_assessment"/>
                         </group>
                     </group>
                 </sheet>
@@ -62,7 +62,7 @@
             <tree string="Customer Sectors" delete="False">
                 <field name="name" string="Name"/>
                 <field name="code"/>
-                <field name="status" string="Status"/>
+                <field name="risk_assessment" string="Risk Assessment"/>
             </tree>
         </field>
     </record> 
@@ -83,8 +83,8 @@
                         <group string="Details">
                             <field name="code"/>
                         </group>
-                         <group string="Status">
-                            <field name="status"/>
+                          <group string="Risk Assessment">
+                            <field name="risk_assessment"/>
                         </group>
                     </group>
                 </sheet>
@@ -116,6 +116,7 @@
         <tree string="Account Products" delete="False">
             <field name="name" string="Name"/>
             <field name="code" string="Code"/>
+            <field name="risk_assessment" string="Risk Assessment"/>
         </tree>
     </field>
 </record>
@@ -137,6 +138,9 @@
                     <group string="Details">
                         <field name="code"/>
                     </group>
+                     <group string="Risk Assessment">
+                            <field name="risk_assessment"/>
+                     </group>
                 </group>
             </sheet>
         </form>
@@ -167,7 +171,7 @@
         <tree string="Education Levels" delete="False">
             <field name="name" string="Education Level"/>
             <field name="code" string="Code"/>
-            <field name="status" string="Status"/>
+            <field name="risk_assessment" string="Risk Assessment"/>
         </tree>
     </field>
 </record>
@@ -189,9 +193,9 @@
                     <group string="Details">
                         <field name="code"/>
                     </group>
-                     <group string="Status">
-                            <field name="status"/>
-                     </group>
+                      <group string="Risk Assessment">
+                            <field name="risk_assessment"/>
+                      </group>
                 </group>
             </sheet>
         </form>
@@ -222,7 +226,7 @@
         <tree string="Customer Tiers" delete="False">
             <field name="name" string="Name"/>
             <field name="code" string="Code"/>
-            <field name="status" string="Status"/>
+            <field name="risk_assessment" string="Risk Assessment"/>
         </tree>
     </field>
 </record>
@@ -244,9 +248,9 @@
                     <group string="Details">
                         <field name="code"/>
                     </group>
-                     <group string="Status">
-                            <field name="status"/>
-                     </group>
+                      <group string="Risk Assessment">
+                            <field name="risk_assessment"/>
+                      </group>
                 </group>
             </sheet>
         </form>
@@ -277,7 +281,7 @@
         <tree string="Customer Regions">
             <field name="name" string="Name"/>
             <field name="code" string="Code"/>
-            <field name="status" string="Status"/>
+<!--            <field name="status" string="Status"/>-->
             <field name="risk_assessment" />
         </tree>
     </field>
@@ -300,9 +304,9 @@
                     <group string="Details">
                         <field name="code"/>
                     </group>
-                     <group string="Status">
-                            <field name="status"/>
-                     </group>
+<!--                     <group string="Status">-->
+<!--                            <field name="status"/>-->
+<!--                     </group>-->
                 </group>
                 <group>
                     <field name="risk_assessment" />
