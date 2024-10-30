@@ -6,6 +6,20 @@ LOW_RISK_THRESHOLD = 10
 MEDIUM_RISK_THRESHOLD = 15
 HIGH_RISK_THRESHOLD = 25
 
+
+class Shareholders(models.Model):
+    _name = 'res.partner.shareholders'
+    _description = 'Shareholders and Directors'
+
+    name = fields.Char(string='Name', required=True,tracking=True)
+    role = fields.Selection(string='Role', selection=[(
+        'director', 'Director'), ('shareholder', 'shareholder')])
+    pct_equity = fields.Float(string='Equity (%)', digits=(10, 2),tracking=True)
+    bvn = fields.Char(string='BVN', tracking=True)
+    customer_id = fields.Many2one(
+        comodel_name='res.partner', string='Partner', ondelete="cascade")
+
+
 class Customer(models.Model):
     _inherit = 'res.partner'
     _sql_constraints = [
@@ -13,29 +27,30 @@ class Customer(models.Model):
          "Customer ID already exists. Value must be unique!"),
     ]
 
-    customer_id = fields.Char(string="Customer ID", index=True,tracking=True)
-    bvn = fields.Char(string='BVN',tracking=True)
+    customer_id = fields.Char(string="Customer ID", index=True, tracking=True)
+    bvn = fields.Char(string='BVN', tracking=True)
     branch_id = fields.Many2one(
-        comodel_name='res.branch', string='Branch', index=True,tracking=True)
+        comodel_name='res.branch', string='Branch', index=True, tracking=True)
     education_level_id = fields.Many2one(
-        comodel_name='res.education.level', string='Education Level', index=True,tracking=True)
+        comodel_name='res.education.level', string='Education Level', index=True, tracking=True)
     kyc_limit_id = fields.Many2one(
         comodel_name='res.partner.kyc.limit', string='KYC Limit')
     tier_id = fields.Many2one(
         comodel_name='res.partner.tier', string='Customer Tier', index=True)
     identification_type_id = fields.Many2one(
-        comodel_name='res.identification.type', string='Identification Type', index=True,tracking=True)
-    identification_number = fields.Char(string='Identification Number',tracking=True)
+        comodel_name='res.identification.type', string='Identification Type', index=True, tracking=True)
+    identification_number = fields.Char(
+        string='Identification Number', tracking=True)
     identification_expiry_date = fields.Date(
-        string='Identification Expiry Date', index=True,tracking=True)
+        string='Identification Expiry Date', index=True, tracking=True)
     dob = fields.Date(
-        string='Date of Birth',tracking=True)
+        string='Date of Birth', tracking=True)
     vat = fields.Char(string='Tax ID/TIN', index=True,
                       help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.")
     region_id = fields.Many2one(
-        comodel_name='res.partner.region', string='Region',tracking=True)
+        comodel_name='res.partner.region', string='Region', tracking=True)
     sector_id = fields.Many2one(
-        comodel_name='res.partner.sector', string='Sector', index=True,tracking=True)
+        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True)
     sex_id = fields.Many2one(
         comodel_name='res.partner.gender', string='Sex', index=True)
     firstname = fields.Char(string='Firstname')
@@ -43,30 +58,53 @@ class Customer(models.Model):
     middlename = fields.Char(string='Middle Name')
     othername = fields.Char(string='Other Name')
     town = fields.Char(string='Town')
-    registration_date = fields.Date(string='Registration Date',tracking=True)
-    company_reg_date = fields.Date(string='Company Registration Date',tracking=True)
-    risk_score = fields.Float(string='Risk Score', digits=(10, 2),tracking=True)
-    risk_level = fields.Char(string='Risk Level',index=True,default='low',tracking=True)
+    registration_date = fields.Date(string='Registration Date', tracking=True)
+    company_reg_date = fields.Date(
+        string='Company Registration Date', tracking=True)
+    risk_score = fields.Float(
+        string='Risk Score', digits=(10, 2), tracking=True)
+    risk_level = fields.Char(
+        string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
-        comodel_name='res.users', string='Account Officer', index=True,tracking=True)
+        comodel_name='res.users', string='Account Officer', index=True, tracking=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(
         comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
     edd_ids = fields.One2many(
-        comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines',tracking=True)
+        comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
+    shareholder_ids = fields.One2many(
+        comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
     risk_assessment_ids = fields.One2many(
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
-    is_pep = fields.Boolean(string="Is PEP", default=False,tracking=True)
-    is_watchlist = fields.Boolean(string="Is Watchlist", default=False,tracking=True)
-    is_fep = fields.Boolean(string="Is FEP", default=False,tracking=True)
-    is_blacklist = fields.Boolean(string="Is Blacklist", default=False,tracking=True)
+    is_pep = fields.Boolean(string="Is PEP", default=False, tracking=True)
+    is_watchlist = fields.Boolean(
+        string="Is Watchlist", default=False, tracking=True)
+    is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
+    is_blacklist = fields.Boolean(
+        string="Is Blacklist", default=False, tracking=True)
     global_pep = fields.Boolean(string="Global PEP", default=False)
     current_branch_id = fields.Integer(
         string='Current Branch', compute='_get_current_branch')
-    
-    
-    def compute_risk_level(self):       
+    internal_category = fields.Selection(string='Internal Category', selection=[('customer', 'Customer'), (
+        'vendor', 'Vendor'), ('partner', 'Partner'), ('correspondent', 'Correspondent'), ('respondent', 'Respondent')], default='customer', index=True)
+    anti_bribery = fields.Binary(string='Anti-Bribery & Corruption Docs')
+    data_protection = fields.Binary(string='Data Protection Docs')
+    whistle_blowing = fields.Binary(string='Whistle Blowing and Ethics Docs')
+    anti_money_laundering = fields.Binary(
+        string='Anti-Money Laundering & Terrorism Financing Doc')
+
+    @api.model
+    def create(self, values):
+        # CODE HERE
+        return super(Customer, self).create(values)
+
+    def write(self, values):
+        # CODE HERE
+        record = super(Customer, self).write(values)
+        return record
+
+    def compute_risk_level(self):
         for record in self:
             try:
                 if record.risk_score is None:
@@ -79,7 +117,7 @@ class Customer(models.Model):
                     return 'high'
             except:
                 return 'low'
-            
+
     def _get_current_branch(self):
         for record in self:
             self.current_branch_id = self.env.user.default_branch_id.id
@@ -133,8 +171,7 @@ class Customer(models.Model):
             'view_mode': 'form',
             'context': {"default_partner_id": self.id},
         }
-        
-    
+
     def action_open_customers(self):
         return {
             'name': _('Customers'),
@@ -142,9 +179,9 @@ class Customer(models.Model):
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
             'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
-            'context':{'search_default_group_branch': 1}
+            'context': {'search_default_group_branch': 1}
         }
-        
+
     @api.model
     def open_customers(self):
         return {
@@ -153,23 +190,24 @@ class Customer(models.Model):
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
             'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
-            'context':{'search_default_group_branch': 1}
+            'context': {'search_default_group_branch': 1}
         }
 
     def get_risk_score(self):
         return self.risk_score
-    
+
     def get_risk_level(self):
         return self.risk_level
-    
+
     def get_risk_level_name(self):
-        return '%s risk'%(self.risk_level)
+        return '%s risk' % (self.risk_level)
 
     def action_compute_risk_score_with_plan(self):
-        #self.env.cr.execute(
+        # self.env.cr.execute(
         #    'select risk_assessment_plan from res_config_settings order by id desc limit 1')
-        #rec = self.env.cr.fetchone()
-        setting  = self.env['res.compliance.settings'].search([('code','=','risk_plan_computation')],limit = 1)
+        # rec = self.env.cr.fetchone()
+        setting = self.env['res.compliance.settings'].search(
+            [('code', '=', 'risk_plan_computation')], limit=1)
         for e in setting:
             plan_setting = e.val
         for r in self:
@@ -198,7 +236,8 @@ class Customer(models.Model):
                 if plan_setting == 'max':
                     r.write({'risk_score': max(scores)})
             # Compute risk level
-            partners = self.env['res.partner'].search([('id','=',r.id)],limit=1)
+            partners = self.env['res.partner'].search(
+                [('id', '=', r.id)], limit=1)
             for e in partners:
                 risk_level = e.compute_risk_level()
-                e.write({'risk_level':risk_level})
+                e.write({'risk_level': risk_level})

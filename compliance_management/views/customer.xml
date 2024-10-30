@@ -151,6 +151,7 @@
                         <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" />
                         <filter name="group_company" string="Company" context="{'group_by': 'parent_id'}"/>
                         <filter name="group_tier" string="Tier" context="{'group_by': 'tier_id'}"/>
+                        <filter name="group_risk_level" string="Risk Level" context="{'group_by': 'risk_level'}"/>
                     </group>
                 </search>
             </xpath>
