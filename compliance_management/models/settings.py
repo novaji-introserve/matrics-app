@@ -1,9 +1,15 @@
 from odoo import models, fields, api, _
 
+    
+class ComplianceSettings(models.Model):
+    _name = 'res.compliance.settings'
+    _description = 'Compliance Settings'
+    _sql_constraints = [
+        ('uniq_compl_settings_code', 'unique(code)',
+         "Code already exists. Value must be unique!")
+    ]
 
-class ResConfigSettings(models.TransientModel):
-    _inherit = 'res.config.settings'
-    # mail send configurator
-    risk_assessment_plan = fields.Selection(
-        string='Compute Risk Assessment', selection=[('avg', 'Using Average Score'), ('max', 'Using Maximum Score')], default='avg')
-
+    name = fields.Char(string="Name", required=True)
+    code = fields.Char(string='Code', required=True,index=True)
+    val = fields.Char(string='Value')
+    narration = fields.Text(string='Narration')

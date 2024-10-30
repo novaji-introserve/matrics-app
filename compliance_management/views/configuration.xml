@@ -634,7 +634,7 @@
     <menuitem
         id="menu_compliance_root"
         name="Compliance"
-        groups="group_compliance_compliance_officer,base.group_user"
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
         web_icon="compliance_management,static/description/icons-compliance.png"
         sequence="-1000"/>
     <menuitem
@@ -733,6 +733,8 @@
         groups="group_compliance_compliance_officer"
         sequence="4"/>
 
+    <menuitem id="menu_compliance_risk_settings" name="Configuration"
+        parent="menu_compliance_configuration" sequence="500"/>
 
   </data>
 </odoo>

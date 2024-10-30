@@ -88,7 +88,7 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_update_risk_score" class="oe_highlight" type="object" string="Update Risk Score"
+                    <button name="action_update_risk_score" class="oe_highlight" type="object" string="Compute Risk Score"
                     groups="compliance_management.group_compliance_branch_compliance_officer" />  
                 </header>
                 <sheet string="Risk Assessment">
@@ -159,7 +159,7 @@
         <field name="view_id" ref="compliance_customer_risk_assessment_tree" />
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Add a Risk Assessment
+                Add Institutional or Counter Party Risk Assessment
             </p>
             <p>
                 No records yet
@@ -173,12 +173,13 @@
         groups="group_compliance_compliance_risk_manager"
         parent="menu_compliance_root"
         sequence="30" />
+    <menuitem id="menu_fcra_risk" name="FCRA Risk Assessment"
+        parent="menu_compliance_risk" sequence="100"/>
     <menuitem
         id="menu_compliance_risk_assessment"
         action="action_list_risk_assessment"
-        parent="menu_compliance_risk"
+        parent="menu_fcra_risk"
         name="Risk Assessment"
-        groups="group_compliance_compliance_risk_manager"
+        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" 
         sequence="10" />
-
 </odoo>

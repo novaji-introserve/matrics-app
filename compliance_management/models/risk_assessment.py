@@ -53,8 +53,13 @@ class RiskAssessment(models.Model):
             rec.write({"risk_rating": score})
 
     def compute_risk_score_from_lines(self):
-        self.env.cr.execute(
-            "SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
+        setting  = self.env['res.compliance.settings'].search([('code','=','risk_plan_computation')],limit = 1)
+        for e in setting:
+            plan_setting = e.val.strip().lower()
+        if plan_setting == 'avg':
+            self.env.cr.execute("SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
+        else:
+            self.env.cr.execute("SELECT max(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
         rec = self.env.cr.fetchone()
         result = 0.00
         try:
@@ -77,7 +82,7 @@ class RiskAssessment(models.Model):
             "views": [[False, "tree"], [False, "form"]],
             "domain": [["id", "=", self.id]],
         }
-
+        
     # filter subject based on universe
 
     @api.onchange('universe_id')

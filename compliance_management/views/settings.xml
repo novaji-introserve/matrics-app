@@ -1,73 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="compliance_config_settings_view_form" model="ir.ui.view">
-        <field name="name">
-            res.config.settings.view.form.inherit.compliance
-        </field>
-        <field name="model">res.config.settings</field>
-        <field name="priority" eval="10" />
-        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+    <!-- Report on Settings -->
+    <record id="compliance_settings_tree" model="ir.ui.view">
+        <field name="name">res_compliance_settings_tree</field>
+        <field name="model">res.compliance.settings</field>
         <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" data-string="Compliance"
-                    data-key="compliance_management"
-                    string="Compliance">
-                    <h2>Risk Assessment Computation</h2>
-                    <div class="row mt16 o_settings_container"
-                        name="compliance_settings_setting_container">
-                        <div class="col-12 col-lg-6 o_setting_box"
-                            id="default_risk_assessment_computation">
-                            <div class="o_setting_right_pane">
-                                <label for="risk_assessment_plan" />
-                                <span class="fa fa-lg fa-building-o"
-                                    title="Values set here are company-specific." role="img"
-                                    aria-label="Values set here are company-specific."
-                                    groups="base.group_system,base.group_erp_manager" />
-                                <div class="row">
-                                    <div class="text-muted col-lg-8">
-                                        Set default risk assessment computation
-                                    </div>
-                                </div>
-                                <div class="content-group">
-                                    <div class="mt16">
-                                        <field name="risk_assessment_plan" required="1"
-                                            class="o_light_label" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--<div
-                class="app_settings_block" data-string="Compliance" data-key="compliance_management"
-                     string="Compliance">
-                    <h2 groups="base.group_system,base.group_erp_manager">Computation Rule</h2 >
-                    <div class="row mt16 o_settings_container" id="compliance_mgt" >
-                        <div class="col-12 col-lg-6 o_setting_box" id="settings_risk_assessment_plan" >
-                            <div class="o_setting_left_pane">
-                                <field name="risk_assessment_plan"/>
-                            </div>
-                           <div class="o_setting_right_pane" >
-                                <label for="risk_assessment_plan"/>
-                                <div class="text-muted" >
-                                    Compute Risk Score using a rule
-                               </div>
-                           </div>
-                       </div>
-                   </div>
-               </div>-->
-            </xpath>
+            <tree string="Compliance Settings">
+                <field name="name" string="Name" />
+                <field name="code" />
+                <field name="val" string="Value" />
+            </tree>
         </field>
     </record>
-    <record id="config_compliance_settings_menu_action" model="ir.actions.act_window">
-        <field name="name">Settings</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.config.settings</field>
-        <field name="view_id" ref="compliance_config_settings_view_form" />
-        <field name="view_mode">form</field>
-        <field name="target">inline</field>
-        <field name="context">{'module' : compliance_management}</field>
+    <!-- Customer Account Type Form -->
+    <record id="compliance_settings_form" model="ir.ui.view">
+        <field name="name">Compliance Settings</field>
+        <field name="model">res.compliance.settings</field>
+        <field name="arch" type="xml">
+            <form class="o_form_document" delete="False">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group string="Details">
+                        <group>
+                            <field name="code" />
+                        </group>
+                        <group>
+                            <field name="val" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="narration" string="Narration">
+                            <field name="narration" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
     </record>
 
+    <!-- Account Type Action -->
+    <record id="action_compliance_settings" model="ir.actions.act_window">
+        <field name="name">Compliance Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.compliance.settings</field>
+        <field name="view_id" ref="compliance_settings_tree" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a Setting
+            </p>
+            <p>
+                No data found
+            </p>
+        </field>
+    </record>
+    <menuitem
+    id="menu_compliance_compliance_settings"
+    action="action_compliance_settings"
+    parent="menu_compliance_risk_settings"
+    name="Settings"
+    groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
+    sequence="1100" />
 
 </odoo>

@@ -1,4 +1,15 @@
 <odoo>
+    <!-- Settings-->
+    <record id="res_compl_settings_risk_plan_computation" model="res.compliance.settings">
+        <field name="name">Risk Plan Computation</field>
+        <field name="code">risk_plan_computation</field>
+        <field name="val">max</field>
+        <field name="narration">Deteremines the policy for computin the risk assessment from the set of plan
+            Values: 
+            avg: use the average
+            max: use the maximum. Default
+        </field>
+    </record>
     <!--  Gender -->
     <record id="res_partner_gender_male" model="res.partner.gender">
         <field name="name">Male</field>

@@ -65,6 +65,7 @@ class Customer(models.Model):
     current_branch_id = fields.Integer(
         string='Current Branch', compute='_get_current_branch')
     
+    
     def compute_risk_level(self):       
         for record in self:
             try:
@@ -165,10 +166,12 @@ class Customer(models.Model):
         return '%s risk'%(self.risk_level)
 
     def action_compute_risk_score_with_plan(self):
-        self.env.cr.execute(
-            'select risk_assessment_plan from res_config_settings order by id desc limit 1')
-        rec = self.env.cr.fetchone()
-        plan_setting = rec[0]
+        #self.env.cr.execute(
+        #    'select risk_assessment_plan from res_config_settings order by id desc limit 1')
+        #rec = self.env.cr.fetchone()
+        setting  = self.env['res.compliance.settings'].search([('code','=','risk_plan_computation')],limit = 1)
+        for e in setting:
+            plan_setting = e.val
         for r in self:
             record_id = self.id
             scores = []

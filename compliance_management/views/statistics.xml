@@ -105,7 +105,7 @@
     <menuitem
         id="menu_compliance_stat"
         action="action_list_compliance_stat"
-        parent="menu_compliance_configuration"
+        parent="menu_compliance_risk_settings"
         name="Statistics"
         groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
         sequence="1000" />
