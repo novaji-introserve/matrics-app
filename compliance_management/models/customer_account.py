@@ -24,3 +24,4 @@ class CustomerAccount(models.Model):
     branch_id = fields.Many2one(comodel_name='res.branch', string='Branch',index=True)
     balance = fields.Float(string='Balance', digits=(15,4))
     account_type_id = fields.Many2one(comodel_name='res.partner.account.type', string='Account Type',required=True,index=True)
+    risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment',index=True)

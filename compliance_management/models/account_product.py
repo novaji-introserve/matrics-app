@@ -16,3 +16,5 @@ class AccountProduct(models.Model):
 
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string='Code', required=True)
+    risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment',index=True)
+
