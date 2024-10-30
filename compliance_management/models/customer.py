@@ -238,6 +238,7 @@ class Customer(models.Model):
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
             'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','respondent')],
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
             'context': {'search_default_group_branch': 1}
         }
 
