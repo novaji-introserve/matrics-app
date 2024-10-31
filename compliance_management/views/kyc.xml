@@ -47,6 +47,7 @@
                             <field name="education_level_id" />
                             <field name="sex_id" />
                             <field name="town" />
+                            <field name="internal_category" invisible="1" />
                         </group>
                         <group string="Identification" name="identification">
                             <field name="customer_id" />
@@ -67,6 +68,19 @@
                         view_ref="compliance_customer_risk_assessment_tree"
                         context="{'default_partner_id': active_id}" />
                 </page>
+                <page name="due_diligence" string="Due Diligence" attrs="{'invisible' : [('internal_category', '!=', 'vendor')]}" >
+                    <group>
+                        <group>
+                            <field name="anti_bribery"/>
+                            <field name="whistle_blowing" />
+                        </group>
+                        <group>
+                            <field name="data_protection"/>
+                            <field name="anti_money_laundering" />
+                        </group>
+                    </group>
+                   
+                </page>
                 <page name='sanction_screening' string="Sanction Screening">
                     <group name="sanction" string="Sanction Screening">
                         <field name="is_pep" attrs="{'readonly': True}" />
@@ -76,6 +90,7 @@
                         <field name="global_pep" attrs="{'readonly': True}" />
                     </group>
                 </page>
+                
             </xpath>
 
             <!-- Add EDD Page to Customer Form -->

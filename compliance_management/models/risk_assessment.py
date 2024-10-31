@@ -31,6 +31,7 @@ class RiskAssessment(models.Model):
                                inverse_name='risk_assessment_id', string='Risk Assessment Lines')
     total_risk_lines = fields.Integer(
         string='Total Risk Lines', _compute='_compute_total_risk_lines', store=True)
+    internal_category = fields.Selection(string='Internal Category', selection=[('inst', 'Institutional'), ('cp', 'Counter Party')],default='inst')
 
     @api.model
     def create(self, vals):
