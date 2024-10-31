@@ -73,9 +73,10 @@
                 <field name="name" string="Name" />
                 <field name="subject_id" />
                 <field name="universe_id" />
-                <field name="assessment_type_id" />
+                <field name="internal_category" string="Category" />
                 <field name="type_id" />
                 <field name="risk_rating" />
+                <field name="internal_category" invisible="1" />
                 <field name="create_uid" />
                 <field name="create_date" />
             </tree>
@@ -113,7 +114,7 @@
                     </group>
                     <group>
                         <group>
-                            <field name="assessment_type_id"/>
+                            <field name="internal_category" string="Category"/>
                             <field name="partner_id"/>
                         </group>
                         <group>
@@ -153,13 +154,29 @@
     </record>
     <!-- Action -->
     <record id="action_list_risk_assessment" model="ir.actions.act_window">
-        <field name="name">Risk Assessment</field>
+        <field name="name">Institutional Risk Assessment</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.risk.assessment</field>
         <field name="view_id" ref="compliance_customer_risk_assessment_tree" />
+        <field name="domain">[('internal_category','=','inst')]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Add Institutional or Counter Party Risk Assessment
+                Add Institutional Risk Assessment
+            </p>
+            <p>
+                No records yet
+            </p>
+        </field>
+    </record>
+    <record id="action_list_risk_assessment_cp" model="ir.actions.act_window">
+        <field name="name">Counter Party Risk Assessment</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.risk.assessment</field>
+        <field name="view_id" ref="compliance_customer_risk_assessment_tree" />
+        <field name="domain">[('internal_category','=','cp')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add Counter Party Risk Assessment
             </p>
             <p>
                 No records yet
@@ -179,7 +196,14 @@
         id="menu_compliance_risk_assessment"
         action="action_list_risk_assessment"
         parent="menu_fcra_risk"
-        name="Risk Assessment"
+        name="Institutional"
         groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" 
         sequence="10" />
+    <menuitem
+        id="menu_compliance_risk_assessment_cp"
+        action="action_list_risk_assessment_cp"
+        parent="menu_fcra_risk"
+        name="Counter Party"
+        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" 
+        sequence="20" />
 </odoo>

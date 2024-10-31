@@ -89,10 +89,14 @@ class Customer(models.Model):
     internal_category = fields.Selection(string='Internal Category', selection=[('customer', 'Customer'), (
         'vendor', 'Vendor'), ('partner', 'Partner'), ('correspondent', 'Correspondent'), ('respondent', 'Respondent')], default='customer', index=True)
     anti_bribery = fields.Binary(string='Anti-Bribery & Corruption Docs')
+    anti_bribery_file_name = fields.Char(string='Anti-Bribery & Corruption Docs')
     data_protection = fields.Binary(string='Data Protection Docs')
+    data_protection_file_name = fields.Char(string='Data Protection Docs')
     whistle_blowing = fields.Binary(string='Whistle Blowing and Ethics Docs')
+    whistle_blowing_file_name = fields.Char(string='Whistle Blowing and Ethics Docs')
     anti_money_laundering = fields.Binary(
         string='Anti-Money Laundering & Terrorism Financing Doc')
+    anti_money_laundering_file_name = fields.Char(string='Anti-Money Laundering & Terrorism Financing Doc')
 
     @api.model
     def create(self, values):
@@ -178,7 +182,7 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','vendor')],
             'context': {'search_default_group_branch': 1}
         }
 
@@ -189,7 +193,51 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
+            'context': {'search_default_group_branch': 1}
+        }
+        
+    @api.model
+    def open_vendors(self):
+        return {
+            'name': _('Vendors'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','vendor')],
+            'context': {'search_default_group_branch': 1}
+        }
+    
+    @api.model
+    def open_partners(self):
+        return {
+            'name': _('Partners'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','partner')],
+            'context': {'search_default_group_branch': 1}
+        }
+    
+    @api.model
+    def open_correspondents(self):
+        return {
+            'name': _('Correspondents'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','correspondent')],
+            'context': {'search_default_group_branch': 1}
+        }
+    
+    @api.model
+    def open_respondents(self):
+        return {
+            'name': _('Respondents'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','respondent')],
             'context': {'search_default_group_branch': 1}
         }
 
