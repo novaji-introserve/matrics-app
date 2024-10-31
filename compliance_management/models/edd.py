@@ -1,55 +1,71 @@
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError, UserError
-
+# from odoo.exceptions import ValidationError, UserError
 
 class CustomerEDD(models.Model):
     _name = 'res.partner.edd'
     _description = 'Enhanced Due Diligence'
-    _inherit = ['mail.thread']
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-
-    name = fields.Char(string="Name")
-    status = fields.Selection(string='Status', selection=[(
-        'draft', 'Draft'), ('completed', 'Completed'), ('approved', 'Approved'), ('cancelled', 'Cancelled'), ('deleted', 'Deleted'), ('archived', 'Archived')], default='draft')
-    description = fields.Text(string='Description')
+    name = fields.Char(string="Name", tracking=True)
+    status = fields.Selection(
+        string='Status',
+        selection=[
+            ('draft', 'Draft'),
+            ('completed', 'Completed'),
+            ('approved', 'Approved'),
+            ('cancelled', 'Cancelled'),
+            ('deleted', 'Deleted'),
+            ('archived', 'Archived')],
+        default='draft',
+        tracking=True
+    )
+    description = fields.Text(string='Description', tracking=True)
     user_id = fields.Many2one(comodel_name='res.users', string='User',
-                            required=True, index=True, default=lambda self: self.env.user.id)
+                               index=True, default=lambda self: self.env.user.id)
     current_user_id = fields.Many2one(comodel_name='res.users', string='Current User',
-                                    required=True, index=True, default=lambda self: self.env.user.id)
+                                       index=True, default=lambda self: self.env.user.id)
     approved_by = fields.Many2one(comodel_name='res.users', string='Approver', readonly=True)
-    customer_id = fields.Many2one(
-        comodel_name='res.partner', string='Customer', index=True)
-    responsible_id = fields.Many2one(
-        comodel_name='res.users', string='Responsible User', index=True)
-    risk_score = fields.Float(
-        string='Risk Score', tracking=True)
-    date_approved = fields.Date(string="Date Approved", readonly=True)
-    approving_officer_id = fields.Many2one(
-        comodel_name='res.users', string='Approving Officer')
-    account_status = fields.Selection(string='Account Status', selection=[
-                                    ('active', 'Active'), ('dormant', 'Dormant')])
-    documentation_status = fields.Selection(string='Documentation Status', selection=[
-                                    ( 'incomplete', 'Incomplete'), ('complete', 'Complete')])
-    last_kyc_date = fields.Date(string="Last Kyc Date")
-    was_kyc_comprehensive = fields.Boolean(string="Was Kyc Comprehensive")
-    has_initiated_new_kyc = fields.Boolean(string="Has Initiated New Kyc")
-    visitation_observation = fields.Text(string="Visitation Observation")
-    overall_kyc_outcome = fields.Text(string="Overall Kyc Outcome")
-    is_foreigner = fields.Boolean(string="Is Foreigner")
-    is_pep = fields.Boolean(string="Is PEP")
-    id_expired = fields.Boolean(string="Id Expired")
-    activity_level_matches_business = fields.Boolean(
-        string="Activity Level Matches Business")
-    main_cash_purpose = fields.Text(string="Main Cash Purpose")
-    main_inflow_purpose = fields.Text(string="Main Inflow Purpose")
-    main_fund_remitters = fields.Text(string="Main Fund Remitters")
-    inflow_sources = fields.Text(string="Inflow Sources")
-    other_related_accounts = fields.Text(string="Other Related Accounts")
-    occupation = fields.Text(string="Occupation")
-    is_current_from_normal = fields.Boolean(string="Is Current From Normal")
-    does_business_support_volume = fields.Boolean(
-        string="Does Business Support Volume")
+    customer_id = fields.Many2one(comodel_name='res.partner', string='Customer', index=True)
+    responsible_id = fields.Many2one(comodel_name='res.users', string='Responsible User', index=True)
+    risk_score = fields.Float(string='Risk Score', tracking=True)
+    date_approved = fields.Date(string="Date Approved", readonly=True, tracking=True)
+    approving_officer_id = fields.Many2one(comodel_name='res.users', string='Approving Officer', tracking=True)
+    account_status = fields.Selection(
+        string='Account Status',
+        selection=[
+            ('active', 'Active'),
+            ('dormant', 'Dormant')],
+        tracking=True
+    )
+    documentation_status = fields.Selection(
+        string='Documentation Status',
+        selection=[
+            ('incomplete', 'Incomplete'),
+            ('complete', 'Complete')],
+        tracking=True
+    )
+    supporting_document = fields.Many2many(
+        'ir.attachment',
+        string="Add Supporting Document(s)",
+        help="Add supporting document(s) for customer EDD"
+    )
+    last_kyc_date = fields.Date(string="Last Kyc Date", tracking=True)
+    was_kyc_comprehensive = fields.Boolean(string="Was Kyc Comprehensive", tracking=True)
+    has_initiated_new_kyc = fields.Boolean(string="Has Initiated New Kyc", tracking=True)
+    visitation_observation = fields.Text(string="Visitation Observation", tracking=True)
+    overall_kyc_outcome = fields.Text(string="Overall Kyc Outcome", tracking=True)
+    is_foreigner = fields.Boolean(string="Is Foreigner", tracking=True)
+    is_pep = fields.Boolean(string="Is PEP", tracking=True)
+    id_expired = fields.Boolean(string="Id Expired", tracking=True)
+    activity_level_matches_business = fields.Boolean(string="Activity Level Matches Business", tracking=True)
+    main_cash_purpose = fields.Text(string="Main Cash Purpose", tracking=True)
+    main_inflow_purpose = fields.Text(string="Main Inflow Purpose", tracking=True)
+    main_fund_remitters = fields.Text(string="Main Fund Remitters", tracking=True)
+    inflow_sources = fields.Text(string="Inflow Sources", tracking=True)
+    other_related_accounts = fields.Text(string="Other Related Accounts", tracking=True)
+    occupation = fields.Text(string="Occupation", tracking=True)
+    is_current_from_normal = fields.Boolean(string="Is Current From Normal", tracking=True)
+    does_business_support_volume = fields.Boolean(string="Does Business Support Volume", tracking=True)
     is_current_user_responsible = fields.Boolean(compute='_compute_is_current_user_responsible')
     is_current_user_approver = fields.Boolean(compute='_compute_is_current_user_approver')
     is_current_user_approving_officer = fields.Boolean(compute='_compute_is_current_user_approving_officer')
@@ -76,18 +92,9 @@ class CustomerEDD(models.Model):
 
     def action_submit_for_review(self):
         self.ensure_one()
-        if not self.name or not self.description or not self.risk_score:
-            raise ValidationError(_('Please fill in all required fields before submitting for review.'))
-        
         self.write({
             'status': 'completed'           
         })   
-
-        # Get the email template and send an email to the Officer in Charge (responsible_id)
-        template_id = self.env.ref('compliance_management.email_template_notify_officer_in_charge')
-        if template_id:
-            template_id.sudo().send_mail(self.id, force_send=True)
-
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),

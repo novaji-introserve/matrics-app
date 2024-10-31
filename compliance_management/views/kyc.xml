@@ -230,7 +230,7 @@
                         type="object"
                         string="Approve"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        attrs="{'invisible': [ '|', ('status', '!=', 'completed'), ('is_current_user_responsible', '=', False)]}"
+                        attrs="{'invisible': [ '|', ('status', '!=', 'completed'), ('is_current_user_approving_officer', '=', False)]}"
                     />
 
                     <button name="action_cancel"
@@ -238,7 +238,7 @@
                         type="object"
                         string="Cancel"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        attrs="{'invisible': ['|' , ('status', '=', 'cancelled'), ('is_current_user_approver', '=', False)]}"
+                        attrs="{'invisible': ['|', ('status', 'in', ['cancelled', 'approved', 'draft']), ('is_current_user_approving_officer', '=', False)]}"
                     />
 
                     <button name="action_archive"
@@ -246,7 +246,7 @@
                         type="object"
                         string="Archive"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        attrs="{'invisible': [('status', 'not in', ('approved', 'cancelled'))]}"
+                        attrs="{'invisible': [('status', 'not in', ('cancelled'))]}"
                     />
 
                     <button name="action_send_back"
@@ -254,7 +254,7 @@
                         type="object"
                         string="Send Back"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        attrs="{'invisible': ['|', ('status', '=', 'draft'), ('is_current_user_approver', '=', False), ('status', '!=', 'archived'),]}"
+                        attrs="{'invisible': ['|', ('status', '=', 'draft'), ('is_current_user_approving_officer', '=', False), ('status', '!=', 'archived'),]}"
                     />
 
                     <field name="status" widget="statusbar"
@@ -362,6 +362,9 @@
                                 <group>
                                     <field name="does_business_support_volume"
                                         string="Does Nature of Business Support Volume and Velocity Of Inflows" />
+                                </group>
+                                <group colspan="2">
+                                   <field name="supporting_document" widget="many2many_binary"/>
                                 </group>
                             </group>
                         </page>
