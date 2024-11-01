@@ -69,7 +69,18 @@ class CustomerEDD(models.Model):
     is_current_user_responsible = fields.Boolean(compute='_compute_is_current_user_responsible')
     is_current_user_approver = fields.Boolean(compute='_compute_is_current_user_approver')
     is_current_user_approving_officer = fields.Boolean(compute='_compute_is_current_user_approving_officer')
+    is_cco = fields.Boolean(compute='_compute_is_cco', store=False, default=lambda self: self._default_is_cco())
 
+    @api.model
+    def _default_is_cco(self):
+        """Default method to set is_cco based on the user group."""
+        return self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+
+    @api.depends_context('uid')
+    def _compute_is_cco(self):
+        """Compute method to update is_cco based on user group when editing records."""
+        for record in self:
+            record.is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
 
 
     @api.depends('responsible_id')
