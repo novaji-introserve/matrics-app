@@ -112,7 +112,10 @@
                 </header>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" type="string" name="get_risk_level_name" icon="fa-thermometer-0">
+                <button class="oe_stat_button" type="object" name="action_total_accounts" icon="fa-star">
+                    <field name="total_accounts" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
                     <span>Risk 
                     <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                     decoration-warning="risk_level in ('medium')"

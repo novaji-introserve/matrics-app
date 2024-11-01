@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Screening Rules -->
+    <record id="compliance_transaction_screening_rule_tree" model="ir.ui.view">
+        <field name="name">compliance_transaction_screening_rule_tree</field>
+        <field name="model">res.transaction.screening.rule</field>
+        <field name="arch" type="xml">
+            <tree string="RTransaction Screening Rule">
+                <field name="name" />
+                <field name="priority" />
+                <field name="risk_level" />
+                <field name="create_uid" />
+                <field name="create_date" />
+            </tree>
+        </field>
+    </record>
+    <!-- Risk Assessment Form -->
+    <record id="compliance_transaction_screening_rule_form" model="ir.ui.view">
+        <field name="name">Transaction Screening Rule Form</field>
+        <field name="model">res.transaction.screening.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_activate" class="oe_highlight" type="object"
+                        string="Activate"
+                        groups="compliance_management.group_compliance_compliance_risk_manager"
+                        confirm="Activate this Rule. Are you sure?"
+                        attrs="{'invisible': [('state', 'not in',['draft','inactive'])]}" />
+                    <button name="action_deactivate" type="object"
+                        string="Deactivate"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Deactivate this Rule. Are you sure?"
+                        attrs="{'invisible': [('state','not in',['active','draft'])]}" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,inactive"
+                        clickable="True" />
+                </header>
+                <sheet string="Transaction Screening Rule">
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" />
+                        </group>
+                        <group>
+                            <field name="risk_level" />
+                        </group>
+                        <group>
+                            <field name="priority" />
+                        </group>
+                    </group>
+                    <notebook colspan="4">
+                        <page name='rule_query' string="Rule SQL Query" autofocus="autofocus">
+                            <field name="sql_query"
+                                placeholder="SQL Query returning a single value..." />
+                        </page>
+                        <page name='internal_notes' string="Internal Notes">
+                            <field name="narration" placeholder="Narration..." />
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </div>
+            </form>
+        </field>
+    </record>
+    <!-- Action -->
+    <record id="action_list_transaction_screening_rule" model="ir.actions.act_window">
+        <field name="name">Transaction Screening Rule</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.transaction.screening.rule</field>
+        <field name="view_id" ref="compliance_transaction_screening_rule_tree" />
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a Transaction Screening Rule
+            </p>
+            <p>
+                No records yet
+            </p>
+        </field>
+    </record>
+    <!-- Menu -->
+    <menuitem id="menu_compliance_transaction_screening" name="Transaction Monitoring"
+        parent="menu_compliance_configuration" sequence="400" />
+    <menuitem
+        id="menu_compliance_transaction_screening_rule"
+        action="action_list_transaction_screening_rule"
+        parent="menu_compliance_transaction_screening"
+        name="Rules"
+        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
+        sequence="100" />
+
+</odoo>
