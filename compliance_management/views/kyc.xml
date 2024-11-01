@@ -66,6 +66,10 @@
             </xpath>
 
             <xpath expr="//page[@name='contact_addresses']" position="before">
+                <page name='accounts' string="Accounts">
+                    <field name="account_ids"
+                        context="{'default_customer_id': active_id}" />
+                </page>
                 <page name='risk_assessment' string="Risk Assessment">
                     <field name="risk_assessment_ids"
                         view_ref="compliance_customer_risk_assessment_tree"
@@ -573,6 +577,6 @@
         parent="menu_compliance_kyc"
         name="Enhanced Due Diligence"
         groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="20" />
+        sequence="100" />
 
 </odoo>

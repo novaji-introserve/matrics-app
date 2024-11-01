@@ -11,10 +11,11 @@ class Shareholders(models.Model):
     _name = 'res.partner.shareholders'
     _description = 'Shareholders and Directors'
 
-    name = fields.Char(string='Name', required=True,tracking=True)
+    name = fields.Char(string='Name', required=True, tracking=True)
     role = fields.Selection(string='Role', selection=[(
         'director', 'Director'), ('shareholder', 'shareholder')])
-    pct_equity = fields.Float(string='Equity (%)', digits=(10, 2),tracking=True)
+    pct_equity = fields.Float(
+        string='Equity (%)', digits=(10, 2), tracking=True)
     bvn = fields.Char(string='BVN', tracking=True)
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Partner', ondelete="cascade")
@@ -89,14 +90,19 @@ class Customer(models.Model):
     internal_category = fields.Selection(string='Internal Category', selection=[('customer', 'Customer'), (
         'vendor', 'Vendor'), ('partner', 'Partner'), ('correspondent', 'Correspondent'), ('respondent', 'Respondent')], default='customer', index=True)
     anti_bribery = fields.Binary(string='Anti-Bribery & Corruption Docs')
-    anti_bribery_file_name = fields.Char(string='Anti-Bribery & Corruption Docs')
+    anti_bribery_file_name = fields.Char(
+        string='Anti-Bribery & Corruption Docs')
     data_protection = fields.Binary(string='Data Protection Docs')
     data_protection_file_name = fields.Char(string='Data Protection Docs')
     whistle_blowing = fields.Binary(string='Whistle Blowing and Ethics Docs')
-    whistle_blowing_file_name = fields.Char(string='Whistle Blowing and Ethics Docs')
+    whistle_blowing_file_name = fields.Char(
+        string='Whistle Blowing and Ethics Docs')
     anti_money_laundering = fields.Binary(
         string='Anti-Money Laundering & Terrorism Financing Doc')
-    anti_money_laundering_file_name = fields.Char(string='Anti-Money Laundering & Terrorism Financing Doc')
+    anti_money_laundering_file_name = fields.Char(
+        string='Anti-Money Laundering & Terrorism Financing Doc')
+    total_accounts = fields.Integer(
+        string='Accounts', compute='_total_accounts', store=True)
 
     @api.model
     def create(self, values):
@@ -107,6 +113,27 @@ class Customer(models.Model):
         # CODE HERE
         record = super(Customer, self).write(values)
         return record
+    
+    @api.depends('account_ids')
+    def _total_accounts(self):
+        for e in self:
+            e.total_accounts = len(e.account_ids)
+
+    def action_total_accounts(self):
+        return {
+            'name': _('Accounts'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner.account',
+            'view_mode': 'tree,form',
+            'domain': [('customer_id.id', 'in', [self.id])],
+            'context': {'search_default_group_branch': 1}
+        }
+        
+    def action_risk_level(self):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
 
     def compute_risk_level(self):
         for record in self:

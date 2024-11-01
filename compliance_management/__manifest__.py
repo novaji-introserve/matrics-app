@@ -43,7 +43,11 @@
         'views/dashboard.xml',
         'views/risk_assessment_plan.xml',
         'views/settings.xml',
-        'views/edd_mail_template.xml'
+        'views/edd_mail_template.xml',
+        'views/customer_accounts.xml',
+        'views/transaction.xml',
+        'views/transaction_screening_rule.xml'
+
             
                 ],
     # only loaded in demonstration mode
