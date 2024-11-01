@@ -42,8 +42,10 @@
         'data/email_templates.xml', 
         'views/dashboard.xml',
         'views/risk_assessment_plan.xml',
-        'views/settings.xml'
-    ],
+        'views/settings.xml',
+        'views/edd_mail_template.xml'
+            
+                ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',

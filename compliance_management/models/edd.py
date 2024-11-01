@@ -66,10 +66,47 @@ class CustomerEDD(models.Model):
     occupation = fields.Text(string="Occupation", tracking=True)
     is_current_from_normal = fields.Boolean(string="Is Current From Normal", tracking=True)
     does_business_support_volume = fields.Boolean(string="Does Business Support Volume", tracking=True)
-    is_current_user_responsible = fields.Boolean(compute='_compute_is_current_user_responsible')
-    is_current_user_approver = fields.Boolean(compute='_compute_is_current_user_approver')
-    is_current_user_approving_officer = fields.Boolean(compute='_compute_is_current_user_approving_officer')
-    is_cco = fields.Boolean(compute='_compute_is_cco', store=False, default=lambda self: self._default_is_cco())
+    # is_current_user_responsible = fields.Boolean(compute='_compute_is_current_user_responsible')
+    is_current_user_approver = fields.Boolean(compute='_compute_is_current_user_approver', store=False)
+    # is_current_user_approving_officer = fields.Boolean(compute='_compute_is_current_user_approving_officer')
+    # is_cco = fields.Boolean(compute='_compute_is_cco', store=False, default=lambda self: self._default_is_cco())
+
+    is_current_user_responsible = fields.Boolean(compute='_compute_is_current_user_responsible', store=False)
+    is_current_user_approving_officer = fields.Boolean(compute='_compute_is_current_user_approving_officer', store=False)
+    is_cco = fields.Boolean(compute='_compute_is_cco', store=False)
+
+
+    # @api.model
+    # def _default_is_cco(self):
+    #     """Default method to set is_cco based on the user group."""
+    #     return self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+
+    # @api.depends_context('uid')
+    # def _compute_is_cco(self):
+    #     """Compute method to update is_cco based on user group when editing records."""
+    #     for record in self:
+    #         record.is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+
+
+    # @api.depends('responsible_id')
+    # def _compute_is_current_user_responsible(self):
+    #     for record in self:
+    #         # Check if the responsible_id matches the current user ID
+    #         record.is_current_user_responsible = (record.responsible_id.id == self.env.user.id)
+
+    # @api.depends('approved_by')
+    # def _compute_is_current_user_approver(self):
+    #     for record in self:
+    #         # Check if the approved_by matches the current user ID
+    #         record.is_current_user_approver = (record.approved_by.id == self.env.user.id)
+            
+    # @api.depends('approving_officer_id')
+    # def _compute_is_current_user_approving_officer(self):
+    #     for record in self:
+    #         # Check if the approved_by matches the current user ID
+    #         record.is_current_user_approving_officer = (record.approving_officer_id.id == self.env.user.id)
+
+
 
     @api.model
     def _default_is_cco(self):
@@ -82,30 +119,72 @@ class CustomerEDD(models.Model):
         for record in self:
             record.is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
 
-
-    @api.depends('responsible_id')
+    @api.depends_context('uid')
     def _compute_is_current_user_responsible(self):
         for record in self:
             # Check if the responsible_id matches the current user ID
             record.is_current_user_responsible = (record.responsible_id.id == self.env.user.id)
 
-    @api.depends('approved_by')
+    @api.depends_context('uid')
     def _compute_is_current_user_approver(self):
         for record in self:
             # Check if the approved_by matches the current user ID
             record.is_current_user_approver = (record.approved_by.id == self.env.user.id)
             
-    @api.depends('approving_officer_id')
+    @api.depends_context('uid')
     def _compute_is_current_user_approving_officer(self):
         for record in self:
-            # Check if the approved_by matches the current user ID
+            # Check if the approving_officer_id matches the current user ID
             record.is_current_user_approving_officer = (record.approving_officer_id.id == self.env.user.id)
 
+    # def action_submit_for_review(self):
+    #     self.ensure_one()
+    #     self.write({
+    #         'status': 'completed'           
+    #     })   
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': _('Enhanced Due Diligence'),
+    #         'res_model': 'res.partner.edd',
+    #         'view_mode': 'list,form',
+    #         'view_id': False,
+    #         'views': [
+    #             (self.env.ref('compliance_management.edd_tree_view').id, 'list'),
+    #             (False, 'form')
+    #         ],
+    #         'target': 'main',
+    #         'context': {
+    #             'message': _('Submitted for review successfully.'),
+    #             'type': 'success',
+    #             'sticky': False,
+    #         },
+    #     }
+
+
+    @api.model
+    def create(self, vals):
+        # Create the record
+        record = super(CustomerEDD, self).create(vals)
+
+        # Send email to the responsible user
+        self._send_new_edd_assigned_email(record)
+        
+        return record
+
+    def _send_new_edd_assigned_email(self, record):
+        """Send an email notification to the responsible user."""
+        template_id = self.env.ref('compliance_management.email_template_new_edd_assigned')
+        if template_id:
+            template_id.send_mail(record.id, force_send=True)
+
     def action_submit_for_review(self):
+        """Mark the record as completed and submit for review."""
         self.ensure_one()
-        self.write({
-            'status': 'completed'           
-        })   
+        self.write({'status': 'completed'})   
+        
+        # Send email to the approving office
+        self._send_edd_submitted_for_review_email(self)
+        
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),
@@ -123,6 +202,12 @@ class CustomerEDD(models.Model):
                 'sticky': False,
             },
         }
+
+    def _send_edd_submitted_for_review_email(self, record):
+        """Send an email notification when the record is submitted for review."""
+        template_id = self.env.ref('compliance_management.email_template_edd_submitted_for_review')
+        if template_id:
+            template_id.send_mail(record.id, force_send=True)
 
     def action_approve(self):
         self.ensure_one()
