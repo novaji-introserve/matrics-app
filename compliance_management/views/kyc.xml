@@ -198,8 +198,8 @@
         <field name="name">res.partner.edd.tree</field>
         <field name="model">res.partner.edd</field>
         <field name="arch" type="xml">
-            <!-- <tree string="Enhanced Due Diligence " delete="false"> -->
-           <tree string="Enhanced Due Diligence ">
+            <tree string="Enhanced Due Diligence " delete="false">
+           <!-- <tree string="Enhanced Due Diligence "> -->
                 <field name="customer_id" />
                 <field name="responsible_id" string="Responsible" />
                 <field name="user_id" string="Initiated By" />
@@ -429,25 +429,20 @@
         </field>
     </record>
 
-<record id="action_res_partner_edd" model="ir.actions.act_window">
-    <field name="name">Enhanced Due Diligence</field>
-    <field name="res_model">res.partner.edd</field>
-    <field name="view_id" ref="edd_tree_view"/>
-    <field name="view_mode">tree,form</field>
-    <field name="domain">['|', '|',
-        ('is_current_user_responsible', '=', True),
-        ('is_current_user_approving_officer', '=', True),
-        ('is_cco', '=', True)]
-    </field>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Conduct EDD for a Customer
-        </p>
-        <p>
-            Customer Enhanced Due Diligence is conducted here
-        </p>
-    </field>
-</record>
+        <record id="action_res_partner_edd" model="ir.actions.act_window">
+            <field name="name">Enhanced Due Diligence</field>
+            <field name="res_model">res.partner.edd</field>
+            <field name="view_id" ref="edd_tree_view"/>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Conduct EDD for a Customer
+                </p>
+                <p>
+                    Customer Enhanced Due Diligence is conducted here
+                </p>
+            </field>
+        </record>
 
     <record id="open_customers" model="ir.actions.server">
         <field name="name">Open Customers</field>
