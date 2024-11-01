@@ -262,7 +262,8 @@
                         type="object"
                         string="Send Back"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        attrs="{'invisible': ['|', ('status', '=', 'approved'), '&amp;', ('status', '=', 'draft'), ('status', '!=', 'completed'), ('is_current_user_approving_officer', '=', True)]}" />
+                        attrs="{'invisible': ['|', ('status', '=', 'draft'), '|', ('status', '=', 'approved'), '&amp;', ('status', '!=', 'completed'), ('is_current_user_approving_officer', '=', True)]}" />
+
 
 
                     <field name="status" widget="statusbar"
@@ -307,85 +308,6 @@
                         </group>
                     </group>
 
-                    <!-- <notebook>
-                        <page string="Complete Enhanced Due Diligence">
-                            <group>
-                                <group>
-                                    <field name="risk_score" widget="slider"
-                                           step="0.5" min="0.5" max="25"
-                                            />
-
-                                    <field name="has_initiated_new_kyc" />
-                                </group>
-                                <group>
-                                    <field name="was_kyc_comprehensive" />
-                                    <field name="last_kyc_date" />
-                                </group>
-                                <group>
-                                 <field name="account_status" 
-                                    />
-                                </group>
-                                <group>
-                                    <field name="documentation_status" />
-                                </group>
-                            </group>
-                            <separator string="" />
-                            <group string="Customer Assessment">
-                                <group colspan="2">
-                                    <field name="visitation_observation" />
-                                </group>
-                                <group colspan="2">
-                                    <field name="overall_kyc_outcome"
-                                        placeholder="overall kyc outcome" />
-                                </group>
-                            </group>
-                            <group>
-                                <group>
-                                    <field name="is_foreigner" string="Is Customer a Foreigner?" />
-                                    <field name="is_pep" string="Is Customer a PEP?" />
-                                </group>
-                                <group>
-                                    <field name="id_expired" string="Customer ID still valid" />
-                                    <field name="activity_level_matches_business"
-                                        string="Does Activity Level Reflect Customer's Business" />
-                                </group>
-                            </group>
-                            <separator string="" />
-                            <group string="Additional Information">
-                                <group colspan="2">
-                                    <field name="main_cash_purpose" />
-                                </group>
-                                <group colspan="2">
-                                    <field name="main_inflow_purpose" />
-                                </group>
-                                <group colspan="2">
-                                    <field name="main_fund_remitters" />
-                                </group>
-                                <group colspan="2">
-                                    <field name="inflow_sources" />
-                                </group>
-                                <group colspan="2">
-                                    <field name="other_related_accounts" />
-                                </group>
-                            </group>
-                            <group>
-                                <group colspan="2">
-                                    <field name="occupation" string="Occupation/Employment Profile" />
-                                </group>
-                                <group>
-                                    <field name="is_current_from_normal"
-                                        string="Is Current Inflow From Normal Business" />
-                                </group>
-                                <group>
-                                    <field name="does_business_support_volume"
-                                        string="Does Nature of Business Support Volume and Velocity Of Inflows" />
-                                </group>
-                                <group colspan="2">
-                                   <field name="supporting_document" widget="many2many_binary"/>
-                                </group>
-                            </group>
-                        </page>
-                    </notebook> -->
                     <notebook>
                         <page string="Complete Enhanced Due Diligence">
                             <group>
@@ -497,9 +419,6 @@
                         </page>
                     </notebook>
 
-
-
-
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" />
@@ -510,21 +429,25 @@
         </field>
     </record>
 
-    <!-- Action -->
-    <record id="action_res_partner_edd" model="ir.actions.act_window">
-        <field name="name">Enhanced Due Diligence</field>
-        <field name="res_model">res.partner.edd</field>
-        <field name="view_id" ref="edd_tree_view" />
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Conduct EDD for a Customer
-            </p>
-            <p>
-                Customer Enhanced Due Diligence is conducted here
-            </p>
-        </field>
-    </record>
+<record id="action_res_partner_edd" model="ir.actions.act_window">
+    <field name="name">Enhanced Due Diligence</field>
+    <field name="res_model">res.partner.edd</field>
+    <field name="view_id" ref="edd_tree_view"/>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">['|', '|',
+        ('is_current_user_responsible', '=', True),
+        ('is_current_user_approving_officer', '=', True),
+        ('is_cco', '=', True)]
+    </field>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Conduct EDD for a Customer
+        </p>
+        <p>
+            Customer Enhanced Due Diligence is conducted here
+        </p>
+    </field>
+</record>
 
     <record id="open_customers" model="ir.actions.server">
         <field name="name">Open Customers</field>
