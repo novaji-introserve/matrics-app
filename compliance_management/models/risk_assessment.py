@@ -52,6 +52,25 @@ class RiskAssessment(models.Model):
         for rec in self:
             score = self.compute_risk_score_from_lines()
             rec.write({"risk_rating": score})
+    
+    def action_create_institutional(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "res.risk.assessment",
+            "views": [[False, "tree"], [False, "form"]],
+            "domain": [["id", "=", self.id]],
+        }
+
+    def action_create_counter_party(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "res.risk.assessment",
+            "views": [[False, "tree"], [False, "form"]],
+            "domain": [["id", "=", self.id]],
+        }
+        
 
     def compute_risk_score_from_lines(self):
         setting  = self.env['res.compliance.settings'].search([('code','=','risk_plan_computation')],limit = 1)

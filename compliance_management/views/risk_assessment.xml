@@ -70,6 +70,12 @@
         <field name="model">res.risk.assessment</field>
         <field name="arch" type="xml">
             <tree string="Risk Assessment">
+                <header>
+                    <button name="action_create_institutional" class="oe_highlight" type="object" string="New Institutional Risk Aseessment"
+                    groups="compliance_management.group_compliance_branch_compliance_officer" /> 
+                    <button name="action_create_counter_party" class="oe_highlight" type="object" string="New Counter-Party Risk Aseessment"
+                    groups="compliance_management.group_compliance_branch_compliance_officer" /> 
+                </header>
                 <field name="name" string="Name" />
                 <field name="subject_id" />
                 <field name="universe_id" />
