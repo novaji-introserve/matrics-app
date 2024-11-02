@@ -60,56 +60,55 @@ class PdfChat(models.Model):
                     #     'question': 'Initial PDF Summary',
                     #     'response': summary,
                     # })
+   
+    
     def _extract_text_from_pdf(self, pdf_file):
         """Extract text from the provided binary PDF file, handling both text-based and image-based PDFs."""
         try:
             # Decode the base64-encoded binary file
             decoded_pdf_data = base64.b64decode(pdf_file)
-
             # Convert the decoded binary data into a byte stream
             pdf_stream = io.BytesIO(decoded_pdf_data)
-            
+        
             # Try reading the PDF using PyPDF2 (for text-based PDFs)
             try:
                 pdf_reader = PyPDF2.PdfReader(pdf_stream)
                 extracted_text = ""
-                
+            
                 for page_num in range(len(pdf_reader.pages)):
                     page = pdf_reader.pages[page_num]
                     text = page.extract_text()
-                    
+                
                     # If no text is found, fallback to OCR
                     if not text or text.isspace():
                         extracted_text += self._extract_text_from_image_pdf(decoded_pdf_data)
                         break
                     extracted_text += text
-                
-                return extracted_text
             
-            except PyPDF2.errors.PdfReadError:
+                return extracted_text
+        
+            except Exception:  # Changed from PyPDF2.errors.PdfReadError
                 # Handle image-based PDF by converting each page to an image and applying OCR
                 return self._extract_text_from_image_pdf(decoded_pdf_data)
-
         except Exception as e:
             raise UserError(f"Error reading PDF file: {str(e)}")
 
     def _extract_text_from_image_pdf(self, pdf_data):
         """Convert image-based PDF pages to text using OCR."""
         extracted_text = ""
-
         try:
             # Convert PDF pages to images
             pages = convert_from_bytes(pdf_data)
-
             # Perform OCR on each page
             for page in pages:
                 text = pytesseract.image_to_string(page)
                 extracted_text += text + "\n"
-        
+    
         except Exception as e:
             raise UserError(f"Error extracting text from image-based PDF: {str(e)}")
-        
+    
         return extracted_text
+    
     # def query_llama_model(self, prompt):
     #     """Query the LLaMA model using the extracted text and user prompt."""
     #     model = "llama3.1"
@@ -118,7 +117,7 @@ class PdfChat(models.Model):
 
     #     # Extract only the 'message.content' part from the response
     #     response_content = response.get('message', {}).get('content', '')
-        return response_content
+        # return response_content
 
     def chat_with_pdf(self):
         for record in self:
@@ -188,6 +187,8 @@ class PdfChat(models.Model):
             print(f"An unexpected error occurred: {e}")  # Handle unexpected errors
 
         return "An unexpected error occurred: {e}"  # Return None or an appropriate value in case of an errorresponses
+
+
 class PdfChatLog(models.Model):
     _name = 'pdf.chat.log'
     _description = 'PDF Chat Log'
