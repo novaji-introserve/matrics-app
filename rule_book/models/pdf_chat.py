@@ -92,6 +92,7 @@ class PdfChat(models.Model):
                 return self._extract_text_from_image_pdf(decoded_pdf_data)
         except Exception as e:
             raise UserError(f"Error reading PDF file: {str(e)}")
+        
 
     def _extract_text_from_image_pdf(self, pdf_data):
         """Convert image-based PDF pages to text using OCR."""
