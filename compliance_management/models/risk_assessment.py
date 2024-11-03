@@ -36,12 +36,17 @@ class RiskAssessment(models.Model):
     @api.model
     def create(self, vals):
         record = super(RiskAssessment, self).create(vals)
+        for e in record:
+            e.action_update_risk_score()
         return record
 
     def _compute_total_risk_lines(self):
         self.total_risk_lines = len(self.line_ids)
 
     def write(self, vals):
+        for e in self:
+            score = e.compute_risk_score_from_lines()
+            vals['risk_rating'] = score
         record = super(RiskAssessment, self).write(vals)
         return record
 
@@ -70,8 +75,15 @@ class RiskAssessment(models.Model):
     def _compute_risk_score(self):
         score = self.compute_risk_score_from_lines()
         for rec in self:
-            rec.risk_rating = score
-
+             rec.write({"risk_rating": score}) 
+    
+    @api.onchange('line_ids')
+    def _onchange_line_ids(self):
+        #score = self.compute_risk_score_from_lines()
+        #for rec in self:
+        #     rec.write({"risk_rating": score})
+        pass
+    
     def action_total_risk_lines(self):
         self.ensure_one()
         return {
