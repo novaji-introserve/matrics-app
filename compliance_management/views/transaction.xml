@@ -6,7 +6,14 @@
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
             <tree string="Transactions">
+                <header>
+                    <button name="done" class="oe_highlight" type="object"
+                        string="Mark Reviewed"
+                        groups="compliance_management.group_compliance_branch_control_officer"
+                        confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" />
+                </header>
                 <field name="name" string="Reference Number" />
+                <field name="customer_id" />
                 <field name="account_id" />
                 <field name="branch_id" />
                 <field name="currency_id" />
@@ -16,6 +23,9 @@
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                     decoration-warning="risk_level in ('medium')"
                     decoration-success="risk_level in ('lowel')" />
+                <field name="state" widget="badge"
+                    decoration-warning="state in ('new')"
+                    decoration-success="state in ('done')" />
                 <field name="date_created" />
             </tree>
         </field>
@@ -30,7 +40,17 @@
                     <button name="action_screen" class="oe_highlight" type="object"
                         string="Run Transaction Screening"
                         groups="compliance_management.group_compliance_compliance_risk_manager"
-                        confirm="Run screening rules. All transaction screening rulles will be applied. The first exception found will flagged. Are you sure?" />
+                        confirm="Run screening rules. All transaction screening rules will be applied. The first exception found will flagged. Are you sure?" />
+                    <button
+                        name="done" class="oe_highlight" type="object"
+                        string="Mark Reviewed"
+                        groups="compliance_management.group_compliance_branch_control_officer"
+                        confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?"
+                        attrs="{'invisible': [('state', 'not in',['new'])]}" />
+                    <field
+                        name="state" widget="statusbar" statusbar_visible="new,done"
+                        clickable="True" />
+
                 </header>
                 <sheet string="Transaction">
                     <div class="oe_button_box" name="button_box">
@@ -98,13 +118,32 @@
                 <field name="name" />
                 <field name="customer_id" />
                 <separator />
+                <filter string="High Risk/ To Review" name="state_new"
+                    domain="[('state', '=', 'new'),('risk_level','=','high')]" />
+                <filter string="Medium Risk/ To Review" name="state_new"
+                    domain="[('state', '=', 'new'),('risk_level','=','medium')]" />
+                <filter string="Low Risk/ To Review" name="state_new"
+                    domain="[('state', '=', 'new'),('risk_level','=','low')]" />    
+                <filter string="Reviewed" name="state_done"
+                    domain="[('state', '=', 'done')]" />
+                <filter string="High Risk / Reviewed" name="risk_level_high"
+                    domain="[('risk_level', '=', 'high'),('state', '=', 'done')]" />
+                <filter string="Medium Risk / Reviewed" name="risk_level_medium"
+                    domain="[('risk_level', '=', 'medium'),('state', '=', 'done')]" />
+                <filter string="Low Risk / Reviewed" name="risk_level_low"
+                    domain="[('risk_level', '=', 'low'),('state', '=', 'done')]" />
+                <separator />
                 <group expand="0" name="group_by" string="Group By">
                     <filter name="group_branch" string="Branch" domain="[]"
                         context="{'group_by' : 'branch_id'}" />
+                    <filter name="group_customer" string="Customer" domain="[]"
+                        context="{'group_by' : 'customer_id'}" />
                     <filter name="group_currency" string="Currency"
                         context="{'group_by': 'currency_id'}" />
                     <filter name="group_tran_type" string="Transaction Type"
                         context="{'group_by': 'tran_type'}" />
+                    <filter name="group_state" string="Review Status"
+                        context="{'group_by': 'state'}" />
                 </group>
             </search>
         </field>
@@ -115,6 +154,15 @@
         <field name="type">ir.actions.server</field>
         <field name="state">code</field>
         <field name="code">action = model.open_transactions()</field>
+    </record>
+    <record model="ir.actions.server" id="action_done">
+        <field name="name">Mark Done</field>
+        <field name="model_id" ref="model_res_customer_transaction"/>
+        <field name="binding_model_id" ref="model_res_customer_transaction"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.done()
+        </field>
     </record>
     <menuitem
         id="menu_compliance_transaction_monitoring"
