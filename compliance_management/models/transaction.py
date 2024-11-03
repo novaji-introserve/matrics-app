@@ -10,6 +10,7 @@ class Transaction(models.Model):
         ('uniq_account_name', 'unique(name)',
          "Account Name already exists. Value must be unique!"),
     ]
+    _order = 'date_created desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     name = fields.Char(string="Reference Number", required=True,index=True)
     account_id = fields.Many2one(comodel_name='res.partner.account', string='Account',index=True)
@@ -24,9 +25,14 @@ class Transaction(models.Model):
     batch_code = fields.Char(string='Batch Code',index=True)
     rule_id = fields.Many2one(comodel_name='res.transaction.screening.rule', string='Exception Rule',tracking=True,index=True)
     risk_level = fields.Selection(string='Risk Level', selection=[('low', 'Low'), ('medium', 'Medium'),('high','High')],default='low',tracking=True)
+    state = fields.Selection(string='Status', selection=[('new', 'To Review'), ('done', 'Done')],tracking=True,index=True,default='new')
     
     def get_risk_level(self):
         return self.risk_level
+    
+    def done(self):
+        for e in self:
+            e.write({'state':'done'})
     
     def action_screen(self):
         rules = self.env['res.transaction.screening.rule'].search(
@@ -55,8 +61,9 @@ class Transaction(models.Model):
             'name': _('Transactions'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
+            'limit': 50,
             'view_mode': 'tree,form',
             'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
-            'context': {'search_default_group_branch': 1}
+            'context': {'search_default_group_branch': 1,'default_state':'new'}
         }
     

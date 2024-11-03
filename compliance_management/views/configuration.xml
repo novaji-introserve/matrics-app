@@ -1,744 +1,761 @@
 <odoo>
-  <data>
-     <!-- Account Types Report -->
-    <record id="compliance_customer_account_type_tree" model="ir.ui.view">
-        <field name="name">res_partner_account_type_tree</field>
-        <field name="model">res.partner.account.type</field>
-        <field name="arch" type="xml">
-            <tree string="Account Types" delete="False">
-                <field name="name" string="Name"/>
-                <field name="code"/>
-                <field name="risk_assessment" string="Risk Assessment"/>
-            </tree>
-        </field>
-    </record>
-     <!-- Customer Account Type Form -->
-    <record id="compliance_customer_account_type_form" model="ir.ui.view">
-        <field name="name">Account Types</field>
-        <field name="model">res.partner.account.type</field>
-        <field name="arch" type="xml">
-            <form class="o_form_document" delete="False">
-                <sheet>
-                    <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
-                        <h1>
-                            <field name="name"/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group string="Details">
-                            <field name="code"/>
+    <data>
+        <!-- Account Types Report -->
+        <record id="compliance_customer_account_type_tree" model="ir.ui.view">
+            <field name="name">res_partner_account_type_tree</field>
+            <field name="model">res.partner.account.type</field>
+            <field name="arch" type="xml">
+                <tree string="Account Types" delete="False">
+                    <field name="name" string="Name" />
+                    <field name="code" />
+                    <field name="risk_assessment" string="Risk Assessment" />
+                </tree>
+            </field>
+        </record>
+        <!-- Customer Account Type Form -->
+        <record id="compliance_customer_account_type_form" model="ir.ui.view">
+            <field name="name">Account Types</field>
+            <field name="model">res.partner.account.type</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                            </group>
+                            <group string="Risk Assessment">
+                                <field name="risk_assessment" />
+                            </group>
                         </group>
-                        <group string="Risk Assessment">
-                            <field name="risk_assessment"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Account Type Action -->
+        <record id="action_list_customer_account_type" model="ir.actions.act_window">
+            <field name="name">Customer Account Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner.account.type</field>
+            <field name="view_id" ref="compliance_customer_account_type_tree" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a Customer Account Type
+                </p>
+                <p>
+                    No Account Type
+                </p>
+            </field>
+        </record>
+
+        <!-- Customer Sectors Report -->
+        <record id="compliance_customer_sector_tree" model="ir.ui.view">
+            <field name="name">res.partner.sector.tree</field>
+            <field name="model">res.partner.sector</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Sectors" delete="False">
+                    <field name="name" string="Name" />
+                    <field name="code" />
+                    <field name="risk_assessment" string="Risk Assessment" />
+                </tree>
+            </field>
+        </record>
+        <!-- Customer Sectors Form -->
+        <record id="compliance_customer_sector_form" model="ir.ui.view">
+            <field name="name">Customer Sector</field>
+            <field name="model">res.partner.sector</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                            </group>
+                            <group string="Risk Assessment">
+                                <field name="risk_assessment" />
+                            </group>
                         </group>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-    <!-- Account Type Action -->
-   <record id="action_list_customer_account_type" model="ir.actions.act_window">
-        <field name="name">Customer Account Type</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.partner.account.type</field>
-        <field name="view_id" ref="compliance_customer_account_type_tree"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Add a Customer Account Type
-            </p>
-            <p>
-                No Account Type
-            </p>
-        </field>
-    </record>
-    
-    <!-- Customer Sectors Report -->
-    <record id="compliance_customer_sector_tree" model="ir.ui.view">
-        <field name="name">res.partner.sector.tree</field>
-        <field name="model">res.partner.sector</field>
-        <field name="arch" type="xml">
-            <tree string="Customer Sectors" delete="False">
-                <field name="name" string="Name"/>
-                <field name="code"/>
-                <field name="risk_assessment" string="Risk Assessment"/>
-            </tree>
-        </field>
-    </record> 
-    <!-- Customer Sectors Form -->
-    <record id="compliance_customer_sector_form" model="ir.ui.view">
-        <field name="name">Customer Sector</field>
-        <field name="model">res.partner.sector</field>
-        <field name="arch" type="xml">
-            <form class="o_form_document" delete="False">
-                <sheet>
-                    <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
-                        <h1>
-                            <field name="name"/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group string="Details">
-                            <field name="code"/>
+        <!-- Customer Sectors Action -->
+        <record id="action_list_customer_sector" model="ir.actions.act_window">
+            <field name="name">Customer Sectors</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner.sector</field>
+            <field name="view_id" ref="compliance_management.compliance_customer_sector_tree" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a Customer Sector
+                </p>
+                <p>
+                    Customer are grouped by sector or industries
+                </p>
+            </field>
+        </record>
+
+        <!-- Account Products Tree View -->
+        <record id="account_product_tree_view" model="ir.ui.view">
+            <field name="name">res.partner.account.product.tree</field>
+            <field name="model">res.partner.account.product</field>
+            <field name="arch" type="xml">
+                <tree string="Account Products" delete="False">
+                    <field name="name" string="Name" />
+                    <field name="code" string="Code" />
+                    <field name="risk_assessment" string="Risk Assessment" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Account Products Form View -->
+        <record id="account_product_form_view" model="ir.ui.view">
+            <field name="name">res.partner.account.product.form</field>
+            <field name="model">res.partner.account.product</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                            </group>
+                            <group string="Risk Assessment">
+                                <field name="risk_assessment" />
+                            </group>
                         </group>
-                          <group string="Risk Assessment">
-                            <field name="risk_assessment"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Account Products Action -->
+        <record id="action_list_account_product" model="ir.actions.act_window">
+            <field name="name">Account Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner.account.product</field>
+            <field name="view_id" ref="account_product_tree_view" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add an Account Product
+                </p>
+                <p>
+                    Account products are listed here.
+                </p>
+            </field>
+        </record>
+
+        <!-- Education Levels Tree View -->
+        <record id="education_level_tree_view" model="ir.ui.view">
+            <field name="name">res.education.level.tree</field>
+            <field name="model">res.education.level</field>
+            <field name="arch" type="xml">
+                <tree string="Education Levels" delete="False">
+                    <field name="name" string="Education Level" />
+                    <field name="code" string="Code" />
+                    <field name="risk_assessment" string="Risk Assessment" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Education Levels Form View -->
+        <record id="education_level_form_view" model="ir.ui.view">
+            <field name="name">res.education.level.form</field>
+            <field name="model">res.education.level</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                            </group>
+                            <group string="Risk Assessment">
+                                <field name="risk_assessment" />
+                            </group>
                         </group>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-    <!-- Customer Sectors Action -->
-   <record id="action_list_customer_sector" model="ir.actions.act_window">
-        <field name="name">Customer Sectors</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.partner.sector</field>
-        <field name="view_id" ref="compliance_management.compliance_customer_sector_tree"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Add a Customer Sector
-            </p>
-            <p>
-                Customer are grouped by sector or industries
-            </p>
-        </field>
-    </record>
+        <!-- Education Levels Action -->
+        <record id="action_list_education_level" model="ir.actions.act_window">
+            <field name="name">Education Levels</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.education.level</field>
+            <field name="view_id" ref="education_level_tree_view" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add an Education Level
+                </p>
+                <p>
+                    Education levels are defined here.
+                </p>
+            </field>
+        </record>
 
-    <!-- Account Products Tree View -->
-<record id="account_product_tree_view" model="ir.ui.view">
-    <field name="name">res.partner.account.product.tree</field>
-    <field name="model">res.partner.account.product</field>
-    <field name="arch" type="xml">
-        <tree string="Account Products" delete="False">
-            <field name="name" string="Name"/>
-            <field name="code" string="Code"/>
-            <field name="risk_assessment" string="Risk Assessment"/>
-        </tree>
-    </field>
-</record>
+        <!-- Customer Tiers Tree View -->
+        <record id="customer_tier_tree_view" model="ir.ui.view">
+            <field name="name">res.partner.tier.tree</field>
+            <field name="model">res.partner.tier</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Tiers" delete="False">
+                    <field name="name" string="Name" />
+                    <field name="code" string="Code" />
+                    <field name="risk_assessment" string="Risk Assessment" />
+                </tree>
+            </field>
+        </record>
 
-<!-- Account Products Form View -->
-<record id="account_product_form_view" model="ir.ui.view">
-    <field name="name">res.partner.account.product.form</field>
-    <field name="model">res.partner.account.product</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code"/>
-                    </group>
-                     <group string="Risk Assessment">
-                            <field name="risk_assessment"/>
-                     </group>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
+        <!-- Customer Tiers Form View -->
+        <record id="customer_tier_form_view" model="ir.ui.view">
+            <field name="name">res.partner.tier.form</field>
+            <field name="model">res.partner.tier</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                            </group>
+                            <group string="Risk Assessment">
+                                <field name="risk_assessment" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-<!-- Account Products Action -->
-<record id="action_list_account_product" model="ir.actions.act_window">
-    <field name="name">Account Products</field>
-    <field name="type">ir.actions.act_window</field>
-    <field name="res_model">res.partner.account.product</field>
-    <field name="view_id" ref="account_product_tree_view"/>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Add an Account Product
-        </p>
-        <p>
-            Account products are listed here.
-        </p>
-    </field>
-</record>
+        <!-- Customer Tiers Action -->
+        <record id="action_list_customer_tier" model="ir.actions.act_window">
+            <field name="name">Customer Tiers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner.tier</field>
+            <field name="view_id" ref="customer_tier_tree_view" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a Customer Tier
+                </p>
+                <p>
+                    Tiers categorize customers based on their levels.
+                </p>
+            </field>
+        </record>
 
-<!-- Education Levels Tree View -->
-<record id="education_level_tree_view" model="ir.ui.view">
-    <field name="name">res.education.level.tree</field>
-    <field name="model">res.education.level</field>
-    <field name="arch" type="xml">
-        <tree string="Education Levels" delete="False">
-            <field name="name" string="Education Level"/>
-            <field name="code" string="Code"/>
-            <field name="risk_assessment" string="Risk Assessment"/>
-        </tree>
-    </field>
-</record>
-
-<!-- Education Levels Form View -->
-<record id="education_level_form_view" model="ir.ui.view">
-    <field name="name">res.education.level.form</field>
-    <field name="model">res.education.level</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code"/>
-                    </group>
-                      <group string="Risk Assessment">
-                            <field name="risk_assessment"/>
-                      </group>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
-
-<!-- Education Levels Action -->
-<record id="action_list_education_level" model="ir.actions.act_window">
-    <field name="name">Education Levels</field>
-    <field name="type">ir.actions.act_window</field>
-    <field name="res_model">res.education.level</field>
-    <field name="view_id" ref="education_level_tree_view"/>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Add an Education Level
-        </p>
-        <p>
-            Education levels are defined here.
-        </p>
-    </field>
-</record>
-
-<!-- Customer Tiers Tree View -->
-<record id="customer_tier_tree_view" model="ir.ui.view">
-    <field name="name">res.partner.tier.tree</field>
-    <field name="model">res.partner.tier</field>
-    <field name="arch" type="xml">
-        <tree string="Customer Tiers" delete="False">
-            <field name="name" string="Name"/>
-            <field name="code" string="Code"/>
-            <field name="risk_assessment" string="Risk Assessment"/>
-        </tree>
-    </field>
-</record>
-
-<!-- Customer Tiers Form View -->
-<record id="customer_tier_form_view" model="ir.ui.view">
-    <field name="name">res.partner.tier.form</field>
-    <field name="model">res.partner.tier</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code"/>
-                    </group>
-                      <group string="Risk Assessment">
-                            <field name="risk_assessment"/>
-                      </group>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
-
-<!-- Customer Tiers Action -->
-<record id="action_list_customer_tier" model="ir.actions.act_window">
-    <field name="name">Customer Tiers</field>
-    <field name="type">ir.actions.act_window</field>
-    <field name="res_model">res.partner.tier</field>
-    <field name="view_id" ref="customer_tier_tree_view"/>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Add a Customer Tier
-        </p>
-        <p>
-            Tiers categorize customers based on their levels.
-        </p>
-    </field>
- </record>
-
- <!-- Customer Regions Tree View -->
-<record id="customer_region_tree_view" model="ir.ui.view">
-    <field name="name">res.partner.region.tree</field>
-    <field name="model">res.partner.region</field>
-    <field name="arch" type="xml">
-        <tree string="Customer Regions">
-            <field name="name" string="Name"/>
-            <field name="code" string="Code"/>
-<!--            <field name="status" string="Status"/>-->
-            <field name="risk_assessment" />
-        </tree>
-    </field>
-</record>
-
-<!-- Customer Regions Form View -->
-<record id="customer_region_form_view" model="ir.ui.view">
-    <field name="name">res.partner.region.form</field>
-    <field name="model">res.partner.region</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code"/>
-                    </group>
-<!--                     <group string="Status">-->
-<!--                            <field name="status"/>-->
-<!--                     </group>-->
-                </group>
-                <group>
+        <!-- Customer Regions Tree View -->
+        <record id="customer_region_tree_view" model="ir.ui.view">
+            <field name="name">res.partner.region.tree</field>
+            <field name="model">res.partner.region</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Regions">
+                    <field name="name" string="Name" />
+                    <field name="code" string="Code" />
                     <field name="risk_assessment" />
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
+                    <field name="risk_rating" />
+                    <field name="create_uid" />
+                    <field name="create_date" />
+                </tree>
+            </field>
+        </record>
 
-<!-- Customer Regions Action -->
-<record id="action_list_customer_region" model="ir.actions.act_window">
-    <field name="name">Customer Regions</field>
-    <field name="type">ir.actions.act_window</field>
-    <field name="res_model">res.partner.region</field>
-    <field name="view_id" ref="customer_region_tree_view"/>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Add a Customer Region
-        </p>
-        <p>
-            Regions categorize customers based on geographical areas.
-        </p>
-    </field>
- </record>
- 
-<!-- Branch Tree View -->
-<record id="view_branch_tree" model="ir.ui.view">
-    <field name="name">res.branch.tree</field>
-    <field name="model">res.branch</field>
-    <field name="arch" type="xml">
-        <tree string="Branches" delete="False">
-            <field name="name" string="Branch Name"/>
-            <field name="code" string="Branch Code"/>
-            <field name="users" string="Users"/>
-        </tree>
-    </field>
-</record>
+        <!-- Customer Regions Form View -->
+        <record id="customer_region_form_view" model="ir.ui.view">
+            <field name="name">res.partner.region.form</field>
+            <field name="model">res.partner.region</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <notebook>
+                            <page name="name" string="Details">
+                                <group>
+                                    <group>
+                                        <field name="code" />
+                                    </group>
+                                    <group>
+                                        <field name="create_uid" />
+                                    </group>
+                                </group>
+                                <group>
+                                    <group>
+                                        <field name="risk_assessment" />
+                                    </group>
+                                    <group>
+                                        <field name="risk_rating" />
+                                    </group>
 
-<!-- Branch Form View -->
-<record id="view_branch_form" model="ir.ui.view">
-    <field name="name">res.branch.form</field>
-    <field name="model">res.branch</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name" string="Branch"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code" string="Branch Code"/>
-                        <field name="users" widget="many2many_tags" string="Users"/>
-                    </group>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
+                                </group>
+                            </page>
+                        </notebook>
 
- <!-- Branch Action -->
- <record id="action_list_branch" model="ir.actions.act_window">
-    <field name="name">Branches</field>
-    <field name="type">ir.actions.act_window</field>
-    <field name="res_model">res.branch</field>
-    <field name="view_mode">tree,form</field>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Add a Branch
-        </p>
-        <p>
-            Manage all company branches here.
-        </p>
-    </field>
-</record>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Customer Regions Action -->
+        <record id="action_list_customer_region" model="ir.actions.act_window">
+            <field name="name">Customer Regions</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner.region</field>
+            <field name="view_id" ref="customer_region_tree_view" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a Customer Region
+                </p>
+                <p>
+                    Regions categorize customers based on geographical areas.
+                </p>
+            </field>
+        </record>
+
+        <!-- Branch Tree View -->
+        <record id="view_branch_tree" model="ir.ui.view">
+            <field name="name">res.branch.tree</field>
+            <field name="model">res.branch</field>
+            <field name="arch" type="xml">
+                <tree string="Branches" delete="False">
+                    <field name="name" string="Branch Name" />
+                    <field name="code" string="Branch Code" />
+                    <field name="users" string="Users" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Branch Form View -->
+        <record id="view_branch_form" model="ir.ui.view">
+            <field name="name">res.branch.form</field>
+            <field name="model">res.branch</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" string="Branch" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" string="Branch Code" />
+                                <field name="users" widget="many2many_tags" string="Users" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Branch Action -->
+        <record id="action_list_branch" model="ir.actions.act_window">
+            <field name="name">Branches</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.branch</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a Branch
+                </p>
+                <p>
+                    Manage all company branches here.
+                </p>
+            </field>
+        </record>
 
 
- <!-- Risk Categories Tree View -->
-<record id="risk_category_tree_view" model="ir.ui.view">
-    <field name="name">res.risk.category.tree</field>
-    <field name="model">res.risk.category</field>
-    <field name="arch" type="xml">
-        <tree string="Risk Categories" delete="False">
-            <field name="name" string="Name"/>
-            <field name="code" string="Code"/>
-            <field name="user_id" string="User"/>
-        </tree>
-    </field>
-</record>
+        <!-- Risk Categories Tree View -->
+        <record id="risk_category_tree_view" model="ir.ui.view">
+            <field name="name">res.risk.category.tree</field>
+            <field name="model">res.risk.category</field>
+            <field name="arch" type="xml">
+                <tree string="Risk Categories" delete="False">
+                    <field name="name" string="Name" />
+                    <field name="code" string="Code" />
+                    <field name="user_id" string="User" />
+                </tree>
+            </field>
+        </record>
 
-<!-- Risk Categories Form View -->
-<record id="risk_category_form_view" model="ir.ui.view">
-    <field name="name">res.risk.category.form</field>
-    <field name="model">res.risk.category</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code"/>
-                        <field name="user_id"/>
-                    </group>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
+        <!-- Risk Categories Form View -->
+        <record id="risk_category_form_view" model="ir.ui.view">
+            <field name="name">res.risk.category.form</field>
+            <field name="model">res.risk.category</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                                <field name="user_id" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-<!-- Risk Categories Action -->
-<record id="action_list_risk_category" model="ir.actions.act_window">
-    <field name="name">Risk Categories</field>
-    <field name="type">ir.actions.act_window</field>
-    <field name="res_model">res.risk.category</field>
-    <field name="view_id" ref="risk_category_tree_view"/>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Add a Risk Category
-        </p>
-        <p>
-            Risk Categories help group risks for better management.
-        </p>
-    </field>
- </record>
+        <!-- Risk Categories Action -->
+        <record id="action_list_risk_category" model="ir.actions.act_window">
+            <field name="name">Risk Categories</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.risk.category</field>
+            <field name="view_id" ref="risk_category_tree_view" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a Risk Category
+                </p>
+                <p>
+                    Risk Categories help group risks for better management.
+                </p>
+            </field>
+        </record>
 
- <!-- Risk Universe Tree View -->
-<record id="risk_universe_tree_view" model="ir.ui.view">
-    <field name="name">res.risk.universe.tree</field>
-    <field name="model">res.risk.universe</field>
-    <field name="arch" type="xml">
-        <tree string="Risk Universe" delete="False">
-            <field name="name" string="Name"/>
-            <field name="code" string="Code"/>
-            <field name="user_id" string="User"/>
-        </tree>
-    </field>
-</record>
+        <!-- Risk Universe Tree View -->
+        <record id="risk_universe_tree_view" model="ir.ui.view">
+            <field name="name">res.risk.universe.tree</field>
+            <field name="model">res.risk.universe</field>
+            <field name="arch" type="xml">
+                <tree string="Risk Universe" delete="False">
+                    <field name="name" string="Name" />
+                    <field name="code" string="Code" />
+                    <field name="user_id" string="User" />
+                </tree>
+            </field>
+        </record>
 
-<!-- Risk Universe Form View -->
-<record id="risk_universe_form_view" model="ir.ui.view">
-    <field name="name">res.risk.universe.form</field>
-    <field name="model">res.risk.universe</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code"/>
-                        <field name="user_id"/>
-                    </group>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
+        <!-- Risk Universe Form View -->
+        <record id="risk_universe_form_view" model="ir.ui.view">
+            <field name="name">res.risk.universe.form</field>
+            <field name="model">res.risk.universe</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                                <field name="user_id" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-<!-- Risk Universe Action -->
-<record id="action_list_risk_universe" model="ir.actions.act_window">
-    <field name="name">Risk Universe</field>
-    <field name="type">ir.actions.act_window</field>
-    <field name="res_model">res.risk.universe</field>
-    <field name="view_id" ref="risk_universe_tree_view"/>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Add a Risk Universe
-        </p>
-        <p>
-            The Risk Universe encompasses all potential risks faced by the organization.
-        </p>
-    </field>
- </record>
+        <!-- Risk Universe Action -->
+        <record id="action_list_risk_universe" model="ir.actions.act_window">
+            <field name="name">Risk Universe</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.risk.universe</field>
+            <field name="view_id" ref="risk_universe_tree_view" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a Risk Universe
+                </p>
+                <p>
+                    The Risk Universe encompasses all potential risks faced by the organization.
+                </p>
+            </field>
+        </record>
 
- <!-- Risk Subject Tree View -->
-<record id="risk_subject_tree_view" model="ir.ui.view">
-    <field name="name">res.risk.subject.tree</field>
-    <field name="model">res.risk.subject</field>
-    <field name="arch" type="xml">
-        <tree string="Risk Subject" delete="False">
-            <field name="name" string="Name"/>
-            <field name="code" string="Code"/>
-            <field name="universe_id" string="Risk Universe"/>
-        </tree>
-    </field>
-</record>
+        <!-- Risk Subject Tree View -->
+        <record id="risk_subject_tree_view" model="ir.ui.view">
+            <field name="name">res.risk.subject.tree</field>
+            <field name="model">res.risk.subject</field>
+            <field name="arch" type="xml">
+                <tree string="Risk Subject" delete="False">
+                    <field name="name" string="Name" />
+                    <field name="code" string="Code" />
+                    <field name="universe_id" string="Risk Universe" />
+                </tree>
+            </field>
+        </record>
 
-<!-- Risk Subject Form View -->
-<record id="risk_subject_form_view" model="ir.ui.view">
-    <field name="name">res.risk.subject.form</field>
-    <field name="model">res.risk.subject</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code"/>
-                        <field name="universe_id"/>
-                    </group>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
+        <!-- Risk Subject Form View -->
+        <record id="risk_subject_form_view" model="ir.ui.view">
+            <field name="name">res.risk.subject.form</field>
+            <field name="model">res.risk.subject</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                                <field name="universe_id" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-<!-- Risk Subject Action -->
-<record id="action_list_risk_subject" model="ir.actions.act_window">
-    <field name="name">Risk Subjects</field>
-    <field name="type">ir.actions.act_window</field>
-    <field name="res_model">res.risk.subject</field>
-    <field name="view_id" ref="risk_subject_tree_view"/>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Add a Risk Subject
-        </p>
-        <p>
-            Risk Subjects represent specific topics or areas related to risk within a universe.
-        </p>
-    </field>
- </record>
- 
- <!-- Risk Type Tree View -->
-<record id="risk_type_tree_view" model="ir.ui.view">
-    <field name="name">res.risk.type.tree</field>
-    <field name="model">res.risk.type</field>
-    <field name="arch" type="xml">
-        <tree string="Risk Types" delete="False">
-            <field name="name" string="Name"/>
-            <field name="code" string="Code"/>
-            <field name="user_id" string="User"/>
-        </tree>
-    </field>
-</record>
+        <!-- Risk Subject Action -->
+        <record id="action_list_risk_subject" model="ir.actions.act_window">
+            <field name="name">Risk Subjects</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.risk.subject</field>
+            <field name="view_id" ref="risk_subject_tree_view" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a Risk Subject
+                </p>
+                <p>
+                    Risk Subjects represent specific topics or areas related to risk within a
+                    universe.
+                </p>
+            </field>
+        </record>
 
-<!-- Risk Type Form View -->
-<record id="risk_type_form_view" model="ir.ui.view">
-    <field name="name">res.risk.type.form</field>
-    <field name="model">res.risk.type</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code"/>
-                        <field name="user_id"/>
-                    </group>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
+        <!-- Risk Type Tree View -->
+        <record id="risk_type_tree_view" model="ir.ui.view">
+            <field name="name">res.risk.type.tree</field>
+            <field name="model">res.risk.type</field>
+            <field name="arch" type="xml">
+                <tree string="Risk Types" delete="False">
+                    <field name="name" string="Name" />
+                    <field name="code" string="Code" />
+                    <field name="user_id" string="User" />
+                </tree>
+            </field>
+        </record>
 
-<!-- Risk Type Action -->
-<record id="action_list_risk_type" model="ir.actions.act_window">
-    <field name="name">Risk Types</field>
-    <field name="type">ir.actions.act_window</field>
-    <field name="res_model">res.risk.type</field>
-    <field name="view_id" ref="risk_type_tree_view"/>
-    <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face">
-            Add a Risk Type
-        </p>
-        <p>
-            Risk Types represent different categories or kinds of risks managed within the system.
-        </p>
-    </field>
- </record>
+        <!-- Risk Type Form View -->
+        <record id="risk_type_form_view" model="ir.ui.view">
+            <field name="name">res.risk.type.form</field>
+            <field name="model">res.risk.type</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                                <field name="user_id" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
- <!-- Risk Level Form View -->
-<record id="risk_level_form_view" model="ir.ui.view">
-    <field name="name">res.risk.level.form</field>
-    <field name="model">res.risk.level</field>
-    <field name="arch" type="xml">
-        <form class="o_form_document" delete="False">
-            <sheet>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1>
-                        <field name="name"/>
-                    </h1>
-                </div>
-                <group>
-                    <group string="Details">
-                        <field name="code"/>
-                        <field name="user_id"/>
-                    </group>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
+        <!-- Risk Type Action -->
+        <record id="action_list_risk_type" model="ir.actions.act_window">
+            <field name="name">Risk Types</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.risk.type</field>
+            <field name="view_id" ref="risk_type_tree_view" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a Risk Type
+                </p>
+                <p>
+                    Risk Types represent different categories or kinds of risks managed within the
+                    system.
+                </p>
+            </field>
+        </record>
 
-     <!-- Menu Items -->
-     <menuitem
-     id="hr.menu_hr_root"
-     name="Employees"
-     groups="base.group_system"
-     web_icon="hr,static/description/icon.svg"
-     sequence="500"/>
-    <menuitem name="Settings"
-     id="base.menu_administration"
-     web_icon="compliance_management,static/description/icon-settings.png"
-     sequence="550"
-     groups="base.group_erp_manager"/>
-    <menuitem id="base.menu_management" name="Apps" sequence="500" web_icon="compliance_management,static/description/icon-apps.png" groups="base.group_system"/>    
-    <menuitem
-        id="menu_compliance_root"
-        name="Compliance"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        web_icon="compliance_management,static/description/icons-compliance.png"
-        sequence="-1000"/>
-    <menuitem
-        id="menu_compliance_configuration"
-        name="Configuration" 
-        groups="group_compliance_compliance_officer,base.group_system"
-        parent="menu_compliance_root"
-        sequence="1500"/>
+        <!-- Risk Level Form View -->
+        <record id="risk_level_form_view" model="ir.ui.view">
+            <field name="name">res.risk.level.form</field>
+            <field name="model">res.risk.level</field>
+            <field name="arch" type="xml">
+                <form class="o_form_document" delete="False">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Details">
+                                <field name="code" />
+                                <field name="user_id" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Menu Items -->
+        <menuitem
+            id="hr.menu_hr_root"
+            name="Employees"
+            groups="base.group_system"
+            web_icon="hr,static/description/icon.svg"
+            sequence="500" />
+        <menuitem name="Settings"
+            id="base.menu_administration"
+            web_icon="compliance_management,static/description/icon-settings.png"
+            sequence="550"
+            groups="base.group_erp_manager" />
+        <menuitem id="base.menu_management" name="Apps" sequence="500"
+            web_icon="compliance_management,static/description/icon-apps.png"
+            groups="base.group_system" />
+        <menuitem
+            id="menu_compliance_root"
+            name="Compliance"
+            groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+            web_icon="compliance_management,static/description/icons-compliance.png"
+            sequence="-1000" />
+        <menuitem
+            id="menu_compliance_configuration"
+            name="Configuration"
+            groups="group_compliance_compliance_officer,base.group_system"
+            parent="menu_compliance_root"
+            sequence="1500" />
 
         <menuitem id="menu_accounts" name="Accounts"
-        parent="menu_compliance_configuration" sequence="80"/>
+            parent="menu_compliance_configuration" sequence="80" />
 
-    <menuitem
-        id="menu_compliance_account_type"
-        action="action_list_customer_account_type"
-        parent="menu_accounts" 
-        name="Account Types"
-        groups="group_compliance_compliance_officer" 
-        sequence="1"/>
-    <menuitem
-        id="menu_compliance_account_product"
-        action="action_list_account_product"
-        parent="menu_accounts"
-        name="Account Products"
-        groups="group_compliance_compliance_officer"
-        sequence="2"/>
-    <menuitem
-        id="menu_compliance_branch"
-        action="action_list_branch"
-        parent="menu_compliance_configuration"
-        name="Branches"
-        groups="group_compliance_compliance_officer"
-        sequence="90"/>
+        <menuitem
+            id="menu_compliance_account_type"
+            action="action_list_customer_account_type"
+            parent="menu_accounts"
+            name="Account Types"
+            groups="group_compliance_compliance_officer"
+            sequence="1" />
+        <menuitem
+            id="menu_compliance_account_product"
+            action="action_list_account_product"
+            parent="menu_accounts"
+            name="Account Products"
+            groups="group_compliance_compliance_officer"
+            sequence="2" />
+        <menuitem
+            id="menu_compliance_branch"
+            action="action_list_branch"
+            parent="menu_compliance_configuration"
+            name="Branches"
+            groups="group_compliance_compliance_officer"
+            sequence="90" />
 
         <menuitem id="menu_customer" name="Customer"
-        parent="menu_compliance_configuration" sequence="90"/>
+            parent="menu_compliance_configuration" sequence="90" />
 
-    <menuitem
-        id="menu_compliance_sector"
-        action="action_list_customer_sector"
-        parent="menu_customer" 
-        name="Customer Sectors"
-        groups="group_compliance_compliance_officer" 
-        sequence="1"/>
-    <menuitem
-        id="menu_compliance_customer_tier"
-        action="action_list_customer_tier"
-        parent="menu_customer"
-        name="Customer Tiers"
-        groups="group_compliance_compliance_officer"
-        sequence="2"/>
-    <menuitem
-        id="menu_compliance_customer_region"
-        action="action_list_customer_region"
-        parent="menu_customer"
-        name="Customer Regions"
-        groups="group_compliance_compliance_officer"
-        sequence="3"/>
-    <menuitem
-        id="menu_compliance_education_level"
-        action="action_list_education_level"
-        parent="menu_customer"
-        name="Education Levels"
-        groups="group_compliance_compliance_officer"
-        sequence="4"/>
+        <menuitem
+            id="menu_compliance_sector"
+            action="action_list_customer_sector"
+            parent="menu_customer"
+            name="Customer Sectors"
+            groups="group_compliance_compliance_officer"
+            sequence="1" />
+        <menuitem
+            id="menu_compliance_customer_tier"
+            action="action_list_customer_tier"
+            parent="menu_customer"
+            name="Customer Tiers"
+            groups="group_compliance_compliance_officer"
+            sequence="2" />
+        <menuitem
+            id="menu_compliance_customer_region"
+            action="action_list_customer_region"
+            parent="menu_customer"
+            name="Customer Regions"
+            groups="group_compliance_compliance_officer"
+            sequence="3" />
+        <menuitem
+            id="menu_compliance_education_level"
+            action="action_list_education_level"
+            parent="menu_customer"
+            name="Education Levels"
+            groups="group_compliance_compliance_officer"
+            sequence="4" />
 
         <menuitem id="menu_risk_assessment" name="Risk Management"
-        parent="menu_compliance_configuration" sequence="100"/>
+            parent="menu_compliance_configuration" sequence="100" />
 
-    <menuitem
-        id="menu_compliance_risk_category"
-        action="action_list_risk_category"
-        parent="menu_risk_assessment"
-        name="Risk Categories"
-        groups="group_compliance_compliance_officer"
-        sequence="1"/>
-    <menuitem
-        id="menu_compliance_risk_universe"
-        action="action_list_risk_universe"
-        parent="menu_risk_assessment"
-        name="Risk Universe"
-        groups="group_compliance_compliance_officer"
-        sequence="2"/>
-    <menuitem
-        id="menu_compliance_risk_subject"
-        action="action_list_risk_subject"
-        parent="menu_risk_assessment"
-        name="Risk Subjects"
-        groups="group_compliance_compliance_officer"
-        sequence="3"/>
-    <menuitem
-        id="menu_compliance_risk_type"
-        action="action_list_risk_type"
-        parent="menu_risk_assessment"
-        name="Risk Types"
-        groups="group_compliance_compliance_officer"
-        sequence="4"/>
+        <menuitem
+            id="menu_compliance_risk_category"
+            action="action_list_risk_category"
+            parent="menu_risk_assessment"
+            name="Risk Categories"
+            groups="group_compliance_compliance_officer"
+            sequence="1" />
+        <menuitem
+            id="menu_compliance_risk_universe"
+            action="action_list_risk_universe"
+            parent="menu_risk_assessment"
+            name="Risk Universe"
+            groups="group_compliance_compliance_officer"
+            sequence="2" />
+        <menuitem
+            id="menu_compliance_risk_subject"
+            action="action_list_risk_subject"
+            parent="menu_risk_assessment"
+            name="Risk Subjects"
+            groups="group_compliance_compliance_officer"
+            sequence="3" />
+        <menuitem
+            id="menu_compliance_risk_type"
+            action="action_list_risk_type"
+            parent="menu_risk_assessment"
+            name="Risk Types"
+            groups="group_compliance_compliance_officer"
+            sequence="4" />
 
-    <menuitem id="menu_compliance_risk_settings" name="Configuration"
-        parent="menu_compliance_configuration" sequence="500"/>
+        <menuitem id="menu_compliance_risk_settings" name="Configuration"
+            parent="menu_compliance_configuration" sequence="500" />
 
-  </data>
+    </data>
 </odoo>
