@@ -14,6 +14,13 @@ import time
 import threading
 from datetime import datetime, timedelta
 from odoo.tools import html_escape
+import logging
+
+_logger = logging.getLogger(__name__)
+# _logger.debug('This is a debug message')
+# _logger.info('This is an info message')
+# _logger.warning('This is a warning message')
+# _logger.error('This is an error message')
 
 load_dotenv()
 
@@ -236,6 +243,7 @@ class RulebookTitle(models.Model):
     @api.model
     def CBNScrapper(self):
         print("CBN Scraper processing")
+        _logger.debug('CBN Scraper processing')
         url = os.getenv("CBN_URL")
 
         # Send a GET request to the URL
@@ -333,6 +341,7 @@ class RulebookTitle(models.Model):
                         )
         else:
             print(f"Failed to retrieve the page. Status code: {response.status_code}")
+            _logger.debug(f"Failed to retrieve the page. Status code: {response.status_code}")
 
     def NDICScrapper(self):
         print("Running NDIC Scraper")
@@ -350,6 +359,8 @@ class RulebookTitle(models.Model):
             response.raise_for_status()
         except requests.RequestException as e:
             print(f"Error fetching data from {url}: {str(e)}")
+            _logger.debug("Error fetching data from %s: %s", url, str(e))
+
             return False
         print(response.text)
         soup = BeautifulSoup(response.text, "html.parser")
@@ -386,6 +397,8 @@ class RulebookTitle(models.Model):
             thread.join()
 
         print(f"NDIC Scraper finished: {success_count} records created, {error_count} errors.")
+        _logger.debug(f"NDIC Scraper finished: {success_count} records created, {error_count} errors.")
+
         return success_count > 0
 
     def _process_batch(self, pdf_links, file_names, base_url, storage_path, source):
@@ -422,6 +435,7 @@ class RulebookTitle(models.Model):
                     )
                     if existing_title:
                         print(f"Skipping, file '{spaced_name}' already exists.")  
+                        _logger.debug(f"Skipping, file '{spaced_name}' already exists.")
                     else:          
 
                         file_binary_data = self.download_file_as_binary(pdf_url)
@@ -446,6 +460,7 @@ class RulebookTitle(models.Model):
 
                 except requests.RequestException as e:
                     print(f"Attempt {attempt + 1} failed for {pdf_url}: {str(e)}")
+                    _logger.debug(f"Attempt {attempt + 1} failed for {pdf_url}: {str(e)}")
                     time.sleep(2)
             else:
                 error_count += 1
@@ -456,6 +471,7 @@ class RulebookTitle(models.Model):
                 self.sudo().create(records_to_create)
             except Exception as e:
                 print(f"Error creating records for batch: {str(e)}")
+                _logger.debug(f"Error creating records for batch: {str(e)}")
                 error_count += len(records_to_create)
 
         print(f"Batch processed: {success_count} records created, {error_count} errors.")
@@ -527,6 +543,7 @@ class RulebookTitle(models.Model):
                 self.sudo().create(all_records_to_create)
             except Exception as e:
                 print(f"Error creating records in bulk: {str(e)}")
+                _logger.debug(f"Error creating records in bulk: {str(e)}")
 
         return "Nfiu Scrape was successful!"    
 
@@ -583,6 +600,7 @@ class RulebookTitle(models.Model):
                     )
                     if existing_title:
                         print(f"Skipping, file already exists.")
+                        _logger.debug('Skipping, file already exists.')
 
                     else:    
                         if not os.path.exists(filepath):
@@ -612,6 +630,7 @@ class RulebookTitle(models.Model):
 
                 except requests.RequestException as e:
                     print(f"Attempt {attempt + 1} failed for {pdf_url}: {str(e)}")
+                    _logger.debug(f"Attempt {attempt + 1} failed for {pdf_url}: {str(e)}")
                     time.sleep(2)
             else:
                 error_count += 1
@@ -694,7 +713,7 @@ class RulebookTitle(models.Model):
         except ValueError as e:
             raise ValueError(f"Error processing date '{date_str}': {e}")
 
-    def get_date_from_url(self, url):
+    # def get_date_from_url(self, url):
         date_pattern1 = re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}")
         date_pattern2 = re.compile(r"\d{1,2}-[A-Za-z]{1,15}-\d{4}")
         date_pattern3 = re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}")
@@ -703,6 +722,9 @@ class RulebookTitle(models.Model):
         date_pattern6 = re.compile(r"\d{4}/\d{2}")
         date_pattern7 = re.compile(r"\([A-Za-z]{3,10}\d{4}\)")
         date_pattern8 = re.compile(r"\b\d{4}\b")
+        date_pattern9 = re.compile(r"\d{4}-\d{2}")
+
+
 
         match1 = date_pattern1.search(url)
         match2 = date_pattern2.search(url)
@@ -712,6 +734,7 @@ class RulebookTitle(models.Model):
         match6 = date_pattern6.search(url)
         match7 = date_pattern7.search(url)
         match8 = date_pattern8.search(url)
+        match9 = date_pattern9.search(url)
 
         if match1:
             date = match1.group(0)
@@ -768,11 +791,14 @@ class RulebookTitle(models.Model):
                 # date_obj = datetime.strptime(date, "%b-%Y")
                 # formatted_date = date_obj.strftime("%m-%Y")
                 date_obj = datetime.strptime(date, "%Y/%m")
-                formatted_date = date_obj.strftime("%Y-%m")
+                formatted_date = date_obj.strftime("%Y-%m-01")
 
                 return formatted_date
+        
             except ValueError:
                 pass  # Invalid date format, continue to the next pattern
+            
+
         if match7:
             date = match7.group(0)
             # return date
@@ -792,8 +818,46 @@ class RulebookTitle(models.Model):
             except ValueError:
                 pass
 
+        if match9:
+            date = match9.group(0)
+            try:
+                date_obj = datetime.strptime(date, "%Y-%m")
+                formatted_date = date_obj.strftime("%Y-%m-01")  # Assuming day is 1
+                return formatted_date
+            except ValueError:
+                pass
+
+
         return ""
 
+
+    def get_date_from_url(self, url):
+        date_patterns = [
+            (re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}"), "%b-%d-%Y"),
+            (re.compile(r"\d{1,2}-[A-Za-z]{1,15}-\d{4}"), "%d-%B-%Y"),
+            (re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}"), "%B-%d-%Y"),
+            (re.compile(r"\d{1,2}[A-Za-z]{3}\d{4}"), "%d%b%Y"),
+            (re.compile(r"[A-Za-z]{3,10}-\d{4}"), "%b-%Y"),  # Defaults to day = 01
+            (re.compile(r"\d{4}/\d{2}"), "%Y/%m"),           # Defaults to day = 01
+            (re.compile(r"\([A-Za-z]{3,10}\d{4}\)"), "(%B%Y)"),  # Defaults to day = 01
+            (re.compile(r"\b\d{4}\b"), "%Y")                 # Defaults to month/day = 01
+        ]
+        
+        for pattern, date_format in date_patterns:
+            match = pattern.search(url)
+            if match:
+                date = match.group(0)
+                try:
+                    # Parse and format dates
+                    date_obj = datetime.strptime(date, date_format)
+                    # Standardize output to "%Y-%m-%d"
+                    formatted_date = date_obj.strftime("%Y-%m-%d")
+                    return formatted_date
+                except ValueError:
+                    pass  # Continue to next pattern if there's a parsing error
+        
+        return ""
+    
     def parse_date(self, date_string):
         print(date_string)
 
