@@ -16,3 +16,4 @@ class CustomerRegion(models.Model):
     risk_assessment = fields.Many2one('res.risk.assessment', string='Risk Assessment')
     status = fields.Selection(string='Status', selection=[(
         'active', 'Active'), ('inactive', 'Inactive')], default='active',index=True)
+    risk_rating = fields.Float(string='Risk Score', digits=(10,2),related='risk_assessment.risk_rating')
