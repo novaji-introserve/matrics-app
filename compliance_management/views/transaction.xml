@@ -155,6 +155,15 @@
         <field name="state">code</field>
         <field name="code">action = model.open_transactions()</field>
     </record>
+    <record model="ir.actions.server" id="action_done">
+        <field name="name">Mark Done</field>
+        <field name="model_id" ref="model_res_customer_transaction"/>
+        <field name="binding_model_id" ref="model_res_customer_transaction"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.done()
+        </field>
+    </record>
     <menuitem
         id="menu_compliance_transaction_monitoring"
         parent="menu_compliance_kyc"
