@@ -77,13 +77,6 @@ class RiskAssessment(models.Model):
         for rec in self:
              rec.write({"risk_rating": score}) 
     
-    @api.onchange('line_ids')
-    def _onchange_line_ids(self):
-        #score = self.compute_risk_score_from_lines()
-        #for rec in self:
-        #     rec.write({"risk_rating": score})
-        pass
-    
     def action_total_risk_lines(self):
         self.ensure_one()
         return {
