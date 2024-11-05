@@ -39,10 +39,10 @@
         'data/res.branch.csv',
         'security/security.xml',
         'views/statistics.xml',
-        'data/email_templates.xml', 
         'views/dashboard.xml',
         'views/risk_assessment_plan.xml',
         'views/settings.xml',
+        'views/edd.xml',
        'views/customer_accounts.xml',
         'views/transaction.xml',
         'views/transaction_screening_rule.xml'
