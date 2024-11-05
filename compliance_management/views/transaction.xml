@@ -149,11 +149,25 @@
         </field>
     </record>
     <record id="open_transactions" model="ir.actions.server">
-        <field name="name">Open Transactions</field>
+        <field name="name">Open Transactions To Review</field>
         <field name="model_id" ref="model_res_customer_transaction" />
         <field name="type">ir.actions.server</field>
         <field name="state">code</field>
         <field name="code">action = model.open_transactions()</field>
+    </record>
+    <record id="open_transactions_done" model="ir.actions.server">
+        <field name="name">Open Transactions To Done</field>
+        <field name="model_id" ref="model_res_customer_transaction" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions_done()</field>
+    </record>
+    <record id="open_transactions_all" model="ir.actions.server">
+        <field name="name">Open All Transactions</field>
+        <field name="model_id" ref="model_res_customer_transaction" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions_all()</field>
     </record>
     <record model="ir.actions.server" id="action_done">
         <field name="name">Mark Done</field>
@@ -174,8 +188,22 @@
         id="menu_compliance_transactions"
         action="open_transactions"
         parent="menu_compliance_transaction_monitoring"
-        name="Transactions"
+        name="Transactions To Review"
         groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
         sequence="10" />
+    <menuitem
+        id="menu_compliance_transactions_done"
+        action="open_transactions_done"
+        parent="menu_compliance_transaction_monitoring"
+        name="Transactions Reviewed"
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+        sequence="20" />
+    <menuitem
+        id="menu_compliance_transactions_all"
+        action="open_transactions_all"
+        parent="menu_compliance_transaction_monitoring"
+        name="All Transactions"
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+        sequence="30" />
 
 </odoo>

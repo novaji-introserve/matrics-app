@@ -58,7 +58,31 @@ class Transaction(models.Model):
     @api.model
     def open_transactions(self):
         return {
-            'name': _('Transactions'),
+            'name': _('Transactions To Review'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('state','=','new')],
+            'context': {'search_default_group_branch': 1,'default_state':'new'}
+        }
+    
+    @api.model
+    def open_transactions_done(self):
+        return {
+            'name': _('Transactions Reviewed'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('state','=','done')],
+            'context': {'search_default_group_branch': 1,'default_state':'new'}
+        }
+    
+    @api.model
+    def open_transactions_all(self):
+        return {
+            'name': _('Transactions To Review'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'limit': 50,
