@@ -35,3 +35,4 @@ class RiskAssessmentPlan(models.Model):
     def action_deactivate(self):
         for e in self:
             e.write({'state': 'inactive'})
+    

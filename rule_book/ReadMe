@@ -1,0 +1,9 @@
+You need to install poppler-utils on Ubuntu, which is required by pdf2image (the library that provides convert_from_bytes). Run this command in your terminal:
+bash
+
+sudo apt-get install -y poppler-utils
+
+If you also haven't installed tesseract-ocr (required for pytesseract), you'll need to install that as well:
+bash
+
+sudo apt-get install -y tesseract-ocr

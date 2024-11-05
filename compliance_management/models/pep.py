@@ -1,16 +1,19 @@
 from odoo import _, api, fields, models
-
+import requests
+import json
+import markdown
 
 class Pep(models.Model):
     _name = 'res.pep'
     _description = 'PEP List'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     
     narration = fields.Html(string='Narration')
     lastmodifiedon = fields.Char(string="Last Modified On")
     lastmodifiedbyemail = fields.Char(string="Last Modified by Email")
-    unique_identifier = fields.Char(string="Unique Identifier", index=True)
-    surname = fields.Char(string="Surname")
-    first_name = fields.Char(string="First Name")
+    unique_identifier = fields.Char(string="Unique Identifier", index=True,required=True)
+    surname = fields.Char(string="Surname",tracking=True,required=True,index=True)
+    first_name = fields.Char(string="First Name",tracking=True,required=True,index=True)
     middle_name = fields.Char(string="Middle Name")
     title = fields.Char(string="Title")
     aka = fields.Char(string="Aka")
@@ -47,3 +50,38 @@ class Pep(models.Model):
     createdon = fields.Char(string="Created On")
     createdbyemail = fields.Char(string="Created by Email")
     lastmodifiedby = fields.Char(string="Last Modified By")
+    
+    @api.model
+    def create(self,vals):
+        if 'first_name' in vals:
+            vals['name'] = self.get_name(vals)
+        record = super(Pep, self).create(vals)
+        return record
+    
+    def write(self,vals):
+        if 'first_name' in vals:
+            vals['name'] = self.get_name(vals)
+        record = super(Pep, self).write(vals)
+        return record
+    
+    def get_name(self,vals):
+        return f"%s %s"%(vals['first_name'],vals['surname'])
+    
+    @api.depends('first_name','surname')
+    def action_find_person(self):
+        name = f"Who is %s %s"%(self.first_name,self.surname)
+        headers = {"Content-Type": "application/json", "Accept": "application/json", "Catch-Control": "no-cache"}
+       
+        json_data = {"contents":[{"parts":[{"text":f"{name}"}]}]}
+        config = self.env['ir.config_parameter'].sudo()
+        api_key = config.get_param('gemini_api_key')
+        try:
+            if api_key:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+                response = requests.post(url, data=json.dumps(json_data), headers=headers)
+                data = json.loads(response.text)
+                # Extract the 'text' tag
+                text_value = data['candidates'][0]['content']['parts'][0]['text']
+                self.write({'narration':markdown.markdown(text_value)})
+        except:
+            pass

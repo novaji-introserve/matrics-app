@@ -16,7 +16,7 @@ class RiskAssessment(models.Model):
     user_id = fields.Many2one(comodel_name='res.users', string='User',
                               required=True, index=True, default=lambda self: self.env.user.id)
     risk_rating = fields.Float(
-        string='Risk Rating', digits=(10, 2), required=True, default=0.0)
+        string='Risk Rating', digits=(10, 2), default=0.0)
     narration = fields.Html(string='Narration')
     subject_id = fields.Many2one(
         comodel_name='res.risk.subject', string='Risk Subject', index=True)
@@ -36,22 +36,24 @@ class RiskAssessment(models.Model):
     @api.model
     def create(self, vals):
         record = super(RiskAssessment, self).create(vals)
-        score = record.compute_risk_score_from_lines()
-        record.write({"risk_rating": score})
+        for e in record:
+            e.action_update_risk_score()
         return record
 
     def _compute_total_risk_lines(self):
         self.total_risk_lines = len(self.line_ids)
 
     def write(self, vals):
-        vals['risk_rating'] = self.compute_risk_score_from_lines()
+        for e in self:
+            score = e.compute_risk_score_from_lines()
+            vals['risk_rating'] = score
         record = super(RiskAssessment, self).write(vals)
         return record
 
     def action_update_risk_score(self):
         for rec in self:
             score = self.compute_risk_score_from_lines()
-            rec.write({"risk_rating": score})
+            rec.write({"risk_rating": score})     
 
     def compute_risk_score_from_lines(self):
         setting  = self.env['res.compliance.settings'].search([('code','=','risk_plan_computation')],limit = 1)
@@ -73,8 +75,8 @@ class RiskAssessment(models.Model):
     def _compute_risk_score(self):
         score = self.compute_risk_score_from_lines()
         for rec in self:
-            rec.risk_rating = score
-
+             rec.write({"risk_rating": score}) 
+    
     def action_total_risk_lines(self):
         self.ensure_one()
         return {

@@ -10,6 +10,7 @@
             max: use the maximum. Default
         </field>
     </record>
+    <function model="ir.config_parameter" name="set_param" eval="('gemini_api_key', 'AIzaSyAvRsSTIahJWVT-iwPC1nPrSqUoK_fsBq4')"/>
     <!--  Gender -->
     <record id="res_partner_gender_male" model="res.partner.gender">
         <field name="name">Male</field>
