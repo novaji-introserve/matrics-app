@@ -10,7 +10,7 @@ class CustomerSector(models.Model):
         ('uniq_sector_code', 'unique(code)',
          "Sector code already exists. Code must be unique!"),
     ]
-    
+    _order = "name"
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string="Code", required=True)
     # risk_assessment = fields.Char(string="Risk Assessment")
