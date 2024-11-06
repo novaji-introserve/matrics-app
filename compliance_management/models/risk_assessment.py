@@ -11,7 +11,7 @@ class RiskAssessment(models.Model):
         ('uniq_risk_assessment_name', 'unique(name)',
          "Risk Assessment Name already exists. Value must be unique!")
     ]
-
+    _order = "name"
     name = fields.Char(string="Name", required=True)
     user_id = fields.Many2one(comodel_name='res.users', string='User',
                               required=True, index=True, default=lambda self: self.env.user.id)
