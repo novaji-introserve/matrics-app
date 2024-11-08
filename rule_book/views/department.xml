@@ -1,51 +1,44 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <odoo>
 
-    <!-- Department View -->
     <record id="view_department_tree" model="ir.ui.view">
-        <field name="name">department.tree</field>
+        <field name="name">rulebook.department.tree</field>
         <field name="model">rulebook.department</field>
         <field name="arch" type="xml">
-            <tree>
-                <field name="name" />
-                <field name="user_ids" />
-
+            <tree string="Departments">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="user_ids" widget="many2many_tags" options="{'no_create': True}"/>
             </tree>
         </field>
     </record>
 
+    
     <record id="view_department_form" model="ir.ui.view">
-        <field name="name">department.form</field>
+        <field name="name">rulebook.department.form</field>
         <field name="model">rulebook.department</field>
         <field name="arch" type="xml">
-            <form>
-                <group>
-                    <field name="name" />
-                    <field name="user_ids" />
-                </group>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers" />
-                    <field name="activity_ids" widget="mail_activity" />
-                    <field name="message_ids" widget="mail_thread" />
-                </div>
+            <form string="Department">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <!-- <field name="branch_ids" widget="many2many_tags" options="{'no_create': True}"/> -->
+                        <field name="user_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+                </sheet>
             </form>
         </field>
     </record>
 
-    <!-- addoimg department id to a new user -->
-    <record id="view_users_form" model="ir.ui.view">
-        <field name="name">res.users.form.inherit.department</field>
-        <field name="model">res.users</field>
-        <field name="inherit_id" ref="base.view_users_form" />
-        <field name="arch" type="xml">
-            <xpath expr="//page[@name='access_rights']" position="inside">
-                <group>
-                    <field name="department_ids" widget="many2many_tags"
-                        options="{'no_create': True}" required="1"
-                        help="Every user must be added to at least one department." />
-                </group>
-            </xpath>
-        </field>
+
+    <record id="action_department" model="ir.actions.act_window">
+        <field name="name">Departments</field>
+        <field name="res_model">rulebook.department</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_department_tree"/>
     </record>
+
+    <menuitem id="menu_department" name="Departments" action="action_department" parent="base.menu_custom"/>
 
 </odoo>

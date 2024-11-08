@@ -37,7 +37,7 @@
 					<div class="layout-page">
 						<!-- statistic page -->
 						<div class="row ">
-							<div class="col-12 col-lg-2 mb-4">
+							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
 								<div class="card h-100">
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
@@ -60,7 +60,7 @@
 								</div>
 							</div>
 							<!-- Repeat for the remaining 4 cards -->
-							<div class="col-12 col-lg-2 mb-4">
+							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
 								<div class="card h-100">
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
@@ -82,29 +82,9 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-12 col-lg-2 mb-4">
-								<div class="card h-100">
-									<div class="card-body">
-										<div class="card-title d-flex align-items-start justify-content-between mb-4">
-											<div class="avatar flex-shrink-0">
-												<img src="rule_book/static/assets/img/icons/object/theme.png" alt="wallet info" class="rounded" />
-											</div>
-										</div>
-										<p class="mb-1">
-											Rulebook Themes
-										</p>
-										<h4 class="card-title mb-3">
-											<t t-out="state.totalThemes" />
-										</h4>
-										<small class="text-success fw-medium">
-											<i class="bx bx-up-arrow-alt">
-											</i>
-											<t t-out="state.newThemesToday" />
-										</small>
-									</div>
-								</div>
-							</div>
-							<div class="col-12 col-lg-2 mb-4">
+
+
+							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
 								<div class="card h-100">
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
@@ -126,7 +106,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-12 col-lg-2 mb-4">
+							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
 								<div class="card h-100">
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
@@ -148,7 +128,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-12 col-lg-2 mb-4">
+							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
 								<div class="card h-100">
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">

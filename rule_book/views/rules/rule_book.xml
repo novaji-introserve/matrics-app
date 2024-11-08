@@ -58,7 +58,7 @@
                 <group string="Basic Information" class="section-group" style="margin-top: 20px;">
                     <group col="2">
                         <field name="name" class="input" placeholder="Select rulebook title" />
-                        <field name="theme_id" placeholder="Select a theme" />
+                        <!-- <field name="theme_id" placeholder="Select a theme" /> -->
                         <field name="type_of_return" placeholder="Specify type of return"
                             class="html_field" widget="html" />
                     </group>
