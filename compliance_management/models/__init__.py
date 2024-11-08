@@ -33,3 +33,4 @@ from . import risk_assessment_plan
 from . import settings
 from . import transaction
 from . import transaction_screening_rule
+from . import pep_customer

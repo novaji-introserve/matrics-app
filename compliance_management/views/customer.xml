@@ -66,6 +66,11 @@
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Add Customer to PEP List. Are you sure?"
                         attrs="{'invisible': [('is_pep', '=',True)]}" />
+                    <button name="action_unmark_pep" class="oe_highlight" type="object"
+                        string="Delist from Global PEP"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Unlink this customer from Global PEP list. Are you sure?" 
+                        attrs="{'invisible': [('global_pep', '=',False)]}" />
                     <button name="action_remove_pep" type="object"
                         string="Remove From PEP List"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
@@ -202,4 +207,72 @@
             </kanban>
         </field>
     </record>
+
+    <!-- Report on Settings -->
+    <record id="compliance_pep_customers_tree" model="ir.ui.view">
+        <field name="name">res_compliance_pep_customers_tree</field>
+        <field name="model">res.customer.pep</field>
+        <field name="arch" type="xml">
+            <tree string="Customer matching PEP" create="False" delete="False">
+                <field name="name" string="Name" />
+                <field name="customer_id" />
+                <field name="firstname" />
+                <field name="lastname" />
+                <field name="unique_identifier" />
+                <field name="branch_id" />
+                <field name="pep_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_customer_pep_search" model="ir.ui.view">
+        <field name="name">Customer PEP Search Custom</field>
+        <field name="model">res.customer.pep</field>
+        <field name="priority" eval="1000"/>
+        <field name="arch" type="xml">
+            <search string="Search Customer PEP">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="firstname"/>
+                <field name="lastname"/>
+                <separator/>
+                <filter string="Customers" name="type_customer" domain="[('internal_category', '=', 'customer')]"/>
+                <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
+                <filter string="Partners" name="type_partner" domain="[('internal_category', '=', 'partner')]"/>
+                <filter string="Respondents" name="type_respondent" domain="[('internal_category', '=', 'respondent')]"/>
+                <filter string="Correspondent" name="type_correspondent" domain="[('internal_category', '=', 'correspondent')]"/>
+                <separator/>
+                <group expand="0" name="group_by" string="Group By">
+                    <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" />
+                    <filter name="group_internal_category" string="Category" context="{'group_by': 'internal_category'}"/>
+                </group>
+            </search>
+          
+        </field>
+    </record>
+
+    <record model="ir.actions.server" id="action_mark_pep">
+        <field name="name">Mark PEP</field>
+        <field name="model_id" ref="model_res_customer_pep"/>
+        <field name="binding_model_id" ref="model_res_customer_pep"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_mark_pep()</field>
+    </record>
+
+    <record id="action_view_customer_pep" model="ir.actions.server">
+        <field name="name">Customers On PEP List</field>
+        <field name="model_id" ref="model_res_customer_pep" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.action_view_customer_pep()</field>
+    </record>
+
+    <menuitem
+        id="menu_compliance_customer_pep"
+        action="action_view_customer_pep"
+        parent="menu_compliance_customer_heading"
+        name="Customers Matching PEPs"
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+        sequence="50" />
+
 </odoo>

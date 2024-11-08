@@ -103,6 +103,7 @@ class Customer(models.Model):
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
         string='Accounts', compute='_total_accounts', store=True)
+    global_pep_id = fields.Many2one('res.pep', string='Related Global PEP',tracking=True)
 
     @api.model
     def create(self, values):
@@ -161,38 +162,51 @@ class Customer(models.Model):
             'view_mode': 'form',
             'context': {"default_customer_id": self.id},
         }
+    
+    def action_unmark_pep(self):
+        for e in self:
+            e.write({'is_pep':False,'global_pep':False,'global_pep_id': None})
+            e.action_compute_risk_score_with_plan()
 
     def action_add_pep(self):
-        self.write({'is_pep': True})
-        self.action_compute_risk_score_with_plan()
+        for e in self:
+            e.write({'is_pep': True})
+            e.action_compute_risk_score_with_plan()
 
     def action_remove_pep(self):
-        self.write({'is_pep': False})
-        self.action_compute_risk_score_with_plan()
+        for e in self:
+            e.write({'is_pep': False})
+            e.action_compute_risk_score_with_plan()
 
     def action_add_fep(self):
-        self.write({'is_fep': True})
-        self.action_compute_risk_score_with_plan()
+        for e in self:
+            e.write({'is_fep': True})
+            e.action_compute_risk_score_with_plan()
 
     def action_remove_fep(self):
-        self.write({'is_fep': False})
-        self.action_compute_risk_score_with_plan()
+        for e in self:
+            e.write({'is_fep': False})
+            e.action_compute_risk_score_with_plan()
 
     def action_blacklist(self):
-        self.write({'is_blacklist': True})
-        self.action_compute_risk_score_with_plan()
+        for e in self:
+            e.write({'is_blacklist': True})
+            e.action_compute_risk_score_with_plan()
 
     def action_remove_blacklist(self):
-        self.write({'is_blacklist': False})
-        self.action_compute_risk_score_with_plan()
+        for e in self:
+            e.write({'is_blacklist': False})
+            e.action_compute_risk_score_with_plan()
 
     def action_watchlist(self):
-        self.write({'is_watchlist': True})
-        self.action_compute_risk_score_with_plan()
+        for e in self:
+            e.write({'is_watchlist': True})
+            e.action_compute_risk_score_with_plan()
 
     def action_remove_watchlist(self):
-        self.write({'is_watchlist': False})
-        self.action_compute_risk_score_with_plan()
+        for e in self:
+            e.write({'is_watchlist': False})
+            e.action_compute_risk_score_with_plan()
 
     def action_conduct_risk_assessment(self):
         return {
@@ -209,7 +223,7 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','vendor')],
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
             'context': {'search_default_group_branch': 1}
         }
 
