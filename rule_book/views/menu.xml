@@ -24,18 +24,18 @@
       </field>
     </record>
 
-    <record id="action_rulebook_department" model="ir.actions.act_window">
+    <!-- <record id="action_rulebook_department" model="ir.actions.act_window">
       <field name="name">Departments</field>
       <field name="res_model">rulebook.department</field>
       <field name="view_mode">tree,form</field>
-    </record>
+    </record> -->
 
-<!-- Branch -->
-    <record id="action_rulebook_branch" model="ir.actions.act_window">
+    <!-- Branch -->
+    <!-- <record id="action_rulebook_branch" model="ir.actions.act_window">
       <field name="name">Branches</field>
       <field name="res_model">rulebook.branch</field>
       <field name="view_mode">tree,form</field>
-    </record>
+    </record> -->
 
     <!-- Risk Categories -->
     <record id="action_rulebook_risk_category" model="ir.actions.act_window">
@@ -122,9 +122,9 @@
     <!-- Submenu for Configuration (with Exception Management) -->
     <menuitem id="menu_rulebook_configuration" name="Configuration" parent="menu_rulebook_theme_root" sequence="3" />
     <menuitem id="menu_rulebook_responsible" name="Email Group" parent="menu_rulebook_configuration" action="action_rulebook_responsible" sequence="4" />
-    <menuitem id="menu_rulebook_department" name="Departments" parent="menu_rulebook_configuration" action="action_rulebook_department" sequence="8" />
-<!-- branch -->
- <menuitem id="menu_rulebook_branch" name="Branches" parent="menu_rulebook_configuration" action="action_rulebook_branch" sequence="8" />
+    <!-- <menuitem id="menu_rulebook_department" name="Departments" parent="menu_rulebook_configuration" action="action_rulebook_department" sequence="8" /> -->
+    <!-- branch -->
+    <!-- <menuitem id="menu_rulebook_branch" name="Branches" parent="menu_rulebook_configuration" action="action_rulebook_branch" sequence="8" /> -->
 
     <menuitem id="menu_rulebook_risk_category" name="Risk Categories" parent="menu_rulebook_configuration" action="action_rulebook_risk_category" sequence="7" />
 

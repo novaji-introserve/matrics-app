@@ -96,6 +96,12 @@ class Rulebook(models.Model):
         tracking=True,
         help="Select the person responsible for this rulebook.",
     )
+    officers_responsible = fields.Many2many(
+        string="Officers Responsible",
+        required=True,
+        tracking=True,
+        help="Select the person(s) responsible for this rulebook.",
+    )
 
     description = fields.Html(
         string="Description",

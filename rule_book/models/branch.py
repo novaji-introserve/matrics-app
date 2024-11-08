@@ -3,15 +3,27 @@ from odoo import models, fields, api
 
 
 
-class Branch(models.Model):
-    _name = 'rulebook.branch'
-    _description = 'Branch'
+# class Branch(models.Model):
+#     _name = 'rulebook.branch'
+#     _description = 'Branch'
+#     _sql_constraints = [
+#         ('uniq_branch_code', 'unique(code)',
+#          "Branch code already exists. Code must be unique!"),
+#     ]
+    
+#     name = fields.Char(string="Branch", required=True)
+#     location = fields.Char(string="Location", required=True)
+#     users = fields.Many2many('res.users', 'res_branch_users_rel', 'branch_id', 'user_id')
+    
+# class Branch(models.Model):
+#     _name = 'rulebook.branch'
+#     _description = 'Branch'
 
-    name = fields.Char(string="Branch Name", required=True)
-    code = fields.Char(string="Branch Code")
-    location = fields.Char(string="Branch Location")    
-    # Relationship with Users
-    user_ids = fields.Many2many('res.users', 'branch_id', string="Users")
+#     name = fields.Char(string="Branch Name", required=True)
+#     code = fields.Char(string="Branch Code")
+#     location = fields.Char(string="Branch Location")    
+#     # Relationship with Users
+#     user_ids = fields.Many2many('res.users', 'branch_id', string="Users")
 
 # class Branch(models.Model):
     
