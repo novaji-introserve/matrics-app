@@ -16,19 +16,19 @@
     "category": "icomply",
     "version": "0.1",
     # any module necessary for this one to work correctly
-    "depends": ["base", "mail", "calendar",'hide_powered_by_odoo','legion_hide_odoo','hide_menu_user'
+    "depends": ["base", "mail", "calendar",'hide_powered_by_odoo','legion_hide_odoo','hr'
                 # "access_apps"
                 ],
     # always loaded
     "data": [
-        "data/preloaded_data/rule_book_branch.xml",
+        # "data/preloaded_data/rule_book_branch.xml",
         "views/menu.xml",
         "views/rules/rule_theme.xml",
         "views/rules/rulebook_sources_views.xml",
         "views/rules/rulebook_title_views.xml",
         # "security/ir.model.access.csv",
         "views/risk/risk_category.xml",
-       "data/preloaded_data/rule_book_department.xml",
+    #    "data/preloaded_data/rule_book_department.xml",
     #    
         "views/responsible.xml",
         "views/rules/rule_book.xml",
@@ -39,7 +39,7 @@
         "data/preloaded_data/risk_categories.xml",
         
         
-        "data/preloaded_data/users.xml",
+        # "data/preloaded_data/users.xml",
         "data/preloaded_data/rule_book_sources.xml",
         
         "views/public/rule_book_submission.xml",
@@ -48,12 +48,13 @@
         "views/rules/web_scaping.xml",
         "data/schedules/web_scraping.xml",
         "views/public/thank_you.xml",
-        "security/group_action.xml",
+        # "security/group_action.xml",
         "views/pdf_chat.xml",
-        "views/branch.xml",
+        # "views/import_users.xml"
+        # "views/branch.xml",
         # 'security/security.csv',
         # "views/department_.xml",
-         "views/department.xml",
+        #  "views/department.xml",
     ],
     # only loaded in demonstration mode
     "demo": [

@@ -14,7 +14,7 @@ class IrModelAccess(models.Model):
     ]
 
     model_list = [
-        "rulebook.department",
+        # "rulebook.department",
         "rulebook",
         "rulebook.report",
         "rulebook.theme",
@@ -26,7 +26,8 @@ class IrModelAccess(models.Model):
         "rulebook.risk_category",
         "rulebook.sources",
         "rulebook.title",
-        "rulebook.branch"
+        # "rulebook.branch"
+        "pdf.chat.log"
     ]
 
     @api.model

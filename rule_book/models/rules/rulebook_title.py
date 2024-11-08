@@ -714,121 +714,121 @@ class RulebookTitle(models.Model):
             raise ValueError(f"Error processing date '{date_str}': {e}")
 
     # def get_date_from_url(self, url):
-        date_pattern1 = re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}")
-        date_pattern2 = re.compile(r"\d{1,2}-[A-Za-z]{1,15}-\d{4}")
-        date_pattern3 = re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}")
-        date_pattern4 = re.compile(r"\d{1,2}[A-Za-z]{3}\d{4}")
-        date_pattern5 = re.compile(r"[A-Za-z]{3,10}-\d{4}")
-        date_pattern6 = re.compile(r"\d{4}/\d{2}")
-        date_pattern7 = re.compile(r"\([A-Za-z]{3,10}\d{4}\)")
-        date_pattern8 = re.compile(r"\b\d{4}\b")
-        date_pattern9 = re.compile(r"\d{4}-\d{2}")
+    #     date_pattern1 = re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}")
+    #     date_pattern2 = re.compile(r"\d{1,2}-[A-Za-z]{1,15}-\d{4}")
+    #     date_pattern3 = re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}")
+    #     date_pattern4 = re.compile(r"\d{1,2}[A-Za-z]{3}\d{4}")
+    #     date_pattern5 = re.compile(r"[A-Za-z]{3,10}-\d{4}")
+    #     date_pattern6 = re.compile(r"\d{4}/\d{2}")
+    #     date_pattern7 = re.compile(r"\([A-Za-z]{3,10}\d{4}\)")
+    #     date_pattern8 = re.compile(r"\b\d{4}\b")
+    #     date_pattern9 = re.compile(r"\d{4}-\d{2}")
 
 
 
-        match1 = date_pattern1.search(url)
-        match2 = date_pattern2.search(url)
-        match3 = date_pattern3.search(url)
-        match4 = date_pattern4.search(url)
-        match5 = date_pattern5.search(url)
-        match6 = date_pattern6.search(url)
-        match7 = date_pattern7.search(url)
-        match8 = date_pattern8.search(url)
-        match9 = date_pattern9.search(url)
+    #     match1 = date_pattern1.search(url)
+    #     match2 = date_pattern2.search(url)
+    #     match3 = date_pattern3.search(url)
+    #     match4 = date_pattern4.search(url)
+    #     match5 = date_pattern5.search(url)
+    #     match6 = date_pattern6.search(url)
+    #     match7 = date_pattern7.search(url)
+    #     match8 = date_pattern8.search(url)
+    #     match9 = date_pattern9.search(url)
 
-        if match1:
-            date = match1.group(0)
-            # return date
-            try:
-                date_obj = datetime.strptime(date, "%b-%d-%Y")
-                formatted_date = date_obj.strftime("%d-%m-%Y")
-                return formatted_date
-            except ValueError:
-                pass  # Invalid date format, continue to the next pattern
+    #     if match1:
+    #         date = match1.group(0)
+    #         # return date
+    #         try:
+    #             date_obj = datetime.strptime(date, "%b-%d-%Y")
+    #             formatted_date = date_obj.strftime("%d-%m-%Y")
+    #             return formatted_date
+    #         except ValueError:
+    #             pass  # Invalid date format, continue to the next pattern
 
-        if match2:
-            date = match2.group(0)
-            # return date
-            try:
-                date_obj = datetime.strptime(date, "%d-%B-%Y")
-                formatted_date = date_obj.strftime("%d-%m-%Y")
-                return formatted_date
-            except ValueError:
-                pass  # Invalid date format
-        if match3:
-            date = match3.group(0)
-            # return date
-            try:
-                date_obj = datetime.strptime(date, "%B-%d-%Y")
-                formatted_date = date_obj.strftime("%d-%m-%Y")
-                return formatted_date
-            except ValueError:
-                pass  # Invalid date format
-        if match4:
-            date = match4.group(0)
-            # return date
-            try:
-                date_obj = datetime.strptime(date, "%d%b%Y")
-                formatted_date = date_obj.strftime("%d-%m-%Y")
+    #     if match2:
+    #         date = match2.group(0)
+    #         # return date
+    #         try:
+    #             date_obj = datetime.strptime(date, "%d-%B-%Y")
+    #             formatted_date = date_obj.strftime("%d-%m-%Y")
+    #             return formatted_date
+    #         except ValueError:
+    #             pass  # Invalid date format
+    #     if match3:
+    #         date = match3.group(0)
+    #         # return date
+    #         try:
+    #             date_obj = datetime.strptime(date, "%B-%d-%Y")
+    #             formatted_date = date_obj.strftime("%d-%m-%Y")
+    #             return formatted_date
+    #         except ValueError:
+    #             pass  # Invalid date format
+    #     if match4:
+    #         date = match4.group(0)
+    #         # return date
+    #         try:
+    #             date_obj = datetime.strptime(date, "%d%b%Y")
+    #             formatted_date = date_obj.strftime("%d-%m-%Y")
 
-                return formatted_date
-            except ValueError:
-                pass  # Invalid date format, continue to the next pattern
-        if match5:
-            date = match5.group(0)
-            # return date
-            try:
-                date_obj = datetime.strptime(date, "%b-%Y")
-                formatted_date = date_obj.strftime("%m-%Y")
+    #             return formatted_date
+    #         except ValueError:
+    #             pass  # Invalid date format, continue to the next pattern
+    #     if match5:
+    #         date = match5.group(0)
+    #         # return date
+    #         try:
+    #             date_obj = datetime.strptime(date, "%b-%Y")
+    #             formatted_date = date_obj.strftime("%m-%Y")
 
-                return formatted_date
-            except ValueError:
-                pass  # Invalid date format, continue to the next pattern
-        if match6:
-            date = match6.group(0)
-            # return date
-            try:
-                # date_obj = datetime.strptime(date, "%b-%Y")
-                # formatted_date = date_obj.strftime("%m-%Y")
-                date_obj = datetime.strptime(date, "%Y/%m")
-                formatted_date = date_obj.strftime("%Y-%m-01")
+    #             return formatted_date
+    #         except ValueError:
+    #             pass  # Invalid date format, continue to the next pattern
+    #     if match6:
+    #         date = match6.group(0)
+    #         # return date
+    #         try:
+    #             # date_obj = datetime.strptime(date, "%b-%Y")
+    #             # formatted_date = date_obj.strftime("%m-%Y")
+    #             date_obj = datetime.strptime(date, "%Y/%m")
+    #             formatted_date = date_obj.strftime("%Y-%m-01")
 
-                return formatted_date
+    #             return formatted_date
         
-            except ValueError:
-                pass  # Invalid date format, continue to the next pattern
+    #         except ValueError:
+    #             pass  # Invalid date format, continue to the next pattern
             
 
-        if match7:
-            date = match7.group(0)
-            # return date
-            try:
+    #     if match7:
+    #         date = match7.group(0)
+    #         # return date
+    #         try:
 
-                date_obj = datetime.strptime(date, "(%B%Y)")
-                formatted_date = date_obj.strftime("%m-%Y")
+    #             date_obj = datetime.strptime(date, "(%B%Y)")
+    #             formatted_date = date_obj.strftime("%m-%Y")
 
-                return formatted_date
-            except ValueError:
-                pass  # Invalid date format, continue to the next pattern
-        if match8:
-            try:
+    #             return formatted_date
+    #         except ValueError:
+    #             pass  # Invalid date format, continue to the next pattern
+    #     if match8:
+    #         try:
 
-                extracted_year = match8.group()
-                return extracted_year
-            except ValueError:
-                pass
+    #             extracted_year = match8.group()
+    #             return extracted_year
+    #         except ValueError:
+    #             pass
 
-        if match9:
-            date = match9.group(0)
-            try:
-                date_obj = datetime.strptime(date, "%Y-%m")
-                formatted_date = date_obj.strftime("%Y-%m-01")  # Assuming day is 1
-                return formatted_date
-            except ValueError:
-                pass
+    #     if match9:
+    #         date = match9.group(0)
+    #         try:
+    #             date_obj = datetime.strptime(date, "%Y-%m")
+    #             formatted_date = date_obj.strftime("%Y-%m-01")  # Assuming day is 1
+    #             return formatted_date
+    #         except ValueError:
+    #             pass
 
 
-        return ""
+    #     return ""
 
 
     def get_date_from_url(self, url):
