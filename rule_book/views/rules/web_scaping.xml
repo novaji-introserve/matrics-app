@@ -39,7 +39,7 @@
     </record>
 
     <record id="view_external_resource_search_" model="ir.ui.view">
-        <field name="name">>external.resource.search</field>
+        <field name="name">external.resource.search</field>
         <field name="model">external.resource</field>
         <field name="arch" type="xml">
             <search >

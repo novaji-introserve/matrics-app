@@ -1,0 +1,787 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data >
+        <record id="boi_branch_01" model="rulebook.branch">
+            <field name="name">Head Office</field>
+            <field name="location">Plot 256 Herbert Macaulay Way Central Business District Abuja FCT</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_02" model="rulebook.branch">
+            <field name="name">Lagos Office</field>
+            <field name="location">23 Marina Lagos Island Lagos</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_03" model="rulebook.branch">
+            <field name="name">Enugu Office</field>
+            <field name="location">39A Garden Avenue Enugu Enugu State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_04" model="rulebook.branch">
+            <field name="name">Kaduna Office</field>
+            <field name="location">18A Muhammadu Buhari Way Kaduna Kaduna State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_05" model="rulebook.branch">
+            <field name="name">Port Harcourt Office</field>
+            <field name="location">186 Port Harcourt/Aba Express Road Port Harcourt Rivers State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_06" model="rulebook.branch">
+            <field name="name">Bauchi Office</field>
+            <field name="location">16 Yandoka Road Bauchi Bauchi State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_07" model="rulebook.branch">
+            <field name="name">Asaba Office</field>
+            <field name="location">Oshimili South Delta State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_08" model="rulebook.branch">
+            <field name="name">Kano Office</field>
+            <field name="location">3 Bank Road Kano Kano State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_09" model="rulebook.branch">
+            <field name="name">Akure Office</field>
+            <field name="location">State Secretariat Road Alagbaka Akure Ondo State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_10" model="rulebook.branch">
+            <field name="name">Ibadan Office</field>
+            <field name="location">Plot 9 Agodi GRA Ibadan Oyo State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_11" model="rulebook.branch">
+            <field name="name">Jos Office</field>
+            <field name="location">35 Murtala Mohammed Way Jos Plateau State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_12" model="rulebook.branch">
+            <field name="name">Abakaliki Desk Office</field>
+            <field name="location">1 Water Works Road Abakaliki Ebonyi State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_13" model="rulebook.branch">
+            <field name="name">Aba Desk Office</field>
+            <field name="location">7 Factory Road Aba Abia State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_14" model="rulebook.branch">
+            <field name="name">Abeokuta Desk Office</field>
+            <field name="location">Block B MITROS House Okelewo Abeokuta Ogun State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_15" model="rulebook.branch">
+            <field name="name">Adamawa Desk Office</field>
+            <field name="location">80 Mohammed Mustapha Way Jimeta Yola Adamawa State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_16" model="rulebook.branch">
+            <field name="name">Akwa Ibom Desk Office</field>
+            <field name="location">Plot 215 Aka Road Uyo Akwa Ibom State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_17" model="rulebook.branch">
+            <field name="name">Benin Desk Office</field>
+            <field name="location">67 Airport Road Benin City Edo State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_18" model="rulebook.branch">
+            <field name="name">Calabar Desk Office</field>
+            <field name="location">14 Barracks Road Calabar Cross River State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_19" model="rulebook.branch">
+            <field name="name">Gombe Desk Office</field>
+            <field name="location">New Commercial Layout Near Central Market Gombe State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_20" model="rulebook.branch">
+            <field name="name">Ilorin Desk Office</field>
+            <field name="location">22 Ejiba Road Off Murtala Mohammed Way Ilorin Kwara State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_21" model="rulebook.branch">
+            <field name="name">Jalingo Desk Office</field>
+            <field name="location">Investment House 22 Hammaruwa Way Jalingo Taraba State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_22" model="rulebook.branch">
+            <field name="name">Katsina Desk Office</field>
+            <field name="location">Old Civil Service Commission Building IBB Way Katsina State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_23" model="rulebook.branch">
+            <field name="name">Kebbi Desk Office</field>
+            <field name="location">Plot 20 Emir Haruna Road Birnin Kebbi Kebbi State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_24" model="rulebook.branch">
+            <field name="name">Lokoja Desk Office</field>
+            <field name="location">Kogi State Investment House Lokoja Kogi State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_25" model="rulebook.branch">
+            <field name="name">Maiduguri Desk Office</field>
+            <field name="location">35 Sir Kashim Ibrahim Way Maiduguri Borno State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_26" model="rulebook.branch">
+            <field name="name">Makurdi Desk Office</field>
+            <field name="location">16 JS Tarka Way Makurdi Benue State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_27" model="rulebook.branch">
+            <field name="name">Minna Desk Office</field>
+            <field name="location">Beside Central Bank of Nigeria Minna Niger State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_28" model="rulebook.branch">
+            <field name="name">Osogbo Desk Office</field>
+            <field name="location">Osun State Property Development Corporation Osogbo Osun State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_29" model="rulebook.branch">
+            <field name="name">Owerri Desk Office</field>
+            <field name="location">Plot P/20 Chief Emmanuel Iwuanyanwu Avenue New Owerri Imo State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_30" model="rulebook.branch">
+            <field name="name">Sokoto Desk Office</field>
+            <field name="location">27A Abdullahi Fodio Road Sokoto Sokoto State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_31" model="rulebook.branch">
+            <field name="name">Yenagoa Desk Office</field>
+            <field name="location">Bayelsa State Investment House Amarata Yenagoa Bayelsa State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_32" model="rulebook.branch">
+            <field name="name">Zamfara Desk Office</field>
+            <field name="location">Former Ministry of Commerce Building Sokoto Road Gusau Zamfara State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_33" model="rulebook.branch">
+            <field name="name">Damaturu Desk Office</field>
+            <field name="location">Plot 117 Gujba Road GRA Damaturu Yobe State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+
+        <record id="boi_branch_34" model="rulebook.branch">
+            <field name="name">Dutse Desk Office</field>
+            <field name="location">Plot 8 Kiyawa Road GRA Dutse Jigawa State</field>
+            <field name="department_ids" eval="[(6, 0, [
+                ref('department_fa'),
+                ref('department_treasury'),
+                ref('department_ans'),
+                ref('department_headmgt'),
+                ref('department_it'),
+                ref('department_legald'),
+                ref('department_cyber'),
+                ref('department_hr'),
+                ref('department_op'),
+                ref('department_legal'),
+                ref('department_consumer'),
+                ref('department_ia'),
+                ref('department_ic'),
+                ref('department_comp'),
+                ref('department_anp'),
+                ref('department_riskmgt')
+            ])]"></field>
+        </record>
+        
+    </data>
+</odoo>

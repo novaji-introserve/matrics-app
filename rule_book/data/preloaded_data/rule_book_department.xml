@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Finance and Accounting Department -->
+        <record id="department_fa" model="rulebook.department">
+
+            <field name="name">Finance and Accounting</field>
+            <field name="code" >FA</field>
+            <!-- <field name="user_ids" eval="[(4, ref('base.group_compliance_chief_compliance_officer'))]"/> -->
+        </record>
+        
+
+        <!-- Treasury Department -->
+        <record id="department_treasury" model="rulebook.department">
+            <field name="name">Treasury</field>
+            <field name="code" >TROPS</field>
+            <!-- <field name="user_ids" eval="[(4, ref('base.group_compliance_chief_compliance_officer'))]"/> -->
+        </record>
+
+        <!-- Assest and Liability Department -->
+        <record id="department_ans" model="rulebook.department">
+            <field name="name">Assest and Liability</field>
+            <field name="code" >AL</field>
+
+        </record>
+
+        <!-- Head/Executive Management Department -->
+        <record id="department_headmgt" model="rulebook.department">
+            <field name="name">Head/Executive Management</field>
+            <field name="code" >EXEC</field>
+
+        </record>
+
+        <!-- IT Department -->
+        <record id="department_it" model="rulebook.department">
+            <field name="name">Infromation Technology</field>
+            <field name="code" >IT</field>
+
+        </record>
+
+        <!-- Legal Division Department -->
+        <record id="department_legald" model="rulebook.department">
+            <field name="name">Legal Division</field>
+            <field name="code" >LD</field>
+
+        </record>
+
+        <!-- Cyber Security Department -->
+        <record id="department_cyber" model="rulebook.department">
+            <field name="name">Cyber Security</field>
+            <field name="code" >CS</field>
+
+        </record>
+
+        <!-- Human Resources Department -->
+        <record id="department_hr" model="rulebook.department">
+            <field name="name">Human Resources</field>
+            <field name="code" >HR</field>
+
+        </record>
+
+        <!-- Operations  Department -->
+        <record id="department_op" model="rulebook.department">
+            <field name="name">Operations</field>
+            <field name="code" >OPS</field>
+
+        </record>
+
+        <!-- Legal Department -->
+        <record id="department_legal" model="rulebook.department">
+            <field name="name">Legal</field>
+            <field name="code" >Legal</field>
+
+        </record>
+
+        <!-- Consumer Care Department -->
+        <record id="department_consumer" model="rulebook.department">
+            <field name="name">Consumer Care</field>
+            <field name="code" >CC</field>
+
+        </record>
+
+        <!-- Internal Audit Department -->
+        <record id="department_ia" model="rulebook.department">
+            <field name="name">Internal Audit</field>
+            <field name="code" >AUDIT</field>
+
+        </record>
+
+        <!-- Internal Control Department -->
+        <record id="department_ic" model="rulebook.department">
+            <field name="name">Internal Control</field>
+            <field name="code" >IC</field>
+
+        </record>
+
+        <!-- Compliance Department -->
+        <record id="department_comp" model="rulebook.department">
+            <field name="name">Compliance</field>
+            <field name="code" >Complinace</field>
+
+        </record>
+
+        <!-- Admin and Procurement -->
+         <record id="department_anp" model="rulebook.department">
+                <field name="name">Admin and Procurement</field>
+                <field name="code" >AP</field>
+
+            </record>
+
+        <!-- Risk Management  -->
+        <record id="department_riskmgt" model="rulebook.department">
+            <field name="name">Risk Management</field>
+            <field name="code" >RISK</field>
+
+        </record>
+
+    </data>
+
+</odoo>

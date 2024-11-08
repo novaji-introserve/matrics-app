@@ -28,12 +28,13 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Enter the title of the rulebook.",
+        # default=""
     )
 
     theme_id = fields.Many2one(
         "rulebook.theme",
         string="Rulebook Theme",
-        required=True,
+        required=False,
         tracking=True,
         help="Select the theme associated with this rulebook.",
     )
@@ -45,6 +46,7 @@ class Rulebook(models.Model):
         help="Specify the risk rating of the rulebook.",
         compute="_compute_risk_rating",
         store=True,
+        # default="critical"
     )
 
     risk_category = fields.Many2one(
@@ -53,6 +55,7 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Select the risk category for this rulebook.",
+        default="Compliance Risk"
     )
 
     first_line_escalation = fields.Many2one(
@@ -203,7 +206,7 @@ class Rulebook(models.Model):
 
     is_recurring = fields.Boolean(
         string="Recurring",
-        default=False,
+        default=True,
         help="Indicate if this rulebook entry should be recurring.",
     )
 

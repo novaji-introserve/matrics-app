@@ -16,16 +16,20 @@
     "category": "icomply",
     "version": "0.1",
     # any module necessary for this one to work correctly
-    "depends": ["base", "mail", "calendar"],
+    "depends": ["base", "mail", "calendar",'hide_powered_by_odoo','legion_hide_odoo','hide_menu_user'
+                # "access_apps"
+                ],
     # always loaded
     "data": [
+        "data/preloaded_data/rule_book_branch.xml",
         "views/menu.xml",
         "views/rules/rule_theme.xml",
         "views/rules/rulebook_sources_views.xml",
         "views/rules/rulebook_title_views.xml",
-        "security/ir.model.access.csv",
+        # "security/ir.model.access.csv",
         "views/risk/risk_category.xml",
-        "views/department.xml",
+       "data/preloaded_data/rule_book_department.xml",
+    #    
         "views/responsible.xml",
         "views/rules/rule_book.xml",
         "data/email_templates/rule_book.xml",
@@ -33,7 +37,11 @@
         # "views/dashboard.xml",
         "data/settings/email_smtp.xml",
         "data/preloaded_data/risk_categories.xml",
+        
+        
+        "data/preloaded_data/users.xml",
         "data/preloaded_data/rule_book_sources.xml",
+        
         "views/public/rule_book_submission.xml",
         "data/email_templates/escalation_email.xml",
         "views/rules/reply_log.xml",
@@ -41,11 +49,16 @@
         "data/schedules/web_scraping.xml",
         "views/public/thank_you.xml",
         "security/group_action.xml",
-        "views/pdf_chat.xml"
+        "views/pdf_chat.xml",
+        "views/branch.xml",
+        # 'security/security.csv',
+        # "views/department_.xml",
+         "views/department.xml",
     ],
     # only loaded in demonstration mode
     "demo": [
         "demo/demo.xml",
+        # "demo/demo_department.xml"
     ],
     "installable": True,
     "application": True,
@@ -57,6 +70,7 @@
         'rule_book/static/src/components/*/*.scss',
         'rule_book/static/src/slider_field.xml',
         'rule_book/static/src/slider_field.js',
+        # 'custom_backend_theme/static/src/img/icons/*',
 
     ]},
 }

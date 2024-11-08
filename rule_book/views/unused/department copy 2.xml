@@ -1,0 +1,190 @@
+
+<odoo>
+    <!-- Branch Form View -->
+    <record id="view_branch_form" model="ir.ui.view">
+        <field name="name">rulebook.branch.form</field>
+        <field name="model">rulebook.branch</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+
+                        <group>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="location"/>
+                        </group>
+                    </group>
+
+                    <!-- Departments Heading and Tree View -->
+                    <!-- <h2 class="m-2">Departments</h2>
+                    <field name="department_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </tree>
+                    </field> -->
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Department Form View -->
+    <record id="view_department_form" model="ir.ui.view">
+        <field name="name">rulebook.department.form</field>
+        <field name="model">rulebook.department</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="code"/>
+                        </group>
+                       
+                    </group>
+
+                    <!-- Users Heading and Tree View -->
+                    <h2 class="m-2">Users</h2>
+                    <field name="user_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="login"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
+
+<!-- 
+<odoo>
+    <record id="view_branch_form" model="ir.ui.view">
+        <field name="name">rulebook.branch.form</field>
+        <field name="model">rulebook.branch</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Departments">
+                            <field name="department_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_department_form" model="ir.ui.view">
+        <field name="name">rulebook.department.form</field>
+        <field name="model">rulebook.department</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                      
+                    </group>
+                        <page string="Users">
+                            <field name="user_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="email"/>
+                                </tree>
+                            </field>
+                        </page>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo> -->
+
+<!-- <record id="view_branch_tree" model="ir.ui.view">
+    <field name="name">rulebook.branch.tree</field>
+    <field name="model">rulebook.branch</field>
+    <field name="arch" type="xml">
+        <tree>
+            <field name="name"/>
+            <field name="department_ids" widget="many2many_tags"/>
+        </tree>
+    </field>
+</record>
+
+<record id="view_branch_form" model="ir.ui.view">
+    <field name="name">rulebook.branch.form</field>
+    <field name="model">rulebook.branch</field>
+    <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="department_ids" widget="many2many_tags"/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record> -->
+<!-- <odoo>
+    <record id="view_department_tree" model="ir.ui.view">
+        <field name="name">department.tree</field>
+        <field name="model">rulebook.department</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="code" />
+                <field name="branch_id" />
+                <field name="user_ids" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_department_form" model="ir.ui.view">
+        <field name="name">department.form</field>
+        <field name="model">rulebook.department</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name" required="1" />
+                    <field name="code" />
+                    <field name="branch_id" required="1" />
+                    <field name="user_ids" widget="many2many_tags" options="{'no_create': True}" />
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_users_form" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.department</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group>
+                    <field name="department_ids" widget="many2many_tags" options="{'no_create': True}" required="1" help="Every user must be added to at least one department." />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo> -->

@@ -26,6 +26,7 @@ class IrModelAccess(models.Model):
         "rulebook.risk_category",
         "rulebook.sources",
         "rulebook.title",
+        "rulebook.branch"
     ]
 
     @api.model
