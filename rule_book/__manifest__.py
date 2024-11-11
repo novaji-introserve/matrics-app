@@ -69,12 +69,8 @@
         # "views/branch.xml",
         # 'security/security.csv',
         # "views/department_.xml",
-<<<<<<< Updated upstream
-         "views/department.xml",
-=======
         #  "views/department.xml",
         
->>>>>>> Stashed changes
     ],
     # only loaded in demonstration mode
     "demo": [
