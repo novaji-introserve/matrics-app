@@ -11,6 +11,7 @@ class AlertReport(models.Model):
     rulebook_name = fields.Char(string='Alert Name', readonly=True)
     reply_date = fields.Date(string='Response Date', readonly=True)
     rulebook_compute_date = fields.Datetime(string='Due Date', readonly=True)
+    department_id = fields.Many2one('hr.department', string='Department', readonly=True)
     submission_timing = fields.Selection([
         ('early', 'Early Submission'),
         ('on_time', 'Right on Time'),
