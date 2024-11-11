@@ -6,11 +6,6 @@ from dateutil.relativedelta import relativedelta
 from ...controllers.rule_book.rule_book import *
 import logging
 from odoo.exceptions import AccessError
-from odoo.exceptions import ValidationError
-import calendar
-import logging
-from datetime import date
-
 
 _logger = logging.getLogger(__name__)
 
@@ -39,7 +34,7 @@ class Rulebook(models.Model):
     theme_id = fields.Many2one(
         "rulebook.theme",
         string="Rulebook Theme",
-        # required=False,
+        required=False,
         tracking=True,
         help="Select the theme associated with this rulebook.",
     )
@@ -66,7 +61,7 @@ class Rulebook(models.Model):
     first_line_escalation = fields.Many2one(
         "res.users",
         string="First Line Escalation",
-        # required=True,
+        required=True,
         tracking=True,
         help="Select the user responsible for the first line escalation.",
     )
@@ -74,7 +69,7 @@ class Rulebook(models.Model):
     second_line_escalation = fields.Many2one(
         "res.users",
         string="Second Line Escalation",
-        # required=True,
+        required=True,
         tracking=True,
         help="Select the user responsible for the second line escalation.",
     )
@@ -95,26 +90,17 @@ class Rulebook(models.Model):
     )
 
     responsible_id = fields.Many2one(
-        "hr.department",
-        string="Department Responsible",
+        "rulebook.responsible",
+        string="Responsible",
         required=True,
         tracking=True,
-        help="Select the department responsible for this rulebook.",
+        help="Select the person responsible for this rulebook.",
     )
-    
-    officer_responsible = fields.Many2one(
-        'res.users',  # Assuming you are linking to the hr.employee model
-        string="Officer Responsible",
+    officers_responsible = fields.Many2many(
+        string="Officers Responsible",
         required=True,
         tracking=True,
-        help="Select the primary person responsible for this rulebook.",
-    )
-
-    officer_cc = fields.Many2many(
-        'res.users',  # Assuming you are linking to the hr.employee model
-        string="Officers To Copy",
-        tracking=True,
-        help="Select the person(s) to copy for this rulebook.",
+        help="Select the person(s) responsible for this rulebook.",
     )
 
     description = fields.Html(
@@ -134,14 +120,14 @@ class Rulebook(models.Model):
         help="List sanctions here, using headings, styling, and other formatting options for clarity.",
     )
 
-    due_date_value = fields.Integer(
-        string="Due Date Value",
-        # required=True,
+    internal_due_date_value = fields.Integer(
+        string="Internal Due Date Value",
+        required=True,
         tracking=True,
-        help="Enter the value for the due date.",
+        help="Enter the value for the internal due date.",
     )
 
-    due_date_unit = fields.Selection(
+    internal_due_date_unit = fields.Selection(
         [
             ("seconds", "Seconds"),
             ("minutes", "Minutes"),
@@ -151,15 +137,15 @@ class Rulebook(models.Model):
             ("months", "Months"),
             ("years", "Years"),
         ],
-        string="Due Date Unit",
-        # required=True,
+        string="Internal Due Date Unit",
+        required=True,
         tracking=True,
-        help="Select the unit for the due date.",
+        help="Select the unit for the internal due date.",
     )
 
     escalation_date_value = fields.Integer(
         string="Escalation Date Value",
-        # required=True,
+        required=True,
         tracking=True,
         help="Enter the value for the escalation date.",
     )
@@ -175,23 +161,23 @@ class Rulebook(models.Model):
             ("years", "Years"),
         ],
         string="Escalation Date Unit",
-        # required=True,
+        required=True,
         tracking=True,
         help="Select the unit for the escalation date.",
     )
 
-    due_date = fields.Datetime(
-        string="Due Date",
-        compute="_compute_due_date",
+    internal_due_date = fields.Datetime(
+        string="Internal Due Date",
+        compute="_compute_internal_due_date",
         store=True,
-        help="The calculated due date based on the provided internal due date values.",
+        help="The calculated internal due date based on the provided values.",
     )
 
     escalation_date = fields.Datetime(
         string="Escalation Date",
         compute="_compute_escalation_date",
         store=True,
-        help="The calculated escalation date based on the provided internal due date values.",
+        help="The calculated escalation date based on the provided values.",
     )
 
     status = fields.Selection(
@@ -208,18 +194,15 @@ class Rulebook(models.Model):
 
     frequency_type = fields.Selection(
         [
-            ("date", "Date"),           
+            ("date", "Date"),
+            ("day_of_month", "Day of a Month"),
+            ("day_every_month", "Day of Every Month"),
             ("daily", "Daily"),
             ("weekly", "Weekly"),
             ("monthly", "Monthly"),
-            ("day_of_month", "Day of a Month"),
-            ("day_every_month", "Day of Every Month"),
-            ("bi_monthly", "Bi-Monthly"),
             ("quarterly", "Quarterly"),
-            ('semi_annually', 'Semi-Annually / Bi-Annually'),
-            ("yearly", "Yearly / Annually"),
-            ("three_yearly", "Every 3 Years"),
-            # ("month_of_year", "Month of the Year"),
+            ("yearly", "Yearly"),
+            ("month_of_year", "Month of the Year"),
             ("immediate", "Immediate"),
         ],
         string="Frequency Type",
@@ -238,26 +221,8 @@ class Rulebook(models.Model):
     )
 
     day_value = fields.Integer(
-        string="Day", help="Specify the day of the month for the regulatory action.",
-        default=1
+        string="Day", help="Specify the day of the month for the regulatory action."
     )
-    
-    quarter_day = fields.Integer(string='Day of Quarter',default=7)
-        
-
-    
-    semi_annual_month1 = fields.Integer(string='First Month', default=1)  # January
-    semi_annual_month2 = fields.Integer(string='Second Month', default=8)  # August
-    semi_annual_day1 = fields.Integer(string='First Month Day', default=28)  # 28th
-    semi_annual_day2 = fields.Integer(string='Second Month Day', default=6)  # 6th
-    
-    bi_monthly_day1 = fields.Integer(string='First Day of Month', default=1)
-    bi_monthly_day2 = fields.Integer(string='Second Day of Month', default=15)
-    
-    year_month_value = fields.Integer(string='Month of the Year', default=1)
-    
-    
-
 
     month_value = fields.Selection(
         [
@@ -284,16 +249,6 @@ class Rulebook(models.Model):
         store=True,
         help="The next regulatory due date based on the frequency type.",
     )
-    
-    day_of_week = fields.Selection([
-        ('0', 'Monday'),
-        ('1', 'Tuesday'),
-        ('2', 'Wednesday'),
-        ('3', 'Thursday'),
-        ('4', 'Friday'),
-        ('5', 'Saturday'),
-        ('6', 'Sunday')
-    ], string='Day of Week')
 
     global_data = {}
 
@@ -320,28 +275,7 @@ class Rulebook(models.Model):
             return action
         except AccessError:
             # If the user lacks permissions, raise a friendly message
-            raise AccessError("You do not have the necessary permissions to view the Reply Log.")  
-        
-    @api.depends('risk_category', 'risk_category.risk_priority')
-    def _compute_risk_rating(self):
-        """Compute risk rating based on the selected risk category's priority"""
-        for record in self:
-            if record.risk_category and record.risk_category.risk_priority:
-                # Directly use the risk priority from the category
-                record.risk_rating = record.risk_category.risk_priority
-            else:
-                record.risk_rating = False
-        
-    @api.onchange('semi_annual_month1', 'semi_annual_month2')
-    def _onchange_semi_annual_months(self):
-        if self.semi_annual_month1 == self.semi_annual_month2:
-             return {
-                'warning': {
-                    'title': 'Invalid Month Selection',
-                    'message': 'Please select different months for your semi-annual periods.'
-                }
-            }
-            # raise AccessError("Semi-annual months must be different")  
+            raise AccessError("You do not have the necessary permissions to view the Reply Log.")    
 
     # @api.depends("id")
     def _compute_upload_link(self, id):
@@ -355,364 +289,107 @@ class Rulebook(models.Model):
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         #
         return f"{base_url}/web#id={id}&cids=1&menu_id=277&action=423&model=rulebook&view_type=form"
-    
-    @api.depends("frequency_type", "date_value", "day_value", "month_value", "day_of_week",
-                 "quarter_day","bi_monthly_day1","bi_monthly_day2","semi_annual_month1",
-                 "semi_annual_month2","semi_annual_day1","semi_annual_day2","year_month_value")  
-         
+
+    @api.depends("risk_category")
+    def _compute_risk_rating(self):
+        """Compute the risk rating based on the risk priority of the risk category."""
+        for record in self:
+            if record.risk_category and record.risk_category.risk_priority:
+                record.risk_rating = record.risk_category.risk_priority
+            else:
+                record.risk_rating = "low"  # Set a default if no category is selected
+
+    @api.depends("frequency_type", "date_value", "day_value", "month_value")
     def _compute_date(self):
         today = fields.Datetime.now()
-        # today = datetime.now(pytz.timezone("Africa/Lagos"))
-        current_weekday = today.weekday()
-        default_time = datetime.combine(today.date(), datetime.min.time()).replace(
-            hour=7, minute=0, second=0
+        default_time = datetime.combine(today, datetime.min.time()).replace(
+            hour=8, minute=0, second=0
         )
-
         for record in self:
-            # Initialize is_recurring to False
-            record.is_recurring = False
-            
             if record.frequency_type == "date":
                 record.computed_date = record.date_value or default_time
-                # Missing boolean assignment for is_recurring
+                record.is_recurring = False
 
             elif record.frequency_type == "day_of_month":
                 if record.day_value and record.month_value:
+                    # Get today's date
+                    today = fields.Date.today()
+
+                    # Ensure day_value and month_value are integers
                     try:
                         day_value = int(record.day_value)
                         month_value = int(record.month_value)
-                        
-                        # Calculate correct year
-                        target_year = today.year
-                        if month_value < today.month or (month_value == today.month and day_value < today.day):
-                            target_year += 1
 
+                        # Try to assign the computed date based on the chosen day and month in the current year
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{target_year}-{month_value:02d}-{day_value:02d} 07:00:00"
+                            f"{today.year}-{month_value:02d}-{day_value:02d} 08:00:00"
                         )
                     except ValueError:
+                        # If the combination is invalid (e.g., February 30), assign it to the next month
                         next_month = (month_value % 12) + 1
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{target_year}-{next_month:02d}-{day_value:02d} 07:00:00"
+                            f"{today.year}-{next_month:02d}-{day_value:02d} 08:00:00"
                         )
-                    record.is_recurring = True
 
+                    # Ensure it's marked as recurring
+                    record.is_recurring = True
             elif record.frequency_type == "day_every_month":
                 if record.day_value:
                     next_month = today.month + 1 if today.month < 12 else 1
                     year = today.year if today.month < 12 else today.year + 1
-                    try:
-                        record.computed_date = fields.Datetime.to_datetime(
-                            f"{year}-{next_month:02d}-{int(record.day_value):02d} 07:00:00"
-                        )
-                        record.is_recurring = True
-                    except ValueError:
-                        # Handle invalid dates (e.g., February 31)
-                        record.computed_date = default_time + timedelta(months=1)
+                    record.computed_date = fields.Datetime.to_datetime(
+                        f"{year}-{next_month:02d}-{record.day_value:02d} 08:00:00"
+                    )
+                    record.is_recurring = True
 
             elif record.frequency_type == "daily":
                 record.computed_date = default_time + timedelta(days=1)
                 record.is_recurring = True
-                
+
             elif record.frequency_type == "weekly":
-                if record.day_of_week:
-                    try:
-                        selected_weekday = int(record.day_of_week)
-                        days_ahead = selected_weekday - current_weekday
-                        if days_ahead <= 0:
-                            days_ahead += 7
-                            
-                        next_date = today.date() + timedelta(days=days_ahead)
-                        record.computed_date = datetime.combine(
-                            next_date,
-                            datetime.min.time()
-                        ).replace(hour=7, minute=0, second=0)
-                    except (ValueError, TypeError):
-                        record.computed_date = default_time + timedelta(weeks=1)
-                else:
-                    record.computed_date = default_time + timedelta(weeks=1)
+                record.computed_date = default_time + timedelta(weeks=1)
                 record.is_recurring = True
 
             elif record.frequency_type == "monthly":
                 next_month = today.month + 1 if today.month < 12 else 1
                 year = today.year if today.month < 12 else today.year + 1
-                record.computed_date = default_time.replace(year=year, month=next_month, day=1)
-                record.is_recurring = True
-                
-            elif record.frequency_type == "bi_monthly":
-                # Ensure days are valid
-                first_day = min(record.bi_monthly_day1 or 1, 28)
-                second_day = min(record.bi_monthly_day2 or 15, 28)
-                
-                # Sort days to ensure first_day < second_day
-                if first_day > second_day:
-                    first_day, second_day = second_day, first_day
-                
-                current_month = today.month
-                current_year = today.year
-                
-                # Create datetime objects for both days in current month
-                first_date = default_time.replace(year=current_year, month=current_month, day=first_day)
-                second_date = default_time.replace(year=current_year, month=current_month, day=second_day)
-                
-                # If both dates have passed in current month, move to next month
-                if today.day > second_day:
-                    if current_month == 12:
-                        first_date = first_date.replace(year=current_year + 1, month=1)
-                        second_date = second_date.replace(year=current_year + 1, month=1)
-                    else:
-                        first_date = first_date.replace(month=current_month + 1)
-                        second_date = second_date.replace(month=current_month + 1)
-                # If first date has passed but second hasn't
-                elif today.day > first_day:
-                    next_date = second_date
-                    record.computed_date = next_date
-                    record.is_recurring = True
-                    continue
-                
-                # Set next date to the first occurrence
-                record.computed_date = first_date
+                default_time = datetime(year, next_month, 1, 7, 0)
+                # Assign the new date to 'record.computed_date'
+                record.computed_date = default_time
                 record.is_recurring = True
 
-          
             elif record.frequency_type == "quarterly":
-                # today = fields.Date.today()
-                current_quarter = (today.month - 1) // 3
-                next_quarter = (current_quarter + 1) % 4
-                next_quarter_month = (next_quarter * 3) + 1
-                
-                # If we're rolling over to next year
-                year = today.year
-                if next_quarter_month < today.month:
-                    year += 1
-                
-                # Default to 7th if quarter_day is not set or invalid
-                day = min(record.quarter_day or 7, 28)  # Limit to 28 to avoid month overflow
-                
-                try:
-                    record.computed_date = datetime(
-                        year, 
-                        next_quarter_month, 
-                        day, 
-                        7, 0, 0  # 8 AM
-                    )
-                except ValueError:
-                    # If date is invalid, default to first day of next quarter
-                    record.computed_date = datetime(
-                        year, 
-                        next_quarter_month, 
-                        1, 
-                        7, 0, 0
-                    )
+                next_quarter_month = ((today.month - 1) // 3 + 1) * 3 + 1
+                year = today.year if next_quarter_month <= 12 else today.year + 1
+                next_quarter_month = (
+                    next_quarter_month
+                    if next_quarter_month <= 12
+                    else next_quarter_month - 12
+                )
+                record.computed_date = default_time.replace(
+                    year=year, month=next_quarter_month
+                )
                 record.is_recurring = True
-                
-            elif record.frequency_type == "semi_annually":
-                today = fields.Date.today()
-                year = today.year
 
-                # Default values if not set
-                month1 = record.semi_annual_month1 or 1
-                month2 = record.semi_annual_month2 or 7
-                day1 = min(record.semi_annual_day1 or 28, 28)  # Limit to 28 to avoid month issues
-                day2 = min(record.semi_annual_day2 or 6, 28)
-
-                # Create datetime objects for comparison
-                date1 = datetime(year, month1, day1, 7, 0, 0)
-                date2 = datetime(year, month2, day2, 7, 0, 0)
-                
-                # Sort dates chronologically
-                if date1 > date2:
-                    date1, date2 = date2, date1
-
-                now = datetime.now()
-                # now = datetime.now(pytz.timezone("Africa/Lagos"))
-                
-                # Determine next occurrence
-                if now < date1:
-                    next_date = date1
-                elif now < date2:
-                    next_date = date2
-                else:
-                    # Both dates have passed, move to next year
-                    next_date = date1.replace(year=year + 1)
-                
-                try:
-                    record.computed_date = next_date
-                except ValueError:
-                    # Handle invalid dates (e.g., February 29 in non-leap year)
-                    if next_date.month == 2:
-                        record.computed_date = next_date.replace(day=28)
-                    else:
-                        # Use last day of the month
-                        last_day = calendar.monthrange(next_date.year, next_date.month)[1]
-                        record.computed_date = next_date.replace(day=min(next_date.day, last_day))
-                
-                record.is_recurring = True
-                
-           
             elif record.frequency_type == "yearly":
-                
-                if not record.year_month_value:
-                    continue
-                        
-                year = today.year
-                month_value = int(record.month_value)
-                
-                # Validate month value
-                if not (1 <= month_value <= 12):
-                    _logger.warning(f"Invalid month value: {month_value}. Setting to default month 12.")
-                    month_value = 12
-                
-                # Get the maximum days for the selected month
-                max_days = calendar.monthrange(year, month_value)[1]
-                
-                # Ensure day is valid for the selected month
-                day = min(record.day_value or 1, max_days)
-                
-                # Create the yearly datetime
-                try:
-                    yearly_date = datetime(year, month_value, day, 7, 0)  # Setting time to 7 AM
-                    
-                    # If the date has already passed this year, move to next year
-                    if yearly_date < today:
-                        yearly_date = yearly_date.replace(year=year + 1)
-                    
-                    record.computed_date = yearly_date
+                record.computed_date = default_time.replace(year=today.year + 1)
+                record.is_recurring = True
+
+            elif record.frequency_type == "month_of_year":
+                if record.month_value:
+                    record.computed_date = default_time.replace(
+                        month=int(record.month_value)
+                    )
                     record.is_recurring = True
-                    
-                except ValueError as e:
-                    _logger.error(f"Error creating date: year={year}, month={month_value}, day={day}. Error: {e}")
-                    continue
-                
-                
-            elif record.frequency_type == "three_yearly":
-                if record.month_value and record.day_value:
-                    try:
-                        month_value = int(record.month_value)
-                        day_value = min(record.day_value or 1, 28)  # Limit to 28 to avoid month issues
-                        
-                        # Calculate the target year
-                        current_year = today.year
-                        target_year = current_year
-                        
-                        # Create the initial date
-                        target_date = datetime(
-                            target_year,
-                            month_value,
-                            day_value,
-                            7, 0, 0  # 8 AM
-                        )
-                        
-                        # If the date has passed this year, calculate next occurrence
-                        if target_date < today:
-                            # Find the next three-year cycle
-                            years_to_add = (3 - ((today.year - target_year) % 3))
-                            target_date = target_date.replace(year=today.year + years_to_add)
-                        
-                        record.computed_date = target_date
-                        record.is_recurring = True
-                        
-                    except ValueError as e:
-                        _logger.error(f"Error creating three-yearly date: {e}")
-                        record.computed_date = default_time
 
             elif record.frequency_type == "immediate":
                 record.computed_date = fields.Datetime.now()
                 record.is_recurring = False
 
-   
-
-    @api.onchange('bi_monthly_day1', 'bi_monthly_day2')
-    def _onchange_days(self):
-        """Validate and adjust days if they exceed 28"""
-        if self.bi_monthly_day1 and self.bi_monthly_day1 > 28:
-            self.bi_monthly_day1 = 28
-        if self.bi_monthly_day2 and self.bi_monthly_day2 > 28:
-            self.bi_monthly_day2 = 28
-            
-    
-            
-    @api.onchange('month_value', 'day_value')
-    def _onchange_yearly_date(self):
-        """Validate and adjust yearly date values"""
-        if self.month_value:
-            try:
-                month = int(self.month_value)
-            except ValueError:
-                month = None
-
-            # Validate month value
-            if month is None or not (1 <= month <= 12):
-                self.month = '12'
-                return {
-                    'warning': {
-                        'title': 'Invalid Month',
-                        'message': 'Month must be between 1 and 12. Setting to December (12).'
-                    }
-                }
-            
-            # Validate day value against the selected month
-            if self.day_value:
-                max_days = calendar.monthrange(fields.Date.today().year, month)[1]
-                if self.day_value > max_days:
-                    self.day_value = max_days
-                    return {
-                        'warning': {
-                            'title': 'Day Adjusted',
-                            'message': f'Day value was adjusted to {max_days} to match the maximum days in the selected month.'
-                        }
-                    }
-                    
-    @api.constrains('semi_annual_month1', 'semi_annual_month2', 'semi_annual_day1', 'semi_annual_day2')
-    def _check_semi_annual_values(self):
+    @api.depends("internal_due_date_value", "internal_due_date_unit", "escalation_date")
+    def _compute_internal_due_date(self):
         for record in self:
-            if record.frequency_type == 'semi_annually':
-                # Check months
-                if record.semi_annual_month1 and not 1 <= record.semi_annual_month1 <= 12:
-                    raise AccessError("First month must be between 1 and 12")
-                if record.semi_annual_month2 and not 1 <= record.semi_annual_month2 <= 12:
-                    raise AccessError("Second month must be between 1 and 12")
-                if record.semi_annual_month1 == record.semi_annual_month2:
-                    raise AccessError("Semi-annual months must be different")
-                
-                # Check days
-                if record.semi_annual_day1 and not 1 <= record.semi_annual_day1 <= 31:
-                    raise AccessError("First day must be between 1 and 31")
-                if record.semi_annual_day2 and not 1 <= record.semi_annual_day2 <= 31:
-                    raise AccessError("Second day must be between 1 and 31")
-                
-                # Validate specific month-day combinations
-                for month, day in [(record.semi_annual_month1, record.semi_annual_day1),
-                                (record.semi_annual_month2, record.semi_annual_day2)]:
-                    if month and day:
-                        try:
-                            # Try to create a date to validate the day is valid for the month
-                            current_year = datetime.now().year
-                            datetime(current_year, month, day)  # Use leap year to allow Feb 29
-                        except ValueError:
-                            raise AccessError(f"Invalid day {day} for month {month}")
-
-    @api.onchange('frequency_type')
-    def _onchange_frequency_type(self):
-        if self.frequency_type == 'semi_annually':
-            self.semi_annual_month1 = 1  # January
-            self.semi_annual_month2 = 8  # August
-            self.semi_annual_day1 = 28   # 28th
-            self.semi_annual_day2 = 6    # 6th
-            
-            
-    @api.constrains('three_year_day')
-    def _check_three_year_day(self):
-        for record in self:
-            if record.frequency_type == 'three_yearly' and record.day_value:
-                if not 1 <= record.three_year_day <= 28:
-                    raise ValidationError(("Please select a day between 1 and 28 for three-yearly frequency."))
-    
-    @api.depends("due_date_value", "due_date_unit", "computed_date")
-    
-    def _compute_due_date(self):
-        for record in self:
-            if record.computed_date and record.due_date_unit in [
+            if record.escalation_date and record.internal_due_date_unit in [
                 "days",
                 "hours",
                 "minutes",
@@ -722,14 +399,14 @@ class Rulebook(models.Model):
                 "years",
             ]:
                 delta_args = {
-                    record.due_date_unit: -record.due_date_value
+                    record.internal_due_date_unit: -record.internal_due_date_value
                 }
-                record.due_date = record.computed_date + relativedelta(
+                record.internal_due_date = record.escalation_date + relativedelta(
                     **delta_args
                 )
             else:
-                # If computed_date is not available, set due_date to False or handle accordingly
-                record.due_date = False
+                # If computed_date is not available, set internal_due_date to False or handle accordingly
+                record.internal_due_date = False
 
     @api.depends(
         "escalation_date_value",
@@ -754,7 +431,7 @@ class Rulebook(models.Model):
                     **delta_args
                 )
             else:
-                # If computed_date is not available, set due_date to False or handle accordingly
+                # If computed_date is not available, set internal_due_date to False or handle accordingly
                 record.escalation_date = False
 
     # creating the record
@@ -768,7 +445,7 @@ class Rulebook(models.Model):
                 vals["risk_rating"] = category.risk_priority
         print(vals)
         record = super(Rulebook, self).create(vals)
-        if record.due_date and record.escalation_date:
+        if record.internal_due_date and record.escalation_date:
             record._schedule_due_dates()
 
             # send out email if the record frequency is immediate
@@ -776,16 +453,13 @@ class Rulebook(models.Model):
             current_year = datetime.now().year
             global global_data
             global_data = {
-                # "email_to": record.officer_responsible.email,
-                "email_to": record.officer_responsible.email,
+                "email_to": record.responsible_id.email,
                 "name": record.first_line_escalation.name,
                 "title": record.name.name,
                 "upload_link": self._compute_upload_link(record.id),
                 "email_from": os.getenv("EMAIL_FROM"),
-                # "email_cc": record.officer_cc.email,
-                "email_cc": self.mapped('officer_cc.email'),
-
-                "due_date": self._compute_formatted_date(record.due_date),
+                "email_cc": record.responsible_id.cc,
+                "due_date": self._compute_formatted_date(record.internal_due_date),
                 "current_year": current_year,
             }
 
@@ -826,7 +500,7 @@ class Rulebook(models.Model):
         result = super(Rulebook, self).write(vals)
 
         # Check for due dates and schedule if needed
-        if "due_date" in vals and "escalation_date" in vals:
+        if "internal_due_date" in vals and "escalation_date" in vals:
             if hasattr(self, "_schedule_due_dates"):
                 self._schedule_due_dates()
         if "frequency_type" in vals and vals["frequency_type"] == "immediate":
@@ -835,25 +509,15 @@ class Rulebook(models.Model):
             current_year = datetime.now().year
             global global_data
             global_data = {
-                "email_to": self.mapped('officer_responsible.email'),
-                "name": self.mapped('first_line_escalation.name'),
-                "title": self.mapped('name.name'),
+                "email_to": record.responsible_id.email,
+                "name": record.first_line_escalation.name,
+                "title": record.name.name,
                 "upload_link": self._compute_upload_link(record.id),
                 "email_from": os.getenv("EMAIL_FROM"),
-                "email_cc": self.mapped('officer_cc.email'),
-                "due_date": self._compute_formatted_date('due_date'),
+                "email_cc": record.responsible_id.cc,
+                "due_date": self._compute_formatted_date(record.internal_due_date),
                 "current_year": current_year,
             }
-            # global_data = {
-            #     "email_to": record.officer_responsible.email,
-            #     "name": record.first_line_escalation.name,
-            #     "title": record.name.name,
-            #     "upload_link": self._compute_upload_link(record.id),
-            #     "email_from": os.getenv("EMAIL_FROM"),
-            #     "email_cc": record.officer_cc.email,
-            #     "due_date": self._compute_formatted_date(record.due_date),
-            #     "current_year": current_year,
-            # }
 
             print(record.responsible_id.cc)
 
@@ -872,8 +536,8 @@ class Rulebook(models.Model):
                 print(f"Mail template with ID {template_id} not found.")
         # Return the result of the write operation
         if (
-            "due_date_value" in vals
-            or "due_date_unit" in vals
+            "internal_due_date_value" in vals
+            or "internal_due_date_unit" in vals
             or "escalation_date_value" in vals
             or "escalation_date_unit" in vals
             or "computed_date" in vals
@@ -934,12 +598,12 @@ class Rulebook(models.Model):
                     }
                 )
 
-            if record.due_date:
+            if record.internal_due_date:
                 self.env["calendar.event"].create(
                     {
                         "name": f"Internal Due Date for {record.id}",
-                        "start": record.due_date,
-                        "stop": record.due_date
+                        "start": record.internal_due_date,
+                        "stop": record.internal_due_date
                         + timedelta(hours=1),  # Set duration of 1 hour
                         "allday": False,  # Event is not all day; includes specific time
                     }
@@ -1074,7 +738,7 @@ class Rulebook(models.Model):
                 "upload_link": self._compute_upload_link(rulebook_id.id),
                 "email_from":  os.getenv("EMAIL_FROM"),
                 "email_cc": rulebook_id.responsible_id.cc,
-                "due_date": self._compute_formatted_date(rulebook_id.due_date),
+                "due_date": self._compute_formatted_date(rulebook_id.internal_due_date),
                 "current_year": current_year,
             }
             print(rulebook_id)
@@ -1127,111 +791,39 @@ class Rulebook(models.Model):
         for record in rulebooks:
             record._compute_next_due_date()
 
-    # def _compute_next_due_date(self):
-    #     print("Updating next due date...")
-    #     """Compute the next due date for the rulebook when the status is 'completed'."""
-    #     for record in self:
-    #         # Check if regulatory date matches computed date
-    #         if record.frequency_type == "monthly":
-    #             next_due_date = record.computed_date + relativedelta(months=1)
-    #         elif record.frequency_type == "quarterly":
-    #             next_due_date = record.computed_date + relativedelta(months=3)
-    #         elif record.frequency_type == "yearly":
-    #             next_due_date = record.computed_date + relativedelta(years=1)
-    #         elif record.frequency_type == "daily":
-    #             next_due_date = record.computed_date + relativedelta(days=1)
-    #         elif record.frequency_type == "weekly":
-    #             next_due_date = record.computed_date + relativedelta(weeks=1)
-    #         elif record.frequency_type == "day_of_month":
-    #             # Move to the same day in the next month
-    #             next_due_date = record.computed_date + relativedelta(months=1)
-    #         elif record.frequency_type == "day_every_month":
-    #             # Move to the same day of the next month
-    #             next_due_date = record.computed_date + relativedelta(months=1)
-    #         elif record.frequency_type == "month_of_year":
-    #             # Move to the same month of the next year
-    #             next_due_date = record.computed_date.replace(
-    #                 year=record.computed_date.year + 1
-    #             )
-    #         elif record.frequency_type == "immediate":
-    #             # Immediate means no specific future due date
-    #             next_due_date = record.computed_date
-    #         else:
-    #             next_due_date = record.computed_date
-    #         record.next_due_date = next_due_date
-    #         # Update the rulebook computed date and reset status for next cycle
-    #         record.computed_date = next_due_date
-    #         print(next_due_date)
-    
     def _compute_next_due_date(self):
         print("Updating next due date...")
         """Compute the next due date for the rulebook when the status is 'completed'."""
         for record in self:
+            # Check if regulatory date matches computed date
             if record.frequency_type == "monthly":
                 next_due_date = record.computed_date + relativedelta(months=1)
-                
             elif record.frequency_type == "quarterly":
                 next_due_date = record.computed_date + relativedelta(months=3)
-                
             elif record.frequency_type == "yearly":
                 next_due_date = record.computed_date + relativedelta(years=1)
-                
             elif record.frequency_type == "daily":
                 next_due_date = record.computed_date + relativedelta(days=1)
-                
             elif record.frequency_type == "weekly":
                 next_due_date = record.computed_date + relativedelta(weeks=1)
-                
             elif record.frequency_type == "day_of_month":
+                # Move to the same day in the next month
                 next_due_date = record.computed_date + relativedelta(months=1)
-                
             elif record.frequency_type == "day_every_month":
+                # Move to the same day of the next month
                 next_due_date = record.computed_date + relativedelta(months=1)
-                
-            elif record.frequency_type == "bi_monthly":
-                # Get the current day of the computed date
-                current_day = record.computed_date.day
-                
-                # Determine if it's the first or second date of the month
-                if current_day == record.bi_monthly_day1:
-                    # If current is first day, next is second day of same month
-                    next_due_date = record.computed_date.replace(day=record.bi_monthly_day2)
-                else:
-                    # If current is second day, next is first day of next month
-                    next_due_date = record.computed_date + relativedelta(months=1)
-                    next_due_date = next_due_date.replace(day=record.bi_monthly_day1)
-                    
-            elif record.frequency_type == "semi_annually":
-                # Get current date components
-                current_month = record.computed_date.month
-                current_day = record.computed_date.day
-                
-                if current_month == record.semi_annual_month1:
-                    # Move to second date of the year
-                    next_due_date = record.computed_date.replace(
-                        month=record.semi_annual_month2,
-                        day=record.semi_annual_day2
-                    )
-                else:
-                    # Move to first date of next year
-                    next_due_date = record.computed_date.replace(
-                        year=record.computed_date.year + 1,
-                        month=record.semi_annual_month1,
-                        day=record.semi_annual_day1
-                    )
-            elif record.frequency_type == "three_yearly":
-                next_due_date = record.computed_date + relativedelta(years=3)
-                
-            elif record.frequency_type == "date":
-                next_due_date = record.computed_date
-                
+            elif record.frequency_type == "month_of_year":
+                # Move to the same month of the next year
+                next_due_date = record.computed_date.replace(
+                    year=record.computed_date.year + 1
+                )
             elif record.frequency_type == "immediate":
+                # Immediate means no specific future due date
                 next_due_date = record.computed_date
-                
             else:
                 next_due_date = record.computed_date
-                
             record.next_due_date = next_due_date
+            # Update the rulebook computed date and reset status for next cycle
             record.computed_date = next_due_date
             print(next_due_date)
 
@@ -1240,7 +832,7 @@ class Rulebook(models.Model):
         for rulebook in self:
             if (
                 rulebook.report_status != "completed"
-                and rulebook.due_date <= fields.Datetime.now()
+                and rulebook.internal_due_date <= fields.Datetime.now()
             ):
                 template_id = self.env.ref("module_name.reminder_email_template").id
                 self.env["mail.template"].browse(template_id).send_mail(rulebook.id)
@@ -1355,7 +947,6 @@ class RulebookReport(models.Model):
         self.rulebook_id.message_post(
             body="The report has been submitted for {}.".format(self.rulebook_id.name),
             partner_ids=[self.rulebook_id.responsible_id.partner_id.id],
-            # partner_ids=[self.rulebook_id.responsible_id.partner_id.id],
         )
         # Add more actions like sending submission emails
 

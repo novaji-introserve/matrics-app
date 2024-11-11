@@ -5,32 +5,24 @@
     <record id="view_rulebook_tree" model="ir.ui.view">
         <field name="name">rulebook.tree</field>
         <field name="model">rulebook</field>
-        <field name="arch" type="xml" >
+        <field name="arch" type="xml">
             <tree >
 
                 <field name="name" />
-                <field name="type_of_return"  widget="html"/>
-                <field name="theme_id" optional="hide" />
+                <field name="type_of_return" widget="html"/>
+                <!-- <field name="theme_id-" optional="hide" /> -->
                 <field name="risk_category" />
                 <field name="first_line_escalation" />
                 <field name="computed_date" string="Current Regulatory Date" widget="date" />
                 <field name="second_line_escalation" optional="hide" />
-               
+
                 <field name="regulatory_agency_id" optional="show" />
-                <field name="responsible_id"  optional="show" />
+                <field name="responsible_id" optional="show" />
                 <field name="frequency_type" optional="hide" />
-            
-                <field name="risk_rating"
-                    widget='badge'
-                    decoration-success="risk_rating == 'low'"
-                    decoration-warning="risk_rating == 'medium'"
-                    decoration-danger="risk_rating == 'critical'" />
-                <field name="status"
-                    widget='badge'
-                    decoration-success="status == 'active'"
-                    decoration-warning="status == 'inactive'"
-                    decoration-danger="status == 'deleted'" />
-              
+
+                <field name="risk_rating" widget='badge' decoration-success="risk_rating == 'low'" decoration-warning="risk_rating == 'medium'" decoration-danger="risk_rating == 'critical'" />
+                <field name="status" widget='badge' decoration-success="status == 'active'" decoration-warning="status == 'inactive'" decoration-danger="status == 'deleted'" />
+
             </tree>
         </field>
     </record>
@@ -41,130 +33,141 @@
         <field name="model">rulebook</field>
         <field name="arch" type="xml">
             <form>
-                <!-- <link rel="stylesheet" type="text/css"
-                    href="/rule_book/static/src/css/form_style.css" /> -->
+                <!-- <link rel="stylesheet" type="text/css" href="/rule_book/static/src/css/form_style.css" /> -->
 
                 <!-- Header Section -->
-                <header
-                    style="background-color: #f0f0f0; padding: 10px; border-bottom: 1px solid #ddd;">
-                    <button type="object" class="oe_highlight oe_right mx-auto px-2 py-2"
-                        name="open_reply_log" string="View Reply Log"
-                        attrs="{'invisible': [('id', '=', False)]}" />
+                <header style="background-color: #f0f0f0; padding: 10px; border-bottom: 1px solid #ddd;">
+                    <button type="object" class="oe_highlight oe_right mx-auto px-2 py-2" name="open_reply_log" string="View Reply Log" attrs="{'invisible': [('id', '=', False)]}" />
                 </header>
 
                 <!-- Basic Information Section -->
-                
-                    <!-- Basic Information Section -->
-                <group string="Basic Information" class="section-group" style="margin-top: 20px;">
+
+                <!-- Basic Information Section -->
+                <group string="Basic Information" class="section-group" style="margin-top: 20px; margin-bottom:35px;">
                     <group col="2">
                         <field name="name" class="input" placeholder="Select rulebook title" />
                         <!-- <field name="theme_id" placeholder="Select a theme" /> -->
-                        <field name="type_of_return" placeholder="Specify type of return"
-                            class="html_field" widget="html" />
+                        <field name="type_of_return" placeholder="Specify type of return" class="html_field" widget="html" />
                     </group>
                     <group col="1" style="grid-column: span 2;">
-                        <field name="description" widget="html"
-                            placeholder="Describe the issue or project" class="html_field" />
-                        <field name="section" widget="html" placeholder="Specify the section"
-                            class="html_field" />
+                        <field name="description" widget="html" placeholder="Describe the issue or project" class="html_field" />
+                        <field name="section" class="input" placeholder="Specify the section" />
                     </group>
                     <!-- <group col="1" style="grid-column: span 2; margin-top: 20px;">
-                        <field name="name" filename="name" widget="pdf_viewer"
-                            options="{'preview_image': 'file'}" placeholder="Upload a PDF" />
+                        <field name="name" filename="name" widget="pdf_viewer" options="{'preview_image': 'file'}" placeholder="Upload a PDF" />
                     </group> -->
                 </group>
-                <!-- Risk and Reminders Section -->
-                    <group string="Risk and Reminders" class="section-group"
-                        style="margin-top: 20px;">
-                        <group col="2">
-                            <field name="risk_category" on_change="1"
-                                placeholder="Select risk category" />
-                            <field name="risk_rating" readonly="1"
-                                placeholder="Risk rating will be displayed here" />
-                        </group>
-                    </group>
 
-                <!-- Due Dates Section -->
-                    <group string="Due Dates" class="section-group" style="margin-top: 20px;">
-                        <group col="2">
-                            <field name="frequency_type" placeholder="Select frequency type" />
-                            <field name="is_recurring" placeholder="Is this recurring?" />
-                        </group>
-                        <group col="2">
-                            <field name="date_value"
-                                attrs="{'invisible': [('frequency_type', 'not in', ['date'])]}"
-                                placeholder="Enter date value" />
-                            <field name="day_value"
-                                attrs="{'invisible': [('frequency_type', 'not in', ['day_of_month', 'day_every_month'])]}"
-                                placeholder="Enter day value" />
-                        </group>
-                        <group col="2">
-                            <field name="month_value"
-                                attrs="{'invisible': [('frequency_type', '!=', 'day_of_month')]}"
-                                placeholder="Enter month value" />
-                            <field name="computed_date" readonly="1"
-                                placeholder="Computed date will be shown here" />
-                        </group>
-                    </group>
 
-                <!-- Escalation Details Section -->
-                    <group string="Escalation Details" class="section-group"
-                        style="margin-top: 20px;">
-                        <group col="2">
-                            <field name="first_line_escalation"
-                                placeholder="First line escalation contact" />
-                            <field name="second_line_escalation"
-                                placeholder="Second line escalation contact" />
-                        </group>
-                        <group col="2">
-                            <field name="escalation_date_value"
-                                placeholder="Enter escalation date value" />
-                            <field name="escalation_date_unit"
-                                placeholder="Select escalation date unit" />
-                        </group>
-                        <group col="2">
-                            <field name="escalation_date" readonly="1"
-                                placeholder="Escalation date will be displayed here" />
-                        </group>
-                    </group>
+                <notebook >
 
-                <!-- Internal Due Date Section -->
-                    <group string="Internal Due Date" class="section-group"
-                        style="margin-top: 20px;">
-                        <group col="2">
-                            <field name="internal_due_date_value"
-                                placeholder="Enter internal due date value" />
-                            <field name="internal_due_date_unit"
-                                placeholder="Select internal due date unit" />
+                    <page string="Risk and Ratings" style="font-weight: bold;">
+                        <!-- Risk and Reminders Section -->
+                        <group  class="section-group" style="margin-top: 20px;">
+                            <!-- <group col="2">
+                                <field name="risk_category" on_change="1" placeholder="Select risk category" />
+                                <field name="risk_rating" readonly="1" placeholder="Risk rating will be displayed here" />
+                            </group> -->
+                            <group col="2">
+                                <field name="risk_category"  placeholder="Select risk category" />
+                                <field name="risk_rating" readonly="1" force_save="1" placeholder="Risk rating will be displayed here" />
+                            </group>
                         </group>
-                        <group col="2">
-                            <field name="internal_due_date" readonly="1"
-                                placeholder="Internal due date will be shown here" />
-                        </group>
-                    </group>
+                    </page>
 
-                <!-- Return and Agency Information Section -->
-                    <group string="Return and Agency Information" class="section-group"
-                        style="margin-top: 20px;">
-                        <group col="2">
-                            <field name="sanction" widget="html"
-                            placeholder="List sanctions here with proper formatting."
-                            class="html_field" />
-                         
-                        </group>
-                        <group col="2">
-                            <field name="regulatory_agency_id"
-                                placeholder="Select regulatory agency" />
-                            <field name="responsible_id"
-                                placeholder="Enter responsible person's name" />
-                        </group>
-                        <group col="2">
-                            <field name="status" attrs="{'invisible': [('id', '=', False)]}"
-                                placeholder="Status will be displayed here" />
-                        </group>
-                    </group>
-           
+                    <page string="Internal Due Dates" style="font-weight: 100;">
+                        <!-- Due Dates Section -->
+                        <group class="section-group" style="margin-top: 20px;">
+                            <group col="2">
+                                <field name="frequency_type" placeholder="Select frequency type" />
+                                <field name="is_recurring" placeholder="Is this recurring?" />
+                            </group>
+                            <group col="2">
+                                <field name="date_value" attrs="{'invisible': [('frequency_type', 'not in', ['date'])]}" placeholder="Enter date value" />
+                                <field name="day_value" attrs="{'invisible': [('frequency_type', 'not in', ['day_of_month', 'day_every_month','yearly','three_yearly'])]}" help="Enter day value (1-28)" />
+                                <field name="month_value" attrs="{'invisible': [('frequency_type', 'not in', ['three_yearly','yearly'])]}" placeholder="Select month value" />
+                                <!-- <field name="year_month_value" attrs="{'invisible': [('frequency_type', 'not in', ['1yearly'])]}" help="Enter month value (1-12)" /> -->
 
+
+                                <field name="day_of_week" attrs="{'invisible': [('frequency_type', '!=', 'weekly')]}" help="Select day of the week"/>
+                                <field name="quarter_day" attrs="{'invisible': [('frequency_type', '!=', 'quarterly')], 'required': [('frequency_type', '=', 'quarterly')]}" placeholder="Day of quarter (1-28)"/>
+
+                                <!-- <field name="three_year_month" attrs="{'invisible': [('frequency_type', '!=', 'three_yearly')],
+                                 'required': [('frequency_type', '=', 'three_yearly')]}"/>
+                                <field name="three_year_day" attrs="{'invisible': [('frequency_type', '!=', 'three_yearly')],
+                                 'required': [('frequency_type', '=', 'three_yearly')]}" min="1" max="28"/> -->
+
+                                <!-- <field name="semi_annual_period" attrs="{'invisible': [('frequency_type', '!=', 'semi_annually')], 'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Select semi-annual periods"/> -->
+                            </group>
+                            <group attrs="{'invisible': [('frequency_type', '!=', 'bi_monthly')]}">
+                                <group>
+                                    <field name="bi_monthly_day1" attrs="{'required': [('frequency_type', '=', 'bi_monthly')]}" help="Select first day of the month (1-28)"/>
+                                    <field name="bi_monthly_day2" attrs="{'required': [('frequency_type', '=', 'bi_monthly')]}" help="Select second day of the month (1-28)"/>
+                                </group>
+                            </group>
+                            <group col="4" attrs="{'invisible': [('frequency_type', '!=', 'semi_annually')]}">
+                                <field name="semi_annual_month1" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="First month (1-12)" help="Select the first month (1-12) for semi-annual frequency"/>
+                                <field name="semi_annual_day1" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Day of first month" help="Enter a valid day for the selected month"/>
+                                <field name="semi_annual_month2" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Second month (1-12)" help="Select the second month (1-12) for semi-annual frequency"/>
+                                <field name="semi_annual_day2" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Day of second month" help="Enter a valid day for the selected month"/>
+                            </group>
+                            <group col="2">
+                                <field name="computed_date" readonly="1" placeholder="Computed date will be shown here" />
+
+                            </group>
+                            
+                        </group>
+                    </page>
+
+
+                    <!-- Escalation Details -->
+
+                    <page string="Escalation Details" style="font-weight: bold;">
+                        <group col="2">
+                            <field name="first_line_escalation" help="First line escalation contact" placeholder="First line escalation contact" />
+                            <field name="second_line_escalation" help="Second line escalation contact" placeholder="First line escalation contact"/>
+                        </group>
+                        <group col="2">
+                            <field name="escalation_date_value" placeholder="Enter escalation date value" help="Date value for when this rulebook should be escalated" />
+                            <field name="escalation_date_unit" placeholder="Select escalation date unit" help="Date Unit for when this rulebook should be escalated" />
+                        </group>
+                        <group col="2">
+                            <field name="escalation_date" readonly="1" placeholder="Escalation date will be displayed here" />
+                        </group>
+                    </page>
+                    <!-- Internal Due Date Section -->
+                    <page string="Due Date" style="font-weight: bold;">
+                        <group >
+                            <group col="2">
+                                <field name="due_date_value" placeholder="Enter due due date value" />
+                                <field name="due_date_unit" placeholder="Select due due date unit" />
+                            </group>
+                            <group col="2">
+                                <field name="due_date" readonly="1" placeholder="Due date will be shown here" />
+                            </group>
+                        </group>
+                    </page>
+
+
+                    <page string="Return and Agency Information" style="font-weight: bold;">
+                        <!-- Return and Agency Information Section -->
+                        <group class="section-group" style="margin-top: 20px;">
+                            <group col="2">
+                                <field name="sanction" widget="html" placeholder="List sanctions here with proper formatting." class="html_field" />
+                            </group>
+                            <group col="2">
+                                <field name="regulatory_agency_id" placeholder="Select regulatory agency" />
+                                <field name="responsible_id" placeholder="Enter responsible department" />
+                                <field name="officer_responsible" placeholder="Enter responsible officer's name" />
+                                <!-- <field name="officer_email" placeholder="Enter responsible officer's email" /> -->
+                            </group>
+                            <group col="2">
+                                <field name="officer_cc" widget="many2many_tags" placeholder="Select officers to copy" />
+                                <field name="status" attrs="{'invisible': [('id', '=', False)]}" placeholder="Status will be displayed here" />
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
             </form>
         </field>
     </record>
@@ -176,30 +179,21 @@
         <field name="arch" type="xml">
             <search>
                 <searchpanel>
-                    <field name="responsible_id" icon="fa-user-tie" enable_counters="1"
-                        options='{"counters": true}' string="Responsible" />
-                    <field name="regulatory_agency_id" icon="fa-building" enable_counters="1"
-                        options='{"counters": true}' string="Regulatory Agency" />
+                    <field name="responsible_id" icon="fa-user-tie" enable_counters="1" options='{"counters": true}' string="Responsible" />
+                    <field name="regulatory_agency_id" icon="fa-building" enable_counters="1" options='{"counters": true}' string="Regulatory Agency" />
 
-                    <field name="risk_category" icon="fa-exclamation-triangle" enable_counters="1"
-                        options='{"counters": true}' string="Risk Category" />
-                    <field name="risk_rating" icon="fa-thermometer-half" enable_counters="1"
-                        options='{"counters": true}' string="Risk Rating" />
-                    <field name="frequency_type" icon="fa-calendar-alt" enable_counters="1"
-                        options='{"counters": true}' string="Frequency Type" />
-                    <field name="theme_id" icon="fa-book" enable_counters="1"
-                        options='{"counters": true}' string="Theme" />
-                    <field name="status" icon="fa-toggle-on" enable_counters="1"
-                        options='{"counters": true}' string="Status" />
+                    <field name="risk_category" icon="fa-exclamation-triangle" enable_counters="1" options='{"counters": true}' string="Risk Category" />
+                    <field name="risk_rating" icon="fa-thermometer-half" enable_counters="1" options='{"counters": true}' string="Risk Rating" />
+                    <field name="frequency_type" icon="fa-calendar-alt" enable_counters="1" options='{"counters": true}' string="Frequency Type" />
+                    <!-- <field name="theme_id" icon="fa-book" enable_counters="1" options='{"counters": true}' string="Theme" /> -->
+                    <field name="status" icon="fa-toggle-on" enable_counters="1" options='{"counters": true}' string="Status" />
 
                 </searchpanel>
                 <!-- Standard search fields -->
                 <field name="name" string="Title" />
                 <field name="description" string="Description" />
-                <filter string="Active and InActive" name="not_deleted"
-                    domain="[('status', '!=', 'deleted')]" />
-                <filter string="Deleted" name="deleted"
-                    domain="[('status', '=', 'deleted')]" />
+                <filter string="Active and InActive" name="not_deleted" domain="[('status', '!=', 'deleted')]" />
+                <filter string="Deleted" name="deleted" domain="[('status', '=', 'deleted')]" />
             </search>
         </field>
     </record>

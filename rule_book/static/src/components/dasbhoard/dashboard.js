@@ -80,6 +80,7 @@ export class Dashboard extends Component {
             created_on: '>=',
             today: new Date().toISOString().split('T')[0] + ' 00:00:00', // Start of today
         });
+        
         this.state.totalTitle = await this._fetchCount('rulebook.title');
 
         // Fetch new rulebooks created today
@@ -160,9 +161,9 @@ export class Dashboard extends Component {
 
             // Fetch first 10 Internal Due Dates
             const internalDueDates = await this.orm.searchRead('rulebook',
-                [['internal_due_date', '!=', false],  ["status", '=', "active"]],
-                ['id', 'type_of_return', 'internal_due_date', 'responsible_id'],
-                { limit: 5, order: 'internal_due_date asc' }
+                [['due_date', '!=', false],  ["status", '=', "active"]],
+                ['id', 'type_of_return', 'due_date', 'responsible_id'],
+                { limit: 5, order: 'due_date asc' }
            );
 
             // Fetch first 10 Regulatory Due Dates (computed_date)
