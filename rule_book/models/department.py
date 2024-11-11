@@ -5,16 +5,12 @@ from odoo.exceptions import ValidationError
 
 
  
-# class Department(models.Model):
-#     _name = 'rulebook.department'
-#     _description = 'Department'
+class Department(models.Model):
+    _name = 'hr.department'
+    # _description = 'Department'
 
-#     name = fields.Char(string="Department Name", required=True)
-#     code = fields.Char(string="Department Code")
-#     manager_id = fields.Many2one('res.users', string="Manager")  # Linking manager to a user
+    email = fields.Char(string="Department Email")
     
-#     # Relationship with Users
-#     user_ids = fields.One2many('res.users', 'department_id', string="Users")
   
 # class BranchDepartment(models.Model):
     

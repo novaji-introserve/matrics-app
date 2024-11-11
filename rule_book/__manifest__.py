@@ -54,7 +54,7 @@
         # "views/branch.xml",
         # 'security/security.csv',
         # "views/department_.xml",
-        #  "views/department.xml",
+         "views/department.xml",
     ],
     # only loaded in demonstration mode
     "demo": [

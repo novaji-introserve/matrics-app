@@ -1,0 +1,44 @@
+
+<odoo>
+
+    <record id="view_department_tree" model="ir.ui.view">
+        <field name="name">rulebook.department.tree</field>
+        <field name="model">rulebook.department</field>
+        <field name="arch" type="xml">
+            <tree string="Departments">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="user_ids" widget="many2many_tags" options="{'no_create': True}"/>
+            </tree>
+        </field>
+    </record>
+
+    
+    <record id="view_department_form" model="ir.ui.view">
+        <field name="name">rulebook.department.form</field>
+        <field name="model">rulebook.department</field>
+        <field name="arch" type="xml">
+            <form string="Department">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <!-- <field name="branch_ids" widget="many2many_tags" options="{'no_create': True}"/> -->
+                        <field name="user_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_department" model="ir.actions.act_window">
+        <field name="name">Departments</field>
+        <field name="res_model">rulebook.department</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_department_tree"/>
+    </record>
+
+    <menuitem id="menu_department" name="Departments" action="action_department" parent="base.menu_custom"/>
+
+</odoo>

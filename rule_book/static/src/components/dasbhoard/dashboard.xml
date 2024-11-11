@@ -165,7 +165,7 @@
 												Upcoming due dates
 											</p>
 										</div>
-										<div class="dropdown">
+										<!-- <div class="dropdown">
 											<button class="btn text-muted p-0" type="button" id="regulatoryDueDates" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 												<i class="bx bx-dots-vertical-rounded bx-lg">
 												</i>
@@ -181,7 +181,7 @@
 													Share
 												</a>
 											</div>
-										</div>
+										</div> -->
 									</div>
 									<div class="card-body">
 										<ul class="p-0 m-0">
@@ -228,7 +228,7 @@
 												Upcoming escalation dates
 											</p>
 										</div>
-										<div class="dropdown">
+										<!-- <div class="dropdown">
 											<button class="btn text-muted p-0" type="button" id="escalationDueDates" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 												<i class="bx bx-dots-vertical-rounded bx-lg">
 												</i>
@@ -244,7 +244,7 @@
 													Share
 												</a>
 											</div>
-										</div>
+										</div> -->
 									</div>
 									<div class="card-body">
 										<ul class="p-0 m-0">
@@ -291,7 +291,7 @@
 												Upcoming internal dates
 											</p>
 										</div>
-										<div class="dropdown">
+										<!-- <div class="dropdown">
 											<button class="btn text-muted p-0" type="button" id="internalDueDates" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 												<i class="bx bx-dots-vertical-rounded bx-lg">
 												</i>
@@ -307,7 +307,7 @@
 													Share
 												</a>
 											</div>
-										</div>
+										</div> -->
 									</div>
 									<div class="card-body">
 										<ul class="p-0 m-0">
@@ -411,7 +411,7 @@
 							</div>
 
 							<!-- Newly Uploaded Document Card -->
-							<!-- <div class="col-md-6 col-lg-4 mb-6">
+							<div class="col-md-6 col-lg-4 mb-6">
 								<div class="card h-auto">
 
 									<div class="card-header d-flex align-items-center justify-content-between">
@@ -432,7 +432,7 @@
 									</t>
 									<t t-else="">
 
-										<t t-foreach="state.newlyUploadedTitle" t-as="title" t-key="title.id">
+										<t t-foreach="state.newlyUploadedTitle" t-as="title" t-key="title.name+title.id" >
 											<div class="card-body pt-4">
 												<ul class="p-0 m-0">
 													<li class="d-flex align-items-center mb-2">
@@ -466,13 +466,13 @@
 																	</h6>
 																</div>
 															</div>
-															<div>
+															<!-- <div>
 																<div class="user-progress d-flex align-items-end gap-2">
 																	<a t-att-href="title.form_link" class="btn btn-primary btn-sm">
                                   View
 																	</a>
 																</div>
-															</div>
+															</div> -->
 														</div>
 													</li>
 												</ul>
@@ -480,7 +480,7 @@
 										</t>
 									</t>
 								</div>
-							</div> -->
+							</div>
 
 
 							<!-- most asked ai question -->
