@@ -333,7 +333,7 @@
 														</div>
 														<div class="user-progress">
 															<!-- Due Date -->
-															<h6 class="mb-0 text-secondary" t-esc="date.internal_due_date">
+															<h6 class="mb-0 text-secondary" >
 															</h6>
 														</div>
 													</div>

@@ -15,19 +15,19 @@ class IrModelAccess(models.Model):
 
     model_list = [
         # "rulebook.department",
-        "rulebook",
-        "rulebook.report",
-        "rulebook.theme",
-        "rulebook.exception_process",
-        "rulebook.exception_type",
-        "external.resource",
-        "reply.log",
-        "rulebook.responsible",
-        "rulebook.risk_category",
-        "rulebook.sources",
-        "rulebook.title",
-        # "rulebook.branch"
-        "pdf.chat.log"
+        # "rulebook",
+        # # "rulebook.report",
+        # "rulebook.theme",
+        # "rulebook.exception_process",
+        # "rulebook.exception_type",
+        # "external.resource",
+        # "reply.log",
+        # "rulebook.responsible",
+        # "rulebook.risk_category",
+        # "rulebook.sources",
+        # "rulebook.title",
+        # # "rulebook.branch"
+        # "pdf.chat.log"
     ]
 
     @api.model
