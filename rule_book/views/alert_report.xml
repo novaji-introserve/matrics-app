@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="view_alert_report_tree" model="ir.ui.view">
+        <field name="name">alert.report.tree</field>
+        <field name="model">alert.report</field>
+        <field name="arch" type="xml">
+            <tree string="Alert Analysis" create="false" delete="false">
+                <field name="rulebook_name"/>
+                <field name="reply_date"/>
+                <field name="rulebook_compute_date"/>
+                <field name="submission_timing" 
+                       decoration-success="submission_timing in ('early', 'on_time')" 
+                       decoration-danger="submission_timing == 'late'"
+                       decoration-muted="submission_timing == 'not_responded'"/>
+                <field name="rulebook_status" 
+                       decoration-info="rulebook_status == 'submitted'" 
+                       decoration-success="rulebook_status == 'completed'" 
+                       decoration-warning="rulebook_status == 'pending'"/>
+                <field name="days_difference"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_alert_report_search" model="ir.ui.view">
+        <field name="name">alert.report.search</field>
+        <field name="model">alert.report</field>
+        <field name="arch" type="xml">
+            <search string="Alert Analysis">
+                <field name="rulebook_name"/>
+                <field name="rulebook_id"/>
+                <filter string="Late Responses" name="late" domain="[('submission_timing', '=', 'late')]"/>
+                <filter string="On Time" name="on_time" domain="[('submission_timing', 'in', ['early', 'on_time'])]"/>
+                <filter string="Not Responded" name="not_responded" domain="[('submission_timing', '=', 'not_responded')]"/>
+                <separator/>
+                <filter string="Pending" name="pending" domain="[('rulebook_status', '=', 'pending')]"/>
+                <filter string="Completed" name="completed" domain="[('rulebook_status', '=', 'completed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Response Timing" name="group_timing" context="{'group_by': 'submission_timing'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'rulebook_status'}"/>
+                    <filter string="Response Date" name="group_date" context="{'group_by': 'reply_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_alert_report_pivot" model="ir.ui.view">
+        <field name="name">alert.report.pivot</field>
+        <field name="model">alert.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Alert Analysis" display_quantity="true">
+                <field name="rulebook_name" type="row"/>
+                <field name="submission_timing" type="col"/>
+                <field name="days_difference" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_alert_report_graph" model="ir.ui.view">
+        <field name="name">alert.report.graph</field>
+        <field name="model">alert.report</field>
+        <field name="arch" type="xml">
+            <graph string="Alert Analysis">
+                <field name="submission_timing"/>
+                <field name="rulebook_name"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_alert_report" model="ir.actions.act_window">
+        <field name="name">Alert Analysis</field>
+        <field name="res_model">alert.report</field>
+        <field name="view_mode">tree,pivot,graph</field>
+        <field name="search_view_id" ref="view_alert_report_search"/>
+        <field name="help">This report performs analysis on alert responses, showing which alerts were responded to on time, late, or not at all.</field>
+    </record>
+</odoo>

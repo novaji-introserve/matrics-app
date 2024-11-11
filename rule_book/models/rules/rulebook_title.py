@@ -4,7 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime
-from odoo import fields, models, api
 from dotenv import load_dotenv
 import base64
 from urllib.parse import unquote, urlparse
@@ -344,6 +343,10 @@ class RulebookTitle(models.Model):
             _logger.debug(f"Failed to retrieve the page. Status code: {response.status_code}")
 
     def NDICScrapper(self):
+        # Add a 60-second delay before starting the scraping
+        print("Waiting for 60 seconds before starting NDIC Scraper...")
+        time.sleep(60)  # Sleep for 60 seconds
+        
         print("Running NDIC Scraper")
         url = os.getenv("NDIC_SCRAPE_URL")
         base_url = os.getenv("NDIC_BASE_URL")
@@ -599,7 +602,7 @@ class RulebookTitle(models.Model):
                         [("file_name", "=", file_name.replace("_", " "))], limit=1
                     )
                     if existing_title:
-                        print(f"Skipping, file already exists.")
+                        print("Skipping, file already exists.")
                         _logger.debug('Skipping, file already exists.')
 
                     else:    

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- security/security.xml -->
+<odoo>
+    <!-- Security Groups Definition -->
+    <data noupdate="0">
+        <!-- Compliance Officer Group -->
+        <record id="group_compliance_officer" model="res.groups">
+            <field name="name">Compliance Officer</field>
+            <field name="category_id" ref="base.module_category_administration"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Department User Group -->
+        <record id="group_department_user" model="res.groups">
+            <field name="name">Department User</field>
+            <field name="category_id" ref="base.module_category_administration"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+    </data>
+
+    <!-- Access Rights Records -->
+    <data noupdate="0">
+        <!-- Compliance Officer Access Rights -->
+        <record id="access_rulebook_compliance" model="ir.model.access">
+            <field name="name">rulebook.compliance</field>
+            <field name="model_id" ref="model_report_rulebook"/>
+            <field name="group_id" ref="group_compliance_officer"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="access_alert_compliance" model="ir.model.access">
+            <field name="name">alert.compliance</field>
+            <field name="model_id" ref="model_alert_report"/>
+            <field name="group_id" ref="group_compliance_officer"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="access_reply_log_compliance" model="ir.model.access">
+            <field name="name">reply.log.compliance</field>
+            <field name="model_id" ref="model_reply_log"/>
+            <field name="group_id" ref="group_compliance_officer"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="access_report_compliance" model="ir.model.access">
+            <field name="name">report.compliance</field>
+            <field name="model_id" ref="model_report_rulebook"/>
+            <field name="group_id" ref="group_compliance_officer"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <!-- Department User Access Rights -->
+        <record id="access_report_department" model="ir.model.access">
+            <field name="name">report.department</field>
+            <field name="model_id" ref="model_report_rulebook"/>
+            <field name="group_id" ref="group_department_user"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+    </data>
+
+    <!-- Record Rules -->
+    <data noupdate="0">
+        <!-- Compliance Officer Rules -->
+        <record id="rule_apps_compliance_no_access" model="ir.rule">
+            <field name="name">No Apps Access for Compliance</field>
+            <field name="model_id" ref="base.model_ir_module_module"/>
+            <field name="groups" eval="[(4, ref('group_compliance_officer'))]"/>
+            <field name="domain_force">[('id', '=', 0)]</field> 
+        </record>
+
+        <!-- Department Users Rules -->
+        <record id="rule_department_reports" model="ir.rule">
+            <field name="name">Department Reports Access</field>
+            <field name="model_id" ref="model_report_rulebook"/>
+            <field name="groups" eval="[(4, ref('group_department_user'))]"/>
+            <field name="domain_force">[('department_id', '=', user.department_id.id)]</field>
+        </record>
+
+        <record id="rule_apps_department_no_access" model="ir.rule">
+            <field name="name">No Apps Access for Departments</field>
+            <field name="model_id" ref="base.model_ir_module_module"/>
+            <field name="groups" eval="[(4, ref('group_department_user'))]"/>
+            <field name="domain_force">[('id', '=', 0)]</field>
+        </record>
+
+        <record id="rule_settings_department_no_access" model="ir.rule">
+            <field name="name">No Settings Access for Departments</field>
+            <field name="model_id" ref="base.model_res_config_settings"/>
+            <field name="groups" eval="[(4, ref('group_department_user'))]"/>
+            <field name="domain_force">[('id', '=', 0)]</field>
+        </record>
+    </data>
+</odoo>

@@ -132,6 +132,7 @@ class ReplyLog(models.Model):
             ("early", "Early Submission"),
             ("on_time", "Right on Time"),
             ("late", "Late Submission"),
+            ("not_responded", "Not Responded"),
         ],
         string="Submission Timing",
         compute="_compute_submission_timing",
@@ -154,6 +155,12 @@ class ReplyLog(models.Model):
     def _compute_submission_timing(self):
         """Compute the submission timing based on the reply date and the regulatory date."""
         for record in self:
+            if not record.reply_date:
+                # If there's no reply date and the due date has passed, mark as not responded
+                if record.rulebook_compute_date and record.rulebook_compute_date < fields.Datetime.now():
+                    record.submission_timing = "not_responded"
+                continue
+            
             # Convert reply_date to a datetime.date object
             reply_date_obj = datetime.strptime(
                 str(record.reply_date), "%Y-%m-%d"
