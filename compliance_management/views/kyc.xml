@@ -93,12 +93,17 @@
                    
                 </page>
                 <page name='sanction_screening' string="Sanction Screening">
-                    <group name="sanction" string="Sanction Screening">
-                        <field name="is_pep" attrs="{'readonly': True}" />
-                        <field name="is_fep" attrs="{'readonly': True}" />
-                        <field name="is_blacklist" attrs="{'readonly': True}" />
-                        <field name="is_watchlist" attrs="{'readonly': True}" />
-                        <field name="global_pep" attrs="{'readonly': True}" />
+                    <group>
+                        <group name="pep" string="PEP Screening">
+                            <field name="is_pep" attrs="{'readonly': True}" />
+                            <field name="global_pep" attrs="{'readonly': True}" />
+                            <field name="global_pep_id" attrs="{'readonly': True}" />
+                        </group>
+                        <group name="other" string="Others">
+                            <field name="is_fep" attrs="{'readonly': True}" />
+                            <field name="is_blacklist" attrs="{'readonly': True}" />
+                            <field name="is_watchlist" attrs="{'readonly': True}" />
+                        </group>
                     </group>
                 </page>
                 
@@ -274,10 +279,18 @@
         groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
         parent="menu_compliance_root"
         sequence="10" />
+    
+    <menuitem
+        id="menu_compliance_customer_heading"
+        action="open_customers"
+        parent="menu_compliance_kyc"
+        name="Customers"
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+        sequence="10" />
     <menuitem
         id="menu_compliance_customer"
         action="open_customers"
-        parent="menu_compliance_kyc"
+        parent="menu_compliance_customer_heading"
         name="Customers"
         groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
         sequence="10" />

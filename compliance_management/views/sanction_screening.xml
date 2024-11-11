@@ -1,7 +1,5 @@
 <odoo>
     <data>
-
-
         <!-- Action for PEP -->
         <record id="action_res_pep" model="ir.actions.act_window">
             <field name="name">PEP List</field>
@@ -215,7 +213,8 @@
             name="Global PEP List"
             groups="group_compliance_compliance_officer"
             sequence="50" />
-
+        
+        
 
     </data>
 </odoo>
