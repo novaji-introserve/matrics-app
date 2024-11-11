@@ -21,6 +21,21 @@
                 ],
     # always loaded
     "data": [
+         # department/reports
+        # Load security groups first
+        "security/security_groups.xml",
+        
+        "security/security.xml",
+        
+        "views/report_rulebook.xml",
+        'views/alert_report.xml',
+        
+        # Then load security rules
+        "security/report_rulebook_security.xml",
+        
+        # Then load access rights
+        "security/ir.model.access.csv",
+        
         # "data/preloaded_data/rule_book_branch.xml",
         "views/menu.xml",
         "views/rules/rule_theme.xml",
@@ -54,7 +69,8 @@
         # "views/branch.xml",
         # 'security/security.csv',
         # "views/department_.xml",
-         "views/department.xml",
+        #  "views/department.xml",
+        
     ],
     # only loaded in demonstration mode
     "demo": [

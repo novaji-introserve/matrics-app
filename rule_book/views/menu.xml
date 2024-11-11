@@ -1,5 +1,10 @@
 <odoo>
   <data>
+  <!-- Make the Apps menu only visible to users not in compliance officer group -->
+        <record id="base.menu_management" model="ir.ui.menu">
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]"/>
+        </record>
+        
     <!-- rule book theme -->
     <!-- <record id="action_rulebook_theme" model="ir.actions.act_window">
       <field name="name">Rulebook Themes</field>
@@ -114,6 +119,8 @@
     <menuitem id="menu_rulebook_rulebook" name="Rulebook" parent="menu_rulebook_details" action="action_rulebook" sequence="1" />
     <menuitem id="menu_rulebook_title" name="Titles" parent="menu_rulebook_details" action="action_rulebook_title" sequence="2" />
     <menuitem id="menu_pdf_chat" name="AI Assistance" parent="menu_rulebook_details" action="action_pdf_chat" sequence="3" />
+    <menuitem id="menu_report_rulebook" name="Reports" parent="menu_rulebook_details" action="action_report_rulebook" sequence="4"/>
+    <menuitem id="menu_alert_report" name="Alerts" parent="menu_rulebook_details" action="action_alert_report" sequence="5"/>
     <!-- <menuitem id="menu_rulebook_theme" name="Themes" parent="menu_rulebook_details" action="action_rulebook_theme" sequence="4" /> -->
     <menuitem id="menu_reply_log" name="Reply Logs" parent="menu_rulebook_details" action="action_reply_log" sequence="5" />
 
