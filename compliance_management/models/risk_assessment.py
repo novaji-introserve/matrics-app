@@ -32,6 +32,7 @@ class RiskAssessment(models.Model):
     total_risk_lines = fields.Integer(
         string='Total Risk Lines', _compute='_compute_total_risk_lines', store=True)
     internal_category = fields.Selection(string='Internal Category', selection=[('inst', 'Institutional'), ('cp', 'Counter Party')],default='inst')
+    is_default = fields.Boolean(string='Is Default',tracking=True)
 
     @api.model
     def create(self, vals):

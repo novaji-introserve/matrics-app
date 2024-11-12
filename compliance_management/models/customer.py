@@ -20,6 +20,12 @@ class Shareholders(models.Model):
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Partner', ondelete="cascade")
 
+class PartnerRiskPlanLines(models.Model):
+    _name="res.partner.risk.plan.line"
+    _description="Partner Risk Plan Lines"
+    partner_id = fields.Many2one('res.partner', string='Partner', ondelete="cascade",index=True)
+    plan_line_id = fields.Many2one('res.compliance.risk.assessment.plan', string='Plan Line',index=True)
+    risk_score = fields.Float(string='Risk Score', digits=(10,2))
 
 class Customer(models.Model):
     _inherit = 'res.partner'
@@ -76,6 +82,7 @@ class Customer(models.Model):
         comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
+    risk_plan_line_ids = fields.One2many(comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
     risk_assessment_ids = fields.One2many(
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
     is_pep = fields.Boolean(string="Is PEP", default=False, tracking=True)
@@ -327,22 +334,29 @@ class Customer(models.Model):
         for e in setting:
             plan_setting = e.val
         record_id = self.id
+        self.env["res.partner.risk.plan.line"].search([('partner_id','=',record_id)]).unlink()
         scores = []
         plans = self.env['res.compliance.risk.assessment.plan'].search(
             [('state', '=', 'active')], order='priority')
         if plans:
             for pl in plans:
+                score = 0
                 try:
                     self.env.cr.execute(pl.sql_query, (record_id,))
                     rec = self.env.cr.fetchone()
                     if rec is not None:
                         # we have a hit
                         if pl.compute_score_from == 'dynamic':
-                            scores.append(
-                                float(rec[0])) if rec is not None else None
-                        else:
-                            # static
-                            scores.append(float(pl.risk_score))
+                            score =  float(rec[0]) if rec is not None else score
+                        if pl.compute_score_from == 'static':
+                            score = pl.risk_score
+                    scores.append(score)
+                    line_id = self.env['res.partner.risk.plan.line'].create({
+                    'partner_id': record_id,
+                    'plan_line_id': pl.id,
+                    'risk_score': score,
+                    })
+                    
                 except:
                     pass
         result = None
