@@ -1,4 +1,15 @@
 <odoo>
+    <record id="risk_plan_line_ids_view_tree" model="ir.ui.view">
+        <field name="name">risk_plan_line_ids.view.tree</field>
+        <field name="model">res.partner.risk.plan.line</field>
+        <field name="arch" type="xml">
+            <tree string="Risk Assessment Plan Lines" create="False" edit="False" delete="False">
+                <field name="plan_line_id" />
+                <field name="risk_score" />
+                <field name="create_date" />
+            </tree>
+        </field>
+    </record>
     <record id="contacts.action_contacts" model="ir.actions.act_window">
         <field name="name">Customers</field>
         <field name="type">ir.actions.act_window</field>
@@ -69,6 +80,10 @@
                 <page name='accounts' string="Accounts">
                     <field name="account_ids"
                         context="{'default_customer_id': active_id}" />
+                </page>
+                <page name='plans' string="Risk Plan">
+                    <field name="risk_plan_line_ids"
+                        context="{'default_partner_id': active_id}" />
                 </page>
                 <page name='risk_assessment' string="Risk Assessment">
                     <field name="risk_assessment_ids"

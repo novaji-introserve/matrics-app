@@ -11,6 +11,12 @@
             max: use the maximum. Default
         </field>
     </record>
+    <record id="res_compl_settings_default_risk_score" model="res.compliance.settings">
+        <field name="name">Default Risk Score</field>
+        <field name="code">default_risk_score</field>
+        <field name="val">7.5</field>
+        <field name="narration">Default Risk Score</field>
+    </record>
     <function model="ir.config_parameter" name="set_param"
         eval="('gemini_api_key', 'AIzaSyAvRsSTIahJWVT-iwPC1nPrSqUoK_fsBq4')" />
     <!--  Gender -->
@@ -417,6 +423,7 @@
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
         <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst" />
         <field name="type_id" ref="compliance_inst_risk_type_3" />
+        <field name="is_default">True</field>
     </record>
     <record id="res_risk_assessment_line_1" model="res.risk.assessment.line">
         <field name="name">Money Laundering</field>
@@ -1817,5 +1824,15 @@
         <field name="state">active</field>
         <field name="compute_score_from">dynamic</field>
         <field name="narration">Customers on Watchlist are significantly high risk</field>
+    </record>
+    <record id="risk_plan_default" model="res.compliance.risk.assessment.plan">
+        <field name="name">Default Risk Score</field>
+        <field name="risk_score">8</field>
+        <field name="code">default_plan</field>
+        <field name="sql_query">select risk_rating from res_risk_assessment where is_default=true limit 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">dynamic</field>
+        <field name="narration">Default Plan for risk rating</field>
     </record>
 </odoo>
