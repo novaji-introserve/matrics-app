@@ -28,7 +28,7 @@
         "security/security.xml",
         
         "views/report_rulebook.xml",
-        'views/alert_report.xml',
+        # 'views/alert_report.xml',
         
         # Then load security rules
         "security/report_rulebook_security.xml",
@@ -65,7 +65,7 @@
         "views/public/thank_you.xml",
         # "security/group_action.xml",
         "views/pdf_chat.xml",
-        # "views/import_users.xml"
+        "views/alerts_rulebook.xml"
         # "views/branch.xml",
         # 'security/security.csv',
         # "views/department_.xml",
@@ -87,6 +87,11 @@
         'rule_book/static/src/components/*/*.scss',
         'rule_book/static/src/slider_field.xml',
         'rule_book/static/src/slider_field.js',
+        # 'rule_book/static/src/js/chart_init.js',
+        #  ('include', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'),
+        #  'rule_book/static/src/js/chart_init.xml',
+            #
+        # ('include', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'),
         # 'custom_backend_theme/static/src/img/icons/*',
 
     ]},

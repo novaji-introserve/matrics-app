@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <templates xml:space="preserve">
+        <t t-name="rule_book.ChartComponent" owl="1">
+            <div class="o_chart_container">
+                <canvas t-ref="chart"/>
+            </div>
+        </t>
+    </templates>
+    
+    <!-- Chart template -->
+    <template id="alert_chart_template" name="Alert Chart Template">
+        <div class="o_chart_container">
+            <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+        </div>
+    </template>
+
     <!-- View for the Alert Report -->
     <record id="view_alert_report_form" model="ir.ui.view">
         <field name="name">alert.report.form</field>
@@ -12,7 +28,9 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="chart_container"/>
+                            <div class="o_chart_container">
+                                <t t-call="rule_book.alert_chart_template"/>
+                            </div>
                         </div>
                     </div>
                 </sheet>

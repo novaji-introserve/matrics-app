@@ -6,6 +6,8 @@ from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
 import logging
 from odoo.tools import format_date
+from odoo.exceptions import AccessError
+
 
 _logger = logging.getLogger(__name__)
 
@@ -33,6 +35,28 @@ class ReplyLog(models.Model):
         compute="_compute_rulebook_name_stripped",
         store=False,  # Not stored in the database
     )
+    
+    @api.model
+    def open_reply_log(self):
+        # Check if the user has a department
+        if not self.env.user.department_id:
+            raise AccessError(("You must be assigned to a department to view Reply Logs."))
+
+        # Return the action to open rulebook records
+        return {
+            'name': ('Reply Logs'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'reply.log',  # This is your target model
+            'view_mode': 'tree,form,kanban',
+            'domain': [
+                ('department_id', '=', self.env.user.department_id.id)
+                
+            ],
+            'context': {
+                'search_default_not_deleted': 1,
+                'default_department_id': self.env.user.department_id.id
+            }
+        }
 
     @api.model
     def get_awaiting_replies(self):

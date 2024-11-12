@@ -58,6 +58,13 @@
 
 
     <!-- rule book -->
+     <record id="open_rulebooks" model="ir.actions.server">
+        <field name="name">Open RuleBooks</field>
+        <field name="model_id" ref="model_rulebook"/>
+        <!-- Reference to the res.users model -->
+        <field name="state">code</field>
+        <field name="code">action = model.open_rulebooks()</field>
+      </record>
     <!-- <record id="action_rulebook" model="ir.actions.act_window">
       <field name="name">RuleBook</field>
       <field name="res_model">rulebook</field>
@@ -72,17 +79,20 @@
 
  
 
-    <record id="open_rulebooks" model="ir.actions.server">
-      <field name="name">Open RuleBooks</field>
-      <field name="model_id" ref="model_rulebook"/>
-      <!-- Reference to the res.users model -->
-      <field name="state">code</field>
-      <field name="code">action = model.open_rulebooks()</field>
-    </record>
+   
+
+   
 
 
     <!-- Reply log -->
-    <record id="action_reply_log" model="ir.actions.act_window">
+     <record id="open_reply_log" model="ir.actions.server">
+        <field name="name">Open Reply Log</field>
+        <field name="model_id" ref="model_reply_log"/>
+        <!-- Reference to the res.users model -->
+        <field name="state">code</field>
+        <field name="code">action = model.open_reply_log()</field>
+      </record>
+    <!-- <record id="action_reply_log" model="ir.actions.act_window">
       <field name="name">Reply Log</field>
       <field name="res_model">reply.log</field>
       <field name="view_mode">tree,form</field>
@@ -94,7 +104,7 @@
           View the Reply Log for your Rule book
         </p>
       </field>
-    </record>
+    </record> -->
 
     <record id="action_pdf_chat" model="ir.actions.act_window">
       <field name="name">PDF Chat</field>
@@ -123,15 +133,17 @@
     <!-- Main Rulebook Menu -->
     <menuitem id="menu_rulebook_theme_root" name="Rulebook" sequence="1" />
 
+    
+
     <!-- Submenu for Rulebook Details (Title, Theme, Rulebook, Reply Logs) -->
     <menuitem id="menu_rulebook_details" name="Rulebook" parent="menu_rulebook_theme_root" sequence="1" />
     <menuitem id="menu_rulebook_rulebook" name="Rulebook" parent="menu_rulebook_details" action="open_rulebooks" sequence="1" />
     <menuitem id="menu_rulebook_title" name="Titles" parent="menu_rulebook_details" action="action_rulebook_title" sequence="2" />
     <menuitem id="menu_pdf_chat" name="AI Assistance" parent="menu_rulebook_details" action="action_pdf_chat" sequence="3" />
     <menuitem id="menu_report_rulebook" name="Reports" parent="menu_rulebook_details" action="action_report_rulebook" sequence="4"/>
-    <menuitem id="menu_alert_report" name="Alerts" parent="menu_rulebook_details" action="action_alert_report" sequence="5"/>
+    
     <!-- <menuitem id="menu_rulebook_theme" name="Themes" parent="menu_rulebook_details" action="action_rulebook_theme" sequence="4" /> -->
-    <menuitem id="menu_reply_log" name="Reply Logs" parent="menu_rulebook_details" action="action_reply_log" sequence="5" />
+    <menuitem id="menu_reply_log" name="Reply Logs" parent="menu_rulebook_details" action="open_reply_log" sequence="5" />
 
     <!-- Submenu for Sources (Regulatory Source and Regulatory Records) -->
     <menuitem id="menu_rulebook_sources_root" name="Sources" parent="menu_rulebook_theme_root" sequence="2" />
