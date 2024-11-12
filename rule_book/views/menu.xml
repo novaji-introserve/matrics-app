@@ -58,6 +58,13 @@
 
 
     <!-- rule book -->
+     <record id="open_rulebooks" model="ir.actions.server">
+        <field name="name">Open RuleBooks</field>
+        <field name="model_id" ref="model_rulebook"/>
+        <!-- Reference to the res.users model -->
+        <field name="state">code</field>
+        <field name="code">action = model.open_rulebooks()</field>
+      </record>
     <!-- <record id="action_rulebook" model="ir.actions.act_window">
       <field name="name">RuleBook</field>
       <field name="res_model">rulebook</field>
@@ -72,13 +79,9 @@
 
  
 
-    <record id="open_rulebooks" model="ir.actions.server">
-      <field name="name">Open RuleBooks</field>
-      <field name="model_id" ref="model_rulebook"/>
-      <!-- Reference to the res.users model -->
-      <field name="state">code</field>
-      <field name="code">action = model.open_rulebooks()</field>
-    </record>
+   
+
+   
 
 
     <!-- Reply log -->
