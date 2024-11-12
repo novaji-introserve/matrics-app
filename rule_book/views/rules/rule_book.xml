@@ -156,8 +156,8 @@
                                 <field name="sanction" widget="html" placeholder="List sanctions here with proper formatting." class="html_field" />
                             </group>
                             <group col="2">
-                                <field name="regulatory_agency_id" placeholder="Select regulatory agency" />
-                                <field name="responsible_id" placeholder="Enter responsible department" />
+                                <field name="regulatory_agency_id" placeholder="Select regulatory agency"  />
+                                <field name="responsible_id" placeholder="Enter responsible department" attrs="{'invisible': True}"/>
                                 <field name="officer_responsible" placeholder="Enter responsible officer's name" />
                                 <!-- <field name="officer_email" placeholder="Enter responsible officer's email" /> -->
                             </group>
@@ -179,7 +179,7 @@
         <field name="arch" type="xml">
             <search>
                 <searchpanel>
-                    <field name="responsible_id" icon="fa-user-tie" enable_counters="1" options='{"counters": true}' string="Responsible" />
+                    <!-- <field name="responsible_id" icon="fa-user-tie" enable_counters="1" options='{"counters": true}' string="Responsible" /> -->
                     <field name="regulatory_agency_id" icon="fa-building" enable_counters="1" options='{"counters": true}' string="Regulatory Agency" />
 
                     <field name="risk_category" icon="fa-exclamation-triangle" enable_counters="1" options='{"counters": true}' string="Risk Category" />

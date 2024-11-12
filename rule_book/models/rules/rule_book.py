@@ -100,6 +100,7 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Select the department responsible for this rulebook.",
+        default=lambda self: self.env.user.department_id.id
     )
     
     officer_responsible = fields.Many2one(
@@ -108,7 +109,9 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Select the primary person responsible for this rulebook.",
+        # default=''
     )
+    
 
     officer_cc = fields.Many2many(
         'res.users',  # Assuming you are linking to the hr.employee model
@@ -298,6 +301,85 @@ class Rulebook(models.Model):
     global_data = {}
 
     # to send the data in the global variable to the template
+    
+    
+    @api.model
+    def open_rulebooks(self):
+        # Check if the user has a department
+        if not self.env.user.department_id:
+            raise AccessError(("You must be assigned to a department to view rulebooks."))
+
+        # Return the action to open rulebook records
+        return {
+            'name': ('RuleBooks'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'rulebook',  # This is your target model
+            'view_mode': 'tree,form,kanban',
+            'domain': [
+                ('responsible_id', '=', self.env.user.department_id.id)
+                
+            ],
+            'context': {
+                'search_default_not_deleted': 1,
+                'default_department_id': self.env.user.department_id.id
+            }
+        }
+    
+    # @api.model
+    # def action_view_rulebook(self):
+    #     # Check if user has department
+    #     if not self.env.user.department_id:
+    #         raise AccessError(("You must be assigned to a department to view rules."))
+    
+    #     return {
+    #         'name': 'RuleBook',
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'rulebook',
+    #         'view_mode': 'tree,form,kanban',
+    #         'domain': [
+    #             ('department_id', '=', self.env.user.department_id.id),
+    #             ('active', '=', True)
+    #         ],
+    #         'context': {
+    #             'search_default_not_deleted': 1,
+    #             'default_department_id': self.env.user.department_id.id
+    #         },
+    #         'help': '''
+    #             <p class="o_view_nocontent_smiling_face">
+    #                 No rules found in your department
+    #             </p>
+    #             <p>
+    #                 Create rules for your department here.
+    #             </p>
+    #         '''
+    #     }
+    # @api.model
+    # def open_rulebook(self):
+    #     return {
+    #         'name': ('Customers'),
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'res.users',
+    #         'view_mode': 'tree,form',
+    #         'domain': [('responsible.id', '=', self.env.user.department_id.id)],
+    #         'context': {'search_default_group_branch': 1}
+    #     }
+        
+    # @api.model
+    # def open_rulebook(self):
+    #     return {
+    #         'name': 'Customers',
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'res.users',
+    #         'view_mode': 'tree,form',
+    #         'domain': [
+    #             ('responsible_id', '=', self.env.user.department_id.id),
+    #             ('active', '=', True)  # Example additional condition
+    #         ],
+    #         'context': {'default_department_id': self.env.user.department_id.id}
+            
+    #     }
+        # lambda self: self.env.user.department_id.id
+        
     def data(self):
         # send the global value to the email template
         return global_data
