@@ -115,6 +115,11 @@ class Customer(models.Model):
     def write(self, values):
         #values['risk_score'] = 1.00
         result = super(Customer, self).write(values)
+        self.flush_model()
+        score = self._get_risk_score_from_plan()
+        risk_level = self.env['res.partner']._get_risk_level_from_score(score)
+        self.env.cr.execute('update res_partner set risk_score = %s,risk_level=%s where id = %s',(score,risk_level,self.id))
+        self.invalidate_model(['risk_score','risk_level'])
         return result
         
     @api.depends('account_ids')
@@ -151,6 +156,21 @@ class Customer(models.Model):
                     return 'high'
             except:
                 return 'low'
+    
+    @api.model
+    def _get_risk_level_from_score(self,risk_score):
+        try:
+            if risk_score is None:
+                return 'low'
+            if risk_score <= LOW_RISK_THRESHOLD:
+                return 'low'
+            if risk_score <= MEDIUM_RISK_THRESHOLD:
+                return 'medium'
+            if risk_score <= HIGH_RISK_THRESHOLD:
+                return 'high'
+        except:
+            return 'low'
+    
 
     def _get_current_branch(self):
         for record in self:
@@ -325,8 +345,10 @@ class Customer(models.Model):
                             scores.append(float(pl.risk_score))
                 except:
                     pass
+        result = None
         if len(scores) > 0:
             if plan_setting == 'avg':
-                return sum(scores) / len(scores)
+                result = sum(scores) / len(scores)
             if plan_setting == 'max':
-                return max(scores)
+                result = max(scores)
+        return 0.00 if result is None else result
