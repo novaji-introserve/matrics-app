@@ -16,26 +16,26 @@
     "category": "icomply",
     "version": "0.1",
     # any module necessary for this one to work correctly
-    "depends": ["base", "mail", "calendar",'hide_powered_by_odoo','legion_hide_odoo','hr'
+    "depends": ["base", "mail", "calendar", 'hide_powered_by_odoo', 'legion_hide_odoo', 'hr'
                 # "access_apps"
                 ],
     # always loaded
     "data": [
-         # department/reports
+        # department/reports
         # Load security groups first
         "security/security_groups.xml",
-        
+
         "security/security.xml",
-        
+
         "views/report_rulebook.xml",
         # 'views/alert_report.xml',
-        
+
         # Then load security rules
         "security/report_rulebook_security.xml",
-        
+
         # Then load access rights
         "security/ir.model.access.csv",
-        
+
         # "data/preloaded_data/rule_book_branch.xml",
         "views/menu.xml",
         "views/rules/rule_theme.xml",
@@ -43,8 +43,8 @@
         "views/rules/rulebook_title_views.xml",
         # "security/ir.model.access.csv",
         "views/risk/risk_category.xml",
-    #    "data/preloaded_data/rule_book_department.xml",
-    #    
+        #    "data/preloaded_data/rule_book_department.xml",
+        #
         "views/responsible.xml",
         "views/rules/rule_book.xml",
         "data/email_templates/rule_book.xml",
@@ -52,11 +52,11 @@
         # "views/dashboard.xml",
         "data/settings/email_smtp.xml",
         "data/preloaded_data/risk_categories.xml",
-        
-        
+
+
         # "data/preloaded_data/users.xml",
         "data/preloaded_data/rule_book_sources.xml",
-        
+
         "views/public/rule_book_submission.xml",
         "data/email_templates/escalation_email.xml",
         "views/rules/reply_log.xml",
@@ -65,12 +65,14 @@
         "views/public/thank_you.xml",
         # "security/group_action.xml",
         "views/pdf_chat.xml",
-        "views/alerts_rulebook.xml"
+        "views/alerts_rulebook.xml",
+        # "views/sales_dashboard.xml,"
         # "views/branch.xml",
         # 'security/security.csv',
         # "views/department_.xml",
         #  "views/department.xml",
-        
+
+
     ],
     # only loaded in demonstration mode
     "demo": [
@@ -87,10 +89,13 @@
         'rule_book/static/src/components/*/*.scss',
         'rule_book/static/src/slider_field.xml',
         'rule_book/static/src/slider_field.js',
+        'rule_book/static/src/components/**/*.js',
+        'rule_book/static/src/components/**/*.xml',
+        'rule_book/static/src/components/**/*.scss',
         # 'rule_book/static/src/js/chart_init.js',
         #  ('include', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'),
         #  'rule_book/static/src/js/chart_init.xml',
-            #
+        #
         # ('include', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'),
         # 'custom_backend_theme/static/src/img/icons/*',
 

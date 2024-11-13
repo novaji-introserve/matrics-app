@@ -860,7 +860,7 @@ class Rulebook(models.Model):
             global_data = {
                 # "email_to": record.officer_responsible.email,
                 "email_to": record.officer_responsible.email,
-                "name": record.first_line_escalation.name,
+                "name": record.officer_responsible.name,
                 "title": record.name.name,
                 "upload_link": self._compute_upload_link(record.id),
                 "email_from": os.getenv("EMAIL_FROM"),

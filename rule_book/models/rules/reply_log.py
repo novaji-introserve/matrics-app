@@ -65,6 +65,7 @@ class ReplyLog(models.Model):
         # Fetch completed replies
         completed_replies = self.search([("rulebook_status", "=", "completed")])
         completed_grouped = {}
+        completed_ids = {reply.id for reply in completed_replies}
 
         for reply in completed_replies:
             key = (reply.rulebook_id.id, reply.next_due_date)
@@ -74,14 +75,18 @@ class ReplyLog(models.Model):
         _logger.info(f"Completed replies grouped: {completed_grouped}")
 
         # Search for awaiting replies
-        awaiting_replies = self.search(
-            [
-                ("rulebook_status", "!=", "completed"),
-                ("rulebook_status", "!=", "reviewed"),
-                ("next_due_date", "not in", list(completed_grouped.values())),
-                ("rulebook_id", "not in", [k[0] for k in completed_grouped.keys()]),
-            ]
-        )
+        awaiting_replies = self.search([
+            ("rulebook_status", "not in", ["completed", "reviewed"]),
+            ("id", "not in", completed_ids)  # Exclude completed replies directly
+        ])
+        # awaiting_replies = self.search(
+        #     [
+        #         ("rulebook_status", "!=", "completed"),
+        #         ("rulebook_status", "!=", "reviewed"),
+        #         ("next_due_date", "not in", list(completed_grouped.values())),
+        #         ("rulebook_id", "not in", [k[0] for k in completed_grouped.keys()]),
+        #     ]
+        # )
 
         _logger.info(f"Awaiting replies found: {awaiting_replies.ids}")
 
