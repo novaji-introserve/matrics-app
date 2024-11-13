@@ -47,6 +47,8 @@ class RulebookTitle(models.Model):
         default='manual',
         tracking=True
     )
+    active = fields.Boolean(string='Active', default=True)
+
     # Add the external_resource_url field if it's not already defined
     external_resource_url = fields.Char("External Resource URL")
 
