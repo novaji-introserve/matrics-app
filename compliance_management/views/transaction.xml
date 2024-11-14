@@ -20,6 +20,7 @@
                 <field name="amount" />
                 <field name="tran_type" />
                 <field name="rule_id" />
+                <field name="likely_fraud" widget="boolean_toggle"  readonly="1"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                     decoration-warning="risk_level in ('medium')"
                     decoration-success="risk_level in ('lowel')" />
@@ -88,6 +89,7 @@
                                     <field name="currency_id" readonly="1" />
                                     <field name="branch_id" readonly="1" />
                                     <field name="rule_id" readonly="1" />
+                                    <field name="likely_fraud" widget="boolean_toggle"  readonly="1"/>
                                 </group>
                                 <group>
                                     <field name="tran_type" readonly="1" />

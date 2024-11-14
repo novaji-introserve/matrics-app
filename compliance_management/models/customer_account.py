@@ -34,6 +34,9 @@ class CustomerAccount(models.Model):
     avg_tran_last1y = fields.Float(string='Avg. Transaction Amount - Last 1Y', digits=(10,2))
     max_tran_last1y = fields.Float(string='Max. Transaction - Last 1Y', digits=(10,2))
     tot_tran_last1y = fields.Float(string='Total Transaction Amount - Last 1Y', digits=(15,2))
+    risk_score = fields.Float(string='Risk Score', digits=(10,2),related="customer_id.risk_score")
+    risk_level = fields.Char(string='Risk Rating',related="customer_id.risk_level")
+    state = fields.Selection(string='Status', selection=[('active', 'Active'), ('dormant', 'Dormant'),('locked','Locked')],tracking=True,default='active')
     
     
     @api.model
@@ -48,4 +51,10 @@ class CustomerAccount(models.Model):
         }
         
     def get_balance(self):
-        return self.balance
+        return  '{0:.2f}'.format(self.balance)
+    
+    def get_risk_score(self):
+        return self.risk_score
+
+    def get_risk_level(self):
+        return self.risk_level

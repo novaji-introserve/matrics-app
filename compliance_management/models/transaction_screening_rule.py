@@ -24,6 +24,7 @@ class TransactionScreeningRule(models.Model):
     state = fields.Selection(string='State', selection=[('draft', 'Draft'), (
         'active', 'Active'), ('inactive', 'Inactive')], default='draft', index=True,tracking=True)
     narration = fields.Text(string='Narration')
+    likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,default=False)
     risk_level = fields.Selection(string='Risk Level', selection=[('low', 'Low'), ('medium', 'Medium'),('high','High')],default='high',tracking=True)
 
     def action_activate(self):

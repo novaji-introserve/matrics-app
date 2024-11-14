@@ -12,6 +12,13 @@
                 <field name="currency_id" />
                 <field name="account_type_id" />
                 <field name="product_id" />
+                <field name="risk_score" />
+                <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
+                decoration-warning="risk_level in ('medium')"
+                decoration-success="risk_level in ('lowel')" />
+                <field name="state" widget="badge" decoration-danger="state == 'locked'"
+                decoration-warning="state in ('dormant')"
+                decoration-success="state in ('active')" />
                 <field name="date_created" />
             </tree>
         </field>
@@ -21,11 +28,25 @@
         <field name="model">res.partner.account</field>
         <field name="arch" type="xml">
             <form readonly="1">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="active,dormant,locked" clickable="True" />
+                </header>
                 <sheet string="Account">
                     <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
+                            <span>Risk 
+                            <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
+                            decoration-warning="risk_level in ('medium')"
+                            decoration-success="risk_level in ('lowel')"/>
+                            </span>
+                           
+                        </button>
+                        <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
+                            <field string="Risk Score"  name="risk_score" widget="statinfo"/>
+                        </button>
                         <button class="oe_stat_button" type="object" name="get_balance"
                             icon="fa-money">
-                            <field string="Balance" name="balance" widget="statinfo" />
+                            <field string="Balance" name="balance" widget="monetary" readonly="True" />
                         </button>
                     </div>
                     <div class="oe_title">
@@ -111,6 +132,8 @@
                         context="{'group_by': 'product_id'}" />
                     <filter name="group_account_type" string="Account Type"
                         context="{'group_by': 'account_type_id'}" />
+                    <filter name="group_state" string="Status"
+                        context="{'group_by': 'state'}" />
                 </group>
             </search>
         </field>
