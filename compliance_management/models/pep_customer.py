@@ -41,7 +41,10 @@ class PepCustomer(models.Model):
         for e in self:
             customers = self.env['res.partner'].search([('id','=',e.id)])
             for c in customers:
-                c.write({'is_pep':True,'global_pep':True,'global_pep_id':e.pep_id})
-                c.action_compute_risk_score_with_plan()
+                try:
+                    c.write({'is_pep':True,'global_pep':True,'global_pep_id':e.pep_id})
+                    c.action_compute_risk_score_with_plan()
+                except:
+                    pass
             
         
