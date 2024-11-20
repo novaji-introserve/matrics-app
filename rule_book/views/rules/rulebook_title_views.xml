@@ -33,7 +33,7 @@
                                 <field name="released_date" />
                                 <field name="source_id" />
                                 <field name="created_by" readonly="1" />
-                                <field name="external_resource_url" readonly="1" />
+                                <field name="external_resource_url" readonly="1" widget="url" />
                                 <field name="input_type" widget="badge" readonly="1" decoration-info="input_type=='ai'" decoration-primary="input_type == 'manual'" />
                             </group>
                             <group>

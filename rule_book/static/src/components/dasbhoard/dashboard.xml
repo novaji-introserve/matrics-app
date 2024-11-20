@@ -25,6 +25,69 @@
 			Config:  Mandatory theme config file contain global vars & default theme options, Set
 			your preferred theme option in this file.
 			-->
+			<style>
+                .custom-button {
+                    color: white;
+                    background-color: #008000;
+                    border: 1px solid #008000;
+                    text-align: center;
+                    padding: 3px 12px;
+                    text-decoration: none;
+                    display: inline-block;
+                    border-radius: 3px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    transition: background-color 0.3s, border-color 0.3s;
+                }
+
+                .custom-button:hover {
+                    background-color: #0056b3;
+                    border-color: #0056b3;
+					color:white
+                }
+
+				<!--  -->
+				.scrollable-container {
+					height: calc(100% - 100px); /* Adjust based on your card header height */
+					overflow-y: auto;
+					overflow-x: hidden;
+					position: relative;
+				}
+
+				.scrollable-container::-webkit-scrollbar {
+					width: 6px;
+				}
+
+				.scrollable-container::-webkit-scrollbar-track {
+					background: #f1f1f1;
+					border-radius: 3px;
+				}
+
+				.scrollable-container::-webkit-scrollbar-thumb {
+					background: #888;
+					border-radius: 3px;
+				}
+
+				.scrollable-container::-webkit-scrollbar-thumb:hover {
+					background: #555;
+				}
+
+				.card.h-100 {
+					display: flex;
+					flex-direction: column;
+					height: 100% !important;
+				}
+
+				.card-header {
+					flex-shrink: 0;
+				}
+
+				.scrollable-container > :last-child {
+					margin-bottom: 1rem;
+				}
+			</style>
+
+
 			<script src="rule_book/static/assets/js/config.js">
 			</script>
 			<!-- Vendors JS -->
@@ -333,8 +396,11 @@
 														</div>
 														<div class="user-progress">
 															<!-- Due Date -->
-															<h6 class="mb-0 text-secondary" >
+															<h6 class="mb-0 text-secondary">
+																<t t-esc="date.internal_due_date" />
+
 															</h6>
+															
 														</div>
 													</div>
 												</li>
@@ -348,68 +414,74 @@
 						<div class="row">
 							<!-- Awaiting Review Card -->
 							<div class="col-md-6 col-lg-4 mb-6">
-								<div class="card h-auto">									<!--
-                  Use h-auto to allow height to adjust based on content -->
+								<div class="card h-auto">									<!-- Changed to h-100 for full height -->
 									<div class="card-header d-flex align-items-center justify-content-between">
 										<div class="card-title mb-0">
 											<h5 class="card-title m-0 me-2 mb-2">
-                        Awaiting Review
+                    Awaiting Review
 											</h5>
 											<p class="card-subtitle">
-                        Rulebook response awaiting review
+                    Rulebook response awaiting review
 											</p>
 										</div>
 									</div>
-									<t t-if="state.awaitingReplies.length === 0">
-										<div class="alert alert-light">
-                      No awaiting replies found.
-										</div>
-									</t>
-									<t t-else="">
-										<t t-foreach="state.awaitingReplies" t-as="reply" t-key="reply.id">
-											<t t-set="index" t-value="state.awaitingReplies.indexOf(reply)" />
-											<div class="card-body pt-4">
-												<ul class="p-0 m-0">
-													<li class="d-flex align-items-center mb-2">
-														<div class="avatar flex-shrink-0 me-3">
-															<img src="rule_book/static/assets/img/icons/object/awaiting_review.png" alt="awaiting" t-att-style="'opacity: ' + (1 - (index / state.awaitingReplies.length))" class="rounded" />
-														</div>
-														<div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-															<div class="me-2">
-																<div class="mb-1">
-																	<small class="text-muted">
-                                  Rulebook:
-																	</small>
-																	<h6 class="fw-bold mb-0">
-																		<t t-esc="reply.rulebook_name" />
-																	</h6>
+									<div class="scrollable-container">										<!-- Added wrapper for scrollable content -->
+										<t t-if="state.hasPermission">
+											<!-- User has permission, now check if there are replies -->
+											<t t-if="state.awaitingReplies.length == 0">
+												<div class="alert alert-light">
+                        No awaiting replies found.
+												</div>
+											</t>
+											<t t-else="">
+												<t t-foreach="state.awaitingReplies" t-as="reply" t-key="reply.id">
+													<t t-set="index" t-value="state.awaitingReplies.indexOf(reply)" />
+													<div class="card-body pt-4">
+														<ul class="p-0 m-0">
+															<li class="d-flex align-items-center mb-2">
+																<div class="avatar flex-shrink-0 me-3">
+																	<img src="rule_book/static/assets/img/icons/object/awaiting_review.png" alt="awaiting" t-att-style="'opacity: ' + (1 - (index / state.awaitingReplies.length))" class="rounded" />
 																</div>
-																<div class="mb-1">
-																	<h6 t-attf-class="fw-700 mb-0 custom-purple
-                    ">
-																		<t t-esc="reply.status" />
-																	</h6>
+																<div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+																	<div class="me-2">
+																		<div class="mb-1">
+																			<small class="text-muted">Rulebook:</small>
+																			<h6 class="fw-bold mb-0">
+																				<t t-esc="reply.rulebook_name" />
+																			</h6>
+																		</div>
+																		<div class="mb-1">
+																			<h6 t-attf-class="fw-700 mb-0 custom-purple">
+																				<t t-esc="reply.status" />
+																			</h6>
+																		</div>
+																	</div>
+																	<div>
+																		<h6 class="mb-2">
+																			<t t-esc="reply.reply_date" />
+																		</h6>
+																		<div class="user-progress d-flex align-items-end gap-2">
+																			<a t-att-href="reply.form_link" class="custom-button">
+																				<small>View</small>
+																			</a>
+																		</div>
+																	</div>
 																</div>
-															</div>
-															<div>
-																<h6 class="mb-2">
-																	<t t-esc="reply.reply_date" />
-																</h6>
-																<div class="user-progress d-flex align-items-end gap-2">
-																	<a t-att-href="reply.form_link" class="btn btn-primary btn-sm">
-																		<small>View</small>
-																	</a>
-																</div>
-															</div>
-														</div>
-													</li>
-												</ul>
-											</div>
+															</li>
+														</ul>
+													</div>
+												</t>
+											</t>
 										</t>
-									</t>
+										<t t-else="">
+											<p></p>
+										</t>
+									</div>
 								</div>
 							</div>
 
+
+							
 							<!-- Newly Uploaded Document Card -->
 							<div class="col-md-6 col-lg-4 mb-6">
 								<div class="card h-auto">
@@ -432,7 +504,7 @@
 									</t>
 									<t t-else="">
 
-										<t t-foreach="state.newlyUploadedTitle" t-as="title" t-key="title.name+title.id" >
+										<t t-foreach="state.newlyUploadedTitle" t-as="title" t-key="title.name+title.id">
 											<div class="card-body pt-4">
 												<ul class="p-0 m-0">
 													<li class="d-flex align-items-center mb-2">
@@ -466,13 +538,13 @@
 																	</h6>
 																</div>
 															</div>
-															<!-- <div>
+															<div>
 																<div class="user-progress d-flex align-items-end gap-2">
-																	<a t-att-href="title.form_link" class="btn btn-primary btn-sm">
+																	<a t-att-href="title.form_link" class="custom-button">
                                   View
 																	</a>
 																</div>
-															</div> -->
+															</div>
 														</div>
 													</li>
 												</ul>

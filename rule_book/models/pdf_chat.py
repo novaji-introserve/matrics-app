@@ -10,7 +10,6 @@ from odoo import models, fields, api
 import PyPDF2
 # import ollama
 from odoo.exceptions import ValidationError, UserError
-import PyPDF2
 from PIL import Image
 import pytesseract
 from pdf2image import convert_from_bytes

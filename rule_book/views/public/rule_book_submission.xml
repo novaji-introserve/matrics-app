@@ -12,20 +12,20 @@
             <div class="highlight-box">
                 <form action="/submit_external_report" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="rulebook_id" t-att-value="rulebook_id" /> 
-                    <p>
-                        <label for="reply_content">Description</label>
-                        <textarea name="reply_content" id="reply_content" rows="3"
-                            class="form-control" required="True"></textarea>
-                    </p>
-                    <p>
+                  
+                    <!-- <p>
                         <label for="reporter">Inputer Name</label>
                         <input type="text" name="reporter" id="reporter" class="form-control"
                             required="True"/>
-                    </p>
+                    </p> -->
                     <p>
                         <label for="document">Attach Document</label>
                         <input type="file" name="document" id="document" class="form-control"
                             required="True"/>
+                    </p>
+                    <p>
+                        <label for="reply_content">Note</label>
+                        <textarea name="reply_content" id="reply_content" rows="3" class="form-control" required="True"></textarea>
                     </p>
                     <p style="text-align: center;">
                         <input type="submit" value="Submit Report" class="btn btn-primary"/>

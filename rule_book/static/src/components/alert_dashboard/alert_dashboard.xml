@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="owl.OwlSalesDashboard" owl="1">
+    <t t-name="AlertDashboard" owl="1">
         <div class="vh-100 overflow-auto bg-muted">
             <div class="row m-3">
-                <div class="col-lg-7">
+                <div class="col-lg-12">
                     <div class="row">
                         <div class="col m-0 p-0">
-                            <div class="shadow-sm border m-2 p-4 bg-white">
+                            <div class="shadow-sm border m-2 p-2 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <h1 class="text-primary fw-bold">Custom Sales Dashboard</h1>
+                                    <h2 class="text-primary fw-bold">Alert Dashboard</h2>
                                     <div>
-                                        <select class="form-select">
+                                        <select class="form-select" t-model="state.period" t-on-change="OnChangePeriod">
                                             <option value="0">Select Period</option>
                                             <option value="7">Last 7 Days</option>
                                             <option value="30">Last 30 Days</option>
@@ -22,43 +22,83 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
-                        <KpiCard name="'Quotations'" value="10" percentage="6"/>
-                        <KpiCard name="'Orders'" value="20" percentage="20"/>
-                        <KpiCard name="'Revenues'" value="'30.50K'" percentage="-3"/>
-                        <KpiCard name="'Average Order'" value="'2.5K'" percentage="-10"/>
+                        <div class="col-2 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h6 class="text-primary fw-bold">Alert Responses</h6>
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <div class="row">
+                        <KpiCard onClick.bind="viewEarlyReply" name="'Early Submission'" value="state.earlyReply.value" />
+                        <!-- <KpiCard name="'Right on Time'" value="20" percentage="20"/> -->
+                        <KpiCard onClick.bind="viewLateReply" name="'Late Submission'" value="state.lateReply.value" />
+                        <KpiCard onClick.bind="viewNoReply" name="'Not Responded'" value="state.noReply.value"/>
+                        <KpiCard onClick.bind="viewPendingReply" name="'Pending'" value="state.pendingReply.value"/>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-2 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h6 class="text-primary fw-bold">Alert Status</h6>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <KpiCard onClick.bind="viewCompleted" name="'Completed '" value="state.completed.value" />
+                        <!-- <KpiCard name="'Right on Time'" value="20" percentage="20"/> -->
+                        <KpiCard onClick.bind="viewReviewed" name="'Reviewed'" value="state.reviewed.value" />
+                        <KpiCard onClick.bind="viewSubmitted" name="'Submitted'" value="state.submitted.value"/>
+                        <KpiCard onClick.bind="viewPending" name="'Pending'" value="state.pending.value" />
+                    </div>
+
                     <div class="row">
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Top Products</h3>
+                                    <h3 class="text-primary fw-bold">Rulebook Responses</h3>
                                     <div class="px-3 py-1 bg-primary cursor-pointer">
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
                                 </div>
-                                <ChartRenderer type="'doughnut'" title="'Top Products Report'"/>
+                                <div style="width:100% !important; margin-top:10px !important;" >
+                                    <ChartRenderer type="'line'" title="'Response Timing Report'" config="state.ResponseTiming"  />
+
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Top Sales People</h3>
+                                    <h3 class="text-primary fw-bold mb-2">Rulebook Status</h3>
                                     <div class="px-3 py-1 bg-primary cursor-pointer">
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
                                 </div>
-                                <ChartRenderer type="'pie'" title="'Top Sales People Report'"/>
+                                <div style="width:100% !important; margin-top:10px !important;">
+                                    <ChartRenderer type="'bar'" title="'Status Report'" config="state.RulebookState" />
+
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
-                <div class="col-lg-5">
+                <!-- <div class="col-lg-8">
                     <div class="row">
                         <div class="col m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Monthly Sales</h3>
+                                    <h3 class="text-primary fw-bold">Late Submission</h3>
                                     <div class="px-3 py-1 bg-primary cursor-pointer">
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
@@ -71,7 +111,7 @@
                         <div class="col m-0 p-0">
                             <div class="shadow-sm border m-2 p-4 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Partner Orders</h3>
+                                    <h3 class="text-primary fw-bold">Not Responded</h3>
                                     <div class="px-3 py-1 bg-primary cursor-pointer">
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
@@ -80,7 +120,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </t>

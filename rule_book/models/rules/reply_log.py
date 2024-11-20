@@ -7,6 +7,8 @@ from odoo.exceptions import UserError
 import logging
 from odoo.tools import format_date
 from odoo.exceptions import AccessError
+from odoo.http import request
+import pytz
 
 
 _logger = logging.getLogger(__name__)
@@ -17,10 +19,13 @@ class ReplyLog(models.Model):
     _description = "Reply Log Model"
     _rec_name = "create_date"
     _order = "id desc"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     # Link to the rulebook this reply relates to
     rulebook_id = fields.Many2one(
-        "rulebook", string="Rulebook", help="Reference to the related Rulebook"
+        "rulebook", string="Rulebook", help="Reference to the related Rulebook",
+        tracking=True,
+
     )
 
     department_id = fields.Many2one(
@@ -28,135 +33,67 @@ class ReplyLog(models.Model):
         string="Department",
         default=lambda self: self.env.user.department_id.id,
         help="The department this reply log belongs to",
+        tracking=True,
+
     )
 
     rulebook_name = fields.Char(
-        string="Rulebook Name",
+        string="Type Of Return",
         compute="_compute_rulebook_name_stripped",
         store=False,  # Not stored in the database
+        tracking=True,
+
     )
-    
-    @api.model
-    def open_reply_log(self):
-        # Check if the user has a department
-        if not self.env.user.department_id:
-            raise AccessError(("You must be assigned to a department to view Reply Logs."))
-
-        # Return the action to open rulebook records
-        return {
-            'name': ('Reply Logs'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'reply.log',  # This is your target model
-            'view_mode': 'tree,form,kanban',
-            'domain': [
-                ('department_id', '=', self.env.user.department_id.id)
-                
-            ],
-            'context': {
-                'search_default_not_deleted': 1,
-                'default_department_id': self.env.user.department_id.id
-            }
-        }
-
-    @api.model
-    def get_awaiting_replies(self):
-        _logger.info("Fetching awaiting replies...")
-
-        # Fetch completed replies
-        completed_replies = self.search([("rulebook_status", "=", "completed")])
-        completed_grouped = {}
-        completed_ids = {reply.id for reply in completed_replies}
-
-        for reply in completed_replies:
-            key = (reply.rulebook_id.id, reply.next_due_date)
-            if key not in completed_grouped:
-                completed_grouped[key] = reply.id
-
-        _logger.info(f"Completed replies grouped: {completed_grouped}")
-
-        # Search for awaiting replies
-        awaiting_replies = self.search([
-            ("rulebook_status", "not in", ["completed", "reviewed"]),
-            ("id", "not in", completed_ids)  # Exclude completed replies directly
-        ])
-        # awaiting_replies = self.search(
-        #     [
-        #         ("rulebook_status", "!=", "completed"),
-        #         ("rulebook_status", "!=", "reviewed"),
-        #         ("next_due_date", "not in", list(completed_grouped.values())),
-        #         ("rulebook_id", "not in", [k[0] for k in completed_grouped.keys()]),
-        #     ]
-        # )
-
-        _logger.info(f"Awaiting replies found: {awaiting_replies.ids}")
-
-        # Prepare the result with required fields
-        result = []
-        for reply in awaiting_replies:
-            formatted_date = (
-                format_date(self.env, reply.reply_date)
-                if reply.reply_date
-                else "No date"
-            )
-            print(reply.rulebook_status.title())
-            print("testing")
-            result.append(
-                {
-                    "id": reply.id,
-                    "rulebook_name": reply.rulebook_name,  # Assuming rulebook_id has a 'name' field
-                    "status": reply.rulebook_status.title(),
-                    "reply_date": formatted_date,
-                    "form_link": f"/web#id={reply.id}&model=reply.log&view_type=form",  # Link to the form view
-                }
-            )
-
-        return result
-
-    def _compute_rulebook_name_stripped(self):
-        for record in self:
-            if record.rulebook_id:
-                # Strip HTML tags
-                record.rulebook_name = re.sub(
-                    r"<[^>]+>", "", record.rulebook_id.type_of_return
-                )
-            else:
-                record.rulebook_name = ""
 
     # The date the reply was submitted, auto-set to the current date, and readonly
-    reply_date = fields.Date(
+    reply_date = fields.Datetime(
         string="Reply Date",
-        default=fields.Date.today,
+        # default=fields.Date.today,
+        default=lambda self: fields.Datetime.now().astimezone(
+            pytz.timezone('Africa/Lagos')).replace(tzinfo=None),
+        # default=fields.Datetime.now,
         readonly=True,
+        tracking=True,
         help="The date when the reply was submitted. It is automatically set to the current date.",
     )
 
     # The textual content of the reply submitted by the reporter
     reply_content = fields.Text(
-        string="Reply Content", help="The content of the reply provided by the inputer."
+        string="Reply Note", help="The content of the reply provided by the inputer.",
+        tracking=True,
+
     )
 
     # The name of the person who submitted the reply (inputter)
-    reporter = fields.Char(
+    reporter = fields.Many2one(
+        "res.users",
+        tracking=True,
         string="Inputer",
         required=True,
-        help="The person who provided or inputted the reply.",
+        help="The user responsible for this rulebook reply.",
     )
+   
 
     # Attached document for the reply (binary file)
     document = fields.Binary(
         string="Attached Document",
         help="Any document (e.g., image, doc, xlsx) attached to the reply.",
+        tracking=True,
     )
+
+    document_filename = fields.Char(string="Document Filename",tracking=True,  )
 
     # The regulatory date as computed from the rulebook (related field)
     rulebook_compute_date = fields.Datetime(
         string="Regulatory Date",
         store=True,
+        tracking=True,
         help="The regulatory date calculated from the related rulebook.",
     )
     next_due_date = fields.Datetime(
         string="Next Due Date",
         store=True,
+        tracking=True,
         help="Next due date.",
     )
 
@@ -171,6 +108,8 @@ class ReplyLog(models.Model):
         string="Rulebook Status",
         default="pending",
         help="The current status of the related rulebook.",
+                tracking=True,
+
     )
 
     # Field to track the timing of submission compared to the regulatory date (early, on time, late)
@@ -185,7 +124,94 @@ class ReplyLog(models.Model):
         compute="_compute_submission_timing",
         store=True,
         help="Indicates whether the reply was submitted early, on time, or late based on the regulatory date.",
+        tracking=True,
+
     )
+
+    @api.model
+    def open_reply_log(self):
+        # Check if the user has a department
+        restricted_group = self.env.ref('rule_book.group_department_user_')
+
+        # Check if the user belongs to the restricted group
+        if restricted_group in self.env.user.groups_id:
+            # Check if the user has a department
+            if not self.env.user.department_id:
+                raise AccessError(
+                    "You must be assigned to a department to view Reply Logs.")
+
+            # Apply restriction to the domain
+            domain = [('department_id', '=', self.env.user.department_id.id)]
+        else:
+            # No restrictions for other users
+            domain = []
+        return {
+            'name': ('Reply Logs'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'reply.log',  # This is your target model
+            'view_mode': 'tree,form,kanban',
+            'domain': domain,
+            'context': {
+                'search_default_not_deleted': 1,
+                'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
+            }
+        }
+        
+
+    
+
+    @api.model
+    def get_awaiting_replies(self):
+        _logger.info("Fetching awaiting replies...")
+
+        try:
+            # Fetch completed replies
+            completed_replies = self.search(
+                [("rulebook_status", "=", "completed")])
+            completed_ids = {
+                reply.rulebook_id.id for reply in completed_replies if reply.rulebook_id}
+
+            _logger.info(f"Completed rulebook IDs: {completed_ids}")
+
+            # Search for awaiting replies
+            awaiting_replies = self.search([
+                ("rulebook_status", "not in", ["completed", "reviewed"]),
+                ("rulebook_id", "not in", list(completed_ids))
+            ])
+
+            _logger.info(f"Awaiting replies found: {awaiting_replies.ids}")
+
+            # Prepare the result
+            result = []
+            for reply in awaiting_replies:
+                formatted_date = fields.Datetime.to_string(
+                    reply.reply_date) if reply.reply_date else "No date"
+
+                _logger.debug(f"Reply status: {reply.rulebook_status.title()}")
+
+                result.append({
+                    "id": reply.id,
+                    "rulebook_name": reply.rulebook_name if hasattr(reply, 'rulebook_name') else reply.rulebook_id.name,
+                    "status": reply.rulebook_status.title(),
+                    "reply_date": formatted_date,
+                    "form_link": f"/web#id={reply.id}&model=reply.log&view_type=form",
+                })
+
+            return result
+
+        except Exception as e:
+            _logger.error(f"Error fetching awaiting replies: {e}")
+            return {"error": str(e)}
+
+    def _compute_rulebook_name_stripped(self):
+        for record in self:
+            if record.rulebook_id:
+                # Strip HTML tags
+                record.rulebook_name = re.sub(
+                    r"<[^>]+>", "", record.rulebook_id.type_of_return
+                )
+            else:
+                record.rulebook_name = ""
 
     global_data = {}
 
@@ -201,7 +227,7 @@ class ReplyLog(models.Model):
 
     @api.depends("reply_date", "rulebook_compute_date")
     def _compute_submission_timing(self):
-        """Compute the submission timing based on the reply date and the regulatory date."""
+        """Compute the submission timing based on the full datetime of reply_date and rulebook_compute_date."""
         for record in self:
             if not record.reply_date:
                 # If there's no reply date and the due date has passed, mark as not responded
@@ -212,21 +238,26 @@ class ReplyLog(models.Model):
                     record.submission_timing = "not_responded"
                 continue
 
-            # Convert reply_date to a datetime.date object
-            reply_date_obj = datetime.strptime(
-                str(record.reply_date), "%Y-%m-%d"
-            ).date()
-            # Extract the date part from rulebook_compute_date
-            compute_date_obj = record.rulebook_compute_date.date()
+            try:
+                # Convert reply_date to a datetime object
+                reply_datetime = fields.Datetime.from_string(record.reply_date)
+                # Convert rulebook_compute_date to a datetime object
+                compute_datetime = fields.Datetime.from_string(
+                    record.rulebook_compute_date)
 
-            # Compare the reply date with the computed rulebook date
-            if reply_date_obj > compute_date_obj:
-                record.submission_timing = "late"
-            elif reply_date_obj < compute_date_obj:
-                record.submission_timing = "early"
-            else:
-                record.submission_timing = "on_time"
+                # Compare the reply datetime with the computed rulebook datetime
+                if reply_datetime > compute_datetime:
+                    record.submission_timing = "late"
+                elif reply_datetime < compute_datetime:
+                    record.submission_timing = "early"
+                else:
+                    record.submission_timing = "on_time"
+            except Exception as e:
+                _logger.error(
+                    f"Error computing submission timing for record {record.id}: {e}")
+                record.submission_timing = "error"
 
+   
     @api.constrains("rulebook_status")
     def _compute_next_due_date(self):
         print(" updating next due date")
@@ -288,6 +319,7 @@ class ReplyLog(models.Model):
                 else:
                     # Do nothing if regulatory date doesn't match computed date
                     continue
+                
 
     @api.constrains("rulebook_status")
     def _check_status_change(self):
@@ -315,9 +347,11 @@ class ReplyLog(models.Model):
 
                 # Handle special cases for day_of_month, day_every_month, and month_of_year
                 if rulebook.frequency_type == "day_of_month":
-                    previous_due_date = rulebook.computed_date - relativedelta(months=1)
+                    previous_due_date = rulebook.computed_date - \
+                        relativedelta(months=1)
                 elif rulebook.frequency_type == "day_every_month":
-                    previous_due_date = rulebook.computed_date - relativedelta(months=1)
+                    previous_due_date = rulebook.computed_date - \
+                        relativedelta(months=1)
                 elif rulebook.frequency_type == "month_of_year":
                     previous_due_date = rulebook.computed_date.replace(
                         year=record.rulebook_compute_date.year - 1
