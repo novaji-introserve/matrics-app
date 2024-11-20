@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-name="owl.kpicard" owl="1">
+        <div class="col-lg-2 col-md-3 col-sm-6 mb-3 cursor-pointer" style="" t-on-click="() => props.onclick(props.status)">
+            <div class="col m-0 p-0 ">
+                <div class="bg-white  rounded shadow p-4 shadow-1 text-center">
+                    <h2 class="h1 fw-bold text-dark">
+                        <span>
+                            <t t-esc="props.value"/>
+                        </span>
+                    </h2>
+                    <h3 class="text-muted h3">
+                        <span>
+                            <t t-esc="props.name" />
+                        </span>
+                    </h3>
+                    <div class="h6 mt-5">
+                        <span t-attf-class="text-#{props.percentage >= 100 ? 'success' : 'danger'}">
+                            <span t-attf-class="me-1 fa fa-arrow-#{props.percentage >= 100 ? 'up' : 'down'}"></span>
+                            <span><t t-esc="props.percentage" />% </span>
+                            <span>since last period</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
