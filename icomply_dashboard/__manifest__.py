@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Icomply_dashboard",
+    'name': "icomply_dashboard",
     'sequence':2,
     'summary': " dashboard overview ",
 
@@ -32,8 +32,8 @@
     "auto_install": False,
     'assets':{
         'web.assets_backend': [
-            'mydashboard/static/src/components/**/*.js',
-            'mydashboard/static/src/components/**/*.xml',
+            'icomply_dashboard/static/src/components/**/*.js',
+            'icomply_dashboard/static/src/components/**/*.xml',
         ]
     }
 }

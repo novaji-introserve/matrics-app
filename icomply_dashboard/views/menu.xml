@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+  <data>
+
+        <record id="case_management_view_tree" model="ir.ui.view">
+            <field name="name">Tags</field>
+            <field name="model">case.management</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="user_id"/>
+                    <field name="assigned_user"/>
+                    <field name="case_status_id"/>
+                    <field name="priority_level_id"/>
+                    <field name="case_action"/>
+                    <field name="title"/>
+                    <field name="created_at"/>
+                    <field name="updated_at"/>
+                
+                </tree>
+            </field>
+        </record>
+
+        <record id="case_management_view_search" model="ir.ui.view">
+            <field name="name">case.management.view.search</field>
+            <field name="model">case.management</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="user_id"/>
+                    <field name="assigned_user"/>
+                    <field name="case_status_id"/>
+                    <field name="priority_level_id"/>
+                    <field name="case_action"/>
+                    <field name="title"/>
+                    <separator/>
+                    
+                </search>
+            </field>
+        </record>
+
+
+
+     
+
+        <record id="action_case_management" model="ir.actions.act_window">
+                <field name="name">Case management</field>
+                <field name="res_model">case.management</field>
+                <field name="view_mode">tree,form</field>
+                <field name="help" type="html">
+                  <p class="o_view_nocontent_smiling_face">
+                    Create case
+                  </p>
+                </field>
+        </record> 
+      
+
+        <record id="dashboard_home" model="ir.actions.client">
+          <field name="name">Dashboard</field>
+          <field name="tag">owl.icomply_dashboard</field>
+        </record> 
+
+    <!-- <menuitem id="icomply_dashboard_menu" name="iComply Dashboard" parent="base.menu_custom"
+      action="icomply_dashboard_action" /> -->
+    <menuitem name="Icomply Dashboard" id="icomply_dashboard_main">
+      <menuitem name="Home" id="menu_Icomply_dashboard" sequence="1" action="dashboard_home" />
+      <menuitem name="Case Management" id="case_management" action="action_case_management" /> 
+    </menuitem>  
+
+  </data>
+</odoo>

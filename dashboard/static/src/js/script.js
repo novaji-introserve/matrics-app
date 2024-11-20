@@ -1,2 +1,0 @@
-// contentType: false,
-                        // processData: false,
