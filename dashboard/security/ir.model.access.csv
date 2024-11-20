@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_case_status,access right for case status,mydashboard.model_case_status,base.group_user,1,1,1,1
+access_case_rating,access right for case rating,mydashboard.model_case_rating,base.group_user,1,1,1,1
+access_case_management,access right for case management,mydashboard.model_case_management,base.group_user,1,1,1,1

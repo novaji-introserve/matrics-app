@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.OwlSalesDashboard" owl="1">
+      <div class="vh-100 p-4 overflow-auto bg-muted ">
+       
+            <div class="row g-5">
+                <div class="col-12">
+                    <div class="col-12 m-0 p-0 ">
+                        <div class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
+                            <h3 class="lead fw-bold">DASHBOARD</h3>
+                           <div>
+                            <select name="" id="" class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
+                                <option value="0" selected="selected">current</option>
+                                <option value="7">7 Days</option>
+                                <option value="14">last 14 Days</option>
+                                <option value="30">last month</option>
+                                <option value="60">2 months</option>
+                            </select>
+                           </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2 mt-md-4">
+                        <KpiCard onclick.bind="displayAllCases" name="'All Cases'" value="state.kpi.allcases" percentage="state.kpi.allcasespercentage" />
+                        <KpiCard onclick.bind="displayAllOpenCases" name="'Open Cases'" value="state.kpi.opencases" percentage="state.kpi.opencasespercentage" />
+                        <KpiCard onclick.bind="displayAllCloseCases" name="'Close Cases'" value="state.kpi.closecases" percentage="state.kpi.closecasespercentage" />
+                        <KpiCard onclick.bind="displayAllOverdueCases" name="'OverDue Case'" value="state.kpi.overdue" percentage="state.kpi.overduecasespercentage" />
+                        <KpiCard onclick.bind="displayNothing" name="'Open Case(%)'" value="state.kpi.opencaseinRespectToAllCase" percentage="state.kpi.opencasespercentage" />
+                        <KpiCard onclick.bind="displayNothing" name="'Close Case(%)'" value="state.kpi.closecaseinRespectToAllCase" percentage="state.kpi.closecasespercentage" />
+                    </div>
+
+                  <div class="row mt-3">
+
+                    <div class="col-md-4 ">
+                        <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                            <h3 class="lead fw-bold text-primary">Case Severity Report</h3>
+                            <button class="btn btn-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked" config="state.openchart" type="'bar'" title="'case by severity'" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 ">
+                        <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                            <h3 class="lead fw-bold text-primary">Case Status Report</h3>
+                            <button class="btn btn-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+                       <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                        <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"  config="state.statuschart" type="'bar'" title="'case by status'" />
+                       </div>
+                    </div>
+                    <div class="col-md-4 ">
+                        <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                            <h3 class="lead fw-bold text-primary">Case category Report</h3>
+                            <button class="btn btn-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+                       <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                        <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked" config="state.categoryChart"  type="'pie'" title="'case by category'" />
+                       </div>
+                    </div>
+
+                  </div>
+
+
+                </div>
+
+               
+            </div>
+
+           
+
+            
+      </div>
+    </t>
+</templates>
