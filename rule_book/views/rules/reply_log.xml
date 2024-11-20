@@ -7,20 +7,11 @@
         <field name="arch" type="xml">
             <tree string="Reply Log" create="false">
                 <field name="rulebook_id" />
-                <field name="rulebook_compute_date" widget="date" />
-                <field name="reply_date" widget="date" />
-                <field name="submission_timing" widget="badge"
-                    decoration-info="submission_timing == 'on_time'"
-                    decoration-success="submission_timing == 'early'"
-                    decoration-danger="submission_timing == 'late'"
-                />
-                <field name="rulebook_status" widget="badge"
-                    decoration-muted="rulebook_status == 'pending'"
-                    decoration-info="rulebook_status == 'submitted'"
-                    decoration-warning="rulebook_status == 'reviewed'"
-                    decoration-success="rulebook_status == 'completed'"
-                />
-                <field name="reporter" />
+                <field name="rulebook_compute_date" widget="datetime" />
+                <field name="reply_date" widget="datetime" />
+                <field name="submission_timing" widget="badge" decoration-info="submission_timing == 'on_time'" decoration-success="submission_timing == 'early'" decoration-danger="submission_timing == 'late'" />
+                <field name="rulebook_status" widget="badge" decoration-muted="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'" />
+                <field name="reporter" string="Officer Responsible" />
             </tree>
         </field>
     </record>
@@ -32,40 +23,44 @@
         <field name="arch" type="xml">
             <form string="Reply Log" class="oe_form_custom">
                 <sheet>
-                  <header>
-                        <field name="rulebook_status" widget="statusbar"
-                            statusbar_visible="pending,submitted,reviewed,completed"
-                            options="{'clickable': 'True'}" />
-                  </header>
+                    <header>
+                        <field name="rulebook_status" widget="statusbar" statusbar_visible="pending,submitted,reviewed,completed" options="{'clickable': 'True'}" />
+                    </header>
                     <div class="oe_title">
                         <h1>
-                            <field name="rulebook_id" />
+                            <field name="rulebook_id"  readonly="1"/>
                         </h1>
-                        <h1>
-                            <field name="rulebook_name" readonly="1" widget="text" />
-                        </h1>
+
                     </div>
                     <group>
-                        <group>
+                        <group class="mt-3">
+                            <field name="rulebook_name" readonly="1" widget="text" />
                             <field name="reply_date" readonly="1" />
                             <field name="reply_content" widget="html" />
-                            <field name="document" widget="binary"
-                                string="Attached Document" />
-
-                           
-                        </group>
-                        <group>
-                            <field name="reporter" readonly="1" />
-                            <field name="rulebook_compute_date" readonly="1"/>
-                           
-                           
-                        </group>
-                        <group>
+                            <field name="document_filename" invisible="1" />
                             <field name="submission_timing" string="Submission Timing" />
-                          
+
                         </group>
+                        <group class="mt-3">
+                            <field name="reporter" readonly="1" string="Officer Responsible" />
+                            <field name="department_id" readonly="1" string="Department Responsible" />
+
+                            <field name="rulebook_compute_date" readonly="1"/>
+
+                        </group>
+                        
                     </group>
+
+                    <group>
+                        <field name="document" filename="document_filename" widget="binary" string="Attached Document" />
+                    </group>
+
                 </sheet>
+                <div class="oe_chatter">
+                    <!-- <field name="message_follower_ids"/> -->
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
     </record>
@@ -79,15 +74,25 @@
                 <field name="rulebook_id" />
                 <field name="submission_timing" />
                 <searchpanel>
-                    <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1"
-                        options='{"counters": true}' />
-                    <field name="submission_timing" icon="fa-clock" string="Submission Timing"
-                        enable_counters="1"
-                        options='{"counters": true}' />
+                    <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1" options='{"counters": true}' />
+                    <field name="submission_timing" icon="fa-clock" string="Submission Timing" enable_counters="1" options='{"counters": true}' />
                 </searchpanel>
-                <field name="reply_content" string="Reply Content" />
+                <field name="reply_content" string="Reply Note" />
 
             </search>
+        </field>
+    </record>
+
+    <!-- Action Definition -->
+    <record id="action_reply_log" model="ir.actions.act_window">
+        <field name="name">Reply Log</field>
+        <field name="res_model">reply.log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_reply_log_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reply logs found
+            </p>
         </field>
     </record>
 

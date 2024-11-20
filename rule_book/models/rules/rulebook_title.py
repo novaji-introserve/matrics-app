@@ -72,14 +72,16 @@ class RulebookTitle(models.Model):
         
         for title in titles:
             # Construct the URL to the form view of each record
-            form_url = f"{base_url}/web#id={title.id}&model=rulebook.title&view_type=form"
+            # form_url = f"{base_url}/web#id={title.id}&model=rulebook.title&view_type=form"
+            form_url = f"/web#id={title.id}&model=rulebook.title&view_type=form"
+
             
             results.append({
                 'name': title.name,
                 'source': title.source_id.name if title.source_id else 'N/A',
                 'created_on': title.created_on,
                 'created_by': title.created_by.name if title.created_by else 'N/A',
-                'form_link': html_escape(form_url),  # HTML escaped link to form view
+                'form_link': (form_url),  # HTML escaped link to form view
             })
         print(results)
         return results

@@ -1,17 +1,35 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_report_rulebook_user,report.rulebook.user,model_rulebook_report,base.group_user,1,1,1,1
 access_report_rulebook_source,report.rulebook.department.user,model_rulebook_sources,base.group_user,1,1,1,1
 access_report_rulebook_reply_log,report.rulebook.compliance,model_reply_log,base.group_user,1,1,1,1
 access_report_rulebook_rulebook_title,report.rulebook.compliance,model_rulebook_title,base.group_user,1,1,1,1
 access_report_rulebook_risk_category,report.rulebook.compliance,rule_book.model_rulebook_risk_category,base.group_user,1,1,1,1
-access_report_rulebook_responsible,report.rulebook.compliance,model_rulebook_responsible,base.group_user,1,1,1,1
 access_report_rulebook_rulebook,report.rulebook.department.user,model_rulebook,base.group_user,1,1,1,1
-access_report_rulebook_alert_report,report.rulebook.compliance,model_alert_report,base.group_user,1,1,1,1
 access_report_rulebook_pdf_chat,report.rulebook.compliance,model_pdf_chat,base.group_user,1,1,1,1
 access_report_rulebook_pdf_chat_log,report.rulebook.compliance,model_pdf_chat_log,base.group_user,1,1,1,1
 access_report_rulebook_report_rulebook,report.rulebook.compliance,model_report_rulebook,base.group_user,1,1,1,1
 access_report_rulebook_external_resources,report.rulebook.compliance,model_external_resource,base.group_user,1,1,1,1
-access_report_rulebook_res_users,report.rulebook.compliance,model_res_users,base.group_user,1,1,1,1
+access_report_rulebook_res_users,normal user access to users,model_res_users,base.group_user,1,1,0,0
+access_res_users_department,user access to department,hr.model_hr_department,base.group_user,1,1,0,0
+access_res_users_employee,user access to employees,hr.model_hr_employee,base.group_user,1,1,0,0
+
+access_report_rulebook_source_department_user,rulebook source department user,model_rulebook_sources,rule_book.group_department_user_,1,1,0,0
+access_report_rulebook_reply_log_department_user,reply log department user,model_reply_log,rule_book.group_department_user_,1,1,1,0
+access_report_rulebook_rulebook_title_department_user,title department user,model_rulebook_title,rule_book.group_department_user_,1,0,0,0
+access_report_rulebook_risk_category_department_user,risk category department user,rule_book.model_rulebook_risk_category,rule_book.group_department_user_,1,1,0,0
+access_report_rulebook_rulebook_department_user,rule book department user,model_rulebook,rule_book.group_department_user_,1,1,0,0
+access_report_rulebook_pdf_chat_department_user,pdf chat department user,model_pdf_chat,rule_book.group_department_user_,1,1,0,0
+access_report_rulebook_pdf_chat_log_department_user,chat log department user,model_pdf_chat_log,rule_book.group_department_user_,1,1,0,0
+access_report_rulebook_report_rulebook_department_user,report rulebook department user,model_report_rulebook,rule_book.group_department_user_,1,1,0,0
+access_report_rulebook_external_resources_department_user,external resource department user,model_external_resource,rule_book.group_department_user_,1,1,1,1
+access_report_rulebook_res_users_department_user,res users department user,model_res_users,rule_book.group_department_user_,1,1,0,0
+access_res_users_department_department_user,hr department department user,hr.model_hr_department,rule_book.group_department_user_,1,1,0,0
+access_res_users_employee_department_user,hr employees department user,hr.model_hr_employee,rule_book.group_department_user_,1,1,0,0
+
+
+
+
+
+
 
 
 

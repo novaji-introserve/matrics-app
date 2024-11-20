@@ -1,5 +1,5 @@
 /** @odoo-module **/
-
+// import { session } from '@web/session'; 
 import { registry } from '@web/core/registry';
 const { Component, useState, onWillStart, useRef } = owl;
 import { useService } from "@web/core/utils/hooks";
@@ -7,46 +7,62 @@ import { useService } from "@web/core/utils/hooks";
 export class Dashboard extends Component {
 
     setup() {
-        this.state = useState({
-            escalationDueDates: [],
-            internalDueDates: [],
-            regulatoryDueDates: [],
-            isLoading: true,
-            totalRulebooks :0,
-            newRulebooksToday: 0,
-            totalTitle:0,
-            newTitleToday:0,
-            totalThemes :0,
-            newThemesToday :0,
-            totalReplies :0,
-            newRepliesToday :0,
-            totalSources :0,
-            newSourcesToday :0,
-            totalChatLogs : 0,
-            newChatLogsToday: 0,
-            awaitingReplies: [],
-            newlyUploadedTitle: [],
-            mostAskedQuestion: [],
-        });
+      this.state = useState({
+        escalationDueDates: [],
+        internalDueDates: [],
+        regulatoryDueDates: [],
+        isLoading: true,
+        totalRulebooks: 0,
+        newRulebooksToday: 0,
+        totalTitle: 0,
+        newTitleToday: 0,
+        totalThemes: 0,
+        newThemesToday: 0,
+        totalReplies: 0,
+        newRepliesToday: 0,
+        totalSources: 0,
+        newSourcesToday: 0,
+        totalChatLogs: 0,
+        newChatLogsToday: 0,
+        awaitingReplies: [],
+        newlyUploadedTitle: [],
+        mostAskedQuestion: [],
+        //   hasPermission: true,
+        hasPermission: false, // Check user group
+      });
 
-        // Initialize the orm service
-        this.orm = useService("orm");
+      // Initialize the orm service
+      this.orm = useService("orm");
+      this.user = useService("user");
 
-        onWillStart(async () => {
-            await this.fetchCounts();
-            await this.fetchData();
-            await this.fetchAwaitingReplies()
-            await this.fetchNewlyUploadedTitle()
-            await this.fetchMostAskedAiQuestion()
-        });
+
+      onWillStart(async () => {
+        this.state.hasPermission = await this.user.hasGroup(
+          "rule_book.group_compliance_manager_"
+        );
+        await this.fetchCounts();
+        await this.fetchData();
+
+        if (this.state.hasPermission) {
+          await this.fetchAwaitingReplies();
+          await this.fetchNewlyUploadedTitle();
+          await this.fetchMostAskedAiQuestion();
+        }
+      });
     }
 
     async fetchAwaitingReplies() {
         try {
             // Using the ORM to fetch awaiting replies
-            const replies = await this.orm.call('reply.log', 'get_awaiting_replies', []);
+            console.log("Using the ORM to fetch awaiting replies");
+            const replies = await this.orm.call(
+              "reply.log",
+              "get_awaiting_replies",
+              []
+            );
             this.state.awaitingReplies = replies;
             console.log(replies); // Print the replies
+            
         } catch (error) {
             console.error('Failed to fetch awaiting replies:', error);
         }
@@ -152,58 +168,94 @@ export class Dashboard extends Component {
 
     async fetchData() {
         try {
-            // Fetch first 10 Escalation Due Dates
-            const escalationDueDates = await this.orm.searchRead('rulebook',
-                [['escalation_date', '!=', false],["status",'=',"active"]],
-                ['id', 'type_of_return', 'escalation_date', 'responsible_id'],
-                { limit: 5, order: 'escalation_date asc' }
-            );
-
-            // Fetch first 10 Internal Due Dates
-            const internalDueDates = await this.orm.searchRead('rulebook',
-                [['due_date', '!=', false],  ["status", '=', "active"]],
-                ['id', 'type_of_return', 'due_date', 'responsible_id'],
-                { limit: 5, order: 'due_date asc' }
-           );
-
-            // Fetch first 10 Regulatory Due Dates (computed_date)
-            const regulatoryDueDates = await this.orm.searchRead('rulebook',
-                [['computed_date', '!=', false],  ["status", '=', "active"]],
-                ['id', 'type_of_return', 'computed_date', 'responsible_id'],
-                { limit: 5, order: 'computed_date asc' }
-                );
-            
+          // Fetch first 10 Escalation Due Dates
+          const today = new Date(); // Get the current date
+          today.setHours(0, 0, 0, 0); // Set to the start of the day
           
-            this.state.escalationDueDates = escalationDueDates.map(date => ({
-                ...date,
-                escalation_date: new Date(date.escalation_date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }),
-                link: this.getRulebookLink(date.id),
-                type_of_return: date.type_of_return.replace(/<[^>]*>/g, '')
-            }));
-            this.state.internalDueDates = internalDueDates.map(date => ({
-                ...date,
-                internal_due_date: new Date(date.internal_due_date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }),
-                link: this.getRulebookLink(date.id),
-                type_of_return: date.type_of_return.replace(/<[^>]*>/g, '')
-            }));
-            this.state.regulatoryDueDates = regulatoryDueDates.map(date => ({
-                ...date,
-                computed_date: new Date(date.computed_date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }),
-                link: this.getRulebookLink(date.id),
-                type_of_return: date.type_of_return.replace(/<[^>]*>/g, '')
-            }));
+          const escalationDueDates = await this.orm.searchRead(
+            "rulebook",
+            [
+              ["escalation_date", "!=", false],
+              ["status", "=", "active"],
+              ["escalation_date", ">=", today.toISOString()],
+            ],
+            ["id", "type_of_return", "escalation_date", "responsible_id"],
+            { limit: 5, order: "escalation_date asc" }
+          );
+
+          // Fetch first 10 Internal Due Dates
+          const internalDueDates = await this.orm.searchRead(
+            "rulebook",
+            [
+              ["due_date", "!=", false],
+              ["status", "=", "active"],
+              ["due_date", ">=", today.toISOString()],
+            ],
+            ["id", "type_of_return", "due_date", "responsible_id"],
+            { limit: 5, order: "due_date asc" }
+          );
+
+          // Fetch first 10 Regulatory Due Dates (computed_date)
+
+          const regulatoryDueDates = await this.orm.searchRead(
+            "rulebook",
+            [
+              ["computed_date", "!=", false],
+              ["computed_date", ">=", today.toISOString()], // Filter for dates greater than or equal to today
+              ["status", "=", "active"],
+            ],
+            ["id", "type_of_return", "computed_date", "responsible_id"],
+            {
+              limit: 5,
+              order: "computed_date asc",
+            }
+          );
+          console.log("date time for today ", today.toISOString(), "");
+          // const regulatoryDueDates = await this.orm.searchRead('rulebook',
+          //     [['computed_date', '!=', false],  ["status", '=', "active"]],
+          //     ['id', 'type_of_return', 'computed_date', 'responsible_id'],
+          //     { limit: 5, order: 'computed_date asc' }
+          //     );
+
+          this.state.escalationDueDates = escalationDueDates.map((date) => ({
+            ...date,
+            escalation_date: new Date(date.escalation_date).toLocaleDateString(
+              "en-US",
+              {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            ),
+            link: this.getRulebookLink(date.id),
+            type_of_return: date.type_of_return.replace(/<[^>]*>/g, ""),
+          }));
+
+          this.state.internalDueDates = internalDueDates.map((date) => ({
+            ...date,
+            internal_due_date: new Date(
+              date.due_date
+            ).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
+            link: this.getRulebookLink(date.id),
+            type_of_return: date.type_of_return.replace(/<[^>]*>/g, ""),
+          }));
+          this.state.regulatoryDueDates = regulatoryDueDates.map((date) => ({
+            ...date,
+            computed_date: new Date(date.computed_date).toLocaleDateString(
+              "en-US",
+              {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            ),
+            link: this.getRulebookLink(date.id),
+            type_of_return: date.type_of_return.replace(/<[^>]*>/g, ""),
+          }));
         } catch (error) {
             console.error('Error fetching escalation due dates:', error);
             this.state.error = 'Failed to fetch due dates.';

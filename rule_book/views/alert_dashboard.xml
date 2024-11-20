@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="action_owl_alert_dashboard" model="ir.actions.client">
+            <field name="name">Alert Dashboard</field>
+            <field name="tag">alert_dashboard</field>
+        </record>
+
+        <menuitem id="menu_rulebook_alert" name="Alert" parent="menu_rulebook_theme_root" sequence="3" groups="rule_book.group_compliance_manager_"/>
+
+
+    </data>
+</odoo>
