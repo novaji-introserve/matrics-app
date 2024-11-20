@@ -16,7 +16,7 @@
     "category": "icomply",
     "version": "0.1",
     # any module necessary for this one to work correctly
-    "depends": ["base", "mail", "calendar", 'hide_powered_by_odoo', 'legion_hide_odoo', 'hr'
+    "depends": ["base", "mail", "calendar", 'hide_powered_by_odoo', 'legion_hide_odoo', 'hr', 'muk_web_theme',
                 # "access_apps"
                 ],
     # always loaded
@@ -25,13 +25,13 @@
         # Load security groups first
         "security/security_groups.xml",
 
-        "security/security.xml",
+        # "security/security.xml",
 
-        "views/report_rulebook.xml",
+        # "views/report_rulebook.xml",
         # 'views/alert_report.xml',
 
         # Then load security rules
-        "security/report_rulebook_security.xml",
+        # "security/report_rulebook_security.xml",
 
         # Then load access rights
         "security/ir.model.access.csv",
@@ -45,9 +45,9 @@
         "views/risk/risk_category.xml",
         #    "data/preloaded_data/rule_book_department.xml",
         #
-        "views/responsible.xml",
+        # "views/responsible.xml",
         "views/rules/rule_book.xml",
-        "data/email_templates/rule_book.xml",
+        "data/email_templates/due_date_email.xml",
         "data/schedules/rule_book.xml",
         # "views/dashboard.xml",
         "data/settings/email_smtp.xml",
@@ -65,8 +65,9 @@
         "views/public/thank_you.xml",
         # "security/group_action.xml",
         "views/pdf_chat.xml",
-        "views/alerts_rulebook.xml",
-        # "views/sales_dashboard.xml,"
+        "views/alert_report_rulebook.xml",
+        # "views/alert_dashboard.xml,"
+        "views/alert_dashboard.xml"
         # "views/branch.xml",
         # 'security/security.csv',
         # "views/department_.xml",
@@ -88,16 +89,13 @@
         'rule_book/static/src/components/*/*.xml',
         'rule_book/static/src/components/*/*.scss',
         'rule_book/static/src/slider_field.xml',
-        'rule_book/static/src/slider_field.js',
-        'rule_book/static/src/components/**/*.js',
-        'rule_book/static/src/components/**/*.xml',
-        'rule_book/static/src/components/**/*.scss',
-        # 'rule_book/static/src/js/chart_init.js',
-        #  ('include', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'),
-        #  'rule_book/static/src/js/chart_init.xml',
-        #
-        # ('include', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'),
-        # 'custom_backend_theme/static/src/img/icons/*',
+        # Add JavaScript files
+        'custom_addons/icomply_odoo/rule_book/static/src/components/**/*.js',
+        # Add CSS files
+        'custom_addons/icomply_odoo/rule_book/static/src/components/**/*.css',
+        # Add XML files if applicable
+        'custom_addons/icomply_odoo/rule_book/static/src/components/**/*.xml',
+       
 
     ]},
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- security/report_rulebook_security.xml -->
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
         <!-- Department-based Access Rule -->
         <record id="rule_report_department_access" model="ir.rule">
             <field name="name">Department Report Access</field>
@@ -27,4 +27,3 @@
         </record>
     </data>
 </odoo>
-

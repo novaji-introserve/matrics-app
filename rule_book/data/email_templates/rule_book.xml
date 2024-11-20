@@ -143,7 +143,7 @@
 
 
         <!-- Internal Due Date Reminder -->
-        <record id="email_template_internal_due_date_" model="mail.template">
+        <!-- <record id="email_template_internal_due_date_" model="mail.template">
             <field name="name">Internal Due Date Reminder for Rulebook</field>
             <field name="email_from">{{object.data()['email_from']}}</field>
             <field name="model_id" ref="rule_book.model_rulebook" />
@@ -151,8 +151,7 @@
             <field name="email_to">{{object.data()['email_to']}}</field>
             <field name="subject">Internal Due Date for {{object.data()['title']}}</field>
             <field name="body_html" type="html">
-                <div
-                    style="font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0;">
+                <div style="font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0;">
                     <div
                         style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border: 1px solid #E0E0E0; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
                         <div style="text-align: center; padding: 10px 0;">
@@ -167,7 +166,10 @@
                             <div
                                 style="background-color: #f0fff0; padding: 15px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
                                 <p style="font-size: 16px; color: #333333; line-height: 1.6;">The
-                                    internal due date for submitting the document for <strong
+                                    internal due date for carryiong out this return <strong
+                                        style="color: #006400;">
+                                        <t t-out="object.data()['rulebook_name']"></t><strong />
+                                   </strong> on rulebook title <strong
                                         style="color: #006400;">
                                         <t
                                             t-out="object.data()['title']"></t><strong />
@@ -176,8 +178,8 @@
                                         <t
                                             t-out="object.data()['due_date']"></t><strong />
                                    </strong>.</p>
-                                <p style="font-size: 16px; color: #333333; line-height: 1.6;">Please
-                                    ensure that the document is uploaded before the due date.</p>
+                                <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                    Please ensure you upload the proof of completion before the due date.</p>
                             </div>
                             <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can
                                 upload the document here: <a
@@ -197,7 +199,7 @@
                 </div>
             </field>
             <field name="auto_delete" eval="False" />
-        </record>
+        </record> -->
 
     </data>
 </odoo>

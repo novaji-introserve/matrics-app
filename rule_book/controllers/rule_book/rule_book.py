@@ -38,78 +38,149 @@ class RuleBookController(http.Controller):
         methods=["POST"],
         csrf=False,
     )
+    # def submit_external_report(self, **kwargs):
+    #     try:
+    #         print("testing")
+
+    #         # Create a new reply log record
+    #         ReplyLog = request.env["reply.log"]
+
+    #         # Get the decrypted rulebook_id from the kwargs
+    #         rulebook_id = kwargs.get("rulebook_id")
+    #         print(rulebook_id)
+    #         print("testing")
+
+    #         # Ensure rulebook_id is provided
+    #         if not rulebook_id:
+    #             raise ValueError("Rulebook ID is missing in the request")
+
+    #         # Handle the file upload
+    #         file_data = kwargs.get("document")
+    #         if isinstance(file_data, FileStorage):
+    #             document = base64.b64encode(file_data.read()).decode("utf-8")
+    #         else:
+    #             document = False
+
+    #         # get the rule book data
+    #         # Fetch the rulebook record using the provided ID
+    #         rulebook = request.env["rulebook"].sudo().browse(int(rulebook_id))
+    #         reporter=kwargs.get("reporter")
+    #         # Create the reply log record
+    #         report = ReplyLog.sudo().create(
+    #             {
+    #                 "rulebook_id": rulebook.id,
+    #                 "reply_content": kwargs.get("reply_content"),
+    #                 "reporter": reporter,
+    #                 "document": document,
+    #                 "rulebook_status": "submitted",
+    #                 "rulebook_compute_date": rulebook.computed_date,
+    #             }
+    #         )
+    #         # getting the url of the reply log
+    #         base_url = (
+    #             request.env["ir.config_parameter"].sudo().get_param("web.base.url")
+    #         )
+    #         #
+    #         url = f"{base_url}/web#id={report.id}&cids=1&menu_id=277&action=423&model=reply.log&view_type=form"
+    #         # global data
+    #         current_year = datetime.now().year
+    #         report.set_global_data(
+    #             {
+    #                 "email_from": "icomply@bio.ng",
+    #                 "email_to": rulebook.first_line_escalation.email,
+    #                 "name":re.sub(r'<[^>]+>', '', rulebook.type_of_return if rulebook.type_of_return else ""),
+    #                 "content": kwargs.get("reply_content"),
+    #                 "url_link": url,
+    #                 "current_year": current_year,
+    #             }
+    #         )
+
+    #         # Trigger alert to escalation officer
+    #         self.trigger_escalation_alert(report)
+
+    #         # Redirect to a thank-you page or another action
+    #         return request.redirect(f"/thank_you?reporter={reporter}")
+    #     except ValueError as e:
+    #         # Handle specific ValueErrors (e.g., missing rulebook_id)
+    #         _logger.error(f"ValueError in submit_external_report: {str(e)}")
+    #         # Optionally redirect to an error page or provide user feedback
+    #         return request.redirect("/error?message=Invalid input")
+
+    #     except Exception as e:
+    #         # Handle other exceptions
+    #         _logger.error(f"Exception in submit_external_report: {str(e)}")
+    #         # Optionally redirect to an error page or provide user feedback
+    #         return request.redirect(f"/error?message={str(e)}")
     def submit_external_report(self, **kwargs):
         try:
-            print("testing")
+            _logger.info("Submitting external report...")
 
             # Create a new reply log record
             ReplyLog = request.env["reply.log"]
 
             # Get the decrypted rulebook_id from the kwargs
             rulebook_id = kwargs.get("rulebook_id")
-            print(rulebook_id)
-            print("testing")
-
-            # Ensure rulebook_id is provided
             if not rulebook_id:
                 raise ValueError("Rulebook ID is missing in the request")
 
             # Handle the file upload
             file_data = kwargs.get("document")
-            if isinstance(file_data, FileStorage):
-                document = base64.b64encode(file_data.read()).decode("utf-8")
-            else:
-                document = False
+            document = False
+            filename = None  # Initialize filename variable
 
-            # get the rule book data
+            if isinstance(file_data, FileStorage):
+                filename = file_data.filename  # Get the filename
+                document = base64.b64encode(file_data.read()).decode("utf-8")
+                _logger.info(f"Uploaded file: {filename}")  # Log the filename
+
             # Fetch the rulebook record using the provided ID
             rulebook = request.env["rulebook"].sudo().browse(int(rulebook_id))
-            reporter=kwargs.get("reporter")
+            # reporter = kwargs.get("reporter")
+            reporter = rulebook.officer_responsible
+            _logger.critical(f"Reporter Id for rulebook: {reporter}")
+            _logger.critical(f"Reporter Name for rulebook: {reporter.name}")
+            
+
+
             # Create the reply log record
-            report = ReplyLog.sudo().create(
-                {
-                    "rulebook_id": rulebook.id,
-                    "reply_content": kwargs.get("reply_content"),
-                    "reporter": reporter,
-                    "document": document,
-                    "rulebook_status": "submitted",
-                    "rulebook_compute_date": rulebook.computed_date,
-                }
-            )
-            # getting the url of the reply log
-            base_url = (
-                request.env["ir.config_parameter"].sudo().get_param("web.base.url")
-            )
-            #
+            report = ReplyLog.sudo().create({
+                "rulebook_id": rulebook.id,
+                "reply_content": kwargs.get("reply_content"),
+                "reporter": reporter.id,
+                "document": document,
+                "document_filename": filename,  # Store the filename
+                "rulebook_status": "submitted",
+                "rulebook_compute_date": rulebook.computed_date,
+            })
+
+            # Generate the URL for the reply log
+            base_url = request.env["ir.config_parameter"].sudo(
+            ).get_param("web.base.url")
             url = f"{base_url}/web#id={report.id}&cids=1&menu_id=277&action=423&model=reply.log&view_type=form"
-            # global data
+
+            # Prepare global data
             current_year = datetime.now().year
-            report.set_global_data(
-                {
-                    "email_from": "icomply@bio.ng",
-                    "email_to": rulebook.first_line_escalation.email,
-                    "name":re.sub(r'<[^>]+>', '', rulebook.type_of_return if rulebook.type_of_return else ""),
-                    "content": kwargs.get("reply_content"),
-                    "url_link": url,
-                    "current_year": current_year,
-                }
-            )
+            report.set_global_data({
+                "email_from": "icomply@bio.ng",
+                "email_to": rulebook.first_line_escalation.email,
+                "name": re.sub(r'<[^>]+>', '', rulebook.type_of_return or ""),
+                "content": kwargs.get("reply_content"),
+                "url_link": url,
+                "current_year": current_year,
+            })
 
             # Trigger alert to escalation officer
             self.trigger_escalation_alert(report)
 
-            # Redirect to a thank-you page or another action
-            return request.redirect(f"/thank_you?reporter={reporter}")
+            # Redirect to a thank-you page
+            return request.redirect(f"/thank_you?reporter={reporter.name}")
+
         except ValueError as e:
-            # Handle specific ValueErrors (e.g., missing rulebook_id)
             _logger.error(f"ValueError in submit_external_report: {str(e)}")
-            # Optionally redirect to an error page or provide user feedback
             return request.redirect("/error?message=Invalid input")
 
         except Exception as e:
-            # Handle other exceptions
             _logger.error(f"Exception in submit_external_report: {str(e)}")
-            # Optionally redirect to an error page or provide user feedback
             return request.redirect(f"/error?message={str(e)}")
 
     def trigger_escalation_alert(self, report):
@@ -160,12 +231,44 @@ class RuleBookController(http.Controller):
     def thank_you_page(self):
         current_year = datetime.now().year
         reporter = request.params.get("reporter")
-        # Decrypt the rulebook ID from the URL
+        # Log the filename
+        _logger.critical(f"Reporter Id for rulebook: {reporter}")
+        
+        # Pass the relevant details to the template
         return request.render(
             "rule_book.thank_you_page_template",
-            {"current_year": current_year,
-             "report_submitter": reporter},
+            {
+                "current_year": current_year,
+                "report_submitter": reporter if reporter else "Unknown",
+            },
         )
+    # @http.route("/thank_you", type="http", auth="public", website=True)
+    # def thank_you_page(self):
+    #     current_year = datetime.now().year
+    #     reporter_id = request.params.get("reporter")
+
+    #     # Fetch the reporter's user details
+    #     reporter = None
+    #     if reporter_id:
+    #         reporter = request.env["res.users"].sudo().browse(int(reporter_id))
+
+    #     # Pass the relevant details to the template
+    #     return request.render(
+    #         "rule_book.thank_you_page_template",
+    #         {
+    #             "current_year": current_year,
+    #             "report_submitter": reporter.name if reporter else "Unknown",
+    #         },
+    #     )
+    # def thank_you_page(self):
+    #     current_year = datetime.now().year
+    #     reporter = request.params.get("reporter")
+    #     # Decrypt the rulebook ID from the URL
+    #     return request.render(
+    #         "rule_book.thank_you_page_template",
+    #         {"current_year": current_year,
+    #          "report_submitter": reporter},
+    #     )
 
     @http.route("/get_stored_document", type="http", auth="public", website=True)
     def get_stored_document(self):
