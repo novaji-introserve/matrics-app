@@ -9,8 +9,9 @@ import { useService } from "@web/core/utils/hooks";
 const { Component, useState, onWillStart, onWillUnmount, useRef, onMounted } =
   owl;
 
-export class OwlSalesDashboard extends Component {
+export class IcomplyDashboard extends Component {
   setup() {
+    
     this.api = useService("orm");
     this.navigate = useService("action");
     this.state = useState({
@@ -182,9 +183,13 @@ export class OwlSalesDashboard extends Component {
       type: "ir.actions.act_window",
       res_model: "case.management",
       name: "case_management_owl_action",
-      domain: this.state.datepicked > 0
-      ? [["case_status_id.name", "=", "Open"],["created_at", ">=", this.state.current_datepicked]] :
-        [["case_status_id.name", "=", "Open"]],
+      domain:
+        this.state.datepicked > 0
+          ? [
+              ["case_status_id.name", "=", "Open"],
+              ["created_at", ">=", this.state.current_datepicked],
+            ]
+          : [["case_status_id.name", "=", "Open"]],
       views: [
         [false, "tree"],
         [false, "form"],
@@ -200,8 +205,9 @@ export class OwlSalesDashboard extends Component {
         this.state.datepicked > 0
           ? [
               ["case_status_id.name", "=", "Closed"],
-              ["created_at", ">=", this.state.current_datepicked]
-            ]:[["case_status_id.name", "=", "Closed"]],
+              ["created_at", ">=", this.state.current_datepicked],
+            ]
+          : [["case_status_id.name", "=", "Closed"]],
       views: [
         [false, "tree"],
         [false, "form"],
@@ -215,7 +221,10 @@ export class OwlSalesDashboard extends Component {
       name: "case_management_owl_action",
       domain:
         this.state.datepicked > 0
-          ? [["case_status_id.name", "=", "Overdue"],["created_at", ">=", this.state.current_datepicked]]
+          ? [
+              ["case_status_id.name", "=", "Overdue"],
+              ["created_at", ">=", this.state.current_datepicked],
+            ]
           : [["case_status_id.name", "=", "Overdue"]],
       views: [
         [false, "tree"],
@@ -439,7 +448,7 @@ export class OwlSalesDashboard extends Component {
           },
         },
       };
-    }else{
+    } else {
       const results = await this.api.searchRead(
         "case.management", // The model to query
         [["created_at", ">=", this.state.current_datepicked]], // No specific domain/filter (can be customized)
@@ -496,7 +505,7 @@ export class OwlSalesDashboard extends Component {
   };
 }
 
-OwlSalesDashboard.template = "owl.OwlSalesDashboard";
-OwlSalesDashboard.components = { KpiCard, ChartRenderer };
+IcomplyDashboard.template = "owl.IcomplyDashboard";
+IcomplyDashboard.components = { KpiCard, ChartRenderer };
 
-registry.category("actions").add("owl.sales_dashboard", OwlSalesDashboard);
+registry.category("actions").add("owl.icomply_dashboard", IcomplyDashboard);
