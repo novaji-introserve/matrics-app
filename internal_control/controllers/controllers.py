@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# from odoo import http
+from odoo import http
+from odoo.http import request
 
-
-# class InternalControl(http.Controller):
-#     @http.route('/internal_control/internal_control', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
+class InternalControl(http.Controller):
+    @http.route('/test', auth='public', website=True)
+    def index(self, **kw):
+        return request.render("internal_control.landing_page")
 
 #     @http.route('/internal_control/internal_control/objects', auth='public')
 #     def list(self, **kw):

@@ -1,0 +1,67 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_alert_rules_tree" model="ir.ui.view">
+        <field name="name">alert.rules.tree</field>
+        <field name="model">alert.rules</field>
+        <field name="arch" type="xml">
+            <tree string="Alert Rules">
+                <field name="name" />
+                <field name="sql_text" />
+                <field name="frequency_id" />
+                <field name="process_category_id" />
+                <field name="email_to" />
+                <field name="status_id" />
+                <field name="alert_group_id" />
+                <field name="branch_code" />
+                <field name="risk_rating" />
+                <field name="date_created" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_alert_rules_form" model="ir.ui.view">
+        <field name="name">alert.rules.form</field>
+        <field name="model">alert.rules</field>
+        <field name="arch" type="xml">
+            <form string="Alert Rule">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                    <group>
+                        <field name="narration"  widget="html" options="{'toolbar': true}" placeholder="Enter narration here..." />
+                    </group>
+                    <group>
+                   
+                    <group class="col-md-6 col-12">
+                        <field name="process_id" />
+                        <field name="sql_text" />
+                        <field name="frequency_id" />
+                        <field name="email_to" />
+                        <field name="status_id" />
+                       
+                    </group>
+                    <group class="col-md-6 col-12">
+                        <field name="process_category_id" />
+                        <field name="alert_group_id" />
+                        <field name="branch_code" />
+                        <field name="risk_rating" />
+                        <field name="date_created" readonly="1" />
+                    </group>
+                    </group>
+                   
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_alert_rules" model="ir.actions.act_window">
+        <field name="name">Alert Rules</field>
+        <field name="res_model">alert.rules</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+    </record>
+
+</odoo>
