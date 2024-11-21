@@ -33,7 +33,7 @@
                         <field name="query" widget="ace" placeholder="SELECT column_1 as label, column_2 as value FROM table"/>
                              <div class="mt-3 text-muted">
                                  <p>Enter a valid SQL query </p>
-                                 <p>data fetched are to be partition by branch ensure there is branch column in your query</p>
+                                 <p>Data fetched are to be partitioned by branch ensure there is branch column in your query</p>
                                  <p class="text-danger">Note: Only SELECT queries are allowed. DDL and DML operations are prohibited.</p>
                              </div>
                     </div>

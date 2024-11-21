@@ -18,16 +18,37 @@
             <field name="name">daily</field>
             <field name="period">1</field>
         </record>
-        <record id="sql_text_1" model="process.sql">
-            <field name="name">Retrieve User In The System For Test</field>
-            <field name="query">
-            select ru.login, ru.active from res_users ru left join res_branch_users_rel rub ON ru.id = rub.user_id ;
-            </field>
+        <!-- Alert Groups -->
+        <record id="alert_group_branch_control" model="alert.group">
+            <field name="name">Branch Control</field>
+            <field name="tag">branch_control</field>
         </record>
+         <record id="alert_group_branch_compliance" model="alert.group">
+            <field name="name">Branch Compliance</field>
+            <field name="tag">branch_control</field>
+        </record>
+         <record id="alert_group_compliance" model="alert.group">
+            <field name="name">Compliance</field>
+            <field name="tag">compliance</field>
+        </record>
+        <record id="alert_group_internal_control" model="alert.group">
+            <field name="name">Internal Control</field>
+            <field name="tag">internal_control</field>
+        </record>
+        <record id="alert_group_internal_audit" model="alert.group">
+            <field name="name">Internal Audit</field>
+            <field name="tag">internal_audit</field>
+        </record>
+        <record id="sql_process_system_users" model="process.sql">
+            <field name="name">System Users</field>
+            <field name="query">select b.name branch,u.login login_username,p.name description,u.active, to_char(u.create_date,'yyyy-mm-dd hh:mi AM') create_at from res_users u left join res_branch_users_rel rb ON u.id = rb.user_id  left join res_branch b on rb.branch_id=b.id  join res_partner p on u.partner_id=p.id  order by u.create_date desc,b.name,u.login</field>
+        </record>
+        <!--
         <record id="alert_rules_1" model="alert.rules">
             <field name="name">Retrieve User In The System For Test</field>
             <field name="sql_text" ref="alert_management.sql_text_1" />
             <field name="frequency_id" ref="alert_management.exception_frequency_1" />
         </record>
+        -->
     </data>
 </odoo>

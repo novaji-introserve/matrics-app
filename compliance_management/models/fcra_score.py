@@ -7,6 +7,7 @@ class FcraScore(models.Model):
     _description = 'FCRA Risk Score'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
+    name = fields.Text(string='Name')
     max_score = fields.Float(default=9, tracking=True)
     min_score = fields.Float(default=0, tracking=True)
     

@@ -5,6 +5,7 @@
     <field name="model">res.fcra.score</field>
     <field name="arch" type="xml">
         <tree string="FCRA Scores" create="false" delete="false">
+             <field name="name" />
             <field name="max_score"/>
             <field name="min_score"/>
             
@@ -18,7 +19,12 @@
     <field name="arch" type="xml">
         <form string="FCRA Score">
             <sheet>
-               
+                 <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                 <group>
                     <group>
                         <field name="max_score"/>

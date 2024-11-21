@@ -31,7 +31,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mail', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation'],
+    'depends': ['base', 'mail', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation','web_chatter_position'],
 
     # always loaded
     'data': [
@@ -48,7 +48,7 @@
 
         'data/hr/hr_dpt.xml',
         'data/hr/hr_job.xml',
-        # 'data/alert.xml',
+        'data/alert.xml',
         # 'data/hr/hr_employee.xml',
         # 'data/users.xml',
 
