@@ -23,15 +23,11 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/internal_control_view.xml',
+        'views/menus.xml',
     ],
 
     'images': [
     'static/description/icon.png',
-    ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
     ],
 
     "installable": True,
