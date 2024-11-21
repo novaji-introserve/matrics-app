@@ -1,2 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_res_internal_control,access_res_internal_control,model_res_internal_control,,1,1,1,1
+access_alert_rules,access right alert rules,internal_control.model_alert_rules,base.group_user,1,1,1,1
+access_exception_frequency_rules,access exception frequency rules,internal_control.model_exception_frequency,base.group_user,1,1,1,1
+access_status_rules,access status rules,internal_control.model_alert_rules_status,base.group_user,1,1,1,1
+access_branch_rules,access branch rules,internal_control.model_tbl_branch,base.group_user,1,1,1,1
+access_process_category_rules,access process category rules,internal_control.model_process_category,base.group_user,1,1,1,1
+access_process_rules,access process rules,internal_control.model_process,base.group_user,1,1,1,1
+access_alert_group_rules,access alert group rules,internal_control.model_alert_group,base.group_user,1,1,1,1

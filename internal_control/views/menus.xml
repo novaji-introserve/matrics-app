@@ -1,5 +1,8 @@
 
 <odoo>
+
+   
+
     <!-- Main Menu -->
     <menuitem id="menu_internal_control_main"
               name="Internal Control"
@@ -18,22 +21,43 @@
               action="compliance_management.open_transactions_all"
               sequence="20"/>
 
+
     <menuitem id="menu_internal_control_alert_monitoring"
               name="Alert Monitoring"
               parent="menu_internal_control_main"
               action="compliance_management.open_transactions_done"
-              sequence="30"/>
+              sequence="30"/> 
+
+    <!-- Menu Item for alert rules -->
+    <menuitem id="menu_alert_rules" 
+    name="Alert Rules" 
+    parent="menu_internal_control_alert_monitoring" 
+    action="action_alert_rules"
+     />
+
+ 
 
     <menuitem id="menu_internal_control_configurations"
-              name="Configurations"
-              parent="menu_internal_control_main"
-              action="compliance_management.action_list_compliance_stat"
-              sequence="40"/>
+     name="Configurations" 
+     parent="menu_internal_control_main"
+    action="compliance_management.action_list_compliance_stat" 
+    sequence="40" />
+    
+    <menuitem id="menu_transaction_rules" 
+    name="Transaction Monitoring"
+     parent="menu_internal_control_configurations"
+    sequence="50" />
+    
+    <menuitem id="menu_internal_control_alert_rules" 
+    name="Rules" parent="menu_transaction_rules"
+    action="compliance_management.open_transactions" sequence="10" />
 
-    <menuitem id="menu_internal_control_alert_rules"
-              name="Transaction Rules"
-              parent="menu_internal_control_configurations"
-              action="compliance_management.open_transactions"
-              sequence="10"/>
+                <!-- Link the action for frequency -->
+    <!-- <menuitem 
+        id="menu_alert_frequency" 
+        name="Alert Frequency" 
+        parent="menu_internal_control_configurations"
+        action="action_alert_frequency"
+     /> -->
 </odoo>
 
