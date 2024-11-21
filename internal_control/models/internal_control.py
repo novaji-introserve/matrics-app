@@ -6,3 +6,8 @@ class InternalControl(models.Model):
 
     name = fields.Char(string="Name", required=True)
     description = fields.Text(string="Description")
+    
+    @api.model
+    def create(self, vals):
+        # Example override for the create method
+        return super(InternalControl, self).create(vals)
