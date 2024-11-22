@@ -1,5 +1,5 @@
 <odoo>      
-    <!-- Edd Tree View -->
+    <!-- Edd Tree View --> 
     <record id="edd_tree_view" model="ir.ui.view">
         <field name="name">res.partner.edd.tree</field>
         <field name="model">res.partner.edd</field>
