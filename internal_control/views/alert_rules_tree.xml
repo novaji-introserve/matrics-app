@@ -32,10 +32,10 @@
                         <field name="name" string="Alert Rule Name"/>
                     </group>
                     <group>
-                        <field name="process_id" string="Process"/>
+                        <field name="process_category_id" string="Process Category"/>
                     </group>
                     <group>
-                        <field name="process_category_id" string="Process Category"/>
+                        <field name="process_id" string="Process"/>
                     </group>
                     <group colspan="2">
                         <field name="narration"  widget="html" options="{'toolbar': true}" placeholder="Enter narration here..." />
