@@ -30,12 +30,9 @@
               action="compliance_management.action_list_compliance_stat"
               sequence="40"/>
 
-    <menuitem id="menu_transaction_rules" name="Transaction Monitoring"
-            parent="menu_internal_control_configurations" sequence="50" />
-
     <menuitem id="menu_internal_control_alert_rules"
-              name="Rules"
-              parent="menu_transaction_rules"
+              name="Transaction Rules"
+              parent="menu_internal_control_configurations"
               action="compliance_management.open_transactions"
               sequence="10"/>
 </odoo>
