@@ -8,7 +8,7 @@
                 <tree string="Exception Frequency">
                     <field name="name" />
                     <field name="period" />
-                    <field name="duration" />
+                   
                     <field name="date_created" />
                 </tree>
             </field>
@@ -23,8 +23,10 @@
                     <sheet>
                         <group>
                             <field name="name" />
-                            <field name="period" />
-                            <field name="duration" readonly="1" />
+                            <field name="period"
+                            attrs="{'invisible': [('name', '=', False)]}"
+                            />
+                          
                             <field name="date_created" readonly="1" />
                         </group>
                     </sheet>

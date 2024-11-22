@@ -30,7 +30,7 @@
                         <field name="name" />
                     </group>
                     <group>
-                        <field name="narration"  widget="html" options="{'toolbar': true}" placeholder="Enter narration here..." />
+                        <field name="narration"    placeholder="Enter narration here..." />
                     </group>
                     <group>
                    

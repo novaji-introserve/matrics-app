@@ -5,7 +5,7 @@ class alert_rules(models.Model):
     _description = "alert rules for exception management"
 
     name = fields.Char(string="Name", required=True)
-    narration = fields.Html(string="narration", required=True)
+    narration = fields.Text(string="narration", required=True)
     sql_text = fields.Text(string="SQL Query", required=True)
     frequency_id = fields.Many2one('exception.frequency', string="Frequency", required=True)
     process_id = fields.Many2one('process', string="Process")
