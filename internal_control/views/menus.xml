@@ -53,11 +53,11 @@
     action="compliance_management.open_transactions" sequence="10" />
 
                 <!-- Link the action for frequency -->
-    <!-- <menuitem 
+    <menuitem 
         id="menu_alert_frequency" 
         name="Alert Frequency" 
         parent="menu_internal_control_configurations"
         action="action_alert_frequency"
-     /> -->
+     />
 </odoo>
 

@@ -3,6 +3,7 @@ from odoo import models, fields, api
 class Alert_group(models.Model):
     _name = 'alert.group'
     _description = 'alert Group for exception management'
+    
 
     name = fields.Char(string="Name", required=True)
     email = fields.Char(string="Email", required=True)
