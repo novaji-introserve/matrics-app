@@ -24,6 +24,14 @@
               action="compliance_management.open_transactions_done"
               sequence="30"/>
 
+    <menuitem id="menu_internal_control_alert_rules_monitoring"
+              name="Alert Rules"
+              parent="menu_internal_control_alert_monitoring"
+              action="action_alert_rules"
+              sequence="10"/>
+
+    
+
     <menuitem id="menu_internal_control_configurations"
               name="Configurations"
               parent="menu_internal_control_main"
@@ -35,5 +43,11 @@
               parent="menu_internal_control_configurations"
               action="compliance_management.open_transactions"
               sequence="10"/>
+
+    <menuitem id="menu_internal_control_alert_rules_frequency"
+              name="Alert Frequency"
+              parent="menu_internal_control_configurations"
+              action="action_alert_frequency"
+              sequence="50"/>
 </odoo>
 
