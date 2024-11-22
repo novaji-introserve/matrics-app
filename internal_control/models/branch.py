@@ -2,7 +2,7 @@ from odoo import models, fields, api
 
 class Branch(models.Model):
     _name = 'tbl.branch'
-    _description = 'branch code for exception management'
+    _description = 'branch table'
 
     branch_code = fields.Char(string="Name", required=True)
     branch_name = fields.Char(string="Code", required=True)
