@@ -42,9 +42,14 @@
               action="compliance_management.action_list_compliance_stat"
               sequence="40"/>
 
-    <menuitem id="menu_internal_control_alert_rules"
-              name="Transaction Rules"
+    <menuitem id="menu_internal_control_transaction_monitoring"
+              name="Transaction Monitoring"
               parent="menu_internal_control_configurations"
+              sequence="50"/>
+
+    <menuitem id="menu_internal_control_alert_rules"
+              name="Rules"
+              parent="menu_internal_control_transaction_monitoring"
               action="compliance_management.open_transactions"
               sequence="10"/>
 
