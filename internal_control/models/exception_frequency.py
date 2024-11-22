@@ -21,8 +21,14 @@ class Exception_frequency(models.Model):
     date_created = fields.Datetime(string="created_at", default=fields.Datetime.now())
 
     
+    @api.onchange("name")
+    def change_period_to_zero(self):
+        self.period = 1
+        
     @api.onchange("period")
     def change_period(self):
+        
+        
     
         if self.name:
             if self.name == "minutes" and self.period > 60:
@@ -51,5 +57,11 @@ class Exception_frequency(models.Model):
             elif self.name == "yearly" and self.period > 12:
                 
                 raise ValidationError("period  must be between 1 and 12")
+            
+            elif self.period == 0:
+                
+                raise ValidationError("period  cannot be zero")
+            
+            
     
                
