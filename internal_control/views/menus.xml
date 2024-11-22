@@ -38,7 +38,7 @@
     <menuitem id="menu_internal_control_transaction_rules"
               name="Rules"
               parent="menu_internal_control_transaction_monitoring"
-              action="compliance_management.open_transactions"
+              action="compliance_management.action_list_transaction_screening_rule"
               sequence="10"/>
 
    <menuitem id="menu_internal_control_alert_rules"
@@ -46,5 +46,12 @@
               parent="menu_internal_control_alert_monitoring"
               action="action_alert_rules"
               sequence="10"/>
+
+   <menuitem id="menu_internal_control_alert_rules_second"
+              name="Test"
+              parent="menu_internal_control_alert_monitoring"
+              action="action_transaction"
+              sequence="20"/>
+
 </odoo>
 

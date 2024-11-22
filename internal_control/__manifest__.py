@@ -25,6 +25,7 @@
         'security/ir.model.access.csv',
         'views/menus.xml',
         'views/alert_rules_tree.xml',
+  
         
     ],
 
