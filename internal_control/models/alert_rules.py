@@ -4,7 +4,7 @@ class alert_rules(models.Model):
     _name = 'alert.rules'
     _description = "alert rules for exception management"
     _inherit = ['mail.thread', 'mail.activity.mixin']
-
+    
     name = fields.Char(string="Name", required=True, Tracking=True)
     narration = fields.Html(string="narration", required=True)
     sql_text = fields.Text(string="SQL Query", required=True, Tracking=True)

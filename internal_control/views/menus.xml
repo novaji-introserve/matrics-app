@@ -24,6 +24,12 @@
               action="compliance_management.open_transactions_done"
               sequence="30"/>
 
+    <menuitem id="menu_internal_control_alert_rules_monitoring"
+              name="Alert Rules"
+              parent="menu_internal_control_alert_monitoring"
+              action="action_alert_rules"
+              sequence="10"/>
+
     <menuitem id="menu_internal_control_configurations"
               name="Configurations"
               parent="menu_internal_control_main"
