@@ -22,7 +22,7 @@
                 <form>
                     <header>
                         <button name="action_submit" string="Submit" type="object" states="draft" class="oe_highlight"/>
-                        <button name="action_approve" string="Approve" type="object" states="submitted" groups="rule_book.group_compliance_officer" class="oe_highlight"/>
+                        <button name="action_approve" string="Approve" type="object" states="submitted"  class="oe_highlight"/>
                         <button name="action_draft" string="Set to Draft" type="object" states="submitted,approved"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
                     </header>

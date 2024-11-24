@@ -132,12 +132,12 @@
 
     <!-- Alerts -->
     <!-- <menuitem id="menu_report_rulebook" name="Reports" parent="menu_rulebook_alert" action="action_report_rulebook" sequence="4"/> -->
-    <menuitem id="menu_owl_alert_dashboard" name="Alert" parent="menu_rulebook_alert" action="action_owl_alert_dashboard" sequence="1" />
+    <!-- <menuitem id="menu_owl_alert_dashboard" name="Alert" parent="menu_rulebook_alert" action="action_owl_alert_dashboard" sequence="1" /> -->
 
 
     <!-- <menuitem id="menu_rulebook_theme" name="Themes" parent="menu_rulebook_details" action="action_rulebook_theme" sequence="4" /> -->
     <!-- Reply Logs -->
-    <menuitem id="menu_reply_log" name="Reply Logs" parent="menu_rulebook_details" action="open_reply_log" sequence="5" />
+    <menuitem id="menu_reply_log" name="Rulebook Logs" parent="menu_rulebook_details" action="open_reply_log" sequence="5" />
 
     <!-- Submenu for Sources (Regulatory Source and Regulatory Records) -->
     <menuitem id="menu_rulebook_sources_root" name="Sources" parent="menu_rulebook_theme_root" sequence="2" />

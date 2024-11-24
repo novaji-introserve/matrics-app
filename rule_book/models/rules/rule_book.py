@@ -47,6 +47,7 @@ class Rulebook(models.Model):
         # tracking=True,
         help="Select the theme associated with this rulebook.",
     )
+    
     risk_rating = fields.Selection(
         [("low", "Low"), ("medium", "Medium"), ("critical", "Critical")],
         string="Risk Rating",
@@ -250,6 +251,9 @@ class Rulebook(models.Model):
     )
     
     quarter_day = fields.Integer(string='Day of Quarter',default=7)
+    
+    next_due_date = fields.Datetime(string="Next Due Date")
+    last_escalation_sent = fields.Datetime(string="Last Escalation Sent")
         
 
     
@@ -344,9 +348,6 @@ class Rulebook(models.Model):
         # send the global value to the email template
         return global_data
 
-    next_due_date = fields.Datetime(string="Next Due Date")
-    last_escalation_sent = fields.Datetime(string="Last Escalation Sent")
-
     # * functinos
 
     # to open up vie resolution button
@@ -364,9 +365,6 @@ class Rulebook(models.Model):
             # If the user lacks permissions, raise a friendly message
             raise AccessError("You do not have the necessary permissions to view the Reply Log.")  
 
-    # def open_reply_log(self):
-    #     action = self.env.ref("rule_book.action_reply_log").sudo().read()[0]
-    #     return action
         
     @api.depends('risk_category', 'risk_category.risk_priority')
     def _compute_risk_rating(self):
@@ -394,14 +392,16 @@ class Rulebook(models.Model):
     def _compute_upload_link(self, id):
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         appendedValue = encrypt_id(id)
-        print(f"{base_url}/report_submission/{appendedValue}")
+        _logger.critical(f"{base_url}/report_submission/{appendedValue}")
         return f"{base_url}/report_submission/{appendedValue}"
 
     def _record_link(self, id):
-        print(id)
+        _logger.critical(id)
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         #
         return f"{base_url}/web#id={id}&cids=1&menu_id=277&action=423&model=rulebook&view_type=form"
+    
+    
     
     @api.depends("frequency_type", "date_value", "day_value", "month_value", "day_of_week",
                  "quarter_day","bi_monthly_day1","bi_monthly_day2","semi_annual_month1",
@@ -421,10 +421,15 @@ class Rulebook(models.Model):
 
         for record in self:
             # Initialize is_recurring to False
-            record.is_recurring = False
+            # record.is_recurring = False
             
             if record.frequency_type == "date":
                 record.computed_date = record.date_value or default_time
+                
+                record.is_recurring = record.is_recurring or False
+
+                
+                _logger.critical("is occur got here " , record.is_recurring)
                 # Missing boolean assignment for is_recurring
 
             elif record.frequency_type == "day_of_month":
@@ -446,7 +451,9 @@ class Rulebook(models.Model):
                         record.computed_date = fields.Datetime.to_datetime(
                             f"{target_year}-{next_month:02d}-{day_value:02d} 07:00:00"
                         )
-                    record.is_recurring = True
+                    # record.is_recurring = True
+                    record.is_recurring = record.is_recurring or False
+
 
             elif record.frequency_type == "day_every_month":
                 if record.day_value:
@@ -463,7 +470,9 @@ class Rulebook(models.Model):
 
             elif record.frequency_type == "daily":
                 record.computed_date = default_time + timedelta(days=1)
-                record.is_recurring = True
+                # record.is_recurring = True
+                record.is_recurring = record.is_recurring or False
+
                 
             elif record.frequency_type == "weekly":
                 if record.day_of_week:
@@ -482,13 +491,17 @@ class Rulebook(models.Model):
                         record.computed_date = default_time + timedelta(weeks=1)
                 else:
                     record.computed_date = default_time + timedelta(weeks=1)
-                record.is_recurring = True
+                # record.is_recurring = True
+                    record.is_recurring = record.is_recurring or False
+
 
             elif record.frequency_type == "monthly":
                 next_month = today.month + 1 if today.month < 12 else 1
                 year = today.year if today.month < 12 else today.year + 1
                 record.computed_date = default_time.replace(year=year, month=next_month, day=1)
-                record.is_recurring = True
+                # record.is_recurring = True
+                record.is_recurring = record.is_recurring or False
+
                 
             elif record.frequency_type == "bi_monthly":
                 # Ensure days are valid
@@ -518,12 +531,16 @@ class Rulebook(models.Model):
                 elif today.day > first_day:
                     next_date = second_date
                     record.computed_date = next_date
-                    record.is_recurring = True
+                    # record.is_recurring = True
+                    record.is_recurring = record.is_recurring or False
+
                     continue
                 
                 # Set next date to the first occurrence
                 record.computed_date = first_date
                 record.is_recurring = True
+                record.is_recurring = record.is_recurring or False
+
 
           
             elif record.frequency_type == "quarterly":
@@ -555,7 +572,9 @@ class Rulebook(models.Model):
                         1, 
                         7, 0, 0
                     )
-                record.is_recurring = True
+                # record.is_recurring = True
+                record.is_recurring = record.is_recurring or False
+
                 
             elif record.frequency_type == "semi_annually":
                 today = fields.Date.today()
@@ -600,7 +619,9 @@ class Rulebook(models.Model):
                         last_day = calendar.monthrange(next_date.year, next_date.month)[1]
                         record.computed_date = next_date.replace(day=min(next_date.day, last_day))
                 
-                record.is_recurring = True
+                # record.is_recurring = True
+                record.is_recurring = record.is_recurring or False
+
                 
            
             elif record.frequency_type == "yearly":
@@ -631,7 +652,9 @@ class Rulebook(models.Model):
                         yearly_date = yearly_date.replace(year=year + 1)
                     
                     record.computed_date = yearly_date
-                    record.is_recurring = True
+                    # record.is_recurring = True
+                    record.is_recurring = record.is_recurring or False
+
                     
                 except ValueError as e:
                     _logger.error(f"Error creating date: year={year}, month={month_value}, day={day}. Error: {e}")
@@ -663,7 +686,9 @@ class Rulebook(models.Model):
                             target_date = target_date.replace(year=today.year + years_to_add)
                         
                         record.computed_date = target_date
-                        record.is_recurring = True
+                        # record.is_recurring = True
+                        record.is_recurring = record.is_recurring or False
+
                         
                     except ValueError as e:
                         _logger.error(f"Error creating three-yearly date: {e}")
@@ -672,6 +697,7 @@ class Rulebook(models.Model):
             elif record.frequency_type == "immediate":
                 record.computed_date = today
                 record.is_recurring = False
+
 
    
 
@@ -762,8 +788,8 @@ class Rulebook(models.Model):
                 if not 1 <= record.three_year_day <= 28:
                     raise ValidationError(("Please select a day between 1 and 28 for three-yearly frequency."))
     
-    @api.depends("due_date_value", "due_date_unit", "computed_date")
     
+    @api.depends("due_date_value", "due_date_unit", "computed_date")   
     def _compute_due_date(self):
         for record in self:
             if record.computed_date and record.due_date_unit in [
@@ -783,7 +809,7 @@ class Rulebook(models.Model):
                 )
             else:
                 # If computed_date is not available, set due_date to False or handle accordingly
-                record.due_date = False
+                record.due_date = None
 
     @api.depends(
         "escalation_date_value",
@@ -809,18 +835,18 @@ class Rulebook(models.Model):
                 )
             else:
                 # If computed_date is not available, set due_date to False or handle accordingly
-                record.escalation_date = False
+                record.escalation_date = None
 
     # creating the record
     @api.model
     def create(self, vals):
-        print(vals)
+        _logger.critical(vals)
         if "risk_category" in vals:
             category = self.env["rulebook.risk_category"].browse(vals["risk_category"])
-            print(category)
+            _logger.critical(category)
             if category and category.risk_priority:
                 vals["risk_rating"] = category.risk_priority
-        print(vals)
+        _logger.critical(vals)
         record = super(Rulebook, self).create(vals)
         if record.due_date and record.escalation_date:
             record._schedule_due_dates()
@@ -838,14 +864,15 @@ class Rulebook(models.Model):
                 "email_from": os.getenv("EMAIL_FROM"),
                 # "email_cc": record.officer_cc.email,
                 "rulebook_name":  re.sub(r'<[^>]+>', '', record.type_of_return),
-
+                
                 "email_cc": self.mapped('officer_cc.email'),
-
+                
                 "due_date": self._compute_formatted_date(record.due_date),
+                
                 "current_year": current_year,
             }
 
-            print(record)
+            _logger.critical(record)
 
             # Ensure rulebook_id is active and frequency_type is not "immediate"
 
@@ -854,29 +881,30 @@ class Rulebook(models.Model):
 
             if template.exists():
                 # Send the email immediately
-                print("i was called here ")
+                _logger.critical("Sent the email immediately ")
                 template.send_mail(record.id, force_send=True)
             else:
-                print(f"Mail template with ID {template_id} not found.")
+                _logger.critical(
+                    f"Mail template with ID {template_id} not found.")
 
         return record
 
     # editing the record
     def write(self, vals):
         # Log the record ID for debugging
-        print(f"Record ID: {self.id}")
+        _logger.critical(f"Record ID: {self.id}")
 
         # Check if 'risk_category' is being updated
         if "risk_category" in vals:
             category = self.env["rulebook.risk_category"].browse(vals["risk_category"])
-            print(f"Category: {category}")
+            _logger.critical(f"Category: {category}")
 
             # Update risk_rating based on risk_category
             if category and category.risk_priority:
                 vals["risk_rating"] = category.risk_priority
 
         # Log the updated values for debugging
-        print(f"Values to write: {vals}")
+        _logger.critical(f"Values to write: {vals}")
 
         # Call the super method and capture the result (typically a boolean)
         result = super(Rulebook, self).write(vals)
@@ -886,7 +914,7 @@ class Rulebook(models.Model):
             if hasattr(self, "_schedule_due_dates"):
                 self._schedule_due_dates()
         if "frequency_type" in vals and vals["frequency_type"] == "immediate":
-            print("it came here")
+            _logger.critical("it came here")
             record = self.env["rulebook"].browse(self.id)
             current_year = datetime.now().year
             global global_data
@@ -896,37 +924,32 @@ class Rulebook(models.Model):
                 "title": self.mapped('name.name'),
                 "upload_link": self._compute_upload_link(record.id),
                 "email_from": os.getenv("EMAIL_FROM"),
-                "rulebook_name":  re.sub(r'<[^>]+>', '', record.type_of_return),
+                "rulebook_name":   record.type_of_return,
+                # "rulebook_name":  re.sub(r'<[^>]+>', '', record.type_of_return),
                 "email_cc": self.mapped('officer_cc.email'),
                 "due_date": self._compute_formatted_date('due_date'),
                 "current_year": current_year,
             }
-            # global_data = {
-            #     "email_to": record.officer_responsible.email,
-            #     "name": record.first_line_escalation.name,
-            #     "title": record.name.name,
-            #     "upload_link": self._compute_upload_link(record.id),
-            #     "email_from": os.getenv("EMAIL_FROM"),
-            #     "email_cc": record.officer_cc.email,
-            #     "due_date": self._compute_formatted_date(record.due_date),
-            #     "current_year": current_year,
-            # }
-
-            print(record.officer_cc.email)
+            
+            _logger.critical("officer copied to email ",
+                             record.officer_cc.email)
 
             # Ensure rulebook_id is active and frequency_type is not "immediate"
 
             template_id = self.env.ref("rule_book.email_template_internal_due_date_").id
-            print(template_id)
+            
+            _logger.critical("template id  " , template_id)
+            
             template = self.env["mail.template"].browse(template_id)
-            print(template)
+            _logger.critical(template)
 
             if template.exists():
                 # Send the email immediately
-                print("i was called here ")
+                _logger.critical("i was called here ")
                 return template.send_mail(record.id, force_send=True)
             else:
-                print(f"Mail template with ID {template_id} not found.")
+                _logger.critical(
+                    f"Mail template with ID {template_id} not found.")
         # Return the result of the write operation
         if (
             "due_date_value" in vals
@@ -1005,6 +1028,7 @@ class Rulebook(models.Model):
         except Exception as e:
             _logger.error(f"Date formatting error: {e}")
             return str(dt)
+        
 
     def _schedule_due_dates(self):
         for record in self:
@@ -1025,7 +1049,7 @@ class Rulebook(models.Model):
             if record.computed_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Regulatory Due Date for {record.id}",
+                        "name": f"Internal Due Date for {record.id}",
                         "start": record.computed_date,
                         "stop": record.computed_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -1036,7 +1060,7 @@ class Rulebook(models.Model):
             if record.due_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Internal Due Date for {record.id}",
+                        "name": f"Regulatory Due Date for {record.id}",
                         "start": record.due_date,
                         "stop": record.due_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -1093,7 +1117,8 @@ class Rulebook(models.Model):
             global_data = {
                 "email_to": rulebook_id.first_line_escalation.email, 
                 "first_line_escalation": rulebook_id.first_line_escalation.name,
-                "rulebook_name":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
+                # "rulebook_name":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
+                "rulebook_name":  rulebook_id.type_of_return,
                 "upload_link": self._compute_upload_link(rulebook_id.id),
                 "email_from":  os.getenv("EMAIL_FROM"),
                 "email_cc": rulebook_id.second_line_escalation.email,
@@ -1133,7 +1158,8 @@ class Rulebook(models.Model):
             global_data = {
                 "email_to": rulebook_id.first_line_escalation.email,
                 "name": rulebook_id.first_line_escalation.name,
-                "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
+                "title":  rulebook_id.type_of_return,
+                # "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
                 "upload_link": self._compute_upload_link(rulebook_id.id),
                 "email_from":  os.getenv("EMAIL_FROM"),
                 "email_cc": rulebook_id.second_line_escalation.email,
@@ -1200,7 +1226,8 @@ class Rulebook(models.Model):
                 _logger.critical(
                     f"Template Exists from send_due_date_emails() : {template.exists()}")
                 if template.exists():
-                    print(f"Mail template with ID {template_id} not found.")
+                    _logger.critical(
+                        f"Mail template with ID {template_id} not found.")
                     return template.send_mail(rulebook_id.id, force_send=True)
                 # self.env['mail.template'].browse(template_id).send_mail(rulebook_id, force_send=True)
 
@@ -1243,8 +1270,10 @@ class Rulebook(models.Model):
     
     
     def _compute_next_due_date(self):
-        print("Updating next due date...")
+        _logger.critical("Updating next due date...")
+        
         """Compute the next due date for the rulebook when the status is 'completed'."""
+        
         for record in self:
             if record.frequency_type == "monthly":
                 next_due_date = record.computed_date + relativedelta(months=1)
@@ -1312,6 +1341,7 @@ class Rulebook(models.Model):
                 
             record.next_due_date = next_due_date
             record.computed_date = next_due_date
+            
             _logger.critical(
                 f"NEXT DUE DATE : {next_due_date}")
 
@@ -1326,7 +1356,7 @@ class Rulebook(models.Model):
                 rulebook.report_status != "completed"
                 and rulebook.due_date <= today
             ):
-                template_id = self.env.ref("module_name.reminder_email_template").id
+                template_id = self.env.ref("rule_book.reminder_email_template").id
                 self.env["mail.template"].browse(template_id).send_mail(rulebook.id)
                 rulebook.last_escalation_sent =  today
 
@@ -1335,7 +1365,7 @@ class Rulebook(models.Model):
                 rulebook.escalation_date <= fields.Datetime.now()
                 and rulebook.report_status != "completed"
             ):
-                template_id = self.env.ref("module_name.escalation_email_template").id
+                template_id = self.env.ref("rule_book.escalation_email_template").id
                 self.env["mail.template"].browse(template_id).send_mail(rulebook.id)
                 rulebook.last_escalation_sent = today
                 
@@ -1357,7 +1387,8 @@ class Rulebook(models.Model):
     @api.model
     def check_and_update_rulebooks(self):
         """Scheduler to check rulebooks with today's date as the regulatory date and update next due date."""
-        print("this is running")
+        _logger.critical(
+            "Scheduler to check rulebooks with today's date as the regulatory date and update next due date.")
 
         # Specify the Africa timezone (Lagos)
         africa_timezone = pytz.timezone("Africa/Lagos")
@@ -1372,6 +1403,9 @@ class Rulebook(models.Model):
         today_end = africa_now.replace(
             hour=23, minute=59, second=59, microsecond=999999
         )
+        
+        today_start = africa_timezone.localize(today_start)
+        today_end = africa_timezone.localize(today_end)
 
         # Search for rulebooks where computed_date is today and is_recurring is True
         rulebooks = self.search(
@@ -1384,6 +1418,7 @@ class Rulebook(models.Model):
 
         for rulebook in rulebooks:
             rulebook._compute_next_due_date()
+            
             
     def _post_email_to_reply_log(self, message):
         """Post a copy of the email message to the reply.log chatter"""

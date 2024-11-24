@@ -85,7 +85,7 @@
 
     <!-- Action Definition -->
     <record id="action_reply_log" model="ir.actions.act_window">
-        <field name="name">Reply Log</field>
+        <field name="name">Rulebook Log</field>
         <field name="res_model">reply.log</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_reply_log_search"/>

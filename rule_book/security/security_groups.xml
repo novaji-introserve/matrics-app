@@ -9,12 +9,12 @@
         </record>
 
         <!-- Group Users -->
-         <record id="group_department_user_" model="res.groups">
-                <field name="name">Department User</field>
-                <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]" />
-                <!-- No implied groups -->
-                <field name="category_id" ref="module_category_rule_book"/>
-            </record>
+        <record id="group_department_user_" model="res.groups">
+            <field name="name">Department User</field>
+            <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]" />
+            <!-- No implied groups -->
+            <field name="category_id" ref="module_category_rule_book"/>
+        </record>
 
         <record id="group_human_resource_" model="res.groups">
             <field name="name">HR Manager</field>
@@ -36,38 +36,88 @@
 
 
 
-        <!-- Record rule for employees to edit only their own record -->
-        <record id="rule_employee_edit_own_record" model="ir.rule">
-            <field name="name">Employee: Edit Own Record</field>
-            <field name="model_id" ref="hr.model_hr_employee"/>
-            <field name="domain_force">[('user_id', '=', user.id)]</field>
-            <field name="groups" eval="[Command.link(ref('base.group_user')),Command.link(ref('rule_book.group_department_user_'))]"/>
-        </record>
-
-        <!-- Record rule for Users to edit only their own record -->
-        <record id="rule_employee_edit_own_record" model="ir.rule">
-            <field name="name">Users: Edit Own Record</field>
-            <field name="model_id" ref="hr.model_res_users"/>
-            <field name="domain_force">[('id', '=', user.id)]</field>
-            <field name="groups" eval="[Command.link(ref('base.group_user')),Command.link(ref('rule_book.group_department_user_'))]"/>
-
-        </record>
-
-        <!-- Record rule for res.users to view only users in their department -->
+        <!-- Record rule for res.users to view only users in their department
         <record id="rule_res_users_department_access" model="ir.rule">
             <field name="name">User: View Department Users</field>
             <field name="model_id" ref="base.model_res_users"/>
             <field name="domain_force">[('employee_ids.department_id', '=', user.employee_id.department_id.id)]</field>
-            <field name="groups" eval="[Command.link(ref('base.group_user')),Command.link(ref('rule_book.group_department_user_'))]"/>
-        </record>
+            <field name="groups" eval="[Command.link(ref('rule_book.group_department_user_'))]"/>
+        </record> -->
 
         <!-- Record rule for hr.department to view only the user's own department -->
-        <record id="rule_hr_department_access" model="ir.rule">
+        <record id="rule_hr_department_access_" model="ir.rule">
             <field name="name">Department: View Own Department</field>
             <field name="model_id" ref="hr.model_hr_department"/>
             <field name="domain_force">[('id', '=', user.employee_id.department_id.id)]</field>
-            <field name="groups" eval="[Command.link(ref('base.group_user')),Command.link(ref('rule_book.group_department_user_'))]"/>
+            <field name="groups" eval="[Command.link(ref('rule_book.group_department_user_')),Command.link(ref('base.group_user'))]"/>
         </record>
+
+        <!-- Record rule for employees to edit only their own record
+        <record id="rule_employee_edit_own_record" model="ir.rule">
+            <field name="name">Employee: Edit Own Record</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[Command.link(ref('rule_book.group_department_user_'))]"/>
+            </record> -->
+
+        <!-- Record rule for Users to edit only their own record
+            <record id="rule_employee_edit_own_record" model="ir.rule">
+                <field name="name">Users: Edit Own Record</field>
+                <field name="model_id" ref="hr.model_res_users"/>
+                <field name="domain_force">[('id', '=', user.id)]</field>
+                <field name="groups" eval="[Command.link(ref('rule_book.group_department_user_'))]"/>
+                
+                </record> -->
+
+        <!-- User Record Rule -->
+        <record id="res_users_department_user_rule" model="ir.rule">
+            <field name="name">Users: Read/Write Own User Record</field>
+            <field name="model_id" ref="base.model_res_users"/>
+            <field name="domain_force">[('id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('rule_book.group_department_user_'))]"/>
+
+        </record>
+
+
+        <!-- Rule for Reading Department Members -->
+        <record id="hr_employee_department_read_rule" model="ir.rule">
+            <field name="name">Employee: Read Own Department</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="domain_force">[('department_id', '=', user.employee_id.department_id.id)]</field>
+            <field name="groups" eval="[(4, ref('rule_book.group_department_user_')),Command.link(ref('base.group_user'))]"/>
+
+            <!-- <field name="domain_force">[('id', '=', user.employee_id.department_id.id)]</field> -->
+            <!-- <field name="groups" eval="[(4, ref('rule_book.group_department_user_'))]"/> -->
+            <!-- <field name="groups" eval="[(4, [ref('rule_book.group_department_user_')])]"/> -->
+            <field name="perm_read">True</field>
+            <field name="perm_write">False</field>
+            <field name="perm_create">False</field>
+            <field name="perm_unlink">False</field>
+
+        </record>
+
+
+        <!-- Rule for Editing Own Record -->
+        <record id="hr_employee_own_write_rule" model="ir.rule">
+            <field name="name">Employee: Edit Own Record Only</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <!-- <field name="domain_force">[('name', '=', user.name)]</field> -->
+            <!-- <field name="domain_force">[('user_id', '=', user.id if not log(f'Current user ID: {user.id}, Employee ID: {user.employee_id.id if user.employee_id else None}', level='error') else user.id)]</field> -->
+
+            <!-- <field name="domain_force">[('id', '=', user.employee_id.id)]</field> -->
+            <!-- <field name="groups" eval="[Command.link(ref('base.group_user')),(4, ref('rule_book.group_department_user_'))]"/> -->
+            <!-- <field name="groups" eval="[(6, 0, [ref('rule_book.group_department_user_')])]"/> -->
+            <field name="groups" eval="[(4, ref('rule_book.group_department_user_')),Command.link(ref('base.group_user'))]"/>
+            <field name="perm_read">True</field>
+            <field name="perm_write">True</field>
+            <field name="perm_create">False</field>
+            <field name="perm_unlink">False</field>
+
+
+        </record>
+
+
 
         <record id="rule_user_full_access" model="ir.rule">
             <field name="name">HR Full Access to Users</field>
@@ -91,67 +141,8 @@
             <field name="groups" eval="[Command.link(ref('rule_book.group_human_resource_'))]"/>
         </record>
 
-        <!-- Access Rights for HR Group -->
-        <record id="access_hr_department_user" model="ir.model.access">
-            <field name="name">hr.department access for HR group</field>
-            <field name="model_id" ref="hr.model_hr_department"/>
-            <field name="group_id" ref="rule_book.group_human_resource_"/>
-            <field name="perm_read" eval="1"/>
-            <field name="perm_write" eval="1"/>
-            <field name="perm_create" eval="1"/>
-            <field name="perm_unlink" eval="1"/>
-        </record>
 
-        <record id="access_res_users_user" model="ir.model.access">
-            <field name="name">res.users access for HR group</field>
-            <field name="model_id" ref="base.model_res_users"/>
-            <field name="group_id" ref="rule_book.group_human_resource_"/>
-            <field name="perm_read" eval="1"/>
-            <field name="perm_write" eval="1"/>
-            <field name="perm_create" eval="1"/>
-            <field name="perm_unlink" eval="1"/>
-        </record>
 
-        <record id="access_hr_employee_user" model="ir.model.access">
-            <field name="name">hr.employee access for HR group</field>
-            <field name="model_id" ref="hr.model_hr_employee"/>
-            <field name="group_id" ref="rule_book.group_human_resource_"/>
-            <field name="perm_read" eval="1"/>
-            <field name="perm_write" eval="1"/>
-            <field name="perm_create" eval="1"/>
-            <field name="perm_unlink" eval="1"/>
-        </record>
-
-        <!-- Access Rights for Normal Users -->
-        <!-- <record id="access_normal_employee_user" model="ir.model.access">
-            <field name="name">hr.employee access for normal employees</field>
-            <field name="model_id" ref="hr.model_hr_employee"/>
-            <field name="group_id" ref="base.group_user"/>
-            <field name="perm_read" eval="1"/>
-            <field name="perm_write" eval="0"/>
-            <field name="perm_create" eval="0"/>
-            <field name="perm_unlink" eval="0"/>
-        </record> -->
-
-        <!-- <record id="access_normal_res_users" model="ir.model.access">
-            <field name="name">res.users access for normal users</field>
-            <field name="model_id" ref="base.model_res_users"/>
-            <field name="group_id" ref="base.group_user"/>
-            <field name="perm_read" eval="1"/>
-            <field name="perm_write" eval="0"/>
-            <field name="perm_create" eval="0"/>
-            <field name="perm_unlink" eval="0"/>
-        </record> -->
-
-        <!-- <record id="access_normal_department_user" model="ir.model.access">
-            <field name="name">hr.department access for normal users</field>
-            <field name="model_id" ref="hr.model_hr_department"/>
-            <field name="group_id" ref="base.group_user"/>
-            <field name="perm_read" eval="1"/>
-            <field name="perm_write" eval="0"/>
-            <field name="perm_create" eval="0"/>
-            <field name="perm_unlink" eval="0"/>
-        </record> -->
 
     </data>
 </odoo>
