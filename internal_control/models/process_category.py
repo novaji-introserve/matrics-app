@@ -6,7 +6,5 @@ class Process_category(models.Model):
 
     name = fields.Char(string="Name", required=True)
     description = fields.Char(string="description", required=True)
-    date_created = fields.Datetime(string="created_at", default=fields.Datetime.now())
-    process_category_id = fields.Many2one('process.category', string="Process Category")
 
   
