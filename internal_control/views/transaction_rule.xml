@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_transaction_screening_rule_internal_control_tree" model="ir.ui.view">
+        <field name="name">transaction.screening.rule.internal.control.tree</field>
+        <field name="model">transaction.screening.rule.internal.control</field>
+        <field name="inherit_id" ref="compliance_management.compliance_transaction_screening_rule_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+
+            </xpath>        
+        </field>
+    </record>
+
+    <record id="view_transaction_screening_rule_internal_control_form" model="ir.ui.view">
+        <field name="name">transaction.screening.rule.internal.control.form</field>
+        <field name="model">transaction.screening.rule.internal.control</field>
+        <field name="inherit_id" ref="compliance_management.compliance_transaction_screening_rule_form" />
+        <field name="arch" type="xml">
+        <xpath expr="//div[@class='oe_chatter']" position="inside">
+            <!-- This will ensure chatter fields are placed exactly as in the original -->
+        </xpath>
+        </field>
+    </record>
+
+    <record id="action_transaction_rule" model="ir.actions.act_window">
+        <field name="name">Transaction Rule</field>
+        <field name="res_model">transaction.screening.rule.internal.control</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_transaction_screening_rule_internal_control_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new transaction rule.
+            </p>
+            <p>
+                Transaction rules are managed here.
+            </p>
+        </field>
+    </record>
+</odoo>

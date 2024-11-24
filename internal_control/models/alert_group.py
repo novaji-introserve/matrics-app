@@ -7,10 +7,8 @@ class Alert_group(models.Model):
 
     name = fields.Char(string="Name", required=True)
     email = fields.Char(string="Email", required=True)
-    email_cc = fields.Char(string="Copy_Email")
+    email_cc = fields.Char(string="Email Copy")
     state = fields.Char(string="State", required=True)
     tag = fields.Char(string="Tag")
-    date_created = fields.Datetime(string="created_at", default=fields.Datetime.now())
-
 
   

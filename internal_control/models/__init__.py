@@ -6,3 +6,4 @@ from . import branch
 from . import exception_frequency
 from . import process_category
 from . import process
+from . import transaction_screening_rule
