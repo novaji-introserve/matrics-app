@@ -28,9 +28,11 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
+        'data/department.xml',
         'views/configuration.xml',
         'views/edd.xml',
         'views/kyc.xml',
+        'data/data.xml',
         'views/risk_assessment.xml',
         'views/res_users.xml',
         'views/sanction_screening.xml',
@@ -42,9 +44,9 @@
         'views/dashboard.xml',
         'views/risk_assessment_plan.xml',
         'views/settings.xml',
-       'views/customer_accounts.xml',
+        'views/customer_accounts.xml',
         'views/transaction.xml',
-        'views/transaction_screening_rule.xml',        
+        'views/transaction_screening_rule.xml',
                 ],
     # only loaded in demonstration mode
     'demo': [
