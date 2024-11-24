@@ -120,13 +120,11 @@ class Customer(models.Model):
         return result
 
     def write(self, values):
-        #values['risk_score'] = 1.00
         result = super(Customer, self).write(values)
-        self.flush_model()
         score = self._get_risk_score_from_plan()
         risk_level = self.env['res.partner']._get_risk_level_from_score(score)
         self.env.cr.execute('update res_partner set risk_score = %s,risk_level=%s where id = %s',(score,risk_level,self.id))
-        self.invalidate_model(['risk_score','risk_level'])
+        self.invalidate_recordset(['risk_score','risk_level'])
         return result
         
     @api.depends('account_ids')
@@ -359,10 +357,11 @@ class Customer(models.Model):
                     
                 except:
                     pass
-        result = None
+                
         if len(scores) > 0:
             if plan_setting == 'avg':
-                result = sum(scores) / len(scores)
+                self.env.cr.execute(f"select avg(risk_score) from res_partner_risk_plan_line where partner_id={record_id} and risk_score > 0")
             if plan_setting == 'max':
-                result = max(scores)
-        return 0.00 if result is None else result
+                self.env.cr.execute(f"select max(risk_score) from res_partner_risk_plan_line where partner_id={record_id}")
+            records = self.env.cr.fetchone()
+        return records[0] if records is not None else 0.00
