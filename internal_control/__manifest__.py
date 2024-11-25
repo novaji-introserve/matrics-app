@@ -23,6 +23,11 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'views/actions.xml',
+        'views/transaction_monitoring_views.xml',
+        'views/account_monitoring_views.xml',
+        'views/fraud_monitoring_views.xml',
+        # 'data/cron_data.xml',
         'views/alert_rules.xml',
         'views/alert_group.xml',
         'views/process.xml',
@@ -42,6 +47,7 @@
     "installable": True,
     "application": True,
     "auto_install": False,
+    'license': 'LGPL-3',
     "assets":{
         'web.assets_backend_legacy_lazy': [
            "internal_control/static/src/components/internal_control.js"
