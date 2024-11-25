@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<record id="view_tbl_branch_tree" model="ir.ui.view">
+    <field name="name">tbl.branch.tree</field>
+    <field name="model">tbl.branch</field>
+    <field name="arch" type="xml">
+        <tree string="Branch">
+            <field name="branch_code"/>
+            <field name="branch_name"/>
+            <field name="address"/>
+            <field name="phone"/>
+            <field name="email"/>
+            <field name="city"/>
+            <field name="state"/>
+            <field name="country"/>
+            <field name="status"/>
+            <field name="create_dt"/>
+        </tree>
+    </field>
+</record>
+
+<record id="view_tbl_branch_form" model="ir.ui.view">
+    <field name="name">tbl.branch.form</field>
+    <field name="model">tbl.branch</field>
+    <field name="arch" type="xml">
+        <form string="Branch">
+            <sheet>
+                <group>
+                   <group class="col-md-4">
+                    <field name="branch_code"/>
+                    <field name="branch_name"/>
+                    <field name="address"/>
+                    <field name="address2"/>
+                    <field name="address3"/>
+                    <field name="phone"/>
+                    <field name="email"/>
+                    <field name="fax"/>
+                    <field name="city"/>
+                    <field name="state"/>
+                    <field name="country"/>
+                    <field name="status"/>
+                    <field name="cashaccount"/>
+                   </group>
+                    
+                    
+
+                  <group class="col-md-4">
+                    <field name="suspenseDR"/>
+                    <field name="interBranchGL"/>
+                    <field name="BranchType"/>
+                    <field name="MBranchCode"/>
+                    <field name="SBranchCode"/>
+                    <field name="User_id"/>
+                    <field name="create_dt"/>
+                    <field name="region"/>
+                    <field name="authid"/>
+                    <field name="subbbranch"/>
+                  </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<record id="action_tbl_branch" model="ir.actions.act_window">
+    <field name="name">Branches</field>
+    <field name="res_model">tbl.branch</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+
+</odoo>

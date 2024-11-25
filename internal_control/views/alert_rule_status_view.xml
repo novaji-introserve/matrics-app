@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View for the process model -->
+    <record id="view_process_tree" model="ir.ui.view">
+        <field name="name">alert.rules.status.tree</field>
+        <field name="model">alert.rules.status</field>
+        <field name="arch" type="xml">
+            <tree string="Process List">
+                <field name="name" />
+                <field name="code" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for the process model -->
+    <record id="view_process_form" model="ir.ui.view">
+        <field name="name">alert.status.form</field>
+        <field name="model">alert.rules.status</field>
+        <field name="arch" type="xml">
+            <form string="Alert Status Form">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="code" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open the tree view -->
+    <record id="action_alert_status" model="ir.actions.act_window">
+        <field name="name">Alert Rules Status</field>
+        <field name="res_model">alert.rules.status</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+</odoo>
