@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# from . import internal_control
 from . import transaction_monitoring
 from . import account_monitoring
 from . import fraud_monitoring
