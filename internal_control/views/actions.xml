@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===================== -->
+    <!-- 1. TRANSACTION MONITORING ACTIONS -->
+    <!-- ===================== -->
+    <!-- Reversed Transactions Action -->
+    <record id="action_reversed_transactions" model="ir.actions.act_window">
+        <field name="name">Reversed Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('Reversal', '=', 1)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reversed transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_backdated_transactions" model="ir.actions.act_window">
+        <field name="name">Backdated Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <!-- <field name="domain">[('TranDate', '<', 'ActualDate')]</field> -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No backdated transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_premature_liquidation" model="ir.actions.act_window">
+        <field name="name">Premature Liquidation</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('AccountModule', '=', 2)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No premature liquidation transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_cancelled_accounts" model="ir.actions.act_window">
+        <field name="name">Cancelled Account</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('status', '=', 2)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No cancelled transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_reactivated_accounts" model="ir.actions.act_window">
+        <field name="name">Reactivated Accounts</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('status', '=', 3)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reactivated accounts transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_date_vs_value_date_accounts" model="ir.actions.act_window">
+        <field name="name">Date vs Value Date Monitoring</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('TranDate', '!=', 'Valuedate')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No date mismatch transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_crypto_transactions" model="ir.actions.act_window">
+        <field name="name">Crypto Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('Narration', 'ilike', 'crypto')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No crypto-related transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_betting_gambling_transactions" model="ir.actions.act_window">
+        <field name="name">Betting/Gambling Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">['|', ('Narration', 'ilike', 'betting'), ('Narration', 'ilike', 'gambling')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No betting/gambling transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- 2. ACCOUNT STATUS & MONITORING ACTIONS -->
+    <!-- ===================== -->
+    <record id="action_account_reactivations" model="ir.actions.act_window">
+        <field name="name">Account Reactivations</field>
+        <field name="res_model">res.internal.control.account.monitoring</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('account_type', '=', 'reactivation')]</field>
+        <field name="context">{'default_account_type': 'reactivation'}</field>
+    </record>
+
+    <record id="action_same_address_accounts" model="ir.actions.act_window">
+        <field name="name">Same Address Accounts</field>
+        <field name="res_model">res.internal.control.account.monitoring</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('account_type', '=', 'same_address')]</field>
+        <field name="context">{'default_account_type': 'same_address'}</field>
+    </record>
+
+
+    <!-- ===================== -->
+    <!-- 3. FRAUD MONITORING ACTIONS -->
+    <!-- ===================== -->
+    <record id="action_fraud_ledger_entries" model="ir.actions.act_window">
+        <field name="name">Fraud Ledger Entries</field>
+        <field name="res_model">res.internal.control.fraud.monitoring</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('fraud_type', '=', 'ledger_entry')]</field>
+        <field name="context">{'default_fraud_type': 'ledger_entry'}</field>
+    </record>
+
+    <record id="action_fraud_postings" model="ir.actions.act_window">
+        <field name="name">Fraud Postings</field>
+        <field name="res_model">res.internal.control.fraud.monitoring</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('fraud_type', '=', 'postings_entry')]</field>
+        <field name="context">{'default_fraud_type': 'postings_entry'}</field>
+    </record>
+
+</odoo>
