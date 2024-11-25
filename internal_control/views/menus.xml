@@ -73,7 +73,6 @@
     <menuitem id="menu_internal_control_configurations"
               name="Configurations"
               parent="menu_internal_control_main"
-              action="compliance_management.action_list_compliance_stat"
               sequence="40"/>
 
     <menuitem id="menu_internal_control_alert_group"
@@ -86,44 +85,7 @@
               name="Alert Frequency"
               parent="menu_internal_control_configurations"
               action="action_alert_frequency"
-<<<<<<< HEAD
-              sequence="50"/>
-              
-    <menuitem id="menu_internal_control_alert_process" 
-        parent="menu_internal_control_configurations" 
-        name="Processes" 
-        sequence="60" />
-
-    <menuitem id="menu_internal_control_alert_process_submenu" 
-        parent="menu_internal_control_alert_process" 
-        name="Process" action="action_process"
-        sequence="1" />
-
-    <menuitem id="menu_internal_control_alert_process_category" 
-        parent="menu_internal_control_alert_process" 
-        name="Process category" action="action_process_category"
-        sequence="10" />
-
-
-
-    <menuitem id="menu_internal_control_alert_group" 
-        parent="menu_internal_control_configurations" 
-        name="Alert Group" action="action_alert_group"
-        sequence="70" />
-
-    <menuitem id="menu_internal_control_alert_branch" 
-        parent="menu_internal_control_configurations" 
-        name="Branch" action="action_tbl_branch"
-        sequence="75" />
-
-    <menuitem id="menu_internal_control_alert_status" 
-        parent="menu_internal_control_configurations" 
-        name="Status" action="action_alert_rules_status"
-        sequence="80" />
-</odoo>
-=======
               sequence="20"/>
->>>>>>> main
 
     <menuitem id="menu_internal_control_process"
               name="Processes"
@@ -143,6 +105,6 @@
     <menuitem id="menu_internal_control_transaction_rules"
               name="Rules"
               parent="menu_internal_control_transaction_monitoring"
-              action="action_transaction_rule"
+              action="action_internal_control_screening_rule"
               sequence="10"/>
 </odoo>
