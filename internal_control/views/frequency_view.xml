@@ -1,5 +1,5 @@
-<odoo>
-    <data>
+<?xml version="1.0" encoding="utf-8"?>
+    <odoo>
         <!-- Tree View (List View) -->
         <record id="view_exception_frequency_tree" model="ir.ui.view">
             <field name="name">exception.frequency.tree</field>
@@ -7,15 +7,12 @@
             <field name="arch" type="xml">
                 <tree string="Exception Frequency">
                     <field name="name" />
-<<<<<<<< HEAD:internal_control/views/frequency_view.xml
                     <field name="period" />
                     <field name="date_created" />
                     <field name="representation" />
-========
-                    <field name="period"/>
-                    <field name="create_date" string="created On"/>
-                    <field name="create_uid" string="created By"/>
->>>>>>>> main:internal_control/views/alert_frequency.xml
+                    <field name="period" />
+                    <field name="create_date" string="Created On" />
+                    <field name="create_uid" string="Created By" />
                 </tree>
             </field>
         </record>
@@ -29,8 +26,8 @@
                     <sheet>
                         <group>
                             <field name="name" />
-                            <field name="period"
-                            attrs="{'invisible': [('name', '=', False)]}"
+                            <field name="period" 
+                                attrs="{'invisible': [('name', '=', False)]}" 
                             />
                         </group>
                     </sheet>
@@ -38,17 +35,12 @@
             </field>
         </record>
 
+        <!-- Action Window -->
         <record id="action_alert_frequency" model="ir.actions.act_window">
             <field name="name">Exception Frequency</field>
             <field name="res_model">exception.frequency</field>
-<<<<<<<< HEAD:internal_control/views/frequency_view.xml
-            <field name="res_model">exception.frequency</field>
-            <field name="view_mode">kanban,form</field>
-            <field name="context">{}</field>
-        </record>
-========
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_exception_frequency_tree"/>
+            <field name="view_id" ref="view_exception_frequency_tree" />
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create new alert groups for exception management.
@@ -57,9 +49,5 @@
                     Alert groups help in managing exception notifications efficiently.
                 </p>
             </field>
-    </record>
->>>>>>>> main:internal_control/views/alert_frequency.xml
-
-        
-    </data>
-</odoo>
+        </record>
+    </odoo>
