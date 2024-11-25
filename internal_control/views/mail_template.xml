@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Email template for new users -->
+    <record id="alert_rules_mail_template" model="mail.template">
+        <field name="name">Alert Mailing System</field>
+        <field name="model_id" ref="internal_control.model_alert_rules"/>
+        <field name="subject">Mail Report From Icomply</field>
+        <field name="email_from">test@novajii.com</field>
+        <field name="email_to">{{ object.email }}</field>
+        <field name="description">this is automation mail base on alert information in the database</field>
+        <field name="body_html" type="html">
+            <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;">
+                <tr>
+                    <td align="center">
+                        <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: #FFFFFF; color: #454748; border-collapse:separate;">
+                            <tbody>
+                                <!-- HEADER -->
+                                <tr>
+                                    <td align="center" style="min-width: 590px;">
+                                        <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                            <tr>
+                                                <td valign="middle">
+                                                  
+                                                    <span style="font-size: 20px; font-weight: bold;">
+                                                        <span style="font-size: 10px;">Report for {{ object.branch_name }}</span>
+                                                    </span>
+                                                </td>
+                                              
+                                                <td>
+
+                                                    <!-- <div
+                                                        class="table-responsive"
+                                                    >
+                                                        <table
+                                                            class="table"
+                                                        >
+                                                            
+                                                            <tbody>
+                                                                
+                                                                <t t-foreach="object.rows" t-as="row">
+                                                                    <tr class="">
+
+                                                                    </tr>
+                                                                </t>
+                                                               
+                                                            </tbody>
+                                                        </table>
+                                                    </div> -->
+                                                    
+
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="text-align:center;">
+                                                    <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <!-- CONTENT -->
+                                <tr>
+                                    <td align="center" style="min-width: 590px;">
+                                        <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                            <tr>
+                                                <td valign="top" style="font-size: 13px;">
+                                                    <div> </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align:center;">
+                                                    <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <!-- FOOTER -->
+                                <tr>
+                                    <td align="center" style="min-width: 590px;">
+                                        <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                            <tr>
+                                                <td valign="middle" align="left">
+                                                    <t>Novaji Introserve</t>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td valign="middle" align="left" style="opacity: 0.7;">
+                                                    <t>+1 650-123-4567</t>
+                                                    <t>
+                                                    | <a t-att-href="'mailto:%s' % ''" style="text-decoration:none; color: #454748;">info@yourcompany.com</a>
+                                                    </t>
+                                                    <t>
+                                                    | <a t-att-href="'%s' % ''" style="text-decoration:none; color: #454748;" >http://www.example.com</a>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <!-- POWERED BY -->
+                 <!-- POWERED BY -->
+                 <tr class='o_email_footer'>
+                    
+                </tr>
+            </table>
+        </field>
+        <field name="lang">en_US</field>
+        <field name="auto_delete" eval="False"/>
+</record>
+</odoo>

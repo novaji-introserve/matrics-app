@@ -1,0 +1,6 @@
+/* Ensure the WYSIWYG editor is always visible */
+.oe_form_field_html .o_html_editor {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+}
