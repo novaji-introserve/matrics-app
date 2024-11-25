@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_account_monitoring_tree" model="ir.ui.view">
+        <field name="name">account.monitoring.tree</field>
+        <field name="model">res.internal.control.account.monitoring</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="account_reference"/>
+                <field name="account_type"/>
+                <field name="account_date"/>
+                <field name="amount"/>
+                <field name="status"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_account_monitoring_form" model="ir.ui.view">
+        <field name="name">account.monitoring.form</field>
+        <field name="model">res.internal.control.account.monitoring</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="account_reference"/>
+                            <field name="account_type"/>
+                            <field name="account_date"/>
+                        </group>
+                        <group>
+                            <field name="amount"/>
+                            <field name="status"/>
+                            <field name="user_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
