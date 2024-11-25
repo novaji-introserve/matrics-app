@@ -310,30 +310,26 @@ class Rulebook(models.Model):
 
     # to send the data in the global variable to the template
     
-    
     @api.model
     def open_rulebooks(self):
-        # Define the restricted group
-        restricted_group = self.env.ref('rule_book.group_department_user_')
+        # Check if user belongs to compliance or COO groups
+        compliance_group = self.env.ref('rule_book.group_compliance_manager_')
+        coo_group = self.env.ref('rule_book.group_chief_compliance_officer_')
 
-        # Check if the user belongs to the restricted group
-        if restricted_group in self.env.user.groups_id:
-            # Check if the user has a department
+        if compliance_group in self.env.user.groups_id or coo_group in self.env.user.groups_id:
+            # No domain restrictions for these groups
+            domain = []
+        else:
+            # Restrict to user's department for other groups
             if not self.env.user.department_id:
                 raise AccessError(
                     "You must be assigned to a department to view rulebooks.")
-
-            # Apply restriction to the domain
             domain = [('responsible_id', '=', self.env.user.department_id.id)]
-        else:
-            # No restrictions for other users
-            domain = []
 
-        # Return the action to open rulebook records
         return {
             'name': 'RuleBooks',
             'type': 'ir.actions.act_window',
-            'res_model': 'rulebook',  # This is your target model
+            'res_model': 'rulebook',
             'view_mode': 'tree,form,kanban',
             'domain': domain,
             'context': {
@@ -341,6 +337,66 @@ class Rulebook(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
+    
+    # @api.model
+    # def open_rulebooks(self):
+    #     # Check if user belongs to compliance or COO groups
+    #     compliance_group = self.env.ref('group_compliance_manager_')
+    #     # coo_group = self.env.ref('rule_book.group_coo_')
+
+    #     if compliance_group in self.env.user.groups_id in self.env.user.groups_id:
+    #         # No domain restrictions for these groups
+    #         domain = []
+    #     else:
+    #         # Restrict to user's department for other groups
+    #         if not self.env.user.department_id:
+    #             raise AccessError(
+    #                 "You must be assigned to a department to view rulebooks.")
+    #         domain = [('responsible_id', '=', self.env.user.department_id.id)]
+
+    #     return {
+    #         'name': 'RuleBooks',
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'rulebook',
+    #         'view_mode': 'tree,form,kanban',
+    #         'domain': domain,
+    #         'context': {
+    #             'search_default_not_deleted': 1,
+    #             'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
+    #         }
+    #     }
+
+    
+    # @api.model
+    # def open_rulebooks(self):
+    #     # Define the restricted group
+    #     restricted_group = self.env.ref('rule_book.group_department_user_')
+
+    #     # Check if the user belongs to the restricted group
+    #     if restricted_group in self.env.user.groups_id:
+    #         # Check if the user has a department
+    #         if not self.env.user.department_id:
+    #             raise AccessError(
+    #                 "You must be assigned to a department to view rulebooks.")
+
+    #         # Apply restriction to the domain
+    #         domain = [('responsible_id', '=', self.env.user.department_id.id)]
+    #     else:
+    #         # No restrictions for other users
+    #         domain = []
+
+    #     # Return the action to open rulebook records
+    #     return {
+    #         'name': 'RuleBooks',
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'rulebook',  # This is your target model
+    #         'view_mode': 'tree,form,kanban',
+    #         'domain': domain,
+    #         'context': {
+    #             'search_default_not_deleted': 1,
+    #             'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
+    #         }
+    #     }
     
    
         

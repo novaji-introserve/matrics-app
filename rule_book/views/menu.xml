@@ -30,11 +30,6 @@
       </field>
     </record>
 
-    <!-- <record id="action_rulebook_department" model="ir.actions.act_window">
-      <field name="name">Departments</field>
-      <field name="res_model">rulebook.department</field>
-      <field name="view_mode">tree,form</field>
-    </record> -->
 
     <!-- Branch -->
     <!-- <record id="action_rulebook_branch" model="ir.actions.act_window">
@@ -81,10 +76,6 @@
 
 
 
-
-
-
-
     <!-- Reply log -->
     <record id="open_reply_log" model="ir.actions.server">
       <field name="name">Open Reply Log</field>
@@ -101,13 +92,6 @@
       <field name="view_mode">tree,form</field>
     </record>
 
-    <!-- <record id="action_rulebook_dashboard" model="ir.actions.act_window">
-      <field name="name">Rulebook Dashboard</field>
-      <field name="res_model">rulebook.dashboard</field>
-      <field name="view_mode">form</field>
-      <field name="view_id" ref="view_rulebook_dashboard_form" />
-      <field name="target">current</field>
-    </record> -->
 
 
     <record id="action_cusotomer_details_js" model="ir.actions.client">
@@ -132,7 +116,7 @@
 
     <!-- Alerts -->
     <!-- <menuitem id="menu_report_rulebook" name="Reports" parent="menu_rulebook_alert" action="action_report_rulebook" sequence="4"/> -->
-    <!-- <menuitem id="menu_owl_alert_dashboard" name="Alert" parent="menu_rulebook_alert" action="action_owl_alert_dashboard" sequence="1" /> -->
+    <menuitem id="menu_owl_alert_dashboard" name="Alert" parent="menu_rulebook_alert" action="action_owl_alert_dashboard" sequence="1" />
 
 
     <!-- <menuitem id="menu_rulebook_theme" name="Themes" parent="menu_rulebook_details" action="action_rulebook_theme" sequence="4" /> -->

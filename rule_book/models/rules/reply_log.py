@@ -49,8 +49,8 @@ class ReplyLog(models.Model):
     reply_date = fields.Datetime(
         string="Reply Date",
         # default=fields.Date.today,
-        default=lambda self: fields.Datetime.now().astimezone(
-            pytz.timezone('Africa/Lagos')).replace(tzinfo=None),
+        default= fields.Datetime.now(),
+        # .astimezone( pytz.timezone('Africa/Lagos')).replace(tzinfo=None),
         # default=fields.Datetime.now,
         readonly=True,
         tracking=True,
@@ -130,21 +130,20 @@ class ReplyLog(models.Model):
 
     @api.model
     def open_reply_log(self):
-        # Check if the user has a department
-        restricted_group = self.env.ref('rule_book.group_department_user_')
+        # Check if user belongs to compliance or COO groups
+        compliance_group = self.env.ref('rule_book.group_compliance_manager_')
+        coo_group = self.env.ref('rule_book.group_chief_compliance_officer_')
 
-        # Check if the user belongs to the restricted group
-        if restricted_group in self.env.user.groups_id:
-            # Check if the user has a department
+        if compliance_group in self.env.user.groups_id or coo_group in self.env.user.groups_id:
+            # No domain restrictions for these groups
+            domain = []
+        else:
+            # Restrict to user's department for other groups
             if not self.env.user.department_id:
                 raise AccessError(
-                    "You must be assigned to a department to view Reply Logs.")
-
-            # Apply restriction to the domain
-            domain = [('department_id', '=', self.env.user.department_id.id)]
-        else:
-            # No restrictions for other users
-            domain = []
+                    "You must be assigned to a department to view rulebook logs.")
+            domain = [('department_id', '=', self.env.user.department_id.id)]        
+        
         return {
             'name': ('Reply Logs'),
             'type': 'ir.actions.act_window',
@@ -158,7 +157,12 @@ class ReplyLog(models.Model):
         }
         
 
-    
+    # def can_edit(self):
+    #     self.ensure_one()
+    #     user = self.env.user
+    #     # Check if user is the reporter or in compliance officer group
+    #     return (user.id == self.reporter.id or
+    #             user.has_group('rule_book.group_chief_compliance_officer_'))
 
     @api.model
     def get_awaiting_replies(self):

@@ -36,7 +36,7 @@
                         <group class="mt-3">
                             <field name="rulebook_name" readonly="1" widget="text" />
                             <field name="reply_date" readonly="1" />
-                            <field name="reply_content" widget="html" />
+                            <field name="reply_content" widget="text" />
                             <field name="document_filename" invisible="1" />
                             <field name="submission_timing" string="Submission Timing" />
 

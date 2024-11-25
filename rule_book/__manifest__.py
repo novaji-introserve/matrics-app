@@ -24,6 +24,7 @@
         # department/reports
         # Load security groups first
         "security/security_groups.xml",
+        'views/user_setting.xml',
 
         # "security/security.xml",
 
