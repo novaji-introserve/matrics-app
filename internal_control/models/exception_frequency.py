@@ -4,8 +4,7 @@ class Exception_frequency(models.Model):
     _name = 'exception.frequency'
     _description = 'exception Frequency rate'
     
-    def __str__(self):
-        return f"{self.period} {self.name}"
+    _rec_name = "representation"
 
     name = fields.Selection(
         [
@@ -27,7 +26,6 @@ class Exception_frequency(models.Model):
         
     @api.onchange("period")
     def change_period(self):
-        
         
     
         if self.name:
@@ -64,4 +62,10 @@ class Exception_frequency(models.Model):
             
             
     
-               
+    @api.depends('period', 'name')
+    def _compute_name_rep(self):
+        for record in self:
+            record.representation = f"{record.period}{record.name}"
+
+    representation = fields.Char(string='representation', compute='_compute_name_rep', store=True)
+  
