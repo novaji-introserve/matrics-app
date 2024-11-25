@@ -6,6 +6,5 @@ class Process_category(models.Model):
 
     name = fields.Char(string="Name", required=True)
     description = fields.Char(string="description", required=True)
-    date_created = fields.Datetime(string="created_at", default=fields.Datetime.now())
-    
+
   

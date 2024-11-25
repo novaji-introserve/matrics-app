@@ -18,22 +18,16 @@
     'version': '0.3',
 
     # any module necessary for this one to work correctly
+    'depends': ['icomply_dashboard', 'compliance_management'],
     'depends': ['base', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'icomply_dashboard', 'web_editor'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/menus.xml',
-        'views/alert_rules_view.xml',
-        'views/alert_group_view.xml',
-        'views/alert_status_view.xml',
-        'views/frequency_view.xml',
-        'views/process_view.xml',
-        'views/process_category_view.xml',
-        'views/branch_view.xml',
-        'views/cron_job.xml',
-        'views/mail_template.xml',
-        'data/email_smtp.xml',
+        'views/alert_rules_tree.xml',
+        'views/frequency_tree.xml',
+        'views/tinymce.xml',
         
     ],
 
@@ -45,6 +39,7 @@
     "installable": True,
     "application": True,
     "auto_install": False,
+    'license': 'LGPL-3',
     "assets":{
         'web.assets_backend': [
            "internal_control/static/src/components/editor.js",

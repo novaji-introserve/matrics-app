@@ -1,23 +1,61 @@
-
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Main Menu -->
-    <menuitem id="menu_internal_control_main"
-              name="Internal Control"
-              sequence="-800"/>
+    <menuitem id="menu_internal_control_main" name="Internal Control" sequence="-800"/>
 
-    <!-- Submenus -->
-    <menuitem id="menu_internal_control_dashboard"
-              name="Dashboard"
-              parent="menu_internal_control_main"
-              action="icomply_dashboard.dashboard_home"
-              sequence="10"/>
+    <!-- Dashboard Submenu -->
+    <menuitem id="menu_internal_control_dashboard" name="Dashboard" parent="menu_internal_control_main" action="icomply_dashboard.dashboard_home" sequence="10"/>
 
-    <menuitem id="menu_internal_control_transactions"
-              name="Transactions"
-              parent="menu_internal_control_main"
-              action="compliance_management.open_transactions_all"
-              sequence="20"/>
+    <!-- ===================== -->
+    <!-- 1. TRANSACTION MENU -->
+    <!-- ===================== -->
+    <!-- Transaction Monitoring Menu -->
+    <menuitem id="menu_transaction_monitoring_root" name="Transaction Monitoring" parent="menu_internal_control_main" sequence="20"/>
 
+    <!-- 1. Transaction Monitoring Category -->
+    <menuitem id="menu_internal_control_transactions" name="Transaction Monitoring" parent="menu_transaction_monitoring_root" sequence="20"/>
+
+    <!-- Transaction Monitoring Submenus -->
+    <menuitem id="menu_internal_control_reversed_transactions" name="Reversed Transactions" parent="menu_internal_control_transactions" action="action_reversed_transactions" sequence="10"/>
+
+    <menuitem id="menu_internal_control_backdated_transactions" name="Backdated Transactions" parent="menu_internal_control_transactions" action="action_backdated_transactions" sequence="20"/>
+
+    <menuitem id="menu_internal_control_premature_liquidation" name="Premature Liquidation" parent="menu_internal_control_transactions" action="action_premature_liquidation" sequence="30"/>
+
+    <menuitem id="menu_internal_control_reactivated_accounts" name="Reactivated Accounts" parent="menu_internal_control_transactions" action="action_reactivated_accounts" sequence="40"/>
+
+    <menuitem id="menu_internal_control_cancelled_accounts" name="Cancelled Accounts" parent="menu_internal_control_transactions" action="action_cancelled_accounts" sequence="50"/>
+
+    <menuitem id="menu_internal_control_date_vs_value_date_accounts" name="Date vs Value Date" parent="menu_internal_control_transactions" action="action_date_vs_value_date_accounts" sequence="60"/>
+
+    <menuitem id="menu_internal_control_date_vs_value_date_accounts" name="Date vs Value Date" parent="menu_internal_control_transactions" action="action_date_vs_value_date_accounts" sequence="60"/>
+
+    <menuitem id="menu_internal_control_crypto_transactions" name="Crypto Transactions" parent="menu_internal_control_transactions" action="action_crypto_transactions" sequence="70"/>
+
+    <menuitem id="menu_internal_control_betting_gambling_transactions" name="Betting/Gambling Transactions" parent="menu_internal_control_transactions" action="action_betting_gambling_transactions" sequence="80"/>
+
+    <!-- ===================== -->
+    <!-- 2. ACCOUNT STATUS MENU -->
+    <!-- ===================== -->
+    <!-- Account status category -->
+    <menuitem id="menu_account_status_monitoring" name="Account Status &amp; Monitoring" parent="menu_transaction_monitoring_root" sequence="30"/>
+
+    <menuitem id="menu_account_reactivations" name="Account Reactivations" parent="menu_account_status_monitoring" action="action_account_reactivations" sequence="10"/>
+
+    <menuitem id="menu_account_same_address" name="Same Address Accounts" parent="menu_account_status_monitoring" action="action_same_address_accounts" sequence="20"/>
+
+    <!-- ===================== -->
+    <!-- 3. FRAUD MONITORING MENU -->
+    <!-- ===================== -->
+    <!-- Account status category -->
+    <menuitem id="menu_account_fraud_monitoring" name="Fraud Monitoring" parent="menu_transaction_monitoring_root" sequence="40"/>
+
+    <menuitem id="menu_fraud_ledger_entries" name="Fraud Ledger Entries" parent="menu_account_fraud_monitoring" action="action_fraud_ledger_entries" sequence="10"/>
+
+    <menuitem id="menu_fraud_postings" name="Fraud Postings" parent="menu_account_fraud_monitoring" action="action_fraud_postings" sequence="20"/>
+
+
+    <!-- Alert Monitoring -->
     <menuitem id="menu_internal_control_alert_monitoring"
               name="Alert Monitoring"
               parent="menu_internal_control_main"
@@ -30,24 +68,25 @@
               action="action_alert_rules"
               sequence="10"/>
 
-    
 
+    <!-- Configurations -->
     <menuitem id="menu_internal_control_configurations"
               name="Configurations"
               parent="menu_internal_control_main"
               action="compliance_management.action_list_compliance_stat"
               sequence="40"/>
 
-    <menuitem id="menu_internal_control_alert_rules"
-              name="Transaction Rules"
+    <menuitem id="menu_internal_control_alert_group"
+              name="Alert Group"
               parent="menu_internal_control_configurations"
-              action="compliance_management.open_transactions"
+              action="action_alert_group"
               sequence="10"/>
 
-    <menuitem id="menu_internal_control_alert_rules_frequency"
+    <menuitem id="menu_internal_control_alert_frequency"
               name="Alert Frequency"
               parent="menu_internal_control_configurations"
               action="action_alert_frequency"
+<<<<<<< HEAD
               sequence="50"/>
               
     <menuitem id="menu_internal_control_alert_process" 
@@ -82,4 +121,28 @@
         name="Status" action="action_alert_rules_status"
         sequence="80" />
 </odoo>
+=======
+              sequence="20"/>
+>>>>>>> main
 
+    <menuitem id="menu_internal_control_process"
+              name="Processes"
+              parent="menu_internal_control_configurations"
+              action="action_process"
+              sequence="30"/>
+
+    <menuitem id="menu_internal_control_process_category"
+              name="Process Category"
+              parent="menu_internal_control_configurations"
+              action="action_process_category"
+              sequence="40"/>
+
+    <menuitem id="menu_internal_control_transaction_monitoring"
+              name="Transaction Monitoring" parent="menu_internal_control_configurations" sequence="60"/>
+
+    <menuitem id="menu_internal_control_transaction_rules"
+              name="Rules"
+              parent="menu_internal_control_transaction_monitoring"
+              action="action_transaction_rule"
+              sequence="10"/>
+</odoo>
