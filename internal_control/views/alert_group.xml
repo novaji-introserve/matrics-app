@@ -5,7 +5,7 @@
         <field name="name">alert.group.tree</field>
         <field name="model">alert.group</field>
         <field name="arch" type="xml">
-            <tree string="Alert Groups">
+            <tree string="Alert Groups" >
                 <field name="name"/>
                 <field name="state"/>
                 <field name="tag"/>

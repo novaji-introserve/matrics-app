@@ -66,7 +66,7 @@
     <menuitem id="menu_internal_control_transaction_rules"
               name="Rules"
               parent="menu_internal_control_transaction_monitoring"
-              action="action_transaction_rule"
+              action="action_internal_control_screening_rule"
               sequence="10"/>
 </odoo>
 

@@ -6,4 +6,4 @@ access_branch_rules,access branch rules,internal_control.model_tbl_branch,base.g
 access_process_category_rules,access process category rules,internal_control.model_process_category,base.group_user,1,1,1,1
 access_process_rules,access process rules,internal_control.model_process,base.group_user,1,1,1,1
 access_alert_group_rules,access alert group rules,internal_control.model_alert_group,base.group_user,1,1,1,1
-access_transaction_screening_internal_control_rules,access transaction screening rule internal control rules,model_transaction_screening_rule_internal_control,base.group_user,1,1,1,1
+access_internal_control_screening_rule,access internal control screening rules,internal_control.model_internal_control_screening_rule,base.group_user,1,1,1,1
