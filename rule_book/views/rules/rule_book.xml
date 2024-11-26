@@ -160,7 +160,8 @@
                             </group>
                             <group col="2">
                                 <field name="regulatory_agency_id" placeholder="Select regulatory agency"  />
-                                <field name="responsible_id" placeholder="Enter responsible department" attrs="{'invisible': True}"/>
+                                <!-- <field name="responsible_id" placeholder="Enter responsible department" attrs="{'invisible': True}"/> -->
+                                <field name="responsible_id" placeholder="Enter responsible department" groups="rule_book.group_compliance_manager_"/>
                                 <field name="officer_responsible" placeholder="Enter responsible officer's name" />
                                 <!-- <field name="officer_email" placeholder="Enter responsible officer's email" /> -->
                             </group>
