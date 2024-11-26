@@ -9,7 +9,7 @@
                 <field name="name" />
                 <field name="description" />
                 <field name="process_category_id" />
-                <field name="branch_id" />
+                <!-- <field name="branch_id" /> -->
             </tree>
         </field>
     </record>
@@ -25,7 +25,7 @@
                         <field name="name" />
                         <field name="description" />
                         <field name="process_category_id" />
-                        <field name="branch_id" />
+                        <!-- <field name="branch_id" /> -->
                     </group>
                 </sheet>
             </form>

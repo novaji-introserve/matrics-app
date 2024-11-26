@@ -6,13 +6,17 @@
         <field name="arch" type="xml">
             <tree string="Alert Rules">
                 <field name="name"/>
-                <field name="sql_text" />
+                <!-- <field name="sql_text" /> -->
                 <field name="frequency_id" />
-                <field name="process_category" />
+                <field name="process_category_id" />
                 <field name="process_id" />
                 <field name="status_id" />
                 <field name="alert_group_id" />
-                <field name="risk_rating" />
+                <field name="risk_rating" 
+                        decoration-success="risk_rating == 5"
+                        decoration-primary="risk_rating == 7"
+                        decoration-danger="risk_rating == 3"
+                        widget="badge"/>     
                 <field name="last_checked" />
                 <field name="date_created" />
             </tree>
@@ -35,7 +39,7 @@
                     <group>
                    
                     <group class="col-md-6 col-12">
-                        <field name="process_category" />
+                        <field name="process_category_id" />
                        
                         <field name="sql_text" />
                         <field name="frequency_id" />
@@ -43,7 +47,7 @@
                       
                     </group>
                     <group class="col-md-6 col-12">
-                        <field name="process_id" attrs="{'invisible': [('process_category', '=', False)]}" />
+                        <field name="process_id"/>
                         <field name="alert_group_id" />
                         <field name="risk_rating" />
                         <field name="date_created" readonly="1" />
