@@ -26,7 +26,7 @@
         'views/menus.xml',
         'views/alert_rules_view.xml',
         'views/alert_group_view.xml',
-        'views/alert_rules_status_view.xml',
+        'views/alert_rule_status_view.xml',
         'views/account_monitoring_views.xml',
         'views/transaction_rule.xml',
         'views/transaction_monitoring_views.xml',
@@ -35,10 +35,10 @@
         'views/process_category_view.xml',
         'views/process_view.xml',
         'views/mail_template.xml',
-        'views/fraud_monitoring.xml',
+        'views/fraud_monitoring_views.xml',
         'views/frequency_view.xml',
         'views/branch_view.xml',
-        'views/chron_job.xml',
+        'views/cron_job.xml',
         
     ],
 
