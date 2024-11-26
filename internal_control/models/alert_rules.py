@@ -26,15 +26,6 @@ class alert_rules(models.Model):
     date_created = fields.Datetime(string="created_at", default=datetime.now(lagos_timezone).replace(tzinfo=None))
     last_checked = fields.Datetime(string="last_checked", default=datetime.now(lagos_timezone).replace(tzinfo=None))
 
-
-    # @api.model
-    # def _get_all_process_category(self):
-    #     rows = self.env['process.category'].search([])
-    #     selection = [(each.name, each.name) for each in rows]
-        
-    #     return selection
-    
- 
             
     
     @api.model
@@ -96,7 +87,7 @@ class alert_rules(models.Model):
                         "email": rule.alert_group.email,
                         "branch_name": rule.process_id.branch_id.branch_name,
                     }  # Pass any data you need here
-                    ).send_mail(self.id, force_send=True)
+                    ).send_mail(rule.id, force_send=True)
                   
                     rule.write({'last_checked': datetime.now(pytz.utc).replace(tzinfo=None)})
    
