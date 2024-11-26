@@ -8,7 +8,7 @@ class Process(models.Model):
     name = fields.Char(string="Name", required=True)
     description = fields.Char(string="Description", required=True)
     process_category_id = fields.Many2one('process.category', string="Process Category")
-    branch_id = fields.Many2one('tbl.branch', string="Branch", required=True)
+    # branch_id = fields.Many2one('tbl.branch', string="Branch", required=True)
 
 
    

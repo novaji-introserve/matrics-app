@@ -15,24 +15,24 @@ class alert_rules(models.Model):
     narration = fields.Html(string="narration", required=True)
     sql_text = fields.Text(string="SQL Query", required=True, Tracking=True)
     frequency_id = fields.Many2one('exception.frequency', string="Frequency", required=True)
-    process_category = fields.Selection(selection=lambda self: self._get_all_process_category(), string="Process Category")
+    # process_category = fields.Selection(selection=lambda self: self._get_all_process_category(), string="Process Category")
     process_id = fields.Many2one('process', string="Process")
     process_category_id = fields.Many2one('process.category', string="Process Category", required=True)
     email_to = fields.Char(string="Email To", Tracking=True)
     status_id = fields.Many2one('alert.rules.status', string="Alert Status") 
     alert_group_id = fields.Many2one('alert.group', string="Alert Group")
-    process_id = fields.Many2one('process', string="Process", domain="[('process_category_id.name', '=', process_category)]")
+    process_id = fields.Many2one('process', string="Process", domain="[('process_category_id', '=', process_category_id)]")
     risk_rating = fields.Many2one("case.rating", string="Risk Rating")
     date_created = fields.Datetime(string="created_at", default=datetime.now(lagos_timezone).replace(tzinfo=None))
     last_checked = fields.Datetime(string="last_checked", default=datetime.now(lagos_timezone).replace(tzinfo=None))
 
 
-    @api.model
-    def _get_all_process_category(self):
-        rows = self.env['process.category'].search([])
-        selection = [(each.name, each.name) for each in rows]
+    # @api.model
+    # def _get_all_process_category(self):
+    #     rows = self.env['process.category'].search([])
+    #     selection = [(each.name, each.name) for each in rows]
         
-        return selection
+    #     return selection
     
  
             
