@@ -59,7 +59,6 @@
     <menuitem id="menu_internal_control_alert_monitoring"
               name="Alert Monitoring"
               parent="menu_internal_control_main"
-              action="compliance_management.open_transactions_done"
               sequence="30"/>
 
     <menuitem id="menu_internal_control_alert_rules_monitoring"
