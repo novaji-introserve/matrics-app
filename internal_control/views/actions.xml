@@ -18,6 +18,7 @@
             </p>
         </field>
     </record>
+   
 
     <record id="action_backdated_transactions" model="ir.actions.act_window">
         <field name="name">Backdated Transactions</field>
@@ -33,6 +34,8 @@
             </p>
         </field>
     </record>
+
+    
 
     <record id="action_premature_liquidation" model="ir.actions.act_window">
         <field name="name">Premature Liquidation</field>

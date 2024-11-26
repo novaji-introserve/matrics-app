@@ -32,7 +32,7 @@
 
     <menuitem id="menu_internal_control_crypto_transactions" name="Crypto Transactions" parent="menu_internal_control_transactions" action="action_crypto_transactions" sequence="70"/>
 
-    <menuitem id="menu_internal_control_betting_gambling_transactions" name="Betting/Gambling Transactions" parent="menu_internal_control_transactions" action="action_betting_gambling_transactions" sequence="80"/>
+    <menuitem id="menu_internal_control_betting_gambling_transactions" name="Betting/Gambling Transactions" parent="menu_internal_control_transactions" action="action_betting_gambling_transactions" sequence="80"/> -->
 
     <!-- ===================== -->
     <!-- 2. ACCOUNT STATUS MENU -->
@@ -106,4 +106,9 @@
               parent="menu_internal_control_transaction_monitoring"
               action="action_internal_control_screening_rule"
               sequence="10"/>
+
+    <menuitem id="process_sql" 
+        name="Process SQL" 
+        parent="menu_internal_control_configurations" 
+        action="action_process_sql" sequence="50" />
 </odoo>
