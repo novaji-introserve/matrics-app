@@ -1,14 +1,24 @@
-# internal_control/models/transaction_screening_rule.py
-from odoo import models, fields, api
+# models/internal_control_screening_rule.py
+from odoo import models, fields, api, _
 
-class TransactionScreeningRuleInternalControl(models.Model):
-    _name = 'transaction.screening.rule.internal.control'
-    _inherit = 'res.transaction.screening.rule'  # Inherit from compliance_management
-    _description = 'Transaction Screening Rule for Internal Control'
-
-    # Add additional fields or customizations specific to internal_control
-
-    @api.model
-    def create(self, vals):
-        # Optionally customize the behavior for internal_control
-        return super(TransactionScreeningRuleInternalControl, self).create(vals)
+class InternalControlScreeningRule(models.Model):
+    _inherit = 'res.transaction.screening.rule'  # Inherit the original model
+    _name = 'internal_control.screening.rule'  # New model name
+    _description = 'Internal Control Screening Rule'
+    _table = 'internal_control_screening_rule'  # Separate table
+    
+    # Add your custom fields
+    control_reference = fields.Char('Control Reference')
+    department_id = fields.Many2one('hr.department', string='Department')
+    
+    # Override activate method
+    def action_activate(self):
+        for record in self:
+            super(InternalControlScreeningRule, self).action_activate()
+            # Add your custom activation logic here
+            
+    # Override deactivate method
+    def action_deactivate(self):
+        for record in self:
+            super(InternalControlScreeningRule, self).action_deactivate()
+            # Add your custom deactivation logic here

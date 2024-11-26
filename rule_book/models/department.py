@@ -10,6 +10,13 @@ class Department(models.Model):
     # _description = 'Department'
 
     email = fields.Char(string="Department Email")
+
+    @api.model
+    def _get_user_department_domain(self):
+        employee = self.env.user.employee_id
+        if employee:
+            return [('department_id', '=', employee.department_id.id)]
+        return []
     
   
 # class BranchDepartment(models.Model):

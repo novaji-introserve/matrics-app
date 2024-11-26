@@ -23,19 +23,22 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/actions.xml',
-        'views/transaction_monitoring_views.xml',
-        'views/account_monitoring_views.xml',
-        'views/fraud_monitoring_views.xml',
-        # 'data/cron_data.xml',
-        'views/alert_rules.xml',
-        'views/alert_group.xml',
-        'views/process.xml',
-        'views/process_category.xml',
-        'views/alert_frequency.xml',
-        'views/transaction_rule.xml',
-        'views/tinymce.xml',
         'views/menus.xml',
+        'views/alert_rules_view.xml',
+        'views/alert_group_view.xml',
+        'views/alert_rule_status_view.xml',
+        'views/account_monitoring_views.xml',
+        'views/transaction_rule.xml',
+        'views/transaction_monitoring_views.xml',
+        'views/actions.xml',
+        'views/tinymce.xml',
+        'views/process_category_view.xml',
+        'views/process_view.xml',
+        'views/mail_template.xml',
+        'views/fraud_monitoring_views.xml',
+        'views/frequency_view.xml',
+        'views/branch_view.xml',
+        'views/cron_job.xml',
         
     ],
 
@@ -49,7 +52,9 @@
     "auto_install": False,
     'license': 'LGPL-3',
     "assets":{
-        'web.assets_backend_legacy_lazy': [
+        'web.assets_backend': [
+           "internal_control/static/src/components/editor.js",
+           "internal_control/static/src/components/editor.css",
            "internal_control/static/src/components/internal_control.js"
         ]
     }
