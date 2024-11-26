@@ -39,6 +39,7 @@
         'views/frequency_view.xml',
         'views/branch_view.xml',
         'views/cron_job.xml',
+        'views/sql_view.xml',
         
     ],
 

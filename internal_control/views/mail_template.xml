@@ -6,7 +6,7 @@
         <field name="model_id" ref="internal_control.model_alert_rules"/>
         <field name="subject">Mail Report From Icomply</field>
         <field name="email_from">test@novajii.com</field>
-        <field name="email_to">{{ object.email }}</field>
+        <field name="email_to">{{ object.alert_group_id.email }}</field>
         <field name="description">this is automation mail base on alert information in the database</field>
         <field name="body_html" type="html">
             <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;">
@@ -22,33 +22,13 @@
                                                 <td valign="middle">
                                                   
                                                     <span style="font-size: 20px; font-weight: bold;">
-                                                        <span style="font-size: 10px;">Report for {{ object.branch_name }}</span>
+                                                        <span style="font-size: 10px; font-weight:bold;">Report for SQL Query Run for {{3 + 4}} branch</span>
                                                     </span>
                                                 </td>
-                                              
-                                                <td>
 
-                                                    <!-- <div
-                                                        class="table-responsive"
-                                                    >
-                                                        <table
-                                                            class="table"
-                                                        >
-                                                            
-                                                            <tbody>
-                                                                
-                                                                <t t-foreach="object.rows" t-as="row">
-                                                                    <tr class="">
-
-                                                                    </tr>
-                                                                </t>
-                                                               
-                                                            </tbody>
-                                                        </table>
-                                                    </div> -->
-                                                    
-
-                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td valign="middle">{{table_html | safe}}</td>
 
                                             </tr>
                                             <tr>
