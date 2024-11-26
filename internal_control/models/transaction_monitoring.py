@@ -126,7 +126,81 @@ class TransactionMonitoring(models.Model):
         # Fetch the transactions (This is a read-only operation)
         transactions = self._fetch_transactions()
         
+        # Trigger the mismatched transactions server action
+        self.invoke_mismatched_transactions_action()
+        
         if transactions:
             _logger.info(f"Successfully fetched {len(transactions)} transactions.")
         else:
             _logger.warning("No transactions fetched or error occurred.")
+
+    @api.model
+    def get_date_mismatched_transactions(self):
+        """Fetch transactions where TranDate and Valuedate dates are different."""
+        _logger.info("Starting get_date_mismatched_transactions method...")
+        try:
+            # Query to extract and compare only the date part of TranDate and Valuedate
+            self.env.cr.execute("""
+                SELECT 
+                    id, 
+                    refno, 
+                    "TranDate", 
+                    "Valuedate", 
+                    LEFT("TranDate", 10) AS tran_date_only,
+                    LEFT("Valuedate", 10) AS value_date_only
+                FROM "tbl_transactions"
+                WHERE 
+                    LEFT("TranDate", 10) != LEFT("Valuedate", 10)
+            """)
+            mismatched_transactions = self.env.cr.fetchall()
+
+            _logger.info(f"Found {len(mismatched_transactions)} transactions with date mismatches.")
+
+            if mismatched_transactions:
+                for txn in mismatched_transactions[:10]:  # Log first 10 mismatches
+                    _logger.info(f"Mismatch - ID: {txn[0]}, RefNo: {txn[1]}, TranDate: {txn[2]}, ValueDate: {txn[3]}")
+
+                # Return an action to display these transactions in the UI
+                mismatched_ids = [txn[0] for txn in mismatched_transactions]
+                return {
+                    'type': 'ir.actions.act_window',
+                    'name': 'Transactions with Date Mismatch',
+                    'res_model': 'tbl_transactions',
+                    'view_mode': 'tree,form',
+                    'domain': [('id', 'in', mismatched_ids)],
+                    'target': 'current',
+                }
+            else:
+                _logger.info("No transactions with mismatched dates found.")
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'type': 'info',
+                        'message': 'No transactions with mismatched dates found.',
+                        'sticky': False,
+                    }
+                }
+        except Exception as e:
+            _logger.error(f"Error detecting date mismatches: {str(e)}")
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'danger',
+                    'message': f'Error detecting date mismatches: {str(e)}',
+                    'sticky': True,
+                }
+            }
+
+    @api.model
+    def invoke_mismatched_transactions_action(self):
+        """Invoke the server action to fetch mismatched transactions"""
+        _logger.info("Invoking the mismatched transactions action programmatically...")
+        
+        # Get the server action using its XML ID
+        action = self.env.ref('internal_control.action_mismatched_transactions')
+        
+        # Trigger the action
+        return action.read()[0]
+
