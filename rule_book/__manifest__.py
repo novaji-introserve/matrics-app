@@ -24,6 +24,7 @@
         # department/reports
         # Load security groups first
         "security/security_groups.xml",
+        'views/user_setting.xml',
 
         # "security/security.xml",
 
@@ -47,7 +48,9 @@
         #
         # "views/responsible.xml",
         "views/rules/rule_book.xml",
-        "data/email_templates/due_date_email.xml",
+        "data/email_templates/regulatory_due_date_email.xml",
+        "data/email_templates/instant_due_date_email.xml",
+
         "data/schedules/rule_book.xml",
         # "views/dashboard.xml",
         "data/settings/email_smtp.xml",
@@ -90,11 +93,11 @@
         'rule_book/static/src/components/*/*.scss',
         'rule_book/static/src/slider_field.xml',
         # Add JavaScript files
-        'custom_addons/icomply_odoo/rule_book/static/src/components/**/*.js',
+        'rule_book/static/src/components/**/*.js',
         # Add CSS files
-        'custom_addons/icomply_odoo/rule_book/static/src/components/**/*.css',
+        'rule_book/static/src/components/**/*.css',
         # Add XML files if applicable
-        'custom_addons/icomply_odoo/rule_book/static/src/components/**/*.xml',
+        'rule_book/static/src/components/**/*.xml',
        
 
     ]},
