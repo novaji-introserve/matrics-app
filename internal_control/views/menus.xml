@@ -12,11 +12,18 @@
     <!-- Transaction Monitoring Menu -->
     <menuitem id="menu_transaction_monitoring_root" name="Transaction Monitoring" parent="menu_internal_control_main" sequence="20"/>
 
+    <!-- All transactions -->
+    <!-- <menuitem id="menu_all_transactions_root" name="All Transactions" sequence="20" parent="menu_transaction_monitoring_root"/>
+
+    <menuitem id="menu_internal_control_transactions_to_review" name="Transactions to review" sequence="10" parent="menu_all_transactions_root" action="action_transactions_to_review"/>
+    <menuitem id="menu_internal_control_transactions_reviewed" name="Transactions Reviewed" sequence="20" parent="menu_all_transactions_root" action="action_transactions_reviewed"/>
+    <menuitem id="menu_internal_control_all_transactions" name="All Transactions" sequence="30" parent="menu_all_transactions_root" action="action_all_transactions"/> -->
+
     <!-- 1. Transaction Monitoring Category -->
-    <menuitem id="menu_internal_control_transactions" name="Transaction Monitoring" parent="menu_transaction_monitoring_root" sequence="20"/>
+    <menuitem id="menu_internal_control_transactions" name="Transaction Monitoring" parent="menu_transaction_monitoring_root" sequence="30"/>
 
     <!-- Transaction Monitoring Submenus -->
-    <menuitem id="menu_internal_control_reversed_transactions" name="Reversed Transactions" parent="menu_internal_control_transactions" action="action_reversed_transactions" sequence="10"/> -->
+    <menuitem id="menu_internal_control_reversed_transactions" name="Reversed Transactions" parent="menu_internal_control_transactions" action="action_reversed_transactions" sequence="10"/>
 
     <menuitem id="menu_internal_control_backdated_transactions" name="Backdated Transactions" parent="menu_internal_control_transactions" action="action_backdated_transactions" sequence="20"/>
 
@@ -26,19 +33,17 @@
 
     <menuitem id="menu_internal_control_cancelled_accounts" name="Cancelled Accounts" parent="menu_internal_control_transactions" action="action_cancelled_accounts" sequence="50"/>
 
-    <menuitem id="menu_internal_control_date_vs_value_date_accounts" name="Date vs Value Date" parent="menu_internal_control_transactions" action="action_date_vs_value_date_accounts" sequence="60"/>
-
-    <menuitem id="menu_internal_control_date_vs_value_date_accounts" name="Date vs Value Date" parent="menu_internal_control_transactions" action="action_date_vs_value_date_accounts" sequence="60"/>
+    <menuitem id="menu_internal_control_date_vs_value_date_accounts" name="Date Mismatch" parent="menu_internal_control_transactions" action="action_date_vs_value_date_accounts" sequence="60"/>
 
     <menuitem id="menu_internal_control_crypto_transactions" name="Crypto Transactions" parent="menu_internal_control_transactions" action="action_crypto_transactions" sequence="70"/>
 
-    <menuitem id="menu_internal_control_betting_gambling_transactions" name="Betting/Gambling Transactions" parent="menu_internal_control_transactions" action="action_betting_gambling_transactions" sequence="80"/> -->
+    <menuitem id="menu_internal_control_betting_gambling_transactions" name="Betting/Gambling Transactions" parent="menu_internal_control_transactions" action="action_betting_gambling_transactions" sequence="80"/>
 
     <!-- ===================== -->
     <!-- 2. ACCOUNT STATUS MENU -->
     <!-- ===================== -->
     <!-- Account status category -->
-    <menuitem id="menu_account_status_monitoring" name="Account Status &amp; Monitoring" parent="menu_transaction_monitoring_root" sequence="30"/>
+    <menuitem id="menu_account_status_monitoring" name="Account Status &amp; Monitoring" parent="menu_transaction_monitoring_root" sequence="40"/>
 
     <menuitem id="menu_account_reactivations" name="Account Reactivations" parent="menu_account_status_monitoring" action="action_account_reactivations" sequence="10"/>
 
@@ -48,7 +53,7 @@
     <!-- 3. FRAUD MONITORING MENU -->
     <!-- ===================== -->
     <!-- Account status category -->
-    <menuitem id="menu_account_fraud_monitoring" name="Fraud Monitoring" parent="menu_transaction_monitoring_root" sequence="40"/>
+    <menuitem id="menu_account_fraud_monitoring" name="Fraud Monitoring" parent="menu_transaction_monitoring_root" sequence="50"/>
 
     <menuitem id="menu_fraud_ledger_entries" name="Fraud Ledger Entries" parent="menu_account_fraud_monitoring" action="action_fraud_ledger_entries" sequence="10"/>
 
@@ -61,11 +66,7 @@
               parent="menu_internal_control_main"
               sequence="30"/>
 
-    <menuitem id="menu_internal_control_alert_rules_monitoring"
-              name="Alert Rules"
-              parent="menu_internal_control_alert_monitoring"
-              action="action_alert_rules"
-              sequence="10"/>
+    <menuitem id="menu_internal_control_alert_rules_monitoring" name="Alert Rules" parent="menu_internal_control_alert_monitoring" action="action_alert_rules" sequence="10"/>
 
 
     <!-- Configurations -->
@@ -74,32 +75,15 @@
               parent="menu_internal_control_main"
               sequence="40"/>
 
-    <menuitem id="menu_internal_control_alert_group"
-              name="Alert Group"
-              parent="menu_internal_control_configurations"
-              action="action_alert_group"
-              sequence="10"/>
+    <menuitem id="menu_internal_control_alert_group" name="Alert Group" parent="menu_internal_control_configurations" action="action_alert_group" sequence="10"/>
 
-    <menuitem id="menu_internal_control_alert_frequency"
-              name="Alert Frequency"
-              parent="menu_internal_control_configurations"
-              action="action_alert_frequency"
-              sequence="20"/>
+    <menuitem id="menu_internal_control_alert_frequency" name="Alert Frequency" parent="menu_internal_control_configurations" action="action_alert_frequency" sequence="20"/>
 
-    <menuitem id="menu_internal_control_process"
-              name="Processes"
-              parent="menu_internal_control_configurations"
-              action="action_process"
-              sequence="30"/>
+    <menuitem id="menu_internal_control_process" name="Processes" parent="menu_internal_control_configurations" action="action_process" sequence="30"/>
 
-    <menuitem id="menu_internal_control_process_category"
-              name="Process Category"
-              parent="menu_internal_control_configurations"
-              action="action_process_category"
-              sequence="40"/>
+    <menuitem id="menu_internal_control_process_category" name="Process Category" parent="menu_internal_control_configurations" action="action_process_category" sequence="40"/>
 
-    <menuitem id="menu_internal_control_transaction_monitoring"
-              name="Transaction Monitoring" parent="menu_internal_control_configurations" sequence="60"/>
+    <menuitem id="menu_internal_control_transaction_monitoring" name="Transaction Monitoring" parent="menu_internal_control_configurations" sequence="60"/>
 
     <menuitem id="menu_internal_control_transaction_rules"
               name="Rules"

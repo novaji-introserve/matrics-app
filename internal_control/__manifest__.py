@@ -23,24 +23,20 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/menus.xml',
+        'views/actions.xml',
         'views/alert_rules_view.xml',
         'views/alert_group_view.xml',
         'views/alert_history.xml',
         'views/account_monitoring_views.xml',
         'views/transaction_rule.xml',
         'views/transaction_monitoring_views.xml',
-        'views/actions.xml',
         'views/tinymce.xml',
-        'views/process_category_view.xml',
-        'views/process_view.xml',
         'views/mail_template.xml',
         'views/fraud_monitoring_views.xml',
-        'views/frequency_view.xml',
         'views/branch_view.xml',
         'views/cron_job.xml',
-        'views/sql_view.xml',
-        
+        'views/sql_view.xml', 
+        'views/menus.xml',
     ],
 
     'images': [

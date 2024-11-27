@@ -36,7 +36,7 @@
                         <group class="mt-3">
                             <field name="rulebook_name" readonly="1" widget="text" />
                             <field name="reply_date" readonly="1" />
-                            <field name="reply_content" widget="html" />
+                            <field name="reply_content" widget="text" />
                             <field name="document_filename" invisible="1" />
                             <field name="submission_timing" string="Submission Timing" />
 
@@ -85,7 +85,7 @@
 
     <!-- Action Definition -->
     <record id="action_reply_log" model="ir.actions.act_window">
-        <field name="name">Reply Log</field>
+        <field name="name">Rulebook Log</field>
         <field name="res_model">reply.log</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_reply_log_search"/>

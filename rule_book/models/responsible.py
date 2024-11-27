@@ -13,8 +13,8 @@ class Responsible(models.Model):
     bc = fields.Char(string='BC (Email List)', tracking=True)
 
 
-class ResCompany(models.Model):
-    _inherit = "res.company"
+# class ResCompany(models.Model):
+#     _inherit = "res.company"
 
-    partner_gid = fields.Char(string="Partner GID")
-    iap_enrich_auto_done = fields.Boolean(string='Automatic Enrichment Done')
+#     partner_gid = fields.Char(string="Partner GID")
+#     iap_enrich_auto_done = fields.Boolean(string='Automatic Enrichment Done')

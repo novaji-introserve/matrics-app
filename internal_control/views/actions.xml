@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+        <!-- All Transactions Action -->
+    <!-- <record id="action_all_transactions" model="ir.actions.act_window">
+        <field name="name">All Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reversed transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record> -->
+
+     <!-- Transactions to review Action -->
+    <!-- <record id="action_transactions_to_review" model="ir.actions.act_window">
+        <field name="name">Transactions to review</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reversed transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record> -->
+
+    <!-- Transactions Reviewed Action -->
+    <!-- <record id="action_transactions_reviewed" model="ir.actions.act_window">
+        <field name="name">Transactions Reviewed</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reversed transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record> -->
+
     <!-- ===================== -->
     <!-- 1. TRANSACTION MONITORING ACTIONS -->
     <!-- ===================== -->
@@ -83,10 +128,15 @@
     </record>
 
     <record id="action_date_vs_value_date_accounts" model="ir.actions.act_window">
-        <field name="name">Date vs Value Date Monitoring</field>
+        <field name="name">Trans Date &amp; Value Date Monitoring</field>
         <field name="res_model">tbl_transactions</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('TranDate', '!=', 'Valuedate')]</field>
+        <!-- <field name="domain">[('TranDate', '!=', 'Valuedate')]</field> -->
+        <field name="domain">[]</field>
+        <field name="context">{
+        'search_default_date_mismatch': 1
+    }</field>
+
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No date mismatch transactions found
@@ -94,6 +144,16 @@
             <p>
                 Transactions will appear here when they match monitoring criteria.
             </p>
+        </field>
+    </record>
+
+    <!-- Server Action to fetch transactions with mismatched dates -->
+    <record id="action_mismatched_transactions" model="ir.actions.server">
+        <field name="name">Fetch Mismatched Transactions</field>
+        <field name="model_id" ref="model_tbl_transactions"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.get_date_mismatched_transactions()
         </field>
     </record>
 

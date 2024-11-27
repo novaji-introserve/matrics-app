@@ -80,7 +80,7 @@
                         <group class="section-group" style="margin-top: 20px;">
                             <group col="2">
                                 <field name="frequency_type" placeholder="Select frequency type" />
-                                <field name="is_recurring" placeholder="Is this recurring?" />
+                                <field name="is_recurring" widget="boolean" placeholder="Is this recurring?" />
                             </group>
                             <group col="2">
                                 <field name="date_value" attrs="{'invisible': [('frequency_type', 'not in', ['date'])]}" placeholder="Enter date value" />
@@ -135,15 +135,16 @@
                             <field name="escalation_date" readonly="1" placeholder="Escalation date will be displayed here" />
                         </group>
                     </page>
-                    <!-- Internal Due Date Section -->
-                    <page string="Due Date" style="font-weight: bold;">
+
+                    <!-- Regulatory Due Date Section -->
+                    <page string="Regulatory Due Date" style="font-weight: bold;">
                         <group >
                             <group col="2">
-                                <field name="due_date_value" placeholder="Enter due due date value" />
-                                <field name="due_date_unit" placeholder="Select due due date unit" />
+                                <field name="due_date_value" placeholder="Enter Regulatory due due date value" />
+                                <field name="due_date_unit" placeholder="Select Regulatory due due date unit" />
                             </group>
                             <group col="2">
-                                <field name="due_date" readonly="1" placeholder="Due date will be shown here" />
+                                <field name="due_date" readonly="1" placeholder="Regulatory due date will be shown here" />
                             </group>
                         </group>
                     </page>
@@ -159,7 +160,8 @@
                             </group>
                             <group col="2">
                                 <field name="regulatory_agency_id" placeholder="Select regulatory agency"  />
-                                <field name="responsible_id" placeholder="Enter responsible department" attrs="{'invisible': True}"/>
+                                <!-- <field name="responsible_id" placeholder="Enter responsible department" attrs="{'invisible': True}"/> -->
+                                <field name="responsible_id" placeholder="Enter responsible department" groups="rule_book.group_compliance_manager_"/>
                                 <field name="officer_responsible" placeholder="Enter responsible officer's name" />
                                 <!-- <field name="officer_email" placeholder="Enter responsible officer's email" /> -->
                             </group>
