@@ -127,12 +127,12 @@
         </field>
     </record>
 
-    <!-- <record id="action_date_vs_value_date_accounts" model="ir.actions.act_window">
+    <record id="action_date_vs_value_date_accounts" model="ir.actions.act_window">
         <field name="name">Trans Date &amp; Value Date Monitoring</field>
         <field name="res_model">tbl_transactions</field>
-        <field name="view_mode">tree,form</field> -->
+        <field name="view_mode">tree,form</field>
         <!-- <field name="domain">[('TranDate', '!=', 'Valuedate')]</field> -->
-        <!-- <field name="domain">[]</field>
+        <field name="domain">[]</field>
         <field name="context">{
         'search_default_date_mismatch': 1
     }</field>
@@ -145,17 +145,17 @@
                 Transactions will appear here when they match monitoring criteria.
             </p>
         </field>
-    </record> -->
+    </record>
 
     <!-- Server Action to fetch transactions with mismatched dates -->
-    <!-- <record id="action_mismatched_transactions" model="ir.actions.server">
+    <record id="action_mismatched_transactions" model="ir.actions.server">
         <field name="name">Fetch Mismatched Transactions</field>
         <field name="model_id" ref="model_tbl_transactions"/>
         <field name="state">code</field>
         <field name="code">
             action = model.get_date_mismatched_transactions()
         </field>
-    </record> -->
+    </record>
 
     <record id="action_crypto_transactions" model="ir.actions.act_window">
         <field name="name">Crypto Transactions</field>
