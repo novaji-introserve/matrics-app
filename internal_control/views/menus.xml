@@ -111,4 +111,9 @@
         name="Process SQL" 
         parent="menu_internal_control_configurations" 
         action="action_process_sql" sequence="50" />
+        
+    <menuitem id="menu_alert_history" 
+        name="Alert History" 
+        parent="menu_internal_control_configurations" 
+        action="action_alert_history_status" sequence="60" />
 </odoo>

@@ -26,7 +26,7 @@
         'views/menus.xml',
         'views/alert_rules_view.xml',
         'views/alert_group_view.xml',
-        'views/alert_rule_status_view.xml',
+        'views/alert_history.xml',
         'views/account_monitoring_views.xml',
         'views/transaction_rule.xml',
         'views/transaction_monitoring_views.xml',

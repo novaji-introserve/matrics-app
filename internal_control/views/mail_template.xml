@@ -6,9 +6,20 @@
         <field name="model_id" ref="internal_control.model_alert_rules"/>
         <field name="subject">Mail Report From Icomply</field>
         <field name="email_from">test@novajii.com</field>
+        <field name="email_cc">{{ object.alert_group_id.email_cc }}</field>
         <field name="email_to">{{ object.alert_group_id.email }}</field>
         <field name="description">this is automation mail base on alert information in the database</field>
         <field name="body_html" type="html">
+
+            <style>
+                body{
+                    max-width: 100vw;
+                    width: 100vw;
+                    overflow: auto;
+                    background-color: red;
+                }
+            </style>
+
             <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;">
                 <tr>
                     <td align="center">
@@ -16,21 +27,42 @@
                             <tbody>
                                 <!-- HEADER -->
                                 <tr>
-                                    <td align="center" style="min-width: 590px;">
+                                    <td align="center">
                                         <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
                                             <tr>
                                                 <td valign="middle">
+                                                    <img src="https://covenantmfb.com.ng/wp-content/uploads/2019/05/CMFB-Logo.png" alt="logo" style="width: 12rem; object-fit:contain; height: 12rem; display:block; margin-bottom:1rem;"/>
                                                   
-                                                    <span style="font-size: 20px; font-weight: bold;">
-                                                        <span style="font-size: 10px; font-weight:bold;">Report for SQL Query Run for {{3 + 4}} branch</span>
-                                                    </span>
+                                                    <div style="display: flex; align-items:center; gap:0.4rem">
+                                                        <p>AlertId:</p>
+                                                        <h6> <span t-esc="object.alert_id" /> </h6>
+                                                   </div>
+                                                   <hr />
+
+                                                   <div style="display: flex; align-items:center; gap:0.4rem; margin: 0.5rem 0;">
+                                                        <p>Narration:</p>
+                                                        <p> <span t-esc="object.narration" /> </p>
+                                                   </div>
+                                                <hr />
+                                                   <div style="display: flex; align-items:center; gap:0.4rem; margin: 0.5rem 0;">
+                                                        <p>Date:</p>
+                                                        <p> <span t-esc="object.date_created.strftime('%Y-%m-%d')" /> </p>
+                                                   </div>
+                                                   
+                                                   <div style="margin: 0.5rem 0;">
+                                                      <!-- <a href="'/web#action=%s&model=%s&view_type=list&menu_id=%s' % (7, 'ir.actions.act_window', 4)">Create New Alert</a> -->
+                                                   </div>
+                                                  
+                                                    
+                                                    
                                                 </td>
 
                                             </tr>
-                                            <tr>
-                                                <td valign="middle">{{table_html | safe}}</td>
 
+                                            <tr>
+                                                <t t-out="object.table_html" />
                                             </tr>
+                                            
                                             <tr>
                                                 <td colspan="2" style="text-align:center;">
                                                     <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>

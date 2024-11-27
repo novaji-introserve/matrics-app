@@ -8,7 +8,7 @@
                 <field name="name" />
                 <field name="email" />
                 <!-- <field name="email_list"  /> -->
-                <!-- <field name="email_cc" /> -->
+                <field name="email_cc" />
                 <field name="state" />
                 <field name="tag" />
                 <field name="date_created"  readonly="1"/>
