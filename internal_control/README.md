@@ -89,3 +89,6 @@ If you encounter any issues:
 - Backup your database before performing these operations
 - Ensure sufficient disk space for the import operation
 - Monitor the database logs for any errors during the process
+- Do not alter the order in which views are called in the manifest.
+- Always ensure that actions are loaded before menus.
+- This means that if you're adding actions in your views, they must be loaded prior to the menus.
