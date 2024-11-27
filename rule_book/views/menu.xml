@@ -11,6 +11,7 @@
       <field name="res_model">rulebook.theme</field>
       <field name="view_mode">tree,form</field>
     </record> -->
+    
     <!-- rule book source -->
     <record id="action_rulebook_sources" model="ir.actions.act_window">
       <field name="name">Rulebook Sources</field>

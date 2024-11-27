@@ -3,12 +3,12 @@
 
     <!-- Internal Due Date Reminder -->
      <record id="email_template_internal_due_date_" model="mail.template">
-            <field name="name">Internal Due Date Reminder for Rulebook</field>
+            <field name="name">Regulatory Due Date Reminder for Rulebook</field>
             <field name="email_from">{{object.data()['email_from']}}</field>
             <field name="model_id" ref="rule_book.model_rulebook" />
             <field name="email_cc">{{object.data()['email_from']}}</field>
             <field name="email_to">{{object.data()['email_to']}}</field>
-            <field name="subject">Internal Due Date for {{object.data()['title']}}</field>
+            <field name="subject">Reminder: Regulatory Due Date for {{object.data()['title']}}</field>
             <field name="body_html" type="html">
                 <div style="font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0;">
                     <div style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border: 1px solid #E0E0E0; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">

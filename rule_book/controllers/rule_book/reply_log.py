@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 
 
 class ReplyController(http.Controller):
-    
+
     def get_lagos_date(self):
         # Get the current UTC time
         utc_now = datetime.now(pytz.UTC)
@@ -41,10 +41,10 @@ class ReplyController(http.Controller):
         currentday2 = self.get_lagos_date()
         _logger.critical(
             f"now formatted: {now}, start formatted minus 30 minute{start_window} ,end  formatted plus 30 minute {end_window}")
-        
+
         _logger.critical(
             f"this is the odoo string version,  start formatted minus 30 minute{start_window_str} ,end  formatted plus 30 minute {end_window_str}, year {current_year}")
-        
+
         _logger.critical(
             f"Now1 timestamp, {now1} ,Now2 timestamp {now2} ,  current day {currentday} , current day formatted {currentday2}")
 
@@ -60,7 +60,8 @@ class ReplyController(http.Controller):
 
         # Search for awaiting replies
         awaiting_replies = request.env['reply.log'].search([
-            ("rulebook_status", "not in", ["completed", "reviewed"]),
+            ("rulebook_status", "not in", [
+             "completed", "reviewed", "pending"]),
             # Ensure we use rulebook_id here
             ("rulebook_id", "not in", list(completed_rulebook_ids))
         ])
