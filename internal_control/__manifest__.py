@@ -33,10 +33,16 @@
         'views/tinymce.xml',
         'views/mail_template.xml',
         'views/fraud_monitoring_views.xml',
+        'views/frequency_view.xml',
+        'views/process_view.xml',
+        'views/process_category_view.xml',
         'views/branch_view.xml',
+        'views/department.xml',
+        # 'views/user_profile.xml',
         'views/cron_job.xml',
         'views/sql_view.xml', 
         'views/menus.xml',
+        
     ],
 
     'images': [

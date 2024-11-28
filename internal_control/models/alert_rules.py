@@ -42,7 +42,7 @@ class alert_rules(models.Model):
     )
     last_checked = fields.Datetime(string="last_checked", default=lambda self:  utc_time.replace(tzinfo=None))
     branch_id = fields.Many2one('tbl.branch', string="Branch", required=True)
-    alert_id = fields.Char(string="alert_id", required=True)
+    alert_id = fields.Char(string="alert_id")
 
 
     @api.onchange('sql_text')
@@ -71,6 +71,7 @@ class alert_rules(models.Model):
         unit = rule.frequency_id.name
         period = rule.frequency_id.period
         next_check = ''
+    
         
         
         
@@ -78,7 +79,7 @@ class alert_rules(models.Model):
             next_check = last_checked + timedelta(minutes=period)
             
             
-        elif unit == 'hourly':
+        elif unit == 'hourly': 
             next_check = last_checked + timedelta(hours=period)
 
             
@@ -98,9 +99,7 @@ class alert_rules(models.Model):
         
         current_time_lagos = datetime.now(lagos_timezone)
         
-        print("next time in lagos")
-        print(next_check)
-        print("************************************************")
+       
         
         if current_time_lagos.year == next_check.year and current_time_lagos.month == next_check.month and  current_time_lagos.day == next_check.day and current_time_lagos.hour == next_check.hour and current_time_lagos.minute == next_check.minute:
             print("sent ") 
@@ -109,6 +108,11 @@ class alert_rules(models.Model):
     
     def send_alert(self, rule):
         try:
+                # update last checked
+                rule.write({'last_checked': utc_time.replace(tzinfo=None)})
+                
+                
+                           
                 self.env.cr.execute(rule.sql_text.query)
                 rows = self.env.cr.fetchall()
                 
@@ -148,7 +152,7 @@ class alert_rules(models.Model):
                
                 table_html = """
                 <table class="table table-bordered table-hover" style="width: 100%; max-width: 100vw; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #ddd; overflow:auto;">
-                    <thead style="background-color: #007046; color: #343a40; text-align: left; padding: 8px;">
+                    <thead style="background-color: #007046; color: #fff; padding: 12px;">
                         <tr>
                             <!-- Table headers -->
                             {header_columns}
@@ -161,14 +165,14 @@ class alert_rules(models.Model):
                 """
                         
                 # Generate the table header
-                header_html = "".join([f"<th style='padding: 8px; text-align: left; background-color: #f8f9fa;'>{header}</th>" for header in column_headers])
+                header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in column_headers])
 
                 # Generate the table rows
                 rows_html = ""
                 for row in rows:
                     rows_html += "<tr>"
                     for cell in row:
-                        rows_html += f"<td style='padding: 8px; text-align: left; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
+                        rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
                     rows_html += "</tr>"
 
                 # Insert the generated HTML into the main table structure
@@ -198,15 +202,10 @@ class alert_rules(models.Model):
                             
                         })
                        
-                    #    update last checked
-
-                        rule.write({"last_checked": utc_time.replace(tzinfo=None)})
+                    #   
+                         
                     
-                    # reload the page to avoid time lagging issues
-                        return {
-                            'type': 'ir.actions.client',
-                            'tag': 'reload',
-                        }
+                    
                         
         
                 else:

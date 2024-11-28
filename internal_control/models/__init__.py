@@ -11,3 +11,5 @@ from . import process
 from . import transaction_screening_rule
 from . import sql
 from . import alert_history
+from . import department
+from . import user_profile

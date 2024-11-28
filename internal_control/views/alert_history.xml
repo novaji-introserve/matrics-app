@@ -9,7 +9,6 @@
                 <field name="alert_id" />
                 <field name="alert_rule_id" />
                 <field name="attachment" />
-                <field name="html_body" />
             </tree>
         </field>
     </record>

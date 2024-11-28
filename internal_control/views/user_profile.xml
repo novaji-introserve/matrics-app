@@ -1,0 +1,55 @@
+<odoo>
+    <data>
+        <!-- Tree View for UserProfile -->
+        <record id="view_users_tree_inherited" model="ir.ui.view">
+            <field name="name">res.users.tree.inherited</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_tree" /> <!-- Inherit the original tree view -->
+            <field name="arch" type="xml">
+                <!-- Add the fields before the first column in the tree -->
+                <xpath expr="//tree" position="inside">
+                    <!-- <field name="dept_code" />
+                    <field name="role_id" />
+                    <field name="ip_address" />
+                    <field name="login_status" />
+                    <field name="phone_no" />
+                    <field name="status" />
+                    <field name="target_amt" /> -->
+                </xpath>
+            </field>
+        </record>
+
+
+
+
+        <!-- Inherited Form View for res.users to include additional fields -->
+            <record id="view_users_form_inherited" model="ir.ui.view">
+            <field name="name">users.form.inherited</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form" />
+            <field name="arch" type="xml">
+                <!-- Add the fields before the group_user section -->
+           
+                
+            </field>
+        </record> 
+
+        <!-- Action to open the views -->
+        <!-- <record id="action_user_profile" model="ir.actions.act_window">
+            <field name="name">Users Profile</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.users</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_users_tree_inherited" />
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add user profile
+                </p>
+            </field>
+        </record> -->
+
+        
+       
+
+    </data>
+</odoo>
