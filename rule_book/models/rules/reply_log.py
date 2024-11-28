@@ -9,8 +9,12 @@ from odoo.tools import format_date
 from odoo.exceptions import AccessError
 from odoo.http import request
 import pytz
+import os
 
 
+from dotenv import load_dotenv
+
+load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
@@ -31,7 +35,6 @@ class ReplyLog(models.Model):
         default=lambda self: self.env.user.department_id.id,
         help="The department this reply log belongs to",
         tracking=True,
-
     )
 
     rulebook_name = fields.Char(
@@ -128,6 +131,48 @@ class ReplyLog(models.Model):
         tracking=True,
 
     )
+    
+    formatted_reply_date = fields.Char(
+        string="Formatted Reply Date",
+        compute="_compute_formatted_reply_date",
+    )
+    
+    formatted_rulebook_date = fields.Char(
+        string="Formatted Rulebook Date",
+        compute="_compute_formatted_rulebook_date",
+    )
+    
+    frequency_type = fields.Selection(
+        related='rulebook_id.frequency_type',
+        string='Frequency Type',
+        readonly=True,
+        help="Frequency type from the associated rulebook"
+    )
+
+    @api.depends("rulebook_compute_date")
+    def _compute_formatted_rulebook_date(self):
+        for record in self:
+            if record.rulebook_compute_date:
+                # Format the date as desired
+                tz = pytz.timezone("Africa/Lagos")
+                local_dt = pytz.utc.localize(
+                    record.rulebook_compute_date).astimezone(tz)
+                record.formatted_rulebook_date = local_dt.strftime(
+                    "%B %d, %Y %H:%M")
+            else:
+                record.formatted_rulebook_date = "N/A"
+
+    @api.depends("reply_date")
+    def _compute_formatted_reply_date(self):
+        for record in self:
+            if record.reply_date:
+                # Format the date as desired
+                tz = pytz.timezone("Africa/Lagos")
+                local_dt = pytz.utc.localize(record.reply_date).astimezone(tz)
+                record.formatted_reply_date = local_dt.strftime(
+                    "%B %d, %Y %H:%M")
+            else:
+                record.formatted_reply_date = ""
 
     @api.model
     def open_reply_log(self):
@@ -157,43 +202,66 @@ class ReplyLog(models.Model):
             }
         }
         
-    # @api.model
     # def write(self, vals):
-    #     """Overrides the default write method to enforce rules."""
-    #     for record in self:
-    #         # Check if reply_content or document is being updated
-    #         if "reply_content" in vals or "document" in vals:
-    #             # Ensure both fields are provided
-    #             if not vals.get("reply_content", record.reply_content):
-    #                 raise AccessError(
-    #                     _("You must provide a reply note before updating."))
-    #             if not vals.get("document", record.document):
-    #                 raise AccessError(
-    #                     _("You must upload a file before updating."))
+    #     """
+    #     Overrides the default write method to enforce rules for reply logs.
+        
+    #     Provides flexible validation and logging for different update scenarios.
+    #     """
+    #     # Comprehensive logging for debugging
+    #     _logger.critical(f"Write method called")
+    #     _logger.critical(f"Current environment context: {self.env.context}")
+    #     _logger.critical(f"Current user: {self.env.user.name}")
+    #     _logger.critical(f"Write vals: {vals}")
 
-    #             # Change status to submitted if both fields are set
-    #             vals["rulebook_status"] = "submitted"
+    #     # Fields that trigger detailed validation
+    #     reply_submission_fields = ['reply_content', 'document']
+        
+    #     # Determine if this is a reply submission context
+    #     is_reply_submission = any(field in vals for field in reply_submission_fields)
 
-    #             # Call the external method in a controller
-    #             request.env["rulebook.controller"].sudo(
-    #             ).trigger_escalation_alert(record)
-   
+    #     # Perform specific validations for reply submission
+    #     if is_reply_submission:
+    #         for record in self:
+    #             # Validate reply content
+    #             if 'reply_content' in vals:
+    #                 reply_content = vals.get('reply_content', '')
+    #                 if not reply_content:
+    #                     raise AccessError(_("You must provide a substantive reply note before updating."))
 
+    #             # Validate document
+    #             if 'document' in vals:
+    #                 if not vals.get('document', False):
+    #                     raise AccessError(_("You must upload a valid document before updating."))
 
-    #     return super(ReplyLog, self).write(vals)
+    #             # Update status and timestamp for reply submissions
+    #             vals['rulebook_status'] = 'submitted'
+    #             vals['reply_date'] = fields.Datetime.now()
+
+    #     try:
+    #         # Perform the write operation
+    #         result = super(ReplyLog, self).write(vals)
+            
+    #         # Optional post-write processing
+            
+    #         return result
+        
+    #     except Exception as e:
+    #         _logger.error(f"Error during write operation: {str(e)}")
+    #         raise
 
     def write(self, vals):
         """Overrides the default write method to enforce rules."""
         for record in self:
             # Check if reply_content or document is being updated
-            if "reply_content" in vals or "document" in vals:
+             if "reply_content" in vals or "document" in vals:
                 # Ensure both fields are provided
-                if not vals.get("reply_content", record.reply_content):
-                    raise AccessError(
-                        _("You must provide a reply note before updating."))
-                if not vals.get("document", record.document):
+                if "reply_content" in vals and not vals["reply_content"]:
+                    raise AccessError(_("You must provide a reply note before updating."))
+                
+                if "document" in vals and not vals["document"]:
                     raise AccessError(_("You must upload a file before updating."))
-
+            
                 # Change status to submitted if both fields are set
                 vals["rulebook_status"] = "submitted"
                 vals["reply_date"]= fields.Datetime.now()
@@ -202,14 +270,14 @@ class ReplyLog(models.Model):
         result = super(ReplyLog, self).write(vals)
 
         
-        rulebook = request.env["rulebook"].sudo().browse(
-            int(record.rulebook_id))
+        rulebook = request.env["rulebook"].sudo().browse(int(record.rulebook_id))
+        
         url = request.env["rulebook"]._record_link(
             record.id, model_name='reply.log')
 
 
         global_data = {
-            "email_from": "leonell4fame@gmail.com",
+            "email_from":  os.getenv("EMAIL_FROM"),
             "email_to": rulebook.first_line_escalation.email,
             "name":  rulebook.type_of_return,
             "title":  rulebook.name.name,
@@ -220,10 +288,12 @@ class ReplyLog(models.Model):
         self.set_global_data(global_data)
 
         for record in self:
-            if record.rulebook_status == 'submitted':
+            if record.rulebook_status == 'submitted' and rulebook.first_line_escalation:
                 self.trigger_escalation_alert(record)
 
         return result
+    
+    
     
     def trigger_escalation_alert(self, report):
         # Logic for sending email to escalation officers
@@ -280,8 +350,15 @@ class ReplyLog(models.Model):
     def _compute_rulebook_name_stripped(self):
         for record in self:
             if record.rulebook_id:
+                rulebook_name = record.rulebook_id.type_of_return or ""
 
-                record.rulebook_name = record.rulebook_id.type_of_return
+                # Check if the string contains HTML tags
+                if re.search(r"<[^>]+>", rulebook_name):
+                    # Strip HTML tags
+                    record.rulebook_name = re.sub(r"<[^>]+>", "", rulebook_name)
+                else:
+                    # No HTML tags; use the name as is
+                    record.rulebook_name = rulebook_name
             else:
                 record.rulebook_name = ""
 

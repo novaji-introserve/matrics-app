@@ -106,7 +106,7 @@ class RuleBookController(http.Controller):
             # Prepare global data
             current_year = datetime.now().year
             global_data = {
-                "email_from": "leonell4fame@gmail.com",
+                "email_from":  os.getenv("EMAIL_FROM"),
                 "email_to": rulebook.first_line_escalation.email,
                 "name":  rulebook.type_of_return,
                 "title":  rulebook.name.name,

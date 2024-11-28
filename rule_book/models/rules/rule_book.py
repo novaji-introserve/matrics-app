@@ -936,7 +936,7 @@ class Rulebook(models.Model):
                 "regulatory_name": self.regulatory_agency_id.name or "N/A",
                 "risk_category": self.risk_category.name if self.risk_category else "N/A",
                 "email_to": self.officer_responsible.email or "N/A",
-                "email_from": os.getenv("EMAIL_FROM", "default@example.com"),
+                "email_from": os.getenv("EMAIL_FROM"),
                 "email_cc":", ".join(self.officer_cc.mapped('email')) or ""
             }
 
@@ -1009,6 +1009,17 @@ class Rulebook(models.Model):
             'next_due_date': self.next_due_date
         }
         
+    def _prepare_reply_log_vals_for_update(self, submission_status, submission_time):
+        """
+        Prepare values for reply log creation with only specific fields
+        """
+        return {
+            'reporter': self.officer_responsible.id if self.officer_responsible else None,
+            'department_id': self.responsible_id.id if self.responsible_id else None,
+            'rulebook_compute_date': self.computed_date,
+            'next_due_date': self.next_due_date
+        }
+        
         
     @api.model
     def create(self, vals):
@@ -1060,7 +1071,6 @@ class Rulebook(models.Model):
     def write(self, vals):
         # Log the record ID for debugging
         self._update_risk_rating(vals)
-        
 
         # Call the super method and capture the result (typically a boolean)
         result = super(Rulebook, self).write(vals)
@@ -1094,7 +1104,7 @@ class Rulebook(models.Model):
             submission_status = 'pending' 
             submission_time = 'pending'
 
-            reply_log_vals = self._prepare_reply_log_vals(
+            reply_log_vals = self._prepare_reply_log_vals_for_update(
                 submission_status,
                 submission_time
             )
@@ -1744,46 +1754,46 @@ class Rulebook(models.Model):
             rulebook._compute_next_due_date()
             
             
-    def _post_email_to_reply_log(self, message):
-        """Post a copy of the email message to the reply.log chatter"""
-        # Create or get a reply log record
-        ReplyLog = self.env['reply.log']
-        reply_log = ReplyLog.search(
-            [('name', '=', f'Log for {self.name}')], limit=1)
-        if not reply_log:
-            reply_log = ReplyLog.create({'name': f'Log for {self.name}'})
+    # def _post_email_to_reply_log(self, message):
+    #     """Post a copy of the email message to the reply.log chatter"""
+    #     # Create or get a reply log record
+    #     ReplyLog = self.env['reply.log']
+    #     reply_log = ReplyLog.search(
+    #         [('name', '=', f'Log for {self.name}')], limit=1)
+    #     if not reply_log:
+    #         reply_log = ReplyLog.create({'name': f'Log for {self.name}'})
 
-        # Get related partners from users/employees
-        recipient_partners = []
-        if message.email_to:
-            # If sending to users
-            users = self.env['res.users'].search(
-                [('email', 'in', message.email_to.split(','))])
-            recipient_partners.extend(users.mapped('partner_id').ids)
+    #     # Get related partners from users/employees
+    #     recipient_partners = []
+    #     if message.email_to:
+    #         # If sending to users
+    #         users = self.env['res.users'].search(
+    #             [('email', 'in', message.email_to.split(','))])
+    #         recipient_partners.extend(users.mapped('partner_id').ids)
 
-            # If sending to employees
-            employees = self.env['hr.employee'].search(
-                [('work_email', 'in', message.email_to.split(','))])
-            recipient_partners.extend(
-                employees.mapped('user_id.partner_id').ids)
+    #         # If sending to employees
+    #         employees = self.env['hr.employee'].search(
+    #             [('work_email', 'in', message.email_to.split(','))])
+    #         recipient_partners.extend(
+    #             employees.mapped('user_id.partner_id').ids)
 
-        reply_log.message_post(
-            body=message.body,
-            subject=message.subject,
-            message_type='email',
-            subtype_id=self.env.ref('mail.mt_comment').id,
-            email_from=message.email_from,
-            # Only include partner_ids if we have any
-            partner_ids=recipient_partners if recipient_partners else None,
-            attachment_ids=message.attachment_ids.ids,
-        )
+    #     reply_log.message_post(
+    #         body=message.body,
+    #         subject=message.subject,
+    #         message_type='email',
+    #         subtype_id=self.env.ref('mail.mt_comment').id,
+    #         email_from=message.email_from,
+    #         # Only include partner_ids if we have any
+    #         partner_ids=recipient_partners if recipient_partners else None,
+    #         attachment_ids=message.attachment_ids.ids,
+    #     )
 
-    def message_post(self, **kwargs):
-        """Override to copy messages to reply.log"""
-        message = super().message_post(**kwargs)
-        if kwargs.get('message_type') == 'email':
-            self._post_email_to_reply_log(message)
-        return message
+    # def message_post(self, **kwargs):
+    #     """Override to copy messages to reply.log"""
+    #     message = super().message_post(**kwargs)
+    #     if kwargs.get('message_type') == 'email':
+    #         self._post_email_to_reply_log(message)
+    #     return message
 
     def submit_report(self):
         """Submit the report and notify responsible parties."""

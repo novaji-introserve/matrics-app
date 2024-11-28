@@ -47,7 +47,7 @@
                     <group col="2">
                         <field name="name" class="input" placeholder="Select rulebook title" />
                         <!-- <field name="theme_id" placeholder="Select a theme" /> -->
-                        <field name="type_of_return" placeholder="Specify type of return" class="text_field" />
+                        <field name="type_of_return" placeholder="Specify type of return" class="text_field" widget="text" options="{'sanitize': True}" />
                     </group>
                     <group col="1" style="grid-column: span 2;">
                         <field name="description" placeholder="Describe the return on this rulebook" class="text_field" />
