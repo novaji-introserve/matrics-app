@@ -11,6 +11,8 @@ import calendar
 import logging
 from datetime import date
 from babel.dates import format_datetime
+import traceback
+
 
 
 _logger = logging.getLogger(__name__)
@@ -337,74 +339,13 @@ class Rulebook(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
-    
-    # @api.model
-    # def open_rulebooks(self):
-    #     # Check if user belongs to compliance or COO groups
-    #     compliance_group = self.env.ref('group_compliance_manager_')
-    #     # coo_group = self.env.ref('rule_book.group_coo_')
-
-    #     if compliance_group in self.env.user.groups_id in self.env.user.groups_id:
-    #         # No domain restrictions for these groups
-    #         domain = []
-    #     else:
-    #         # Restrict to user's department for other groups
-    #         if not self.env.user.department_id:
-    #             raise AccessError(
-    #                 "You must be assigned to a department to view rulebooks.")
-    #         domain = [('responsible_id', '=', self.env.user.department_id.id)]
-
-    #     return {
-    #         'name': 'RuleBooks',
-    #         'type': 'ir.actions.act_window',
-    #         'res_model': 'rulebook',
-    #         'view_mode': 'tree,form,kanban',
-    #         'domain': domain,
-    #         'context': {
-    #             'search_default_not_deleted': 1,
-    #             'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
-    #         }
-    #     }
-
-    
-    # @api.model
-    # def open_rulebooks(self):
-    #     # Define the restricted group
-    #     restricted_group = self.env.ref('rule_book.group_department_user_')
-
-    #     # Check if the user belongs to the restricted group
-    #     if restricted_group in self.env.user.groups_id:
-    #         # Check if the user has a department
-    #         if not self.env.user.department_id:
-    #             raise AccessError(
-    #                 "You must be assigned to a department to view rulebooks.")
-
-    #         # Apply restriction to the domain
-    #         domain = [('responsible_id', '=', self.env.user.department_id.id)]
-    #     else:
-    #         # No restrictions for other users
-    #         domain = []
-
-    #     # Return the action to open rulebook records
-    #     return {
-    #         'name': 'RuleBooks',
-    #         'type': 'ir.actions.act_window',
-    #         'res_model': 'rulebook',  # This is your target model
-    #         'view_mode': 'tree,form,kanban',
-    #         'domain': domain,
-    #         'context': {
-    #             'search_default_not_deleted': 1,
-    #             'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
-    #         }
-    #     }
-    
+   
    
         
     def data(self):
         # send the global value to the email template
         return global_data
 
-    # * functinos
 
     # to open up vie resolution button
     def open_reply_log(self):
@@ -451,17 +392,93 @@ class Rulebook(models.Model):
         _logger.critical(f"{base_url}/report_submission/{appendedValue}")
         return f"{base_url}/report_submission/{appendedValue}"
 
-    def _record_link(self, id):
-        _logger.critical(id)
-        base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
-        #
-        return f"{base_url}/web#id={id}&cids=1&menu_id=277&action=423&model=rulebook&view_type=form"
+
+    
+    # def _record_link(self, record_id):
+    #     """Generate a dynamic URL to access the record form view."""
+    #     _logger.critical(record_id)
+
+    #     # Get the base URL from system parameters
+    #     base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
+
+    #     # Fetch the default action ID for the model dynamically
+    #     action = self.env["ir.actions.act_window"].search(
+    #         [("res_model", "=", "rulebook")], limit=1
+    #     )
+
+    #     # Fetch the default menu ID for the rulebook model
+    #     menu = self.env["ir.ui.menu"].search(
+    #         [("action", "=", f"ir.actions.act_window,{action.id}")], limit=1
+    #     )
+
+    #     # Construct the URL dynamically
+    #     return (
+    #         f"{base_url}/web#id={record_id}&model=rulebook&view_type=form"
+    #         + (f"&menu_id={menu.id}" if menu else "")
+    #         + (f"&action={action.id}" if action else "")
+    #     )
+    
+    def _record_link(self, record_id, model_name=None):
+        """
+        Generate a dynamic URL to access a record's form view.
+        
+        :param record_id: ID of the record to link
+        :param model_name: Optional model name (defaults to current model)
+        :return: Constructed URL or False if URL cannot be generated
+        """
+        try:
+            # Use current model if no model name provided
+            if model_name is None:
+                model_name = self._name
+
+            # Get the base URL from system parameters
+            base_url = self.env["ir.config_parameter"].sudo(
+            ).get_param("web.base.url")
+
+            # Find the default action for the model
+            action = self.env["ir.actions.act_window"].search(
+                [("res_model", "=", model_name)], limit=1
+            )
+
+            # Find the corresponding menu (if exists)
+            menu = False
+            if action:
+                menu = self.env["ir.ui.menu"].search(
+                    [("action", "=", f"ir.actions.act_window,{action.id}")], limit=1
+                )
+
+            # Construct the URL dynamically
+            url_parts = [
+                f"{base_url}/web#id={record_id}",
+                f"model={model_name}",
+                "view_type=form"
+            ]
+
+            # Conditionally add menu and action
+            if menu:
+                url_parts.append(f"menu_id={menu.id}")
+            if action:
+                url_parts.append(f"action={action.id}")
+
+            return "&".join(url_parts)
+
+        except Exception as e:
+            # Log the error and return False
+            self.env['ir.logging'].sudo().create({
+                'name': 'Record Link Generation',
+                'type': 'server',
+                'dbname': self.env.cr.dbname,
+                'level': 'ERROR',
+                'message': f'Failed to generate record link: {str(e)}'
+            })
+            return False
     
     
     
     @api.depends("frequency_type", "date_value", "day_value", "month_value", "day_of_week",
                  "quarter_day","bi_monthly_day1","bi_monthly_day2","semi_annual_month1",
                  "semi_annual_month2","semi_annual_day1","semi_annual_day2","year_month_value")  
+         
          
     def _compute_date(self):
         today = fields.Datetime.now()
@@ -841,7 +858,7 @@ class Rulebook(models.Model):
     def _check_three_year_day(self):
         for record in self:
             if record.frequency_type == 'three_yearly' and record.day_value:
-                if not 1 <= record.three_year_day <= 28:
+                if not 1 <= record.day_value <= 28:
                     raise ValidationError(("Please select a day between 1 and 28 for three-yearly frequency."))
     
     
@@ -872,6 +889,8 @@ class Rulebook(models.Model):
         "escalation_date_unit",
         "computed_date",
     )
+    
+    
     def _compute_escalation_date(self):
         for record in self:
             if record.computed_date and record.escalation_date_unit in [
@@ -892,156 +911,285 @@ class Rulebook(models.Model):
             else:
                 # If computed_date is not available, set due_date to False or handle accordingly
                 record.escalation_date = None
-
-    # creating the record
-    @api.model
-    def create(self, vals):
-        _logger.critical(vals)
-        if "risk_category" in vals:
-            category = self.env["rulebook.risk_category"].browse(vals["risk_category"])
-            _logger.critical(category)
-            if category and category.risk_priority:
-                vals["risk_rating"] = category.risk_priority
-        _logger.critical(vals)
-        record = super(Rulebook, self).create(vals)
-        if record.due_date and record.escalation_date:
-            record._schedule_due_dates()
-
-            # send out email if the record frequency is immediate
-        if record.frequency_type == "immediate":
-            current_year = datetime.now().year
+                
+                
+    def _prepare_email_data(self):
+        """Prepare email data dictionary"""
+        try:
+            # Detailed checks for each required field
+            if not self.officer_responsible:
+                _logger.critical(
+                    f"No officer responsible for record {self.id}")
+                return {}
+            
             global global_data
             global_data = {
-                # "email_to": record.officer_responsible.email,
-                "email_to": record.officer_responsible.email,
-                "name": record.officer_responsible.name,
-                "title": record.name.name,
-                "upload_link": self._compute_upload_link(record.id),
-                "email_from": os.getenv("EMAIL_FROM"),
-                # "email_cc": record.officer_cc.email,
-                "rulebook_name":  re.sub(r'<[^>]+>', '', record.type_of_return),
-                
-                "email_cc": self.mapped('officer_cc.email'),
-                
-                "due_date": self._compute_formatted_date(record.due_date),
-                
-                "current_year": current_year,
+                "officer_responsible": self.officer_responsible.name or "N/A",
+                "responsible_id": self.responsible_id.name or "N/A",
+                "rulebook_name": self.name.name or "N/A",
+                "due_date": self.due_date or "N/A",
+                "record_link": self._record_link(self.id) or "N/A",
+                "upload_link": self._compute_upload_link(self.id) or "N/A",
+                "current_year": fields.Date.today().year,
+                "rulebook_return": self.type_of_return or "N/A",
+                # "regulatory_name": self.regulatory_name or "N/A",
+                "regulatory_name": self.regulatory_agency_id.name or "N/A",
+                "risk_category": self.risk_category.name if self.risk_category else "N/A",
+                "email_to": self.officer_responsible.email or "N/A",
+                "email_from": os.getenv("EMAIL_FROM", "default@example.com"),
+                "email_cc":", ".join(self.officer_cc.mapped('email')) or ""
             }
 
-            _logger.critical(record)
+            # Optional CC handling
+           
 
-            # Ensure rulebook_id is active and frequency_type is not "immediate"
+            # Extensive logging of prepared email data
+            _logger.critical(f"Prepared email data: {global_data}")
 
-            template_id = self.env.ref("rule_book.email_template_internal_due_date_").id
-            template = self.env["mail.template"].browse(template_id)
+            return global_data
+        
+        except Exception as e:
+            _logger.critical(f"Error preparing email data: {str(e)}")
+            _logger.critical(traceback.format_exc())
+            return {}
+       
+            
+    
+    def _send_internal_due_date_email(self):
+        """Send immediate notification email"""
+        try:
+            # Ensure the record exists and is valid
+            if not self:
+                _logger.critical("No record found to send email")
+                return False
 
-            if template.exists():
-                # Send the email immediately
-                _logger.critical("Sent the email immediately ")
-                template.send_mail(record.id, force_send=True)
-            else:
-                _logger.critical(
-                    f"Mail template with ID {template_id} not found.")
+            # Verify email data is not empty
+            email_data = self._prepare_email_data()
+            if not email_data:
+                _logger.critical("No email data prepared for sending")
+                return False
 
-        return record
+            # Find the email template
+            try:
+                template = self.env.ref(
+                    "rule_book.rulebook_due_date_notification_template")
+            except ValueError:
+                _logger.critical("Email template not found")
+                return False
 
-    # editing the record
+            # Detailed logging for debugging
+            _logger.critical(f"Attempting to send email for record {self.id}")
+            _logger.critical(f"Email data: {email_data}")
+
+            # Send the email
+            email_result=template.send_mail(self.id, force_send=True)
+
+            _logger.critical(f"Email sent successfully. Result: {email_result}")
+            return True
+        except Exception as e:
+            _logger.critical(f"Comprehensive email send failure: {str(e)}")
+            # Log the full traceback for more detailed debugging
+            _logger.critical(traceback.format_exc())
+            return False
+       
+        
+        
+    def _prepare_reply_log_vals(self, submission_status, submission_time):
+        """Prepare values for reply log creation"""
+        
+        return {
+            'rulebook_id': self.id,
+            'reporter': self.officer_responsible.id,
+            'rulebook_status': submission_status,
+            'submission_timing': submission_time,
+            'reply_date': None,
+            'reply_content': None,
+            'department_id': self.responsible_id.id,
+            'rulebook_compute_date': self.computed_date,
+            'next_due_date': self.next_due_date
+        }
+        
+        
+    @api.model
+    def create(self, vals):
+        try:
+            # Handle risk category
+            if "risk_category" in vals:
+                category = self.env["rulebook.risk_category"].browse(
+                    vals["risk_category"])
+                if category and category.risk_priority:
+                    vals["risk_rating"] = category.risk_priority
+
+            # Create rulebook record
+            record = super(Rulebook, self).create(vals)
+            
+           
+
+            # Initialize submission status
+            submission_status = 'pending'
+            submission_time = 'pending'
+
+            # Handle immediate frequency
+            if record.frequency_type == "immediate":
+                submission_status 
+                submission_time 
+                record._send_internal_due_date_email()
+
+            # Handle due dates
+            elif record.due_date or record.escalation_date:
+                record._schedule_due_dates()
+
+            # Create reply log
+            reply_log_vals = record._prepare_reply_log_vals(
+                submission_status,
+                submission_time
+            )
+            
+            
+            # self.env['reply.log'].create(reply_log_vals)
+            
+            record._copy_rulebook_chatter_to_reply_log()
+
+            return record
+
+        except Exception as e:
+            _logger.error(f"Error creating rulebook record: {str(e)}")
+            raise
+        
+
     def write(self, vals):
         # Log the record ID for debugging
-        _logger.critical(f"Record ID: {self.id}")
-
-        # Check if 'risk_category' is being updated
-        if "risk_category" in vals:
-            category = self.env["rulebook.risk_category"].browse(vals["risk_category"])
-            _logger.critical(f"Category: {category}")
-
-            # Update risk_rating based on risk_category
-            if category and category.risk_priority:
-                vals["risk_rating"] = category.risk_priority
-
-        # Log the updated values for debugging
-        _logger.critical(f"Values to write: {vals}")
+        self._update_risk_rating(vals)
+        
 
         # Call the super method and capture the result (typically a boolean)
         result = super(Rulebook, self).write(vals)
 
-        # Check for due dates and schedule if needed
-        if "due_date" in vals and "escalation_date" in vals:
+       
+        if vals.get("frequency_type") == "immediate":
+            try:
+                # Prepare email data
+                email_data = self._prepare_email_data()
+
+                # Enhanced logging
+                _logger.info(
+                    f"Frequency type set to immediate for record {self.id}")
+                _logger.info(f"Prepared email data: {email_data}")
+
+                # Send immediate notification
+                if email_data:
+                    send_result = self._send_internal_due_date_email()
+                    if not send_result:
+                        _logger.error(f"Failed to send email for record {self.id}")
+                else:
+                    _logger.warning(f"No email data prepared for record {self.id}")
+
+            except Exception as e:
+                _logger.error(f"Error in email sending process: {str(e)}")
+            
+         # Update reply log if status-related fields are changed
+        status_related_fields = [
+            'frequency_type', 'due_date', 'escalation_date']
+        if any(field in vals for field in status_related_fields):
+            submission_status = 'pending' 
+            submission_time = 'pending'
+
+            reply_log_vals = self._prepare_reply_log_vals(
+                submission_status,
+                submission_time
+            )
+
+            existing_log = self.env['reply.log'].search(
+            [('rulebook_id', '=', self.id)],
+            order='id desc',  # Orders by ID in descending order
+            limit=1 )
+
+            if existing_log:
+                existing_log.write(reply_log_vals)
+            else:
+                None
+                # self.env['reply.log'].create(reply_log_vals)
+                    
+        
+        due_date_related_keys = [
+            "due_date",
+            "escalation_date",
+            "due_date_value",
+            "due_date_unit",
+            "escalation_date_value",
+            "escalation_date_unit",
+            "computed_date",
+            "frequency_type"
+        ]
+
+        if any(key in vals for key in due_date_related_keys):
             if hasattr(self, "_schedule_due_dates"):
                 self._schedule_due_dates()
-        if "frequency_type" in vals and vals["frequency_type"] == "immediate":
-            _logger.critical("it came here")
-            record = self.env["rulebook"].browse(self.id)
-            current_year = datetime.now().year
-            global global_data
-            global_data = {
-                "email_to": self.mapped('officer_responsible.email'),
-                "name": self.mapped('first_line_escalation.name'),
-                "title": self.mapped('name.name'),
-                "upload_link": self._compute_upload_link(record.id),
-                "email_from": os.getenv("EMAIL_FROM"),
-                "rulebook_name":   record.type_of_return,
-                # "rulebook_name":  re.sub(r'<[^>]+>', '', record.type_of_return),
-                "email_cc": self.mapped('officer_cc.email'),
-                "due_date": self._compute_formatted_date('due_date'),
-                "current_year": current_year,
-            }
-            
-            _logger.critical("officer copied to email ",
-                             record.officer_cc.email)
+                
+        self._copy_rulebook_chatter_to_reply_log()
 
-            # Ensure rulebook_id is active and frequency_type is not "immediate"
-
-            template_id = self.env.ref("rule_book.email_template_internal_due_date_").id
-            
-            _logger.critical("template id  " , template_id)
-            
-            template = self.env["mail.template"].browse(template_id)
-            _logger.critical(template)
-
-            if template.exists():
-                # Send the email immediately
-                _logger.critical("i was called here ")
-                return template.send_mail(record.id, force_send=True)
-            else:
-                _logger.critical(
-                    f"Mail template with ID {template_id} not found.")
-        # Return the result of the write operation
-        if (
-            "due_date_value" in vals
-            or "due_date_unit" in vals
-            or "escalation_date_value" in vals
-            or "escalation_date_unit" in vals
-            or "computed_date" in vals
-            or "frequency_type" in vals
-        ):
-            self._schedule_due_dates()
 
         return result
+          
 
-    # def _compute_formatted_date(self, dt):
-    #     # Extract day, month, year, and time components
-    #     day = dt.day
-    #     month = dt.strftime("%B")
-    #     year = dt.year
-    #     hour = dt.strftime("%-I")  # Remove leading zero from the hour
-    #     minute = dt.strftime("%M")
-    #     am_pm = dt.strftime("%p").lower()
+    def _copy_rulebook_chatter_to_reply_log(self):
+        # Find all existing reply logs for this rulebook
+        reply_logs = self.env['reply.log'].search([('rulebook_id', '=', self.id)])
+        reply_log_vals = self._prepare_reply_log_vals(
+            submission_status='pending',
+            submission_time ='pending'
+        )
 
-    #     # Determine the correct ordinal suffix for the day
-    #     if day % 10 == 1 and day != 11:
-    #         day_suffix = "st"
-    #     elif day % 10 == 2 and day != 12:
-    #         day_suffix = "nd"
-    #     elif day % 10 == 3 and day != 13:
-    #         day_suffix = "rd"
-    #     else:
-    #         day_suffix = "th"
+        # If no reply log exists, create one
+        if not reply_logs:
+            reply_log = self.env['reply.log'].create(reply_log_vals)
+        else:
+            reply_log = reply_logs[0]
 
-    #     # Format the final string
-    #     formatted_date = f"{day}{day_suffix} of {month}, {year} by {hour}{am_pm}"
+        # Copy all messages from rulebook to reply log
+        messages = self.env['mail.message'].search([
+            ('res_id', '=', self.id),
+            ('model', '=', 'rulebook')
+        ], order='create_date asc')
 
-    #     return formatted_date if formatted_date else dt
+        for message in messages:
+            # Copy the message to the reply log
+            message.copy({
+                'model': 'reply.log',
+                'res_id': reply_log.id
+            })
+
+        # Copy email templates
+        # First, get the main attachment from the rulebook
+        if self.message_main_attachment_id:
+            # Link the main attachment to the reply log
+            self.env['ir.attachment'].browse(self.message_main_attachment_id.id).copy({
+                'res_model': 'reply.log',
+                'res_id': reply_log.id
+            })
+
+        return reply_log
+
+    # editing the record
+    def _update_risk_rating(self, vals):
+        """
+        Update risk rating based on risk category.
+        
+        Args:
+            vals (dict): Dictionary of values being written
+        """
+        try:
+            if "risk_category" in vals:
+                category = self.env["rulebook.risk_category"].browse(vals["risk_category"])
+                
+                if category and category.risk_priority:
+                    vals["risk_rating"] = category.risk_priority
+                
+                _logger.info(f"Risk category updated: {category}")
+        
+        except Exception as e:
+            _logger.error(f"Error updating risk rating: {e}")
+                       
     
     def _compute_formatted_date(self, dt):
         """
@@ -1085,18 +1233,20 @@ class Rulebook(models.Model):
             _logger.error(f"Date formatting error: {e}")
             return str(dt)
         
-
+        
     def _schedule_due_dates(self):
         for record in self:
             # Ensure any existing events are removed
             events = self.env["calendar.event"].search(
                 [("name", "ilike", f"Regulatory Due Date for {record.id}")]
-            )
+            )            
             events.unlink()
+            
             events = self.env["calendar.event"].search(
                 [("name", "ilike", f"Internal Due Date for {record.id}")]
-            )
+            )            
             events.unlink()
+            
             events = self.env["calendar.event"].search(
                 [("name", "ilike", f"Escalation Due Date for {record.id}")]
             )
@@ -1107,8 +1257,8 @@ class Rulebook(models.Model):
                     {
                         "name": f"Internal Due Date for {record.id}",
                         "start": record.computed_date,
-                        "stop": record.computed_date
-                        + timedelta(hours=1),  # Set duration of 1 hour
+                        "stop": record.computed_date,
+                        # + timedelta(hours=0),  # Set duration of 1 hour
                         "allday": False,  # Event is not all day; includes specific time
                     }
                 )
@@ -1118,8 +1268,8 @@ class Rulebook(models.Model):
                     {
                         "name": f"Regulatory Due Date for {record.id}",
                         "start": record.due_date,
-                        "stop": record.due_date
-                        + timedelta(hours=1),  # Set duration of 1 hour
+                        "stop": record.due_date,
+                        # + timedelta(hours=1),  # Set duration of 1 hour
                         "allday": False,  # Event is not all day; includes specific time
                     }
                 )
@@ -1129,182 +1279,219 @@ class Rulebook(models.Model):
                     {
                         "name": f"Escalation Due Date for {record.id}",
                         "start": record.escalation_date,
-                        "stop": record.escalation_date
-                        + timedelta(hours=1),  # Set duration of 1 hour
+                        "stop": record.escalation_date,
+                        # + timedelta(hours=1),  # Set duration of 1 hour
                         "allday": False,  # Event is not all day; includes specific time
                     }
                 )
 
     # * function that gos to the calendar module and try to check if an event is due
+    # def send_due_date_emails(self):
+    #     # Get the current time
+    #     global global_data
+    #     # now = datetime.now(pytz.timezone("Africa/Lagos"))
+    #     now = datetime.now(pytz.timezone("Africa/Lagos")).replace(tzinfo=None)
+    #     start_window = now - timedelta(minutes=29)
+    #     end_window = now + timedelta(minutes=29)
+
+    #     # Convert to Odoo Datetime format
+    #     start_window_str = fields.Datetime.to_string(start_window)
+    #     end_window_str = fields.Datetime.to_string(end_window)
+    #     current_year = datetime.now().year
+
+    #     # regulatory due date
+    #     # Find events related to rulebooks that are within the 29-minute window
+    #     events = self.env["calendar.event"].search(
+    #         [
+    #             ("name", "ilike", "Regulatory Due Date for"),
+    #             ("start", "<=", end_window_str),
+    #             ("start", ">=", start_window_str),
+    #         ]
+    #     )
+    #     for event in events:
+
+    #         global_data = {
+    #             "name": self.get_record_name(event.name.split(" ")[-1]),
+    #         }
+    #         rulebook_id = self.env["rulebook"].search(
+    #             [("id", "=", event.name.split(" ")[-1])]
+    #         )
+    #         # print(event.name.split(" ")[-1])
+    #         # print(rulebook_id)
+    #         _logger.critical( f"from send_due_date_emails() : {event.name.split(' ')[-1]} ... Rulebook ID {rulebook_id} ")
+            
+    #         global_data = {
+    #             "email_to": rulebook_id.first_line_escalation.email, 
+    #             "first_line_escalation": rulebook_id.first_line_escalation.name,
+    #             # "rulebook_name":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
+    #             "rulebook_name":  rulebook_id.type_of_return,
+    #             "upload_link": self._compute_upload_link(rulebook_id.id),
+    #             "email_from":  os.getenv("EMAIL_FROM"),
+    #             "email_cc": rulebook_id.second_line_escalation.email,
+    #             "regulatory_name":rulebook_id.regulatory_agency_id.name,
+    #             "risk_category": rulebook_id.risk_category.name,
+    #             "record_link": self._record_link(rulebook_id.id),
+    #             "current_year": current_year,
+    #         }
+    #         if (
+    #             rulebook_id
+    #             and rulebook_id.status == "active"
+    #             and rulebook_id.frequency_type != "immediate"
+    #         ):
+    #             template_id = self.env.ref(
+    #                 "rule_book.rulebook_due_date_notification_template"
+    #             ).id
+    #             self.env["mail.template"].browse(template_id).send_mail(
+    #                 rulebook_id.id, force_send=True
+    #             )
+    #     # escalation due date
+    #     # Find events related to rulebooks that are within the 29-minute window
+    #     events = self.env["calendar.event"].search(
+    #         [
+    #             ("name", "ilike", "Escalation Due Date for"),
+    #             ("start", "<=", end_window_str),
+    #             ("start", ">=", start_window_str),
+    #         ]
+    #     )
+    #     for event in events:
+
+    #         # print(self.get_record_name(event.name.split(" ")[-1]))
+
+    #         rulebook_id = self.env["rulebook"].search(
+    #             [("id", "=", event.name.split(" ")[-1])]
+    #         )
+
+    #         global_data = {
+    #             "email_to": rulebook_id.first_line_escalation.email,
+    #             "name": rulebook_id.first_line_escalation.name,
+    #             "title":  rulebook_id.type_of_return,
+    #             # "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
+    #             "upload_link": self._compute_upload_link(rulebook_id.id),
+    #             "email_from":  os.getenv("EMAIL_FROM"),
+    #             "email_cc": rulebook_id.second_line_escalation.email,
+    #             "due_date": self._compute_formatted_date(rulebook_id.escalation_date),
+    #             "record_link": self._record_link(rulebook_id.id),
+    #             "current_year": current_year,
+    #         }
+    #         if (
+    #             rulebook_id
+    #             and rulebook_id.status == "active"
+    #             and rulebook_id.frequency_type != "immediate"
+    #         ):
+    #             template_id = self.env.ref(
+    #                 "rule_book.email_template_first_line_escalation"
+    #             ).id
+    #             self.env["mail.template"].browse(template_id).send_mail(
+    #                 rulebook_id.id, force_send=True
+    #             )
+
+    #     # internal due date
+    #     # Find events related to rulebooks that are within the 29-minute window
+    #     events = self.env["calendar.event"].search(
+    #         [
+    #             ("name", "ilike", "Internal Due Date for"),
+    #             ("start", "<=", end_window_str),
+    #             ("start", ">=", start_window_str),
+    #         ]
+    #     )
+    #     for event in events:
+
+    #         # print(self.get_record_name(event.name.split(" ")[-1]))
+    #         _logger.critical(
+    #             f"Template Exists from send_due_date_emails() : {self.get_record_name(event.name.split(' ')[-1])}")
+
+    #         rulebook_id = self.env["rulebook"].search(
+    #             [("id", "=", event.name.split(" ")[-1])]
+    #         )
+    #         global_data = {
+    #             "email_to": rulebook_id.officer_responsible.email,
+    #             "name": rulebook_id.officer_responsible.name if rulebook_id.officer_responsible.name else rulebook_id.officer_responsible.email,
+    #             # "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
+    #             "title":  rulebook_id.type_of_return,
+    #             "upload_link": self._compute_upload_link(rulebook_id.id),
+    #             "email_from":  os.getenv("EMAIL_FROM"),
+    #             # "rulebook_name":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
+    #             "rulebook_name":   rulebook_id.type_of_return,
+    #             "email_cc": rulebook_id.officer_cc.email,
+    #             "due_date": self._compute_formatted_date(rulebook_id.due_date),
+    #             "current_year": current_year,
+    #         }
+    #         _logger.critical(
+    #             f"Rulebbok ID from send_due_date_emails() : {rulebook_id}")
+            
+    #         if (
+    #             rulebook_id
+    #             and rulebook_id.status == "active"
+    #             and rulebook_id.frequency_type != "immediate"
+    #         ):
+    #             template_id = self.env.ref(
+    #                 "rule_book.email_template_internal_due_date_"
+    #             ).id
+    #             template = self.env["mail.template"].browse(template_id)
+    #             # print(template.exists())
+    #             _logger.critical(
+    #                 f"Template Exists from send_due_date_emails() : {template.exists()}")
+    #             if template.exists():
+    #                 _logger.critical(
+    #                     f"Mail template with ID {template_id} not found.")
+    #                 return template.send_mail(rulebook_id.id, force_send=True)
+    #             # self.env['mail.template'].browse(template_id).send_mail(rulebook_id, force_send=True)
+
     def send_due_date_emails(self):
-        # Get the current time
-        global global_data
-        # now = datetime.now(pytz.timezone("Africa/Lagos"))
-        now = datetime.now(pytz.timezone("Africa/Lagos")).replace(tzinfo=None)
+        now = fields.Datetime.context_timestamp(self, datetime.now())
         start_window = now - timedelta(minutes=29)
         end_window = now + timedelta(minutes=29)
-
-        # Convert to Odoo Datetime format
         start_window_str = fields.Datetime.to_string(start_window)
         end_window_str = fields.Datetime.to_string(end_window)
-        current_year = datetime.now().year
 
-        # regulatory due date
-        # Find events related to rulebooks that are within the 29-minute window
-        events = self.env["calendar.event"].search(
-            [
-                ("name", "ilike", "Regulatory Due Date for"),
-                ("start", "<=", end_window_str),
-                ("start", ">=", start_window_str),
-            ]
-        )
-        for event in events:
+        EVENT_TYPES = {
+            "regulatory": "Regulatory Due Date for",
+            "escalation": "Escalation Due Date for",
+            "internal": "Internal Due Date for",
+        }
 
-            global_data = {
-                "name": self.get_record_name(event.name.split(" ")[-1]),
-            }
-            rulebook_id = self.env["rulebook"].search(
-                [("id", "=", event.name.split(" ")[-1])]
+        TEMPLATE_MAP = {
+            "regulatory": "rule_book.rulebook_due_date_notification_template",
+            "escalation": "rule_book.email_template_first_line_escalation",
+            "internal": "rule_book.email_template_internal_due_date_",
+        }
+
+        for event_type, name_filter in EVENT_TYPES.items():
+            events = self.env["calendar.event"].search(
+                [
+                    ("name", "ilike", name_filter),
+                    ("start", "<=", end_window_str),
+                    ("start", ">=", start_window_str),
+                ]
             )
-            # print(event.name.split(" ")[-1])
-            # print(rulebook_id)
-            _logger.critical( f"from send_due_date_emails() : {event.name.split(' ')[-1]} ... Rulebook ID {rulebook_id} ")
-            
-            global_data = {
-                "email_to": rulebook_id.first_line_escalation.email, 
-                "first_line_escalation": rulebook_id.first_line_escalation.name,
-                # "rulebook_name":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
-                "rulebook_name":  rulebook_id.type_of_return,
-                "upload_link": self._compute_upload_link(rulebook_id.id),
-                "email_from":  os.getenv("EMAIL_FROM"),
-                "email_cc": rulebook_id.second_line_escalation.email,
-                "regulatory_name":rulebook_id.regulatory_agency_id.name,
-                "risk_category": rulebook_id.risk_category.name,
-                "record_link": self._record_link(rulebook_id.id),
-                "current_year": current_year,
-            }
-            if (
-                rulebook_id
-                and rulebook_id.status == "active"
-                and rulebook_id.frequency_type != "immediate"
-            ):
-                template_id = self.env.ref(
-                    "rule_book.rulebook_due_date_notification_template"
-                ).id
-                self.env["mail.template"].browse(template_id).send_mail(
-                    rulebook_id.id, force_send=True
-                )
-        # escalation due date
-        # Find events related to rulebooks that are within the 29-minute window
-        events = self.env["calendar.event"].search(
-            [
-                ("name", "ilike", "Escalation Due Date for"),
-                ("start", "<=", end_window_str),
-                ("start", ">=", start_window_str),
-            ]
-        )
-        for event in events:
+            for event in events:
+                rulebook_id = self.env["rulebook"].search(
+                    [("id", "=", event.name.split(" ")[-1])])
+                if rulebook_id and rulebook_id.status == "active" and rulebook_id.frequency_type != "immediate":
+                    template_ref = TEMPLATE_MAP[event_type]
+                    self.env.ref(template_ref).send_mail(
+                        rulebook_id.id, force_send=True)
 
-            # print(self.get_record_name(event.name.split(" ")[-1]))
 
-            rulebook_id = self.env["rulebook"].search(
-                [("id", "=", event.name.split(" ")[-1])]
-            )
+    # def get_model_name_and_id_from_string(self, record_string):
+    #     # Split the string to extract model name and ID
+    #     parts = record_string.strip(",)").split("(")
+    #     model_name = parts[0]
+    #     record_id = int(parts[1]) if len(parts) > 1 else None
+    #     return model_name, record_id
 
-            global_data = {
-                "email_to": rulebook_id.first_line_escalation.email,
-                "name": rulebook_id.first_line_escalation.name,
-                "title":  rulebook_id.type_of_return,
-                # "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
-                "upload_link": self._compute_upload_link(rulebook_id.id),
-                "email_from":  os.getenv("EMAIL_FROM"),
-                "email_cc": rulebook_id.second_line_escalation.email,
-                "due_date": self._compute_formatted_date(rulebook_id.escalation_date),
-                "record_link": self._record_link(rulebook_id.id),
-                "current_year": current_year,
-            }
-            if (
-                rulebook_id
-                and rulebook_id.status == "active"
-                and rulebook_id.frequency_type != "immediate"
-            ):
-                template_id = self.env.ref(
-                    "rule_book.email_template_first_line_escalation"
-                ).id
-                self.env["mail.template"].browse(template_id).send_mail(
-                    rulebook_id.id, force_send=True
-                )
+    # def get_record_name(self, record_string):
+    #     model_name, record_id = self.get_model_name_and_id_from_string(record_string)
 
-        # internal due date
-        # Find events related to rulebooks that are within the 29-minute window
-        events = self.env["calendar.event"].search(
-            [
-                ("name", "ilike", "Internal Due Date for"),
-                ("start", "<=", end_window_str),
-                ("start", ">=", start_window_str),
-            ]
-        )
-        for event in events:
-
-            # print(self.get_record_name(event.name.split(" ")[-1]))
-            _logger.critical(
-                f"Template Exists from send_due_date_emails() : {self.get_record_name(event.name.split(' ')[-1])}")
-
-            rulebook_id = self.env["rulebook"].search(
-                [("id", "=", event.name.split(" ")[-1])]
-            )
-            global_data = {
-                "email_to": rulebook_id.officer_responsible.email,
-                "name": rulebook_id.officer_responsible.name if rulebook_id.officer_responsible.name else rulebook_id.officer_responsible.email,
-                # "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
-                "title":  rulebook_id.type_of_return,
-                "upload_link": self._compute_upload_link(rulebook_id.id),
-                "email_from":  os.getenv("EMAIL_FROM"),
-                # "rulebook_name":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
-                "rulebook_name":   rulebook_id.type_of_return,
-                "email_cc": rulebook_id.officer_cc.email,
-                "due_date": self._compute_formatted_date(rulebook_id.due_date),
-                "current_year": current_year,
-            }
-            _logger.critical(
-                f"Rulebbok ID from send_due_date_emails() : {rulebook_id}")
-            
-            if (
-                rulebook_id
-                and rulebook_id.status == "active"
-                and rulebook_id.frequency_type != "immediate"
-            ):
-                template_id = self.env.ref(
-                    "rule_book.email_template_internal_due_date_"
-                ).id
-                template = self.env["mail.template"].browse(template_id)
-                # print(template.exists())
-                _logger.critical(
-                    f"Template Exists from send_due_date_emails() : {template.exists()}")
-                if template.exists():
-                    _logger.critical(
-                        f"Mail template with ID {template_id} not found.")
-                    return template.send_mail(rulebook_id.id, force_send=True)
-                # self.env['mail.template'].browse(template_id).send_mail(rulebook_id, force_send=True)
-
-    def get_model_name_and_id_from_string(self, record_string):
-        # Split the string to extract model name and ID
-        parts = record_string.strip(",)").split("(")
-        model_name = parts[0]
-        record_id = int(parts[1]) if len(parts) > 1 else None
-        return model_name, record_id
-
-    def get_record_name(self, record_string):
-        model_name, record_id = self.get_model_name_and_id_from_string(record_string)
-
-        if model_name and record_id:
-            # Fetch the model using self.env
-            Model = self.env[model_name]
-            # Fetch the record
-            record = Model.browse(record_id)
-            # Access the 'name' field
-            return record.name
-        return None
+    #     if model_name and record_id:
+    #         # Fetch the model using self.env
+    #         Model = self.env[model_name]
+    #         # Fetch the record
+    #         record = Model.browse(record_id)
+    #         # Access the 'name' field
+    #         return record.name
+    #     return None
+    
 
     @api.model
     def check_rulebook_and_update_due_date(self):
@@ -1313,15 +1500,19 @@ class Rulebook(models.Model):
         current_date=fields.Datetime.now().astimezone(
             pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
 
-        rulebooks = self.env["reply.log"].search(
+        rulebooks = self.env["rulebook"].search(
             [
-                ("rulebook_compute_date", "<=", current_date),
-                ("rulebook_id.is_recurring", "=", True),
+                ("computed_date", "<=", current_date),
+                ("is_recurring", "=", True),
             ]
         )
 
         for record in rulebooks:
-            record._compute_next_due_date()
+            try:
+                record._compute_next_due_date()
+            except Exception as e:
+                _logger.critical(f"Failed to update rulebook {record.id}: {e}")
+            
 
     
     
@@ -1403,28 +1594,105 @@ class Rulebook(models.Model):
 
             
 
-    def send_reminder_email(self):
-        """Send a reminder email to the responsible party if the due date is approaching."""
-        today = fields.Datetime.now().astimezone(
-            pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-        for rulebook in self:
-            if (
-                rulebook.report_status != "completed"
-                and rulebook.due_date <= today
-            ):
-                template_id = self.env.ref("rule_book.reminder_email_template").id
-                self.env["mail.template"].browse(template_id).send_mail(rulebook.id)
-                rulebook.last_escalation_sent =  today
+    # def send_reminder_email(self):
+    #     """Send a reminder email to the responsible party if the due date is approaching."""
+    #     today = fields.Datetime.now().astimezone(
+    #         pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
+    #     for rulebook in self:
+    #         if (
+    #             rulebook.report_status != "completed"
+    #             and rulebook.due_date <= today
+    #         ):
+    #             template_id = self.env.ref("rule_book.reminder_email_template").id
+    #             self.env["mail.template"].browse(template_id).send_mail(rulebook.id)
+    #             rulebook.last_escalation_sent =  today
 
-            # Notify first and second line escalation officers
-            if (
-                rulebook.escalation_date <= fields.Datetime.now()
-                and rulebook.report_status != "completed"
-            ):
-                template_id = self.env.ref("rule_book.escalation_email_template").id
-                self.env["mail.template"].browse(template_id).send_mail(rulebook.id)
-                rulebook.last_escalation_sent = today
+    #         # Notify first and second line escalation officers
+    #         if (
+    #             rulebook.escalation_date <= fields.Datetime.now()
+    #             and rulebook.report_status != "completed"
+    #         ):
+    #             template_id = self.env.ref("rule_book.escalation_email_template").id
+    #             self.env["mail.template"].browse(template_id).send_mail(rulebook.id)
+    #             rulebook.last_escalation_sent = today
                 
+    def send_reminder_email(self):
+        """Send reminder and escalation emails for due or escalated rulebooks."""
+        # Get current date (only date part) in the user's timezone
+        today = fields.Date.context_today(self)
+        rulebooks_to_update = self.env["rulebook"]
+
+        for rulebook in self:
+            try:
+                # Reminder Email: Check if due_date matches today
+                if (
+                    rulebook.report_status != "completed"
+                    and rulebook.computed_date
+                    and rulebook.computed_date.date() == today
+                ):
+                    email_data = {
+                        # "first_line_escalation": rulebook.first_line_escalation.name,
+                        "officer_responsible": rulebook.officer_responsible.name,
+                        "responsible_id": rulebook.responsible_id.name,
+                        "rulebook_name": rulebook.name,
+                        "due_date": rulebook.computed_date,
+                        "record_link": self._record_link(rulebook.id),
+                        "upload_link": self._compute_upload_link(rulebook.id),
+                        "current_year": fields.Date.today().year,
+                        "rulebook_return": rulebook.type_of_return,
+                        "regulatory_name": rulebook.regulatory_agency_id.name,
+                        "risk_category": rulebook.risk_category.name,
+                        "email_to": rulebook.officer_responsible.email,
+                        "email_from": os.getenv("EMAIL_FROM"),
+                        # "email_cc": record.officer_cc.email,
+                        "email_cc": self.mapped('officer_cc.email'),
+                    }
+                    template_id = self.env.ref(
+                        "rule_book.rulebook_due_date_notification_template").id
+                    template.with_context(email_data).send_mail(rulebook.id)
+                    rulebooks_to_update |= rulebook
+
+                # Escalation Email: Check if escalation_date matches today
+                if (
+                    rulebook.escalation_date
+                    and rulebook.escalation_date.date() == today
+                    and rulebook.report_status != "completed"
+                ):
+                    
+                    email_data = {
+                        "first_line_escalation": rulebook.first_line_escalation.name,
+                        "officer_responsible": rulebook.officer_responsible.name,
+                        "responsible_id": rulebook.responsible_id.name,
+                        "rulebook_name": rulebook.name,
+                        "due_date": rulebook.escalation_date,
+                        "record_link": self._record_link(rulebook.id),
+                        "upload_link": self._compute_upload_link(rulebook.id),
+                        "current_year": fields.Date.today().year,
+                        "rulebook_return": rulebook.type_of_return,
+                        "regulatory_name": rulebook.regulatory_name,
+                        "risk_category":rulebook.risk_category.name,                        
+                        "email_to": rulebook.officer_responsible.email,
+                        "email_from": os.getenv("EMAIL_FROM"),
+                        # "email_cc": record.officer_cc.email,                        
+                        "email_cc": ", ".join(rulebook.officer_cc.mapped('email')),
+                    }
+
+                    # Pass context data and send the email
+                    template = self.env.ref("rule_book.escalation_email_template")
+                    template.with_context(**email_data).send_mail(rulebook.id,force_send=True)
+                    rulebooks_to_update |= rulebook
+
+            except Exception as e:
+                # Log errors for debugging
+                _logger.error(f"Failed to process Rulebook {rulebook.id}: {e}")
+
+        # Batch update `last_escalation_sent` field
+        try:
+            if rulebooks_to_update:
+                rulebooks_to_update.write({"last_escalation_sent": fields.Datetime.now()})
+        except Exception as e:
+            _logger.error(f"Failed to update last_escalation_sent for rulebooks: {e}")
+            
 
     def _notify_user(self):
         # Create a client action to show the dialog

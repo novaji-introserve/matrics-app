@@ -20,13 +20,14 @@
                     <div style="padding: 20px;">
                         <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong
                                 style="color: #004225;">
-                                <t t-out="object.data()['name']" />
+                                <t t-out="object.data()['first_line_escalation']" />
                             </strong>
                             ,</p>
 
                         <div
                             style="background-color: #f0fff0; padding: 20px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
                             <p style="font-size: 16px; color: #333333; line-height: 1.6;">The user
+                                <t t-out="object.data()['officer_responsible']" /> in <t t-out="object.data()['responsible_id']" />
                                 has not yet uploaded the regulatory document for <strong
                                     style="color: #004225;">
                                     <t t-out="object.data()['title']" />

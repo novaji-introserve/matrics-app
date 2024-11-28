@@ -4,11 +4,11 @@
     <!-- Instant Due Date Notification when Due date is the current day -->
 
   <record id="rulebook_due_date_notification_template" model="mail.template">
-        <field name="name">Rulebook Due Date Notification</field>
-        <field name="email_from">{{object.data()['email_from']}}</field>
-        <field name="email_cc">{{object.data()['email_cc']}}</field>
-        <field name="email_to">{{object.data()['email_to']}}</field>
-        <field name="subject">Reminder: Rulebook Due Date for {{object.data()['rulebook_name']}}</field>
+        <field name="name">Internal Due Date Reminder For Rulebook </field>
+        <field name="email_from">{{email_data.email_from}}</field>
+        <field name="email_cc">{{email_data.email_cc}}</field>
+        <field name="email_to">{{email_data.email_to}}</field>
+        <field name="subject">Reminder: Internal Due Date for {{email_data.rulebook_name}}</field>
         <field name="model_id" ref="rule_book.model_rulebook" />
         <field name="body_html" type="html">
             <div style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
@@ -18,25 +18,24 @@
 
                 <div style="padding: 20px;">
                     <p style="font-size: 16px; color: #333333; line-height: 1.6;"> Dear <strong style="color: #004225;">
-                        <t t-out="object.data()['first_line_escalation']" />
+                        <t t-out="email_data['officer_responsible']" />
                     </strong>
                             ,
                 </p>
 
                 <div style="background-color: #f0fff0; padding: 20px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
                     <p style="font-size: 16px; color: #333333; line-height: 1.6;"> This is a
-                                reminder that today is the due date for the regulatory action
-                                associated with the rulebook titled <strong style="color: #004225;">
-                        <t t-out="object.data()['rulebook_name']" />
+                                reminder that today is the internal due date for the rulebook return <strong style="color: #004225;">
+                        <t t-out="email_data['rulebook_return']" />
                     </strong>. 
                 </p>
                 <p style="font-size: 16px; color: #333333; line-height: 1.6;">
                     <strong style="color: #004225;">Regulatory Agency:</strong>
-                    <t t-out="object.data()['regulatory_name']" />
+                    <t t-out="email_data['regulatory_name']" />
                 </p>
                 <p style="font-size: 16px; color: #333333; line-height: 1.6;">
                     <strong style="color: #004225;">Risk Category:</strong>
-                    <t t-out="object.data()['risk_category']" />
+                    <t t-out="email_data['risk_category']" />
                 </p>
             </div>
 
@@ -46,11 +45,11 @@
             </p>
 
             <p style="text-align: center;">
-                <a t-attf-href="#{object.data()['record_link']}" style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 20px; font-size: 16px;">View
+                <a t-attf-href="#{email_data['record_link']}" style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 20px; font-size: 16px;">View
                                 Rulebook Details</a>
             </p>
             <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can upload
-                            the document at the following link: <a t-attf-href="#{object.data()['upload_link']}" style="display: inline-block;  color: #004225; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
+                            the document at the following link: <a t-attf-href="#{email_data.['upload_link']}" style="display: inline-block;  color: #004225; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
                             Document</a>
             </p>
 

@@ -21,12 +21,9 @@ class ReplyLog(models.Model):
     _order = "id desc"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    # Link to the rulebook this reply relates to
+    
     rulebook_id = fields.Many2one(
-        "rulebook", string="Rulebook", help="Reference to the related Rulebook",
-        tracking=True,
-
-    )
+        'rulebook', required=True, ondelete='cascade', tracking=True, string="Rulebook", help="Reference to the related Rulebook",)
 
     department_id = fields.Many2one(
         "hr.department",
@@ -89,12 +86,15 @@ class ReplyLog(models.Model):
         store=True,
         tracking=True,
         help="The regulatory date calculated from the related rulebook.",
+        related='rulebook_id.computed_date',
     )
+    
     next_due_date = fields.Datetime(
         string="Next Due Date",
         store=True,
         tracking=True,
         help="Next due date.",
+        related='rulebook_id.next_due_date'
     )
 
     # The status of the rulebook (pending, submitted, reviewed, completed)
@@ -108,7 +108,7 @@ class ReplyLog(models.Model):
         string="Rulebook Status",
         default="pending",
         help="The current status of the related rulebook.",
-                tracking=True,
+        tracking=True,
 
     )
 
@@ -117,6 +117,7 @@ class ReplyLog(models.Model):
         [
             ("early", "Early Submission"),
             ("on_time", "Right on Time"),
+            ("pending", "Pending"),
             ("late", "Late Submission"),
             ("not_responded", "Not Responded"),
         ],
@@ -156,14 +157,83 @@ class ReplyLog(models.Model):
             }
         }
         
+    # @api.model
+    # def write(self, vals):
+    #     """Overrides the default write method to enforce rules."""
+    #     for record in self:
+    #         # Check if reply_content or document is being updated
+    #         if "reply_content" in vals or "document" in vals:
+    #             # Ensure both fields are provided
+    #             if not vals.get("reply_content", record.reply_content):
+    #                 raise AccessError(
+    #                     _("You must provide a reply note before updating."))
+    #             if not vals.get("document", record.document):
+    #                 raise AccessError(
+    #                     _("You must upload a file before updating."))
 
-    # def can_edit(self):
-    #     self.ensure_one()
-    #     user = self.env.user
-    #     # Check if user is the reporter or in compliance officer group
-    #     return (user.id == self.reporter.id or
-    #             user.has_group('rule_book.group_chief_compliance_officer_'))
+    #             # Change status to submitted if both fields are set
+    #             vals["rulebook_status"] = "submitted"
 
+    #             # Call the external method in a controller
+    #             request.env["rulebook.controller"].sudo(
+    #             ).trigger_escalation_alert(record)
+   
+
+
+    #     return super(ReplyLog, self).write(vals)
+
+    def write(self, vals):
+        """Overrides the default write method to enforce rules."""
+        for record in self:
+            # Check if reply_content or document is being updated
+            if "reply_content" in vals or "document" in vals:
+                # Ensure both fields are provided
+                if not vals.get("reply_content", record.reply_content):
+                    raise AccessError(
+                        _("You must provide a reply note before updating."))
+                if not vals.get("document", record.document):
+                    raise AccessError(_("You must upload a file before updating."))
+
+                # Change status to submitted if both fields are set
+                vals["rulebook_status"] = "submitted"
+                vals["reply_date"]= fields.Datetime.now()
+
+        # Perform the write operation
+        result = super(ReplyLog, self).write(vals)
+
+        
+        rulebook = request.env["rulebook"].sudo().browse(
+            int(record.rulebook_id))
+        url = request.env["rulebook"]._record_link(
+            record.id, model_name='reply.log')
+
+
+        global_data = {
+            "email_from": "leonell4fame@gmail.com",
+            "email_to": rulebook.first_line_escalation.email,
+            "name":  rulebook.type_of_return,
+            "title":  rulebook.name.name,
+            "content": record.reply_content,
+            "url_link": url,
+            "current_year": datetime.now().year,
+        }
+        self.set_global_data(global_data)
+
+        for record in self:
+            if record.rulebook_status == 'submitted':
+                self.trigger_escalation_alert(record)
+
+        return result
+    
+    def trigger_escalation_alert(self, report):
+        # Logic for sending email to escalation officers
+        template = request.env.ref("rule_book.email_template_escalation")
+        if template:
+            template.sudo().send_mail(report.id, force_send=True)
+        else:
+            _logger.critical(
+                "Email template 'rule_book.email_template_escalation' not found.")
+    
     @api.model
     def get_awaiting_replies(self):
         _logger.info("Fetching awaiting replies...")
@@ -179,7 +249,7 @@ class ReplyLog(models.Model):
 
             # Search for awaiting replies
             awaiting_replies = self.search([
-                ("rulebook_status", "not in", ["completed", "reviewed"]),
+                ("rulebook_status", "not in", ["completed", "reviewed","pending"]),
                 ("rulebook_id", "not in", list(completed_ids))
             ])
 
@@ -210,10 +280,8 @@ class ReplyLog(models.Model):
     def _compute_rulebook_name_stripped(self):
         for record in self:
             if record.rulebook_id:
-                # Strip HTML tags
-                record.rulebook_name = re.sub(
-                    r"<[^>]+>", "", record.rulebook_id.type_of_return
-                )
+
+                record.rulebook_name = record.rulebook_id.type_of_return
             else:
                 record.rulebook_name = ""
 
@@ -255,162 +323,160 @@ class ReplyLog(models.Model):
                 elif reply_datetime < compute_datetime:
                     record.submission_timing = "early"
                 else:
-                    record.submission_timing = "on_time"
+                    record.submission_timing = "pending"
             except Exception as e:
                 _logger.error(
                     f"Error computing submission timing for record {record.id}: {e}")
                 record.submission_timing = "error"
 
    
-    @api.constrains("rulebook_status")
-    
-    def _compute_next_due_date(self):
-       
-        print(" updating next due date")
-        """Compute the next due date for the rulebook when the status is 'completed'."""
-        for record in self:
-            rulebook = record.rulebook_id
-            if (
-                rulebook
-                and rulebook.is_recurring
-                and record.rulebook_status == "completed"
-            ):
-                # Check if regulatory date matches computed date
-                if record.rulebook_compute_date == rulebook.computed_date:
-                    if rulebook.frequency_type == "monthly":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            months=1
-                        )
-                    elif rulebook.frequency_type == "quarterly":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            months=3
-                        )
-                    elif rulebook.frequency_type == "yearly":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            years=1
-                        )
-                    elif rulebook.frequency_type == "daily":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            days=1
-                        )
-                    elif rulebook.frequency_type == "weekly":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            weeks=1
-                        )
-                    elif rulebook.frequency_type == "day_of_month":
-                        # Move to the same day in the next month
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            months=1
-                        )
-                    elif rulebook.frequency_type == "day_every_month":
-                        # Move to the same day of the next month
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            months=1
-                        )
-                    elif rulebook.frequency_type == "month_of_year":
-                        # Move to the same month of the next year
-                        next_due_date = record.rulebook_compute_date.replace(
-                            year=record.rulebook_compute_date.year + 1
-                        )
-                    elif rulebook.frequency_type == "immediate":
-                        # Immediate means no specific future due date
-                        next_due_date = record.rulebook_compute_date
-                    else:
-                        next_due_date = record.rulebook_compute_date
-                    print(next_due_date)
-                    record.next_due_date = next_due_date
-                    # Update the rulebook computed date and reset status for next cycle
-                    rulebook.computed_date = next_due_date
-                    print(next_due_date)
-                else:
-                    # Do nothing if regulatory date doesn't match computed date
-                    continue
+    # @api.constrains("rulebook_status")
+    # def _compute_next_due_date(self):
+    #     print(" updating next due date")
+    #     """Compute the next due date for the rulebook when the status is 'completed'."""
+    #     for record in self:
+    #         rulebook = record.rulebook_id
+    #         if (
+    #             rulebook
+    #             and rulebook.is_recurring
+    #             and record.rulebook_status == "completed"
+    #         ):
+    #             # Check if regulatory date matches computed date
+    #             if record.rulebook_compute_date == rulebook.computed_date:
+    #                 if rulebook.frequency_type == "monthly":
+    #                     next_due_date = record.rulebook_compute_date + relativedelta(
+    #                         months=1
+    #                     )
+    #                 elif rulebook.frequency_type == "quarterly":
+    #                     next_due_date = record.rulebook_compute_date + relativedelta(
+    #                         months=3
+    #                     )
+    #                 elif rulebook.frequency_type == "yearly":
+    #                     next_due_date = record.rulebook_compute_date + relativedelta(
+    #                         years=1
+    #                     )
+    #                 elif rulebook.frequency_type == "daily":
+    #                     next_due_date = record.rulebook_compute_date + relativedelta(
+    #                         days=1
+    #                     )
+    #                 elif rulebook.frequency_type == "weekly":
+    #                     next_due_date = record.rulebook_compute_date + relativedelta(
+    #                         weeks=1
+    #                     )
+    #                 elif rulebook.frequency_type == "day_of_month":
+    #                     # Move to the same day in the next month
+    #                     next_due_date = record.rulebook_compute_date + relativedelta(
+    #                         months=1
+    #                     )
+    #                 elif rulebook.frequency_type == "day_every_month":
+    #                     # Move to the same day of the next month
+    #                     next_due_date = record.rulebook_compute_date + relativedelta(
+    #                         months=1
+    #                     )
+    #                 elif rulebook.frequency_type == "month_of_year":
+    #                     # Move to the same month of the next year
+    #                     next_due_date = record.rulebook_compute_date.replace(
+    #                         year=record.rulebook_compute_date.year + 1
+    #                     )
+    #                 elif rulebook.frequency_type == "immediate":
+    #                     # Immediate means no specific future due date
+    #                     next_due_date = record.rulebook_compute_date
+    #                 else:
+    #                     next_due_date = record.rulebook_compute_date
+    #                 print(next_due_date)
+    #                 record.next_due_date = next_due_date
+    #                 # Update the rulebook computed date and reset status for next cycle
+    #                 rulebook.computed_date = next_due_date
+    #                 print(next_due_date)
+    #             else:
+    #                 # Do nothing if regulatory date doesn't match computed date
+    #                 continue
+         
                 
-    
-    def _compute_next_due_date(self):
-        _logger.critical("Updating next due date...")
+    # @api.constrains("rulebook_status")
+    # def _compute_next_due_date(self):
+    #     _logger.critical("Updating next due date...")
 
-        """Compute the next due date for the rulebook when the status is 'completed'."""
+    #     """Compute the next due date for the rulebook when the status is 'completed'."""
 
-        for record in self:
-            if record.frequency_type == "monthly":
-                next_due_date = record.computed_date + relativedelta(months=1)
+    #     for record in self:
+    #         if record.frequency_type == "monthly":
+    #             next_due_date = record.computed_date + relativedelta(months=1)
 
-            elif record.frequency_type == "quarterly":
-                next_due_date = record.computed_date + relativedelta(months=3)
+    #         elif record.frequency_type == "quarterly":
+    #             next_due_date = record.computed_date + relativedelta(months=3)
 
-            elif record.frequency_type == "yearly":
-                next_due_date = record.computed_date + relativedelta(years=1)
+    #         elif record.frequency_type == "yearly":
+    #             next_due_date = record.computed_date + relativedelta(years=1)
 
-            elif record.frequency_type == "daily":
-                next_due_date = record.computed_date + relativedelta(days=1)
+    #         elif record.frequency_type == "daily":
+    #             next_due_date = record.computed_date + relativedelta(days=1)
 
-            elif record.frequency_type == "weekly":
-                next_due_date = record.computed_date + relativedelta(weeks=1)
+    #         elif record.frequency_type == "weekly":
+    #             next_due_date = record.computed_date + relativedelta(weeks=1)
 
-            elif record.frequency_type == "day_of_month":
-                next_due_date = record.computed_date + relativedelta(months=1)
+    #         elif record.frequency_type == "day_of_month":
+    #             next_due_date = record.computed_date + relativedelta(months=1)
 
-            elif record.frequency_type == "day_every_month":
-                next_due_date = record.computed_date + relativedelta(months=1)
+    #         elif record.frequency_type == "day_every_month":
+    #             next_due_date = record.computed_date + relativedelta(months=1)
 
-            elif record.frequency_type == "bi_monthly":
-                # Get the current day of the computed date
-                current_day = record.computed_date.day
+    #         elif record.frequency_type == "bi_monthly":
+    #             # Get the current day of the computed date
+    #             current_day = record.computed_date.day
 
-                # Determine if it's the first or second date of the month
-                if current_day == record.bi_monthly_day1:
-                    # If current is first day, next is second day of same month
-                    next_due_date = record.computed_date.replace(
-                        day=record.bi_monthly_day2)
-                else:
-                    # If current is second day, next is first day of next month
-                    next_due_date = record.computed_date + \
-                        relativedelta(months=1)
-                    next_due_date = next_due_date.replace(
-                        day=record.bi_monthly_day1)
+    #             # Determine if it's the first or second date of the month
+    #             if current_day == record.bi_monthly_day1:
+    #                 # If current is first day, next is second day of same month
+    #                 next_due_date = record.computed_date.replace(
+    #                     day=record.bi_monthly_day2)
+    #             else:
+    #                 # If current is second day, next is first day of next month
+    #                 next_due_date = record.computed_date + \
+    #                     relativedelta(months=1)
+    #                 next_due_date = next_due_date.replace(
+    #                     day=record.bi_monthly_day1)
 
-            elif record.frequency_type == "semi_annually":
-                # Get current date components
-                current_month = record.computed_date.month
-                current_day = record.computed_date.day
+    #         elif record.frequency_type == "semi_annually":
+    #             # Get current date components
+    #             current_month = record.computed_date.month
+    #             current_day = record.computed_date.day
 
-                if current_month == record.semi_annual_month1:
-                    # Move to second date of the year
-                    next_due_date = record.computed_date.replace(
-                        month=record.semi_annual_month2,
-                        day=record.semi_annual_day2
-                    )
-                else:
-                    # Move to first date of next year
-                    next_due_date = record.computed_date.replace(
-                        year=record.computed_date.year + 1,
-                        month=record.semi_annual_month1,
-                        day=record.semi_annual_day1
-                    )
-            elif record.frequency_type == "three_yearly":
-                next_due_date = record.computed_date + relativedelta(years=3)
+    #             if current_month == record.semi_annual_month1:
+    #                 # Move to second date of the year
+    #                 next_due_date = record.computed_date.replace(
+    #                     month=record.semi_annual_month2,
+    #                     day=record.semi_annual_day2
+    #                 )
+    #             else:
+    #                 # Move to first date of next year
+    #                 next_due_date = record.computed_date.replace(
+    #                     year=record.computed_date.year + 1,
+    #                     month=record.semi_annual_month1,
+    #                     day=record.semi_annual_day1
+    #                 )
+    #         elif record.frequency_type == "three_yearly":
+    #             next_due_date = record.computed_date + relativedelta(years=3)
 
-            elif record.frequency_type == "date":
-                next_due_date = record.computed_date
+    #         elif record.frequency_type == "date":
+    #             next_due_date = record.computed_date
 
-            elif record.frequency_type == "immediate":
-                next_due_date = record.computed_date
+    #         elif record.frequency_type == "immediate":
+    #             next_due_date = record.computed_date
 
-            else:
-                next_due_date = record.computed_date
+    #         else:
+    #             next_due_date = record.computed_date
 
-            record.next_due_date = next_due_date
-            record.computed_date = next_due_date
+    #         record.next_due_date = next_due_date
+    #         record.computed_date = next_due_date
 
-            _logger.critical(
-                f"NEXT DUE DATE : {next_due_date}")
+    #         _logger.critical(
+    #             f"NEXT DUE DATE : {next_due_date}")
 
+   
     @api.model
     def update_reply_log_due_dates(self):
         """Update the next due date for all reply logs based on rulebook recurrence."""
-        # reply_logs = self.env['reply.log'].search(
-        #     [('rulebook_id.is_recurring', '=', True), ('rulebook.rulebook_status',' ==' "completed")])
         reply_logs = self.env['reply.log'].search(
             [('rulebook_id.is_recurring', '=', True), ('rulebook_status', '=', 'completed')])
 
