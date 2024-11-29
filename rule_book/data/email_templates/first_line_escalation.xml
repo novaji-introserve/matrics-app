@@ -2,12 +2,12 @@
     <data>
      
         <!-- First Line Escalation Template -->
-        <record id="escalation_email_template" model="mail.template">
+        <record id="email_template_first_line_escalation_" model="mail.template">
             <field name="name">First Line Escalation for Rulebook</field>
             <field name="email_from">{{object.data()['email_from']}}</field>
-            <field name="email_cc">{{object.data()['email_cc']}}</field>
-            <field name="email_to">{{object.data()['email_to']}}</field>
-            <field name="subject">Escalation Due Date for {{object.data()['title']}}</field>
+            <field name="email_cc">{{object.data()['second_line_escalation']}}</field>
+            <field name="email_to">{{object.data()['first_line_escalation']}}</field>
+            <field name="subject">Escalation Due Date for {{object.data()['rulebook_return']}}</field>
             <field name="body_html" type="html">
                 <div
                     style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
@@ -20,7 +20,7 @@
                     <div style="padding: 20px;">
                         <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong
                                 style="color: #004225;">
-                                <t t-out="object.data()['first_line_escalation']" />
+                                <t t-out="object.data()['first_line_name']" />
                             </strong>
                             ,</p>
 
@@ -30,12 +30,12 @@
                                 <t t-out="object.data()['officer_responsible']" /> in <t t-out="object.data()['responsible_id']" />
                                 has not yet uploaded the regulatory document for <strong
                                     style="color: #004225;">
-                                    <t t-out="object.data()['title']" />
+                                    <t t-out="object.data()['rulebook_return']" />
                                 </strong>
                                 .</p>
                             <p style="font-size: 16px; color: #333333; line-height: 1.6;">
                                 <strong style="color: #004225;">Escalation Due Date:</strong>
-                                <t t-out="object.data()['due_date']" />
+                                <t t-out="object.data()['escalation_date']" />
                             </p>
                         </div>
 
@@ -45,11 +45,11 @@
                                 style="display: inline-block; color: #006400; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Check Details</a>
                         </p>
 
-                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can upload
+                        <!-- <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can upload
                             the document at the following link: <a
                                 t-attf-href="#{object.data()['upload_link']}"
                                 style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit Document</a>
-                        </p>
+                        </p> -->
 
                         <p style="font-size: 16px; color: #333333; line-height: 1.6;">Thank you.</p>
                     </div>
