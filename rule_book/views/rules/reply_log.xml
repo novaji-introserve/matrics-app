@@ -6,7 +6,9 @@
         <field name="model">reply.log</field>
         <field name="arch" type="xml">
             <tree string="Reply Log" create="false">
-                <field name="rulebook_id" />
+                <field name="rulebook_id" string="Rulebook Title"/>
+                <field name="rulebook_name" string="Rulebook Returns" />
+
                 <!-- <field name="rulebook_compute_date" widget="datetime" /> -->
                 <!-- <field name="reply_date" widget="datetime" options="{'format': 'MMMM dd, yyyy HH:mm:ss'}" /> -->
                 <field name="formatted_rulebook_date" string="Internal Due Date" />

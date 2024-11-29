@@ -134,12 +134,12 @@ class RuleBookController(http.Controller):
    
     def trigger_escalation_alert(self, report):
         # Logic for sending email to escalation officers
-        template = request.env.ref("rule_book.email_template_escalation")
+        template = request.env.ref("rule_book.email_template_rulebook_log_notification_")
         if template:
             template.sudo().send_mail(report.id, force_send=True)
         else:
             _logger.critical(
-                "Email template 'rule_book.email_template_escalation' not found.")
+                "Email template 'rule_book.email_template_rulebook_log_notification_' not found.")
 
 
     @http.route(
