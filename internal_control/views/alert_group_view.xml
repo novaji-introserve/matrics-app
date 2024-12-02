@@ -6,9 +6,8 @@
         <field name="arch" type="xml">
             <tree string="Alert group">
                 <field name="name" />
-                <field name="email" />
-                <!-- <field name="email_list"  /> -->
-                <!-- <field name="email_cc" /> -->
+                <field name="email_list"  />
+                <field name="email_cc" />
                 <field name="state" />
                 <field name="tag" />
                 <field name="date_created"  readonly="1"/>
@@ -28,7 +27,7 @@
                    
                     <group class="col-md-6 col-12">
                        <field name="name" />
-                       <field name="email"/>
+                       <field name="users_ids" widget="many2many_tags"/>
                        <field name="state" />
                     </group>
                     <group class="col-md-6 col-12">

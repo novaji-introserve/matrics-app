@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="email_template_rulebook_log_notification_" model="mail.template">
+        <field name="name">Rulebook Log Alert</field>
+        <field name="model_id" ref="model_reply_log" />
+        <field name="email_from">{{object.data()['email_from']}}</field>
+        <field name="email_to">{{object.data()['email_to']}}</field>
+        <field name="subject">New Report Submitted:{{object.data()['name']}}</field>
+        <field name="body_html" type="html">
+            <div class="email-container" style="font-family: Arial, sans-serif; background-color: #f0f8ff; color: #333333; margin: 0; padding: 0;">
+                <div class="email-content" style="background-color: #ffffff; margin: 20px auto; padding: 20px; max-width: 600px; border: 1px solid #E0E0E0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); background: linear-gradient(135deg, #f6f8f9 30%, #ffffff);">
+                    <div class="header" style="text-align: center; padding: 10px 0;">
+                        <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg" alt="Bank of Industry" style="max-width: 150px;" />
+                    </div>
+                    <div class="content" style="padding: 20px;">
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong style="color: #006400;"> Officer</strong>,
+                        </p>
+                        <div class="highlight-box" style="background-color: #f0fff0; padding: 20px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">A new report has been submitted for the rulebook return 
+                               
+                                                                <!-- <strong style="color: #006400;">
+                                    <span style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                        <t t-out="object.data()['name']"></t>
+                                    </span>
+                                </strong> -->
+                                <strong style="color: #004225;">
+                                    <t t-out="object.data()['name']" />
+                                </strong>. 
+
+                            </p>
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                <strong style="color: #006400;">Title:
+                                    <span style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                        <t t-out="object.data()['title']"></t>
+                                    </span>
+                                </strong>
+                            </p>
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                <strong style="color: #006400;">Reply Note:
+                                    <span style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                        <t t-out="object.data()['content']"></t>
+                                    </span>
+                                </strong>
+                            </p>
+                        </div>
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Please review
+                            this return.</p>
+                        <p>
+                            <a t-attf-href="#{object.data()['url_link']}" class="button" style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 20px; font-size: 16px;">View
+                                Report</a>
+                        </p>
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Best Regards,<br />
+                            Your Compliance Team</p>
+                    </div>
+                    <div class="footer" style="text-align: center; margin-top: 30px; font-size: 12px; color: #999999;"> &amp;copy; <t t-out="object.data()['current_year']"></t> Bank of Industry. All rights
+                    reserved. </div>
+                </div>
+            </div>
+        </field>
+        <field name="auto_delete" eval="False" />
+    </record>
+
+
+</odoo>
+<!-- 
+<div>
+    <p>Dear Escalation Officer,</p>
+    <p>A new report has been submitted for the rulebook <strong>
+            <t t-out="object.data()['name']"></t>
+        </strong>.</p>
+    <p>
+        <strong>Description:</strong>
+        <t t-out="object.data()['content']"></t>
+    </p>
+    <p>Please review the attached document.</p>
+    <p>
+        <a t-attf-href="#{object.data()['url_link']}">View Report</a>
+    </p>
+
+    <p>Best Regards,<br />Your Compliance Team</p>
+</div> -->

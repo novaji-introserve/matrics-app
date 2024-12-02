@@ -16,7 +16,7 @@ export class AlertDashboard extends Component {
         [
           "submission_timing",
           "in",
-          ["early", "on_time", "late", "not_responded"],
+          ["early", "pending", "late", "not_responded"],
         ],
       ];
 
@@ -30,7 +30,7 @@ export class AlertDashboard extends Component {
       // Initialize counters for each status
       const groupedData = {
         early: { count: 0, name: "Early Submission" },
-        on_time: { count: 0, name: "Right on Time" },
+        pending: { count: 0, name: "Pending" },
         late: { count: 0, name: "Late Submission" },
         not_responded: { count: 0, name: "Not Responded" },
       };
@@ -221,7 +221,7 @@ export class AlertDashboard extends Component {
         value: 1,
         percentage: 1,
       },
-      period: 7,
+      period: 0,
     });
 
     this.orm = useService("orm");
@@ -292,7 +292,7 @@ export class AlertDashboard extends Component {
     const period = this.state.period;
     const previous_date = this.state.previous_date;
 
-    const domain = [["submission_timing", "in", ["on_time"]]];
+    const domain = [["submission_timing", "in", ["pending"]]];
 
     if (period > 0) {
       domain.push(["reply_date", ">", current_date]);
@@ -302,7 +302,7 @@ export class AlertDashboard extends Component {
 
     this.state.pendingReply.value = data;
 
-    const prev_domain = [["submission_timing", "in", ["on_time"]]];
+    const prev_domain = [["submission_timing", "in", ["pending"]]];
 
     if (period > 0) {
       prev_domain.push(
@@ -527,7 +527,7 @@ export class AlertDashboard extends Component {
 
   //   Rulebook that is not yet due (pending)
   async viewPendingReply() {
-    const domain = [["submission_timing", "in", ["on_time"]]];
+    const domain = [["submission_timing", "in", ["pending"]]];
 
     if (this.state.period > 0) {
       domain.push(["reply_date", ">", this.state.current_date]);

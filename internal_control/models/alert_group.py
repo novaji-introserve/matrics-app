@@ -6,18 +6,16 @@ class Alert_group(models.Model):
     
 
     name = fields.Char(string="Name", required=True)
-    email = fields.Char(string="Email", required=True)
+    users_ids = fields.Many2many('res.users', 'alert_group_user_rel', 'alert_group_id', 'user_id', string="Users", required=True)
     email_cc = fields.Char(string="Copy_Email")
     state = fields.Boolean(string="State",default=True, required=True)
     tag = fields.Char(string="Tag")
     date_created = fields.Datetime(string="created_at", default=fields.Datetime.now())
     email_list = fields.Text(string="email_list", compute="split_email")
 
-    @api.depends('email')
+    @api.onchange('users_ids')
     def split_email(self):
         for record in self:
-            # Split the email string by commas and remove any empty entries (if any)
-            if record.email:
-                record.email_list = str(record.email.split(','))
-            else:
-                raise ValidationError('Provide Strings of Email separated by comma(,) for this group')
+            
+             record.email_list = ', '.join(user.email for user in record.users_ids)
+           

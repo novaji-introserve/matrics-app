@@ -2,13 +2,13 @@
 <odoo>
 
     <!-- Internal Due Date Reminder -->
-     <record id="email_template_internal_due_date_" model="mail.template">
-            <field name="name">Internal Due Date Reminder for Rulebook</field>
+     <record id="email_template_regulatory_due_date_" model="mail.template">
+            <field name="name">Regulatory Due Date Reminder for Rulebook</field>
             <field name="email_from">{{object.data()['email_from']}}</field>
             <field name="model_id" ref="rule_book.model_rulebook" />
-            <field name="email_cc">{{object.data()['email_from']}}</field>
+            <field name="email_cc">{{object.data()['email_cc']}}</field>
             <field name="email_to">{{object.data()['email_to']}}</field>
-            <field name="subject">Internal Due Date for {{object.data()['title']}}</field>
+            <field name="subject">Reminder: Regulatory Due Date for {{object.data()['rulebook_return']}}</field>
             <field name="body_html" type="html">
                 <div style="font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0;">
                     <div style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border: 1px solid #E0E0E0; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
@@ -17,26 +17,26 @@
                         </div>
                         <div style="padding: 20px;">
                             <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong style="color: #006400;">
-                                <t t-out="object.data()['name']"></t>
+                                <t t-out="object.data()['officer_responsible']"></t>
                                 <strong/>
                             </strong>
                         </p>
                         <div style="background-color: #f0fff0; padding: 15px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
                             <p style="font-size: 16px; color: #333333; line-height: 1.6;">The
                                     internal due date for carrying out this return <strong style="color: #006400;">
-                                <t t-out="object.data()['rulebook_name']"></t>
+                                <t t-out="object.data()['rulebook_return']"></t>
                                 <strong />
                             </strong> on rulebook title <strong style="color: #006400;">
-                            <t t-out="object.data()['title']"></t>
+                            <t t-out="object.data()['rulebook_name']"></t>
                             <strong />
                         </strong>
-                                    is approaching. The due date is <strong style="color: #006400;">
-                        <t t-out="object.data()['due_date']"></t>
+                                    is approaching. The internal due date is <strong style="color: #006400;">
+                        <t t-out="object.data()['computed_date']"></t>
                         <strong />
                     </strong>.
                 </p>
                 <p style="font-size: 16px; color: #333333; line-height: 1.6;">
-                                    Please ensure you upload the proof of completion before the due date.</p>
+                                    Please ensure you upload the proof of completion before the aforementioned date.</p>
             </div>
             <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can
                                 upload the document here: <a t-attf-href="#{object.data()['upload_link']}" style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
