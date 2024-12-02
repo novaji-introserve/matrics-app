@@ -39,6 +39,155 @@
 
     <menuitem id="menu_internal_control_betting_gambling_transactions" name="Betting/Gambling Transactions" parent="menu_internal_control_transactions" action="action_betting_gambling_transactions" sequence="80"/>
 
+    <menuitem
+        id="menu_internal_control_cash_collateral_entries"
+        name="Cash Collateral Entries"
+        parent="menu_internal_control_transactions"
+        action="action_cash_collateral_entries"
+        sequence="90"/>
+    
+    <menuitem
+        id="menu_internal_control_reversal_from_income_ledgers"
+        name="Reversal from Income Ledgers"
+        action="action_reversal_from_income_ledgers"
+        parent="menu_internal_control_transactions"
+        sequence="100"/>
+
+    <menuitem
+        id="menu_internal_control_collateral_before_guarantee"
+        name="Collateral Before Guarantee"
+        action="action_collateral_before_guarantee"
+        parent="menu_internal_control_transactions"
+        sequence="110"/>
+
+    <menuitem
+        id="menu_internal_control_reportable_limit_monitoring"
+        name="Reportable Limit Monitoring"
+        action="action_reportable_limit_monitoring"
+        parent="menu_internal_control_transactions"
+        sequence="120"/>
+    
+    <menuitem
+        id="menu_internal_control_tier_1_transactions_over_limit"
+        name="Tier 1 Transactions Over Limit"
+        action="action_tier_1_transactions_over_limit"
+        parent="menu_internal_control_transactions"
+        sequence="130"/>
+
+    <menuitem
+        id="menu_internal_control_tier_2_transactions_over_limit"
+        name="Tier 2 Transactions Over Limit"
+        action="action_tier_2_transactions_over_limit"
+        parent="menu_internal_control_transactions"
+        sequence="140"/>
+    
+    <menuitem
+        id="menu_internal_control_large_individual_withdrawals"
+        name="Large Individual Withdrawals"
+        action="action_large_individual_withdrawals"
+        parent="menu_internal_control_transactions"
+        sequence="150"/>
+
+    <menuitem
+        id="menu_internal_control_large_corporate_withdrawals"
+        name="Large Corporate Withdrawals"
+        action="action_large_corporate_withdrawals"
+        parent="menu_internal_control_transactions"
+        sequence="160"/>
+
+    <menuitem
+        id="menu_internal_control_e_payment_to_staff"
+        name="E-payment to Staff"
+        action="action_e_payment_to_staff"
+        parent="menu_internal_control_transactions"
+        sequence="170"/>
+
+    <menuitem
+        id="menu_internal_control_e_payment_to_customers"
+        name="E-payment to Customers"
+        action="action_e_payment_to_customers"
+        parent="menu_internal_control_transactions"
+        sequence="180"/>
+
+    <menuitem
+        id="menu_internal_control_atm_ledger_limits"
+        name="ATM Ledger Limits"
+        action="action_atm_ledger_limits"
+        parent="menu_internal_control_transactions"
+        sequence="190"/>
+
+    <menuitem
+        id="menu_internal_control_tier_1_to_tier_2_upgrades"
+        name="Tier 1 to Tier 2 Upgrades"
+        action="action_tier_1_to_tier_2_upgrades"
+        parent="menu_internal_control_transactions"
+        sequence="200"/>
+
+    <menuitem
+        id="menu_internal_control_tier_2_to_tier_3_upgrades"
+        name="Tier 2 to Tier 3 Upgrades"
+        action="action_tier_2_to_tier_3_upgrades"
+        parent="menu_internal_control_transactions"
+        sequence="210"/>
+
+    <menuitem
+        id="menu_internal_control_savings_account_in_debit"
+        name="Savings Account in Debit"
+        action="action_savings_account_in_debit"
+        parent="menu_internal_control_transactions"
+        sequence="220"/>
+
+    <menuitem
+        id="menu_internal_control_suspense_ledger_withdrawals"
+        name="Suspense Ledger Withdrawals"
+        action="action_suspense_ledger_withdrawals"
+        parent="menu_internal_control_transactions"
+        sequence="230"/>
+
+    <menuitem
+        id="menu_internal_control_large_cheque_deposits"
+        name="Large Cheque Deposits"
+        action="action_large_cheque_deposits"
+        parent="menu_internal_control_transactions"
+        sequence="240"/>
+
+    <menuitem
+        id="menu_internal_control_collection_account_postings"
+        name="Collection Account Postings"
+        action="action_collection_account_postings"
+        parent="menu_internal_control_transactions"
+        sequence="250"/>
+
+    <menuitem
+        id="menu_internal_control_multiple_deposits_monitoring"
+        name="Multiple Deposits Monitoring"
+        action="action_multiple_deposits_monitoring"
+        parent="menu_internal_control_transactions"
+        sequence="260"/>
+
+    <menuitem
+        id="menu_internal_control_large_account_inflows"
+        name="Large Account Inflows"
+        action="action_large_account_inflows"
+        parent="menu_internal_control_transactions"
+        sequence="270"/>
+
+    <menuitem
+        id="menu_internal_control_e_payment_debit_transactions"
+        name="E-payment Debit Transactions"
+        action="action_e_payment_debit_transactions"
+        parent="menu_internal_control_transactions"
+        sequence="280"/>
+
+    <menuitem
+        id="menu_internal_control_unscanned_mandates"
+        name="Unscanned Mandates"
+        action="action_unscanned_mandates"
+        parent="menu_internal_control_transactions"
+        sequence="290"/>
+
+
+
     <!-- ===================== -->
     <!-- 2. ACCOUNT STATUS MENU -->
     <!-- ===================== -->
@@ -91,10 +240,6 @@
 
 
    
-
-
-        
-
     <!-- Configurations -->
     <menuitem id="menu_internal_control_configurations"
               name="Configurations"

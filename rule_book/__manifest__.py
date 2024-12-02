@@ -58,7 +58,7 @@
         # "data/preloaded_data/users.xml",
         "data/preloaded_data/rule_book_sources.xml",
         "data/email_templates/rulebook_log_notification.xml",
-        "data/email_templates/first_escalation.xml",
+        "data/email_templates/first_line_escalation.xml",
         "data/email_templates/escalation_notification.xml",
 
         "views/public/rule_book_submission.xml",

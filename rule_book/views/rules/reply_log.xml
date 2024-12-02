@@ -6,9 +6,13 @@
         <field name="model">reply.log</field>
         <field name="arch" type="xml">
             <tree string="Reply Log" create="false">
-                <field name="rulebook_id" />
-                <field name="rulebook_compute_date" widget="datetime" />
-                <field name="reply_date" widget="datetime" />
+                <field name="rulebook_id" string="Rulebook Title"/>
+                <field name="rulebook_name" string="Rulebook Returns" />
+
+                <!-- <field name="rulebook_compute_date" widget="datetime" /> -->
+                <!-- <field name="reply_date" widget="datetime" options="{'format': 'MMMM dd, yyyy HH:mm:ss'}" /> -->
+                <field name="formatted_rulebook_date" string="Internal Due Date" />
+                <field name="formatted_reply_date"  string="Reply date"/>
                 <field name="submission_timing" widget="badge" decoration-info="submission_timing == 'pending'" decoration-success="submission_timing == 'early'" decoration-warning="submission_timing == 'late'" decoration-danger="submission_timing == 'not_responded'" />
                 <field name="rulebook_status" widget="badge" decoration-muted="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'" />
                 <field name="reporter" string="Officer Responsible" />
@@ -34,9 +38,11 @@
                     </div>
                     <group>
                         <group class="mt-3">
-                            <field name="rulebook_name" readonly="1" widget="text" />
-                            <field name="reply_date" readonly="1" />
-                            <field name="reply_content" widget="text" />
+                            <field name="rulebook_name" class="text_field" />
+                            <field name="formatted_reply_date" readonly="1" string="Reply date"/>
+
+                            <!-- <field name="reply_date" readonly="1" widget="datetime" options="{'format': 'MMMM dd, yyyy HH:mm:ss'}"/> -->
+                            <field name="reply_content" class="text_field" />
                             <field name="document_filename" invisible="1" />
                             <field name="submission_timing" string="Submission Timing" />
 
@@ -45,7 +51,12 @@
                             <field name="reporter" readonly="1" string="Officer Responsible" />
                             <field name="department_id" readonly="1" string="Department Responsible" />
 
-                            <field name="rulebook_compute_date" readonly="1"/>
+                            <!-- <field name="rulebook_compute_date" readonly="1"/> -->
+                            <field name="formatted_rulebook_date" readonly="1" string="Internal Due Date" />
+
+                            <field name="frequency_type" readonly="1"/>
+
+
 
                         </group>
 

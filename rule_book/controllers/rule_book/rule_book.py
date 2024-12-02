@@ -106,7 +106,7 @@ class RuleBookController(http.Controller):
             # Prepare global data
             current_year = datetime.now().year
             global_data = {
-                "email_from": "leonell4fame@gmail.com",
+                "email_from":  os.getenv("EMAIL_FROM"),
                 "email_to": rulebook.first_line_escalation.email,
                 "name":  rulebook.type_of_return,
                 "title":  rulebook.name.name,
@@ -134,12 +134,12 @@ class RuleBookController(http.Controller):
    
     def trigger_escalation_alert(self, report):
         # Logic for sending email to escalation officers
-        template = request.env.ref("rule_book.email_template_escalation")
+        template = request.env.ref("rule_book.email_template_rulebook_log_notification_")
         if template:
             template.sudo().send_mail(report.id, force_send=True)
         else:
             _logger.critical(
-                "Email template 'rule_book.email_template_escalation' not found.")
+                "Email template 'rule_book.email_template_rulebook_log_notification_' not found.")
 
 
     @http.route(
