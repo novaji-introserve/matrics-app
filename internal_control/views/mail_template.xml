@@ -68,9 +68,15 @@
                                                         <p> <span t-esc="object.narration" /> </p>
                                                    </div>
                                                 <hr />
+                                                   <!-- <div style="">
+                                                        <a href="data:application/octet-stream;base64,${attachmentId.datas}" download="${attachmentId.name}">
+                                                            Download CSV
+                                                        </a>
+                                                   </div> -->
+                                                <hr />
                                                    <div style="display: flex; align-items:center; gap:0.4rem; margin: 0.5rem 0;">
                                                         <p>Date:</p>
-                                                        <p> <span t-esc="object.date_created.strftime('%Y-%m-%d')" /> </p>
+                                                        <p> <span t-esc="object.last_checked.strftime('%Y-%m-%d')" /> </p>
                                                    </div>
                                                    
                                                    <div style="margin: 0.5rem 0;">

@@ -12,3 +12,4 @@ access_alert_group_rules,access alert group rules,internal_control.model_alert_g
 access_internal_control_screening_rule,access internal control screening rules,internal_control.model_internal_control_screening_rule,base.group_user,1,1,1,1
 access_internal_control_sql_rule,access internal control sql rules,internal_control.model_process_sql,base.group_user,1,1,1,1
 access_internal_control_alert_history,access internal control alert history,internal_control.model_alert_history,base.group_user,1,1,1,1
+access_internal_control_email_branch,access internal control email branch,internal_control.model_email_branch,base.group_user,1,1,1,1

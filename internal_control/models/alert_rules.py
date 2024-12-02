@@ -8,17 +8,18 @@ import csv
 import io
 import base64, time, uuid
 
-lagos_timezone = pytz.timezone('Africa/Lagos')
+# lagos_timezone = pytz.timezone('Africa/Lagos')
 
-# Get the current time in Lagos timezone
-current_time = datetime.now(lagos_timezone)
+# # Get the current time in Lagos timezone
+# current_time = datetime.now(lagos_timezone)
 
-utc_time = current_time.astimezone(timezone('UTC'))
+# utc_time = current_time.astimezone(timezone('UTC'))
 
 class alert_rules(models.Model):
     _name = 'alert.rules'
     _description = "alert rules for exception management"
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'id desc'
     
     name = fields.Char(string="Name", required=True, Tracking=True)
     narration = fields.Html(string="narration", required=True)
@@ -38,11 +39,12 @@ class alert_rules(models.Model):
     table_html = fields.Html(string="table_html")
     date_created = fields.Datetime(
     string="created_at", 
-    default=lambda self:  utc_time.replace(tzinfo=None) 
+    default=fields.Datetime.now()
     )
-    last_checked = fields.Datetime(string="last_checked", default=lambda self:  utc_time.replace(tzinfo=None))
+    last_checked = fields.Datetime(string="last_checked", default=fields.Datetime.now())
     branch_id = fields.Many2one('tbl.branch', string="Branch", required=True)
     alert_id = fields.Char(string="alert_id")
+    attachmentId = fields.Char(string="attachments")
 
 
     @api.onchange('sql_text')
@@ -67,7 +69,7 @@ class alert_rules(models.Model):
             
     
     def process(self, rule):
-        last_checked = rule.last_checked.astimezone(lagos_timezone)
+        last_checked = rule.last_checked
         unit = rule.frequency_id.name
         period = rule.frequency_id.period
         next_check = ''
@@ -97,119 +99,177 @@ class alert_rules(models.Model):
         else:
             raise ValidationError(f"Unsupported Unit")
         
-        current_time_lagos = datetime.now(lagos_timezone)
+         
         
-       
+    
         
+        current_time_lagos = fields.Datetime.now()
         if current_time_lagos.year == next_check.year and current_time_lagos.month == next_check.month and  current_time_lagos.day == next_check.day and current_time_lagos.hour == next_check.hour and current_time_lagos.minute == next_check.minute:
+
+            
+            rule.write({'last_checked': fields.Datetime.now()})
             print("sent ") 
             self.send_alert(rule)
     
     
     def send_alert(self, rule):
         try:
-                # update last checked
-                rule.write({'last_checked': utc_time.replace(tzinfo=None)})
-                
-                
-                           
-                self.env.cr.execute(rule.sql_text.query)
+                # first query to create csv
+                self.env.cr.execute(f"{rule.sql_text.query}")
                 rows = self.env.cr.fetchall()
                 
-                column_headers = [description[0] for description in self.env.cr.description]
-                
-                     # Create a CSV in memory
-                csv_buffer = io.StringIO()
-                csv_writer = csv.writer(csv_buffer)
+                # Get column names dynamically
+                columns = [desc[0] for desc in self.env.cr.description]
 
-                # Write headers to the CSV
-                csv_writer.writerow(column_headers)
+                # Find the index of subbranchcode dynamically
+                subbranchcode_index = None
+                for i, column in enumerate(columns):
+                    if 'subbranchcode' in column.lower():  # Case insensitive search
+                        subbranchcode_index = i
+                        break
 
-                # Write data rows to the CSV
-                for row in rows:
-                    csv_writer.writerow(row)
+                if subbranchcode_index is None:
+                    print("subbranchcode column not found")
+                else:
+                    branches = []
+
+                    # Loop through the rows and get the value of subbranchcode dynamically
+                    for row in rows:
+                        subbranchcode = row[subbranchcode_index]  # Accessing subbranchcode dynamically by index
+                        
+                        if subbranchcode not in branches:
+                            branches.append(subbranchcode)
+
+                    # Initialize a dictionary to store the emails by branch
+                    branch_emails = {}
+
+                    for branch in branches:
+                        
+                        # Search for records in the email.branch model that match the current branch
+                        email_branch = self.env['email.branch'].search([])
+                        
+                        print(email_branch.branch_id)
+                        # print(email_branch)
+                        
+                    #     if email_branch:
+                    #     #     print("helo world")
+                    # #         # Assuming email_list contains a comma-separated string of emails
+                    #         email_list = email_branch.email_list
+                    #         # # branch_emails[email_branch.branch_id.branch_name] = email_list
+                    #         print(email_branch.branch_id.branch_name)
+                    #         print(email_list)
+
+                    # print(branch_emails)  
+                     
+                   
                 
-                csv_content = csv_buffer.getvalue()
-                csv_buffer.close()
+                # column_headers = [description[0] for description in self.env.cr.description]
+                
+                #      # Create a CSV in memory
+                # csv_buffer = io.StringIO()
+                # csv_writer = csv.writer(csv_buffer)
+
+                # # Write headers to the CSV
+                # csv_writer.writerow(column_headers)
+
+                # # Write data rows to the CSV
+                # for row in rows:
+                #     csv_writer.writerow(row)
+                
+                # csv_content = csv_buffer.getvalue()
+                # csv_buffer.close()
                 
                 
-                # Step 3: Base64 encode the CSV content
-                encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
+                # # Step 3: Base64 encode the CSV content
+                # encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
 
                 
-                attachment = {
-                    'name': 'report.csv',
-                    'mimetype': 'text/csv',  # The MIME type for CSV files
-                    'type': 'binary',
-                    'datas': encoded_content,
-                    'res_model': 'ir.attachment',
-                    'res_id': rule.id,  # The record ID that the attachment will be associated with
-                }
-                attachment_id = self.env['ir.attachment'].create(attachment)
+                # attachment = {
+                #     'name': 'report.csv',
+                #     'mimetype': 'text/csv',  # The MIME type for CSV files
+                #     'type': 'binary',
+                #     'datas': encoded_content,
+                #     'res_model': 'alert.rules',
+                #     'res_id': rule.id,  # The record ID that the attachment will be associated with
+                # }
+                # attachment_id = self.env['ir.attachment'].create(attachment)
+                
+                # # second query to create table
+                # self.env.cr.execute(f"{rule.sql_text.query} LIMIT 10")
+                # rows2 = self.env.cr.fetchall()
+                
+
                  
                  
-                # Create the HTML table for the email
+                # # Create the HTML table for the email
                
-                table_html = """
-                <table class="table table-bordered table-hover" style="width: 100%; max-width: 100vw; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #ddd; overflow:auto;">
-                    <thead style="background-color: #007046; color: #fff; padding: 12px;">
-                        <tr>
-                            <!-- Table headers -->
-                            {header_columns}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {table_rows}
-                    </tbody>
-                </table>
-                """
+                # table_html = """
+                # <table class="table table-bordered table-hover" style="width: 100%; max-width: 100vw; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #ddd; overflow:auto;">
+                #     <thead style="background-color: #007046; color: #fff; padding: 12px;">
+                #         <tr>
+                #             <!-- Table headers -->
+                #             {header_columns}
+                #         </tr>
+                #     </thead>
+                #     <tbody>
+                #         {table_rows}
+                #     </tbody>
+                # </table>
+                # """
                         
-                # Generate the table header
-                header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in column_headers])
+                # # Generate the table header
+                # header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in column_headers])
 
-                # Generate the table rows
-                rows_html = ""
-                for row in rows:
-                    rows_html += "<tr>"
-                    for cell in row:
-                        rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
-                    rows_html += "</tr>"
+                # # Generate the table rows
+                # rows_html = ""
+                # for row in rows2:
+                #     rows_html += "<tr>"
+                #     for cell in row:
+                #         rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
+                #     rows_html += "</tr>"
 
-                # Insert the generated HTML into the main table structure
-                table_html = table_html.format(header_columns=header_html, table_rows=rows_html)
+                # # Insert the generated HTML into the main table structure
+                # table_html = table_html.format(header_columns=header_html, table_rows=rows_html)
 
-                template = self.env.ref('internal_control.alert_rules_mail_template')
+                # template = self.env.ref('internal_control.alert_rules_mail_template')
                 
-                if template:
+                # if template:
                     
-                        template.attachment_ids = [(4, attachment_id.id)]  # Attach the attachment to the template
+                #         template.attachment_ids = [(4, attachment_id.id)]  # Attach the attachment to the template
 
                         
-                        # generate random string attached for each alert to be send
-                        alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
+                #         # generate random string attached for each alert to be send
+                #         alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
                         
-                        rule.table_html = table_html
-                        rule.alert_id = alert_id
+                #         rule.table_html = table_html
+                #         rule.alert_id = alert_id
+                #         rule.attachmentId = attachment_id.id
                         
-                        template.send_mail(rule.id, force_send=True)
+                #         template.send_mail(rule.id, force_send=True)
                         
-                        # record the history
-                        new_alert_history = self.env['alert.history'].create({
-                            "alert_id": alert_id,
-                            "attachment": attachment_id.id,
-                            "html_body": table_html,
-                            "alert_rule_id": rule.id,
+                #         # record the history
+                #         new_alert_history = self.env['alert.history'].create({
+                #             "alert_id": alert_id,
+                #             "attachment": attachment_id.id,
+                #             "html_body": table_html,
+                #             "alert_rule_id": rule.id,
+                #             "process_id": rule.process_id.name,
+                #             "process_category": rule.process_category_id.name,
+                #             "process_category": rule.process_category_id.name,
+                #             "risk_rating": rule.risk_rating.name,
+                #             "date_created": rule.date_created,
+                #             "last_checked": rule.last_checked
                             
-                        })
+                #         })
                        
-                    #   
+                #     #   
                          
                     
                     
                         
         
-                else:
-                  raise ValidationError("Mail Template Not Found")
+                # else:
+                #   raise ValidationError("Mail Template Not Found")
                   
         
         except BaseException as e:
