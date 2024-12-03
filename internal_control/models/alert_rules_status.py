@@ -6,5 +6,10 @@ class alert_rules_status(models.Model):
 
     name = fields.Char(string="Name", required=True)
     code = fields.Boolean(string="Code", required=True)
+<<<<<<< HEAD
+    date_created = fields.Datetime(string="created_at", default=fields.Datetime.now())
+
+=======
+>>>>>>> main
 
    

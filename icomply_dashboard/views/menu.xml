@@ -60,10 +60,17 @@
 
     <!-- <menuitem id="icomply_dashboard_menu" name="iComply Dashboard" parent="base.menu_custom"
       action="icomply_dashboard_action" /> -->
+<<<<<<< HEAD
+    <menuitem name="Icomply Dashboard" id="icomply_dashboard_main">
+      <menuitem name="Home" id="menu_Icomply_dashboard" sequence="1" action="dashboard_home" />
+      <menuitem name="Case Management" id="case_management" action="action_case_management" /> 
+    </menuitem>  
+=======
     <!-- <menuitem name="Icomply Dashboard" id="icomply_dashboard_main">
       <menuitem name="Home" id="menu_Icomply_dashboard" sequence="1" action="dashboard_home" />
       <menuitem name="Case Management" id="case_management" action="action_case_management" /> 
     </menuitem>   -->
+>>>>>>> main
 
   </data>
 </odoo>

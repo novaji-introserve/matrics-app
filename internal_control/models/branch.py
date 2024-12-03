@@ -29,6 +29,9 @@ class Branch(models.Model):
     subbbranch = fields.Integer(string="subbbranch")
     
     _sql_constraints = [('branch_code_unique', 'unique(branch_code)', 'Branch Code must be unique!')]
+<<<<<<< HEAD
+
+=======
     _rec_name = 'representation'
 
     @api.depends('branch_code', 'branch_name')
@@ -37,4 +40,5 @@ class Branch(models.Model):
             record.representation = f"{record.branch_code} - {record.branch_name}"
 
     representation = fields.Char(string='representation', compute='_compute_name_rep', store=True)
+>>>>>>> main
   

@@ -287,4 +287,4 @@ class alert_rules(models.Model):
                 _logger.error(f"Unexpected error occurred while sending email: {e}")
                 break  # Break the loop on any other error
 
-        _logger.error("Failed to send email after several attempts.")
+        # _logger.error("Failed to send email after several attempts.")

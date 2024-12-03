@@ -75,6 +75,13 @@
     </record> -->
 
 
+<<<<<<< HEAD
+
+
+
+
+=======
+>>>>>>> main
 
 
     <!-- Reply log -->
@@ -122,7 +129,11 @@
 
     <!-- <menuitem id="menu_rulebook_theme" name="Themes" parent="menu_rulebook_details" action="action_rulebook_theme" sequence="4" /> -->
     <!-- Reply Logs -->
+<<<<<<< HEAD
+    <menuitem id="menu_reply_log" name="Reply Logs" parent="menu_rulebook_details" action="open_reply_log" sequence="5" />
+=======
     <menuitem id="menu_reply_log" name="Rulebook Logs" parent="menu_rulebook_details" action="open_reply_log" sequence="5" />
+>>>>>>> main
 
     <!-- Submenu for Sources (Regulatory Source and Regulatory Records) -->
     <menuitem id="menu_rulebook_sources_root" name="Sources" parent="menu_rulebook_theme_root" sequence="2" />
