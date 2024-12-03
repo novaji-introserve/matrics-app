@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <!-- All Transactions Action -->
+    <!-- <record id="action_all_transactions" model="ir.actions.act_window">
+        <field name="name">All Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reversed transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record> -->
+
+     <!-- Transactions to review Action -->
+    <!-- <record id="action_transactions_to_review" model="ir.actions.act_window">
+        <field name="name">Transactions to review</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reversed transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record> -->
+
+    <!-- Transactions Reviewed Action -->
+    <!-- <record id="action_transactions_reviewed" model="ir.actions.act_window">
+        <field name="name">Transactions Reviewed</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reversed transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record> -->
+
+    <!-- ===================== -->
+    <!-- 1. TRANSACTION MONITORING ACTIONS -->
+    <!-- ===================== -->
+    <!-- Reversed Transactions Action -->
+    <record id="action_reversed_transactions" model="ir.actions.act_window">
+        <field name="name">Reversed Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('Reversal', '=', 1)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reversed transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+   
+
+    <record id="action_backdated_transactions" model="ir.actions.act_window">
+        <field name="name">Backdated Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <!-- <field name="domain">[('TranDate', '<', 'ActualDate')]</field> -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No backdated transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    
+
+    <record id="action_premature_liquidation" model="ir.actions.act_window">
+        <field name="name">Premature Liquidation</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('AccountModule', '=', 2)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No premature liquidation transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_cancelled_accounts" model="ir.actions.act_window">
+        <field name="name">Cancelled Account</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('status', '=', 2)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No cancelled transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_reactivated_accounts" model="ir.actions.act_window">
+        <field name="name">Reactivated Accounts</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('status', '=', 3)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reactivated accounts transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_date_vs_value_date_accounts" model="ir.actions.act_window">
+        <field name="name">Trans Date &amp; Value Date Monitoring</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <!-- <field name="domain">[('TranDate', '!=', 'Valuedate')]</field> -->
+        <field name="domain">[]</field>
+        <field name="context">{
+        'search_default_date_mismatch': 1
+    }</field>
+
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No date mismatch transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <!-- Server Action to fetch transactions with mismatched dates -->
+    <record id="action_mismatched_transactions" model="ir.actions.server">
+        <field name="name">Fetch Mismatched Transactions</field>
+        <field name="model_id" ref="model_tbl_transactions"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.get_date_mismatched_transactions()
+        </field>
+    </record>
+
+    <record id="action_crypto_transactions" model="ir.actions.act_window">
+        <field name="name">Crypto Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('Narration', 'ilike', 'crypto')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No crypto-related transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_betting_gambling_transactions" model="ir.actions.act_window">
+        <field name="name">Betting/Gambling Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">['|', ('Narration', 'ilike', 'betting'), ('Narration', 'ilike', 'gambling')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No betting/gambling transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_cash_collateral_entries" model="ir.actions.act_window">
+        <field name="name">Cash Collateral Entries</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No cash collateral entries found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_collateral_before_guarantee" model="ir.actions.act_window">
+        <field name="name">Collateral Before Guarantee</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No collateral before guarantee found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_reportable_limit_monitoring" model="ir.actions.act_window">
+        <field name="name">Reportable Limit Monitoring</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reportable limit monitoring found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_reversal_from_income_ledgers" model="ir.actions.act_window">
+        <field name="name">Reversal from Income Ledgers</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reversal from income ledgers found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_tier_1_transactions_over_limit" model="ir.actions.act_window">
+        <field name="name">Tier 1 Transactions Over Limit</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Tier 1 transactions over limit found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_tier_2_transactions_over_limit" model="ir.actions.act_window">
+        <field name="name">Tier 2 Transactions Over Limit</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Tier 2 transactions over limit found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_large_individual_withdrawals" model="ir.actions.act_window">
+        <field name="name">Large Individual Withdrawals</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No large individual withdrawals found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_large_corporate_withdrawals" model="ir.actions.act_window">
+        <field name="name">Large Corporate Withdrawals</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No large corporate withdrawals found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_e_payment_to_staff" model="ir.actions.act_window">
+        <field name="name">E-payment to Staff</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No e-payment to staff found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_e_payment_to_customers" model="ir.actions.act_window">
+        <field name="name">E-payment to Customers</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No e-payment to customers found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_atm_ledger_limits" model="ir.actions.act_window">
+        <field name="name">ATM Ledger Limits</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No ATM ledger limits found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_tier_1_to_tier_2_upgrades" model="ir.actions.act_window">
+        <field name="name">Tier 1 to Tier 2 Upgrades</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Tier 1 to Tier 2 upgrades found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_tier_2_to_tier_3_upgrades" model="ir.actions.act_window">
+        <field name="name">Tier 2 to Tier 3 Upgrades</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Tier 2 to Tier 3 upgrades found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_savings_account_in_debit" model="ir.actions.act_window">
+        <field name="name">Savings Account in Debit</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No savings account in debit found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_suspense_ledger_withdrawals" model="ir.actions.act_window">
+        <field name="name">Suspense Ledger Withdrawals</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No suspense ledger withdrawals found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_large_cheque_deposits" model="ir.actions.act_window">
+        <field name="name">Large Cheque Deposits</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No large cheque deposits found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_collection_account_postings" model="ir.actions.act_window">
+        <field name="name">Collection Account Postings</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No collection account postings found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_multiple_deposits_monitoring" model="ir.actions.act_window">
+        <field name="name">Multiple Deposits Monitoring</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No multiple deposits found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_large_account_inflows" model="ir.actions.act_window">
+        <field name="name">Large Account Inflows</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No large account inflows found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_e_payment_debit_transactions" model="ir.actions.act_window">
+        <field name="name">E-payment Debit Transactions</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No e-payment debit transactions found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_unscanned_mandates" model="ir.actions.act_window">
+        <field name="name">Unscanned Mandates</field>
+        <field name="res_model">tbl_transactions</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No unscanned mandates found
+            </p>
+            <p>
+                Transactions will appear here when they match monitoring criteria.
+            </p>
+        </field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- 2. ACCOUNT STATUS & MONITORING ACTIONS -->
+    <!-- ===================== -->
+    <record id="action_account_reactivations" model="ir.actions.act_window">
+        <field name="name">Account Reactivations</field>
+        <field name="res_model">res.internal.control.account.monitoring</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('account_type', '=', 'reactivation')]</field>
+        <field name="context">{'default_account_type': 'reactivation'}</field>
+    </record>
+
+    <record id="action_same_address_accounts" model="ir.actions.act_window">
+        <field name="name">Same Address Accounts</field>
+        <field name="res_model">res.internal.control.account.monitoring</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('account_type', '=', 'same_address')]</field>
+        <field name="context">{'default_account_type': 'same_address'}</field>
+    </record>
+
+
+    <!-- ===================== -->
+    <!-- 3. FRAUD MONITORING ACTIONS -->
+    <!-- ===================== -->
+    <record id="action_fraud_ledger_entries" model="ir.actions.act_window">
+        <field name="name">Fraud Ledger Entries</field>
+        <field name="res_model">res.internal.control.fraud.monitoring</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('fraud_type', '=', 'ledger_entry')]</field>
+        <field name="context">{'default_fraud_type': 'ledger_entry'}</field>
+    </record>
+
+    <record id="action_fraud_postings" model="ir.actions.act_window">
+        <field name="name">Fraud Postings</field>
+        <field name="res_model">res.internal.control.fraud.monitoring</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('fraud_type', '=', 'postings_entry')]</field>
+        <field name="context">{'default_fraud_type': 'postings_entry'}</field>
+    </record>
+
+</odoo>

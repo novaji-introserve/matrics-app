@@ -1,0 +1,42 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_process_sql_tree" model="ir.ui.view">
+        <field name="name">process.sql.tree</field>
+        <field name="model">process.sql</field>
+        <field name="arch" type="xml">
+            <tree string="SQL Queries">
+                <field name="name" />
+                <field name="query" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_process_sql_form" model="ir.ui.view">
+        <field name="name">process.sql.form</field>
+        <field name="model">process.sql</field>
+        <field name="arch" type="xml">
+            <form string="SQL Query">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="query" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_process_sql" model="ir.actions.act_window">
+        <field name="name">SQL Queries</field>
+        <field name="res_model">process.sql</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_process_sql_tree" />
+        <field name="context">{}</field>
+    </record>
+
+    
+
+    
+</odoo>

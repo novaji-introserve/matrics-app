@@ -27,7 +27,11 @@
                         <div class="col-2 m-0 p-0">
                             <div class="shadow-sm border m-2 p-2 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
+<<<<<<< HEAD
                                     <h6 class="text-primary fw-bold">Alert Responses</h6>
+=======
+                                    <h6 class="text-primary fw-bold">Rulebook Responses</h6>
+>>>>>>> main
 
                                 </div>
                             </div>
@@ -46,7 +50,11 @@
                         <div class="col-2 m-0 p-0">
                             <div class="shadow-sm border m-2 p-2 bg-white">
                                 <div class="d-flex align-items-center justify-content-between">
+<<<<<<< HEAD
                                     <h6 class="text-primary fw-bold">Alert Status</h6>
+=======
+                                    <h6 class="text-primary fw-bold">Rulebook Status</h6>
+>>>>>>> main
                                     
                                 </div>
                             </div>

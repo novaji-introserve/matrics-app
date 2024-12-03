@@ -1,17 +1,18 @@
 <odoo>
-    <data>
-        <!-- Scheduled Action to Send Rulebook Due Date Emails -->
+    
+    <!-- Scheduled Action to Send Rulebook Due Date Emails -->
+    <!-- <data>
         <record id="rulebook_send_due_date_emails_action" model="ir.cron">
             <field name="name">Send Rulebook Due Date Emails</field>
             <field name="model_id" ref="rule_book.model_rulebook" />
             <field name="state">code</field>
             <field name="code">model.send_due_date_emails()</field>
-            <field name="interval_number">30</field>
+            <field name="interval_number">10</field>
             <field name="interval_type">minutes</field>
-            <field name="numbercall">-1</field> <!-- -1 means infinite -->
+            <field name="numbercall">-1</field> 
             <field name="active" eval="True" />
         </record>
-    </data>
+    </data> -->
 
     <data>
         <!-- Cron Job for checking rulebooks and updating due dates -->
@@ -21,12 +22,29 @@
             <field name="state">code</field>
             <field name="code">model.check_rulebook_and_update_due_date()</field>
             <field name="active" eval="True" />
-            <field name="interval_type">days</field>
-            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="interval_number">5</field>
             <field name="numbercall">-1</field>
-            <field name="doall" eval="False" />
+            <!-- <field name="doall" eval="False" />
             <field name="nextcall"
-                eval="(datetime.now().replace(hour=19, minute=0, second=0, microsecond=0))" />
+                eval="(datetime.now().replace(hour=19, minute=0, second=0, microsecond=0))" /> -->
+        </record>
+    </data>
+
+
+    <data>
+        <!-- Cron Job for checking rulebooks and updating due dates -->
+        <record id="cron_check_rulebook_send_emails" model="ir.cron">
+            <field name="name">Send Internal reminder and escalation emails </field>
+            <field name="model_id" ref="model_rulebook" />
+            <field name="state">code</field>
+            <field name="code">model.send_reminder_email()</field>
+            <field name="active" eval="True" />
+            <field name="interval_type">minutes</field>
+            <field name="interval_number">5</field>
+            <field name="numbercall">-1</field>
+            <!-- <field name="doall" eval="False" />
+            <field name="nextcall" eval="(datetime.now().replace(hour=19, minute=0, second=0, microsecond=0))" /> -->
         </record>
     </data>
     

@@ -9,8 +9,15 @@ from odoo.tools import format_date
 from odoo.exceptions import AccessError
 from odoo.http import request
 import pytz
+<<<<<<< HEAD
+=======
+import os
+>>>>>>> main
 
 
+from dotenv import load_dotenv
+
+load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
@@ -21,12 +28,15 @@ class ReplyLog(models.Model):
     _order = "id desc"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    # Link to the rulebook this reply relates to
     rulebook_id = fields.Many2one(
+<<<<<<< HEAD
         "rulebook", string="Rulebook", help="Reference to the related Rulebook",
         tracking=True,
 
     )
+=======
+        'rulebook', required=True, ondelete='cascade', tracking=True, string="Rulebook", help="Reference to the related Rulebook",)
+>>>>>>> main
 
     department_id = fields.Many2one(
         "hr.department",
@@ -34,7 +44,10 @@ class ReplyLog(models.Model):
         default=lambda self: self.env.user.department_id.id,
         help="The department this reply log belongs to",
         tracking=True,
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     )
 
     rulebook_name = fields.Char(
@@ -49,8 +62,13 @@ class ReplyLog(models.Model):
     reply_date = fields.Datetime(
         string="Reply Date",
         # default=fields.Date.today,
+<<<<<<< HEAD
         default=lambda self: fields.Datetime.now().astimezone(
             pytz.timezone('Africa/Lagos')).replace(tzinfo=None),
+=======
+        default=fields.Datetime.now(),
+        # .astimezone( pytz.timezone('Africa/Lagos')).replace(tzinfo=None),
+>>>>>>> main
         # default=fields.Datetime.now,
         readonly=True,
         tracking=True,
@@ -81,7 +99,11 @@ class ReplyLog(models.Model):
         tracking=True,
     )
 
+<<<<<<< HEAD
     document_filename = fields.Char(string="Document Filename",tracking=True,  )
+=======
+    document_filename = fields.Char(string="Document Filename", tracking=True,)
+>>>>>>> main
 
     # The regulatory date as computed from the rulebook (related field)
     rulebook_compute_date = fields.Datetime(
@@ -89,12 +111,23 @@ class ReplyLog(models.Model):
         store=True,
         tracking=True,
         help="The regulatory date calculated from the related rulebook.",
+        related='rulebook_id.computed_date',
     )
+
+    last_escalation_sent = fields.Datetime(
+        string="Last Escalation Sent",
+        store=True,
+        tracking=True,
+        help="The last escalation date calculated from the related rulebook.",
+        related='rulebook_id.last_escalation_sent',
+    )
+
     next_due_date = fields.Datetime(
         string="Next Due Date",
         store=True,
         tracking=True,
         help="Next due date.",
+        related='rulebook_id.next_due_date'
     )
 
     # The status of the rulebook (pending, submitted, reviewed, completed)
@@ -108,7 +141,11 @@ class ReplyLog(models.Model):
         string="Rulebook Status",
         default="pending",
         help="The current status of the related rulebook.",
+<<<<<<< HEAD
                 tracking=True,
+=======
+        tracking=True,
+>>>>>>> main
 
     )
 
@@ -117,8 +154,9 @@ class ReplyLog(models.Model):
         [
             ("early", "Early Submission"),
             ("on_time", "Right on Time"),
+            ("pending", "Pending"),
             ("late", "Late Submission"),
-            ("not_responded", "Not Responded"),
+            ("not_responded", "Over Due/ Not Responded "),
         ],
         string="Submission Timing",
         compute="_compute_submission_timing",
@@ -128,6 +166,7 @@ class ReplyLog(models.Model):
 
     )
 
+<<<<<<< HEAD
     @api.model
     def open_reply_log(self):
         # Check if the user has a department
@@ -145,6 +184,66 @@ class ReplyLog(models.Model):
         else:
             # No restrictions for other users
             domain = []
+=======
+    formatted_reply_date = fields.Char(
+        string="Formatted Reply Date",
+        compute="_compute_formatted_reply_date",
+    )
+
+    formatted_rulebook_date = fields.Char(
+        string="Formatted Rulebook Date",
+        compute="_compute_formatted_rulebook_date",
+    )
+
+    frequency_type = fields.Selection(
+        related='rulebook_id.frequency_type',
+        string='Frequency Type',
+        readonly=True,
+        help="Frequency type from the associated rulebook"
+    )
+
+    @api.depends("rulebook_compute_date")
+    def _compute_formatted_rulebook_date(self):
+        for record in self:
+            if record.rulebook_compute_date:
+                # Format the date as desired
+                tz = pytz.timezone("Africa/Lagos")
+                local_dt = pytz.utc.localize(
+                    record.rulebook_compute_date).astimezone(tz)
+                record.formatted_rulebook_date = local_dt.strftime(
+                    "%B %d, %Y %H:%M")
+            else:
+                record.formatted_rulebook_date = "N/A"
+
+    @api.depends("reply_date")
+    def _compute_formatted_reply_date(self):
+        for record in self:
+            if record.reply_date:
+                # Format the date as desired
+                tz = pytz.timezone("Africa/Lagos")
+                local_dt = pytz.utc.localize(record.reply_date).astimezone(tz)
+                record.formatted_reply_date = local_dt.strftime(
+                    "%B %d, %Y %H:%M")
+            else:
+                record.formatted_reply_date = ""
+
+    @api.model
+    def open_reply_log(self):
+        # Check if user belongs to compliance or COO groups
+        compliance_group = self.env.ref('rule_book.group_compliance_manager_')
+        coo_group = self.env.ref('rule_book.group_chief_compliance_officer_')
+
+        if compliance_group in self.env.user.groups_id or coo_group in self.env.user.groups_id:
+            # No domain restrictions for these groups
+            domain = []
+        else:
+            # Restrict to user's department for other groups
+            if not self.env.user.department_id:
+                raise AccessError(
+                    "You must be assigned to a department to view rulebook logs.")
+            domain = [('department_id', '=', self.env.user.department_id.id)]
+
+>>>>>>> main
         return {
             'name': ('Reply Logs'),
             'type': 'ir.actions.act_window',
@@ -156,9 +255,114 @@ class ReplyLog(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
+<<<<<<< HEAD
         
 
     
+=======
+
+    # def write(self, vals):
+    #     """
+    #     Overrides the default write method to enforce rules for reply logs.
+
+    #     Provides flexible validation and logging for different update scenarios.
+    #     """
+    #     # Comprehensive logging for debugging
+    #     _logger.critical(f"Write method called")
+    #     _logger.critical(f"Current environment context: {self.env.context}")
+    #     _logger.critical(f"Current user: {self.env.user.name}")
+    #     _logger.critical(f"Write vals: {vals}")
+
+    #     # Fields that trigger detailed validation
+    #     reply_submission_fields = ['reply_content', 'document']
+
+    #     # Determine if this is a reply submission context
+    #     is_reply_submission = any(field in vals for field in reply_submission_fields)
+
+    #     # Perform specific validations for reply submission
+    #     if is_reply_submission:
+    #         for record in self:
+    #             # Validate reply content
+    #             if 'reply_content' in vals:
+    #                 reply_content = vals.get('reply_content', '')
+    #                 if not reply_content:
+    #                     raise AccessError(_("You must provide a substantive reply note before updating."))
+
+    #             # Validate document
+    #             if 'document' in vals:
+    #                 if not vals.get('document', False):
+    #                     raise AccessError(_("You must upload a valid document before updating."))
+
+    #             # Update status and timestamp for reply submissions
+    #             vals['rulebook_status'] = 'submitted'
+    #             vals['reply_date'] = fields.Datetime.now()
+
+    #     try:
+    #         # Perform the write operation
+    #         result = super(ReplyLog, self).write(vals)
+
+    #         # Optional post-write processing
+
+    #         return result
+
+    #     except Exception as e:
+    #         _logger.error(f"Error during write operation: {str(e)}")
+    #         raise
+
+    def write(self, vals):
+        """Overrides the default write method to enforce rules."""
+        for record in self:
+            # Check if reply_content or document is being updated
+            if "reply_content" in vals or "document" in vals:
+                # Ensure both fields are provided
+                if "reply_content" in vals and not vals["reply_content"]:
+                    raise AccessError(
+                        _("You must provide a reply note before updating."))
+
+                if "document" in vals and not vals["document"]:
+                    raise AccessError(
+                        _("You must upload a file before updating."))
+
+                # Change status to submitted if both fields are set
+                vals["rulebook_status"] = "submitted"
+                vals["reply_date"] = fields.Datetime.now()
+
+        # Perform the write operation
+        result = super(ReplyLog, self).write(vals)
+
+        rulebook = request.env["rulebook"].sudo().browse(
+            int(record.rulebook_id))
+
+        url = request.env["rulebook"]._record_link(
+            record.id, model_name='reply.log')
+
+        global_data = {
+            "email_from":  os.getenv("EMAIL_FROM"),
+            "email_to": rulebook.first_line_escalation.email,
+            "name":  rulebook.type_of_return,
+            "title":  rulebook.name.name,
+            "content": record.reply_content,
+            "url_link": url,
+            "current_year": datetime.now().year,
+        }
+        self.set_global_data(global_data)
+
+        for record in self:
+            if record.rulebook_status == 'submitted' and rulebook.first_line_escalation:
+                self.trigger_escalation_alert(record)
+
+        return result
+
+    def trigger_escalation_alert(self, report):
+        # Logic for sending email to escalation officers
+        template = request.env.ref(
+            "rule_book.email_template_rulebook_log_notification_")
+        if template:
+            template.sudo().send_mail(report.id, force_send=True)
+        else:
+            _logger.critical(
+                "Email template 'rule_book.email_template_rulebook_log_notification_' not found.")
+>>>>>>> main
 
     @api.model
     def get_awaiting_replies(self):
@@ -175,7 +379,12 @@ class ReplyLog(models.Model):
 
             # Search for awaiting replies
             awaiting_replies = self.search([
+<<<<<<< HEAD
                 ("rulebook_status", "not in", ["completed", "reviewed"]),
+=======
+                ("rulebook_status", "not in", [
+                 "completed", "reviewed", "pending"]),
+>>>>>>> main
                 ("rulebook_id", "not in", list(completed_ids))
             ])
 
@@ -206,10 +415,23 @@ class ReplyLog(models.Model):
     def _compute_rulebook_name_stripped(self):
         for record in self:
             if record.rulebook_id:
+<<<<<<< HEAD
                 # Strip HTML tags
                 record.rulebook_name = re.sub(
                     r"<[^>]+>", "", record.rulebook_id.type_of_return
                 )
+=======
+                rulebook_name = record.rulebook_id.type_of_return or ""
+
+                # Check if the string contains HTML tags
+                if re.search(r"<[^>]+>", rulebook_name):
+                    # Strip HTML tags
+                    record.rulebook_name = re.sub(
+                        r"<[^>]+>", "", rulebook_name)
+                else:
+                    # No HTML tags; use the name as is
+                    record.rulebook_name = rulebook_name
+>>>>>>> main
             else:
                 record.rulebook_name = ""
 
@@ -250,6 +472,7 @@ class ReplyLog(models.Model):
                     record.submission_timing = "late"
                 elif reply_datetime < compute_datetime:
                     record.submission_timing = "early"
+<<<<<<< HEAD
                 else:
                     record.submission_timing = "on_time"
             except Exception as e:
@@ -320,6 +543,29 @@ class ReplyLog(models.Model):
                     # Do nothing if regulatory date doesn't match computed date
                     continue
                 
+=======
+                else:
+                    record.submission_timing = "pending"
+            except Exception as e:
+                _logger.error(
+                    f"Error computing submission timing for record {record.id}: {e}")
+                record.submission_timing = "error"
+
+   
+    @api.model
+    def update_reply_log_due_dates(self):
+        """Update the next due date for all reply logs based on rulebook recurrence."""
+        reply_logs = self.env['reply.log'].search(
+            [('rulebook_id.is_recurring', '=', True), ('rulebook_status', '=', 'completed')])
+
+        for reply_log in reply_logs:
+            rulebook = reply_log.rulebook_id
+            if rulebook:
+                # Update the next due date based on rulebook's next_due_date
+                reply_log.next_due_date = rulebook.next_due_date
+                _logger.info(
+                    f"Updated next due date for reply log {reply_log.id} based on rulebook {rulebook.name}")
+>>>>>>> main
 
     @api.constrains("rulebook_status")
     def _check_status_change(self):
