@@ -56,6 +56,10 @@ class Pep(models.Model):
     createdon = fields.Char(string="Created On")
     createdbyemail = fields.Char(string="Created by Email")
     lastmodifiedby = fields.Char(string="Last Modified By")
+    religion = fields.Text(string='Religion')
+    citizenship = fields.Char(string='Citizenship')
+    education = fields.Text(string='Education')
+    career_history = fields.Text(string='Career History')
     
     @api.model
     def create(self,vals):
@@ -77,7 +81,6 @@ class Pep(models.Model):
     def action_find_person(self):
         name = f"Who is %s %s"%(self.first_name,self.surname)
         headers = {"Content-Type": "application/json", "Accept": "application/json", "Catch-Control": "no-cache"}
-       
         json_data = {"contents":[{"parts":[{"text":f"{name}"}]}]}
         config = self.env['ir.config_parameter'].sudo()
         api_key = config.get_param('gemini_api_key')
@@ -91,3 +94,59 @@ class Pep(models.Model):
                 self.write({'narration':markdown.markdown(text_value)})
         except:
             pass
+        
+        self.query_sanctions_service(self.first_name,self.surname)
+        
+    
+    def query_sanctions_service(self,firstname,lastname):
+        config = self.env['ir.config_parameter'].sudo()
+        API_KEY = config.get_param('opensanctions_api_key')
+        if API_KEY is not None:
+            try:
+                headers = {
+                    "Authorization": API_KEY,
+                }
+                # Prepare a query to match on schema and the name property
+                query = {
+                    "queries": {
+                        "q1": {"schema": "Person", "properties": {"name": [f"{firstname} {lastname}"]}}
+                    }
+                }
+                # Make the request
+                response = requests.post(
+                    "https://api.opensanctions.org/match/default", headers=headers, json=query
+                )
+                # Check for HTTP errors
+                response.raise_for_status()
+                # Get the results for our query
+                data = response.json()["responses"]["q1"]["results"]
+                person = data[0]
+                metadata = data[1]
+                properties = person['properties']
+                position = "\n".join(properties['position']) if 'position' in properties else "\n".join(metadata['properties']['position'])
+                education = "\n".join(metadata['properties']['education']) if 'education' in metadata['properties'] else None
+                notes = "\n".join(properties['notes']) if 'notes' in properties else None
+                birth_place = "\n".join(properties['birthPlace']) if 'birthPlace' in properties else None
+                religion = "\n".join(properties['religion']) if 'religion' in properties else ''
+                middle_name = metadata['properties']['middleName'][0] if 'middleName' in metadata['properties'] else ''
+                first_name = metadata['properties']['firstName'][0] if 'firstName' in  metadata['properties'] else " ".join(person['caption'])
+                last_name = metadata['properties']['lastName'][0] if 'lastName' in metadata['properties'] else None
+                title = metadata['properties']['title'][0] if 'title' in metadata['properties'] else ''
+                gender = person['properties']['gender'][0].capitalize()
+                citizenship = person['properties']['citizenship'][0].upper()
+                birth_date = person['properties']['birthDate'][0]
+                unique_id = person['id']
+                # Now 'data' is a dictionary
+                self.write({
+                        'sex': gender,
+                        'date_of_birth': birth_date,
+                        'title': title,
+                        'education': education,
+                        'religion': religion,
+                        'citizenship': citizenship,
+                        'middle_name': middle_name,
+                        'place_of_birth': birth_place,
+                        'career_history':position})
+            
+            except:
+                None
