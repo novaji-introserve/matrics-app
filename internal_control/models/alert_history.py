@@ -15,6 +15,8 @@ class alert_history(models.Model):
     risk_rating = fields.Char()
     process_id = fields.Char()
     date_created = fields.Char()
+    narration = fields.Char()
+    email = fields.Char()
     
    
     def generate_csv(self):

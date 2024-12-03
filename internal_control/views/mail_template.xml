@@ -3,11 +3,10 @@
     <!-- Email template for new users -->
     <record id="alert_rules_mail_template" model="mail.template">
         <field name="name">Alert Mailing System</field>
-        <field name="model_id" ref="internal_control.model_alert_rules"/>
+        <field name="model_id" ref="internal_control.model_alert_history"/>
         <field name="subject">Mail Report From Icomply</field>
         <field name="email_from">test@novajii.com</field>
-        <field name="email_cc">{{ object.alert_group_id.email_cc }}</field>
-        <field name="email_to">{{ object.alert_group_id.email_list }}</field>
+        <field name="email_to">{{ object.email }}</field>
         <field name="description">this is automation mail base on alert information in the database</field>
         <field name="body_html" type="html">
 
@@ -76,7 +75,7 @@
                                                 <hr />
                                                    <div style="display: flex; align-items:center; gap:0.4rem; margin: 0.5rem 0;">
                                                         <p>Date:</p>
-                                                        <p> <span t-esc="object.last_checked.strftime('%Y-%m-%d')" /> </p>
+                                                        <p> <span t-esc="object.last_checked" /> </p>
                                                    </div>
                                                    
                                                    <div style="margin: 0.5rem 0;">
@@ -90,7 +89,7 @@
                                             </tr>
 
                                             <tr>
-                                                <t t-raw="object.table_html" />
+                                                <t t-raw="object.html_body" />
                                             </tr>
                                             
                                             <tr>

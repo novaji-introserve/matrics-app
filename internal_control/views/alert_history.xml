@@ -10,6 +10,8 @@
                 <field name="process_category" />
                 <field name="process_id" />
                 <field name="risk_rating" />
+                <field name="narration" />
+                <field name="email" />
                 <field name="date_created" />
 
             </tree>
