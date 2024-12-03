@@ -38,6 +38,7 @@
             <field name="model">res.pep</field>
             <field name="arch" type="xml">
                 <tree string="Global PEP List">
+                    <field name="unique_identifier"/>
                     <field name="name"/>
                     <field name="surname"/>
                     <field name="first_name"/>

@@ -8,6 +8,12 @@ class Pep(models.Model):
     _description = 'PEP List'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
+    _sql_constraints = [
+        ('uniq_pep_identifier', 'unique(unique_identifier)',
+         "Unique Identifier already exists. Value must be unique!"),
+    ]
+    _order="surname,first_name"
+    
     narration = fields.Html(string='Narration')
     lastmodifiedon = fields.Char(string="Last Modified On")
     lastmodifiedbyemail = fields.Char(string="Last Modified by Email")

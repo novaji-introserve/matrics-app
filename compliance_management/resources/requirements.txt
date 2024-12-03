@@ -131,7 +131,8 @@ ollama
 pytesseract
 pdf2image
 XlsxWriter
-
+click-odoo
+pandas
 #* on the development server instll the following
 # * tesseract
 # * ollama
