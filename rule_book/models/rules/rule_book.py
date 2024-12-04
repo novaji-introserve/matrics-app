@@ -141,11 +141,17 @@ class Rulebook(models.Model):
         help="List sanctions here, using headings, styling, and other formatting options for clarity.",
     )
 
-    last_alert_sent = fields.Datetime(
-        string="Last Alert sent Date Value",
+    last_reg_due_date_sent = fields.Datetime(
+        string="Last Regulatory Alert sent Date Value",
         # required=True,
         tracking=True,
 
+    )
+    
+    last_internal_due_date_sent = fields.Datetime(
+        string="Last Internal Alert sent Date Value",
+        # required=True,
+        tracking=True,
     )
 
     due_date_value = fields.Integer(
@@ -872,7 +878,6 @@ class Rulebook(models.Model):
                     raise ValidationError(
                         ("Please select a day between 1 and 28 for three-yearly frequency."))
 
-
     @api.depends("due_date_value", "due_date_unit", "computed_date")
     def _compute_due_date(self):
         for record in self:
@@ -900,7 +905,6 @@ class Rulebook(models.Model):
                 # If computed_date is not available, set due_date to False or handle accordingly
                 record.due_date = None
 
-
     def _compute_due_date_for_cron(self):
         for record in self:
             if record.computed_date and record.due_date_unit in [
@@ -912,58 +916,54 @@ class Rulebook(models.Model):
                 "months",
                 "years",
             ]:
-                delta_args = {
-                    record.due_date_unit: -record.due_date_value
-                }
-                record.due_date = record.computed_date + relativedelta(
-                    **delta_args
-                )
-                _logger.critical(
-                    f"writing escalation date {record.due_date}")
-                record.sudo().write({
-                    'due_date': record.due_date,
-                })
+                if record.due_date_value:
+                    delta_args = {
+                        record.due_date_unit: -record.due_date_value
+                    }
+                    record.due_date = record.computed_date + relativedelta(
+                        **delta_args
+                    )
+                    _logger.critical(
+                        f"writing escalation date {record.due_date}")
+                    record.sudo().write({
+                        'due_date': record.due_date,
+                    })
             else:
                 # If computed_date is not available, set due_date to False or handle accordingly
                 record.due_date = None
-                
 
     def _compute_escalation_date_for_cron(self):
         for record in self:
             if record.computed_date and record.escalation_date_unit in [
-                    "days",
-                    "hours",
-                    "minutes",
-                    "seconds",
-                    "weeks",
-                    "months",
-                    "years",
-                ]:
-                    delta_args = {
-                        record.escalation_date_unit: -record.escalation_date_value
-                    }
-                    record.escalation_date = record.computed_date + relativedelta(
-                        **delta_args
-                    )
-                    _logger.critical(
-                        f"writing escalation date {record.escalation_date}")
+                "days",
+                "hours",
+                "minutes",
+                "seconds",
+                "weeks",
+                "months",
+                "years",
+            ]:
+                delta_args = {
+                    record.escalation_date_unit: -record.escalation_date_value
+                }
+                record.escalation_date = record.computed_date + relativedelta(
+                    **delta_args
+                )
+                _logger.critical(
+                    f"writing escalation date {record.escalation_date}")
 
-                    record.sudo().write({
-                        'escalation_date': record.escalation_date,
-                    })
+                record.sudo().write({
+                    'escalation_date': record.escalation_date,
+                })
             else:
                 # If computed_date is not available, set due_date to False or handle accordingly
                 record.escalation_date = None
 
-
-   
     @api.depends(
         "escalation_date_value",
         "escalation_date_unit",
         "computed_date",
     )
-
-    
     def _compute_escalation_date(self):
         for record in self:
             if record.computed_date and record.escalation_date_unit in [
@@ -1009,7 +1009,7 @@ class Rulebook(models.Model):
                 "record_link": self._record_link(self.id) or "N/A",
                 "upload_link": self._compute_upload_link(self.id) or "N/A",
                 "current_year": fields.Date.today().year,
-                "rulebook_return": self.type_of_return or "N/A",
+                "rulebook_return": re.sub(r'<[^>]+>', '', self.type_of_return) or "N/A",
                 # "regulatory_name": self.regulatory_name or "N/A",
                 "regulatory_name": self.regulatory_agency_id.name or "N/A",
                 "risk_category": self.risk_category.name if self.risk_category else "N/A",
@@ -1398,26 +1398,26 @@ class Rulebook(models.Model):
             # Ensure any existing events are removed
             events = self.env["calendar.event"].search(
                 [("name", "ilike",
-                  f"Regulatory Due Date for {record.type_of_return} (ID: {record.id})")]
+                  f"Regulatory Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})")]
             )
             events.unlink()
 
             events = self.env["calendar.event"].search(
                 [("name", "ilike",
-                  f"Internal Due Date for {record.type_of_return} (ID: {record.id})")]
+                  f"Internal Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})")]
             )
             events.unlink()
 
             events = self.env["calendar.event"].search(
                 [("name", "ilike",
-                  f"Escalation Due Date for {record.type_of_return} (ID: {record.id})")]
+                  f"Escalation Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})")]
             )
             events.unlink()
 
             if record.computed_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Internal Due Date for {record.type_of_return} (ID: {record.id})",
+                        "name": f"Internal Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})",
                         "start": record.computed_date,
                         "stop": record.computed_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -1428,7 +1428,7 @@ class Rulebook(models.Model):
             if record.due_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Regulatory Due Date for {record.type_of_return} (ID: {record.id})",
+                        "name": f"Regulatory Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})",
                         "start": record.due_date,
                         "stop": record.due_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -1439,7 +1439,7 @@ class Rulebook(models.Model):
             if record.escalation_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Escalation Due Date for {record.type_of_return} (ID: {record.id})",
+                        "name": f"Escalation Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})",
                         "start": record.escalation_date,
                         "stop": record.escalation_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -1601,25 +1601,47 @@ class Rulebook(models.Model):
 
         today = datetime.now().date()
 
+        _logger.critical(
+            f"rulebooks with today's regulatory date  {today}, plus one day {today + timedelta(days=1)}")
+        
+        today = fields.Datetime.now().astimezone(
+            pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
+
+        # Adjust to local midnight without timezone conversion
+        day_start = today.replace(hour=0, minute=0, second=0)
+        day_end = today.replace(hour=23, minute=59, second=59)
+        time_in_15_minutes = today + timedelta(minutes=15)
+
+        day_start = day_start.replace(
+            tzinfo=None, microsecond=0)  # Remove timezone info
+        day_end = day_end.replace(tzinfo=None, microsecond=0)
+
+        time_in_15_minutes = time_in_15_minutes.replace(
+            tzinfo=None, microsecond=0)
+
         # Perform the search
         rulebooks = self.env["rulebook"].search(
             [
-                ("computed_date", ">=", today),
-                ("computed_date", "<", today + timedelta(days=1)),
+                ("computed_date", ">=", day_start),
+                ("computed_date", "<", day_end),
                 ("is_recurring", "=", True),
             ]
         )
-        _logger.critical(
-            f"rulebooks with today's regulatory date  {rulebooks}")
+
 
         for record in rulebooks:
             try:
                 _logger.critical(
-                    f"To Update rulebook {record.id}:,  type of return : {record.type_of_return} frequency : {record.frequency_type}")
-                record._compute_next_due_date()
+                    f"To Update rulebook {record.id}:,  type of return : {re.sub(r'<[^>]+>', '', record.type_of_return)} frequency : {record.frequency_type}")
+
+                computed_date = (record.computed_date)
+                time_in_5_minutes = computed_date - timedelta(minutes=5)
+
+                if today >= time_in_5_minutes and computed_date:
+                    record._compute_next_due_date()
+
             except Exception as e:
                 _logger.critical(f"Failed to update rulebook {record.id}: {e}")
-                
 
     def _compute_next_due_date(self):
         _logger.critical("Updating next due date...")
@@ -1736,11 +1758,12 @@ class Rulebook(models.Model):
         """Send reminder and escalation emails for due or escalated rulebooks."""
         today = fields.Datetime.now().astimezone(
             pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
+        
 
         rulebooks_to_update_alert = self.env["rulebook"]
         rulebooks_to_update_escalation = self.env["rulebook"]
 
-        minutes = timedelta(minutes=20)
+        time_in_20_minutes = today + timedelta(minutes=20)
         _logger.critical(
             f"Send reminder and escalation emails cron job has started ")
 
@@ -1762,30 +1785,39 @@ class Rulebook(models.Model):
                 needs_update_alert = False
                 needs_update_escalation = False
                 _logger.critical(
-                    f"Incomplete Rulebooks to process type of return : {rulebook.type_of_return} ID {rulebook.id}")
+                    f"Incomplete Rulebooks to process type of return : {re.sub(r'<[^>]+>', '', rulebook.type_of_return)} ID {rulebook.id}")
 
                 # Reminder Email: Check if due_date matches today
-                if rulebook.computed_date and today <= rulebook.computed_date <= (today + minutes):
-                    rulebook._send_internal_due_date_email()
-                    needs_update_alert = True
+                time_in_5_minutes = rulebook.computed_date - \
+                    timedelta(minutes=5)
+
+                if rulebook.computed_date and today.date() == rulebook.computed_date.date():
+                    if abs((rulebook.computed_date - today).total_seconds()) <= 600:
+                        if not rulebook.last_internal_due_date_sent or rulebook.last_internal_due_date_sent.date() != today.date():
+                            rulebook._send_internal_due_date_email()
+                            needs_update_alert = True
+                    
 
                 # Escalation Email: Check if escalation_date matches today
-                if rulebook.escalation_date and today <= rulebook.escalation_date <= (today + minutes):
-                    rulebook._send_escalation_due_date_email()
-                    needs_update_escalation = True
+                if rulebook.escalation_date and today.date() == rulebook.escalation_date.date():
+                    if abs((rulebook.computed_date - today).total_seconds()) <= 600:
+                        if not rulebook.last_escalation_sent or rulebook.last_escalation_sent.date() != today.date():
+                            rulebook._send_escalation_due_date_email()
+                            needs_update_escalation = True
+                   
 
                 # Check if due_date is within 5 minutes of today
                 if rulebook.due_date and rulebook.due_date < rulebook.computed_date:
                     due_time = rulebook.due_date.time()
                     due_time_today = today.replace(
                         hour=due_time.hour, minute=due_time.minute, second=due_time.second)
-                    due_time_before_5_minutes = due_time_today - \
+                    due_time_before_15_minutes = due_time_today - \
                         timedelta(minutes=15)
 
                     _logger.critical(
-                        f" due_time_before_5_minutes {due_time_before_5_minutes}  , due date today  {due_time_today}  , due time {due_time}")
-                    if due_time_before_5_minutes <= today <= due_time_today:
-                        if rulebook.computed_date > today and (not rulebook.last_alert_sent or rulebook.last_alert_sent.date() != today.date()):
+                        f" due_time_before_15_minutes {due_time_before_15_minutes}  , due date today  {due_time_today}  , due time {due_time}")
+                    if due_time_before_15_minutes <= today <= due_time_today:
+                        if rulebook.computed_date > today and (not rulebook.last_reg_due_date_sent or rulebook.last_reg_due_date_sent.date() != today.date()):
                             rulebook._send_regulatory_due_date_email()
                             needs_update_alert = True
 
@@ -1799,22 +1831,22 @@ class Rulebook(models.Model):
                 _logger.critical(
                     f"Failed to process Rulebook {rulebook.id}: {e}")
 
-        # Update last_alert_sent for rulebooks with reminder emails
+        # Update last_reg_due_date_sent for rulebooks with reminder emails
         if rulebooks_to_update_alert:
             try:
                 # Direct update using ORM
                 for rulebooktoday in rulebooks_to_update_alert:
                     rulebooktoday.sudo().write({
-                        'last_alert_sent': today
+                        'last_reg_due_date_sent': today
                     })
                 # rulebooks_to_update_alert.sudo().write({
-                #     'last_alert_sent': fields.Datetime.now()
+                #     'last_reg_due_date_sent': fields.Datetime.now()
                 # })
                 _logger.critical(
-                    f"Updated last_alert_sent for rulebooks {rulebooks_to_update_alert.ids}")
+                    f"Updated last_reg_due_date_sent for rulebooks {rulebooks_to_update_alert.ids}")
             except Exception as e:
                 _logger.critical(
-                    f"Failed to update last_alert_sent for rulebooks: {e}")
+                    f"Failed to update last_reg_due_date_sent for rulebooks: {e}")
 
         # Update last_escalation_sent for rulebooks with escalation emails
         if rulebooks_to_update_escalation:
@@ -1832,277 +1864,6 @@ class Rulebook(models.Model):
                 _logger.critical(
                     f"Failed to update last_escalation_sent for rulebooks: {e}")
 
-    # def send_reminder_email(self):
-    #     """Send reminder and escalation emails for due or escalated rulebooks."""
-    #     today = fields.Datetime.now().astimezone(
-    #         pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-
-    #     rulebooks_to_update_alert = self.env["rulebook"]
-    #     rulebooks_to_update_escalation = self.env["rulebook"]
-    #     rulebooks_to_ = self.env["rulebook"]
-
-    #     minutes = timedelta(minutes=20)
-    #     _logger.critical(
-    #         f"Send reminder and escalation emails cron job has started ")
-
-    #     # Get all rulebook IDs in the current recordset
-    #     rulebook_ = self.env["rulebook"].search([])
-    #     rulebook_ids = rulebook_.ids
-    #     _logger.critical(f"Rulebook ids {rulebook_ids}")
-
-    #     # Fetch completed reply logs for these rulebooks in a single query
-    #     incomplete_rulebooks = self.env['reply.log'].search([
-    #         ('rulebook_id', 'in', rulebook_ids),
-    #         ('rulebook_status', '!=', 'completed')
-    #     ]).mapped('rulebook_id')
-
-    #     _logger.critical(f"INcomplete Rulebooks IDS {incomplete_rulebooks}")
-
-    #     for rulebook in incomplete_rulebooks:
-    #         try:
-    #             needs_update_alert = False
-    #             needs_update_escalation = False
-    #             _logger.critical(
-    #                 f"Incomplete Rulebooks to process {rulebook.type_of_return} ID {rulebook.id}")
-
-    #             # Reminder Email: Check if due_date matches today
-    #             if rulebook.computed_date and today <= rulebook.computed_date <= (today + minutes):
-    #                 rulebook._send_internal_due_date_email()
-    #                 needs_update_alert = True
-
-    #             # Escalation Email: Check if escalation_date matches today
-    #             if rulebook.escalation_date and today <= rulebook.escalation_date <= (today + minutes):
-    #                 rulebook._send_escalation_due_date_email()
-    #                 needs_update_escalation = True
-
-    #             # Check if due_date is within 5 minutes of today and send regulatory reminder email
-    #             if rulebook.due_date and rulebook.due_date < rulebook.computed_date:
-    #                 due_time = rulebook.due_date.time()
-    #                 due_time_today = today.replace(
-    #                     hour=due_time.hour, minute=due_time.minute, second=due_time.second)
-    #                 due_time_before_5_minutes = due_time_today - timedelta(minutes=5)
-
-    #                 # if due_time_before_5_minutes <= today <= due_time_today:
-    #                     # if rulebook.computed_date > today and (not rulebook.last_alert_sent or rulebook.last_alert_sent.date() != today.date()):
-    #                 # rulebook._send_regulatory_due_date_email()
-    #                 needs_update_alert = True
-
-    #             # Conditionally add to rulebooks_to_update for alert or escalation
-    #             if needs_update_alert:
-    #                 rulebooks_to_update_alert |= rulebook
-    #             if needs_update_escalation:
-    #                 rulebooks_to_update_escalation |= rulebook
-
-    #         except Exception as e:
-    #             _logger.critical(f"Failed to process Rulebook {rulebook.id}: {e}")
-
-    #     # Update last_alert_sent for rulebooks with reminder emails
-    #     if rulebooks_to_update_alert:
-    #         _logger.critical(
-    #             f"Rulebooks to Update (Reminder): {rulebooks_to_update_alert.ids} ids:  {rulebooks_to_update_alert}")
-    #         rulebooks_to_ = self.env["rulebook"]
-
-    #         rulebooks_to_update = tuple(rulebooks_to_update_alert.ids)
-
-    #         # Then modify your query to:
-    #         result = rulebooks_to_.browse(
-    #             rulebooks_to_.search([('id', 'in', rulebooks_to_update)])
-    #         ).read()
-
-    #         _logger.critical(result)
-    #         try:
-
-    #             # result = rulebooks_to_.browse(  rulebooks_to_.search(  [('id', 'in', rulebooks_to_update_alert.ids)]) ).read()
-
-    #             self.write({result})
-
-    #             _logger.critical(
-    #                 f"Updated last_alert_sent for rulebooks {rulebooks_to_update_alert.ids}")
-    #         except Exception as e:
-    #             _logger.critical(
-    #                 f"Failed to update last_alert_sent for rulebooks: {e}")
-
-    #     # Update last_escalation_sent for rulebooks with escalation emails
-    #     if rulebooks_to_update_escalation:
-    #         try:
-    #             _logger.critical(
-    #                 f"Rulebooks to Update (Escalation): {rulebooks_to_update_escalation.ids}")
-    #             rulebooks_to_update_escalation.write({
-    #                 "last_escalation_sent": fields.Datetime.now()
-    #             })
-    #             _logger.critical(
-    #                 f"Updated last_escalation_sent for rulebooks {rulebooks_to_update_escalation.ids}")
-    #         except Exception as e:
-    #             _logger.critical(
-    #                 f"Failed to update last_escalation_sent for rulebooks: {e}")
-
-    # def send_reminder_email(self):
-    #     """Send reminder and escalation emails for due or escalated rulebooks."""
-    #     today = fields.Datetime.now().astimezone(
-    #         pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-
-    #     rulebooks_to_update = self.env["rulebook"]
-
-    #     minutes = timedelta(minutes=20)
-    #     _logger.critical(
-    #         f"Send reminder and escalation emails cron job has started ")
-
-    #     # Search for all rulebooks
-    #     rulebooks = self.env["rulebook"].search([])
-
-    #     _logger.critical(f"Total Rulebooks: {len(rulebooks)}")
-
-    #     # Find rulebooks with incomplete reply logs
-    #     completed_rulebook_ids = self.env['reply.log'].search([
-    #         ('rulebook_id', 'in', rulebooks.ids),
-    #         ('rulebook_status', '=', 'completed')
-    #     ]).mapped('rulebook_id.id')
-
-    #     # Filter incomplete rulebooks
-    #     incomplete_rulebooks = rulebooks.filtered(
-    #         lambda r: r.id not in completed_rulebook_ids
-    #     )
-
-    #     _logger.critical(f"Incomplete Rulebooks: {len(incomplete_rulebooks)}")
-
-    #     for rulebook in incomplete_rulebooks:
-    #         try:
-    #             needs_update = False
-    #             _logger.critical(
-    #                 f"Processing Rulebook {rulebook.id}, Type: {rulebook.type_of_return}")
-
-    #             # Reminder Email
-    #             if rulebook.computed_date and today <= rulebook.computed_date <= (today + minutes):
-    #                 rulebook._send_internal_due_date_email()
-    #                 needs_update = True
-
-    #             # Escalation Email
-    #             if rulebook.escalation_date and today <= rulebook.escalation_date <= (today + minutes):
-    #                 rulebook._send_escalation_due_date_email()
-    #                 needs_update = True
-
-    #             # Regulatory Due Date Email
-    #             if rulebook.due_date and rulebook.due_date < rulebook.computed_date:
-    #                 due_time = rulebook.due_date.time()
-    #                 due_time_today = today.replace(
-    #                     hour=due_time.hour, minute=due_time.minute, second=due_time.second)
-    #                 due_time_before_5_minutes = due_time_today - \
-    #                     timedelta(minutes=5)
-
-    #                 if due_time_before_5_minutes <= today <= due_time_today:
-    #                     if (rulebook.computed_date > today and
-    #                         (not rulebook.last_alert_sent or
-    #                         rulebook.last_alert_sent.date() != today.date())):
-    #                         rulebook._send_regulatory_due_date_email()
-    #                         needs_update = True
-
-    #             if needs_update:
-    #                 rulebooks_to_update |= rulebook
-
-    #         except Exception as e:
-    #             _logger.critical(f"Failed to process Rulebook {rulebook.id}: {e}")
-
-    #     # Batch update fields
-    #     if rulebooks_to_update:
-    #         _logger.critical(f"Rulebooks to Update: {rulebooks_to_update.ids}")
-    #         try:
-    #             rulebooks_to_update.write({
-    #                 "last_escalation_sent": fields.Datetime.now(),
-    #                 "last_alert_sent": fields.Datetime.now()
-    #             })
-    #             _logger.critical(f"Updated escalation and alert timestamps")
-    #         except Exception as e:
-    #             _logger.critical(f"Failed to update timestamps: {e}")
-    #     else:
-    #         _logger.critical("No rulebooks to update")
-
-    # def send_reminder_email(self):
-    #     """Send reminder and escalation emails for due or escalated rulebooks."""
-    #     # today = fields.Datetime()
-    #     today = fields.Datetime.now().astimezone(
-    #         pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-
-    #     rulebooks_to_update = self.env["rulebook"]
-
-    #     minutes = timedelta(minutes=20)
-    #     _logger.critical(
-    #         f"Send reminder and escalation emails cron job has started ")
-
-    #     # Get all rulebook IDs in the current recordset
-    #     rulebook_ = self.env["rulebook"].search([])
-    #     rulebook_ids=rulebook_.ids
-
-    #     _logger.critical(
-    #         f"Rulebook ids {rulebook_ids} ")
-
-    #     # Fetch completed reply logs for these rulebooks in a single query
-    #     incomplete_rulebooks = self.env['reply.log'].search([
-    #         ('rulebook_id', 'in', rulebook_ids),
-    #         ('rulebook_status', '!=', 'completed')
-    #     ]).mapped('rulebook_id')
-
-    #     _logger.critical(
-    #         f"INcomplete Rulebooks IDS {incomplete_rulebooks}")
-
-    #     for rulebook in incomplete_rulebooks:
-
-    #         try:
-    #             needs_update = False
-    #             _logger.critical(f"Incomplete Rulebooks to process {rulebook.type_of_return} ID {rulebook.id}")
-
-    #             # Reminder Email: Check if due_date matches today
-    #             if rulebook.computed_date and today <= rulebook.computed_date <= (today + minutes):
-    #                 rulebook._send_internal_due_date_email()
-    #                 needs_update = False
-
-    #             # Escalation Email: Check if escalation_date matches today
-    #             if rulebook.escalation_date and today <= rulebook.escalation_date <= (today + minutes):
-    #                 rulebook._send_escalation_due_date_email()
-    #                 needs_update = True
-
-    #             # Assuming today is the current datetime (this should be set or obtained properly in your code)
-    #             if rulebook.due_date and rulebook.due_date < rulebook.computed_date:
-    #                 # Extract the time from the due_date
-    #                 due_time = rulebook.due_date.time()
-    #                 # Create a datetime object for the due time (with the same date as today)
-    #                 due_time_today = today.replace(hour=due_time.hour, minute=due_time.minute, second=due_time.second)
-    #                 # Subtract 5 minutes from the due time
-    #                 due_time_before_5_minutes = due_time_today - timedelta(minutes=5)
-    #                 # Check if the current time is within the 5-minute window before the due time
-    #                 if due_time_before_5_minutes <= today <= due_time_today:
-    #                     # Ensure that the computed date is in the future and that an alert hasn't already been sent today
-    #                     if rulebook.computed_date > today and (not rulebook.last_alert_sent or rulebook.last_alert_sent.date() != today.date()):
-    #                         rulebook._send_regulatory_due_date_email()
-    #                         needs_update = False
-
-    #             # if needs_update:
-    #                 rulebooks_to_update |= rulebook
-
-    #         except Exception as e:
-    #             _logger.critical(f"Failed to process Rulebook {rulebook.id}: {e}")
-
-    #     # Batch update `last_escalation_sent` field
-    #     if rulebooks_to_update:
-    #         _logger.critical(
-    #             f"Rulebooks to Update {rulebooks_to_update} ")
-    #         try:
-    #             rulebooks_to_update.write({
-    #                 "last_escalation_sent": fields.Datetime.now(),
-    #             })
-    #             _logger.critical(
-    #                 f"Updated last_escalation_sent for rulebooks {rulebooks_to_update.ids}")
-
-    #         except Exception as e:
-    #             _logger.critical(
-    #                 f"Failed to update last_escalation_sent for rulebooks: {e}")
-    #     else:
-    #         _logger.critical(
-    #             f"Rulebooks ids: {rulebooks_to_update.ids}")
-    #         rulebooks_to_update.write({
-    #             "last_alert_sent": fields.Datetime.now(),
-    #             "rulebook_ids": rulebooks_to_update.ids
-    #             })
-
     @api.model
     def check_and_update_rulebooks(self):
         """Scheduler to check rulebooks with today's date as the regulatory date and update next due date."""
@@ -2110,19 +1871,20 @@ class Rulebook(models.Model):
             "Scheduler to check rulebooks with today's date as the regulatory date and update next due date.")
 
         # Specify the Africa timezone (Lagos)
-        africa_timezone = pytz.timezone("Africa/Lagos")
-        # Get the current date and time in the Africa/Lagos timezone
-        africa_now = datetime.now(africa_timezone)
 
-        # Get today's start and end times (naive) and localize them
-        today_start = africa_timezone.localize(africa_now.replace(
-            hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None))
-        today_end = africa_timezone.localize(africa_now.replace(
-            hour=23, minute=59, second=59, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None))
+        timezone_str = "Africa/Lagos"
+        timezone = pytz.timezone(timezone_str)
+        today = datetime.now(timezone)
+        today_start = today.replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today.replace(
+            hour=23, minute=59, second=59, microsecond=999999)
 
         # Format the date and time to the desired output
         formatted_today_start = today_start.strftime('%Y-%m-%d %H:%M:%S')
         formatted_today_end = today_end.strftime('%Y-%m-%d %H:%M:%S')
+
+        time_in_15_minutes = today + timedelta(minutes=10)
+        time_in_15_minutes = time_in_15_minutes.strftime('%Y-%m-%d %H:%M:%S')
 
         _logger.critical("today start : ", today_start,
                          " today end", today_end)
@@ -2137,7 +1899,24 @@ class Rulebook(models.Model):
         )
 
         for rulebook in rulebooks:
-            rulebook._compute_next_due_date()
+            computed_date = rulebook.computed_date
+
+            # Localize the naive datetime to Africa/Lagos timezone
+            if computed_date.tzinfo is None:
+                try:
+                    # Attempt to localize the naive datetime
+                    localized_computed_date = timezone.localize(computed_date)
+                except Exception as e:
+                    # Log any localization errors
+                    _logger.error(f"Error localizing date: {e}")
+                    continue
+            else:
+                # If already timezone-aware, convert to Africa/Lagos
+                localized_computed_date = computed_date.astimezone(timezone)
+
+            # Compare with current time in Africa/Lagos
+            if today <= localized_computed_date < time_in_15_minutes:
+                rulebook._compute_next_due_date()
 
     def get_lagos_date(self):
         # Get the current UTC time
