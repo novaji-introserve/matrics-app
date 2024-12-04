@@ -147,7 +147,7 @@ class Rulebook(models.Model):
         tracking=True,
 
     )
-
+    
     last_internal_due_date_sent = fields.Datetime(
         string="Last Internal Alert sent Date Value",
         # required=True,
@@ -1168,27 +1168,7 @@ class Rulebook(models.Model):
             'reply_content': None,
             'department_id': self.responsible_id.id,
             'rulebook_compute_date': self.computed_date,
-            'next_due_date': self.due_date,
-            'day_of_week': self.day_of_week,
-            'month_value': self.month_value,
-            'bi_monthly_day2': self.bi_monthly_day2,
-            'bi_monthly_day1': self.bi_monthly_day1,
-            'semi_annual_day2': self.semi_annual_day2,
-            'semi_annual_day1': self.semi_annual_day1,
-            'semi_annual_month2': self.selfsemi_annual_month2,
-            'semi_annual_month1': self.semi_annual_month1,
-            'quarter_day': self.quarter_day,
-            'status': self.status,
-            'officer_cc': self.officer_cc,
-            'escalation_date': self.escalation_date,
-            'escalation_date_unit': self.escalation_date_unit,
-            'escalation_date_value': self.escalation_date_value,
-            'due_date_unit': self.due_date_unit,
-            'due_date_value': self.due_date_value,
-            'first_line_escalation': self.first_line_escalation,
-            'second_line_escalation': self.second_line_escalation
-
-
+            'next_due_date': self.next_due_date
         }
 
     def _prepare_reply_log_vals_for_update(self):
@@ -1198,10 +1178,8 @@ class Rulebook(models.Model):
         return {
             'reporter': self.officer_responsible.id if self.officer_responsible else None,
             'department_id': self.responsible_id.id if self.responsible_id else None,
-            'officer_cc': self.officer_cc,
-            'status': self.status,
-            'first_line_escalation': self.first_line_escalation,
-            'second_line_escalation': self.second_line_escalation
+            'rulebook_compute_date': self.computed_date,
+            'next_due_date': self.next_due_date
         }
 
     @api.model
@@ -1223,9 +1201,9 @@ class Rulebook(models.Model):
                 submission_time
                 record._send_internal_due_date_email()
 
-            # # Handle due dates
-            # elif record.due_date or record.escalation_date:
-            #     record._schedule_due_dates()
+            # Handle due dates
+            elif record.due_date or record.escalation_date:
+                record._schedule_due_dates()
 
             # Create reply log
             reply_log_vals = record._prepare_reply_log_vals(
@@ -1233,11 +1211,9 @@ class Rulebook(models.Model):
                 submission_time
             )
 
-            reply = self.env['reply.log'].create(reply_log_vals)
-            if reply and reply.next_due_date or reply.escalation_date:
-                reply._schedule_due_dates()
+            # self.env['reply.log'].create(reply_log_vals)
 
-            # record._copy_rulebook_chatter_to_reply_log()
+            record._copy_rulebook_chatter_to_reply_log()
 
             return record
 
@@ -1279,52 +1255,102 @@ class Rulebook(models.Model):
             except Exception as e:
                 _logger.error(f"Error in email sending process: {str(e)}")
 
-        #  # Update reply log if status-related fields are changed
-        # status_related_fields = [
-        #     'frequency_type', 'due_date', 'escalation_date']
-        # if any(field in vals for field in status_related_fields):
+         # Update reply log if status-related fields are changed
+        status_related_fields = [
+            'frequency_type', 'due_date', 'escalation_date']
+        if any(field in vals for field in status_related_fields):
 
-        #     reply_log_vals = self._prepare_reply_log_vals_for_update()
+            reply_log_vals = self._prepare_reply_log_vals_for_update()
 
-        #     existing_log = self.env['reply.log'].search(
-        #         [('rulebook_id', '=', self.id)],
-        #         order='id desc',  # Orders by ID in descending order
-        #         limit=1)
+            existing_log = self.env['reply.log'].search(
+                [('rulebook_id', '=', self.id)],
+                order='id desc',  # Orders by ID in descending order
+                limit=1)
 
-        #     if existing_log:
-        #         existing_log.sudo().write(reply_log_vals)
-        #     else:
-        #         None
-        #         # self.env['reply.log'].create(reply_log_vals)
+            if existing_log:
+                existing_log.sudo().write(reply_log_vals)
+            else:
+                None
+                # self.env['reply.log'].create(reply_log_vals)
 
-        # due_date_related_keys = [
-        #     "due_date",
-        #     "escalation_date",
-        #     "due_date_value",
-        #     "due_date_unit",
-        #     "escalation_date_value",
-        #     "escalation_date_unit",
-        #     "computed_date",
-        #     "frequency_type"
-        # ]
+        due_date_related_keys = [
+            "due_date",
+            "escalation_date",
+            "due_date_value",
+            "due_date_unit",
+            "escalation_date_value",
+            "escalation_date_unit",
+            "computed_date",
+            "frequency_type"
+        ]
 
-        # if any(key in vals for key in due_date_related_keys):
-        #     if hasattr(self, "_schedule_due_dates"):
-        #         self._schedule_due_dates()
+        if any(key in vals for key in due_date_related_keys):
+            if hasattr(self, "_schedule_due_dates"):
+                self._schedule_due_dates()
 
         self._copy_rulebook_chatter_to_reply_log()
 
         return result
 
-    
+    # def _copy_rulebook_chatter_to_reply_log(self, rulebook=None):
+    #     """
+    #     Copy rulebook chatter to reply log.
+
+    #     Args:
+    #         rulebook: optional rulebook record. If not provided, uses self.
+    #     Returns:
+    #         reply.log record
+    #     """
+    #     # Use provided rulebook or self
+    #     current_rulebook = rulebook or self
+    #     _logger.critical(f"current rule book  {current_rulebook}")
+
+    #     # Find all existing reply logs for this rulebook
+    #     reply_logs = self.env['reply.log'].search([
+    #         ('rulebook_id', '=', current_rulebook.id)
+    #     ])
+
+    #     # Prepare reply log values
+    #     reply_log_vals = current_rulebook._prepare_reply_log_vals(
+    #         submission_status='pending',
+    #         submission_time='pending'
+    #     )
+    #     reply_log_vals['rulebook_id'] = current_rulebook.id
+
+    #     _logger.info(
+    #         f"Preparing reply log for rulebook {current_rulebook.id}: {reply_log_vals}")
+
+    #     # Create new reply log if none exists, else use existing one
+    #     if not reply_logs:
+    #         reply_log = self.env['reply.log'].create(reply_log_vals)
+    #     else:
+    #         reply_log = reply_logs[0]
+
+    #     # Copy all messages from rulebook to reply log
+    #     messages = self.env['mail.message'].search([
+    #         ('res_id', '=', current_rulebook.id),
+    #         ('model', '=', 'rulebook')
+    #     ], order='create_date asc')
+
+    #     for message in messages:
+    #         message.copy({
+    #             'model': 'reply.log',
+    #             'res_id': reply_log.id
+    #         })
+
+    #     # Copy main attachment if exists
+    #     if current_rulebook.message_main_attachment_id:
+    #         self.env['ir.attachment'].browse(current_rulebook.message_main_attachment_id.id).copy({
+    #             'res_model': 'reply.log',
+    #             'res_id': reply_log.id
+    #         })
+
+    #     return reply_log
 
     def _copy_rulebook_chatter_to_reply_log(self):
-        
+        # Find all existing reply logs for this rulebook
         reply_logs = self.env['reply.log'].search(
-            [('rulebook_id', '=', self.id)],
-            order='create_date desc',
-            limit=1
-        )
+            [('rulebook_id', '=', self.id)])
 
         reply_log_vals = self._prepare_reply_log_vals(
             submission_status='pending',
@@ -1336,11 +1362,12 @@ class Rulebook(models.Model):
         _logger.critical(
             f"Reply log vals {reply_log_vals}  rulebook_id {self.id}")
         # If no reply log exists, create one
-                    
-        if not reply_logs and self.frequency_type == "immediate":
+        reply_log_vals['rulebook_id'] = self.id
+
+        if not reply_logs:
             reply_log = self.env['reply.log'].sudo().create(reply_log_vals)
         else:
-            reply_log = reply_logs
+            reply_log = reply_logs[0]
 
         # Copy all messages from rulebook to reply log
         messages = self.env['mail.message'].search([
@@ -1366,34 +1393,33 @@ class Rulebook(models.Model):
 
         return reply_log
 
-    
     def _schedule_due_dates(self):
         for record in self:
             # Ensure any existing events are removed
             events = self.env["calendar.event"].search(
                 [("name", "ilike",
-                  f"Regulatory Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})")]
+                  f"Regulatory Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})")]
             )
             events.unlink()
 
             events = self.env["calendar.event"].search(
                 [("name", "ilike",
-                  f"Internal Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})")]
+                  f"Internal Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})")]
             )
             events.unlink()
 
             events = self.env["calendar.event"].search(
                 [("name", "ilike",
-                  f"Escalation Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})")]
+                  f"Escalation Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})")]
             )
             events.unlink()
 
-            if record.rulebook_compute_date:
+            if record.computed_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Internal Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})",
-                        "start": record.rulebook_compute_date,
-                        "stop": record.rulebook_compute_date
+                        "name": f"Internal Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})",
+                        "start": record.computed_date,
+                        "stop": record.computed_date
                         + timedelta(hours=1),  # Set duration of 1 hour
                         "allday": False,  # Event is not all day; includes specific time
                     }
@@ -1402,7 +1428,7 @@ class Rulebook(models.Model):
             if record.due_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Regulatory Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})",
+                        "name": f"Regulatory Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})",
                         "start": record.due_date,
                         "stop": record.due_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -1413,7 +1439,7 @@ class Rulebook(models.Model):
             if record.escalation_date:
                 self.env["calendar.event"].create(
                     {
-                        "name": f"Escalation Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})",
+                        "name": f"Escalation Due Date for {re.sub(r'<[^>]+>', '', record.type_of_return)} (ID: {record.id})",
                         "start": record.escalation_date,
                         "stop": record.escalation_date
                         + timedelta(hours=1),  # Set duration of 1 hour
@@ -1551,7 +1577,6 @@ class Rulebook(models.Model):
                     _logger.warning(
                         f"Invalid rulebook ID in event: {event.name}")
 
-   
     def _get_rulebook_from_event(self, event):
         """
         Helper method to extract the rulebook ID from the event's name.
@@ -1578,7 +1603,7 @@ class Rulebook(models.Model):
 
         _logger.critical(
             f"rulebooks with today's regulatory date  {today}, plus one day {today + timedelta(days=1)}")
-
+        
         today = fields.Datetime.now().astimezone(
             pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
 
@@ -1603,6 +1628,7 @@ class Rulebook(models.Model):
             ]
         )
 
+
         for record in rulebooks:
             try:
                 _logger.critical(
@@ -1616,8 +1642,6 @@ class Rulebook(models.Model):
 
             except Exception as e:
                 _logger.critical(f"Failed to update rulebook {record.id}: {e}")
-                
-                
 
     def _compute_next_due_date(self):
         _logger.critical("Updating next due date...")
@@ -1734,6 +1758,7 @@ class Rulebook(models.Model):
         """Send reminder and escalation emails for due or escalated rulebooks."""
         today = fields.Datetime.now().astimezone(
             pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
+        
 
         rulebooks_to_update_alert = self.env["rulebook"]
         rulebooks_to_update_escalation = self.env["rulebook"]
@@ -1771,6 +1796,7 @@ class Rulebook(models.Model):
                         if not rulebook.last_internal_due_date_sent or rulebook.last_internal_due_date_sent.date() != today.date():
                             rulebook._send_internal_due_date_email()
                             needs_update_alert = True
+                    
 
                 # Escalation Email: Check if escalation_date matches today
                 if rulebook.escalation_date and today.date() == rulebook.escalation_date.date():
@@ -1778,6 +1804,7 @@ class Rulebook(models.Model):
                         if not rulebook.last_escalation_sent or rulebook.last_escalation_sent.date() != today.date():
                             rulebook._send_escalation_due_date_email()
                             needs_update_escalation = True
+                   
 
                 # Check if due_date is within 5 minutes of today
                 if rulebook.due_date and rulebook.due_date < rulebook.computed_date:
@@ -1837,7 +1864,6 @@ class Rulebook(models.Model):
                 _logger.critical(
                     f"Failed to update last_escalation_sent for rulebooks: {e}")
 
-   
     @api.model
     def check_and_update_rulebooks(self):
         """Scheduler to check rulebooks with today's date as the regulatory date and update next due date."""
