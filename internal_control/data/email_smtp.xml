@@ -6,8 +6,10 @@
             <field name="name">Email Server</field>
             <field name="smtp_host">smtp.gmail.com</field>
             <field name="smtp_port">587</field>
-            <field name="smtp_user">introservenovaji@gmail.com</field>
-            <field name="smtp_pass">azdrmcfdgegmwbta</field>
+            <!-- <field name="smtp_user">introservenovaji@gmail.com</field> -->
+            <!-- <field name="smtp_pass">azdrmcfdgegmwbta</field> -->
+            <field name="smtp_user">jimohkayodeyusuf@gmail.com</field>
+            <field name="smtp_pass">lnedfwndeeiepauk</field>
             <field name="smtp_encryption">starttls</field>
             <field name="smtp_debug" eval="False"></field>
             <field name="sequence">10</field>

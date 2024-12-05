@@ -41,7 +41,9 @@
         # 'views/user_profile.xml',
         'views/cron_job.xml',
         'views/sql_view.xml', 
+        'views/emailbranch.xml',
         'views/menus.xml',
+        
         
     ],
 
@@ -58,7 +60,8 @@
         'web.assets_backend': [
            "internal_control/static/src/components/editor.js",
            "internal_control/static/src/components/editor.css",
-           "internal_control/static/src/components/internal_control.js"
+           "internal_control/static/src/components/internal_control.js",
+           "internal_control/static/src/css/style.css"
         ]
     }
 }

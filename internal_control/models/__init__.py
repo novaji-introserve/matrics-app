@@ -13,3 +13,5 @@ from . import sql
 from . import alert_history
 from . import department
 from . import user_profile
+from . import EmailBranch
+

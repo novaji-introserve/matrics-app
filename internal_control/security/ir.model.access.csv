@@ -1,8 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_tbl_transactions,access_tbl_transactions,internal_control.model_tbl_transactions,base.group_user,1,0,0,0
+access_tbl_transactions,access_tbl_transactions,internal_control.model_tbl_transactions,base.group_user,1,1,1,1
 access_res_internal_control_account_monitoring,access_res_internal_control_account_monitoring,internal_control.model_res_internal_control_account_monitoring,base.group_user,1,1,1,1
 access_res_internal_control_fraud_monitoring,access_res_internal_control_fraud_monitoring,internal_control.model_res_internal_control_fraud_monitoring,base.group_user,1,1,1,1
-access_tbl_transactions,access_tbl_transactions,internal_control.model_tbl_transactions,base.group_user,1,0,0,0
 access_alert_rules,access right alert rules,internal_control.model_alert_rules,base.group_user,1,1,1,1
 access_exception_frequency_rules,access exception frequency rules,internal_control.model_exception_frequency,base.group_user,1,1,1,1
 access_branch_rules,access branch rules,internal_control.model_tbl_branch,base.group_user,1,1,1,1
@@ -12,3 +11,4 @@ access_alert_group_rules,access alert group rules,internal_control.model_alert_g
 access_internal_control_screening_rule,access internal control screening rules,internal_control.model_internal_control_screening_rule,base.group_user,1,1,1,1
 access_internal_control_sql_rule,access internal control sql rules,internal_control.model_process_sql,base.group_user,1,1,1,1
 access_internal_control_alert_history,access internal control alert history,internal_control.model_alert_history,base.group_user,1,1,1,1
+access_internal_control_email_branch,access internal control email branch,internal_control.model_email_branch,base.group_user,1,1,1,1

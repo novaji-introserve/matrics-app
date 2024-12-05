@@ -3,11 +3,10 @@
     <!-- Email template for new users -->
     <record id="alert_rules_mail_template" model="mail.template">
         <field name="name">Alert Mailing System</field>
-        <field name="model_id" ref="internal_control.model_alert_rules"/>
+        <field name="model_id" ref="internal_control.model_alert_history"/>
         <field name="subject">Mail Report From Icomply</field>
-        <field name="email_from">test@novajii.com</field>
-        <field name="email_cc">{{ object.alert_group_id.email_cc }}</field>
-        <field name="email_to">{{ object.alert_group_id.email_list }}</field>
+        <field name="email_from">admin@dejaneesconcepts.com.ng</field>
+        <field name="email_to">{{ object.email }}</field>
         <field name="description">this is automation mail base on alert information in the database</field>
         <field name="body_html" type="html">
 
@@ -56,8 +55,13 @@
                                             <tr>
                                                 <td valign="middle">
                                                     <img src="https://covenantmfb.com.ng/wp-content/uploads/2019/05/CMFB-Logo.png" alt="logo" style="width: 12rem; object-fit:contain; height: 12rem; display:block; margin-bottom:1rem;"/>
-                                                  
-                                                    <div style="display: flex; align-items:center; gap:0.4rem">
+
+                                                    
+                                                       <a t-att-href="object.attachment_link" target="_blank" style="background-color: green; color: #fff; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                                                           Download CSV
+                                                        </a>
+                                                   
+                                                    <div style="display: flex; align-items:center; gap:0.4rem; margin-top:1rem;">
                                                         <p>AlertId:</p>
                                                         <h6> <span t-esc="object.alert_id" /> </h6>
                                                    </div>
@@ -68,15 +72,14 @@
                                                         <p> <span t-esc="object.narration" /> </p>
                                                    </div>
                                                 <hr />
+                                                  
+                                                <hr />
                                                    <div style="display: flex; align-items:center; gap:0.4rem; margin: 0.5rem 0;">
                                                         <p>Date:</p>
-                                                        <p> <span t-esc="object.date_created.strftime('%Y-%m-%d')" /> </p>
+                                                        <p> <span t-esc="object.last_checked" /> </p>
                                                    </div>
                                                    
-                                                   <div style="margin: 0.5rem 0;">
-                                                      <!-- <a href="'/web#action=%s&model=%s&view_type=list&menu_id=%s' % (7, 'ir.actions.act_window', 4)">Create New Alert</a> -->
-                                                   </div>
-                                                  
+                                              
                                                     
                                                     
                                                 </td>
@@ -84,7 +87,7 @@
                                             </tr>
 
                                             <tr>
-                                                <t t-raw="object.table_html" />
+                                                <t t-raw="object.html_body" />
                                             </tr>
                                             
                                             <tr>
