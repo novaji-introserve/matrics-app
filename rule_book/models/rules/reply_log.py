@@ -15,7 +15,6 @@ import traceback
 from ...controllers.rule_book.rule_book import *
 
 
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,6 +27,8 @@ class ReplyLog(models.Model):
     _rec_name = "create_date"
     _order = "id desc"
     _inherit = ['mail.thread', 'mail.activity.mixin']
+
+    active = fields.Boolean(string='Active', default=True)
 
     rulebook_id = fields.Many2one(
         'rulebook', required=True, ondelete='cascade', tracking=True, string="Rulebook", help="Reference to the related Rulebook",)
@@ -88,15 +89,15 @@ class ReplyLog(models.Model):
     # The regulatory date as computed from the rulebook (related field)
     rulebook_compute_date = fields.Datetime(
         string="Internal Due Date",
-        store=True,
+        # store=True,
         tracking=True,
         help="The regulatory date calculated from the related rulebook.",
-        # related='rulebook_id.rulebook_computed_date',
+        # related='rulebook_id.rulebook_compute_date',
     )
 
     last_escalation_sent = fields.Datetime(
         string="Last Escalation Sent",
-        store=True,
+        # store=True,
         tracking=True,
         help="The last escalation date calculated from the related rulebook.",
         # related='rulebook_id.last_escalation_sent',
@@ -104,7 +105,7 @@ class ReplyLog(models.Model):
 
     next_due_date = fields.Datetime(
         string="Next Regulatory Date",
-        store=True,
+        # store=True,
         tracking=True,
         help="Next due date.",
         # related='rulebook_id.next_due_date'
@@ -145,6 +146,7 @@ class ReplyLog(models.Model):
     formatted_reply_date = fields.Char(
         string="Formatted Reply Date",
         compute="_compute_formatted_reply_date",
+
     )
 
     formatted_rulebook_date = fields.Char(
@@ -246,11 +248,13 @@ class ReplyLog(models.Model):
 
     quarter_day = fields.Integer(string='Day of Quarter', default=7)
 
-    due_date = fields.Datetime(string="Regulatory Date",
-                               store=True,
-                               tracking=True,
-                               help="due date.",
-                               )
+    due_date = fields.Datetime(
+        string="Regulatory Date",
+        # store=True,
+        tracking=True,
+        help="due date.",
+    )
+
     last_escalation_sent = fields.Datetime(string="Last Escalation Sent")
 
     semi_annual_month1 = fields.Integer(
@@ -372,67 +376,17 @@ class ReplyLog(models.Model):
             }
         }
 
-    # def write(self, vals):
-    #     """
-    #     Overrides the default write method to enforce rules for reply logs.
-
-    #     Provides flexible validation and logging for different update scenarios.
-    #     """
-    #     # Comprehensive logging for debugging
-    #     _logger.critical(f"Write method called")
-    #     _logger.critical(f"Current environment context: {self.env.context}")
-    #     _logger.critical(f"Current user: {self.env.user.name}")
-    #     _logger.critical(f"Write vals: {vals}")
-
-    #     # Fields that trigger detailed validation
-    #     reply_submission_fields = ['reply_content', 'document']
-
-    #     # Determine if this is a reply submission context
-    #     is_reply_submission = any(field in vals for field in reply_submission_fields)
-
-    #     # Perform specific validations for reply submission
-    #     if is_reply_submission:
-    #         for record in self:
-    #             # Validate reply content
-    #             if 'reply_content' in vals:
-    #                 reply_content = vals.get('reply_content', '')
-    #                 if not reply_content:
-    #                     raise AccessError(_("You must provide a substantive reply note before updating."))
-
-    #             # Validate document
-    #             if 'document' in vals:
-    #                 if not vals.get('document', False):
-    #                     raise AccessError(_("You must upload a valid document before updating."))
-
-    #             # Update status and timestamp for reply submissions
-    #             vals['rulebook_status'] = 'submitted'
-    #             vals['reply_date'] = fields.Datetime.now()
-
-    #     try:
-    #         # Perform the write operation
-    #         result = super(ReplyLog, self).write(vals)
-
-    #         # Optional post-write processing
-
-    #         return result
-
-    #     except Exception as e:
-    #         _logger.error(f"Error during write operation: {str(e)}")
-    #         raise
-
     def write(self, vals):
         """Overrides the default write method to enforce rules."""
         for record in self:
             # Check if reply_content or document is being updated
-            if "reply_content" in vals or "document" in vals:
-                # Ensure both fields are provided
-                if "reply_content" in vals and not vals["reply_content"]:
+            if "reply_content" in vals or "document" in vals or "document_filename" in vals:
+                # Require both reply_content and document to be present
+                if (not vals.get("reply_content") or
+                    not vals.get("document") or
+                        not vals.get("document_filename")):
                     raise AccessError(
-                        _("You must provide a reply note before updating."))
-
-                if "document" in vals and not vals["document"]:
-                    raise AccessError(
-                        _("You must upload a file before updating."))
+                        _("You must provide both a reply note and upload a file."))
 
                 # Change status to submitted if both fields are set
                 vals["rulebook_status"] = "submitted"
@@ -515,8 +469,8 @@ class ReplyLog(models.Model):
             return result
 
         except Exception as e:
-            _logger.error(f"Error fetching awaiting replies: {e}")
-            return {"error": str(e)}
+            _logger.critical(f"Error fetching awaiting replies: {e}")
+            return {"CRictical_error": str(e)}
 
     def _compute_rulebook_name_stripped(self):
         for record in self:
@@ -546,95 +500,79 @@ class ReplyLog(models.Model):
         global global_data
         global_data = data
 
+    def create(self, vals):
+
+        # Create rulebook record
+        record = super(ReplyLog, self).create(vals)
+        self._update_submission_timing()
+
+        return record
+
     @api.depends("reply_date", "rulebook_compute_date")
     def _compute_submission_timing(self):
         """Compute the submission timing based on the full datetime of reply_date and rulebook_compute_date."""
         for record in self:
-            if not record.reply_date:
-                # If there's no reply date and the due date has passed, mark as not responded
-                if (
-                    record.rulebook_compute_date
-                    and record.rulebook_compute_date < fields.Datetime.now()
-                ):
-                    record.submission_timing = "not_responded"
-                continue
+            today = fields.Datetime.now().astimezone(
+                pytz.timezone('Africa/Lagos')).replace(tzinfo=None, microsecond=0)
 
             try:
+                if not record.reply_date:
+                    # If there's no reply date and the due date has passed, mark as not responded
+                    if (
+                        not record.reply_date and record.rulebook_compute_date
+                        and record.rulebook_compute_date < today
+                    ):
+                        record.submission_timing = "not_responded"
+                    continue
                 # Convert reply_date to a datetime object
-                reply_datetime = fields.Datetime.from_string(record.reply_date)
+                reply_datetime = (record.reply_date)
                 # Convert rulebook_compute_date to a datetime object
-                compute_datetime = fields.Datetime.from_string(
-                    record.rulebook_compute_date)
+                compute_datetime = (record.rulebook_compute_date)
 
                 # Compare the reply datetime with the computed rulebook datetime
-                if reply_datetime > compute_datetime:
+                if reply_datetime and reply_datetime > compute_datetime:
                     record.submission_timing = "late"
-                elif reply_datetime < compute_datetime:
+                elif reply_datetime and reply_datetime < compute_datetime:
                     record.submission_timing = "early"
                 else:
                     record.submission_timing = "pending"
             except Exception as e:
-                _logger.error(
-                    f"Error computing submission timing for record {record.id}: {e}")
+                _logger.critical(
+                    f"CRITICAL Error computing submission timing for record {record.id}: {e}")
                 record.submission_timing = "error"
 
     @api.model
-    def update_reply_log_due_dates(self):
-        """Update the next due date for all reply logs based on rulebook recurrence."""
-        reply_logs = self.env['reply.log'].search(
-            [('rulebook_id.is_recurring', '=', True), ('rulebook_status', '=', 'completed')])
+    def _update_submission_timing(self):
+        """Cron job to compute the submission timing for all rulebook logs."""
+        today = fields.Datetime.now().astimezone(
+            pytz.timezone('Africa/Lagos')).replace(tzinfo=None, microsecond=0)
 
-        for reply_log in reply_logs:
-            rulebook = reply_log.rulebook_id
-            if rulebook:
-                # Update the next due date based on rulebook's next_due_date
-                reply_log.next_due_date = rulebook.next_due_date
-                _logger.info(
-                    f"Updated next due date for reply log {reply_log.id} based on rulebook {rulebook.name}")
+        # Get all records that need the computation
+        rulebooks = self.search([])
 
-    @api.constrains("rulebook_status")
-    def _check_status_change(self):
-        print(" updating check status change")
-        """Check when status changes from 'completed' to any other status and adjust rulebook."""
-        for record in self:
-            rulebook = record.rulebook_id
-            print("testing")
-            print(record.next_due_date)
-            if (
-                rulebook
-                and rulebook.is_recurring
-                and record.rulebook_status != "completed"
-                and record.next_due_date != False
-            ):
-                # Calculate the previous due date based on the frequency type
-                previous_due_date = rulebook.computed_date - relativedelta(
-                    days=rulebook.frequency_type == "daily" and 1 or 0,
-                    weeks=rulebook.frequency_type == "weekly" and 1 or 0,
-                    months=(rulebook.frequency_type == "monthly" and 1)
-                    or (rulebook.frequency_type == "quarterly" and 3)
-                    or 0,
-                    years=rulebook.frequency_type == "yearly" and 1 or 0,
-                )
+        for record in rulebooks:
+            _logger.critical(
+                f"reply datetime{record.reply_date}:  computed date {record.rulebook_compute_date}  today date {today}")
 
-                # Handle special cases for day_of_month, day_every_month, and month_of_year
-                if rulebook.frequency_type == "day_of_month":
-                    previous_due_date = rulebook.computed_date - \
-                        relativedelta(months=1)
-                elif rulebook.frequency_type == "day_every_month":
-                    previous_due_date = rulebook.computed_date - \
-                        relativedelta(months=1)
-                elif rulebook.frequency_type == "month_of_year":
-                    previous_due_date = rulebook.computed_date.replace(
-                        year=record.rulebook_compute_date.year - 1
-                    )
-                print(previous_due_date)
-                print("===========================")
-                print(rulebook.computed_date)
-                # If the rulebook's computed date is currently set to the new status
-                if record.rulebook_compute_date == previous_due_date:
-                    print("i got here")
-                    # Move rulebook computed date back to the previous due date
-                    rulebook.computed_date = previous_due_date
+            try:
+                if not record.reply_date:
+                    # If there's no reply date and the due date has passed, mark as not responded
+                    if record.rulebook_compute_date and record.rulebook_compute_date < today:
+                        record.submission_timing = "not_responded"
+                       
+                        record.sudo().write({
+                            'submission_timing': record.submission_timing,
+                        })
+                        
+                        _logger.critical(
+                            f"submissio timing updated {record.submission_timing}:  computed date {record.rulebook_compute_date}  today date {today}")
+
+                    return  # Skip to the next record if no reply_date is available
+
+            except Exception as e:
+                _logger.critical(
+                    f"CRITICAL Error computing submission timing for record {record.id}: {e}")
+                record.submission_timing = "error"
 
     def _compute_next_due_date(self):
         _logger.critical("Updating next due date...")
@@ -647,108 +585,118 @@ class ReplyLog(models.Model):
                 next_due_date = None
 
                 if record.frequency_type == "monthly":
-                    next_due_date = record.rulebook_computed_date + \
+                    next_due_date = record.rulebook_compute_date + \
                         relativedelta(months=1)
 
                 elif record.frequency_type == "quarterly":
-                    next_due_date = record.rulebook_computed_date + \
+                    next_due_date = record.rulebook_compute_date + \
                         relativedelta(months=3)
 
                 elif record.frequency_type == "yearly":
-                    next_due_date = record.rulebook_computed_date + \
+                    next_due_date = record.rulebook_compute_date + \
                         relativedelta(years=1)
 
                 elif record.frequency_type == "daily":
-                    next_due_date = record.rulebook_computed_date + \
+                    next_due_date = record.rulebook_compute_date + \
                         relativedelta(days=1)
 
                 elif record.frequency_type == "weekly":
-                    next_due_date = record.rulebook_computed_date + \
+                    next_due_date = record.rulebook_compute_date + \
                         relativedelta(weeks=1)
 
                 elif record.frequency_type == "day_of_month":
-                    next_due_date = record.rulebook_computed_date + \
+                    next_due_date = record.rulebook_compute_date + \
                         relativedelta(months=1)
 
                 elif record.frequency_type == "day_every_month":
-                    next_due_date = record.rulebook_computed_date + \
+                    next_due_date = record.rulebook_compute_date + \
                         relativedelta(months=1)
 
                 elif record.frequency_type == "bi_monthly":
                     # Get the current day of the computed date
-                    current_day = record.rulebook_computed_date.day
+                    current_day = record.rulebook_compute_date.day
 
                     # Determine if it's the first or second date of the month
                     if current_day == record.bi_monthly_day1:
                         # If current is first day, next is second day of same month
-                        next_due_date = record.rulebook_computed_date.replace(
+                        next_due_date = record.rulebook_compute_date.replace(
                             day=record.bi_monthly_day2)
                     else:
                         # If current is second day, next is first day of next month
-                        next_due_date = record.rulebook_computed_date + \
+                        next_due_date = record.rulebook_compute_date + \
                             relativedelta(months=1)
                         next_due_date = next_due_date.replace(
                             day=record.bi_monthly_day1)
 
                 elif record.frequency_type == "semi_annually":
                     # Get current date components
-                    current_month = record.rulebook_computed_date.month
-                    current_day = record.rulebook_computed_date.day
+                    current_month = record.rulebook_compute_date.month
+                    current_day = record.rulebook_compute_date.day
 
                     if current_month == record.semi_annual_month1:
                         # Move to second date of the year
-                        next_due_date = record.rulebook_computed_date.replace(
+                        next_due_date = record.rulebook_compute_date.replace(
                             month=record.semi_annual_month2,
                             day=record.semi_annual_day2
                         )
                     else:
                         # Move to first date of next year
-                        next_due_date = record.rulebook_computed_date.replace(
-                            year=record.rulebook_computed_date.year + 1,
+                        next_due_date = record.rulebook_compute_date.replace(
+                            year=record.rulebook_compute_date.year + 1,
                             month=record.semi_annual_month1,
                             day=record.semi_annual_day1
                         )
                 elif record.frequency_type == "three_yearly":
-                    next_due_date = record.rulebook_computed_date + \
+                    next_due_date = record.rulebook_compute_date + \
                         relativedelta(years=3)
 
                 elif record.frequency_type == "date":
-                    next_due_date = record.rulebook_computed_date
+                    next_due_date = record.rulebook_compute_date
 
                 elif record.frequency_type == "immediate":
-                    next_due_date = record.rulebook_computed_date
+                    next_due_date = record.rulebook_compute_date
 
                 else:
-                    next_due_date = record.rulebook_computed_date
+                    next_due_date = record.rulebook_compute_date
 
                 if not next_due_date:
                     _logger.critical(
                         f"Invalid frequency type '{record.frequency_type}' for record {record.id}.")
-                    next_due_date = record.rulebook_computed_date
+                    next_due_date = record.rulebook_compute_date
 
-                record.next_due_date = next_due_date
-                record.rulebook_computed_date = next_due_date
+                # record.next_due_date = next_due_date
+                # record.rulebook_compute_date = next_due_date
 
-                record.sudo().write({
+                # record._compute_escalation_date()
+                # record._compute_due_date()
+
+                _logger.critical(
+                    f"Copying data here here is the due date {next_due_date}.")
+
+                new_record = record.copy({
                     'next_due_date': next_due_date,
-                    'rulebook_computed_date': next_due_date
+                    'rulebook_compute_date': next_due_date
                 })
 
-                record._compute_escalation_date_for_cron()
-                record._compute_due_date_for_cron()
+                # Optionally, compute escalation date and due date for the new record
+                new_record._compute_escalation_date()
+                new_record._compute_due_date()
+                
+                self._update_submission_timing()
+
 
                 _logger.critical(
                     f"Record {record.id}: Computed next due date as {next_due_date}.")
 
             except Exception as e:
-                _logger.error(
-                    f"Error computing next due date for record {record.id}: {str(e)}"
+                _logger.critical(
+                    f"CRITICAL Error computing next due date for record {record.id}: {str(e)}"
                 )
                 record.next_due_date = None
 
-    def _compute_escalation_date_for_cron(self):
+    def _compute_escalation_date(self):
         for record in self:
-            if record.rulebook_computed_date and record.escalation_date_unit in [
+            if record.rulebook_compute_date and record.escalation_date_unit in [
                 "days",
                 "hours",
                 "minutes",
@@ -760,7 +708,7 @@ class ReplyLog(models.Model):
                 delta_args = {
                     record.escalation_date_unit: -record.escalation_date_value
                 }
-                record.escalation_date = record.rulebook_computed_date + relativedelta(
+                record.escalation_date = record.rulebook_compute_date + relativedelta(
                     **delta_args
                 )
                 _logger.critical(
@@ -770,12 +718,12 @@ class ReplyLog(models.Model):
                     'escalation_date': record.escalation_date,
                 })
             else:
-                # If rulebook_computed_date is not available, set due_date to False or handle accordingly
+                # If rulebook_compute_date is not available, set due_date to False or handle accordingly
                 record.escalation_date = None
 
-    def _compute_due_date_for_cron(self):
+    def _compute_due_date(self):
         for record in self:
-            if record.rulebook_computed_date and record.due_date_unit in [
+            if record.rulebook_compute_date and record.due_date_unit in [
                 "days",
                 "hours",
                 "minutes",
@@ -788,16 +736,16 @@ class ReplyLog(models.Model):
                     delta_args = {
                         record.due_date_unit: -record.due_date_value
                     }
-                    record.due_date = record.rulebook_computed_date + relativedelta(
+                    record.due_date = record.rulebook_compute_date + relativedelta(
                         **delta_args
                     )
                     _logger.critical(
-                        f"writing escalation date {record.next_due_date}")
+                        f"writing Due date  HERE{record.next_due_date}")
                     record.sudo().write({
                         'due_date': record.due_date,
                     })
             else:
-                # If rulebook_computed_date is not available, set due_date to False or handle accordingly
+                # If rulebook_compute_date is not available, set due_date to False or handle accordingly
                 record.due_date = None
 
     @api.model
@@ -829,21 +777,27 @@ class ReplyLog(models.Model):
             [
                 ("rulebook_compute_date", ">=", day_start),
                 ("rulebook_compute_date", "<", day_end),
-                ("rulebook_id.is_recurring", "=", True),
+                ("rulebook_id.is_recurring", "=", True)
+                # ("reporter", "=", 477),
             ]
         )
+        _logger.critical(
+            f"Rulebooks to update {rulebooks}..,  start date :{day_start}..., end date :{day_end}")
 
         for record in rulebooks:
             try:
+                rulebook_model = record.rulebook_id
                 _logger.critical(
-                    f"To Update rulebook {record.id}:,  type of return : {re.sub(r'<[^>]+>', '', record.type_of_return)} frequency : {record.frequency_type}")
+                    f"To Update rulebook {record.id}:,  type of return : {re.sub(r'<[^>]+>', '', rulebook_model.type_of_return)} frequency : {rulebook_model.frequency_type}")
 
-                rulebook_computed_date = (
-                    record.rulebook_rulebook_computed_date)
-                time_in_5_minutes = rulebook_computed_date - \
+                rulebook_compute_date = (record.rulebook_compute_date)
+                time_in_5_minutes = rulebook_compute_date - \
                     timedelta(minutes=5)
-
-                if today >= time_in_5_minutes and rulebook_computed_date:
+                time_difference = today - time_in_5_minutes
+                _logger.critical(
+                f"Time Difference {time_difference}:,  today : {today} time_in_5_minutes : {time_in_5_minutes}")
+                # Check if the time difference is exactly 5 minutes (or within 1 second tolerance for precision)
+                if abs(time_difference) <= timedelta(minutes=5) and rulebook_compute_date:
                     record._compute_next_due_date()
 
             except Exception as e:
@@ -866,29 +820,27 @@ class ReplyLog(models.Model):
         # Get all rulebook IDs in the current recordset
         rulebook_ = self.env["rulebook"].search([])
         rulebook_ids = rulebook_.ids
-        _logger.critical(f"Rulebook ids {rulebook_ids}")
+        _logger.critical(f"ALL Rulebook ids {rulebook_ids}")
 
-        # Fetch completed reply logs for these rulebooks in a single query
         incomplete_rulebook_logs = self.env['reply.log'].search([
             ('rulebook_status', '!=', 'completed'),
-        ]).mapped('rulebook_id')
+        ])
 
         _logger.critical(
-            f"INcomplete Rulebooks IDS {incomplete_rulebook_logs}")
+            f"INcomplete Rulebooks LOGS IDS {incomplete_rulebook_logs}")
+        
 
         for rulebook in incomplete_rulebook_logs:
+            _logger.critical(
+                f"Incomplete Rulebook logs to process type of return : {rulebook}  compute_date {rulebook.rulebook_compute_date}.. today {today}... due date {rulebook.due_date}")
             try:
                 needs_update_internal_alert = False
                 needs_update_regulatory_alert = False
                 needs_update_escalation = False
 
-                rulebook_model = rulebook.rulebook_id
-
-                _logger.critical(
-                    f"Incomplete Rulebook logs to process type of return : {re.sub(r'<[^>]+>', '', rulebook_model.type_of_return)} ID {rulebook.id}")
-
+           
                 # Reminder Email: Check if due_date matches today
-                computed_date = rulebook.rulebook_computed_date
+                computed_date = rulebook.rulebook_compute_date
 
                 if computed_date and today.date() == computed_date.date():
                     if abs((computed_date - today).total_seconds()) <= 600:
@@ -973,46 +925,6 @@ class ReplyLog(models.Model):
                 _logger.critical(
                     f"Failed to update last_escalation_sent for rulebooks: {e}")
 
-    def _send_escalation_due_date_email(self):
-        """Send escalation_due_date notification email"""
-        try:
-            # Ensure the record exists and is valid
-            if not self:
-                _logger.critical("No record found to send email")
-                return False
-
-            # Verify email data is not empty
-            email_data = self._prepare_email_data()
-            if not email_data:
-                _logger.critical("No email data prepared for sending")
-                return False
-
-            # Find the email template
-            try:
-                template = self.env.ref(
-                    "rule_book.email_template_first_line_escalation_")
-            except ValueError:
-                _logger.critical(
-                    " escalation_due_date Email template not found")
-                return False
-
-            # Detailed logging for debugging
-            _logger.critical(
-                f"Attempting to send escalation_due_date email for record {self.id}")
-            _logger.critical(f"Email data: {email_data}")
-
-            # Send the email
-            email_result = template.send_mail(self.id, force_send=True)
-
-            _logger.critical(
-                f"escalation_due_date Email sent successfully. Result: {email_result}")
-            return True
-        except Exception as e:
-            _logger.critical(f"Comprehensive email send failure: {str(e)}")
-            # Log the full traceback for more detailed debugging
-            _logger.critical(traceback.format_exc())
-            return False
-
     def _prepare_email_data(self):
         """Prepare email data dictionary"""
         try:
@@ -1022,7 +934,7 @@ class ReplyLog(models.Model):
                 order='create_date desc',
                 limit=1
             )
-            
+
             if rulebook and not rulebook[0].officer_responsible:
                 _logger.critical(
                     f"No officer responsible for record {self.id}")
@@ -1044,10 +956,10 @@ class ReplyLog(models.Model):
                 "email_to": rulebook[0].officer_responsible.email or "N/A",
                 "email_from": os.getenv("EMAIL_FROM"),
                 "email_cc": ", ".join(rulebook[0].officer_cc.mapped('email')) or "",
-                "first_line_escalation": self.first_line_escalation.email or "",
-                "first_line_name": self.first_line_escalation.name or "",
-                "second_line_escalation": self.second_line_escalation.email or "",
-                "computed_date": self._compute_formatted_date(self.rulebook_computed_date) or "N/A",
+                "first_line_escalation": rulebook[0].first_line_escalation.email or "",
+                "first_line_name": rulebook[0].first_line_escalation.name or "",
+                "second_line_escalation": rulebook[0].second_line_escalation.email or "",
+                "computed_date": self._compute_formatted_date(self.rulebook_compute_date) or "N/A",
                 "escalation_date": self.escalation_date or "N/A",
                 "due_date": self._compute_formatted_date(self.due_date) or "N/A",
 
@@ -1061,7 +973,7 @@ class ReplyLog(models.Model):
             return global_data
 
         except Exception as e:
-            _logger.critical(f"Error preparing email data: {str(e)}")
+            _logger.critical(f"Critical Error preparing email data: {str(e)}")
             _logger.critical(traceback.format_exc())
             return {}
 
@@ -1104,18 +1016,16 @@ class ReplyLog(models.Model):
             return formatted_time
 
         except Exception as e:
-            _logger.error(f"Date formatting error: {e}")
+            _logger.critical(f"Date formatting CRITICAL error: {e}")
             return str(dt)
 
-   
     def _compute_upload_link(self, id):
         base_url = self.env["ir.config_parameter"].sudo(
         ).get_param("web.base.url")
         appendedValue = encrypt_id(id)
         _logger.critical(f"{base_url}/report_submission/{appendedValue}")
         return f"{base_url}/report_submission/{appendedValue}"
-    
-    
+
     def _record_link(self, record_id, model_name=None):
         """
         Generate a dynamic URL to access a record's form view.
@@ -1171,3 +1081,176 @@ class ReplyLog(models.Model):
             })
             return False
 
+    def _send_escalation_due_date_email(self):
+        """Send escalation_due_date notification email"""
+        try:
+            # Ensure the record exists and is valid
+            if not self:
+                _logger.critical("No record found to send email")
+                return False
+
+            # Verify email data is not empty
+            email_data = self._prepare_email_data()
+            if not email_data:
+                _logger.critical("No email data prepared for sending")
+                return False
+
+            # Find the email template
+            try:
+                template = self.env.ref(
+                    "rule_book.email_template_first_line_escalation_")
+            except ValueError:
+                _logger.critical(
+                    " escalation_due_date Email template not found")
+                return False
+
+            # Detailed logging for debugging
+            _logger.critical(
+                f"Attempting to send escalation_due_date email for record {self.id}")
+            _logger.critical(f"Email data: {email_data}")
+
+            # Send the email
+            email_result = template.send_mail(self.id, force_send=True)
+
+            _logger.critical(
+                f"escalation_due_date Email sent successfully. Result: {email_result}")
+            return True
+        except Exception as e:
+            _logger.critical(f"Comprehensive email send failure: {str(e)}")
+            # Log the full traceback for more detailed debugging
+            _logger.critical(traceback.format_exc())
+            return False
+
+    def _send_internal_due_date_email(self):
+        """Send internal_due_date notification email"""
+        try:
+            # Ensure the record exists and is valid
+            if not self:
+                _logger.critical("No record found to send email")
+                return False
+
+            # Verify email data is not empty
+            email_data = self._prepare_email_data()
+            if not email_data:
+                _logger.critical("No email data prepared for sending")
+                return False
+
+            # Find the email template
+            try:
+                template = self.env.ref(
+                    "rule_book.email_template_internal_due_date_")
+            except ValueError:
+                _logger.critical("internal_due_date Email template not found")
+                return False
+
+            # Detailed logging for debugging
+            _logger.critical(
+                f"Attempting to send internal_due_date email for record {self.id}")
+            _logger.critical(f"Email data: {email_data}")
+
+            # Send the email
+            email_result = template.send_mail(self.id, force_send=True)
+
+            _logger.critical(
+                f"internal_due_date Email sent successfully. Result: {email_result}")
+            return True
+        except Exception as e:
+            _logger.critical(f"Comprehensive email send failure: {str(e)}")
+            # Log the full traceback for more detailed debugging
+            _logger.critical(traceback.format_exc())
+            return False
+
+    def _send_regulatory_due_date_email(self):
+        """Send regulatory_due_date notification email"""
+        try:
+            # Ensure the record exists and is valid
+            if not self:
+                _logger.critical("No record found to send email")
+                return False
+
+            # Verify email data is not empty
+            email_data = self._prepare_email_data()
+            if not email_data:
+                _logger.critical("No email data prepared for sending")
+                return False
+
+            # Find the email template
+            try:
+                template = self.env.ref(
+                    "rule_book.email_template_regulatory_due_date_")
+            except ValueError:
+                _logger.critical(
+                    " regulatory_due_date Email template not found")
+                return False
+
+            # Detailed logging for debugging
+            _logger.critical(
+                f"Attempting to send regulatory_due_date email for record {self.id}")
+            _logger.critical(f"Email data: {email_data}")
+
+            # Send the email
+            email_result = template.send_mail(self.id, force_send=True)
+
+            _logger.critical(
+                f"regulatory_due_date Email sent successfully. Result: {email_result}")
+            return True
+        except Exception as e:
+            _logger.critical(f"Comprehensive email send failure: {str(e)}")
+            # Log the full traceback for more detailed debugging
+            _logger.critical(traceback.format_exc())
+            return False
+        
+
+    def _schedule_due_dates(self):
+        for record in self:
+            # Ensure any existing events are removed
+            events = self.env["calendar.event"].search(
+                [("name", "ilike",
+                  f"Regulatory Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})")]
+            )
+            events.unlink()
+
+            events = self.env["calendar.event"].search(
+                [("name", "ilike",
+                  f"Internal Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})")]
+            )
+            events.unlink()
+
+            events = self.env["calendar.event"].search(
+                [("name", "ilike",
+                  f"Escalation Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})")]
+            )
+            events.unlink()
+
+            if record.rulebook_compute_date:
+                self.env["calendar.event"].create(
+                    {
+                        "name": f"Internal Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})",
+                        "start": record.rulebook_compute_date,
+                        "stop": record.rulebook_compute_date
+                        + timedelta(hours=1),  # Set duration of 1 hour
+                        "allday": False,  # Event is not all day; includes specific time
+                    }
+                )
+
+            if record.due_date:
+                self.env["calendar.event"].create(
+                    {
+                        "name": f"Regulatory Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})",
+                        "start": record.due_date,
+                        "stop": record.due_date
+                        + timedelta(hours=1),  # Set duration of 1 hour
+                        "allday": False,  # Event is not all day; includes specific time
+                    }
+                )
+
+            if record.escalation_date:
+                self.env["calendar.event"].create(
+                    {
+                        "name": f"Escalation Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})",
+                        "start": record.escalation_date,
+                        "stop": record.escalation_date
+                        + timedelta(hours=1),  # Set duration of 1 hour
+                        "allday": False,  # Event is not all day; includes specific time
+                    }
+                )

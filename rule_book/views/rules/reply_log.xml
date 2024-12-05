@@ -12,10 +12,13 @@
                 <!-- <field name="rulebook_compute_date" widget="datetime" /> -->
                 <!-- <field name="reply_date" widget="datetime" options="{'format': 'MMMM dd, yyyy HH:mm:ss'}" /> -->
                 <field name="formatted_rulebook_date" string="Internal Due Date" />
-                <field name="formatted_reply_date"  string="Reply date"/>
+                <field name="formatted_reply_date" string="Reply date"/>
                 <field name="submission_timing" widget="badge" decoration-info="submission_timing == 'pending'" decoration-success="submission_timing == 'early'" decoration-warning="submission_timing == 'late'" decoration-danger="submission_timing == 'not_responded'" />
                 <field name="rulebook_status" widget="badge" decoration-muted="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'" />
                 <field name="reporter" string="Officer Responsible" />
+
+                <field name="active" invisible="1" />
+
             </tree>
         </field>
     </record>
@@ -51,7 +54,7 @@
                             <field name="reporter" readonly="1" string="Officer Responsible" />
                             <field name="department_id" readonly="1" string="Department Responsible" />
 
-                            <!-- <field name="rulebook_compute_date" readonly="1"/> -->
+                            <field name="rulebook_compute_date" string="computed date" readonly="1"/>
                             <field name="formatted_rulebook_date" readonly="1" string="Internal Due Date" />
 
                             <field name="frequency_type" readonly="1"/>
@@ -76,23 +79,6 @@
         </field>
     </record>
 
-    <!-- Search View -->
-    <record id="view_reply_log_search" model="ir.ui.view">
-        <field name="name">reply.log.search</field>
-        <field name="model">reply.log</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="rulebook_id" />
-                <field name="submission_timing" />
-                <searchpanel>
-                    <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1" options='{"counters": true}' />
-                    <field name="submission_timing" icon="fa-clock" string="Submission Timing" enable_counters="1" options='{"counters": true}' />
-                </searchpanel>
-                <field name="reply_content" string="Reply Note" />
-
-            </search>
-        </field>
-    </record>
 
     <!-- Action Definition -->
     <record id="action_reply_log" model="ir.actions.act_window">
@@ -107,5 +93,31 @@
         </field>
     </record>
 
+    <!-- Search View -->
+    <record id="view_reply_log_search" model="ir.ui.view">
+        <field name="name">reply.log.search</field>
+        <field name="model">reply.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="rulebook_id" />
+                <field name="submission_timing" />
+                <!-- <field name="rulebook_compute_date" /> -->
+                <searchpanel>
+                    <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1" options='{"counters": true}' />
+                    <field name="submission_timing" icon="fa-clock" string="Submission Timing" enable_counters="1" options='{"counters": true}' />
+                    <!-- <field name="rulebook_compute_date" icon="fa-clock" string="Internal due date Timing" enable_counters="1" options='{"counters": true}' /> -->
+
+                </searchpanel>
+
+                <field name="reply_content" string="Reply Note" />
+
+                <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">
+                    <!-- Archive filter -->
+                    <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                </group>
+
+            </search>
+        </field>
+    </record>
 
 </odoo>
