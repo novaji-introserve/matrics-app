@@ -13,12 +13,12 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+utc_time = current_time.astimezone(timezone('UTC'))
 
 class alert_rules(models.Model):
     _name = 'alert.rules'
     _description = "alert rules for exception management"
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'id desc'
     
     name = fields.Char(string="Name", required=True, Tracking=True)
     narration = fields.Html(string="narration", required=True)
@@ -264,27 +264,3 @@ class alert_rules(models.Model):
         
         except BaseException as e:
             raise ValueError(str(e))
-        
-        
-
-    def send_email_with_retries(self, template, new_alert_history):
-        
-        retries = 3  # Number of retries before failing
-        delay = 5  # Delay in seconds between retries
-
-        for attempt in range(retries):
-            try:
-                template.send_mail(new_alert_history.id, force_send=True)
-                _logger.info(f"Email sent successfully on attempt {attempt + 1}")
-                return  # Exit if the email is sent successfully
-            except smtplib.SMTPServerDisconnected as e:
-                _logger.error(f"SMTP server disconnected on attempt {attempt + 1}. Retrying...")
-                time.sleep(delay)  # Wait before retrying
-            except smtplib.SMTPException as e:
-                _logger.error(f"SMTP error occurred: {e}")
-                break  # Break the loop if a non-recoverable error occurs
-            except Exception as e:
-                _logger.error(f"Unexpected error occurred while sending email: {e}")
-                break  # Break the loop on any other error
-
-        # _logger.error("Failed to send email after several attempts.")

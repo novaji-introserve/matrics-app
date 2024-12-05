@@ -9,10 +9,7 @@ from odoo.tools import format_date
 from odoo.exceptions import AccessError
 from odoo.http import request
 import pytz
-<<<<<<< HEAD
-=======
 import os
->>>>>>> main
 
 
 from dotenv import load_dotenv
@@ -29,14 +26,7 @@ class ReplyLog(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     rulebook_id = fields.Many2one(
-<<<<<<< HEAD
-        "rulebook", string="Rulebook", help="Reference to the related Rulebook",
-        tracking=True,
-
-    )
-=======
         'rulebook', required=True, ondelete='cascade', tracking=True, string="Rulebook", help="Reference to the related Rulebook",)
->>>>>>> main
 
     department_id = fields.Many2one(
         "hr.department",
@@ -44,10 +34,6 @@ class ReplyLog(models.Model):
         default=lambda self: self.env.user.department_id.id,
         help="The department this reply log belongs to",
         tracking=True,
-<<<<<<< HEAD
-
-=======
->>>>>>> main
     )
 
     rulebook_name = fields.Char(
@@ -62,13 +48,8 @@ class ReplyLog(models.Model):
     reply_date = fields.Datetime(
         string="Reply Date",
         # default=fields.Date.today,
-<<<<<<< HEAD
-        default=lambda self: fields.Datetime.now().astimezone(
-            pytz.timezone('Africa/Lagos')).replace(tzinfo=None),
-=======
         default=fields.Datetime.now(),
         # .astimezone( pytz.timezone('Africa/Lagos')).replace(tzinfo=None),
->>>>>>> main
         # default=fields.Datetime.now,
         readonly=True,
         tracking=True,
@@ -99,11 +80,7 @@ class ReplyLog(models.Model):
         tracking=True,
     )
 
-<<<<<<< HEAD
-    document_filename = fields.Char(string="Document Filename",tracking=True,  )
-=======
     document_filename = fields.Char(string="Document Filename", tracking=True,)
->>>>>>> main
 
     # The regulatory date as computed from the rulebook (related field)
     rulebook_compute_date = fields.Datetime(
@@ -141,11 +118,7 @@ class ReplyLog(models.Model):
         string="Rulebook Status",
         default="pending",
         help="The current status of the related rulebook.",
-<<<<<<< HEAD
-                tracking=True,
-=======
         tracking=True,
->>>>>>> main
 
     )
 
@@ -166,25 +139,6 @@ class ReplyLog(models.Model):
 
     )
 
-<<<<<<< HEAD
-    @api.model
-    def open_reply_log(self):
-        # Check if the user has a department
-        restricted_group = self.env.ref('rule_book.group_department_user_')
-
-        # Check if the user belongs to the restricted group
-        if restricted_group in self.env.user.groups_id:
-            # Check if the user has a department
-            if not self.env.user.department_id:
-                raise AccessError(
-                    "You must be assigned to a department to view Reply Logs.")
-
-            # Apply restriction to the domain
-            domain = [('department_id', '=', self.env.user.department_id.id)]
-        else:
-            # No restrictions for other users
-            domain = []
-=======
     formatted_reply_date = fields.Char(
         string="Formatted Reply Date",
         compute="_compute_formatted_reply_date",
@@ -243,7 +197,6 @@ class ReplyLog(models.Model):
                     "You must be assigned to a department to view rulebook logs.")
             domain = [('department_id', '=', self.env.user.department_id.id)]
 
->>>>>>> main
         return {
             'name': ('Reply Logs'),
             'type': 'ir.actions.act_window',
@@ -255,11 +208,6 @@ class ReplyLog(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
-<<<<<<< HEAD
-        
-
-    
-=======
 
     # def write(self, vals):
     #     """
@@ -362,7 +310,6 @@ class ReplyLog(models.Model):
         else:
             _logger.critical(
                 "Email template 'rule_book.email_template_rulebook_log_notification_' not found.")
->>>>>>> main
 
     @api.model
     def get_awaiting_replies(self):
@@ -379,12 +326,8 @@ class ReplyLog(models.Model):
 
             # Search for awaiting replies
             awaiting_replies = self.search([
-<<<<<<< HEAD
-                ("rulebook_status", "not in", ["completed", "reviewed"]),
-=======
                 ("rulebook_status", "not in", [
                  "completed", "reviewed", "pending"]),
->>>>>>> main
                 ("rulebook_id", "not in", list(completed_ids))
             ])
 
@@ -415,12 +358,6 @@ class ReplyLog(models.Model):
     def _compute_rulebook_name_stripped(self):
         for record in self:
             if record.rulebook_id:
-<<<<<<< HEAD
-                # Strip HTML tags
-                record.rulebook_name = re.sub(
-                    r"<[^>]+>", "", record.rulebook_id.type_of_return
-                )
-=======
                 rulebook_name = record.rulebook_id.type_of_return or ""
 
                 # Check if the string contains HTML tags
@@ -431,7 +368,6 @@ class ReplyLog(models.Model):
                 else:
                     # No HTML tags; use the name as is
                     record.rulebook_name = rulebook_name
->>>>>>> main
             else:
                 record.rulebook_name = ""
 
@@ -472,78 +408,6 @@ class ReplyLog(models.Model):
                     record.submission_timing = "late"
                 elif reply_datetime < compute_datetime:
                     record.submission_timing = "early"
-<<<<<<< HEAD
-                else:
-                    record.submission_timing = "on_time"
-            except Exception as e:
-                _logger.error(
-                    f"Error computing submission timing for record {record.id}: {e}")
-                record.submission_timing = "error"
-
-   
-    @api.constrains("rulebook_status")
-    def _compute_next_due_date(self):
-        print(" updating next due date")
-        """Compute the next due date for the rulebook when the status is 'completed'."""
-        for record in self:
-            rulebook = record.rulebook_id
-            if (
-                rulebook
-                and rulebook.is_recurring
-                and record.rulebook_status == "completed"
-            ):
-                # Check if regulatory date matches computed date
-                if record.rulebook_compute_date == rulebook.computed_date:
-                    if rulebook.frequency_type == "monthly":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            months=1
-                        )
-                    elif rulebook.frequency_type == "quarterly":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            months=3
-                        )
-                    elif rulebook.frequency_type == "yearly":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            years=1
-                        )
-                    elif rulebook.frequency_type == "daily":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            days=1
-                        )
-                    elif rulebook.frequency_type == "weekly":
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            weeks=1
-                        )
-                    elif rulebook.frequency_type == "day_of_month":
-                        # Move to the same day in the next month
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            months=1
-                        )
-                    elif rulebook.frequency_type == "day_every_month":
-                        # Move to the same day of the next month
-                        next_due_date = record.rulebook_compute_date + relativedelta(
-                            months=1
-                        )
-                    elif rulebook.frequency_type == "month_of_year":
-                        # Move to the same month of the next year
-                        next_due_date = record.rulebook_compute_date.replace(
-                            year=record.rulebook_compute_date.year + 1
-                        )
-                    elif rulebook.frequency_type == "immediate":
-                        # Immediate means no specific future due date
-                        next_due_date = record.rulebook_compute_date
-                    else:
-                        next_due_date = record.rulebook_compute_date
-                    print(next_due_date)
-                    record.next_due_date = next_due_date
-                    # Update the rulebook computed date and reset status for next cycle
-                    rulebook.computed_date = next_due_date
-                    print(next_due_date)
-                else:
-                    # Do nothing if regulatory date doesn't match computed date
-                    continue
-                
-=======
                 else:
                     record.submission_timing = "pending"
             except Exception as e:
@@ -565,7 +429,6 @@ class ReplyLog(models.Model):
                 reply_log.next_due_date = rulebook.next_due_date
                 _logger.info(
                     f"Updated next due date for reply log {reply_log.id} based on rulebook {rulebook.name}")
->>>>>>> main
 
     @api.constrains("rulebook_status")
     def _check_status_change(self):
