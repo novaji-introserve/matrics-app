@@ -7,7 +7,8 @@ class alert_history(models.Model):
     _order = 'id desc'
 
     alert_id = fields.Char(string="alert_id", required=True)
-    attachment = fields.Many2one("ir.attachment")
+    attachment_data = fields.Char()
+    attachment_link = fields.Char()
     html_body = fields.Html(string="html body")
     alert_rule_id = fields.Many2one("alert.rules")
     process_category = fields.Char()

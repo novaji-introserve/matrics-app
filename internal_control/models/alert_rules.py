@@ -32,7 +32,6 @@ class alert_rules(models.Model):
     default="1",  # The default value is an integer (1)
     string="Alert Status"
     )
-    alert_group_id = fields.Many2one('alert.group', string="Alert Group")
     process_id = fields.Many2one('process', string="Process", domain="[('process_category_id', '=', process_category_id)]")
     risk_rating = fields.Many2one("case.rating", string="Risk Rating")
     date_created = fields.Datetime(
@@ -40,7 +39,6 @@ class alert_rules(models.Model):
     default=fields.Datetime.now()
     )
     last_checked = fields.Datetime(string="last_checked", default=fields.Datetime.now())
-    branch_id = fields.Many2one('tbl.branch', string="Branch", required=True)
 
 
 
@@ -235,11 +233,11 @@ class alert_rules(models.Model):
                                 # record the history
                                 new_alert_history = self.env['alert.history'].create({
                                     "alert_id": alert_id,
-                                    "attachment": attachment_id.id,
+                                    "attachment_data": attachment_id.id,
+                                    "attachment_link": f"/web/content/{attachment_id.id}?download=true",
                                     "html_body": table_html,
                                     "alert_rule_id": rule.id,
                                     "process_id": rule.process_id.name,
-                                    "process_category": rule.process_category_id.name,
                                     "process_category": rule.process_category_id.name,
                                     "risk_rating": rule.risk_rating.name,
                                     "date_created": rule.date_created,
@@ -253,9 +251,7 @@ class alert_rules(models.Model):
                                 
                         
 
-                                template.attachment_ids = [(4, attachment_id.id)]  # Attach the attachment to the template
-                                
-                                self.send_email_with_retries(template, new_alert_history)
+                                template.send_mail(new_alert_history.id, force_send=True)
                         
                 
                         else:
@@ -266,25 +262,3 @@ class alert_rules(models.Model):
             raise ValueError(str(e))
         
         
-
-    def send_email_with_retries(self, template, new_alert_history):
-        
-        retries = 3  # Number of retries before failing
-        delay = 5  # Delay in seconds between retries
-
-        for attempt in range(retries):
-            try:
-                template.send_mail(new_alert_history.id, force_send=True)
-                _logger.info(f"Email sent successfully on attempt {attempt + 1}")
-                return  # Exit if the email is sent successfully
-            except smtplib.SMTPServerDisconnected as e:
-                _logger.error(f"SMTP server disconnected on attempt {attempt + 1}. Retrying...")
-                time.sleep(delay)  # Wait before retrying
-            except smtplib.SMTPException as e:
-                _logger.error(f"SMTP error occurred: {e}")
-                break  # Break the loop if a non-recoverable error occurs
-            except Exception as e:
-                _logger.error(f"Unexpected error occurred while sending email: {e}")
-                break  # Break the loop on any other error
-
-        _logger.error("Failed to send email after several attempts.")
