@@ -38,9 +38,8 @@ class alert_rules(models.Model):
     process_id = fields.Many2one('process', string="Process", domain="[('process_category_id', '=', process_category_id)]")
     risk_rating = fields.Many2one("case.rating", string="Risk Rating")
     date_created = fields.Datetime(
-    string="created_at", 
-    default=fields.Datetime.now()
-    default=fields.Datetime.now()
+        string="created_at",
+        default=fields.Datetime.now()
     )
     last_checked = fields.Datetime(string="last_checked", default=fields.Datetime.now())
 
@@ -100,28 +99,20 @@ class alert_rules(models.Model):
             raise ValidationError(f"Unsupported Unit")
         
          
-         
-        
     
-    
-        
-        current_time_lagos = fields.Datetime.now()
         current_time_lagos = fields.Datetime.now()
         if current_time_lagos.year == next_check.year and current_time_lagos.month == next_check.month and  current_time_lagos.day == next_check.day and current_time_lagos.hour == next_check.hour and current_time_lagos.minute == next_check.minute:
 
             
             rule.write({'last_checked': fields.Datetime.now()})
-
-            
-            rule.write({'last_checked': fields.Datetime.now()})
+        
             print("sent ") 
             self.send_alert(rule)
     
     
     def send_alert(self, rule):
         try:
-                # first query to create csv
-                self.env.cr.execute(f"{rule.sql_text.query}")
+
                 # first query to create csv
                 self.env.cr.execute(f"{rule.sql_text.query}")
                 rows = self.env.cr.fetchall()
@@ -171,54 +162,7 @@ class alert_rules(models.Model):
                                  # Create a CSV in memory
                         csv_buffer = io.StringIO()
                         csv_writer = csv.writer(csv_buffer)
-                # Get column names dynamically
-                columns = [desc[0] for desc in self.env.cr.description]
 
-                # Find the index of subbranchcode dynamically
-                subbranchcode_index = None
-                for i, column in enumerate(columns):
-                    if 'subbranchcode' in column.lower():  # Case insensitive search
-                        subbranchcode_index = i
-                        break
-
-                if subbranchcode_index is None:
-                    print("subbranchcode column not found")
-                else:
-                    branches = []
-
-                    # Loop through the rows and get the value of subbranchcode dynamically
-                    for row in rows:
-                        subbranchcode = row[subbranchcode_index]  # Accessing subbranchcode dynamically by index
-                        
-                        if subbranchcode not in branches:
-                            branches.append(subbranchcode)
-
-                    # Initialize a dictionary to store the emails by branch
-                    branch_emails = {}
-
-                    for branch in branches:
-                        
-                        # Search for records in the email.branch model that match the current branch
-                        email_branch = self.env['email.branch'].search([("branch_id.id", '=', int(branch))])
-                        
-                        if email_branch:
-                                email_list = email_branch.email_list
-                                branch_emails[email_branch.branch_id.id] = email_list
-                                                    
-
-                    for key, bEmails in branch_emails.items():
-                        self.env.cr.execute(f"{rule.sql_text.query} WHERE subbranchcode = '{key}';")
-                        rowsForEachBranch = self.env.cr.fetchall()
-                
-                        # Get column names dynamically
-                        columnsForEachBranch = [desc[0] for desc in self.env.cr.description]
-                        
-                                 # Create a CSV in memory
-                        csv_buffer = io.StringIO()
-                        csv_writer = csv.writer(csv_buffer)
-
-                        # Write headers to the CSV
-                        csv_writer.writerow(columnsForEachBranch)
                         # Write headers to the CSV
                         csv_writer.writerow(columnsForEachBranch)
 
@@ -232,28 +176,8 @@ class alert_rules(models.Model):
                         
                         # Step 3: Base64 encode the CSV content
                         encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
-                        # Write data rows to the CSV
-                        for row in rowsForEachBranch:
-                            csv_writer.writerow(row)
                         
-                        csv_content = csv_buffer.getvalue()
-                        csv_buffer.close()
-                        
-                        
-                        # Step 3: Base64 encode the CSV content
-                        encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
-
-                        
-                        
-
-                        # second query to create table
-                     
-                        
-                        
-
-                        # second query to create table
-                     
-                 
+             
                         # Create the HTML table for the email
                     
                         table_html = """
@@ -274,23 +198,7 @@ class alert_rules(models.Model):
                         header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columnsForEachBranch])
                         # Create the HTML table for the email
                     
-                        table_html = """
-                        <table class="table table-bordered table-hover" style="width: 100%; max-width: 100vw; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #ddd; overflow:auto;">
-                            <thead style="background-color: #007046; color: #fff; padding: 12px;">
-                                <tr>
-                                    <!-- Table headers -->
-                                    {header_columns}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {table_rows}
-                            </tbody>
-                        </table>
-                        """
-                                
-                        # Generate the table header
-                        header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columnsForEachBranch])
-
+                      
                         # Generate the table rows
                         rows_html = ""
                         for row in rowsForEachBranch[:10]:
@@ -298,24 +206,12 @@ class alert_rules(models.Model):
                             for cell in row:
                                 rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
                             rows_html += "</tr>"
-                        # Generate the table rows
-                        rows_html = ""
-                        for row in rowsForEachBranch[:10]:
-                            rows_html += "<tr>"
-                            for cell in row:
-                                rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
-                            rows_html += "</tr>"
-
+                       
                         # Insert the generated HTML into the main table structure
                         table_html = table_html.format(header_columns=header_html, table_rows=rows_html)
-                        # Insert the generated HTML into the main table structure
-                        table_html = table_html.format(header_columns=header_html, table_rows=rows_html)
-
+                       
                         template = self.env.ref('internal_control.alert_rules_mail_template')
                         
-                        if template:
-                            
-                        template = self.env.ref('internal_control.alert_rules_mail_template')
                         
                         if template:
                             
@@ -363,8 +259,7 @@ class alert_rules(models.Model):
                         else:
                           raise ValidationError("Mail Template Not Found")
                 
-                        else:
-                          raise ValidationError("Mail Template Not Found")
+                     
                   
         
         except BaseException as e:

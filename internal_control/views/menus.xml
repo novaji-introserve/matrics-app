@@ -13,11 +13,11 @@
     <menuitem id="menu_transaction_monitoring_root" name="Transaction Monitoring" parent="menu_internal_control_main" sequence="20"/>
 
     <!-- All transactions -->
-    <!-- <menuitem id="menu_all_transactions_root" name="All Transactions" sequence="20" parent="menu_transaction_monitoring_root"/>
-
-    <menuitem id="menu_internal_control_transactions_to_review" name="Transactions to review" sequence="10" parent="menu_all_transactions_root" action="action_transactions_to_review"/>
-    <menuitem id="menu_internal_control_transactions_reviewed" name="Transactions Reviewed" sequence="20" parent="menu_all_transactions_root" action="action_transactions_reviewed"/>
-    <menuitem id="menu_internal_control_all_transactions" name="All Transactions" sequence="30" parent="menu_all_transactions_root" action="action_all_transactions"/> -->
+    <menuitem id="menu_all_transactions_root" name="Transactions Log" sequence="20" parent="menu_transaction_monitoring_root"/>
+    
+    <menuitem id="menu_internal_control_all_transactions" name="All Transactions" sequence="10" parent="menu_all_transactions_root" action="action_all_transactions"/>
+    <menuitem id="menu_internal_control_open_transactions" name="Transactions To Review" sequence="30" parent="menu_all_transactions_root" action="action_all_open_transactions"/>
+    <menuitem id="menu_internal_control_transactions_reviewed" name="Transactions Reviewed" sequence="20" parent="menu_all_transactions_root" action="action_all_reviewed_transactions"/>
 
     <!-- 1. Transaction Monitoring Category -->
     <menuitem id="menu_internal_control_transactions" name="Transaction Monitoring" parent="menu_transaction_monitoring_root" sequence="30"/>

@@ -22,13 +22,13 @@ class alert_history(models.Model):
    
     def generate_csv(self):
         
-            id = self.attachment.id
-            if id:
+            url = self.attachment_link
+            if url:
                 # Perform the download action
-                attachment_url = '/web/content/%s?download=true' % id
+    
                 return {
                     'type': 'ir.actions.act_url',
-                    'url': attachment_url,
+                    'url': url,
                     'target': 'self',
                 }
  
