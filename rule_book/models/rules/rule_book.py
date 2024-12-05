@@ -375,7 +375,6 @@ class Rulebook(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
-
     def data(self):
         # send the global value to the email template
         return global_data
@@ -408,7 +407,6 @@ class Rulebook(models.Model):
                 record.risk_rating = record.risk_category.risk_priority
             else:
                 record.risk_rating = False
-
     @api.onchange('semi_annual_month1', 'semi_annual_month2')
     def _onchange_semi_annual_months(self):
         if self.semi_annual_month1 == self.semi_annual_month2:
@@ -2138,6 +2136,15 @@ class Rulebook(models.Model):
 
         for rulebook in rulebooks:
             rulebook._compute_next_due_date()
+            
+    def _post_email_to_reply_log(self, message):
+        """Post a copy of the email message to the reply.log chatter"""
+        # Create or get a reply log record
+        ReplyLog = self.env['reply.log']
+        reply_log = ReplyLog.search(
+            [('name', '=', f'Log for {self.name}')], limit=1)
+        if not reply_log:
+            reply_log = ReplyLog.create({'name': f'Log for {self.name}'})
 
     def get_lagos_date(self):
         # Get the current UTC time

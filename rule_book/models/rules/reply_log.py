@@ -71,6 +71,7 @@ class ReplyLog(models.Model):
         required=True,
         help="The user responsible for this rulebook reply.",
     )
+   
 
     # Attached document for the reply (binary file)
     document = fields.Binary(
