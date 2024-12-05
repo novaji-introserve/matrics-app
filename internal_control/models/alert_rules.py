@@ -13,7 +13,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-utc_time = current_time.astimezone(timezone('UTC'))
+
 
 class alert_rules(models.Model):
     _name = 'alert.rules'
