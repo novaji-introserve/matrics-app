@@ -47,11 +47,7 @@
                     <group col="2">
                         <field name="name" class="input" placeholder="Select rulebook title" />
                         <!-- <field name="theme_id" placeholder="Select a theme" /> -->
-<<<<<<< HEAD
-                        <field name="type_of_return" placeholder="Specify type of return" class="text_field" widget="html"/>
-=======
                         <field name="type_of_return" placeholder="Specify type of return" class="text_field" widget="text" options="{'sanitize': True}" />
->>>>>>> main
                     </group>
                     <group col="1" style="grid-column: span 2;">
                         <field name="description" placeholder="Describe the return on this rulebook" class="text_field" />
@@ -116,11 +112,7 @@
                                 <field name="semi_annual_day2" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Day of second month" help="Enter a valid day for the selected month"/>
                             </group>
                             <group col="2">
-<<<<<<< HEAD
-                                <field name="computed_date" placeholder="Computed date will be shown here" string="computed date"/>
-=======
                                 <field name="computed_date" placeholder="Computed date will be shown here" string="Internal due date"/>
->>>>>>> main
 
                             </group>
                             

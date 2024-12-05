@@ -12,11 +12,8 @@ import calendar
 import logging
 from datetime import date
 from babel.dates import format_datetime
-<<<<<<< HEAD
-=======
 import traceback
 import json
->>>>>>> main
 
 
 _logger = logging.getLogger(__name__)
@@ -33,11 +30,6 @@ class Rulebook(models.Model):
     _order = "id desc"
     # _inherit = ["mail.thread"]
     _inherit = ['mail.thread', 'mail.activity.mixin']
-<<<<<<< HEAD
-
-
-=======
->>>>>>> main
 
     name = fields.Many2one(
         "rulebook.title",
@@ -358,23 +350,6 @@ class Rulebook(models.Model):
 
     @api.model
     def open_rulebooks(self):
-<<<<<<< HEAD
-        # Define the restricted group
-        restricted_group = self.env.ref('rule_book.group_department_user_')
-
-        # Check if the user belongs to the restricted group
-        if restricted_group in self.env.user.groups_id:
-            # Check if the user has a department
-            if not self.env.user.department_id:
-                raise AccessError(
-                    "You must be assigned to a department to view rulebooks.")
-
-            # Apply restriction to the domain
-            domain = [('responsible_id', '=', self.env.user.department_id.id)]
-        else:
-            # No restrictions for other users
-            domain = []
-=======
         # Check if user belongs to compliance or COO groups
         compliance_group = self.env.ref('rule_book.group_compliance_manager_')
         coo_group = self.env.ref('rule_book.group_chief_compliance_officer_')
@@ -388,7 +363,6 @@ class Rulebook(models.Model):
                 raise AccessError(
                     "You must be assigned to a department to view rulebooks.")
             domain = [('responsible_id', '=', self.env.user.department_id.id)]
->>>>>>> main
 
         return {
             'name': 'RuleBooks',
@@ -401,13 +375,6 @@ class Rulebook(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
-<<<<<<< HEAD
-    
-   
-        
-=======
-
->>>>>>> main
     def data(self):
         # send the global value to the email template
         return global_data
@@ -427,18 +394,9 @@ class Rulebook(models.Model):
             return action
         except AccessError:
             # If the user lacks permissions, raise a friendly message
-<<<<<<< HEAD
-            raise AccessError("You do not have the necessary permissions to view the Reply Log.")  
-
-    # def open_reply_log(self):
-    #     action = self.env.ref("rule_book.action_reply_log").sudo().read()[0]
-    #     return action
-        
-=======
             raise AccessError(
                 "You do not have the necessary permissions to view the Reply Log.")
 
->>>>>>> main
     @api.depends('risk_category', 'risk_category.risk_priority')
     def _compute_risk_rating(self):
         """Compute risk rating based on the selected risk category's priority"""
@@ -449,12 +407,6 @@ class Rulebook(models.Model):
                 record.risk_rating = record.risk_category.risk_priority
             else:
                 record.risk_rating = False
-<<<<<<< HEAD
-                
-        
-=======
-
->>>>>>> main
     @api.onchange('semi_annual_month1', 'semi_annual_month2')
     def _onchange_semi_annual_months(self):
         if self.semi_annual_month1 == self.semi_annual_month2:
@@ -534,21 +486,12 @@ class Rulebook(models.Model):
                  "semi_annual_month2", "semi_annual_day1", "semi_annual_day2", "year_month_value")
     def _compute_date(self):
         today = fields.Datetime.now()
-<<<<<<< HEAD
-        
-        # today=fields.Datetime.now().astimezone(
-        #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-        
-        current_weekday = today.weekday()
-        
-=======
 
         # today=fields.Datetime.now().astimezone(
         #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
 
         current_weekday = today.weekday()
 
->>>>>>> main
         default_time = datetime.combine(today.date(), datetime.min.time()).replace(
             hour=7, minute=0, second=0
         )
@@ -1070,12 +1013,6 @@ class Rulebook(models.Model):
                 "risk_category": self.risk_category.name if self.risk_category else "N/A",
                 "email_to": self.officer_responsible.email or "N/A",
                 "email_from": os.getenv("EMAIL_FROM"),
-<<<<<<< HEAD
-                # "email_cc": record.officer_cc.email,
-                "rulebook_name":  re.sub(r'<[^>]+>', '', record.type_of_return),
-
-                "email_cc": self.mapped('officer_cc.email'),
-=======
                 "email_cc": ", ".join(self.officer_cc.mapped('email')) or "",
                 "first_line_escalation": self.first_line_escalation.email or "",
                 "first_line_name": self.first_line_escalation.name or "",
@@ -1083,7 +1020,6 @@ class Rulebook(models.Model):
                 "computed_date": self._compute_formatted_date(self.computed_date) or "N/A",
                 "escalation_date": self.escalation_date or "N/A",
                 "due_date": self._compute_formatted_date(self.due_date) or "N/A",
->>>>>>> main
 
             }
 
@@ -1349,128 +1285,6 @@ class Rulebook(models.Model):
         if any(key in vals for key in due_date_related_keys):
             if hasattr(self, "_schedule_due_dates"):
                 self._schedule_due_dates()
-<<<<<<< HEAD
-        if "frequency_type" in vals and vals["frequency_type"] == "immediate":
-            print("it came here")
-            record = self.env["rulebook"].browse(self.id)
-            current_year = datetime.now().year
-            global global_data
-            global_data = {
-                "email_to": self.mapped('officer_responsible.email'),
-                "name": self.mapped('first_line_escalation.name'),
-                "title": self.mapped('name.name'),
-                "upload_link": self._compute_upload_link(record.id),
-                "email_from": os.getenv("EMAIL_FROM"),
-                "rulebook_name":  re.sub(r'<[^>]+>', '', record.type_of_return),
-                "email_cc": self.mapped('officer_cc.email'),
-                "due_date": self._compute_formatted_date('due_date'),
-                "current_year": current_year,
-            }
-            # global_data = {
-            #     "email_to": record.officer_responsible.email,
-            #     "name": record.first_line_escalation.name,
-            #     "title": record.name.name,
-            #     "upload_link": self._compute_upload_link(record.id),
-            #     "email_from": os.getenv("EMAIL_FROM"),
-            #     "email_cc": record.officer_cc.email,
-            #     "due_date": self._compute_formatted_date(record.due_date),
-            #     "current_year": current_year,
-            # }
-
-            print(record.officer_cc.email)
-
-            # Ensure rulebook_id is active and frequency_type is not "immediate"
-
-            template_id = self.env.ref("rule_book.email_template_internal_due_date_").id
-            print(template_id)
-            template = self.env["mail.template"].browse(template_id)
-            print(template)
-
-            if template.exists():
-                # Send the email immediately
-                print("i was called here ")
-                return template.send_mail(record.id, force_send=True)
-            else:
-                print(f"Mail template with ID {template_id} not found.")
-        # Return the result of the write operation
-        if (
-            "due_date_value" in vals
-            or "due_date_unit" in vals
-            or "escalation_date_value" in vals
-            or "escalation_date_unit" in vals
-            or "computed_date" in vals
-            or "frequency_type" in vals
-        ):
-            self._schedule_due_dates()
-
-        return result
-
-    # def _compute_formatted_date(self, dt):
-    #     # Extract day, month, year, and time components
-    #     day = dt.day
-    #     month = dt.strftime("%B")
-    #     year = dt.year
-    #     hour = dt.strftime("%-I")  # Remove leading zero from the hour
-    #     minute = dt.strftime("%M")
-    #     am_pm = dt.strftime("%p").lower()
-
-    #     # Determine the correct ordinal suffix for the day
-    #     if day % 10 == 1 and day != 11:
-    #         day_suffix = "st"
-    #     elif day % 10 == 2 and day != 12:
-    #         day_suffix = "nd"
-    #     elif day % 10 == 3 and day != 13:
-    #         day_suffix = "rd"
-    #     else:
-    #         day_suffix = "th"
-
-    #     # Format the final string
-    #     formatted_date = f"{day}{day_suffix} of {month}, {year} by {hour}{am_pm}"
-
-    #     return formatted_date if formatted_date else dt
-    
-    def _compute_formatted_date(self, dt):
-        """
-        Format datetime to format like '21st of November, 2024 by 2pm'
-        Args:
-            dt: datetime object
-        Returns:
-            str: Formatted date string
-        """
-        if not dt:
-            return ""
-
-        try:
-            # Ordinal suffixes lookup
-            if dt.tzinfo is None:
-                
-                dt = dt.replace(tzinfo=pytz.utc)
-
-        # Convert to the desired timezone (e.g., Africa/Lagos)
-            lagos_tz = pytz.timezone("Africa/Lagos")
-            dt = dt.astimezone(lagos_tz)
-            
-            SUFFIXES = {
-                1: "st", 2: "nd", 3: "rd",
-                21: "st", 22: "nd", 23: "rd",
-                31: "st"
-            }
-
-            # Get day suffix
-            day_suffix = SUFFIXES.get(dt.day, "th")
-
-            # Format date
-            formatted_time = dt.strftime(
-                f"%-d{day_suffix} of %B, %Y by %-I%p").lower()
-            
-            _logger.critical(f"formatted time %s: {formatted_time}")
-
-            return formatted_time
-
-        except Exception as e:
-            _logger.error(f"Date formatting error: {e}")
-            return str(dt)
-=======
 
         self._copy_rulebook_chatter_to_reply_log()
 
@@ -1576,7 +1390,6 @@ class Rulebook(models.Model):
             })
 
         return reply_log
->>>>>>> main
 
     def _schedule_due_dates(self):
         for record in self:
@@ -1696,15 +1509,8 @@ class Rulebook(models.Model):
             return str(dt)
 
     def send_due_date_emails(self):
-<<<<<<< HEAD
-        # Get the current time
-        global global_data
-        # now = datetime.now(pytz.timezone("Africa/Lagos"))
-        now = datetime.now(pytz.timezone("Africa/Lagos")).replace(tzinfo=None)
-=======
         # Get the current time and calculate the start and end window for the email notifications
         now = fields.Datetime.context_timestamp(self, datetime.now())
->>>>>>> main
         start_window = now - timedelta(minutes=29)
         end_window = now + timedelta(minutes=29)
 
@@ -1728,54 +1534,8 @@ class Rulebook(models.Model):
                 ("start", ">=", start_window_str)
             ])
 
-<<<<<<< HEAD
-            global_data = {
-                "name": self.get_record_name(event.name.split(" ")[-1]),
-            }
-            rulebook_id = self.env["rulebook"].search(
-                [("id", "=", event.name.split(" ")[-1])]
-            )
-            # print(event.name.split(" ")[-1])
-            # print(rulebook_id)
-            _logger.critical( f"from send_due_date_emails() : {event.name.split(' ')[-1]} ... Rulebook ID {rulebook_id} ")
-            
-            global_data = {
-                "email_to": rulebook_id.first_line_escalation.email, 
-                "first_line_escalation": rulebook_id.first_line_escalation.name,
-                "rulebook_name":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
-                "upload_link": self._compute_upload_link(rulebook_id.id),
-                "email_from":  os.getenv("EMAIL_FROM"),
-                "email_cc": rulebook_id.second_line_escalation.email,
-                "regulatory_name":rulebook_id.regulatory_agency_id.name,
-                "risk_category": rulebook_id.risk_category.name,
-                "record_link": self._record_link(rulebook_id.id),
-                "current_year": current_year,
-            }
-            if (
-                rulebook_id
-                and rulebook_id.status == "active"
-                and rulebook_id.frequency_type != "immediate"
-            ):
-                template_id = self.env.ref(
-                    "rule_book.rulebook_due_date_notification_template"
-                ).id
-                self.env["mail.template"].browse(template_id).send_mail(
-                    rulebook_id.id, force_send=True
-                )
-        # escalation due date
-        # Find events related to rulebooks that are within the 29-minute window
-        events = self.env["calendar.event"].search(
-            [
-                ("name", "ilike", "Escalation Due Date for"),
-                ("start", "<=", end_window_str),
-                ("start", ">=", start_window_str),
-            ]
-        )
-        for event in events:
-=======
             # Process each event
             global global_data
->>>>>>> main
 
             for event in events:
                 # Extract the rulebook ID from the event's name (assuming ID is at the end)
@@ -1815,66 +1575,6 @@ class Rulebook(models.Model):
                     _logger.warning(
                         f"Invalid rulebook ID in event: {event.name}")
 
-<<<<<<< HEAD
-            # print(self.get_record_name(event.name.split(" ")[-1]))
-            _logger.critical(
-                f"Template Exists from send_due_date_emails() : {self.get_record_name(event.name.split(' ')[-1])}")
-
-            rulebook_id = self.env["rulebook"].search(
-                [("id", "=", event.name.split(" ")[-1])]
-            )
-            global_data = {
-                "email_to": rulebook_id.officer_responsible.email,
-                "name": rulebook_id.officer_responsible.name if rulebook_id.officer_responsible.name else rulebook_id.officer_responsible.email,
-                # "title":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
-                "title":  rulebook_id.type_of_return,
-                "upload_link": self._compute_upload_link(rulebook_id.id),
-                "email_from":  os.getenv("EMAIL_FROM"),
-                # "rulebook_name":  re.sub(r'<[^>]+>', '', rulebook_id.type_of_return),
-                "rulebook_name":   rulebook_id.type_of_return,
-                "email_cc": rulebook_id.officer_cc.email,
-                "due_date": self._compute_formatted_date(rulebook_id.due_date),
-                "current_year": current_year,
-            }
-            _logger.critical(
-                f"Rulebbok ID from send_due_date_emails() : {rulebook_id}")
-            
-            if (
-                rulebook_id
-                and rulebook_id.status == "active"
-                and rulebook_id.frequency_type != "immediate"
-            ):
-                template_id = self.env.ref(
-                    "rule_book.email_template_internal_due_date_"
-                ).id
-                template = self.env["mail.template"].browse(template_id)
-                # print(template.exists())
-                _logger.critical(
-                    f"Template Exists from send_due_date_emails() : {template.exists()}")
-                if template.exists():
-                    print(f"Mail template with ID {template_id} not found.")
-                    return template.send_mail(rulebook_id.id, force_send=True)
-                # self.env['mail.template'].browse(template_id).send_mail(rulebook_id, force_send=True)
-
-    def get_model_name_and_id_from_string(self, record_string):
-        # Split the string to extract model name and ID
-        parts = record_string.strip(",)").split("(")
-        model_name = parts[0]
-        record_id = int(parts[1]) if len(parts) > 1 else None
-        return model_name, record_id
-
-    def get_record_name(self, record_string):
-        model_name, record_id = self.get_model_name_and_id_from_string(record_string)
-
-        if model_name and record_id:
-            # Fetch the model using self.env
-            Model = self.env[model_name]
-            # Fetch the record
-            record = Model.browse(record_id)
-            # Access the 'name' field
-            return record.name
-        return None
-=======
     def _get_rulebook_from_event(self, event):
         """
         Helper method to extract the rulebook ID from the event's name.
@@ -1892,17 +1592,10 @@ class Rulebook(models.Model):
         except (ValueError, IndexError) as e:
             raise ValueError(
                 f"Error extracting rulebook ID from event: {event.name}. Error: {str(e)}")
->>>>>>> main
 
     @api.model
     def check_rulebook_and_update_due_date(self):
         """Check rulebooks with today's regulatory date and update next due date."""
-<<<<<<< HEAD
-        # current_date = fields.Datetime.now()  # Today's date
-        current_date=fields.Datetime.now().astimezone(
-            pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-=======
->>>>>>> main
 
         today = datetime.now().date()
 
@@ -1926,90 +1619,12 @@ class Rulebook(models.Model):
                 _logger.critical(f"Failed to update rulebook {record.id}: {e}")
                 
 
-<<<<<<< HEAD
-    
-    
-=======
->>>>>>> main
     def _compute_next_due_date(self):
         _logger.critical("Updating next due date...")
 
         """Compute the next due date for the rulebook when the status is 'completed'."""
 
         for record in self:
-<<<<<<< HEAD
-            if record.frequency_type == "monthly":
-                next_due_date = record.computed_date + relativedelta(months=1)
-                
-            elif record.frequency_type == "quarterly":
-                next_due_date = record.computed_date + relativedelta(months=3)
-                
-            elif record.frequency_type == "yearly":
-                next_due_date = record.computed_date + relativedelta(years=1)
-                
-            elif record.frequency_type == "daily":
-                next_due_date = record.computed_date + relativedelta(days=1)
-                
-            elif record.frequency_type == "weekly":
-                next_due_date = record.computed_date + relativedelta(weeks=1)
-                
-            elif record.frequency_type == "day_of_month":
-                next_due_date = record.computed_date + relativedelta(months=1)
-                
-            elif record.frequency_type == "day_every_month":
-                next_due_date = record.computed_date + relativedelta(months=1)
-                
-            elif record.frequency_type == "bi_monthly":
-                # Get the current day of the computed date
-                current_day = record.computed_date.day
-                
-                # Determine if it's the first or second date of the month
-                if current_day == record.bi_monthly_day1:
-                    # If current is first day, next is second day of same month
-                    next_due_date = record.computed_date.replace(day=record.bi_monthly_day2)
-                else:
-                    # If current is second day, next is first day of next month
-                    next_due_date = record.computed_date + relativedelta(months=1)
-                    next_due_date = next_due_date.replace(day=record.bi_monthly_day1)
-                    
-            elif record.frequency_type == "semi_annually":
-                # Get current date components
-                current_month = record.computed_date.month
-                current_day = record.computed_date.day
-                
-                if current_month == record.semi_annual_month1:
-                    # Move to second date of the year
-                    next_due_date = record.computed_date.replace(
-                        month=record.semi_annual_month2,
-                        day=record.semi_annual_day2
-                    )
-                else:
-                    # Move to first date of next year
-                    next_due_date = record.computed_date.replace(
-                        year=record.computed_date.year + 1,
-                        month=record.semi_annual_month1,
-                        day=record.semi_annual_day1
-                    )
-            elif record.frequency_type == "three_yearly":
-                next_due_date = record.computed_date + relativedelta(years=3)
-                
-            elif record.frequency_type == "date":
-                next_due_date = record.computed_date
-                
-            elif record.frequency_type == "immediate":
-                next_due_date = record.computed_date
-                
-            else:
-                next_due_date = record.computed_date
-                
-            record.next_due_date = next_due_date
-            record.computed_date = next_due_date
-            _logger.critical(
-                f"NEXT DUE DATE : {next_due_date}")
-
-            
-=======
->>>>>>> main
 
             try:
                 next_due_date = None
@@ -2116,43 +1731,6 @@ class Rulebook(models.Model):
 
     @api.model
     def send_reminder_email(self):
-<<<<<<< HEAD
-        """Send a reminder email to the responsible party if the due date is approaching."""
-        today = fields.Datetime.now().astimezone(
-            pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-        for rulebook in self:
-            if (
-                rulebook.report_status != "completed"
-                and rulebook.due_date <= today
-            ):
-                template_id = self.env.ref("module_name.reminder_email_template").id
-                self.env["mail.template"].browse(template_id).send_mail(rulebook.id)
-                rulebook.last_escalation_sent =  today
-
-            # Notify first and second line escalation officers
-            if (
-                rulebook.escalation_date <= fields.Datetime.now()
-                and rulebook.report_status != "completed"
-            ):
-                template_id = self.env.ref("module_name.escalation_email_template").id
-                self.env["mail.template"].browse(template_id).send_mail(rulebook.id)
-                rulebook.last_escalation_sent = today
-                
-
-    def _notify_user(self):
-        # Create a client action to show the dialog
-        action = {
-            "type": "ir.actions.client",
-            "tag": "display_notification",
-            "params": {
-                "title": "Record Updated",
-                "message": "The record has been updated and the next due date has been updated.",
-                "sticky": False,  # Set to True if you want the notification to be sticky
-            },
-        }
-        return action
-    
-=======
         """Send reminder and escalation emails for due or escalated rulebooks."""
         today = fields.Datetime.now().astimezone(
             pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
@@ -2522,28 +2100,10 @@ class Rulebook(models.Model):
     #             "last_alert_sent": fields.Datetime.now(),
     #             "rulebook_ids": rulebooks_to_update.ids
     #             })
->>>>>>> main
 
     @api.model
     def check_and_update_rulebooks(self):
         """Scheduler to check rulebooks with today's date as the regulatory date and update next due date."""
-<<<<<<< HEAD
-        print("this is running")
-
-        # Specify the Africa timezone (Lagos)
-        africa_timezone = pytz.timezone("Africa/Lagos")
-
-        # Get the current date and time in the Africa/Lagos timezone
-        africa_now = datetime.now(africa_timezone)
-        
-        # Get today's date without time
-        today_start = africa_now.replace(
-            hour=0, minute=0, second=0, microsecond=0
-        )
-        today_end = africa_now.replace(
-            hour=23, minute=59, second=59, microsecond=999999
-        )
-=======
         _logger.critical(
             "Scheduler to check rulebooks with today's date as the regulatory date and update next due date.")
 
@@ -2564,7 +2124,6 @@ class Rulebook(models.Model):
 
         _logger.critical("today start : ", today_start,
                          " today end", today_end)
->>>>>>> main
 
         # Search for rulebooks where computed_date is today and is_recurring is True
         rulebooks = self.search(
@@ -2587,69 +2146,6 @@ class Rulebook(models.Model):
         if not reply_log:
             reply_log = ReplyLog.create({'name': f'Log for {self.name}'})
 
-<<<<<<< HEAD
-        # Get related partners from users/employees
-        recipient_partners = []
-        if message.email_to:
-            # If sending to users
-            users = self.env['res.users'].search(
-                [('email', 'in', message.email_to.split(','))])
-            recipient_partners.extend(users.mapped('partner_id').ids)
-
-            # If sending to employees
-            employees = self.env['hr.employee'].search(
-                [('work_email', 'in', message.email_to.split(','))])
-            recipient_partners.extend(
-                employees.mapped('user_id.partner_id').ids)
-
-        reply_log.message_post(
-            body=message.body,
-            subject=message.subject,
-            message_type='email',
-            subtype_id=self.env.ref('mail.mt_comment').id,
-            email_from=message.email_from,
-            # Only include partner_ids if we have any
-            partner_ids=recipient_partners if recipient_partners else None,
-            attachment_ids=message.attachment_ids.ids,
-        )
-
-    def message_post(self, **kwargs):
-        """Override to copy messages to reply.log"""
-        message = super().message_post(**kwargs)
-        if kwargs.get('message_type') == 'email':
-            self._post_email_to_reply_log(message)
-        return message
-
-    def submit_report(self):
-        """Submit the report and notify responsible parties."""
-        self.status = "submitted"
-        self.rulebook_id.report_status = "submitted"
-        self.rulebook_id.message_post(
-            body="The report has been submitted for {}.".format(
-                self.rulebook_id.name),
-            partner_ids=[self.rulebook_id.responsible_id.partner_id.id],
-            # partner_ids=[self.rulebook_id.responsible_id.partner_id.id],
-        )
-        # Add more actions like sending submission emails
-
-    def get_lagos_date(self):
-        # Get the current UTC time
-        utc_now = datetime.now(pytz.UTC)
-
-        # Convert to Lagos timezone
-        lagos_tz = pytz.timezone('Africa/Lagos')
-        lagos_now = utc_now.astimezone(lagos_tz)
-
-        # Get just the date
-        lagos_date = lagos_now.date()
-
-        return lagos_date 
-
-    
-
-
-# the sty
-=======
     def get_lagos_date(self):
         # Get the current UTC time
         utc_now = datetime.now(pytz.UTC)
@@ -2662,4 +2158,3 @@ class Rulebook(models.Model):
         lagos_date = lagos_now.date()
 
         return lagos_date
->>>>>>> main

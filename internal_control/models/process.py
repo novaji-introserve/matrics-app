@@ -7,11 +7,7 @@ class Process(models.Model):
    
     name = fields.Char(string="Name", required=True)
     description = fields.Char(string="Description", required=True)
-<<<<<<< HEAD
-
-=======
     process_category_id = fields.Many2one('process.category', string="Process Category")
     
->>>>>>> main
 
    

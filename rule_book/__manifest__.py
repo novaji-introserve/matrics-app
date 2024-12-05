@@ -16,11 +16,7 @@
     "category": "icomply",
     "version": "0.1",
     # any module necessary for this one to work correctly
-<<<<<<< HEAD
-    "depends": ["base", "mail", "calendar", 'hide_powered_by_odoo', 'legion_hide_odoo', 'hr', 'muk_web_theme',
-=======
     "depends": ["base", "web", "mail", "calendar", 'hide_powered_by_odoo', 'legion_hide_odoo', 'hr', 'muk_web_theme',
->>>>>>> main
                 # "access_apps"
                 ],
     # always loaded
@@ -52,13 +48,9 @@
         #
         # "views/responsible.xml",
         "views/rules/rule_book.xml",
-<<<<<<< HEAD
-        "data/email_templates/due_date_email.xml",
-=======
         "data/email_templates/regulatory_due_date_email.xml",
         "data/email_templates/internal_due_date_email.xml",
 
->>>>>>> main
         "data/schedules/rule_book.xml",
         # "views/dashboard.xml",
         "data/settings/email_smtp.xml",
@@ -101,21 +93,12 @@
         'rule_book/static/src/components/*/*.scss',
         'rule_book/static/src/slider_field.xml',
         # Add JavaScript files
-<<<<<<< HEAD
-        'custom_addons/icomply_odoo/rule_book/static/src/components/**/*.js',
-        # Add CSS files
-        'custom_addons/icomply_odoo/rule_book/static/src/components/**/*.css',
-        # Add XML files if applicable
-        'custom_addons/icomply_odoo/rule_book/static/src/components/**/*.xml',
-       
-=======
         'rule_book/static/src/components/**/*.js',
         # Add CSS files
         'rule_book/static/src/components/**/*.css',
         # Add XML files if applicable
         'rule_book/static/src/components/**/*.xml',
 
->>>>>>> main
 
     ]},
 }
