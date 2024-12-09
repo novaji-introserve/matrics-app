@@ -1,6 +1,6 @@
 <odoo>
     <data>
-     
+
         <!-- First Line Escalation Template -->
         <record id="email_template_first_line_escalation_" model="mail.template">
             <field name="name">First Line Escalation for Rulebook</field>
@@ -8,63 +8,72 @@
             <field name="email_cc">{{object.data()['second_line_escalation']}}</field>
             <field name="email_to">{{object.data()['first_line_escalation']}}</field>
             <field name="subject">Escalation Due Date for {{object.data()['rulebook_return']}}</field>
+            <field name="model_id" ref="rule_book.model_reply_log"/>
+
             <field name="body_html" type="html">
-                <div
-                    style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
+                <div style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
                     <div style="text-align: center; padding: 10px 0;">
-                        <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg"
-                            alt="Bank of Industry"
-                            style="max-width: 100px;" />
+                        <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg" alt="Bank of Industry" style="max-width: 100px;" />
                     </div>
 
                     <div style="padding: 20px;">
-                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong
-                                style="color: #004225;">
-                                <t t-out="object.data()['first_line_name']" />
-                            </strong>
-                            ,</p>
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong style="color: #004225;">
+                            <t t-out="object.data()['first_line_name']" />
+                        </strong>
+                            ,
+                    </p>
 
-                        <div
-                            style="background-color: #f0fff0; padding: 20px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
-                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">The user
-                                <t t-out="object.data()['officer_responsible']" /> in <t t-out="object.data()['responsible_id']" />
-                                has not yet uploaded the regulatory document for <strong
-                                    style="color: #004225;">
-                                    <t t-out="object.data()['rulebook_return']" />
+                    <div style="background-color: #f0fff0; padding: 20px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">The user<span style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                <strong style="color: #004225;">
+                                    <t t-out="object.data()['officer_responsible']" />
                                 </strong>
-                                .</p>
-                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">
-                                <strong style="color: #004225;">Escalation Due Date:</strong>
-                                <t t-out="object.data()['escalation_date']" />
-                            </p>
-                        </div>
+                            </span>                        
+                                in <span style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                <strong style="color: #004225;">
+                                    <t t-out="object.data()['responsible_id']" />
+                                </strong>
 
-                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can check
-                            the regulatory details here: <a
-                                t-attf-href="#{object.data()['record_link']}"
-                                style="display: inline-block; color: #006400; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Check Details</a>
-                        </p>
+                            </span>
+                                is yet to respond to this return <strong style="color: #004225;">
+                            <t t-out="object.data()['rulebook_return']" />
+                        </strong>
+                                .
+                    </p>
+                    <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                        <strong style="color: #004225;">Date and Time Entry:
+                        </strong>
+                                <t t-out="object.data()['datetime']"></t>
+                    </p>
+                    
+                    <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                        <strong style="color: #004225;">Escalation Due Date:</strong>
+                        <t t-out="object.data()['escalation_date']" />
+                    </p>
+                    
+                </div>
 
-                        <!-- <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can upload
-                            the document at the following link: <a
-                                t-attf-href="#{object.data()['upload_link']}"
-                                style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit Document</a>
+                <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can check
+                            the regulatory details here: <a t-attf-href="#{object.data()['record_link']}" style="display: inline-block; color: #006400; text-decoration: none; padding: 5px 10px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Check Details</a>
+                </p>
+
+                <!-- <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can upload
+                            the document at the following link: <a t-attf-href="#{object.data()['upload_link']}" style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit Document</a>
                         </p> -->
 
-                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Thank you.</p>
-                    </div>
+                <p style="font-size: 16px; color: #333333; line-height: 1.6;">Thank you.</p>
+            </div>
 
-                    <div
-                        style="text-align: center; margin-top: 30px; font-size: 12px; color: #999999;">
-                        <p style="margin: 0;">...transforming Nigeria's industrial sector.</p>
-                        <p style="margin: 0;">&amp;copy; <t t-out="object.data()['current_year']"
-                              /> Bank of Industry. All rights reserved.</p>
-                    </div>
-                </div>
-            </field>
-            <field name="auto_delete" eval="False" />
-        </record>
+            <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #999999;">
+                <p style="margin: 0;">...transforming Nigeria's industrial sector.</p>
+                <p style="margin: 0;">&amp;copy; <t t-out="object.data()['current_year']" />
+ Bank of Industry. All rights reserved.</p>
+            </div>
+        </div>
+    </field>
+    <field name="auto_delete" eval="False" />
+</record>
 
 
-    </data>
+</data>
 </odoo>

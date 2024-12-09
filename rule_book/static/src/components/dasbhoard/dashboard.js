@@ -10,6 +10,7 @@ export class Dashboard extends Component {
       this.state = useState({
         escalationDueDates: [],
         internalDueDates: [],
+        reminderDueDates: [],
         regulatoryDueDates: [],
         isLoading: true,
         totalRulebooks: 0,
@@ -187,12 +188,24 @@ export class Dashboard extends Component {
           const internalDueDates = await this.orm.searchRead(
             "rulebook",
             [
-              ["due_date", "!=", false],
+              ["reg_due_date", "!=", false],
               ["status", "=", "active"],
-              ["due_date", ">=", today.toISOString()],
+              ["reg_due_date", ">=", today.toISOString()],
             ],
-            ["id", "type_of_return", "due_date", "responsible_id"],
-            { limit: 5, order: "due_date asc" }
+            ["id", "type_of_return", "reg_due_date", "responsible_id"],
+            { limit: 5, order: "reg_due_date asc" }
+          );
+
+          // Fetch first 10 Reminder Due Dates
+          const reminderDueDates = await this.orm.searchRead(
+            "rulebook",
+            [
+              ["reminder_due_date", "!=", false],
+              ["status", "=", "active"],
+              ["reminder_due_date", ">=", today.toISOString()],
+            ],
+            ["id", "type_of_return", "reminder_due_date", "responsible_id"],
+            { limit: 5, order: "reminder_due_date asc" }
           );
 
           // Fetch first 10 Regulatory Due Dates (computed_date)
@@ -234,7 +247,7 @@ export class Dashboard extends Component {
           this.state.internalDueDates = internalDueDates.map((date) => ({
             ...date,
             internal_due_date: new Date(
-              date.due_date
+              date.reg_due_date
             ).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -243,6 +256,21 @@ export class Dashboard extends Component {
             link: this.getRulebookLink(date.id),
             type_of_return: date.type_of_return.replace(/<[^>]*>/g, ""),
           }));
+
+           this.state.reminderDueDates = reminderDueDates.map((date) => ({
+             ...date,
+             reminder_due_date: new Date(date.reminder_due_date).toLocaleDateString(
+               "en-US",
+               {
+                 year: "numeric",
+                 month: "long",
+                 day: "numeric",
+               }
+             ),
+             link: this.getRulebookLink(date.id),
+             type_of_return: date.type_of_return.replace(/<[^>]*>/g, ""),
+           }));
+
           this.state.regulatoryDueDates = regulatoryDueDates.map((date) => ({
             ...date,
             computed_date: new Date(date.computed_date).toLocaleDateString(
