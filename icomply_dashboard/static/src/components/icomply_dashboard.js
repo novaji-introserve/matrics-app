@@ -268,7 +268,7 @@ export class IcomplyDashboard extends Component {
         labels: labels,
         datasets: [
           {
-            label: "Number of cases",
+            label: "",
             data: counts,
             hoverOffset: 4,
           },
@@ -307,7 +307,7 @@ export class IcomplyDashboard extends Component {
         labels: labels,
         datasets: [
           {
-            label: "Number of cases",
+            label: "",
             data: counts,
             hoverOffset: 4,
           },
@@ -348,7 +348,7 @@ export class IcomplyDashboard extends Component {
         labels: labels,
         datasets: [
           {
-            label: "Number of cases",
+            label: "",
             data: counts,
             hoverOffset: 4,
           },
@@ -384,7 +384,7 @@ export class IcomplyDashboard extends Component {
         labels: labels,
         datasets: [
           {
-            label: "Number of cases",
+            label: "",
             data: counts,
             hoverOffset: 4,
           },
@@ -425,7 +425,7 @@ export class IcomplyDashboard extends Component {
         labels: labels,
         datasets: [
           {
-            label: "Number of Cases",
+            label: "",
             data: counts,
             backgroundColor: [
               "rgba(75, 192, 0, 0.5)", // Color for first segment
@@ -478,7 +478,7 @@ export class IcomplyDashboard extends Component {
         labels: labels,
         datasets: [
           {
-            label: "Number of Cases",
+            label: "",
             data: counts,
             backgroundColor: [
               "rgba(75, 192, 0, 0.5)", // Color for first segment

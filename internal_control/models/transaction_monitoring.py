@@ -4,12 +4,10 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class TransactionMonitoring(models.Model):
-    _name = "tbl_transactions"
+    _name = "tbl.transactions"
     _description = "Transaction Monitoring"
     _rec_name = "refno"
     _inherit = ["mail.thread", "mail.activity.mixin"]
-    _auto = False
-    _table = 'tbl_transactions'
 
     id = fields.Integer(string="id", readonly=True)
     refno = fields.Char(string="Reference Number", readonly=True)
@@ -31,12 +29,20 @@ class TransactionMonitoring(models.Model):
     authid = fields.Char(string="Auth ID", readonly=True)
     status = fields.Integer(string="Status", readonly=True)
     batchno = fields.Char(string="Batch Number", readonly=True)
-    AccountNumber = fields.Integer(string="Account Number", readonly=True)
+    AccountNumber = fields.Char(string="Account Number", readonly=True)
     Tran_Channel = fields.Integer(string="Transaction Channel", readonly=True)
     Request_ID = fields.Char(string="Request ID", readonly=True)
     RRN = fields.Char(string="RRN", readonly=True)
     REM = fields.Char(string="REM", readonly=True)
     overideid = fields.Integer(string="Override ID", readonly=True)
+    
+    rule_id = fields.Many2one(comodel_name='res.transaction.screening.rule',
+                              string='Exception Rule', tracking=True, index=True)
+    risk_level = fields.Selection(string='Risk Level', selection=[(
+        'low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='low', tracking=True)
+    state = fields.Selection(string='Status', selection=[(
+        'new', 'To Review'), ('done', 'Done')], tracking=True, index=True, default='new')
+    likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
     
     # Computed fields to show "NULL" if data is missing
     refno_null = fields.Char(string="Reference Number", compute="_compute_null_values")
@@ -203,4 +209,41 @@ class TransactionMonitoring(models.Model):
         
         # Trigger the action
         return action.read()[0]
+
+
+    @api.model
+    def open_transactions(self):
+        return {
+            'name': 'Transactions To Review',
+            'type': 'ir.actions.act_window',
+            'res_model': 'tbl.transactions',
+            'view_mode': 'tree,form',
+            'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'new')],
+            'context': {'group_by': ['subbranchcode']},
+        }
+
+    @api.model
+    def open_transactions_done(self):
+        return {
+            'name': 'Reviewed Transactions',
+            'type': 'ir.actions.act_window',
+            'res_model': 'tbl.transactions',
+            'view_mode': 'tree,form',
+            'domain': [('state', '=', 'done')],
+            'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'done')],
+            'context': {'group_by': ['subbranchcode']},
+           
+        }
+
+    @api.model
+    def open_transactions_all(self):
+    
+        return {
+            'name': 'All Transactions',
+            'type': 'ir.actions.act_window',
+            'res_model': 'tbl.transactions',
+            'view_mode': 'tree,form',
+            'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id])],
+            'context': {'group_by': ['subbranchcode']},
+        }
 

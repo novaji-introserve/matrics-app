@@ -1,0 +1,13 @@
+/* Apply a specific height or width to the container */
+.o_field_html {
+    max-width: 100%;
+    overflow: auto;     /* Allow scrolling */
+}
+
+/* Scroll horizontally for tables */
+.o_field_html table {
+    width: 100%;
+    table-layout: fixed; /* Ensures that table columns don't get squeezed */
+    overflow: auto;    /* Allow horizontal scrolling */
+    display: block;      /* Makes the table scrollable */
+}

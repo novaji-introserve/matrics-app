@@ -10,7 +10,6 @@ _logger = logging.getLogger(__name__)
 
 
 class ReplyController(http.Controller):
-
     def get_lagos_date(self):
         # Get the current UTC time
         utc_now = datetime.now(pytz.UTC)

@@ -26,20 +26,25 @@
         'views/actions.xml',
         'views/alert_rules_view.xml',
         'views/alert_group_view.xml',
-        'views/frequency_view.xml',
-        'views/process_category_view.xml',
-        'views/process_view.xml',
-        'views/alert_rule_status_view.xml',
+        'views/alert_history.xml',
         'views/account_monitoring_views.xml',
         'views/transaction_rule.xml',
         'views/transaction_monitoring_views.xml',
         'views/tinymce.xml',
         'views/mail_template.xml',
         'views/fraud_monitoring_views.xml',
+        'views/frequency_view.xml',
+        'views/process_view.xml',
+        'views/process_category_view.xml',
         'views/branch_view.xml',
+        'views/department.xml',
+        # 'views/user_profile.xml',
         'views/cron_job.xml',
         'views/sql_view.xml', 
+        'views/emailbranch.xml',
         'views/menus.xml',
+        
+        
     ],
 
     'images': [
@@ -55,7 +60,8 @@
         'web.assets_backend': [
            "internal_control/static/src/components/editor.js",
            "internal_control/static/src/components/editor.css",
-           "internal_control/static/src/components/internal_control.js"
+           "internal_control/static/src/components/internal_control.js",
+           "internal_control/static/src/css/style.css"
         ]
     }
 }

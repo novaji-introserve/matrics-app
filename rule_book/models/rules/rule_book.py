@@ -417,7 +417,6 @@ class Rulebook(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
-
     def data(self):
         # send the global value to the email template
         return global_data
@@ -450,7 +449,6 @@ class Rulebook(models.Model):
                 record.risk_rating = record.risk_category.risk_priority
             else:
                 record.risk_rating = False
-
     @api.onchange('semi_annual_month1', 'semi_annual_month2')
     def _onchange_semi_annual_months(self):
         if self.semi_annual_month1 == self.semi_annual_month2:

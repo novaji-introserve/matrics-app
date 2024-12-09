@@ -83,6 +83,7 @@ class ReplyLog(models.Model):
         store=True,
 
     )
+   
 
     # Attached document for the reply (binary file)
     document = fields.Binary(

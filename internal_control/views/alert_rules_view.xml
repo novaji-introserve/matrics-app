@@ -10,14 +10,12 @@
                 <field name="frequency_id" />
                 <field name="process_category_id" />
                 <field name="process_id" />
-                <field name="branch_id" />
                 <field name="status" />
-                <field name="alert_group_id" />
-                <field name="risk_rating" 
-                        decoration-success="risk_rating == 5"
-                        decoration-primary="risk_rating == 7"
-                        decoration-danger="risk_rating == 6"
-                        widget="badge"/>     
+                <field  name="risk_rating"
+                    decoration-success="risk_rating == 'low'"
+                    decoration-warning="risk_rating == 'medium'"
+                    decoration-danger="risk_rating == 'high'"
+                widget="badge"/>     
                 <field name="last_checked" />
                 <field name="date_created" />
             </tree>
@@ -48,11 +46,9 @@
                       
                     </group>
                     <group class="col-md-6 col-12">
-                        <field name="last_checked" />
                         <field name="process_id"/>
-                        <field name="alert_group_id" />
                         <field name="risk_rating" />
-                        <field name="branch_id" />
+                        <field name="last_checked" />
                         
                     </group>
                     </group>

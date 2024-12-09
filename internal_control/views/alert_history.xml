@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View for the process model -->
+    <record id="view_alert_history_tree" model="ir.ui.view">
+        <field name="name">alert.history.tree</field>
+        <field name="model">alert.history</field>
+        <field name="arch" type="xml">
+            <tree string="Alert History List" create="false">
+                <field name="alert_id" />
+                <field name="process_category" />
+                <field name="process_id" />
+                <field name="risk_rating" />
+                <field name="narration" />
+                <field name="email" />
+                <field name="date_created" />
+
+            </tree>
+        </field>
+    </record>
+
+    <!-- form View for the process model -->
+    <record id="view_alert_history_form" model="ir.ui.view">
+        <field name="name">alert.history.form</field>
+        <field name="model">alert.history</field>
+        <field name="arch" type="xml">
+            <form string="Alert History List" readonly="1">
+                <header>
+                    <!-- Add the button to generate and download CSV -->
+                    <button name="generate_csv" type="object" string="Download CSV" class="btn-success" />
+                </header>
+               <sheet>
+                <group>
+                    <group>
+                        <field name="alert_id" />
+                        <field name="process_category" />
+                        <field name="last_checked" />
+                    </group>
+                    <group>
+                        <field name="risk_rating" />
+                    
+                        <field name="date_created" />
+                    </group>
+                </group>
+                <field name="html_body" widget="html" />
+               </sheet>
+            </form>
+        </field>
+    </record>
+
+    
+
+    <!-- Action to open the tree view -->
+    <record id="action_alert_history_status" model="ir.actions.act_window">
+        <field name="name">Alert History </field>
+        <field name="res_model">alert.history</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+</odoo>

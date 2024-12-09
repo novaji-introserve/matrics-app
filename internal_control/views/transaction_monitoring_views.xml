@@ -3,11 +3,15 @@
     <!-- Form View -->
     <record id="view_transaction_monitoring_form" model="ir.ui.view">
         <field name="name">transaction.monitoring.form</field>
-        <field name="model">tbl_transactions</field>
+        <field name="model">tbl.transactions</field>
         <field name="arch" type="xml">
             <form string="Transaction Details" create="false" edit="false" delete="false">
                 <header>
-                    <field name="status_null" widget="statusbar"/>
+                    <field name="state" widget="statusbar" 
+                    options="{'clickable':'1'}" 
+                    attrs="{'invisible': [('state', '=', 'done')]}"
+                    />
+                    
                 </header>
                 <sheet>
                     <!-- Title Section -->
@@ -93,7 +97,7 @@
     <!-- Tree View -->
     <record id="view_transaction_monitoring_tree" model="ir.ui.view">
         <field name="name">transaction.monitoring.tree</field>
-        <field name="model">tbl_transactions</field>
+        <field name="model">tbl.transactions</field>
         <field name="arch" type="xml">
             <tree string="Transaction Monitoring" create="false">
                 <field name="refno_null"/>
@@ -113,5 +117,30 @@
                 <field name="rrn_null"/>
             </tree>
         </field>
+    </record>
+
+
+    <!-- Server Action for all transactions -->
+    <record id="action_all_transactions" model="ir.actions.server">
+        <field name="name">all.transactions</field>
+        <field name="model_id" ref="model_tbl_transactions" /> <!-- Replace with your model's external ID -->
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions_all()</field>
+    </record>
+
+    <!-- Server Action for all Open transactions -->
+    <record id="action_all_open_transactions" model="ir.actions.server">
+        <field name="name">Open.transactions</field>
+        <field name="model_id" ref="model_tbl_transactions" /> <!-- Replace with your model's external ID -->
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions()</field>
+    </record>
+
+    <!-- Server Action for all reviews transactions -->
+    <record id="action_all_reviewed_transactions" model="ir.actions.server">
+        <field name="name">Reviewed.transactions</field>
+        <field name="model_id" ref="model_tbl_transactions" /> <!-- Replace with your model's external ID -->
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions_done()</field>
     </record>
 </odoo>
