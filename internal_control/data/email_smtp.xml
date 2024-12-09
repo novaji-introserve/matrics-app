@@ -4,12 +4,10 @@
 
         <record id="outgoing_mail" model="ir.mail_server">
             <field name="name">Email Server</field>
-            <field name="smtp_host">smtp.gmail.com</field>
+            <field name="smtp_host">smtp.mailgun.org</field>
             <field name="smtp_port">587</field>
-            <!-- <field name="smtp_user">introservenovaji@gmail.com</field> -->
-            <!-- <field name="smtp_pass">azdrmcfdgegmwbta</field> -->
-            <field name="smtp_user">jimohkayodeyusuf@gmail.com</field>
-            <field name="smtp_pass">lnedfwndeeiepauk</field>
+            <field name="smtp_user">postmaster@mg1.covenantmfb.com.ng</field>
+            <field name="smtp_pass">a37d1ec645ec7da3c9a89bde649ef2e1-9dfbeecd-1b3f0188</field>
             <field name="smtp_encryption">starttls</field>
             <field name="smtp_debug" eval="False"></field>
             <field name="sequence">10</field>
