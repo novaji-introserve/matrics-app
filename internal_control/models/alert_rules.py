@@ -14,6 +14,7 @@ import smtplib
 from time import sleep
 import logging
 
+
 _logger = logging.getLogger(__name__)
 
 
@@ -36,12 +37,18 @@ class alert_rules(models.Model):
     string="Alert Status"
     )
     process_id = fields.Many2one('process', string="Process", domain="[('process_category_id', '=', process_category_id)]")
-    risk_rating = fields.Many2one("case.rating", string="Risk Rating")
+    risk_rating = fields.Selection(
+        selection=[("low", "Low"),("medium", "Medium"), ("high", "High")],
+        default= "low",  # The default value is the first risk rating
+        string="Risk Rating"
+    )
     date_created = fields.Datetime(
         string="created_at",
         default=fields.Datetime.now()
     )
     last_checked = fields.Datetime(string="last_checked", default=fields.Datetime.now())
+
+
 
 
 
@@ -128,7 +135,7 @@ class alert_rules(models.Model):
                         break
 
                 if subbranchcode_index is None:
-                    print("subbranchcode column not found")
+                    raise ValidationError("subbranchcode column must be in the sql statement")
                 else:
                     branches = []
 
@@ -136,7 +143,9 @@ class alert_rules(models.Model):
                     for row in rows:
                         subbranchcode = row[subbranchcode_index]  # Accessing subbranchcode dynamically by index
                         
-                        if subbranchcode not in branches:
+                        if subbranchcode == "" or subbranchcode == None:
+                            raise ValidationError("fix empty subbranchcode in the table and try again")
+                        elif subbranchcode not in branches:
                             branches.append(subbranchcode)
 
                     # Initialize a dictionary to store the emails by branch

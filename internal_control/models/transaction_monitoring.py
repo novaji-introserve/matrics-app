@@ -218,8 +218,8 @@ class TransactionMonitoring(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'tbl.transactions',
             'view_mode': 'tree,form',
-            'domain': [('state', '=', 'new')],
-            # 'context': {'default_state': 'new'}
+            'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'new')],
+            'context': {'group_by': ['subbranchcode']},
         }
 
     @api.model
@@ -230,17 +230,20 @@ class TransactionMonitoring(models.Model):
             'res_model': 'tbl.transactions',
             'view_mode': 'tree,form',
             'domain': [('state', '=', 'done')],
-            # 'context': {'search_default_group_branch': 1, 'default_state': 'new'}
+            'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'done')],
+            'context': {'group_by': ['subbranchcode']},
+           
         }
 
     @api.model
     def open_transactions_all(self):
+    
         return {
             'name': 'All Transactions',
             'type': 'ir.actions.act_window',
             'res_model': 'tbl.transactions',
             'view_mode': 'tree,form',
-            'domain': [],
-            # 'context': {'search_default_group_branch': 1, 'default_state': 'new'}
+            'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id])],
+            'context': {'group_by': ['subbranchcode']},
         }
 
