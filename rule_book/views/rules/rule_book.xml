@@ -8,12 +8,12 @@
         <field name="arch" type="xml">
             <tree >
 
-                <field name="name" />
+                <field name="name" string="Source" />
                 <field name="type_of_return" widget="html"/>
                 <!-- <field name="theme_id-" optional="hide" /> -->
                 <field name="risk_category" />
                 <field name="first_line_escalation" />
-                <field name="computed_date" string="Current Regulatory Date" widget="date" />
+                <field name="computed_date" string="Internal Due Date" widget="date" />
                 <field name="second_line_escalation" optional="hide" />
 
                 <field name="regulatory_agency_id" optional="show" />
@@ -40,7 +40,7 @@
 
                 <!-- Header Section -->
                 <header style="background-color: #f0f0f0; padding: 10px; border-bottom: 1px solid #ddd;">
-                    <button type="object" class="oe_highlight oe_right mx-auto px-2 py-2" name="open_reply_log" string="View Reply Log" attrs="{'invisible': [('id', '=', False)]}" />
+                    <button type="object" class="oe_highlight oe_right mx-auto px-2 py-2" name="open_reply_log" string="View Rulebook Log" attrs="{'invisible': [('id', '=', False)]}" />
                 </header>
 
                 <!-- Basic Information Section -->
@@ -115,7 +115,7 @@
                                 <field name="semi_annual_day2" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Day of second month" help="Enter a valid day for the selected month"/>
                             </group>
                             <group col="2">
-                                <field name="computed_date" readonly="0" placeholder="Computed date will be shown here" string="Internal due date"/>
+                                <field name="computed_date" readonly="0" placeholder="Next internal due date will be shown here" string="Internal due date"/>
 
                             </group>
                             

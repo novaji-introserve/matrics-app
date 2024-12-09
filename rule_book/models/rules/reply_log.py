@@ -23,7 +23,7 @@ _logger = logging.getLogger(__name__)
 
 class ReplyLog(models.Model):
     _name = "reply.log"
-    _description = "Reply Log Model"
+    _description = "Rulebook Logs"
     _rec_name = "create_date"
     _order = "id desc"
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -485,7 +485,7 @@ class ReplyLog(models.Model):
             domain = [('department_id', '=', self.env.user.department_id.id)]
 
         return {
-            'name': ('Reply Logs'),
+            'name': ('Rulebook Logs'),
             'type': 'ir.actions.act_window',
             'res_model': 'reply.log',  # This is your target model
             'view_mode': 'tree,form,kanban',
@@ -495,68 +495,43 @@ class ReplyLog(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
-
+        
     def write(self, vals):
         """Overrides the default write method to enforce rules."""
-        for record in self:
-    
-            if not record.id:  # New record
-                if not (vals.get('document') and vals.get('document_filename') and vals.get('reply_content')):
-                    raise AccessError(
-                        _("Both reply note and document upload are required."))
-            else:  # Existing record
-                has_existing_document = bool(record.document)
-                has_existing_reply = bool(record.reply_content)
-
-                if vals.get('document') and not vals.get('document_filename'):
-                    raise AccessError(
-                        _("Document content is required ."))
-                if vals.get('document_filename') and not vals.get('document'):
-                    raise AccessError(
-                        _("Document content is required."))
-
-                # If no previous document/reply, require both
-                if not (has_existing_document or has_existing_reply):
-                    if not (vals.get('document') and vals.get('document_filename') and vals.get('reply_content')):
-                        raise AccessError(
-                            _("Both reply note and document upload are required."))
-
-
-                # Change status to submitted if both fields are set
-                vals["rulebook_status"] = "submitted"
-                vals["reply_date"] = datetime.now().replace(microsecond=0)
-
+        vals = self._validate_update_conditions(vals)
+        
         # Perform the write operation
         result = super(ReplyLog, self).write(vals)
-
-        rulebook = request.env["rulebook"].sudo().browse(
-            int(record.rulebook_id))
-
-        url = request.env["rulebook"]._record_link(
-            record.id, model_name='reply.log')
-
-        now = datetime.now()
-        now_without_microseconds = now.replace(microsecond=0)
-
-        global_data = {
-            "email_from":  os.getenv("EMAIL_FROM"),
-            "email_to": rulebook.first_line_escalation.email,
-            "type_of_return": re.sub(r'(<[^>]+>|&\w+;)', '', rulebook.type_of_return),
-            "rulebook_source":  rulebook.name.name,
-            "content": record.reply_content,
-            "url_link": url,
-            "current_year": datetime.now().year,
-            "first_line_escalation_name": rulebook.first_line_escalation.name,
-            "datetime": self._compute_formatted_date(now_without_microseconds)
-
-        }
-        self.set_global_data(global_data)
-
+        
+        # Iterate through the records being updated
         for record in self:
+            rulebook = request.env["rulebook"].sudo().browse(
+                int(record.rulebook_id))
+            url = request.env["rulebook"]._record_link(
+                record.id, model_name='reply.log')
+            
+            now = datetime.now()
+            now_without_microseconds = now.replace(microsecond=0)
+            
+            global_data = {
+                "email_from":  os.getenv("EMAIL_FROM"),
+                "email_to": rulebook.first_line_escalation.email,
+                "type_of_return": re.sub(r'(<[^>]+>|&\w+;)', '', rulebook.type_of_return),
+                "rulebook_source":  rulebook.name.name,
+                "content": record.reply_content,
+                "url_link": url,
+                "current_year": datetime.now().year,
+                "first_line_escalation_name": rulebook.first_line_escalation.name,
+                "datetime": self._compute_formatted_date(now_without_microseconds)
+            }
+            
+            self.set_global_data(global_data)
+            
             if record.rulebook_status == 'submitted' and rulebook.first_line_escalation:
                 self.trigger_escalation_alert(record)
-
+        
         return result
+
 
     def trigger_escalation_alert(self, report):
         # Logic for sending email to escalation officers
@@ -952,10 +927,6 @@ class ReplyLog(models.Model):
         #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
         today = datetime.now().replace(microsecond=0)
 
-        rulebooks_to_update_internal_alert = self.env["reply.log"]
-        rulebooks_to_update_escalation = self.env["reply.log"]
-        update_remider_alert = self.env["reply.log"]
-
         _logger.critical(
             f"Send reminder and escalation emails cron job has started ")
 
@@ -975,9 +946,6 @@ class ReplyLog(models.Model):
             _logger.critical(
                 f"Incomplete Rulebook logs to process type of return : {rulebook}  compute_date {rulebook.rulebook_compute_date}.. today {today}... due date {rulebook.reg_due_date}")
             try:
-                needs_update_internal_alert = False
-                needs_update_reminder_alert = False
-                needs_update_escalation = False
 
                 # Reminder Email: Check if reg_due_date matches today
                 computed_date = rulebook.rulebook_compute_date
@@ -986,13 +954,21 @@ class ReplyLog(models.Model):
                 _logger.critical(
                     f"Incomplete Rulebook logs to process type of return : {rulebook}  compute_date {rulebook.rulebook_compute_date}.. today {today}... time difference date {time_diff}")
 
+                # Internal Email: Check if Internal_due_date matches today
+
                 if computed_date and today.date() == computed_date.date():
                     if computed_date < today:
                         if not rulebook.last_internal_due_date_sent or rulebook.last_internal_due_date_sent.date() != today.date():
                             rulebook._send_internal_due_date_email()
                             _logger.critical(
                                 f" Interanal  Due date email sent!  {rulebook}")
-                            needs_update_internal_alert = True
+
+                            rulebook.sudo().write({
+                                'last_internal_due_date_sent': today
+                            })
+
+                            _logger.critical(
+                                f"Updated last_internal_due_date_sent for rulebook log {rulebook.ids}")
 
                 # Escalation Email: Check if escalation_date matches today
                 if rulebook.escalation_date and today.date() == rulebook.escalation_date.date():
@@ -1001,10 +977,16 @@ class ReplyLog(models.Model):
                             rulebook._send_escalation_due_date_email()
                             _logger.critical(
                                 f" Escalation email sent!  {rulebook}")
-                            needs_update_escalation = True
 
-                # Check if due_date is within 5 minutes of today
-                if rulebook.reminder_due_date:
+                            rulebook.sudo().write({
+                                'last_escalation_sent': today
+                            })
+
+                            _logger.critical(
+                                f"Updated last_escalation_sent for rulebook log {rulebook.ids}")
+
+                # Check if reminder_due_date is due today
+                if rulebook.reminder_due_date and rulebook.reminder_due_date.date() == today.date():
                     due_time_today = rulebook.reminder_due_date.time()
 
                     _logger.critical(
@@ -1014,62 +996,18 @@ class ReplyLog(models.Model):
                             rulebook._send_reminder_email()
                             _logger.critical(
                                 f" Reminder email sent!  {rulebook}")
-                            needs_update_reminder_alert = True
 
-                # Conditionally add to rulebooks_to_update for alert or escalation
-                if needs_update_internal_alert:
-                    rulebooks_to_update_internal_alert |= rulebook
-                if needs_update_escalation:
-                    rulebooks_to_update_escalation |= rulebook
-                if needs_update_reminder_alert:
-                    update_remider_alert |= rulebook
+                            rulebook.sudo().write({
+                                'last_reminder_due_date_sent': today
+                            })
+
+                            _logger.critical(
+                                f"Updated last_reminder_due_date_sent for rulebook log {rulebook.ids}")
 
             except Exception as e:
                 _logger.critical(
                     f"Failed to process Rulebook {rulebook.id}: {e}")
-
-        # Update last_reg_due_date_sent for rulebooks with reminder emails
-        if rulebooks_to_update_internal_alert:
-            try:
-                # Direct update using ORM
-                for rulebooktoday in rulebooks_to_update_internal_alert:
-                    rulebooktoday.sudo().write({
-                        'last_internal_due_date_sent': today
-                    })
-
-                _logger.critical(
-                    f"Updated last_reg_due_date_sent for rulebooks {rulebooks_to_update_internal_alert.ids}")
-            except Exception as e:
-                _logger.critical(
-                    f"Failed to update last_reg_due_date_sent for rulebooks: {e}")
-
-        # Update last_escalation_sent for rulebooks with escalation emails
-        if rulebooks_to_update_escalation:
-            try:
-                for rulebooktoday in rulebooks_to_update_escalation:
-                    rulebooktoday.sudo().write({
-                        'last_escalation_sent': today
-                    })
-
-                _logger.critical(
-                    f"Updated last_escalation_sent for rulebooks {rulebooks_to_update_escalation.ids}")
-            except Exception as e:
-                _logger.critical(
-                    f"Failed to update last_escalation_sent for rulebooks: {e}")
-
-        # Update last_internal_due_date_sent for rulebooks with internal emails
-        if update_remider_alert:
-            try:
-                for rulebooktoday in update_remider_alert:
-                    rulebooktoday.sudo().write({
-                        'last_reminder_due_date_sent': today
-                    })
-
-                _logger.critical(
-                    f"Updated last_escalation_sent for rulebooks {update_remider_alert.ids}")
-            except Exception as e:
-                _logger.critical(
-                    f"Failed to update last_escalation_sent for rulebooks: {e}")
+        
 
     def _prepare_email_data(self):
         """Prepare email data dictionary"""
@@ -1387,3 +1325,72 @@ class ReplyLog(models.Model):
                         "allday": False,  # Event is not all day; includes specific time
                     }
                 )
+
+    def _validate_update_conditions(self, vals):
+        """
+        Validate update conditions for reply content and document.
+        - Ensures both fields are uploaded together on first submission
+        - Prevents both fields from being empty after initial submission
+        """
+        # Check if user is attempting to update either reply content or document
+        updating_reply_content = "reply_content" in vals
+        updating_document = "document" in vals or "document_filename" in vals
+
+        # Check if the record has never been submitted before
+        is_first_submission = not self.document and not self.reply_content
+
+        # First-time submission validation
+        if is_first_submission:
+            # For first submission, both reply content and document must be provided together
+            if updating_reply_content and not updating_document:
+                raise AccessError(
+                    _("You must upload a document along with the reply note on first submission."))
+
+            if updating_document and not updating_reply_content:
+                raise AccessError(
+                    _("You must provide a reply note along with the document on first submission."))
+
+            # Validate that both fields have content when first submitting
+            if updating_reply_content:
+                if not vals.get("reply_content"):
+                    raise AccessError(
+                        _("Reply note cannot be empty."))
+
+            if updating_document:
+                if "document_filename" in vals and not vals.get("document_filename"):
+                    raise AccessError(
+                        _("File upload is required."))
+
+                if "document" in vals and not vals.get("document"):
+                    raise AccessError(
+                        _("File upload is required."))
+
+            # If both fields are valid on first submission, update status
+            if updating_reply_content and updating_document:
+                vals["rulebook_status"] = "submitted"
+                vals["reply_date"] = fields.Datetime.now()
+
+        # Validation for subsequent updates
+        else:
+            # Check if attempting to empty both reply content and document
+            is_emptying_reply_content = (
+                updating_reply_content and
+                (vals.get("reply_content") == '' or vals.get("reply_content") is False)
+            )
+
+            is_emptying_document = (
+                updating_document and
+                (
+                    (vals.get("document") is False) and
+                    (vals.get("document_filename") ==
+                     '' or vals.get("document_filename") is False or vals.get("document") == '')
+                )
+            )
+
+            # If both fields are being emptied, raise an exception
+            if is_emptying_reply_content or is_emptying_document:
+                raise AccessError(_(
+                    "Your reply note and the document cannot be empty. "
+                ))
+
+        return vals

@@ -17,7 +17,7 @@
         <field name="name">rulebook.sources.form</field>
         <field name="model">rulebook.sources</field>
         <field name="arch" type="xml">
-            <form string="Rulebook Source">
+            <form string="Regulatory Source">
                 <sheet>
                     <group>
                         <field name="name" />

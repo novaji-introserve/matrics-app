@@ -36,7 +36,7 @@ class Rulebook(models.Model):
         string="RuleBook Title",
         required=True,
         tracking=True,
-        help="Enter the title of the rulebook.",
+        help="Rulebook Source document.",
         # default=""
     )
 
@@ -46,7 +46,7 @@ class Rulebook(models.Model):
         string="Risk Rating",
         required=True,
         tracking=True,
-        help="Specify the risk rating of the rulebook.",
+        help="Risk rating of the rulebook.",
         compute="_compute_risk_rating",
         store=True,
         # default="critical"
@@ -57,7 +57,7 @@ class Rulebook(models.Model):
         string="Risk Category",
         required=True,
         tracking=True,
-        help="Select the risk category for this rulebook.",
+        help="Risk category for this rulebook.",
         default="Compliance Risk"
     )
 
@@ -66,7 +66,7 @@ class Rulebook(models.Model):
         string="First Line Escalation",
         # required=True,
         tracking=True,
-        help="Select the user responsible for the first line escalation.",
+        help="First line escalation officer.",
     )
 
     second_line_escalation = fields.Many2one(
@@ -74,14 +74,14 @@ class Rulebook(models.Model):
         string="Second Line Escalation",
         # required=True,
         tracking=True,
-        help="Select the user responsible for the second line escalation.",
+        help="Second line escalation officer.",
     )
 
     type_of_return = fields.Char(
         string="Type of Return",
         required=True,
         tracking=True,
-        help="Enter the type of return for this rulebook.",
+        help="Type of return for this rulebook.",
     )
 
     regulatory_agency_id = fields.Many2one(
@@ -89,7 +89,7 @@ class Rulebook(models.Model):
         string="Regulatory Agency",
         required=True,
         tracking=True,
-        help="Select the regulatory agency associated with this rulebook.",
+        help="Regulatory agency associated with this rulebook.",
     )
 
     responsible_id = fields.Many2one(
@@ -97,7 +97,7 @@ class Rulebook(models.Model):
         string="Department Responsible",
         required=True,
         tracking=True,
-        help="Select the department responsible for this rulebook.",
+        help="Department responsible for this rulebook.",
         default=lambda self: self.env.user.department_id.id
     )
 
@@ -106,7 +106,7 @@ class Rulebook(models.Model):
         string="Officer Responsible",
         required=True,
         tracking=True,
-        help="Select the primary person responsible for this rulebook.",
+        help="Primary person responsible for this rulebook.",
         # default=''
     )
 
@@ -120,18 +120,18 @@ class Rulebook(models.Model):
     description = fields.Text(
         string="Description",
         tracking=True,
-        help="Provide a detailed description of the rulebook.",
+        help="Detailed description of the rulebook.",
     )
 
     section = fields.Char(
         string="Section",
-        help="Add relevant section in the rulebook title for reference purposes.",
+        help="Relevant section in the rulebook title for reference purposes.",
     )
 
     sanction = fields.Text(
         string="Sanction",
         tracking=True,
-        help="List sanctions here, using headings, styling, and other formatting options for clarity.",
+        help="List sanctions here.",
     )
 
     last_reg_due_date_sent = fields.Datetime(
@@ -151,7 +151,7 @@ class Rulebook(models.Model):
         string="Next regulatory due date",
         compute="_compute_date",
         store=True,
-        help="The next regulatory due date based on the frequency type.",
+        help="Internal due date for this rulebook.",
     )
 
 
@@ -537,7 +537,7 @@ class Rulebook(models.Model):
 
         # Combine the date and set the time to 10:00 AM (Lagos time)
         default_time = datetime.combine(today.date(), datetime.min.time()).replace(
-            hour=8, minute=0, second=0
+            hour=15, minute=0, second=0
         )
 
 
@@ -568,7 +568,7 @@ class Rulebook(models.Model):
                             target_year += 1
 
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{target_year}-{month_value:02d}-{day_value:02d} 08:00:00"
+                            f"{target_year}-{month_value:02d}-{day_value:02d} 15:00:00"
                         )
                         # record.computed_date = datetime(
                         #     target_year, month_value, day_value, 8, 0, 0)
@@ -578,7 +578,7 @@ class Rulebook(models.Model):
                     except ValueError:
                         next_month = (month_value % 12) + 1
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{target_year}-{next_month:02d}-{day_value:02d} 08:00:00"
+                            f"{target_year}-{next_month:02d}-{day_value:02d} 15:00:00"
                         )
                         
 
@@ -591,7 +591,7 @@ class Rulebook(models.Model):
                     year = today.year if today.month < 12 else today.year + 1
                     try:
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{year}-{next_month:02d}-{int(record.day_value):02d} 08:00:00"
+                            f"{year}-{next_month:02d}-{int(record.day_value):02d} 15:00:00"
                         )
 
                         record.is_recurring = True
@@ -617,7 +617,7 @@ class Rulebook(models.Model):
                         record.computed_date = datetime.combine(
                             next_date,
                             datetime.min.time()
-                        ).replace(hour=8, minute=0, second=0)
+                        ).replace(hour=15, minute=0, second=0)
                         
 
                     except (ValueError, TypeError):
@@ -700,7 +700,7 @@ class Rulebook(models.Model):
                         year,
                         next_quarter_month,
                         day,
-                        8, 0, 0  # 8 AM
+                        15, 0, 0  # 4 pM
                     )
                 except ValueError:
                     # If date is invalid, default to first day of next quarter
@@ -708,7 +708,7 @@ class Rulebook(models.Model):
                         year,
                         next_quarter_month,
                         1,
-                        8, 0, 0
+                        15, 0, 0
                     )
                 # record.is_recurring = True
                 record.is_recurring = record.is_recurring or False
@@ -725,8 +725,8 @@ class Rulebook(models.Model):
                 day2 = min(record.semi_annual_day2 or 6, 28)
 
                 # Create datetime objects for comparison
-                date1 = datetime(year, month1, day1, 8, 0, 0) - timedelta(hours=1)
-                date2 = datetime(year, month2, day2, 8, 0,
+                date1 = datetime(year, month1, day1, 15, 0, 0) - timedelta(hours=1)
+                date2 = datetime(year, month2, day2, 15, 0,
                                  0) - timedelta(hours=1)
 
                 # Sort dates chronologically
@@ -786,7 +786,7 @@ class Rulebook(models.Model):
                 # Create the yearly datetime
                 try:
                     # Setting time to 7 AM
-                    yearly_date = datetime(year, month_value, day, 8, 0)
+                    yearly_date = datetime(year, month_value, day, 15, 0)
 
                     # If the date has already passed this year, move to next year
                     if yearly_date < today:
@@ -817,7 +817,7 @@ class Rulebook(models.Model):
                             target_year,
                             month_value,
                             day_value,
-                            8, 0, 0  # 8 AM
+                            15, 0, 0  # 4 pM
                         )
 
                         # If the date has passed this year, calculate next occurrence
