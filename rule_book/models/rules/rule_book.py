@@ -1959,6 +1959,7 @@ class Rulebook(models.Model):
             # Clean the 'type_of_return' field by removing HTML tags and entities
             clean_value = re.sub(r'(<[^>]+>|&\w+;)',
                                  '', rulebook.type_of_return)
+            clean_value = re.sub(r'\s+', ' ', clean_value).strip()
 
             # Update the record with the cleaned value
             if clean_value != rulebook.type_of_return:
