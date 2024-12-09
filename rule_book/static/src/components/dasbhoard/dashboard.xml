@@ -240,7 +240,7 @@ RuleBook Source
 												Internal Due Dates
 											</h5>
 											<p class="card-subtitle">
-												Upcoming due dates
+												Upcoming Internal dates
 											</p>
 										</div>
 
@@ -336,7 +336,7 @@ RuleBook Source
 												Regulatory Due Dates
 											</h5>
 											<p class="card-subtitle">
-												Upcoming internal dates
+												Upcoming Regulatory dates
 											</p>
 										</div>
 										<!-- <div class="dropdown">
