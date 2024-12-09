@@ -21,49 +21,49 @@
                     </div>
 
                     <div class="row mt-2 mt-md-4">
-                        <KpiCard onclick.bind="displayAllCases" name="'All Cases'" value="state.kpi.allcases" percentage="state.kpi.allcasespercentage" />
-                        <KpiCard onclick.bind="displayAllOpenCases" name="'Open Cases'" value="state.kpi.opencases" percentage="state.kpi.opencasespercentage" />
-                        <KpiCard onclick.bind="displayAllCloseCases" name="'Close Cases'" value="state.kpi.closecases" percentage="state.kpi.closecasespercentage" />
-                        <KpiCard onclick.bind="displayAllOverdueCases" name="'OverDue Case'" value="state.kpi.overdue" percentage="state.kpi.overduecasespercentage" />
-                        <KpiCard onclick.bind="displayNothing" name="'Open Case(%)'" value="state.kpi.opencaseinRespectToAllCase" percentage="state.kpi.opencasespercentage" />
-                        <KpiCard onclick.bind="displayNothing" name="'Close Case(%)'" value="state.kpi.closecaseinRespectToAllCase" percentage="state.kpi.closecasespercentage" />
+                        <KpiCard onclick.bind="displayAllCases" name="'High Risk Tran.'" value="state.kpi.allcases" percentage="state.kpi.allcasespercentage" />
+                        <KpiCard onclick.bind="displayAllOpenCases" name="'Medium Risk Tran.'" value="state.kpi.opencases" percentage="state.kpi.opencasespercentage" />
+                        <KpiCard onclick.bind="displayAllCloseCases" name="'Low Risk Tran.'" value="state.kpi.closecases" percentage="state.kpi.closecasespercentage" />
+                        <KpiCard onclick.bind="displayAllOverdueCases" name="'Total Exception Rules'" value="state.kpi.overdue" percentage="state.kpi.overduecasespercentage" />
+                        <KpiCard onclick.bind="displayNothing" name="'High Risk(%)'" value="state.kpi.opencaseinRespectToAllCase" percentage="state.kpi.opencasespercentage" />
+                        <KpiCard onclick.bind="displayNothing" name="'Medium Case(%)'" value="state.kpi.closecaseinRespectToAllCase" percentage="state.kpi.closecasespercentage" />
                     </div>
 
                   <div class="row mt-3">
 
                     <div class="col-md-4 ">
                         <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                            <h3 class="lead fw-bold text-primary">Case Severity Report</h3>
+                            <h3 class="lead fw-bold text-primary">High Risk Report</h3>
                             <button class="btn btn-primary">
                                 <i class="fa fa-angle-right"></i>
                             </button>
                         </div>
 
                         <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked" config="state.openchart" type="'bar'" title="'case by severity'" />
+                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked" config="state.openchart" type="'bar'" title="'High Risk'" />
                         </div>
                     </div>
 
                     <div class="col-md-4 ">
                         <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                            <h3 class="lead fw-bold text-primary">Case Status Report</h3>
+                            <h3 class="lead fw-bold text-primary">Medium Risk Report</h3>
                             <button class="btn btn-primary">
                                 <i class="fa fa-angle-right"></i>
                             </button>
                         </div>
                        <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                        <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"  config="state.statuschart" type="'bar'" title="'case by status'" />
+                        <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"  config="state.statuschart" type="'bar'" title="'Medium Risk'" />
                        </div>
                     </div>
                     <div class="col-md-4 ">
                         <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                            <h3 class="lead fw-bold text-primary">Case category Report</h3>
+                            <h3 class="lead fw-bold text-primary">Low Risk Report</h3>
                             <button class="btn btn-primary">
                                 <i class="fa fa-angle-right"></i>
                             </button>
                         </div>
                        <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                        <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked" config="state.categoryChart"  type="'pie'" title="'case by category'" />
+                        <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked" config="state.categoryChart"  type="'pie'" title="'Low Risk'" />
                        </div>
                     </div>
 

@@ -11,11 +11,11 @@
                 <field name="process_category_id" />
                 <field name="process_id" />
                 <field name="status" />
-                <field name="risk_rating" 
-                        decoration-success="risk_rating == 5"
-                        decoration-primary="risk_rating == 7"
-                        decoration-danger="risk_rating == 6"
-                        widget="badge"/>     
+                <field  name="risk_rating"
+                    decoration-success="risk_rating == 'low'"
+                    decoration-warning="risk_rating == 'medium'"
+                    decoration-danger="risk_rating == 'high'"
+                widget="badge"/>     
                 <field name="last_checked" />
                 <field name="date_created" />
             </tree>

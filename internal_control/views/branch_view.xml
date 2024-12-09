@@ -7,14 +7,7 @@
         <tree string="Branch">
             <field name="branch_code"/>
             <field name="branch_name"/>
-            <field name="address"/>
-            <field name="phone"/>
-            <field name="email"/>
-            <field name="city"/>
-            <field name="state"/>
-            <field name="country"/>
-            <field name="status"/>
-            <field name="create_dt"/>
+            <field name="users"/>
         </tree>
     </field>
 </record>
@@ -25,38 +18,14 @@
     <field name="arch" type="xml">
         <form string="Branch">
             <sheet>
-                <group>
-                   <group class="col-md-4">
+                
+                   <group>
                     <field name="branch_code"/>
                     <field name="branch_name"/>
-                    <field name="address"/>
-                    <field name="address2"/>
-                    <field name="address3"/>
-                    <field name="phone"/>
-                    <field name="email"/>
-                    <field name="fax"/>
-                    <field name="city"/>
-                    <field name="state"/>
-                    <field name="country"/>
-                    <field name="status"/>
-                    <field name="cashaccount"/>
+                    <field name="users" widget="many2many_tags"/>
                    </group>
-                    
-                    
-
-                  <group class="col-md-4">
-                    <field name="suspenseDR"/>
-                    <field name="interBranchGL"/>
-                    <field name="BranchType"/>
-                    <field name="MBranchCode"/>
-                    <field name="SBranchCode"/>
-                    <field name="User_id"/>
-                    <field name="create_dt"/>
-                    <field name="region"/>
-                    <field name="authid"/>
-                    <field name="subbbranch"/>
-                  </group>
-                </group>
+    
+               
             </sheet>
         </form>
     </field>
