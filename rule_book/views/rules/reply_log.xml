@@ -43,6 +43,13 @@
                         <group class="mt-3">
                             <field name="rulebook_name" class="text_field" />
                             <field name="formatted_reply_date" readonly="1" string="Reply date"/>
+                            
+                            <!-- <field name="reply_date" readonly="1" string="original Reply date"/>
+                            <field name="reg_due_date" readonly="0" />
+                            <field name="reminder_due_date" readonly="0" />
+                            <field name="formatted_reminder_date" readonly="0" />
+                            <field name="escalation_date" readonly="0" />
+                            <field name="formatted_escalation_date" readonly="0" /> -->
 
                             <!-- <field name="reply_date" readonly="1" widget="datetime" options="{'format': 'MMMM dd, yyyy HH:mm:ss'}"/> -->
                             <field name="reply_content" class="text_field" />
@@ -54,8 +61,10 @@
                             <field name="reporter" readonly="1" string="Officer Responsible" />
                             <field name="department_id" readonly="1" string="Department Responsible" />
 
-                            <field name="rulebook_compute_date" string="computed date" readonly="1"/>
+                            <!-- <field name="rulebook_compute_date" string="computed date" readonly="0"/> -->
                             <field name="formatted_rulebook_date" readonly="1" string="Internal Due Date" />
+                            <field name="formatted_regulatory_date" readonly="1" string="Regulatory Due Date" />
+
 
                             <field name="frequency_type" readonly="1"/>
 

@@ -130,9 +130,9 @@ export class Dashboard extends Component {
         ),
         this.orm.searchRead(
           "rulebook",
-          [...commonDomain, ["due_date", "!=", false]],
-          [...commonFields, "due_date"],
-          { ...commonParams, order: "due_date asc" }
+          [...commonDomain, ["reg_due_date", "!=", false]],
+          [...commonFields, "reg_due_date"],
+          { ...commonParams, order: "reg_due_date asc" }
         ),
         this.orm.searchRead(
           "rulebook",
@@ -144,7 +144,7 @@ export class Dashboard extends Component {
 
       this.state.dueDates = {
         escalation: this.formatDueDates(escalation, "escalation_date"),
-        internal: this.formatDueDates(internal, "due_date"),
+        internal: this.formatDueDates(internal, "reg_due_date"),
         regulatory: this.formatDueDates(regulatory, "computed_date"),
       };
     } catch (error) {

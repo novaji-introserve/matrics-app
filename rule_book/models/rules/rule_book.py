@@ -40,13 +40,6 @@ class Rulebook(models.Model):
         # default=""
     )
 
-    theme_id = fields.Many2one(
-        "rulebook.theme",
-        string="Rulebook Theme",
-        # required=False,
-        # tracking=True,
-        help="Select the theme associated with this rulebook.",
-    )
 
     risk_rating = fields.Selection(
         [("low", "Low"), ("medium", "Medium"), ("critical", "Critical")],
@@ -142,7 +135,7 @@ class Rulebook(models.Model):
     )
 
     last_reg_due_date_sent = fields.Datetime(
-        string="Last Regulatory Alert sent Date Value",
+        string="Last Regulatory Alert sent",
         # required=True,
         tracking=True,
 
@@ -153,33 +146,19 @@ class Rulebook(models.Model):
         # required=True,
         tracking=True,
     )
-
-    due_date_value = fields.Integer(
-        string="Due Date Value",
-        # required=True,
-        tracking=True,
-        help="Enter the value for the due date.",
+    
+    computed_date = fields.Datetime(
+        string="Next regulatory due date",
+        compute="_compute_date",
+        store=True,
+        help="The next regulatory due date based on the frequency type.",
     )
 
-    due_date_unit = fields.Selection(
-        [
-            ("seconds", "Seconds"),
-            ("minutes", "Minutes"),
-            ("hours", "Hours"),
-            ("days", "Days"),
-            ("weeks", "Weeks"),
-            ("months", "Months"),
-            ("years", "Years"),
-        ],
-        string="Due Date Unit",
-        # required=True,
-        tracking=True,
-        help="Select the unit for the due date.",
-    )
+
 
     escalation_date_value = fields.Integer(
-        string="Escalation Date Value",
-        # required=True,
+        string="Escalation date value",
+        default=1,
         tracking=True,
         help="Enter the value for the escalation date.",
     )
@@ -194,25 +173,78 @@ class Rulebook(models.Model):
             ("months", "Months"),
             ("years", "Years"),
         ],
-        string="Escalation Date Unit",
-        # required=True,
+        string="Escalation date unit",
+        default='days',
         tracking=True,
         help="Select the unit for the escalation date.",
     )
-
-    due_date = fields.Datetime(
-        string="Regulatory Due Date",
-        compute="_compute_due_date",
-        store=True,
-        help="The calculated due date based on the provided internal due date values.",
-    )
-
+    
     escalation_date = fields.Datetime(
         string="Escalation Date",
         compute="_compute_escalation_date",
         store=True,
         help="The calculated escalation date based on the provided internal due date values.",
     )
+    
+    reg_due_date_value = fields.Integer(
+        string="Regulatory date value",
+        # default=1,
+        tracking=True,
+        help="Enter the value for the regulatory due date.",
+    )
+    reg_due_date_unit = fields.Selection(
+        [
+            ("seconds", "Seconds"),
+            ("minutes", "Minutes"),
+            ("hours", "Hours"),
+            ("days", "Days"),
+            ("weeks", "Weeks"),
+            ("months", "Months"),
+            ("years", "Years"),
+        ],
+        string="Regulatory date unit",
+        # required=True,
+        # default='days',
+        tracking=True,
+        help="Select the unit for the regulatory due date.",
+    )
+
+    reg_due_date = fields.Datetime(
+        string="Regulatory due date",
+        compute="_compute_reg_due_date",
+        store=True,
+        help="The calculated due date based on the provided internal due date values.",
+    )
+    
+    reminder_due_date_value = fields.Integer(
+        string="Reminder date value",
+        # default=True,
+        tracking=True,
+        help="Enter the value for the reminder due date.",
+    )
+    reminder_due_date_unit = fields.Selection(
+        [
+            ("seconds", "Seconds"),
+            ("minutes", "Minutes"),
+            ("hours", "Hours"),
+            ("days", "Days"),
+            ("weeks", "Weeks"),
+            ("months", "Months"),
+            ("years", "Years"),
+        ],
+        string="Reminder date unit",
+        # required=True,
+        tracking=True,
+        help="Select the unit for the reminder due date.",
+    )
+
+    reminder_due_date = fields.Datetime(
+        string="Reminder due date",
+        compute="_compute_reminder_due_date",
+        store=True,
+        help="The calculated reminder date based on the provided internal due date values.",
+    )
+
 
     status = fields.Selection(
         [
@@ -264,7 +296,7 @@ class Rulebook(models.Model):
 
     quarter_day = fields.Integer(string='Day of Quarter', default=7)
 
-    next_due_date = fields.Datetime(string="Next Due Date")
+    next_compute_date = fields.Datetime(string="Next Due Date")
     last_escalation_sent = fields.Datetime(string="Last Escalation Sent")
 
     semi_annual_month1 = fields.Integer(
@@ -300,12 +332,6 @@ class Rulebook(models.Model):
         help="Select the month for the regulatory action.",
     )
 
-    computed_date = fields.Datetime(
-        string="Next Regulatory Due Date",
-        compute="_compute_date",
-        store=True,
-        help="The next regulatory due date based on the frequency type.",
-    )
 
     day_of_week = fields.Selection([
         ('0', 'Monday'),
@@ -319,6 +345,13 @@ class Rulebook(models.Model):
     
     active = fields.Boolean(string='Active', default=True)
 
+    theme_id = fields.Many2one(
+        "rulebook.theme",
+        string="Rulebook Theme",
+        # required=False,
+        # tracking=True,
+        help="Select the theme associated with this rulebook.",
+    )
 
     global_data = {}
 
@@ -496,16 +529,17 @@ class Rulebook(models.Model):
                  "quarter_day", "bi_monthly_day1", "bi_monthly_day2", "semi_annual_month1",
                  "semi_annual_month2", "semi_annual_day1", "semi_annual_day2", "year_month_value")
     def _compute_date(self):
-        today = fields.Datetime.now()
+       
+        today = fields.Datetime.now() - timedelta(hours=1)
 
-        # today=fields.Datetime.now().astimezone(
-        #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-
+        # Get the weekday (0 = Monday, 6 = Sunday)
         current_weekday = today.weekday()
 
+        # Combine the date and set the time to 10:00 AM (Lagos time)
         default_time = datetime.combine(today.date(), datetime.min.time()).replace(
-            hour=7, minute=0, second=0
+            hour=8, minute=0, second=0
         )
+
 
         for record in self:
             # Initialize is_recurring to False
@@ -534,15 +568,20 @@ class Rulebook(models.Model):
                             target_year += 1
 
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{target_year}-{month_value:02d}-{day_value:02d} 07:00:00"
+                            f"{target_year}-{month_value:02d}-{day_value:02d} 08:00:00"
                         )
+                        # record.computed_date = datetime(
+                        #     target_year, month_value, day_value, 8, 0, 0)
+
                         _logger.critical(
                             f"computed Date {record.computed_date}")
                     except ValueError:
                         next_month = (month_value % 12) + 1
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{target_year}-{next_month:02d}-{day_value:02d} 07:00:00"
+                            f"{target_year}-{next_month:02d}-{day_value:02d} 08:00:00"
                         )
+                        
+
                     # record.is_recurring = True
                     record.is_recurring = record.is_recurring or False
 
@@ -552,8 +591,9 @@ class Rulebook(models.Model):
                     year = today.year if today.month < 12 else today.year + 1
                     try:
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{year}-{next_month:02d}-{int(record.day_value):02d} 07:00:00"
+                            f"{year}-{next_month:02d}-{int(record.day_value):02d} 08:00:00"
                         )
+
                         record.is_recurring = True
                     except ValueError:
                         # Handle invalid dates (e.g., February 31)
@@ -577,7 +617,9 @@ class Rulebook(models.Model):
                         record.computed_date = datetime.combine(
                             next_date,
                             datetime.min.time()
-                        ).replace(hour=7, minute=0, second=0)
+                        ).replace(hour=8, minute=0, second=0)
+                        
+
                     except (ValueError, TypeError):
                         record.computed_date = default_time + \
                             timedelta(weeks=1)
@@ -658,7 +700,7 @@ class Rulebook(models.Model):
                         year,
                         next_quarter_month,
                         day,
-                        7, 0, 0  # 8 AM
+                        8, 0, 0  # 8 AM
                     )
                 except ValueError:
                     # If date is invalid, default to first day of next quarter
@@ -666,7 +708,7 @@ class Rulebook(models.Model):
                         year,
                         next_quarter_month,
                         1,
-                        7, 0, 0
+                        8, 0, 0
                     )
                 # record.is_recurring = True
                 record.is_recurring = record.is_recurring or False
@@ -683,16 +725,17 @@ class Rulebook(models.Model):
                 day2 = min(record.semi_annual_day2 or 6, 28)
 
                 # Create datetime objects for comparison
-                date1 = datetime(year, month1, day1, 7, 0, 0)
-                date2 = datetime(year, month2, day2, 7, 0, 0)
+                date1 = datetime(year, month1, day1, 8, 0, 0) - timedelta(hours=1)
+                date2 = datetime(year, month2, day2, 8, 0,
+                                 0) - timedelta(hours=1)
 
                 # Sort dates chronologically
                 if date1 > date2:
                     date1, date2 = date2, date1
 
-                # now = datetime.now()
-                now = datetime.now(pytz.timezone(
-                    "Africa/Lagos")).replace(tzinfo=None)
+                now = datetime.now()
+                # now = datetime.now(pytz.timezone(
+                #     "Africa/Lagos")).replace(tzinfo=None)
                 # now = datetime.now(pytz.timezone("Africa/Lagos"))
 
                 # Determine next occurrence
@@ -743,7 +786,7 @@ class Rulebook(models.Model):
                 # Create the yearly datetime
                 try:
                     # Setting time to 7 AM
-                    yearly_date = datetime(year, month_value, day, 7, 0)
+                    yearly_date = datetime(year, month_value, day, 8, 0)
 
                     # If the date has already passed this year, move to next year
                     if yearly_date < today:
@@ -774,7 +817,7 @@ class Rulebook(models.Model):
                             target_year,
                             month_value,
                             day_value,
-                            7, 0, 0  # 8 AM
+                            8, 0, 0  # 8 AM
                         )
 
                         # If the date has passed this year, calculate next occurrence
@@ -796,6 +839,7 @@ class Rulebook(models.Model):
             elif record.frequency_type == "immediate":
                 record.computed_date = today
                 record.is_recurring = False
+                
 
     @api.onchange('bi_monthly_day1', 'bi_monthly_day2')
     def _onchange_days(self):
@@ -886,10 +930,10 @@ class Rulebook(models.Model):
                         ("Please select a day between 1 and 28 for three-yearly frequency."))
                     
 
-    @api.depends("due_date_value", "due_date_unit", "computed_date")
-    def _compute_due_date(self):
+    @api.depends("reg_due_date_value", "reg_due_date_unit", "computed_date")
+    def _compute_reg_due_date(self):
         for record in self:
-            if record.computed_date and record.due_date_unit in [
+            if record.computed_date and record.reg_due_date_unit in [
                 "days",
                 "hours",
                 "minutes",
@@ -899,19 +943,20 @@ class Rulebook(models.Model):
                 "years",
             ]:
                 delta_args = {
-                    record.due_date_unit: -record.due_date_value
+                    record.reg_due_date_unit: record.reg_due_date_value
                 }
-                record.due_date = record.computed_date + relativedelta(
+                record.reg_due_date = record.computed_date + relativedelta(
                     **delta_args
                 )
                
             else:
-                # If computed_date is not available, set due_date to False or handle accordingly
-                record.due_date = None
+                # If computed_date is not available, set reg_due_date to False or handle accordingly
+                record.reg_due_date = None
 
-    def _compute_due_date_for_cron(self):
+   
+    def _compute_reg_due_date_for_cron_job(self):
         for record in self:
-            if record.computed_date and record.due_date_unit in [
+            if record.computed_date and record.reg_due_date_unit in [
                 "days",
                 "hours",
                 "minutes",
@@ -920,24 +965,24 @@ class Rulebook(models.Model):
                 "months",
                 "years",
             ]:
-                if record.due_date_value:
+                if record.reg_due_date_value:
                     delta_args = {
-                        record.due_date_unit: -record.due_date_value
+                        record.reg_due_date_unit: record.reg_due_date_value
                     }
-                    record.due_date = record.computed_date + relativedelta(
+                    record.reg_due_date = record.computed_date + relativedelta(
                         **delta_args
                     )
                     _logger.critical(
-                        f"writing escalation date {record.due_date}")
+                        f"writing escalation date {record.reg_due_date}")
                     record.sudo().write({
-                        'due_date': record.due_date,
+                        'reg_due_date': record.reg_due_date,
                     })
             else:
-                # If computed_date is not available, set due_date to False or handle accordingly
-                record.due_date = None
+                # If computed_date is not available, set reg_due_date to False or handle accordingly
+                record.reg_due_date = None
                 
 
-    def _compute_escalation_date_for_cron(self):
+    def _compute_escalation_date_for_cron_job(self):
         for record in self:
             if record.computed_date and record.escalation_date_unit in [
                 "days",
@@ -949,7 +994,7 @@ class Rulebook(models.Model):
                 "years",
             ]:
                 delta_args = {
-                    record.escalation_date_unit: -record.escalation_date_value
+                    record.escalation_date_unit: record.escalation_date_value
                 }
                 record.escalation_date = record.computed_date + relativedelta(
                     **delta_args
@@ -961,7 +1006,7 @@ class Rulebook(models.Model):
                     'escalation_date': record.escalation_date,
                 })
             else:
-                # If computed_date is not available, set due_date to False or handle accordingly
+                # If computed_date is not available, set reg_due_date to False or handle accordingly
                 record.escalation_date = None
 
     @api.depends(
@@ -969,6 +1014,7 @@ class Rulebook(models.Model):
         "escalation_date_unit",
         "computed_date",
     )
+    
     def _compute_escalation_date(self):
         for record in self:
             if record.computed_date and record.escalation_date_unit in [
@@ -981,17 +1027,39 @@ class Rulebook(models.Model):
                 "years",
             ]:
                 delta_args = {
-                    record.escalation_date_unit: -record.escalation_date_value
+                    record.escalation_date_unit: record.escalation_date_value  # Remove negative sign
                 }
-                record.escalation_date = record.computed_date + relativedelta(
-                    **delta_args
-                )
-                
+                record.escalation_date = record.computed_date + relativedelta(**delta_args)
             else:
-                # If computed_date is not available, set due_date to False or handle accordingly
+                # If computed_date is not available, set escalation_date to None or handle accordingly
                 record.escalation_date = None
                 
+     
+    @api.depends("reminder_due_date_value", "reminder_due_date_unit", "computed_date")
+    def _compute_reminder_due_date(self):
+        for record in self:
+            if record.computed_date and record.reminder_due_date_unit in [
+                "days",
+                "hours",
+                "minutes",
+                "seconds",
+                "weeks",
+                "months",
+                "years",
+            ]:
+                delta_args = {
+                    record.reminder_due_date_unit: -record.reminder_due_date_value
+                }
+                record.reminder_due_date = record.computed_date + relativedelta(
+                    **delta_args
+                )
+               
+            else:
+                # If computed_date is not available, set reg_due_date to False or handle accordingly
+                record.reminder_due_date = None
 
+
+     
     def _prepare_email_data(self):
         """Prepare email data dictionary"""
         try:
@@ -1006,7 +1074,6 @@ class Rulebook(models.Model):
                 "officer_responsible": self.officer_responsible.name or "N/A",
                 "responsible_id": self.responsible_id.name or "N/A",
                 "rulebook_name": self.name.name or "N/A",
-                "due_date": self._compute_formatted_date(self.due_date) or "N/A",
                 "record_link": self._record_link(self.id) or "N/A",
                 "upload_link": self._compute_upload_link(self.id) or "N/A",
                 "current_year": fields.Date.today().year,
@@ -1022,7 +1089,7 @@ class Rulebook(models.Model):
                 "second_line_escalation": self.second_line_escalation.email or "",
                 "computed_date": self._compute_formatted_date(self.computed_date) or "N/A",
                 "escalation_date": self.escalation_date or "N/A",
-                "due_date": self._compute_formatted_date(self.due_date) or "N/A",
+                "reg_due_date": self._compute_formatted_date(self.reg_due_date) or "N/A",
 
             }
 
@@ -1117,8 +1184,8 @@ class Rulebook(models.Model):
             _logger.critical(traceback.format_exc())
             return False
 
-    def _send_regulatory_due_date_email(self):
-        """Send regulatory_due_date notification email"""
+    def _send_reminder_due_date_email(self):
+        """Send Reminder notification email"""
         try:
             # Ensure the record exists and is valid
             if not self:
@@ -1134,22 +1201,22 @@ class Rulebook(models.Model):
             # Find the email template
             try:
                 template = self.env.ref(
-                    "rule_book.email_template_regulatory_due_date_")
+                    "rule_book.reminder_email_template_")
             except ValueError:
                 _logger.critical(
-                    " regulatory_due_date Email template not found")
+                    " reminder Email template not found")
                 return False
 
             # Detailed logging for debugging
             _logger.critical(
-                f"Attempting to send regulatory_due_date email for record {self.id}")
+                f"Attempting to send Reminder email for record {self.id}")
             _logger.critical(f"Email data: {email_data}")
 
             # Send the email
             email_result = template.send_mail(self.id, force_send=True)
 
             _logger.critical(
-                f"regulatory_due_date Email sent successfully. Result: {email_result}")
+                f"Reminder Email sent successfully. Result: {email_result}")
             return True
         except Exception as e:
             _logger.critical(f"Comprehensive email send failure: {str(e)}")
@@ -1169,7 +1236,7 @@ class Rulebook(models.Model):
             'reply_content': None,
             'department_id': self.responsible_id.id if self.responsible_id else False,
             'rulebook_compute_date': self.computed_date,
-            'next_due_date': self.due_date,
+            'next_compute_date': self.reg_due_date,
             'day_of_week': self.day_of_week,
             'month_value': self.month_value,
             'bi_monthly_day2': self.bi_monthly_day2,
@@ -1185,13 +1252,15 @@ class Rulebook(models.Model):
             'escalation_date': self.escalation_date,
             'escalation_date_unit': self.escalation_date_unit,
             'escalation_date_value': self.escalation_date_value,
-            'due_date_unit': self.due_date_unit,
-            'due_date_value': self.due_date_value,
+            'reg_due_date_unit': self.reg_due_date_unit,
+            'reg_due_date_value': self.reg_due_date_value,
             'first_line_escalation': self.first_line_escalation.id if self.first_line_escalation else False,
             'second_line_escalation': self.second_line_escalation.id if self.second_line_escalation else False,
-
-            'due_date':self.due_date
-
+            'reg_due_date':self.reg_due_date,
+            'rulebook_name': self.type_of_return,
+            'reminder_due_date': self.reminder_due_date,
+            'reminder_due_date_unit':self.reminder_due_date_unit,
+            'reminder_due_date_value': self.reminder_due_date_value
 
         }
 
@@ -1215,7 +1284,11 @@ class Rulebook(models.Model):
             self._update_risk_rating(vals)
 
             # Create rulebook record
-            record = super(Rulebook, self).create(vals)            
+            record = super(Rulebook, self).create(vals)
+
+            # Add 1 hour to computed_date if it exists
+            if record.computed_date:
+                record.computed_date += timedelta(hours=1)
 
             # Initialize submission status
             submission_status = 'pending'
@@ -1227,22 +1300,24 @@ class Rulebook(models.Model):
                 submission_time
                 record._send_internal_due_date_email()
                 record._copy_rulebook_chatter_to_reply_log()
-            else :
-
+            else:
                 reply_log_vals = record._prepare_reply_log_vals(
                     submission_status,
                     submission_time
                 )
-
                 reply = self.env['reply.log'].create(reply_log_vals)
-                if reply and reply.next_due_date or reply.escalation_date:
-                    reply._schedule_due_dates()
+                _logger.critical(
+                    f"insert rulebook record {reply}   computed date from rulebook {record.computed_date}")
 
+                if reply and reply.next_compute_date or reply.escalation_date:
+                    # reply._schedule_due_dates()
+                    None
 
             return record
 
         except Exception as e:
-            _logger.error(f"Error creating rulebook record: {str(e)}")
+            # Optional: add error handling
+            _logger.critical(f"Error in Rulebook create method: {e}")
             raise
 
     def write(self, vals):
@@ -1250,7 +1325,7 @@ class Rulebook(models.Model):
         self._update_risk_rating(vals)
         # self.your_method()
 
-        _logger.info(f"Write values for rulebook email data: {vals}")
+        _logger.critical(f"Write values for rulebook email data: {vals}")
 
         # Call the super method and capture the result (typically a boolean)
         result = super(Rulebook, self).write(vals)
@@ -1386,12 +1461,12 @@ class Rulebook(models.Model):
                     }
                 )
 
-            if record.due_date:
+            if record.reg_due_date:
                 self.env["calendar.event"].create(
                     {
                         "name": f"Regulatory Due Date for {re.sub(r'<[^>]+>', '', record.rulebook_name)} (ID: {record.rulebook_id})",
-                        "start": record.due_date,
-                        "stop": record.due_date
+                        "start": record.reg_due_date,
+                        "stop": record.reg_due_date
                         + timedelta(hours=1),  # Set duration of 1 hour
                         "allday": False,  # Event is not all day; includes specific time
                     }
@@ -1429,9 +1504,51 @@ class Rulebook(models.Model):
         except Exception as e:
             _logger.error(f"Error updating risk rating: {e}")
 
+    # def _compute_formatted_date(self, dt):
+    #     """
+    #     Format datetime to format like '21st of November, 2024 by 2pm'
+    #     Args:
+    #         dt: datetime object
+    #     Returns:
+    #         str: Formatted date string
+    #     """
+    #     if not dt:
+    #         return ""
+
+    #     try:
+    #         # Ordinal suffixes lookup
+    #         if dt.tzinfo is None:
+
+    #             dt = dt.replace(tzinfo=pytz.utc)
+
+    #     # Convert to the desired timezone (e.g., Africa/Lagos)
+    #         lagos_tz = pytz.timezone("Africa/Lagos")
+    #         dt = dt.astimezone(lagos_tz)
+
+    #         SUFFIXES = {
+    #             1: "st", 2: "nd", 3: "rd",
+    #             21: "st", 22: "nd", 23: "rd",
+    #             31: "st"
+    #         }
+
+    #         # Get day suffix
+    #         day_suffix = SUFFIXES.get(dt.day, "th")
+
+    #         # Format date
+    #         formatted_time = dt.strftime(
+    #             f"%-d{day_suffix} of %B, %Y by %-I%p").lower()
+
+    #         _logger.critical(f"formatted time %s: {formatted_time}")
+
+    #         return formatted_time
+
+    #     except Exception as e:
+    #         _logger.error(f"Date formatting error: {e}")
+    #         return str(dt)
+
     def _compute_formatted_date(self, dt):
         """
-        Format datetime to format like '21st of November, 2024 by 2pm'
+        Format datetime to format like 'November 28, 2024 07:44 AM'
         Args:
             dt: datetime object
         Returns:
@@ -1441,39 +1558,32 @@ class Rulebook(models.Model):
             return ""
 
         try:
-            # Ordinal suffixes lookup
+            # Check if datetime has timezone info, if not, set to UTC
             if dt.tzinfo is None:
-
                 dt = dt.replace(tzinfo=pytz.utc)
 
-        # Convert to the desired timezone (e.g., Africa/Lagos)
+            # Convert to the desired timezone (e.g., Africa/Lagos)
             lagos_tz = pytz.timezone("Africa/Lagos")
             dt = dt.astimezone(lagos_tz)
+            dt = datetime.now().replace(microsecond=0)
 
-            SUFFIXES = {
-                1: "st", 2: "nd", 3: "rd",
-                21: "st", 22: "nd", 23: "rd",
-                31: "st"
-            }
+            # Format the date and time as "November 28, 2024 07:44 AM"
+            formatted_time = dt.strftime("%B %d, %Y %I:%M %p")
 
-            # Get day suffix
-            day_suffix = SUFFIXES.get(dt.day, "th")
-
-            # Format date
-            formatted_time = dt.strftime(
-                f"%-d{day_suffix} of %B, %Y by %-I%p").lower()
-
-            _logger.critical(f"formatted time %s: {formatted_time}")
+            # Log formatted time for debugging
+            _logger.critical(f"formatted time: {formatted_time}")
 
             return formatted_time
 
         except Exception as e:
-            _logger.error(f"Date formatting error: {e}")
+            _logger.critical(f"Date formatting CRITICAL error: {e}")
             return str(dt)
 
+
+    
     def send_due_date_emails(self):
         # Get the current time and calculate the start and end window for the email notifications
-        now = fields.Datetime.context_timestamp(self, datetime.now())
+        now = fields.Datetime.now()
         start_window = now - timedelta(minutes=29)
         end_window = now + timedelta(minutes=29)
 
@@ -1515,7 +1625,7 @@ class Rulebook(models.Model):
                         "rulebook_name": rulebook_id.name.name or "N/A",
                         "computed_date": self._compute_formatted_date(rulebook_id.computed_date) or "N/A",
                         "escalation_date": self._compute_formatted_date(rulebook_id.escalation_date) or "N/A",
-                        "due_date": self._compute_formatted_date(rulebook_id.due_date) or "N/A",
+                        "reg_due_date": self._compute_formatted_date(rulebook_id.reg_due_date) or "N/A",
                         "record_link": self._record_link(self.id) or "N/A",
                         "upload_link": self._compute_upload_link(self.id) or "N/A",
                         "current_year": fields.Date.today().year,
@@ -1566,8 +1676,9 @@ class Rulebook(models.Model):
         _logger.critical(
             f"rulebooks with today's regulatory date  {today}, plus one day {today + timedelta(days=1)}")
 
-        today = fields.Datetime.now().astimezone(
-            pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
+        today = fields.Datetime.now()
+        # .astimezone(
+        #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
 
         # Adjust to local midnight without timezone conversion
         day_start = today.replace(hour=0, minute=0, second=0)
@@ -1609,39 +1720,39 @@ class Rulebook(models.Model):
     def _compute_next_due_date(self):
         _logger.critical("Updating next due date...")
 
-        """Compute the next due date for the rulebook when the status is 'completed'."""
+        """Compute the next internal due date for the rulebook when the status is 'completed'."""
 
         for record in self:
 
             try:
-                next_due_date = None
+                next_compute_date = None
 
                 if record.frequency_type == "monthly":
-                    next_due_date = record.computed_date + \
+                    next_compute_date = record.computed_date + \
                         relativedelta(months=1)
 
                 elif record.frequency_type == "quarterly":
-                    next_due_date = record.computed_date + \
+                    next_compute_date = record.computed_date + \
                         relativedelta(months=3)
 
                 elif record.frequency_type == "yearly":
-                    next_due_date = record.computed_date + \
+                    next_compute_date = record.computed_date + \
                         relativedelta(years=1)
 
                 elif record.frequency_type == "daily":
-                    next_due_date = record.computed_date + \
+                    next_compute_date = record.computed_date + \
                         relativedelta(days=1)
 
                 elif record.frequency_type == "weekly":
-                    next_due_date = record.computed_date + \
+                    next_compute_date = record.computed_date + \
                         relativedelta(weeks=1)
 
                 elif record.frequency_type == "day_of_month":
-                    next_due_date = record.computed_date + \
+                    next_compute_date = record.computed_date + \
                         relativedelta(months=1)
 
                 elif record.frequency_type == "day_every_month":
-                    next_due_date = record.computed_date + \
+                    next_compute_date = record.computed_date + \
                         relativedelta(months=1)
 
                 elif record.frequency_type == "bi_monthly":
@@ -1651,13 +1762,13 @@ class Rulebook(models.Model):
                     # Determine if it's the first or second date of the month
                     if current_day == record.bi_monthly_day1:
                         # If current is first day, next is second day of same month
-                        next_due_date = record.computed_date.replace(
+                        next_compute_date = record.computed_date.replace(
                             day=record.bi_monthly_day2)
                     else:
                         # If current is second day, next is first day of next month
-                        next_due_date = record.computed_date + \
+                        next_compute_date = record.computed_date + \
                             relativedelta(months=1)
-                        next_due_date = next_due_date.replace(
+                        next_compute_date = next_compute_date.replace(
                             day=record.bi_monthly_day1)
 
                 elif record.frequency_type == "semi_annually":
@@ -1667,58 +1778,57 @@ class Rulebook(models.Model):
 
                     if current_month == record.semi_annual_month1:
                         # Move to second date of the year
-                        next_due_date = record.computed_date.replace(
+                        next_compute_date = record.computed_date.replace(
                             month=record.semi_annual_month2,
                             day=record.semi_annual_day2
                         )
                     else:
                         # Move to first date of next year
-                        next_due_date = record.computed_date.replace(
+                        next_compute_date = record.computed_date.replace(
                             year=record.computed_date.year + 1,
                             month=record.semi_annual_month1,
                             day=record.semi_annual_day1
                         )
                 elif record.frequency_type == "three_yearly":
-                    next_due_date = record.computed_date + \
+                    next_compute_date = record.computed_date + \
                         relativedelta(years=3)
 
                 elif record.frequency_type == "date":
-                    next_due_date = record.computed_date
+                    next_compute_date = record.computed_date
 
                 elif record.frequency_type == "immediate":
-                    next_due_date = record.computed_date
+                    next_compute_date = record.computed_date
 
                 else:
-                    next_due_date = record.computed_date
+                    next_compute_date = record.computed_date
 
-                if not next_due_date:
+                if not next_compute_date:
                     _logger.critical(
                         f"Invalid frequency type '{record.frequency_type}' for record {record.id}.")
-                    next_due_date = record.computed_date
+                    next_compute_date = record.computed_date
 
-                record.next_due_date = next_due_date
-                record.computed_date = next_due_date
+                record.next_compute_date = next_compute_date
+                record.computed_date = next_compute_date
 
                 record.sudo().write({
-                    'next_due_date': next_due_date,
-                    'computed_date': next_due_date
+                    'next_compute_date': next_compute_date,
+                    'computed_date': next_compute_date
                 })
 
-                record._compute_escalation_date_for_cron()
-                record._compute_due_date_for_cron()
+                record._compute_escalation_date_for_cron_job()
+                record._compute_reg_due_date_for_cron_job()
 
                 _logger.critical(
-                    f"Record {record.id}: Computed next due date as {next_due_date}.")
+                    f"Record {record.id}: Computed next due date as {next_compute_date}.")
 
             except Exception as e:
                 _logger.error(
                     f"Error computing next due date for record {record.id}: {str(e)}"
                 )
-                record.next_due_date = None
+                record.next_compute_date = None
 
     @api.model
-    # def send_reminder_email(self):
-    def create_rulebook_logs_on_rulebook_creation(self):
+    def _create_rulebook_logs_entry(self):
         """create rulebook logs entry for rulebook."""
         # today = fields.Datetime.now().astimezone(
         #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
@@ -1737,7 +1847,7 @@ class Rulebook(models.Model):
                 'rulebook_id').ids),  # Rulebooks not in reply.log
             ('status', '=', 'active'),  # Status should be 'active'
             # Frequency should not be 'immediate'
-            ('frequency_type', '!=', 'immediate')
+            ('frequency_type', '!=', 'immediate'),
             ('computed_date', '!=', False)  # is_reoccuring should be True
         ])
 
@@ -1757,8 +1867,7 @@ class Rulebook(models.Model):
                 
                 reply_log_vals = rulebook._prepare_reply_log_vals(
                     submission_status ='pending',
-                    submission_time='pending'
-                    
+                    submission_time='pending'                    
                 )
                 
                 reply = self.env['reply.log'].sudo().create(reply_log_vals)
@@ -1771,9 +1880,7 @@ class Rulebook(models.Model):
                 _logger.critical(
                     f"Failed to process Rulebook {rulebook.id}: {e}")
                 continue
-           
-
-       
+             
 
    
     @api.model
@@ -1786,7 +1893,8 @@ class Rulebook(models.Model):
 
         timezone_str = "Africa/Lagos"
         timezone = pytz.timezone(timezone_str)
-        today = datetime.now(timezone)
+        # today = datetime.now(timezone)
+        today = datetime.now()
         today_start = today.replace(hour=0, minute=0, second=0, microsecond=0)
         today_end = today.replace(
             hour=23, minute=59, second=59, microsecond=999999)
@@ -1842,3 +1950,27 @@ class Rulebook(models.Model):
         lagos_date = lagos_now.date()
 
         return lagos_date
+
+    def clean_html_in_type_of_return(self):
+        # Fetch all rulebook records (you can apply filters if needed)
+        rulebooks = self.search([('type_of_return', '!=', False)])
+
+        for rulebook in rulebooks:
+            # Clean the 'type_of_return' field by removing HTML tags and entities
+            clean_value = re.sub(r'(<[^>]+>|&\w+;)',
+                                 '', rulebook.type_of_return)
+
+            # Update the record with the cleaned value
+            if clean_value != rulebook.type_of_return:
+                rulebook.sudo().write({'type_of_return': clean_value})
+                _logger.critical(
+                    f"Updated rulebook {rulebook.id}: Cleaned type_of_return field.")
+
+    def update_time_zone_for_all_users(self):
+        users = self.env['res.users'].search([])  # Get all users
+        for user in users:
+            user.sudo().write({'tz': 'Africa/Lagos'})
+            _logger.critical(
+                F"timezone update successfull {user}  users found ..{users}")
+        return True
+    

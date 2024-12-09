@@ -115,7 +115,7 @@
                                 <field name="semi_annual_day2" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Day of second month" help="Enter a valid day for the selected month"/>
                             </group>
                             <group col="2">
-                                <field name="computed_date" placeholder="Computed date will be shown here" string="Internal due date"/>
+                                <field name="computed_date" readonly="0" placeholder="Computed date will be shown here" string="Internal due date"/>
 
                             </group>
                             
@@ -143,11 +143,24 @@
                     <page string="Regulatory Due Date" style="font-weight: bold;">
                         <group >
                             <group col="2">
-                                <field name="due_date_value" placeholder="Enter Regulatory due due date value" />
-                                <field name="due_date_unit" placeholder="Select Regulatory due due date unit" />
+                                <field name="reg_due_date_value" help="Enter Regulatory due date value" />
+                                <field name="reg_due_date_unit" help="Select Regulatory due date unit" />
                             </group>
                             <group col="2">
-                                <field name="due_date" readonly="1" placeholder="Regulatory due date will be shown here" />
+                                <field name="reg_due_date" readonly="1" help="Regulatory due date will be shown here" />
+                            </group>
+                        </group>
+                    </page>
+
+                    <!-- Reminder Due Date Section -->
+                    <page string="Reminder Date" style="font-weight: bold;">
+                        <group >
+                            <group col="2">
+                                <field name="reminder_due_date_value" placeholder="Enter Reminder due date value" />
+                                <field name="reminder_due_date_unit" placeholder="Select Reminder due date unit" />
+                            </group>
+                            <group col="2">
+                                <field name="reminder_due_date" readonly="1" placeholder="Reminder due date will be shown here" />
                             </group>
                         </group>
                     </page>
