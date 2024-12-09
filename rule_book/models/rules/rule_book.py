@@ -148,7 +148,7 @@ class Rulebook(models.Model):
     )
     
     computed_date = fields.Datetime(
-        string="Next regulatory due date",
+        string="Internal due date",
         compute="_compute_date",
         store=True,
         help="Internal due date for this rulebook.",
