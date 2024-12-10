@@ -51,15 +51,15 @@
                     </group>
 
                     <group>
-                        <group string="SQL STATEMENT">
+                        <group string="SQL">
                             <field name="sql_text" />
                         </group>
-                        <group string="RISK RATING">
+                        <group string="RATING">
                             <field name="risk_rating"  string="Rating"/>
                         </group>
                     </group>
                     <group>
-                        <group string="FREQUENCY ">
+                        <group string="INTERVALS">
                             <field name="frequency_id" />
                         </group>
                         <group string="LAST CHECKED">
