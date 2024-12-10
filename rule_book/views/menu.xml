@@ -21,12 +21,12 @@
 
 
     <record id="action_rulebook_title" model="ir.actions.act_window">
-      <field name="name">Rulebook Titles</field>
+      <field name="name">Rulebook Source</field>
       <field name="res_model">rulebook.title</field>
       <field name="view_mode">tree,form</field>
       <field name="help" type="html">
         <p class="oe_view_nocontent_create">
-          Create your rule book title
+          Create your rule book Source
         </p>
       </field>
     </record>
@@ -112,8 +112,8 @@
     <!-- Submenu for Rulebook Details (Title, Theme, Rulebook, Reply Logs) -->
     <menuitem id="menu_rulebook_details" name="Rulebook" parent="menu_rulebook_theme_root" sequence="1" />
     <menuitem id="menu_rulebook_rulebook" name="Rulebook" parent="menu_rulebook_details" action="open_rulebooks" sequence="1" />
-    <menuitem id="menu_rulebook_title" name="Titles" parent="menu_rulebook_details" action="action_rulebook_title" sequence="2" />
-    <menuitem id="menu_pdf_chat" name="AI Assistance" parent="menu_rulebook_details" action="action_pdf_chat" sequence="3" />
+    <menuitem id="menu_rulebook_title" name="Source" parent="menu_rulebook_details" action="action_rulebook_title" sequence="2" groups="rule_book.group_compliance_manager_" />
+    <menuitem id="menu_pdf_chat" name="AI Assistance" parent="menu_rulebook_details" action="action_pdf_chat" sequence="3" groups="rule_book.group_compliance_manager_"/>
 
     <!-- Alerts -->
     <!-- <menuitem id="menu_report_rulebook" name="Reports" parent="menu_rulebook_alert" action="action_report_rulebook" sequence="4"/> -->
@@ -125,7 +125,7 @@
     <menuitem id="menu_reply_log" name="Rulebook Logs" parent="menu_rulebook_details" action="open_reply_log" sequence="5" />
 
     <!-- Submenu for Sources (Regulatory Source and Regulatory Records) -->
-    <menuitem id="menu_rulebook_sources_root" name="Sources" parent="menu_rulebook_theme_root" sequence="2" />
+    <menuitem id="menu_rulebook_sources_root" name="Regulatory Sources" parent="menu_rulebook_theme_root" sequence="2" groups="rule_book.group_compliance_manager_" />
     <!-- Submenu for Configuration (with Exception Management) -->
     <menuitem id="menu_rulebook_configuration" name="Configuration" parent="menu_rulebook_theme_root" sequence="4" groups="rule_book.group_compliance_manager_" />
 

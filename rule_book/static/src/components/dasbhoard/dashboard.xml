@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-	<t t-name="rule_book.Dashboard" owl="1">
+	<t t-name="rule_book.DashboardMain" owl="1">
 		<div style="width: 100%; height: 100%; overflow: auto; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; marginTop:15px">
 			<!-- Favicon -->
 			<link rel="icon" type="image/x-icon" href="rule_book/static/assets/img/favicon/favicon.ico" />
@@ -11,20 +11,7 @@
 			<link rel="stylesheet" href="rule_book/static/assets/vendor/fonts/boxicons.css" />
 			<!-- Core CSS -->
 			<link rel="stylesheet" href="rule_book/static/assets/vendor/css/core.css" class="template-customizer-core-css" />
-			<!--
-			<link rel="stylesheet" href="rule_book/static/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
-			-->
-			<!-- <link rel="stylesheet" href="rule_book/static/assets/css/demo.css" /> -->
-			<!-- Vendors CSS -->
-
-			<!-- Page CSS -->
-			<!-- Helpers -->
-			<!-- <script src="rule_book/static/assets/vendor/js/helpers.js"></script> -->
-			<!--
-			?
-			Config:  Mandatory theme config file contain global vars & default theme options, Set
-			your preferred theme option in this file.
-			-->
+			
 			<style>
                 .custom-button {
                     color: white;
@@ -44,33 +31,8 @@
                     background-color: #0056b3;
                     border-color: #0056b3;
 					color:white
-                }
-
-				<!--  -->
-				.scrollable-container {
-					height: calc(100% - 100px); /* Adjust based on your card header height */
-					overflow-y: auto;
-					overflow-x: hidden;
-					position: relative;
-				}
-
-				.scrollable-container::-webkit-scrollbar {
-					width: 6px;
-				}
-
-				.scrollable-container::-webkit-scrollbar-track {
-					background: #f1f1f1;
-					border-radius: 3px;
-				}
-
-				.scrollable-container::-webkit-scrollbar-thumb {
-					background: #888;
-					border-radius: 3px;
-				}
-
-				.scrollable-container::-webkit-scrollbar-thumb:hover {
-					background: #555;
-				}
+                }																																						<!--  -->
+				
 
 				.card.h-100 {
 					display: flex;
@@ -81,10 +43,47 @@
 				.card-header {
 					flex-shrink: 0;
 				}
-
-				.scrollable-container > :last-child {
-					margin-bottom: 1rem;
+				
+				.card-body {
+					max-height: 350px !important;
+					overflow-y: auto !important;
+					scrollbar-width: thin !important; /* For Firefox */
+					scrollbar-color: #888 #ccc !important; /* For Firefox */
 				}
+
+				.card-body::-webkit-scrollbar {
+					width: 8px !important;
+				}
+
+				.card-body::-webkit-scrollbar-thumb {
+					background-color: #888 !important;
+					border-radius: 10px !important;
+				}
+
+				.card-body::-webkit-scrollbar-track {
+					background-color: #ccc !important;
+				}
+
+				.col-lg-2-5 {
+					width: 20.83% !important;  /* 2.5 / 12 * 100 = 20.83% */
+				}
+
+				/* Medium screens (tablets) - 50% width */
+				@media (max-width: 991px) {
+					.col-md-2-5 {
+						width: 50% !important; /* 6 columns of 12, 50% of the container */
+					}
+				}
+
+				/* Small screens (mobiles) - Full width */
+				@media (max-width: 767px) {
+					.col-sm-2-5 {
+						width: 100% !important; /* 12 columns of 12, 100% width */
+					}
+				}
+
+
+
 			</style>
 
 
@@ -99,14 +98,19 @@
 					<!-- Layout container -->
 					<div class="layout-page">
 						<!-- statistic page -->
-						<div class="row ">
-							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
+						<div class="row d-flex justify-content-around">
+							<div class="col mb-4" >
 								<div class="card h-100">
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
-											<div class="avatar flex-shrink-0">
+											<!-- <div class="avatar flex-shrink-0">
 												<img src="rule_book/static/assets/img/icons/object/rule_book.png" alt="chart success" class="rounded" />
-											</div>
+											</div> -->
+											<a href="/web#menu_id=146&action=207" class="d-flex align-items-center">
+												<div class="avatar flex-shrink-0">
+													<img src="/rule_book/static/assets/img/icons/object/rule_book.png" alt="Rule Book" class="rounded" />
+												</div>
+											</a>
 										</div>
 										<p class="mb-1">
 											RuleBook
@@ -123,16 +127,19 @@
 								</div>
 							</div>
 							<!-- Repeat for the remaining 4 cards -->
-							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
-								<div class="card h-100">
+							<div class="col mb-4">
+								<div class="card h-100" >
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
-											<div class="avatar flex-shrink-0">
-												<img src="rule_book/static/assets/img/icons/object/rulebook_title.png" alt="chart success" class="rounded" />
-											</div>
+
+											<a href="/web#menu_id=147&action=187" class="d-flex align-items-center">
+												<div class="avatar flex-shrink-0">
+													<img src="/rule_book/static/assets/img/icons/object/rulebook_title.png" alt="RuleBook Source" class="rounded" />
+												</div>
+											</a>
 										</div>
 										<p class="mb-1">
-											Title
+RuleBook Source
 										</p>
 										<h4 class="card-title mb-3">
 											<t t-out="state.totalTitle" />
@@ -147,16 +154,19 @@
 							</div>
 
 
-							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
+							<div class="col mb-4 ">
 								<div class="card h-100">
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
-											<div class="avatar flex-shrink-0">
-												<img src="rule_book/static/assets/img/icons/object/reply.png" alt="wallet info" class="rounded" />
-											</div>
+
+											<a href="/web#menu_id=149&action=208" class="d-flex align-items-center">
+												<div class="avatar flex-shrink-0">
+													<img src="/rule_book/static/assets/img/icons/object/reply.png" alt="RuleBook Logs" class="rounded" />
+												</div>
+											</a>
 										</div>
 										<p class="mb-1">
-											Reply Logs
+											RuleBook Logs
 										</p>
 										<h4 class="card-title mb-3">
 											<t t-out="state.totalReplies" />
@@ -169,13 +179,17 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
+
+							<div class="col mb-4 ">
 								<div class="card h-100">
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
-											<div class="avatar flex-shrink-0">
-												<img src="rule_book/static/assets/img/icons/object/ai.png" alt="chart success" class="rounded" />
-											</div>
+
+											<a href="/web#menu_id=148&action=192" class="d-flex align-items-center">
+												<div class="avatar flex-shrink-0">
+													<img src="/rule_book/static/assets/img/icons/object/ai.png" alt="Ai Chat" class="rounded" />
+												</div>
+											</a>
 										</div>
 										<p class="mb-1">
 											AI Chat
@@ -191,13 +205,17 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-12 col-lg-2 mb-4" style="width: 20%!important;">
+
+							<div class="col mb-4 ">
 								<div class="card h-100">
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
-											<div class="avatar flex-shrink-0">
-												<img src="rule_book/static/assets/img/icons/object/regulatory.png" alt="wallet info" class="rounded" />
-											</div>
+
+											<a href="/web#menu_id=154&action=186" class="d-flex align-items-center">
+												<div class="avatar flex-shrink-0">
+													<img src="/rule_book/static/assets/img/icons/object/regulatory.png" alt="Regulatory Source" class="rounded" />
+												</div>
+											</a>
 										</div>
 										<p class="mb-1">
 											Regulatory Sources
@@ -214,45 +232,29 @@
 								</div>
 							</div>
 						</div>
-						<!-- regulatory date -->
+						<!--  Dates -->
 						<div class="row">
-							<!-- regualatory due data -->
-							<div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-6">
-								<div class="card h-100">
+							<!-- internal due data -->
+							<div class="col-md-6 col-lg-3 col-xl-3 order-0 mb-6">
+								<div class="card ">
 									<div class="card-header d-flex justify-content-between">
 										<div class="card-title mb-0">
 											<h5 class="mb-1">
-												Regulatory Due Dates
+												Internal Due Dates
 											</h5>
 											<p class="card-subtitle">
-												Upcoming due dates
+												Upcoming Internal dates
 											</p>
 										</div>
-										<!-- <div class="dropdown">
-											<button class="btn text-muted p-0" type="button" id="regulatoryDueDates" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-												<i class="bx bx-dots-vertical-rounded bx-lg">
-												</i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end" aria-labelledby="regulatoryDueDates">
-												<a class="dropdown-item">
-													Select All
-												</a>
-												<a class="dropdown-item">
-													Refresh
-												</a>
-												<a class="dropdown-item">
-													Share
-												</a>
-											</div>
-										</div> -->
+
 									</div>
 									<div class="card-body">
 										<ul class="p-0 m-0">
-											<t t-foreach="state.regulatoryDueDates" t-as="date" t-key="date.id">
-												<t t-set="index" t-value="state.regulatoryDueDates.indexOf(date)" />
+											<t t-foreach="state.internalDueDates" t-as="date" t-key="date.id">
+												<t t-set="index" t-value="state.internalDueDates.indexOf(date)" />
 												<li class="d-flex align-items-center mb-5">
 													<div class="avatar flex-shrink-0 me-3">
-														<span class="avatar-initial rounded bg-danger" t-att-style="'opacity: ' + (1 - (index / state.regulatoryDueDates.length))">
+														<span class="avatar-initial rounded bg-success" t-att-style="'opacity: ' + (1 - (index / state.internalDueDates.length))">
 															<i class="bx bx-calendar">
 															</i>
 														</span>
@@ -260,16 +262,16 @@
 													<div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
 														<div class="me-2">
 															<a t-att-href="date.link" class="text-decoration-none text-black">
-																<h6 class="mb-0" t-esc="date.type_of_return">
+																<h6 class="mb-0" t-esc="date.rulebook_name">
 																</h6>
 															</a>
 															<small>
-																<t t-esc="date.responsible_id[1]" />
+																<t t-esc="date.department_id[1]" />
 															</small>
 														</div>
 														<div class="user-progress">
 															<h6 class="mb-0">
-																<t t-esc="date.computed_date" />
+																<t t-esc="date.internal_due_date" />
 															</h6>
 														</div>
 													</div>
@@ -279,9 +281,10 @@
 									</div>
 								</div>
 							</div>
+
 							<!-- escalation due date -->
-							<div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-6">
-								<div class="card h-100">
+							<div class="col-md-6 col-lg-3 col-xl-3 order-0 mb-6">
+								<div class="card ">
 									<div class="card-header d-flex justify-content-between">
 										<div class="card-title mb-0">
 											<h5 class="mb-1">
@@ -291,23 +294,7 @@
 												Upcoming escalation dates
 											</p>
 										</div>
-										<!-- <div class="dropdown">
-											<button class="btn text-muted p-0" type="button" id="escalationDueDates" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-												<i class="bx bx-dots-vertical-rounded bx-lg">
-												</i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end" aria-labelledby="escalationDueDates">
-												<a class="dropdown-item">
-													Select All
-												</a>
-												<a class="dropdown-item">
-													Refresh
-												</a>
-												<a class="dropdown-item">
-													Share
-												</a>
-											</div>
-										</div> -->
+
 									</div>
 									<div class="card-body">
 										<ul class="p-0 m-0">
@@ -315,7 +302,7 @@
 												<t t-set="index" t-value="state.escalationDueDates.indexOf(date)" />
 												<li class="d-flex align-items-center mb-5">
 													<div class="avatar flex-shrink-0 me-3">
-														<span class="avatar-initial rounded bg-label-info" t-att-style="'opacity: ' + (1 - (index / state.escalationDueDates.length))">
+														<span class="avatar-initial rounded bg-label-warning" t-att-style="'opacity: ' + (1 - (index / state.escalationDueDates.length))">
 															<i class="bx bx-calendar">
 															</i>
 														</span>
@@ -323,11 +310,11 @@
 													<div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
 														<div class="me-2">
 															<a t-att-href="date.link" class="text-decoration-none text-black">
-																<h6 class="mb-0" t-esc="date.type_of_return">
+																<h6 class="mb-0" t-esc="date.rulebook_name">
 																</h6>
 															</a>
 															<small>
-																<t t-esc="date.responsible_id[1]" />
+																<t t-esc="date.department_id[1]" />
 															</small>
 														</div>
 														<div class="user-progress">
@@ -342,43 +329,84 @@
 									</div>
 								</div>
 							</div>
-							<!-- internal due date -->
-							<div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-6">
-								<div class="card h-100">
+
+							<!-- Regulatory due date -->
+							<div class="col-md-6 col-lg-3 col-xl-3 order-0 mb-6">
+								<div class="card ">
 									<div class="card-header d-flex justify-content-between">
 										<div class="card-title mb-0">
 											<h5 class="mb-1">
-												Internal Due Dates
+												Regulatory Due Dates
 											</h5>
 											<p class="card-subtitle">
-												Upcoming internal dates
+												Upcoming Regulatory dates
 											</p>
 										</div>
-										<!-- <div class="dropdown">
-											<button class="btn text-muted p-0" type="button" id="internalDueDates" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-												<i class="bx bx-dots-vertical-rounded bx-lg">
-												</i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end" aria-labelledby="internalDueDates">
-												<a class="dropdown-item">
-													Select All
-												</a>
-												<a class="dropdown-item">
-													Refresh
-												</a>
-												<a class="dropdown-item">
-													Share
-												</a>
-											</div>
-										</div> -->
+										
 									</div>
 									<div class="card-body">
 										<ul class="p-0 m-0">
-											<t t-foreach="state.internalDueDates" t-as="date" t-key="date.id">
-												<t t-set="index" t-value="state.internalDueDates.indexOf(date)" />
+											<t t-foreach="state.regulatoryDueDates" t-as="date" t-key="date.id">
+												<t t-set="index" t-value="state.regulatoryDueDates.indexOf(date)" />
 												<li class="d-flex align-items-center mb-5">
 													<div class="avatar flex-shrink-0 me-3">
-														<span class="avatar-initial rounded bg-label-primary" t-att-style="'opacity: ' + (1 - (index / state.internalDueDates.length))">
+														<!-- <span class="avatar-initial rounded bg-label-danger" t-att-style="'background-color: #cc0000; opacity: ' + (1 - (index / state.internalDueDates.length))">
+															<i class="bx bx-calendar">
+															</i>
+														</span> -->
+														<span class="avatar-initial rounded bg-label-danger" t-att-style="'background-color: rgb(204, 0, 0); opacity: ' + (1 - (index / state.regulatoryDueDates.length))">
+															<i class="bx bx-calendar"></i>
+														</span>
+
+													</div>
+													<div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+														<div class="me-2">
+															<!-- Main Title -->
+															<a t-att-href="date.link" class="text-decoration-none text-black">
+																<h6 class="mb-0" t-esc="date.rulebook_name">
+																</h6>
+															</a>
+															<!-- Subtitle -->
+															<small class="text-muted" t-esc="date.department_id[1]">
+															</small>
+														</div>
+														<div class="user-progress">
+															<!-- Due Date -->
+															<h6 class="mb-0 text-secondary">
+																<t t-esc="date.reg_due_date" />
+
+															</h6>
+
+														</div>
+													</div>
+												</li>
+											</t>
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							<!-- Upcoming reminders -->
+							<div class="col-md-6 col-lg-3 col-xl-3 order-0 mb-6">
+								<div class="card ">
+									<div class="card-header d-flex justify-content-between">
+										<div class="card-title mb-0">
+											<h5 class="mb-1">
+												Reminder Dates
+											</h5>
+											<p class="card-subtitle">
+												Upcoming Reminders
+											</p>
+										</div>
+
+									</div>
+									<div class="card-body">
+										<ul class="p-0 m-0">
+											<t t-foreach="state.reminderDueDates" t-as="date" t-key="date.id">
+												<t t-set="index" t-value="state.reminderDueDates.indexOf(date)" />
+												<li class="d-flex align-items-center mb-5">
+													<div class="avatar flex-shrink-0 me-3">
+														<span class="avatar-initial rounded bg-label-info" t-att-style="'opacity: ' + (1 - (index / state.reminderDueDates.length))">
 															<i class="bx bx-calendar">
 															</i>
 														</span>
@@ -387,20 +415,20 @@
 														<div class="me-2">
 															<!-- Main Title -->
 															<a t-att-href="date.link" class="text-decoration-none text-black">
-																<h6 class="mb-0" t-esc="date.type_of_return">
+																<h6 class="mb-0" t-esc="date.rulebook_name">
 																</h6>
 															</a>
 															<!-- Subtitle -->
-															<small class="text-muted" t-esc="date.responsible_id[1]">
+															<small class="text-muted" t-esc="date.department_id[1]">
 															</small>
 														</div>
 														<div class="user-progress">
 															<!-- Due Date -->
 															<h6 class="mb-0 text-secondary">
-																<t t-esc="date.internal_due_date" />
+																<t t-esc="date.reminder_due_date" />
 
 															</h6>
-															
+
 														</div>
 													</div>
 												</li>
@@ -410,11 +438,12 @@
 								</div>
 							</div>
 						</div>
+
 						<!-- awaiting reply log -->
 						<div class="row">
 							<!-- Awaiting Review Card -->
 							<div class="col-md-6 col-lg-4 mb-6">
-								<div class="card h-auto">									<!-- Changed to h-100 for full height -->
+								<div class="card h-auto">
 									<div class="card-header d-flex align-items-center justify-content-between">
 										<div class="card-title mb-0">
 											<h5 class="card-title m-0 me-2 mb-2">
@@ -425,9 +454,10 @@
 											</p>
 										</div>
 									</div>
-									<div class="scrollable-container">										<!-- Added wrapper for scrollable content -->
+
+									<!-- Wrapper div for the scrollable content -->
+									<div class="card-body pt-4" style="max-height: 350px; overflow-y: auto;">
 										<t t-if="state.hasPermission">
-											<!-- User has permission, now check if there are replies -->
 											<t t-if="state.awaitingReplies.length == 0">
 												<div class="alert alert-light">
                         No awaiting replies found.
@@ -436,40 +466,38 @@
 											<t t-else="">
 												<t t-foreach="state.awaitingReplies" t-as="reply" t-key="reply.id">
 													<t t-set="index" t-value="state.awaitingReplies.indexOf(reply)" />
-													<div class="card-body pt-4">
-														<ul class="p-0 m-0">
-															<li class="d-flex align-items-center mb-2">
-																<div class="avatar flex-shrink-0 me-3">
-																	<img src="rule_book/static/assets/img/icons/object/awaiting_review.png" alt="awaiting" t-att-style="'opacity: ' + (1 - (index / state.awaitingReplies.length))" class="rounded" />
-																</div>
-																<div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-																	<div class="me-2">
-																		<div class="mb-1">
-																			<small class="text-muted">Rulebook:</small>
-																			<h6 class="fw-bold mb-0">
-																				<t t-esc="reply.rulebook_name" />
-																			</h6>
-																		</div>
-																		<div class="mb-1">
-																			<h6 t-attf-class="fw-700 mb-0 custom-purple">
-																				<t t-esc="reply.status" />
-																			</h6>
-																		</div>
-																	</div>
-																	<div>
-																		<h6 class="mb-2">
-																			<t t-esc="reply.reply_date" />
+													<ul class="p-0 m-0">
+														<li class="d-flex align-items-center mb-2">
+															<div class="avatar flex-shrink-0 me-3">
+																<img src="rule_book/static/assets/img/icons/object/awaiting_review.png" alt="awaiting" t-att-style="'opacity: ' + (1 - (index / state.awaitingReplies.length))" class="rounded" />
+															</div>
+															<div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+																<div class="me-2">
+																	<div class="mb-1">
+																		<small class="text-muted">Rulebook:</small>
+																		<h6 class="fw-bold mb-0">
+																			<t t-esc="reply.rulebook_name" />
 																		</h6>
-																		<div class="user-progress d-flex align-items-end gap-2">
-																			<a t-att-href="reply.form_link" class="custom-button">
-																				<small>View</small>
-																			</a>
-																		</div>
+																	</div>
+																	<div class="mb-1">
+																		<h6 t-attf-class="fw-700 mb-0 custom-purple">
+																			<t t-esc="reply.status" />
+																		</h6>
 																	</div>
 																</div>
-															</li>
-														</ul>
-													</div>
+																<div>
+																	<h6 class="mb-2">
+																		<t t-esc="reply.reply_date" />
+																	</h6>
+																	<div class="user-progress d-flex align-items-end gap-2">
+																		<a t-att-href="reply.form_link" class="custom-button">
+																			<small>View</small>
+																		</a>
+																	</div>
+																</div>
+															</div>
+														</li>
+													</ul>
 												</t>
 											</t>
 										</t>
@@ -481,32 +509,31 @@
 							</div>
 
 
-							
-							<!-- Newly Uploaded Document Card -->
-							<div class="col-md-6 col-lg-4 mb-6">
-								<div class="card h-auto">
 
+							<!-- Newly Uploaded Document Card -->
+
+							<div class="col-md-6 col-lg-4 mb-6">
+								<div class="card">
 									<div class="card-header d-flex align-items-center justify-content-between">
 										<div class="card-title mb-0">
 											<h5 class="card-title m-0 me-2 mb-2">
-                        Newly Uploaded Document
+                    Newly Uploaded Document
 											</h5>
 											<p class="card-subtitle">
-                        List of newly uploaded regulatory document
+                    List of newly uploaded regulatory document
 											</p>
 										</div>
 									</div>
 
 									<t t-if="state.newlyUploadedTitle.length === 0">
 										<div class="alert alert-light mt-2">
-                    No newly uploaded titles available for this reply.
+                No newly uploaded titles available for this reply.
 										</div>
 									</t>
 									<t t-else="">
-
-										<t t-foreach="state.newlyUploadedTitle" t-as="title" t-key="title.name+title.id">
-											<div class="card-body pt-4">
-												<ul class="p-0 m-0">
+										<div class="card-body pt-4" style="max-height: 300px; overflow-y: auto;">
+											<ul class="p-0 m-0">
+												<t t-foreach="state.newlyUploadedTitle" t-as="title" t-key="title.name+title.id">
 													<li class="d-flex align-items-center mb-2">
 														<div class="avatar flex-shrink-0 me-3">
 															<img src="/rule_book/static/assets/img/icons/object/rulebook.png" alt="rulebook" class="rounded" />
@@ -515,7 +542,7 @@
 															<div class="me-2">
 																<div class="mb-1">
 																	<small class="text-muted">
-                                  Rulebook:
+                                            Rulebook:
 																	</small>
 																	<h6 class="fw-bold mb-0">
 																		<t t-esc="title.name" />
@@ -523,7 +550,7 @@
 																</div>
 																<div class="mb-1">
 																	<small class="text-muted">
-                                  Source:
+                                            Source:
 																	</small>
 																	<h6 class="fw-bold mb-0">
 																		<t t-esc="title.source" />
@@ -531,7 +558,7 @@
 																</div>
 																<div class="mb-1">
 																	<small class="text-muted">
-                                  Created On:
+                                            Created On:
 																	</small>
 																	<h6 class="fw-bold mb-0">
 																		<t t-esc="title.created_on" />
@@ -541,47 +568,47 @@
 															<div>
 																<div class="user-progress d-flex align-items-end gap-2">
 																	<a t-att-href="title.form_link" class="custom-button">
-                                  View
+                                            View
 																	</a>
 																</div>
 															</div>
 														</div>
 													</li>
-												</ul>
-											</div>
-										</t>
+												</t>
+											</ul>
+										</div>
 									</t>
 								</div>
 							</div>
 
 
-							<!-- most asked ai question -->
+							<!-- Most Asked AI Questions -->
 							<div class="col-md-6 col-lg-4 mb-6">
-								<div class="card h-auto">
+								<div class="card">
 									<div class="card-header d-flex align-items-center justify-content-between">
 										<div class="card-title mb-0">
 											<h5 class="card-title m-0 me-2 mb-2">
-                        Most Asked AI Questions
+                    Most Asked AI Questions
 											</h5>
 											<p class="card-subtitle">
-                        List of the most frequently asked AI questions
+                    List of the most frequently asked AI questions
 											</p>
 										</div>
 									</div>
 									<t t-if="state.mostAskedQuestion.length === 0">
 										<div class="alert alert-light">
-                      No questions have been asked yet.
+                No questions have been asked yet.
 										</div>
 									</t>
 									<t t-else="">
 										<!-- Loop through the list of questions and their counts -->
-										<t t-foreach="state.mostAskedQuestion" t-as="question" t-key="question.question">
-											<t t-set="index" t-value="state.mostAskedQuestion.indexOf(question)" />
-											<div class="card-body pt-4">
-												<ul class="p-0 m-0">
+										<div class="card-body pt-4" style="max-height: 300px; overflow-y: auto;">
+											<ul class="p-0 m-0">
+												<t t-foreach="state.mostAskedQuestion" t-as="question" t-key="question.question">
+													<t t-set="index" t-value="state.mostAskedQuestion.indexOf(question)" />
 													<li class="d-flex align-items-center mb-2">
 														<!-- Circular container for the count -->
-														<div class="avatar flex-shrink-0 me-3" t-att-style="'opacity: ' + (1 - (index / state.mostAskedQuestion.length))">
+														<div class=" flex-shrink-0 me-3" t-att-style="'opacity: ' + (1 - (index / state.mostAskedQuestion.length))">
 															<div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
 																<span class="fw-bold">
 																	<t t-esc="question.count" />
@@ -594,7 +621,7 @@
 															<div class="me-2">
 																<div class="mb-1">
 																	<small class="text-muted">
-                                  Question:
+                                            Question:
 																	</small>
 																	<h6 class="fw-bold mb-0">
 																		<t t-esc="question.question" />
@@ -603,13 +630,13 @@
 															</div>
 														</div>
 													</li>
-												</ul>
-											</div>
-										</t>
+												</t>
+											</ul>
+										</div>
 									</t>
-
 								</div>
 							</div>
+
 
 						</div>
 

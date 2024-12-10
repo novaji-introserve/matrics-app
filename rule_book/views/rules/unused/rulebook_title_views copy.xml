@@ -67,7 +67,7 @@
         <field name="name">rulebook.title.search</field>
         <field name="model">rulebook.title</field>
         <field name="arch" type="xml">
-            <search string="Rulebook Titles">
+            <search string="Rulebook Source">
                 <field name="name" />
                 <field name="status" />
                 <field name="source_id" />

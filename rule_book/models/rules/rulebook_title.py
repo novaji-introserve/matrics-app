@@ -25,7 +25,7 @@ load_dotenv()
 
 class RulebookTitle(models.Model):
     _name = 'rulebook.title'
-    _description = 'Rulebook Titles'
+    _description = 'Rulebook Sources'
     _rec_name = 'name'
 
     name = fields.Char(string='Title', required=True)

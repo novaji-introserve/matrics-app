@@ -1,5 +1,5 @@
 function hello() {
-    console.log("hello, from olumide");
+    console.log("");
 
 }
 hello()
