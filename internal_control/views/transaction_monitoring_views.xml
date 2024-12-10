@@ -3,93 +3,94 @@
     <!-- Form View -->
     <record id="view_transaction_monitoring_form" model="ir.ui.view">
         <field name="name">transaction.monitoring.form</field>
-        <field name="model">tbl.transactions</field>
+        <field name="model">res.customer.transaction</field>
+        <field name="inherit_id" ref="compliance_management.compliance_transaction_form" />
         <field name="arch" type="xml">
-            <form string="Transaction Details" create="false" edit="false" delete="false">
-                <header>
-                    <field name="state" widget="statusbar" 
-                    options="{'clickable':'1'}" 
-                    attrs="{'invisible': [('state', '=', 'done')]}"
-                    />
-                    
-                </header>
-                <sheet>
-                    <!-- Title Section -->
-                    <div class="oe_title">
-                        <h1>
-                            <field name="accountnumber_null" readonly="1" placeholder="Account Number"/>
-                        </h1>
-                    </div>
-                    <group>
+            <xpath expr="//form" position="replace">
+                <form string="Transaction Details" create="false" edit="false" delete="false">
+                    <header>
+                        <field name="state" widget="statusbar" options="{'clickable':'1'}"
+                            attrs="{'invisible': [('state', '=', 'done')]}" />
+                
+                    </header>
+                    <sheet>
+                        <!-- Title Section -->
+                        <div class="oe_title">
+                            <h1>
+                                <field name="accountnumber_null" readonly="1" placeholder="Account Number" />
+                            </h1>
+                        </div>
                         <group>
-                            <field name="tran_date_null" readonly="1"/>
-                            <field name="accountnumber_null" readonly="1"/>
-                            <field name="tran_currency_null" readonly="1"/>
+                            <group>
+                                <field name="tran_date_null" readonly="1" />
+                                <field name="accountnumber_null" readonly="1" />
+                                <field name="tran_currency_null" readonly="1" />
+                            </group>
+                            <group>
+                                <field name="tellerno_null" readonly="1" />
+                                <field name="narration_null" readonly="1" />
+                            </group>
                         </group>
-                        <group>
-                            <field name="tellerno_null" readonly="1"/>
-                            <field name="narration_null" readonly="1"/>
-                        </group>
-                    </group>
-
-                    <!-- Notebook Sections -->
-                    <notebook>
-                        <!-- Transaction Details Page -->
-                        <page string="Transaction Details" name="transaction_details">
-                            <group>
-                                <group string="Date Information">
-                                    <field name="valuedate_null" readonly="1"/>
-                                    <field name="actual_date_null" readonly="1"/>
+                
+                        <!-- Notebook Sections -->
+                        <notebook>
+                            <!-- Transaction Details Page -->
+                            <page string="Transaction Details" name="transaction_details">
+                                <group>
+                                    <group string="Date Information">
+                                        <field name="valuedate_null" readonly="1" />
+                                        <field name="actual_date_null" readonly="1" />
+                                    </group>
+                                    <group string="Amount Details">
+                                        <field name="crossrate_null" readonly="1" />
+                                        <field name="charge_null" readonly="1" />
+                                    </group>
                                 </group>
-                                <group string="Amount Details">
-                                    <field name="crossrate_null" readonly="1"/>
-                                    <field name="charge_null" readonly="1"/>
+                                <group>
+                                    <group string="Transaction Information">
+                                        <field name="account_module_null" readonly="1" />
+                                        <field name="tran_channel_null" readonly="1" />
+                                        <field name="reversal_null" readonly="1" />
+                                    </group>
+                                    <group string="Reference Numbers">
+                                        <field name="batchno_null" readonly="1" />
+                                        <field name="chknum_null" readonly="1" />
+                                    </group>
                                 </group>
-                            </group>
-                            <group>
-                                <group string="Transaction Information">
-                                    <field name="account_module_null" readonly="1"/>
-                                    <field name="tran_channel_null" readonly="1"/>
-                                    <field name="reversal_null" readonly="1"/>
+                            </page>
+                
+                            <!-- Processing Information Page -->
+                            <page string="Processing Details" name="processing_details">
+                                <group>
+                                    <group string="Authorization">
+                                        <field name="authid_null" readonly="1" />
+                                        <field name="overideid_null" readonly="1" />
+                                        <field name="status_null" readonly="1" />
+                                    </group>
+                                    <group string="Branch Information">
+                                        <field name="subbranchcode_null" readonly="1" />
+                                        <field name="deptcode_null" readonly="1" />
+                                    </group>
                                 </group>
-                                <group string="Reference Numbers">
-                                    <field name="batchno_null" readonly="1"/>
-                                    <field name="chknum_null" readonly="1"/>
+                            </page>
+                
+                            <!-- Reference Information Page -->
+                            <page string="Reference Information" name="reference_info">
+                                <group>
+                                    <group string="System References">
+                                        <field name="request_id_null" readonly="1" />
+                                        <field name="rrn_null" readonly="1" />
+                                        <field name="rem_null" readonly="1" />
+                                    </group>
+                                    <group string="Post Information">
+                                        <field name="Postseq" readonly="1" />
+                                    </group>
                                 </group>
-                            </group>
-                        </page>
-
-                        <!-- Processing Information Page -->
-                        <page string="Processing Details" name="processing_details">
-                            <group>
-                                <group string="Authorization">
-                                    <field name="authid_null" readonly="1"/>
-                                    <field name="overideid_null" readonly="1"/>
-                                    <field name="status_null" readonly="1"/>
-                                </group>
-                                <group string="Branch Information">
-                                    <field name="subbranchcode_null" readonly="1"/>
-                                    <field name="deptcode_null" readonly="1"/>
-                                </group>
-                            </group>
-                        </page>
-
-                        <!-- Reference Information Page -->
-                        <page string="Reference Information" name="reference_info">
-                            <group>
-                                <group string="System References">
-                                    <field name="request_id_null" readonly="1"/>
-                                    <field name="rrn_null" readonly="1"/>
-                                    <field name="rem_null" readonly="1"/>
-                                </group>
-                                <group string="Post Information">
-                                    <field name="Postseq" readonly="1"/>
-                                </group>
-                            </group>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+           </xpath>
         </field>
     </record>
 
@@ -97,50 +98,54 @@
     <!-- Tree View -->
     <record id="view_transaction_monitoring_tree" model="ir.ui.view">
         <field name="name">transaction.monitoring.tree</field>
-        <field name="model">tbl.transactions</field>
+        <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
+        <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <tree string="Transaction Monitoring" create="false">
-                <field name="refno_null"/>
-                <field name="tran_date_null"/>
-                <field name="valuedate_null"/>
-                <field name="actual_date_null"/>
-                <field name="narration_null"/>
-                <field name="tran_currency_null"/>
-                <field name="crossrate_null"/>
-                <field name="reversal_null"/>
-                <field name="account_module_null"/>
-                <field name="tellerno_null"/>
-                <field name="status_null"/>
-                <field name="accountnumber_null"/>
-                <field name="tran_channel_null"/>
-                <field name="request_id_null"/>
-                <field name="rrn_null"/>
-            </tree>
+            <xpath expr="//tree" position="replace">
+                <tree string="Transaction Monitoring" create="false">
+                    <field name="refno_null" />
+                    <field name="tran_date_null" />
+                    <field name="valuedate_null" />
+                    <field name="actual_date_null" />
+                    <field name="narration_null" />
+                    <field name="tran_currency_null" />
+                    <field name="crossrate_null" />
+                    <field name="reversal_null" />
+                    <field name="account_module_null" />
+                    <field name="tellerno_null" />
+                    <field name="status_null" />
+                    <field name="accountnumber_null" />
+                    <field name="tran_channel_null" />
+                    <field name="request_id_null" />
+                    <field name="rrn_null" />
+                </tree>
+            </xpath>
+           
         </field>
     </record>
 
 
-    <!-- Server Action for all transactions -->
+  
     <record id="action_all_transactions" model="ir.actions.server">
         <field name="name">all.transactions</field>
-        <field name="model_id" ref="model_tbl_transactions" /> <!-- Replace with your model's external ID -->
+        <field name="model_id" ref="model_res_customer_transaction" /> 
         <field name="state">code</field>
         <field name="code">action = model.open_transactions_all()</field>
     </record>
 
-    <!-- Server Action for all Open transactions -->
+   
     <record id="action_all_open_transactions" model="ir.actions.server">
         <field name="name">Open.transactions</field>
-        <field name="model_id" ref="model_tbl_transactions" /> <!-- Replace with your model's external ID -->
+        <field name="model_id" ref="model_res_customer_transaction" /> 
         <field name="state">code</field>
         <field name="code">action = model.open_transactions()</field>
     </record>
 
-    <!-- Server Action for all reviews transactions -->
+    
     <record id="action_all_reviewed_transactions" model="ir.actions.server">
         <field name="name">Reviewed.transactions</field>
-        <field name="model_id" ref="model_tbl_transactions" /> <!-- Replace with your model's external ID -->
+        <field name="model_id" ref="model_res_customer_transaction" /> 
         <field name="state">code</field>
         <field name="code">action = model.open_transactions_done()</field>
-    </record>
+    </record> 
 </odoo>

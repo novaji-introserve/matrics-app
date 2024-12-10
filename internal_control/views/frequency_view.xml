@@ -2,32 +2,35 @@
 <odoo>
     <!-- Tree View (List View) -->
     <record id="view_exception_frequency_tree" model="ir.ui.view">
-        <field name="name">exception.frequency.tree</field>
+        <field name="name">Exception Frequency</field>
         <field name="model">exception.frequency</field>
         <field name="arch" type="xml">
             <tree string="Exception Frequency">
-                <field name="name" />
-                <field name="period" />
-                <field name="date_created" />
-                <field name="representation" />
-                <!-- <field name="period" /> -->
-                <field name="create_date" string="Created On" />
-                <field name="create_uid" string="Created By" />
+                <field name="name" string="Frequency" widget="selection" colspan="2" class="text-left" />
+                <field name="period" string="Frequency Cycle" colspan="2" class="text-left"/>
+                <field name="create_uid" string="Created By" widget="many2one_avatar_user" colspan="2" class="text-left" />
+                <field name="date_created" string="Date Created" widget="datetime"  class="text-left" colspan="2"/>
             </tree>
         </field>
     </record>
 
     <!-- Form View -->
     <record id="view_exception_frequency_form" model="ir.ui.view">
-        <field name="name">exception.frequency.form</field>
+        <field name="name">Exception Frequency </field>
         <field name="model">exception.frequency</field>
         <field name="arch" type="xml">
             <form string="Exception Frequency">
                 <sheet>
-                    <group>
-                        <field name="name" />
-                        <field name="period" 
-                               attrs="{'invisible': [('name', '=', False)]}" 
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h3>
+                            <field name="name" string="Frequency Type" class="col-12" />
+                        </h3>
+                    </div>
+                    <group string="Interval" class="col-10" >
+                        <field name="period"
+                            string="Frequency Cycle"
+                            attrs="{'invisible': [('name', '=', False)]}"  
                         />
                     </group>
                 </sheet>
@@ -43,10 +46,10 @@
         <field name="view_id" ref="view_exception_frequency_tree" />
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create new alert groups for exception management.
+                Create new frequency for exception management.
             </p>
             <p>
-                Alert groups help in managing exception notifications efficiently.
+                exception frequency help in managing how frequent the system check for exception.
             </p>
         </field>
     </record>
