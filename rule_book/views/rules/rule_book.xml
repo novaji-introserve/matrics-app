@@ -115,7 +115,7 @@
                                 <field name="semi_annual_day2" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Day of second month" help="Enter a valid day for the selected month"/>
                             </group>
                             <group col="2">
-                                <field name="computed_date" readonly="0" placeholder="Next internal due date will be shown here" string="Internal due date"/>
+                                <field name="computed_date" readonly="0" placeholder="Next internal due date will be shown here" string="Due date"/>
 
                             </group>
                             

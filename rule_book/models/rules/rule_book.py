@@ -33,7 +33,7 @@ class Rulebook(models.Model):
 
     name = fields.Many2one(
         "rulebook.title",
-        string="RuleBook Title",
+        string="RuleBook Source",
         required=True,
         tracking=True,
         help="Rulebook Source document.",
@@ -723,8 +723,8 @@ class Rulebook(models.Model):
                 day2 = min(record.semi_annual_day2 or 6, 28)
 
                 # Create datetime objects for comparison
-                date1 = datetime(year, month1, day1, 15, 0, 0) - timedelta(hours=1)
-                date2 = datetime(year, month2, day2, 15, 0,
+                date1 = datetime(year, month1, day1, 16, 0, 0) - timedelta(hours=1)
+                date2 = datetime(year, month2, day2, 16, 0,
                                  0) - timedelta(hours=1)
 
                 # Sort dates chronologically
