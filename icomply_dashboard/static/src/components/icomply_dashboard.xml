@@ -1,83 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="owl.IcomplyDashboard" owl="1">
-      <div class="vh-100 p-4 overflow-auto bg-muted ">
-       
+        <div class="vh-100 p-4 overflow-auto bg-muted ">
+
             <div class="row g-5">
                 <div class="col-12">
                     <div class="col-12 m-0 p-0 ">
-                        <div class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
+                        <div
+                            class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
                             <h3 class="lead fw-bold">DASHBOARD</h3>
-                           <div>
-                            <select name="" id="" class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
-                                <option value="0" selected="selected">current</option>
-                                <option value="7">7 Days</option>
-                                <option value="14">last 14 Days</option>
-                                <option value="30">last month</option>
-                                <option value="60">2 months</option>
-                            </select>
-                           </div>
+                            <div>
+                                <select name="" id="" class="form-select" t-model="state.datepicked"
+                                    t-on-change="filterByDate">
+                                    <option value="0" selected="selected">current</option>
+                                    <option value="7">7 Days</option>
+                                    <option value="14">last 14 Days</option>
+                                    <option value="30">last month</option>
+                                    <option value="60">2 months</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row mt-2 mt-md-4">
-                        <KpiCard onclick.bind="displayAllCases" name="'High Risk Tran.'" value="state.kpi.allcases" percentage="state.kpi.allcasespercentage" />
-                        <KpiCard onclick.bind="displayAllOpenCases" name="'Medium Risk Tran.'" value="state.kpi.opencases" percentage="state.kpi.opencasespercentage" />
-                        <KpiCard onclick.bind="displayAllCloseCases" name="'Low Risk Tran.'" value="state.kpi.closecases" percentage="state.kpi.closecasespercentage" />
-                        <KpiCard onclick.bind="displayAllOverdueCases" name="'Total Exception Rules'" value="state.kpi.overdue" percentage="state.kpi.overduecasespercentage" />
-                        <KpiCard onclick.bind="displayNothing" name="'High Risk(%)'" value="state.kpi.opencaseinRespectToAllCase" percentage="state.kpi.opencasespercentage" />
-                        <KpiCard onclick.bind="displayNothing" name="'Medium Case(%)'" value="state.kpi.closecaseinRespectToAllCase" percentage="state.kpi.closecasespercentage" />
+                        <KpiCard onclick.bind="displayAllCases" name="'High Risk Tran.'" value="state.kpi.highrisk"
+                            percentage="state.kpi.highriskbypercent" />
+
+                        <KpiCard onclick.bind="displayAllOpenCases" name="'Medium Risk Tran.'"
+                            value="state.kpi.mediumrisk" percentage="state.kpi.mediumriskbypercent" />
+
+                        <KpiCard onclick.bind="displayAllCloseCases" name="'Low Risk Tran.'" value="state.kpi.lowrisk"
+                            percentage="state.kpi.lowriskpercentage" />
+
+                        <KpiCard onclick.bind="displayAllOverdueCases" name="'Total Exception Rules'"
+                            value="state.kpi.totalrules" percentage="state.kpi.totalrulespercentage" />
+
+                        <KpiCard onclick.bind="displayNothing" name="'High Risk(%)'"
+                            value="state.kpi.highriskinRespectToTotalRules"
+                            percentage="state.kpi.highriskinRespectToTotalRulesPercentage" />
+
+                        <KpiCard onclick.bind="displayNothing" name="'Medium Risk(%)'"
+                            value="state.kpi.mediumriskinRespectToTotalRules"
+                            percentage="state.kpi.mediumriskinRespectToTotalRulesPercentage" />
+
+                        <KpiCard onclick.bind="displayNothing" name="'Low Risk(%)'"
+                            value="state.kpi.lowriskinRespectToTotalRules"
+                            percentage="state.kpi.lowriskinRespectToTotalRulesPercent" />
                     </div>
 
-                  <div class="row mt-3">
+                    <div class="row mt-3">
 
-                    <div class="col-md-4 ">
-                        <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                            <h3 class="lead fw-bold text-primary">High Risk Report</h3>
-                            <button class="btn btn-primary">
-                                <i class="fa fa-angle-right"></i>
-                            </button>
+                        <div class="col-md-4 ">
+                            <div
+                                class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                                <h3 class="lead fw-bold text-primary">Risk Rating Report</h3>
+                                <button class="btn btn-primary">
+                                    <i class="fa fa-angle-right"></i>
+                                </button>
+                            </div>
+
+                            <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                                <ChartRenderer datepicked="state.datepicked"
+                                    current_datepicked="state.current_datepicked" config="state.riskratingchart" type="'bar'"
+                                    title="'Rating'" />
+                            </div>
                         </div>
 
-                        <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked" config="state.openchart" type="'bar'" title="'High Risk'" />
+                        <div class="col-md-4 ">
+                            <div
+                                class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                                <h3 class="lead fw-bold text-primary">Rules By Category Report</h3>
+                                <button class="btn btn-primary">
+                                    <i class="fa fa-angle-right"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                                <ChartRenderer datepicked="state.datepicked"
+                                    current_datepicked="state.current_datepicked" config="state.categorychart"
+                                    type="'bar'" title="'Category'" />
+                            </div>
                         </div>
+                        <div class="col-md-4 ">
+                            <div
+                                class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                                <h3 class="lead fw-bold text-primary">Rules By Frequency Report</h3>
+                                <button class="btn btn-primary">
+                                    <i class="fa fa-angle-right"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                                <ChartRenderer datepicked="state.datepicked"
+                                    current_datepicked="state.current_datepicked" config="state.frequencychart"
+                                    type="'pie'" title="'Frequency'" />
+                            </div>
+                        </div>
+
                     </div>
-
-                    <div class="col-md-4 ">
-                        <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                            <h3 class="lead fw-bold text-primary">Medium Risk Report</h3>
-                            <button class="btn btn-primary">
-                                <i class="fa fa-angle-right"></i>
-                            </button>
-                        </div>
-                       <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                        <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"  config="state.statuschart" type="'bar'" title="'Medium Risk'" />
-                       </div>
-                    </div>
-                    <div class="col-md-4 ">
-                        <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                            <h3 class="lead fw-bold text-primary">Low Risk Report</h3>
-                            <button class="btn btn-primary">
-                                <i class="fa fa-angle-right"></i>
-                            </button>
-                        </div>
-                       <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                        <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked" config="state.categoryChart"  type="'pie'" title="'Low Risk'" />
-                       </div>
-                    </div>
-
-                  </div>
 
 
                 </div>
 
-               
+
             </div>
 
-           
 
-            
-      </div>
+
+
+        </div>
     </t>
 </templates>

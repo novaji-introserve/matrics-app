@@ -6,13 +6,9 @@
         <field name="model">res.customer.transaction</field>
         <field name="inherit_id" ref="compliance_management.compliance_transaction_form" />
         <field name="arch" type="xml">
-            <xpath expr="//form" position="replace">
+            <xpath expr="//sheet" position="replace">
                 <form string="Transaction Details" create="false" edit="false" delete="false">
-                    <header>
-                        <field name="state" widget="statusbar" options="{'clickable':'1'}"
-                            attrs="{'invisible': [('state', '=', 'done')]}" />
-                
-                    </header>
+                    
                     <sheet>
                         <!-- Title Section -->
                         <div class="oe_title">
