@@ -1979,3 +1979,15 @@ class Rulebook(models.Model):
                 F"timezone update successfull {user}  users found ..{users}")
         return True
     
+    @api.model
+    def clear_employee_mobile_phone(self):
+        # Explicitly reference the hr.employee model
+        employee_model = self.env['hr.employee']        
+        # Fetch all employees explicitly
+        employees = employee_model.search([])  # Get all employees
+        # Loop over each employee and clear their mobile_phone
+        for employee in employees:
+            employee.sudo().write({'work_phone': False})  # Set mobile_phone to False (NULL in Odoo)
+
+        return True
+    
