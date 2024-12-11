@@ -65,7 +65,7 @@ class Exception_frequency(models.Model):
     @api.depends('period', 'name')
     def _compute_name_rep(self):
         for record in self:
-            record.representation = f"{record.period}{record.name}"
+            record.representation = f"{record.period} {record.name}"
 
     representation = fields.Char(string='representation', compute='_compute_name_rep', store=True)
   

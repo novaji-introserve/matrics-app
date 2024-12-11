@@ -4,12 +4,10 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class TransactionMonitoring(models.Model):
-    _name = "tbl.transactions"
-    _description = "Transaction Monitoring"
     _rec_name = "refno"
-    _inherit = ["mail.thread", "mail.activity.mixin"]
+    _inherit = ["res.customer.transaction"]
 
-    id = fields.Integer(string="id", readonly=True)
+    # id = fields.Integer(string="id", readonly=True)
     refno = fields.Char(string="Reference Number", readonly=True)
     Postseq = fields.Integer(string="Post Sequence", readonly=True)
     TranDate = fields.Char(string="Transaction Date", readonly=True)
@@ -35,14 +33,6 @@ class TransactionMonitoring(models.Model):
     RRN = fields.Char(string="RRN", readonly=True)
     REM = fields.Char(string="REM", readonly=True)
     overideid = fields.Integer(string="Override ID", readonly=True)
-    
-    rule_id = fields.Many2one(comodel_name='res.transaction.screening.rule',
-                              string='Exception Rule', tracking=True, index=True)
-    risk_level = fields.Selection(string='Risk Level', selection=[(
-        'low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='low', tracking=True)
-    state = fields.Selection(string='Status', selection=[(
-        'new', 'To Review'), ('done', 'Done')], tracking=True, index=True, default='new')
-    likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
     
     # Computed fields to show "NULL" if data is missing
     refno_null = fields.Char(string="Reference Number", compute="_compute_null_values")
@@ -213,10 +203,11 @@ class TransactionMonitoring(models.Model):
 
     @api.model
     def open_transactions(self):
+    
         return {
             'name': 'Transactions To Review',
             'type': 'ir.actions.act_window',
-            'res_model': 'tbl.transactions',
+            'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
             'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'new')],
             'context': {'group_by': ['subbranchcode']},
@@ -227,7 +218,7 @@ class TransactionMonitoring(models.Model):
         return {
             'name': 'Reviewed Transactions',
             'type': 'ir.actions.act_window',
-            'res_model': 'tbl.transactions',
+            'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
             'domain': [('state', '=', 'done')],
             'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'done')],
@@ -241,7 +232,7 @@ class TransactionMonitoring(models.Model):
         return {
             'name': 'All Transactions',
             'type': 'ir.actions.act_window',
-            'res_model': 'tbl.transactions',
+            'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
             'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id])],
             'context': {'group_by': ['subbranchcode']},

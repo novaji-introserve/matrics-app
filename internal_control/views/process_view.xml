@@ -21,11 +21,21 @@
         <field name="arch" type="xml">
             <form string="Process Form">
                 <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
-                        <field name="name" />
-                        <field name="description" />
-                        <field name="process_category_id" />
-                        <!-- <field name="branch_id" /> -->
+                        
+                        <group string="PROCESS DESCRIPTION">
+                            <field name="description" />
+                        </group>
+                        
+                        <group string="PROCESS CATEGORY">
+                            <field name="process_category_id" string="Category" />
+                        </group>
                     </group>
                 </sheet>
             </form>

@@ -66,6 +66,7 @@ class Transaction(models.Model):
                     self.rule_id = rule
                     self.risk_level = rule.risk_level
                     return
+            
 
     @api.model
     def open_transactions(self):

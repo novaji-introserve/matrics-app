@@ -11,17 +11,21 @@ const { Component, useState, onWillStart, onWillUnmount, useRef, onMounted } =
 
 export class IcomplyDashboard extends Component {
   setup() {
-    
     this.api = useService("orm");
     this.navigate = useService("action");
     this.state = useState({
       kpi: {
-        opencases: 0,
-        closecases: 0,
-        allcases: 0,
-        overdue: 0,
-        opencasebypercent: "0%",
-        closecasebypercent: "0%",
+        lowrisk: 0,
+        mediumrisk: 0,
+        highrisk: 0,
+        totalrules: 0,
+        highriskbypercent: "0",
+        mediumriskbypercent: "0",
+        lowriskpercentage: "0",
+        totalrulespercentage: "0",
+        lowriskinRespectToTotalRulesPercent: "0",
+        mediumriskinRespectToTotalRulesPercentage: "0",
+        highriskinRespectToTotalRulesPercentage: "0",
       },
       datepicked: 0,
     });
@@ -31,9 +35,9 @@ export class IcomplyDashboard extends Component {
     });
 
     onWillStart(async () => {
-      await this.getCaseSeverityChart();
-      await this.getCaseByStatusChart();
-      await this.getCaseByCategoryChart();
+      await this.getRiskRatingChart();
+      await this.getProcessCategoryChart();
+      await this.getFrequencyChart();
     });
   }
 
@@ -52,115 +56,146 @@ export class IcomplyDashboard extends Component {
     if (
       this.state.current_datepicked === new Date().toLocaleDateString("en-US")
     ) {
-      let allcasestotal = await this.api.searchCount("case.management", []);
-      let openCasesCount = await this.api.searchCount("case.management", [
-        ["case_status_id.name", "=", "Open"],
-      ]);
-      let closeCasesCount = await this.api.searchCount("case.management", [
-        ["case_status_id.name", "=", "Closed"],
-      ]);
-      let overdueCasesCount = await this.api.searchCount("case.management", [
-        ["case_status_id.name", "=", "Overdue"],
-      ]);
+      let allrulesCount = await this.api.searchCount(
+        "res.customer.transaction",
+        []
+      );
+      let lowriskCount = await this.api.searchCount(
+        "res.customer.transaction",
+        [["risk_level", "=", "low"]]
+      );
+      let mediumriskCount = await this.api.searchCount(
+        "res.customer.transaction",
+        [["risk_level", "=", "medium"]]
+      );
+      let highriskCount = await this.api.searchCount(
+        "res.customer.transaction",
+        [["risk_level", "=", "high"]]
+      );
 
-      this.state.kpi.allcases = allcasestotal;
-      this.state.kpi.opencases = openCasesCount;
-      this.state.kpi.closecases = closeCasesCount;
-      this.state.kpi.overdue = overdueCasesCount;
-      this.state.kpi.allcasespercentage = 0;
-      this.state.kpi.opencasespercentage = 0;
-      this.state.kpi.closecasespercentage = 0;
-      this.state.kpi.overduecasespercentage = 0;
-      this.state.kpi.opencaseinRespectToAllCase = `${(
-        (openCasesCount / allcasestotal) *
+      this.state.kpi.lowrisk = lowriskCount;
+      this.state.kpi.mediumrisk = mediumriskCount;
+      this.state.kpi.highrisk = highriskCount;
+      this.state.kpi.totalrules = allrulesCount;
+
+      // each risk count in respect to all records
+
+      this.state.kpi.lowriskinRespectToTotalRules = `${(
+        (lowriskCount / allrulesCount) *
         100
       ).toFixed(1)}%`;
-      this.state.kpi.closecaseinRespectToAllCase = `${(
-        (closeCasesCount / allcasestotal) *
+
+      this.state.kpi.mediumriskinRespectToTotalRules = `${(
+        (mediumriskCount / allrulesCount) *
+        100
+      ).toFixed(1)}%`;
+
+      this.state.kpi.highriskinRespectToTotalRules = `${(
+        (highriskCount / allrulesCount) *
         100
       ).toFixed(1)}%`;
     } else {
-      let allcasestotal = await this.api.searchCount("case.management", [
-        ["created_at", ">=", this.state.current_datepicked],
+      let allrulesCount = await this.api.searchCount("alert.rules", [
+        ["date_created", ">=", this.state.current_datepicked],
       ]);
-      let openCasesCount = await this.api.searchCount("case.management", [
-        ["case_status_id.name", "=", "Open"],
-        ["created_at", ">=", this.state.current_datepicked],
+      let lowriskCount = await this.api.searchCount("alert.rules", [
+        ["risk_rating", "=", "low"],
+        ["date_created", ">=", this.state.current_datepicked],
       ]);
-      let closeCasesCount = await this.api.searchCount("case.management", [
-        ["case_status_id.name", "=", "Closed"],
-        ["created_at", ">=", this.state.current_datepicked],
+      let mediumriskCount = await this.api.searchCount("alert.rules", [
+        ["risk_rating", "=", "medium"],
+        ["date_created", ">=", this.state.current_datepicked],
       ]);
-      let overdueCasesCount = await this.api.searchCount("case.management", [
-        ["case_status_id.name", "=", "Overdue"],
-        ["created_at", ">=", this.state.current_datepicked],
+      let highriskCount = await this.api.searchCount("alert.rules", [
+        ["risk_rating", "=", "high"],
+        ["date_created", ">=", this.state.current_datepicked],
       ]);
 
-      this.state.kpi.allcases = allcasestotal;
-      this.state.kpi.opencases = openCasesCount;
-      this.state.kpi.closecases = closeCasesCount;
-      this.state.kpi.overdue = overdueCasesCount;
+      this.state.kpi.lowrisk = lowriskCount;
+      this.state.kpi.mediumrisk = mediumriskCount;
+      this.state.kpi.highrisk = highriskCount;
+      this.state.kpi.totalrules = allrulesCount;
+
+      // each risk count in respect to all records
+
+      this.state.kpi.lowriskinRespectToTotalRules = `${(
+        (lowriskCount / allrulesCount) *
+        100
+      ).toFixed(1)}%`;
+
+      this.state.kpi.mediumriskinRespectToTotalRules = `${(
+        (mediumriskCount / allrulesCount) *
+        100
+      ).toFixed(1)}%`;
+
+      this.state.kpi.highriskinRespectToTotalRules = `${(
+        (highriskCount / allrulesCount) *
+        100
+      ).toFixed(1)}%`;
 
       // this calculate total data in range of the date filtered and last occurrence o the date
 
-      let allcasestotal_prev = await this.api.searchCount("case.management", [
-        ["created_at", "<", this.state.current_datepicked],
-        ["created_at", ">=", this.state.previous_datepicked],
+      let total_rules_prev_count = await this.api.searchCount("alert.rules", [
+        ["date_created", "<", this.state.current_datepicked],
+        ["date_created", ">=", this.state.previous_datepicked],
       ]);
-      let openCasesCount_prev = await this.api.searchCount("case.management", [
-        ["case_status_id.name", "=", "Open"],
-        ["created_at", "<", this.state.current_datepicked],
-        ["created_at", ">=", this.state.previous_datepicked],
-      ]);
-      let closeCasesCount_prev = await this.api.searchCount("case.management", [
-        ["case_status_id.name", "=", "Closed"],
-        ["created_at", "<", this.state.current_datepicked],
-        ["created_at", ">=", this.state.previous_datepicked],
-      ]);
-      let overdueCasesCount_prev = await this.api.searchCount(
-        "case.management",
-        [
-          ["case_status_id.name", "=", "Overdue"],
-          ["created_at", "<", this.state.current_datepicked],
-          ["created_at", ">=", this.state.previous_datepicked],
-        ]
-      );
 
-      this.state.kpi.allcasespercentage =
-        allcasestotal_prev == 0
+      let low_risk_prev_count = await this.api.searchCount("alert.rules", [
+        ["risk_rating", "=", "low"],
+        ["date_created", "<", this.state.current_datepicked],
+        ["date_created", ">=", this.state.previous_datepicked],
+      ]);
+
+      let medium_risk_prev_count = await this.api.searchCount("alert.rules", [
+        ["risk_rating", "=", "medium"],
+        ["date_created", "<", this.state.current_datepicked],
+        ["date_created", ">=", this.state.previous_datepicked],
+      ]);
+
+      let high_risk_prev_count = await this.api.searchCount("alert.rules", [
+        ["risk_rating", "=", "high"],
+        ["date_created", "<", this.state.current_datepicked],
+        ["date_created", ">=", this.state.previous_datepicked],
+      ]);
+
+      this.state.kpi.totalrulespercentage =
+        total_rules_prev_count == 0
           ? 0
           : (
-              ((allcasestotal - allcasestotal_prev) / allcasestotal_prev) *
+              ((allrulesCount - total_rules_prev_count) /
+                total_rules_prev_count) *
               100
             ).toFixed(2);
-      this.state.kpi.opencasespercentage =
-        openCasesCount_prev == 0
+
+      this.state.kpi.lowriskpercentage =
+        low_risk_prev_count == 0
           ? 0
           : (
-              ((openCasesCount - openCasesCount_prev) / openCasesCount_prev) *
+              ((lowriskCount - low_risk_prev_count) / low_risk_prev_count) *
               100
             ).toFixed(2);
-      this.state.kpi.closecasespercentage =
-        closeCasesCount_prev == 0
+
+      this.state.kpi.mediumriskbypercent =
+        medium_risk_prev_count == 0
           ? 0
           : (
-              ((closeCasesCount - closeCasesCount_prev) /
-                closeCasesCount_prev) *
+              ((mediumriskCount - medium_risk_prev_count) /
+                medium_risk_prev_count) *
               100
             ).toFixed(2);
-      this.state.kpi.overduecasespercentage =
-        overdueCasesCount_prev == 0
+
+      this.state.kpi.highriskbypercent =
+        high_risk_prev_count == 0
           ? 0
           : (
-              ((overdueCasesCount - overdueCasesCount_prev) /
-                overdueCasesCount_prev) *
+              ((highriskCount - high_risk_prev_count) / high_risk_prev_count) *
               100
             ).toFixed(2);
     }
     // reload chart on select change
-    await this.getCaseSeverityChart();
-    await this.getCaseByStatusChart();
-    await this.getCaseByCategoryChart();
+    await this.getRiskRatingChart();
+    await this.getProcessCategoryChart();
+    await this.getFrequencyChart();
   };
 
   displayAllCases() {
@@ -236,23 +271,22 @@ export class IcomplyDashboard extends Component {
 
   // chart implementation
 
-  getCaseSeverityChart = async () => {
+  getRiskRatingChart = async () => {
     if (this.state.datepicked == 0) {
       // Use read_group to perform aggregation and group by priority_level_id
       const results = await this.api.searchRead(
-        "case.management", // The model to query
+        "alert.rules", // The model to query
         [], // No specific domain/filter (can be customized)
-        ["priority_level_id"] // Fields to group by (priority_level_id)
+        ["risk_rating"] // Fields to group by (priority_level_id)
       );
 
       const groupedData = {};
       results.forEach((record) => {
-        const priorityId = record.priority_level_id[0]; // Get priority_level_id (ID)
-        const priorityName = record.priority_level_id[1]; // Get priority_level_id.name (Name)
-        if (!groupedData[priorityId]) {
-          groupedData[priorityId] = { count: 0, name: priorityName };
+        const Name = record.risk_rating; // Get priority_level_id.name (Name)
+        if (!groupedData[Name]) {
+          groupedData[Name] = { count: 0, name: Name };
         }
-        groupedData[priorityId].count++;
+        groupedData[Name].count++;
       });
 
       // Prepare the data for Chart.js
@@ -264,7 +298,7 @@ export class IcomplyDashboard extends Component {
         counts.push(data.count); // Priority count
       });
 
-      this.state.openchart = {
+      this.state.riskratingchart = {
         labels: labels,
         datasets: [
           {
@@ -276,19 +310,18 @@ export class IcomplyDashboard extends Component {
       };
     } else if (this.state.datepicked > 0) {
       const results = await this.api.searchRead(
-        "case.management", // The model to query
-        [["created_at", ">=", this.state.current_datepicked]], // No specific domain/filter (can be customized)
-        ["priority_level_id"] // Fields to group by (priority_level_id)
+        "alert.rules", // The model to query
+        [["date_created", ">=", this.state.current_datepicked]], // No specific domain/filter (can be customized)
+        ["risk_rating"] // Fields to group by (priority_level_id)
       );
 
       const groupedData = {};
       results.forEach((record) => {
-        const priorityId = record.priority_level_id[0]; // Get priority_level_id (ID)
-        const priorityName = record.priority_level_id[1]; // Get priority_level_id.name (Name)
-        if (!groupedData[priorityId]) {
-          groupedData[priorityId] = { count: 0, name: priorityName };
+        const Name = record.risk_rating; // Get priority_level_id.name (Name)
+        if (!groupedData[Name]) {
+          groupedData[Name] = { count: 0, name: Name };
         }
-        groupedData[priorityId].count++;
+        groupedData[Name].count++;
       });
 
       // Prepare the data for Chart.js
@@ -303,7 +336,7 @@ export class IcomplyDashboard extends Component {
       console.log(labels);
       console.log(counts);
 
-      this.state.openchart = {
+      this.state.riskratingchart = {
         labels: labels,
         datasets: [
           {
@@ -316,100 +349,103 @@ export class IcomplyDashboard extends Component {
     }
   };
 
-  getCaseByStatusChart = async () => {
+  getProcessCategoryChart = async () => {
     if (this.state.datepicked == 0) {
       // Use read_group to perform aggregation and group by priority_level_id
       const results = await this.api.searchRead(
-        "case.management", // The model to query
+        "alert.rules", // The model to query
         [], // No specific domain/filter (can be customized)
-        ["case_status_id"] // Fields to group by (priority_level_id)
+        ["process_category_id"] // Fields to group by (priority_level_id)
       );
 
-      const groupedData = {};
-      results.forEach((record) => {
-        const statusId = record.case_status_id[0]; // Get case_status_id (ID)
-        const statusName = record.case_status_id[1]; // Get status_level_id.name (Name)
-        if (!groupedData[statusId]) {
-          groupedData[statusId] = { count: 0, name: statusName };
-        }
-        groupedData[statusId].count++;
-      });
 
-      // Prepare the data for Chart.js
-      const labels = [];
-      const counts = [];
+        const groupedData = {};
+        results.forEach((record) => {
+          const id = record.process_category_id[0]; // Get process_category_id (ID)
+          const Name = record.process_category_id[1]; // Get status_level_id.name (Name)
+          if (!groupedData[id]) {
+            groupedData[id] = { count: 0, name: Name };
+          }
+          groupedData[id].count++;
+        });
 
-      Object.values(groupedData).forEach((data) => {
-        labels.push(data.name); // Priority name
-        counts.push(data.count); // Priority count
-      });
+        // Prepare the data for Chart.js
+        const labels = [];
+        const counts = [];
 
-      this.state.statuschart = {
-        labels: labels,
-        datasets: [
-          {
-            label: "",
-            data: counts,
-            hoverOffset: 4,
-          },
-        ],
-      };
-    } else if (this.state.datepicked > 0) {
-      const results = await this.api.searchRead(
-        "case.management", // The model to query
-        [["created_at", ">=", this.state.current_datepicked]], // No specific domain/filter (can be customized)
-        ["case_status_id"] // Fields to group by (priority_level_id)
-      );
+        Object.values(groupedData).forEach((data) => {
+          labels.push(data.name); // Priority name
+          counts.push(data.count); // Priority count
+        });
 
-      const groupedData = {};
-      results.forEach((record) => {
-        const statusId = record.case_status_id[0]; // Get case_status_id (ID)
-        const statusName = record.case_status_id[1]; // Get status_level_id.name (Name)
-        if (!groupedData[statusId]) {
-          groupedData[statusId] = { count: 0, name: statusName };
-        }
-        groupedData[statusId].count++;
-      });
+        this.state.categorychart = {
+          labels: labels,
+          datasets: [
+            {
+              label: "",
+              data: counts,
+              hoverOffset: 4,
+            },
+          ],
+        };
+      } 
+      else if (this.state.datepicked > 0) {
+        const results = await this.api.searchRead(
+          "alert.rules", // The model to query
+          [["date_created", ">=", this.state.current_datepicked]], // No specific domain/filter (can be customized)
+          ["process_category_id"] // Fields to group by (priority_level_id)
+        );
+         const groupedData = {};
+         results.forEach((record) => {
+           const id = record.process_category_id[0]; // Get process_category_id (ID)
+           const Name = record.process_category_id[1]; // Get status_level_id.name (Name)
+           if (!groupedData[id]) {
+             groupedData[id] = { count: 0, name: Name };
+           }
+           groupedData[id].count++;
+         });
 
-      // Prepare the data for Chart.js
-      const labels = [];
-      const counts = [];
+         // Prepare the data for Chart.js
+         const labels = [];
+         const counts = [];
 
-      Object.values(groupedData).forEach((data) => {
-        labels.push(data.name); // Priority name
-        counts.push(data.count); // Priority count
-      });
+         Object.values(groupedData).forEach((data) => {
+           labels.push(data.name); // Priority name
+           counts.push(data.count); // Priority count
+         });
 
-      this.state.statuschart = {
-        labels: labels,
-        datasets: [
-          {
-            label: "",
-            data: counts,
-            hoverOffset: 4,
-          },
-        ],
-      };
-    }
+         this.state.categorychart = {
+           labels: labels,
+           datasets: [
+             {
+               label: "",
+               data: counts,
+               hoverOffset: 4,
+             },
+           ],
+         };
+
+
+      }
   };
 
-  getCaseByCategoryChart = async () => {
+  getFrequencyChart = async () => {
     if (this.state.datepicked == 0) {
       // Use read_group to perform aggregation and group by priority_level_id
       const results = await this.api.searchRead(
-        "case.management", // The model to query
+        "alert.rules", // The model to query
         [], // No specific domain/filter (can be customized)
-        ["case_status_id"] // Fields to group by (priority_level_id)
+        ["frequency_id"] // Fields to group by (priority_level_id)
       );
 
       const groupedData = {};
       results.forEach((record) => {
-        const statusId = record.case_status_id[0]; // Get case_status_id (ID)
-        const statusName = record.case_status_id[1]; // Get status_level_id.name (Name)
-        if (!groupedData[statusId]) {
-          groupedData[statusId] = { count: 0, name: statusName };
+        const id = record.frequency_id[0]; // Get frequency_id (ID)
+        const Name = record.frequency_id[1]; // Get status_level_id.name (Name)
+        if (!groupedData[id]) {
+          groupedData[id] = { count: 0, name: Name };
         }
-        groupedData[statusId].count++;
+        groupedData[id].count++;
       });
 
       // Prepare the data for Chart.js
@@ -421,7 +457,7 @@ export class IcomplyDashboard extends Component {
         counts.push(data.count); // Priority count
       });
 
-      this.state.categoryChart = {
+      this.state.frequencychart = {
         labels: labels,
         datasets: [
           {
@@ -450,19 +486,19 @@ export class IcomplyDashboard extends Component {
       };
     } else {
       const results = await this.api.searchRead(
-        "case.management", // The model to query
-        [["created_at", ">=", this.state.current_datepicked]], // No specific domain/filter (can be customized)
-        ["case_status_id"] // Fields to group by (priority_level_id)
+        "alert.rules", // The model to query
+        [["date_created", ">=", this.state.current_datepicked]], // No specific domain/filter (can be customized)
+        ["frequency_id"] // Fields to group by (priority_level_id)
       );
 
       const groupedData = {};
       results.forEach((record) => {
-        const statusId = record.case_status_id[0]; // Get case_status_id (ID)
-        const statusName = record.case_status_id[1]; // Get status_level_id.name (Name)
-        if (!groupedData[statusId]) {
-          groupedData[statusId] = { count: 0, name: statusName };
+        const id = record.frequency_id[0]; // Get frequency_id (ID)
+        const Name = record.frequency_id[1]; // Get status_level_id.name (Name)
+        if (!groupedData[id]) {
+          groupedData[id] = { count: 0, name: Name };
         }
-        groupedData[statusId].count++;
+        groupedData[id].count++;
       });
 
       // Prepare the data for Chart.js
@@ -474,7 +510,7 @@ export class IcomplyDashboard extends Component {
         counts.push(data.count); // Priority count
       });
 
-      this.state.categoryChart = {
+      this.state.frequencychart = {
         labels: labels,
         datasets: [
           {
