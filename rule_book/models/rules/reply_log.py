@@ -14,7 +14,6 @@ import json
 import traceback
 from ...controllers.rule_book.rule_book import *
 
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -1332,66 +1331,78 @@ class ReplyLog(models.Model):
         Validate update conditions for reply content and document.
         - Ensures both fields are uploaded together on first submission
         - Prevents both fields from being empty after initial submission
+        - Validates date conditions before allowing updates to reply or document
         """
         # Check if user is attempting to update either reply content or document
         updating_reply_content = "reply_content" in vals
         updating_document = "document" in vals or "document_filename" in vals
 
-        # Check if the record has never been submitted before
-        is_first_submission = not self.document and not self.reply_content
+        for record in self:
+            # Date validation checks only when updating reply content or document
+            if updating_reply_content or updating_document:
+                if record.reminder_due_date and record.reminder_due_date.date() > datetime.today().date():
+                    raise UserError(
+                        _("You cannot modify the reply or upload documents as the Reminder Due Date is in the future."))
+                elif not record.reminder_due_date and record.rulebook_compute_date.date() > datetime.today().date():
+                    raise UserError(
+                        _("You cannot modify the reply or upload documents as the Internal Due Date is in the future."))
 
-        # First-time submission validation
-        if is_first_submission:
-            # For first submission, both reply content and document must be provided together
-            if updating_reply_content and not updating_document:
-                raise AccessError(
-                    _("You must upload a document along with the reply note on first submission."))
+            # Check if the record has never been submitted before
+            is_first_submission = not record.document and not record.reply_content
 
-            if updating_document and not updating_reply_content:
-                raise AccessError(
-                    _("You must provide a reply note along with the document on first submission."))
-
-            # Validate that both fields have content when first submitting
-            if updating_reply_content:
-                if not vals.get("reply_content"):
+            # First-time submission validation
+            if is_first_submission:
+                # For first submission, both reply content and document must be provided together
+                if updating_reply_content and not updating_document:
                     raise AccessError(
-                        _("Reply note cannot be empty."))
+                        _("You must upload a document along with the reply note on first submission."))
 
-            if updating_document:
-                if "document_filename" in vals and not vals.get("document_filename"):
+                if updating_document and not updating_reply_content:
                     raise AccessError(
-                        _("File upload is required."))
+                        _("You must provide a reply note along with the document on first submission."))
 
-                if "document" in vals and not vals.get("document"):
-                    raise AccessError(
-                        _("File upload is required."))
+                # Validate that both fields have content when first submitting
+                if updating_reply_content:
+                    if not vals.get("reply_content"):
+                        raise AccessError(
+                            _("Reply note cannot be empty."))
 
-            # If both fields are valid on first submission, update status
-            if updating_reply_content and updating_document:
-                vals["rulebook_status"] = "submitted"
-                vals["reply_date"] = fields.Datetime.now()
+                if updating_document:
+                    if "document_filename" in vals and not vals.get("document_filename"):
+                        raise AccessError(
+                            _("File upload is required."))
 
-        # Validation for subsequent updates
-        else:
-            # Check if attempting to empty both reply content and document
-            is_emptying_reply_content = (
-                updating_reply_content and
-                (vals.get("reply_content") == '' or vals.get("reply_content") is False)
-            )
+                    if "document" in vals and not vals.get("document"):
+                        raise AccessError(
+                            _("File upload is required."))
 
-            is_emptying_document = (
-                updating_document and
-                (
-                    (vals.get("document") is False) and
-                    (vals.get("document_filename") ==
-                     '' or vals.get("document_filename") is False or vals.get("document") == '')
+                # If both fields are valid on first submission, update status
+                if updating_reply_content and updating_document:
+                    vals["rulebook_status"] = "submitted"
+                    vals["reply_date"] = fields.Datetime.now()
+
+            # Validation for subsequent updates
+            else:
+                # Check if attempting to empty both reply content and document
+                is_emptying_reply_content = (
+                    updating_reply_content and
+                    (vals.get("reply_content") ==
+                    '' or vals.get("reply_content") is False)
                 )
-            )
 
-            # If both fields are being emptied, raise an exception
-            if is_emptying_reply_content or is_emptying_document:
-                raise AccessError(_(
-                    "Your reply note and the document cannot be empty. "
-                ))
+                is_emptying_document = (
+                    updating_document and
+                    (
+                        (vals.get("document") is False) and
+                        (vals.get("document_filename") ==
+                        '' or vals.get("document_filename") is False or vals.get("document") == '')
+                    )
+                )
+
+                # If both fields are being emptied, raise an exception
+                if is_emptying_reply_content or is_emptying_document:
+                    raise AccessError(_(
+                        "Your reply note and the document cannot be empty. "
+                    ))
 
         return vals

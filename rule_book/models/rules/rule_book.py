@@ -1950,20 +1950,26 @@ class Rulebook(models.Model):
         return lagos_date
 
     def clean_html_in_type_of_return(self):
+        """
+        Clean HTML tags from type_of_return field and capitalize the first letter of each word.
+        """
         # Fetch all rulebook records (you can apply filters if needed)
         rulebooks = self.search([('type_of_return', '!=', False)])
 
         for rulebook in rulebooks:
             # Clean the 'type_of_return' field by removing HTML tags and entities
-            clean_value = re.sub(r'(<[^>]+>|&\w+;)',
-                                 '', rulebook.type_of_return)
+            clean_value = re.sub(r'(<[^>]+>|&\w+;)', '', rulebook.type_of_return)
             clean_value = re.sub(r'\s+', ' ', clean_value).strip()
 
-            # Update the record with the cleaned value
+            # Capitalize the first letter of each word
+            clean_value = ' '.join(word.capitalize()
+                                for word in clean_value.split())
+
+            # Update the record with the cleaned and capitalized value
             if clean_value != rulebook.type_of_return:
                 rulebook.sudo().write({'type_of_return': clean_value})
                 _logger.critical(
-                    f"Updated rulebook {rulebook.id}: Cleaned type_of_return field.")
+                    f"Updated rulebook {rulebook.id}: Cleaned and capitalized type_of_return field.")
 
     def update_time_zone_for_all_users(self):
         users = self.env['res.users'].search([])  # Get all users

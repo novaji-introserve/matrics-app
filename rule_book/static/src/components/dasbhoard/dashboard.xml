@@ -310,7 +310,7 @@ RuleBook Source
 													<div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
 														<div class="me-2">
 															<a t-att-href="date.link" class="text-decoration-none text-black">
-																<h6 class="mb-0" t-esc="date.rulebook_name">
+																<h6 class="mb-1" t-esc="date.rulebook_name">
 																</h6>
 															</a>
 															<small>
@@ -339,7 +339,7 @@ RuleBook Source
 												Regulatory Due Dates
 											</h5>
 											<p class="card-subtitle">
-												Upcoming Regulatory dates
+												Upcoming regulatory dates
 											</p>
 										</div>
 										
@@ -395,7 +395,7 @@ RuleBook Source
 												Reminder Dates
 											</h5>
 											<p class="card-subtitle">
-												Upcoming Reminders
+												Upcoming reminders
 											</p>
 										</div>
 
