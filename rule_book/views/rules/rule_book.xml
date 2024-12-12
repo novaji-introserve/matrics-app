@@ -119,7 +119,9 @@
                                 <field name="semi_annual_day2" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Day of second month" help="Enter a valid day for the selected month"/>
                             </group>
                             <group col="2">
-                                <field name="computed_date" readonly="1" placeholder="Next internal due date will be shown here" string="Due date"/>
+                                <!-- <field name="computed_date" readonly="1" placeholder="Next internal due date will be shown here" string="Due date"/> -->
+                                <field name="formatted_rulebook_date" readonly="1" placeholder="Next internal due date will be shown here" string="Due date" />
+
 
                             </group>
                             
@@ -139,7 +141,9 @@
                             <field name="escalation_date_unit" placeholder="Select escalation date unit" help="Date Unit for when this rulebook should be escalated" />
                         </group>
                         <group col="2">
-                            <field name="escalation_date" readonly="1" placeholder="Escalation date will be displayed here" />
+                            <!-- <field name="escalation_date" readonly="1" placeholder="Escalation date will be displayed here" /> -->
+                            <field name="formatted_escalation_date" readonly="1" placeholder="Escalation date will be displayed here"  string=" Escalation Due date" />
+
                         </group>
                     </page>
 
@@ -151,7 +155,9 @@
                                 <field name="reg_due_date_unit" help="Select Regulatory due date unit" />
                             </group>
                             <group col="2">
-                                <field name="reg_due_date" readonly="1" help="Regulatory due date will be shown here" />
+                                <!-- <field name="reg_due_date" readonly="1" help="Regulatory due date will be shown here" /> -->
+                                <field name="formatted_regulatory_date" readonly="1" help="Regulatory due date will be shown here" string="Regulatory Due date" />
+
                             </group>
                         </group>
                     </page>
@@ -164,7 +170,9 @@
                                 <field name="reminder_due_date_unit" placeholder="Select Reminder due date unit" />
                             </group>
                             <group col="2">
-                                <field name="reminder_due_date" readonly="1" placeholder="Reminder due date will be shown here" />
+                                <!-- <field name="reminder_due_date" readonly="1" placeholder="Reminder due date will be shown here" /> -->
+                                <field name="formatted_reminder_date" readonly="1" placeholder="Reminder due date will be shown here" string="Reminder Due date" />
+
                             </group>
                         </group>
                     </page>
