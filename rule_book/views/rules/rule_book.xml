@@ -213,8 +213,9 @@
 
                 </searchpanel>
                 <!-- Standard search fields -->
-                <field name="name" string="Title" />
+                <field name="name" string="Source" />
                 <field name="description" string="Description" />
+                <field name="type_of_return" string="Type Of Return" />
                 
                 <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">
 
