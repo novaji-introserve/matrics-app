@@ -13,7 +13,7 @@ import logging
 import smtplib
 from time import sleep
 import logging
-
+from collections import defaultdict
 
 _logger = logging.getLogger(__name__)
 
@@ -25,18 +25,18 @@ class alert_rules(models.Model):
     _order = 'id desc'
     
     name = fields.Char(string="Name", required=True, Tracking=True)
-    narration = fields.Html(string="narration", required=True)
-    sql_text = fields.Many2one("process.sql",string="SQL Query", required=True)
-    frequency_id = fields.Many2one('exception.frequency', string="Frequency", required=True)
+    narration = fields.Html(string="narration", required=True, tracking=True)
+    sql_text = fields.Many2one("process.sql",string="SQL Query", required=True, tracking=True)
+    frequency_id = fields.Many2one('exception.frequency', string="Frequency", required=True, tracking=True)
     process_id = fields.Many2one('process', string="Process")
     process_category_id = fields.Many2one('process.category', string="Process Category", required=True)
-    email_to = fields.Char(string="Email To", Tracking=True)
     status = fields.Selection(
     [("1", "Active"), ("0", "Inactive")],
     default="1",  # The default value is an integer (1)
-    string="Alert Status"
+    string="Alert Status",
+    tracking=True
     )
-    process_id = fields.Many2one('process', string="Process", domain="[('process_category_id', '=', process_category_id)]")
+    process_id = fields.Many2one('process', string="Process", domain="[('process_category_id', '=', process_category_id)]", tracking=True)
     risk_rating = fields.Selection(
         selection=[("low", "Low"),("medium", "Medium"), ("high", "High")],
         default= "low",  # The default value is the first risk rating
@@ -149,33 +149,34 @@ class alert_rules(models.Model):
                             branches.append(subbranchcode)
 
                     # Initialize a dictionary to store the emails by branch
-                    branch_emails = {}
+                    branch_emails = defaultdict(list)
 
                     for branch in branches:
                         
-                        # Search for records in the email.branch model that match the current branch
-                        email_branch = self.env['email.branch'].search([("branch_id.id", '=', int(branch))])
+                    #     # Search for records in the email.branch model that match the current branch
+                    #    
+                        email_branch = self.env['res.branch'].sudo().search([("id", '=', int(branch))])
                         
                         if email_branch:
-                                email_list = email_branch.email_list
-                                branch_emails[email_branch.branch_id.id] = email_list
-                                                    
+                                for user in email_branch.users:
+                                    branch_emails[email_branch.id].append(user.email)      
 
                     for key, bEmails in branch_emails.items():
                         self.env.cr.execute(f"{rule.sql_text.query} WHERE subbranchcode = '{key}';")
                         rowsForEachBranch = self.env.cr.fetchall()
                 
-                        # Get column names dynamically
-                        columnsForEachBranch = [desc[0] for desc in self.env.cr.description]
+        #                 # Get column names dynamically
+                        columnsForEachBranch = [" ".join(desc[0].split("_")).title() for desc in self.env.cr.description]
                         
-                                 # Create a CSV in memory
+        #                          # Create a CSV in memory
                         csv_buffer = io.StringIO()
                         csv_writer = csv.writer(csv_buffer)
+                        
 
-                        # Write headers to the CSV
+        #                 # Write headers to the CSV
                         csv_writer.writerow(columnsForEachBranch)
 
-                        # Write data rows to the CSV
+        #                 # Write data rows to the CSV
                         for row in rowsForEachBranch:
                             csv_writer.writerow(row)
                         
@@ -183,11 +184,11 @@ class alert_rules(models.Model):
                         csv_buffer.close()
                         
                         
-                        # Step 3: Base64 encode the CSV content
+        #                 # Step 3: Base64 encode the CSV content
                         encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
                         
              
-                        # Create the HTML table for the email
+        #                 # Create the HTML table for the email
                     
                         table_html = """
                         <table class="table table-bordered table-hover" style="width: 100%; max-width: 100vw; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #ddd; overflow:auto;">
@@ -226,7 +227,7 @@ class alert_rules(models.Model):
                             
 
                                 
-                                # generate random string attached for each alert to be send
+        #                         # generate random string attached for each alert to be send
                                 alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
                                 
                                
@@ -241,7 +242,7 @@ class alert_rules(models.Model):
                                 
                                 attachment_id = self.env['ir.attachment'].create(attachment)
                                 
-                                # record the history
+        #                         # record the history
                                 new_alert_history = self.env['alert.history'].create({
                                     "alert_id": alert_id,
                                     "attachment_data": attachment_id.id,
@@ -250,10 +251,10 @@ class alert_rules(models.Model):
                                     "alert_rule_id": rule.id,
                                     "process_id": rule.process_id.name,
                                     "process_category": rule.process_category_id.name,
-                                    "risk_rating": rule.risk_rating.name,
+                                    "risk_rating": rule.risk_rating,
                                     "date_created": rule.date_created,
                                     "last_checked": rule.last_checked,
-                                    "email": bEmails,
+                                    "email": ",".join(bEmails),
                                     "narration": rule.narration
                                 
                                 })

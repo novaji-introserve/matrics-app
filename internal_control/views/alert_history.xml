@@ -26,22 +26,37 @@
             <form string="Alert History List" readonly="1">
                 <header>
                     <!-- Add the button to generate and download CSV -->
-                    <button name="generate_csv" type="object" string="Download CSV" class="btn-success" />
+                    <button name="generate_csv" type="object" string="Download CSV" style="background-color: #007046;" />
                 </header>
                <sheet>
+                <div class="oe_title">
+                    <label for="alert_id" class="oe_edit_only" />
+                    <h1>
+                        <field name="alert_id" string="ALERT ID" />
+                    </h1>
+                </div>
                 <group>
-                    <group>
-                        <field name="alert_id" />
-                        <field name="process_category" />
-                        <field name="last_checked" />
+                    <group string="PROCESS CATEGORY">
+                        <field name="process_category" string="Category"/>
                     </group>
-                    <group>
-                        <field name="risk_rating" />
-                    
-                        <field name="date_created" />
+                    <group string="RISK RATING">
+                        <field name="risk_rating" string="Rating"/>
                     </group>
                 </group>
-                <field name="html_body" widget="html" />
+
+                <group string="DATE INFORMATION">
+                    <group>
+                        <field name="last_checked" string="Last Checked" />
+                    </group>
+                    <group>
+                        <field name="date_created" string="Date Created" />
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Record">
+                        <field name="html_body" widget="html" />
+                    </page>
+                </notebook>
                </sheet>
             </form>
         </field>

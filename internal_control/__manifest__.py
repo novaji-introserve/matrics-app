@@ -25,7 +25,6 @@
         'security/ir.model.access.csv',
         'views/actions.xml',
         'views/alert_rules_view.xml',
-        'views/alert_group_view.xml',
         'views/alert_history.xml',
         'views/account_monitoring_views.xml',
         'views/transaction_rule.xml',
@@ -36,12 +35,9 @@
         'views/frequency_view.xml',
         'views/process_view.xml',
         'views/process_category_view.xml',
-        'views/branch_view.xml',
         'views/department.xml',
-        # 'views/user_profile.xml',
         'views/cron_job.xml',
         'views/sql_view.xml', 
-        'views/emailbranch.xml',
         'views/menus.xml',
         
         

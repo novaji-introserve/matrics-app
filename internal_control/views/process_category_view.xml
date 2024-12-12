@@ -19,10 +19,16 @@
         <field name="arch" type="xml">
             <form string="Process Category Form">
                 <sheet>
-                    <group>
-                        <field name="name" />
-                        <field name="description" />
-                    </group>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <div class="oe_title">
+                        <label for="description" class="oe_edit_only" />
+                        <h2><field name="description" /></h2>
+                    </div>
                 </sheet>
             </form>
         </field>

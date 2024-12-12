@@ -1,39 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 <record id="view_tbl_branch_tree" model="ir.ui.view">
-    <field name="name">tbl.branch.tree</field>
-    <field name="model">tbl.branch</field>
+    <field name="name">res.branch.tree</field>
+    <field name="model">res.branch</field>
     <field name="arch" type="xml">
         <tree string="Branch">
-            <field name="branch_code"/>
-            <field name="branch_name"/>
-            <field name="users"/>
+            <field name="code"/>
+            <field name="name"/>
+            <field name="users"/> 
         </tree>
     </field>
 </record>
 
 <record id="view_tbl_branch_form" model="ir.ui.view">
-    <field name="name">tbl.branch.form</field>
-    <field name="model">tbl.branch</field>
+    <field name="name">res.branch.form</field>
+    <field name="model">res.branch</field>
     <field name="arch" type="xml">
         <form string="Branch">
             <sheet>
                 
-                   <group>
-                    <field name="branch_code"/>
-                    <field name="branch_name"/>
+                <group>
+                    <field name="code"/>
+                    <field name="name"/>
                     <field name="users" widget="many2many_tags"/>
-                   </group>
-    
-               
+                </group>
             </sheet>
         </form>
     </field>
 </record>
 
-<record id="action_tbl_branch" model="ir.actions.act_window">
+<record id="action_res_branch" model="ir.actions.act_window">
     <field name="name">Branches</field>
-    <field name="res_model">tbl.branch</field>
+    <field name="res_model">res.branch</field>
     <field name="view_mode">tree,form</field>
 </record>
 
