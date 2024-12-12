@@ -3,7 +3,7 @@ from odoo.exceptions import ValidationError
 class Exception_frequency(models.Model):
     _name = 'exception.frequency'
     _description = 'exception Frequency rate'
-    
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = "representation"
 
     name = fields.Selection(

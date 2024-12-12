@@ -29,6 +29,8 @@
         'views/account_monitoring_views.xml',
         'views/transaction_rule.xml',
         'views/transaction_monitoring_views.xml',
+        'views/customer.xml',
+        'views/customer_account.xml',
         'views/tinymce.xml',
         'views/mail_template.xml',
         'views/fraud_monitoring_views.xml',

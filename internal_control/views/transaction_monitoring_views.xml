@@ -10,6 +10,14 @@
                 <form string="Transaction Details" create="false" edit="false" delete="false">
                     
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
+                                <span>Risk
+                                    <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
+                                        decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('lowel')" />
+                                </span>
+                            </button>
+                        </div>
                         <!-- Title Section -->
                         <div class="oe_title">
                             <h1>
@@ -23,6 +31,7 @@
                                 <field name="tran_currency_null" readonly="1" />
                             </group>
                             <group>
+                                <field name="likely_fraud" widget="boolean_toggle" readonly="1" />
                                 <field name="tellerno_null" readonly="1" />
                                 <field name="narration_null" readonly="1" />
                             </group>
@@ -38,6 +47,7 @@
                                         <field name="actual_date_null" readonly="1" />
                                     </group>
                                     <group string="Amount Details">
+                                        <field name="amount" readonly="1" string="Amount" />
                                         <field name="crossrate_null" readonly="1" />
                                         <field name="charge_null" readonly="1" />
                                     </group>
@@ -109,9 +119,13 @@
                     <field name="reversal_null" />
                     <field name="account_module_null" />
                     <field name="tellerno_null" />
-                    <field name="status_null" />
                     <field name="accountnumber_null" />
                     <field name="tran_channel_null" />
+                    <field name="likely_fraud" widget="boolean_toggle" readonly="1" />
+                    <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
+                        decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('lowel')" />
+                    <field name="state" widget="badge" decoration-warning="state in ('new')" decoration-success="state in ('done')" />
+                    
                     <field name="request_id_null" />
                     <field name="rrn_null" />
                 </tree>

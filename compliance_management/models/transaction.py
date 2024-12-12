@@ -2,7 +2,6 @@
 
 from odoo import models, fields, api, _
 
-
 class Transaction(models.Model):
     _name = 'res.customer.transaction'
     _description = 'Transaction'
@@ -49,24 +48,26 @@ class Transaction(models.Model):
         if rules:
             for rule in rules:
                 # try:
-                query = rule.sql_query
-                char_to_replace = {'#AMOUNT#': f"{self.amount}",
-                                   '#ACCOUNT_ID#': f"{self.account_id.id}",
-                                   "#CUSTOMER_ID#": f"{self.customer_id.id}",
-                                   "#TRAN_DATE#": f"{self.date_created}",
-                                   "#BRANCH_ID#": f"{self.branch_id.id}",
-                                   "#CURRENCY_ID#": f"{self.currency_id.id}"}
-                # Iterate over all key-value pairs in dictionary
-                for key, value in char_to_replace.items():
-                    # Replace key character with value character in string
-                    query = query.replace(key, value)
-                self.env.cr.execute(query)
-                rec = self.env.cr.fetchone()
-                if rec is not None:
-                    self.rule_id = rule
-                    self.risk_level = rule.risk_level
-                    return
-            
+                    query = rule.sql_query
+                    char_to_replace = {'#AMOUNT#': f"{self.amount}",
+                                    '#ACCOUNT_ID#': f"{self.account_id.id}",
+                                    "#CUSTOMER_ID#": f"{self.customer_id.id}",
+                                    "#TRAN_DATE#": f"{self.date_created}",
+                                    "#BRANCH_ID#": f"{self.branch_id.id}",
+                                    "#CURRENCY_ID#": f"{self.currency_id.id}"}
+                    # Iterate over all key-value pairs in dictionary
+                    for key, value in char_to_replace.items():
+                        # Replace key character with value character in string
+                        query = query.replace(key, value)
+                        
+                    self.env.cr.execute(query)
+                   
+                    rec = self.env.cr.fetchone()
+                    if rec is not None:
+                        self.rule_id = rule
+                        self.risk_level = rule.risk_level
+                        return
+                
 
     @api.model
     def open_transactions(self):
