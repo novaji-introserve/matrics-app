@@ -16,6 +16,8 @@
                 <field name="submission_timing" widget="badge" decoration-info="submission_timing == 'pending'" decoration-success="submission_timing == 'early'" decoration-warning="submission_timing == 'late'" decoration-danger="submission_timing == 'not_responded'" />
                 <field name="rulebook_status" widget="badge" decoration-muted="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'" />
                 <field name="reporter" string="Officer Responsible" />
+                <field name="reg_due_date" optional="hide" string="Regulatory Due Date"/>
+
 
                 <field name="active" invisible="1" />
 
@@ -58,6 +60,10 @@
                         </group>
                         <group class="mt-3">
                             <field name="reporter" readonly="1" string="Officer Responsible" />
+                            <!-- <field name="officer_cc" widget="many2many_tags" readonly="1" string="Officer(s) Copied To This Return"/> -->
+                            <field name="officer_cc" widget="many2many_tags" readonly="1" string="Officer(s) Included in This Return" attrs="{'invisible': [('officer_cc', '=', [])]}" />
+
+
                             <field name="department_id" readonly="1" string="Department Responsible" />
 
                             <!-- <field name="rulebook_compute_date" string="computed date" readonly="0"/> -->

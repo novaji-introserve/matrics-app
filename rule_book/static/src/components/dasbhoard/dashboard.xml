@@ -262,7 +262,7 @@ RuleBook Source
 													<div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
 														<div class="me-2">
 															<a t-att-href="date.link" class="text-decoration-none text-black">
-																<h6 class="mb-0" t-esc="date.rulebook_name">
+																<h6 class="mb-1" t-esc="date.rulebook_name">
 																</h6>
 															</a>
 															<small>
@@ -363,7 +363,7 @@ RuleBook Source
 														<div class="me-2">
 															<!-- Main Title -->
 															<a t-att-href="date.link" class="text-decoration-none text-black">
-																<h6 class="mb-0" t-esc="date.rulebook_name">
+																<h6 class="mb-1" t-esc="date.rulebook_name">
 																</h6>
 															</a>
 															<!-- Subtitle -->
@@ -415,7 +415,7 @@ RuleBook Source
 														<div class="me-2">
 															<!-- Main Title -->
 															<a t-att-href="date.link" class="text-decoration-none text-black">
-																<h6 class="mb-0" t-esc="date.rulebook_name">
+																<h6 class="mb-1" t-esc="date.rulebook_name">
 																</h6>
 															</a>
 															<!-- Subtitle -->
