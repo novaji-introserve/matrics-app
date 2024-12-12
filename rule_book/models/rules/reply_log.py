@@ -78,7 +78,7 @@ class ReplyLog(models.Model):
         tracking=True,
         string="Inputer",
         required=True,
-        help="The user responsible for this rulebook reply.",
+        help="The primary user responsible for this rulebook reply.",
         store=True,
 
     )
