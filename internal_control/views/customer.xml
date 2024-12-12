@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_customer_form_inherited" model="ir.ui.view">
+        <field name="name">customer.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="compliance_management.customer_actions_inherit_res_partner" />
+        <field name="arch" type="xml">
+           
+            <xpath expr="//header" position="replace">
+                <header />
+            </xpath>
+            <xpath expr="//page[@name='plans']" position="replace" />
+             <xpath expr="//page[@name='accounts']" position="replace" /> 
+            <xpath expr="//page[@name='risk_assessment']" position="replace" />
+            <xpath expr="//page[@name='sanction_screening']" position="replace" />
+            <xpath expr="//page[@name='edd_record']" position="replace" />
+            <!-- <xpath expr="//page[@name='accounting']" position="replace" />  -->
+          
+        </field>
+    </record>
+
+
+    <!-- Tree View -->
+    <!-- <record id="view_transaction_monitoring_tree" model="ir.ui.view">
+        <field name="name">transaction.monitoring.tree</field>
+        <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
+        <field name="model">res.customer.transaction</field>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="replace">
+                
+            </xpath>
+
+        </field>
+    </record> -->
+
+
+
+   
+</odoo>

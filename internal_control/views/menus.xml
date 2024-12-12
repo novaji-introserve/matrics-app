@@ -276,13 +276,35 @@
         parent="menu_internal_control_configurations" 
         action="action_process_sql" sequence="50" />
 
-        <menuitem id="menu_user_profile" 
+    <menuitem id="menu_user_profile" 
             name="Users" 
             parent="menu_internal_control_configurations" 
             action="base.action_res_users" 
             sequence="90"/>
-            />
-        
+    />
+
+
+    <menuitem id="menu_customer_management" 
+            name="Customer Management"  
+            parent="menu_internal_control_main" 
+            sequence="20"/>
+    />
+   
+    <menuitem id="menu_customer" 
+            name="Customer"  
+            parent="menu_customer_management" 
+            action="compliance_management.contacts_action_contacts_inherit"
+            sequence="10"/>
+    />
+   
+    
+    <menuitem id="menu_account" 
+            name="Account"  
+            parent="menu_customer_management" 
+            action="action_customer_account"
+            sequence="10"/>
+    />
+    
    
 
 </odoo>

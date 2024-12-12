@@ -210,7 +210,7 @@ class TransactionMonitoring(models.Model):
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
             'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'new')],
-            'context': {'group_by': ['subbranchcode']},
+           'context': {'search_default_group_branch': 1, 'default_state': 'new'}
         }
 
     @api.model
@@ -222,7 +222,8 @@ class TransactionMonitoring(models.Model):
             'view_mode': 'tree,form',
             'domain': [('state', '=', 'done')],
             'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'done')],
-            'context': {'group_by': ['subbranchcode']},
+            # 'context': {'search_default_group_by': ['subbranchcode']},
+            'context': {'search_default_group_branch': 1, 'default_state': 'new'}
            
         }
 
@@ -235,6 +236,6 @@ class TransactionMonitoring(models.Model):
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
             'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id])],
-            'context': {'group_by': ['subbranchcode']},
+            'context': {'search_default_group_branch': 1, 'default_state': 'new'}
         }
 
