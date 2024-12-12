@@ -513,6 +513,8 @@ class ReplyLog(models.Model):
             now = datetime.now()
             now_without_microseconds = now.replace(microsecond=0)
             
+            global global_data
+            
             global_data = {
                 "email_from":  os.getenv("EMAIL_FROM"),
                 "email_to": rulebook.first_line_escalation.email,
@@ -598,6 +600,7 @@ class ReplyLog(models.Model):
     def set_global_data(self, data):
         global global_data
         global_data = data
+        
 
     def create(self, vals):
 
@@ -1029,7 +1032,8 @@ class ReplyLog(models.Model):
                 return {}
             now = datetime.now()
             now_without_microseconds = now.replace(microsecond=0)
-            global global_data
+            
+            global global_data            
             global_data = {
                 "officer_responsible": rulebook.officer_responsible.name or "N/A",
                 "responsible_id": rulebook.responsible_id.name or "N/A",
@@ -1038,7 +1042,7 @@ class ReplyLog(models.Model):
                 "record_link": self._record_link(self.id) or "N/A",
                 "upload_link": self._compute_upload_link(self.id) or "N/A",
                 "current_year": fields.Date.today().year,
-                "rulebook_return": re.sub(r'(<[^>]+>|&\w+;)', '', rulebook.type_of_return) or "N/A",
+                "rulebook_return": re.sub(r'(<[^>]+>|&\w+;)', '', self.rulebook_name) or "N/A",
                 "regulatory_name": rulebook.regulatory_agency_id.name or "N/A",
                 "risk_category": rulebook.risk_category.name if rulebook.risk_category else "N/A",
                 "email_to": rulebook.officer_responsible.email or "N/A",
