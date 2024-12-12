@@ -288,6 +288,10 @@ class Rulebook(models.Model):
     date_value = fields.Datetime(
         string="Date", help="Specify the exact date for the regulatory action."
     )
+    
+    time_value = fields.Float(
+        string="Time Value", help="Specify the exact time for the regulatory action."
+    )
 
     day_value = fields.Integer(
         string="Day", help="Specify the day of the month for the regulatory action.",
@@ -417,6 +421,8 @@ class Rulebook(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
+        
+        
     def data(self):
         # send the global value to the email template
         return global_data
@@ -523,7 +529,7 @@ class Rulebook(models.Model):
             })
             return False
 
-    @api.depends("frequency_type", "date_value", "day_value", "month_value", "day_of_week",
+    @api.depends("frequency_type", "date_value","time_value", "day_value", "month_value", "day_of_week",
                  "quarter_day", "bi_monthly_day1", "bi_monthly_day2", "semi_annual_month1",
                  "semi_annual_month2", "semi_annual_day1", "semi_annual_day2", "year_month_value")
     def _compute_date(self):
@@ -834,8 +840,9 @@ class Rulebook(models.Model):
                         _logger.error(f"Error creating three-yearly date: {e}")
                         record.computed_date = default_time
 
-            elif record.frequency_type == "immediate":
+            elif record.frequency_type == "immediate" :
                 record.computed_date = today
+                # record.computed_date = today + timedelta(hours=record.time_value)                
                 record.is_recurring = False
                 
 
@@ -1067,6 +1074,9 @@ class Rulebook(models.Model):
                     f"No officer responsible for record {self.id}")
                 return {}
 
+
+            now = datetime.now()
+            now_without_microseconds = now.replace(microsecond=0)
             global global_data
             global_data = {
                 "officer_responsible": self.officer_responsible.name or "N/A",
@@ -1088,6 +1098,7 @@ class Rulebook(models.Model):
                 "computed_date": self._compute_formatted_date(self.computed_date) or "N/A",
                 "escalation_date": self.escalation_date or "N/A",
                 "reg_due_date": self._compute_formatted_date(self.reg_due_date) or "N/A",
+                "datetime": self._compute_formatted_date(now_without_microseconds)
 
             }
 
@@ -1120,7 +1131,7 @@ class Rulebook(models.Model):
             # Find the email template
             try:
                 template = self.env.ref(
-                    "rule_book.email_template_internal_due_date_")
+                    "rule_book.email_template_internal_due_date_immediate_")
             except ValueError:
                 _logger.critical("internal_due_date Email template not found")
                 return False
@@ -1128,7 +1139,7 @@ class Rulebook(models.Model):
             # Detailed logging for debugging
             _logger.critical(
                 f"Attempting to send internal_due_date email for record {self.id}")
-            _logger.critical(f"Email data: {email_data}")
+            _logger.critical(f"Email data from Rulebool model: {email_data}")
 
             # Send the email
             email_result = template.send_mail(self.id, force_send=True)
@@ -1502,47 +1513,7 @@ class Rulebook(models.Model):
         except Exception as e:
             _logger.error(f"Error updating risk rating: {e}")
 
-    # def _compute_formatted_date(self, dt):
-    #     """
-    #     Format datetime to format like '21st of November, 2024 by 2pm'
-    #     Args:
-    #         dt: datetime object
-    #     Returns:
-    #         str: Formatted date string
-    #     """
-    #     if not dt:
-    #         return ""
-
-    #     try:
-    #         # Ordinal suffixes lookup
-    #         if dt.tzinfo is None:
-
-    #             dt = dt.replace(tzinfo=pytz.utc)
-
-    #     # Convert to the desired timezone (e.g., Africa/Lagos)
-    #         lagos_tz = pytz.timezone("Africa/Lagos")
-    #         dt = dt.astimezone(lagos_tz)
-
-    #         SUFFIXES = {
-    #             1: "st", 2: "nd", 3: "rd",
-    #             21: "st", 22: "nd", 23: "rd",
-    #             31: "st"
-    #         }
-
-    #         # Get day suffix
-    #         day_suffix = SUFFIXES.get(dt.day, "th")
-
-    #         # Format date
-    #         formatted_time = dt.strftime(
-    #             f"%-d{day_suffix} of %B, %Y by %-I%p").lower()
-
-    #         _logger.critical(f"formatted time %s: {formatted_time}")
-
-    #         return formatted_time
-
-    #     except Exception as e:
-    #         _logger.error(f"Date formatting error: {e}")
-    #         return str(dt)
+    
 
     def _compute_formatted_date(self, dt):
         """
@@ -1557,19 +1528,12 @@ class Rulebook(models.Model):
 
         try:
             # Check if datetime has timezone info, if not, set to UTC
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=pytz.utc)
-
-            # Convert to the desired timezone (e.g., Africa/Lagos)
-            lagos_tz = pytz.timezone("Africa/Lagos")
-            dt = dt.astimezone(lagos_tz)
-            dt = datetime.now().replace(microsecond=0)
 
             # Format the date and time as "November 28, 2024 07:44 AM"
             formatted_time = dt.strftime("%B %d, %Y %I:%M %p")
 
-            # Log formatted time for debugging
-            _logger.critical(f"formatted time: {formatted_time}")
+            # # Log formatted time for debugging
+            # _logger.critical(f"formatted time: {formatted_time}")
 
             return formatted_time
 

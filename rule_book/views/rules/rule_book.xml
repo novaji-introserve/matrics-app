@@ -92,6 +92,7 @@
                                 <field name="date_value" attrs="{'invisible': [('frequency_type', 'not in', ['date'])]}" placeholder="Enter date value" />
                                 <field name="day_value" attrs="{'invisible': [('frequency_type', 'not in', ['day_of_month', 'day_every_month','yearly','three_yearly'])]}" help="Enter day value (1-28)" />
                                 <field name="month_value" attrs="{'invisible': [('frequency_type', 'not in', ['day_of_month','three_yearly','yearly'])]}" placeholder="Select month value" />
+                                <!-- <field name="time_value" attrs="{'invisible': [('frequency_type', 'not in', ['immediate'])]}" placeholder="Select time value" /> -->
                                 <!-- <field name="year_month_value" attrs="{'invisible': [('frequency_type', 'not in', ['1yearly'])]}" help="Enter month value (1-12)" /> -->
 
 
@@ -118,7 +119,7 @@
                                 <field name="semi_annual_day2" attrs="{'required': [('frequency_type', '=', 'semi_annually')]}" placeholder="Day of second month" help="Enter a valid day for the selected month"/>
                             </group>
                             <group col="2">
-                                <field name="computed_date" readonly="0" placeholder="Next internal due date will be shown here" string="Due date"/>
+                                <field name="computed_date" readonly="1" placeholder="Next internal due date will be shown here" string="Due date"/>
 
                             </group>
                             
@@ -216,6 +217,7 @@
                 <field name="name" string="Source" />
                 <field name="description" string="Description" />
                 <field name="type_of_return" string="Type Of Return" />
+                <field name="frequency_type" string="Frequency Type" />
                 
                 <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">
 
