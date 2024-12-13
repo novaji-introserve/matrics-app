@@ -39,6 +39,33 @@ class Rulebook(models.Model):
         help="Rulebook Source document.",
         # default=""
     )
+    
+    computed_date_adjusted = fields.Boolean(
+        'Computed Date Adjusted', default=False)
+    
+    formatted_rulebook_date = fields.Char(
+        string="Formatted Rulebook Date",
+        compute="_compute_formatted_rulebook_date",        # store=True
+
+    )
+    
+    formatted_regulatory_date = fields.Char(
+        string="Formatted Regulatory Date",
+        compute="_compute_formatted_regulatory_date",
+        # store=True
+    )
+
+    formatted_reminder_date = fields.Char(
+        string="Formatted Reminder Date",
+        compute="_compute_formatted_reminder_date",
+        # store=True
+    )
+
+    formatted_escalation_date = fields.Char(
+        string="Formatted Escalation Date",
+        compute="_compute_formatted_escalation_date",
+        # store=True
+    )
 
 
     risk_rating = fields.Selection(
@@ -455,6 +482,7 @@ class Rulebook(models.Model):
                 record.risk_rating = record.risk_category.risk_priority
             else:
                 record.risk_rating = False
+                
     @api.onchange('semi_annual_month1', 'semi_annual_month2')
     def _onchange_semi_annual_months(self):
         if self.semi_annual_month1 == self.semi_annual_month2:
@@ -529,19 +557,20 @@ class Rulebook(models.Model):
             })
             return False
 
+   
     @api.depends("frequency_type", "date_value","time_value", "day_value", "month_value", "day_of_week",
                  "quarter_day", "bi_monthly_day1", "bi_monthly_day2", "semi_annual_month1",
                  "semi_annual_month2", "semi_annual_day1", "semi_annual_day2", "year_month_value")
     def _compute_date(self):
        
-        today = fields.Datetime.now() - timedelta(hours=1)
+        today =  datetime.now()
 
         # Get the weekday (0 = Monday, 6 = Sunday)
         current_weekday = today.weekday()
 
         # Combine the date and set the time to 10:00 AM (Lagos time)
         default_time = datetime.combine(today.date(), datetime.min.time()).replace(
-            hour=15, minute=0, second=0
+            hour=16, minute=0, second=0
         )
 
 
@@ -572,7 +601,7 @@ class Rulebook(models.Model):
                             target_year += 1
 
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{target_year}-{month_value:02d}-{day_value:02d} 15:00:00"
+                            f"{target_year}-{month_value:02d}-{day_value:02d} 16:00:00"
                         )
                         # record.computed_date = datetime(
                         #     target_year, month_value, day_value, 8, 0, 0)
@@ -582,7 +611,7 @@ class Rulebook(models.Model):
                     except ValueError:
                         next_month = (month_value % 12) + 1
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{target_year}-{next_month:02d}-{day_value:02d} 15:00:00"
+                            f"{target_year}-{next_month:02d}-{day_value:02d} 16:00:00"
                         )
                         
 
@@ -595,7 +624,7 @@ class Rulebook(models.Model):
                     year = today.year if today.month < 12 else today.year + 1
                     try:
                         record.computed_date = fields.Datetime.to_datetime(
-                            f"{year}-{next_month:02d}-{int(record.day_value):02d} 15:00:00"
+                            f"{year}-{next_month:02d}-{int(record.day_value):02d} 16:00:00"
                         )
 
                         record.is_recurring = True
@@ -621,7 +650,7 @@ class Rulebook(models.Model):
                         record.computed_date = datetime.combine(
                             next_date,
                             datetime.min.time()
-                        ).replace(hour=15, minute=0, second=0)
+                        ).replace(hour=16, minute=0, second=0)
                         
 
                     except (ValueError, TypeError):
@@ -704,7 +733,7 @@ class Rulebook(models.Model):
                         year,
                         next_quarter_month,
                         day,
-                        15, 0, 0  # 4 pM
+                        16, 0, 0  # 4 pM
                     )
                 except ValueError:
                     # If date is invalid, default to first day of next quarter
@@ -712,7 +741,7 @@ class Rulebook(models.Model):
                         year,
                         next_quarter_month,
                         1,
-                        15, 0, 0
+                        16, 0, 0
                     )
                 # record.is_recurring = True
                 record.is_recurring = record.is_recurring or False
@@ -729,9 +758,9 @@ class Rulebook(models.Model):
                 day2 = min(record.semi_annual_day2 or 6, 28)
 
                 # Create datetime objects for comparison
-                date1 = datetime(year, month1, day1, 16, 0, 0) - timedelta(hours=1)
+                date1 = datetime(year, month1, day1, 16, 0, 0) 
                 date2 = datetime(year, month2, day2, 16, 0,
-                                 0) - timedelta(hours=1)
+                                 0) 
 
                 # Sort dates chronologically
                 if date1 > date2:
@@ -790,7 +819,7 @@ class Rulebook(models.Model):
                 # Create the yearly datetime
                 try:
                     # Setting time to 7 AM
-                    yearly_date = datetime(year, month_value, day, 15, 0)
+                    yearly_date = datetime(year, month_value, day, 16, 0)
 
                     # If the date has already passed this year, move to next year
                     if yearly_date < today:
@@ -821,7 +850,7 @@ class Rulebook(models.Model):
                             target_year,
                             month_value,
                             day_value,
-                            15, 0, 0  # 4 pM
+                            16, 0, 0  # 4 pM
                         )
 
                         # If the date has passed this year, calculate next occurrence
@@ -853,6 +882,8 @@ class Rulebook(models.Model):
             self.bi_monthly_day1 = 28
         if self.bi_monthly_day2 and self.bi_monthly_day2 > 28:
             self.bi_monthly_day2 = 28
+            
+    
 
     @api.onchange('month_value', 'day_value')
     def _onchange_yearly_date(self):
@@ -1063,7 +1094,45 @@ class Rulebook(models.Model):
                 # If computed_date is not available, set reg_due_date to False or handle accordingly
                 record.reminder_due_date = None
 
+    @api.depends("computed_date")
+    def _compute_formatted_rulebook_date(self):
+        for record in self:
+            if record.computed_date:
 
+                record.formatted_rulebook_date = self._compute_formatted_date(
+                    (record.computed_date))
+            else:
+                record.formatted_rulebook_date = "N/A"
+    
+    @api.depends("reg_due_date")
+    def _compute_formatted_regulatory_date(self):
+        for record in self:
+            if record.reg_due_date:
+
+                record.formatted_regulatory_date = self._compute_formatted_date(
+                    record.reg_due_date)
+            else:
+                record.formatted_regulatory_date = "N/A"
+
+    @api.depends("reminder_due_date")
+    def _compute_formatted_reminder_date(self):
+        for record in self:
+            if record.reminder_due_date:
+
+                record.formatted_reminder_date = self._compute_formatted_date(
+                    record.reminder_due_date)
+            else:
+                record.formatted_reminder_date = "N/A"
+
+    @api.depends("escalation_date")
+    def _compute_formatted_escalation_date(self):
+        for record in self:
+            if record.escalation_date:
+
+                record.formatted_escalation_date = self._compute_formatted_date(
+                    record.escalation_date)
+            else:
+                record.formatted_escalation_date = "N/A"
      
     def _prepare_email_data(self):
         """Prepare email data dictionary"""
@@ -1296,8 +1365,13 @@ class Rulebook(models.Model):
             record = super(Rulebook, self).create(vals)
 
             # Add 1 hour to computed_date if it exists
-            if record.computed_date:
+            # if record.computed_date:
+            #     _logger.critical(f"added one hour to rulebook")
+            #     record.computed_date += timedelta(hours=1)
+            if record.computed_date and not record.computed_date_adjusted:
+                _logger.critical(f"Adding one hour to computed_date for Rulebook ID {record.id}")
                 record.computed_date += timedelta(hours=1)
+                record.computed_date_adjusted = True
 
             # Initialize submission status
             submission_status = 'pending'
@@ -1329,12 +1403,24 @@ class Rulebook(models.Model):
             _logger.critical(f"Error in Rulebook create method: {e}")
             raise
 
+    
     def write(self, vals):
         # Log the record ID for debugging
         self._update_risk_rating(vals)
         # self.your_method()
 
         _logger.critical(f"Write values for rulebook email data: {vals}")
+        
+        updating_computed_date = "computed_date" in vals or "frequency_type" in vals
+
+        # If 'computed_date' exists and is being updated, subtract one hour
+        if updating_computed_date and "computed_date" in vals:
+            _logger.critical(f"computed date was herrere")
+            # Ensure computed_date is not None before performing arithmetic
+            if vals["computed_date"]:
+                _logger.critical(f"computed date got updated")
+
+                vals["computed_date"] = vals["computed_date"] - timedelta(hours=1)
 
         # Call the super method and capture the result (typically a boolean)
         result = super(Rulebook, self).write(vals)
@@ -1825,14 +1911,25 @@ class Rulebook(models.Model):
             _logger.critical(
                 f"REPLY LOGS VALUES FOR INSERT {reply_log_vals} ")
             try:
-                # Create a new reply log entry for the rulebook
                 
                 reply_log_vals = rulebook._prepare_reply_log_vals(
                     submission_status ='pending',
-                    submission_time='pending'                    
+                    submission_time='pending' ,                   
                 )
+                if rulebook.computed_date and not rulebook.computed_date_adjusted:
+                    adjusted_computed_date = rulebook.computed_date + \
+                        timedelta(hours=1)
+                    
+                else:
+                    adjusted_computed_date = rulebook.computed_date
+                    
+                _logger.critical(
+                    f" adjusted_computed_date {adjusted_computed_date},.... computed_date { rulebook.computed_date}")
+
+                reply_log_vals['rulebook_compute_date'] = adjusted_computed_date
                 
-                reply = self.env['reply.log'].sudo().create(reply_log_vals)
+                          
+                reply = self.env['reply.log'].create(reply_log_vals)
 
                 _logger.critical(
                     f"Created reply.log for Rulebook ID {rulebook.id}  Reply Log ID {reply.id}")
@@ -1842,6 +1939,7 @@ class Rulebook(models.Model):
                 _logger.critical(
                     f"Failed to process Rulebook {rulebook.id}: {e}")
                 continue
+    
              
 
    
