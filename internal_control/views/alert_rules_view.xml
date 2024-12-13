@@ -16,7 +16,7 @@
                     decoration-warning="risk_rating == 'medium'"
                     decoration-danger="risk_rating == 'high'"
                 widget="badge"/>     
-                <field name="last_checked" />
+            <field name="last_checked" string="Last Checked" widget="datetime" />
                 <field name="date_created" string="Date Created" />
             </tree>
         </field>
@@ -63,7 +63,7 @@
                             <field name="frequency_id" />
                         </group>
                         <group string="LAST CHECKED">
-                            <field name="last_checked" widget="datetime" />
+                            <field name="last_checked" string="Last Checked" widget="datetime" />
                         </group>
                     </group>
                     
