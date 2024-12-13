@@ -56,7 +56,7 @@
                         <field name="type_of_return" placeholder="Specify type of return" class="text_field" widget="text" options="{'sanitize': True}" />
                     </group>
                     <group col="1" style="grid-column: span 2;">
-                        <field name="description" placeholder="Describe the return on this rulebook" class="text_field" />
+                        <!-- <field name="description" placeholder="Describe the return on this rulebook" class="text_field" /> -->
                         <field name="section" class="input" placeholder="Specify the section" />
                     </group>
                     <!-- <group col="1" style="grid-column: span 2; margin-top: 20px;">

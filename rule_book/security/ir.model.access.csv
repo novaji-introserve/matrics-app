@@ -42,6 +42,10 @@ access_res_users_department_cco,hr department cco user,hr.model_hr_department,ru
 access_res_users_employee_cco,hr employees cco user,hr.model_hr_employee,rule_book.group_chief_compliance_officer_,1,1,1,1
 
 access_rulebook_rulebook_manager,report.rulebook.compliance.manager,model_rulebook,rule_book.group_compliance_manager_,1,1,1,1
+rulebook_reply_log_manager,report.rulebook.compliance.manager,model_reply_log,rule_book.group_compliance_manager_,1,1,1,1
+rulebook_title_manager,title manager user,model_rulebook_title,rule_book.group_compliance_manager_,1,1,1,1
+
+
 
 
 
