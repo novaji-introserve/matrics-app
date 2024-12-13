@@ -18,7 +18,8 @@ export class IcomplyDashboard extends Component {
         lowrisk: 0,
         mediumrisk: 0,
         highrisk: 0,
-        totalrules: 0,
+        totaltransaction: 0,
+        alertrulestotal: 0,
         highriskbypercent: "0",
         mediumriskbypercent: "0",
         lowriskpercentage: "0",
@@ -56,7 +57,7 @@ export class IcomplyDashboard extends Component {
     if (
       this.state.current_datepicked === new Date().toLocaleDateString("en-US")
     ) {
-      let allrulesCount = await this.api.searchCount(
+      let totalTransactionCount = await this.api.searchCount(
         "res.customer.transaction",
         []
       );
@@ -72,30 +73,37 @@ export class IcomplyDashboard extends Component {
         "res.customer.transaction",
         [["risk_level", "=", "high"]]
       );
+      let alerttulesCount = await this.api.searchCount(
+        "alert.rules",
+        []
+      );
 
       this.state.kpi.lowrisk = lowriskCount;
       this.state.kpi.mediumrisk = mediumriskCount;
       this.state.kpi.highrisk = highriskCount;
-      this.state.kpi.totalrules = allrulesCount;
+      this.state.kpi.totaltransaction = totalTransactionCount;
+      this.state.kpi.alertrulestotal = alerttulesCount;
 
       // each risk count in respect to all records
 
-      this.state.kpi.lowriskinRespectToTotalRules = `${(
-        (lowriskCount / allrulesCount) *
+      this.state.kpi.lowriskinRespectToTotalTransaction = `${(
+        (lowriskCount / totalTransactionCount) *
         100
       ).toFixed(1)}%`;
 
-      this.state.kpi.mediumriskinRespectToTotalRules = `${(
-        (mediumriskCount / allrulesCount) *
+
+
+      this.state.kpi.mediumriskinRespectToTotalTransaction = `${(
+        (mediumriskCount / totalTransactionCount) *
         100
       ).toFixed(1)}%`;
 
-      this.state.kpi.highriskinRespectToTotalRules = `${(
-        (highriskCount / allrulesCount) *
+      this.state.kpi.highriskinRespectToTotalTransaction = `${(
+        (highriskCount / totalTransactionCount) *
         100
       ).toFixed(1)}%`;
     } else {
-      let allrulesCount = await this.api.searchCount("alert.rules", [
+      let totalTransactionCount = await this.api.searchCount("alert.rules", [
         ["date_created", ">=", this.state.current_datepicked],
       ]);
       let lowriskCount = await this.api.searchCount("alert.rules", [
@@ -114,22 +122,22 @@ export class IcomplyDashboard extends Component {
       this.state.kpi.lowrisk = lowriskCount;
       this.state.kpi.mediumrisk = mediumriskCount;
       this.state.kpi.highrisk = highriskCount;
-      this.state.kpi.totalrules = allrulesCount;
+      this.state.kpi.totaltransaction = totalTransactionCount;
 
       // each risk count in respect to all records
 
-      this.state.kpi.lowriskinRespectToTotalRules = `${(
-        (lowriskCount / allrulesCount) *
+      this.state.kpi.lowriskinRespectToTotalTransaction = `${(
+        (lowriskCount / totalTransactionCount) *
         100
       ).toFixed(1)}%`;
 
-      this.state.kpi.mediumriskinRespectToTotalRules = `${(
-        (mediumriskCount / allrulesCount) *
+      this.state.kpi.mediumriskiinRespectToTotalTransaction = `${(
+        (mediumriskCount / totalTransactionCount) *
         100
       ).toFixed(1)}%`;
 
-      this.state.kpi.highriskinRespectToTotalRules = `${(
-        (highriskCount / allrulesCount) *
+      this.state.kpi.highriskiinRespectToTotalTransaction = `${(
+        (highriskCount / totalTransactionCount) *
         100
       ).toFixed(1)}%`;
 
@@ -158,11 +166,11 @@ export class IcomplyDashboard extends Component {
         ["date_created", ">=", this.state.previous_datepicked],
       ]);
 
-      this.state.kpi.totalrulespercentage =
+      this.state.kpi.totaltransactionpercentage =
         total_rules_prev_count == 0
           ? 0
           : (
-              ((allrulesCount - total_rules_prev_count) /
+              ((totalTransactionCount - total_rules_prev_count) /
                 total_rules_prev_count) *
               100
             ).toFixed(2);

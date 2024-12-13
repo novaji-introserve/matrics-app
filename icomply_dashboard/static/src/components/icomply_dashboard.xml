@@ -32,20 +32,24 @@
                         <KpiCard onclick.bind="displayAllCloseCases" name="'Low Risk Tran.'" value="state.kpi.lowrisk"
                             percentage="state.kpi.lowriskpercentage" />
 
-                        <KpiCard onclick.bind="displayAllOverdueCases" name="'Total Exception Rules'"
-                            value="state.kpi.totalrules" percentage="state.kpi.totalrulespercentage" />
+                        <KpiCard onclick.bind="displayAllOverdueCases" name="'Screened Transaction'"
+                            value="state.kpi.totaltransaction" percentage="state.kpi.totalrulespercentage" />
 
                         <KpiCard onclick.bind="displayNothing" name="'High Risk(%)'"
-                            value="state.kpi.highriskinRespectToTotalRules"
-                            percentage="state.kpi.highriskinRespectToTotalRulesPercentage" />
+                            value="state.kpi.highriskinRespectToTotalTransaction"
+                            percentage="state.kpi.highriskiinRespectToTotalTransactionPercentage" />
 
                         <KpiCard onclick.bind="displayNothing" name="'Medium Risk(%)'"
-                            value="state.kpi.mediumriskinRespectToTotalRules"
-                            percentage="state.kpi.mediumriskinRespectToTotalRulesPercentage" />
+                            value="state.kpi.mediumriskinRespectToTotalTransaction"
+                            percentage="state.kpi.mediumriskiinRespectToTotalTransactionPercentage" />
 
                         <KpiCard onclick.bind="displayNothing" name="'Low Risk(%)'"
-                            value="state.kpi.lowriskinRespectToTotalRules"
-                            percentage="state.kpi.lowriskinRespectToTotalRulesPercent" />
+                            value="state.kpi.lowriskinRespectToTotalTransaction"
+                            percentage="state.kpi.lowriskiinRespectToTotalTransactionPercent" />
+
+                        <KpiCard onclick.bind="displayNothing" name="'Alert Rules'"
+                            value="state.kpi.alertrulestotal"
+                            percentage="" />
                     </div>
 
                     <div class="row mt-3">
