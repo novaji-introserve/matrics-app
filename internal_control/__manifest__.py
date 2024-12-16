@@ -43,7 +43,7 @@
         'views/cron_job.xml',
         'views/sql_view.xml', 
         'views/menus.xml',
-        'internal_control/static/src/dropdown.xml',
+        # 'internal_control/static/src/dropdown.xml',
         
         
     ],
