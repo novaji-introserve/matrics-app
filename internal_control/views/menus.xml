@@ -305,6 +305,14 @@
             sequence="10"/>
     />
     
+
+
+<menuitem id="menu_internal_control_cron_tree_parent" 
+    name="Schedule Action"
+    parent="menu_internal_control_configurations"
+    action="action_ir_cron"
+    sequence="80" />
+
    
 
 </odoo>

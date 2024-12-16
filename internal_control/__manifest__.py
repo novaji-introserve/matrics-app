@@ -27,6 +27,8 @@
         'views/alert_rules_view.xml',
         'views/alert_history.xml',
         'views/account_monitoring_views.xml',
+        'views/screen_rules_cron_job.xml',
+        'views/cron_schedule.xml',
         'views/transaction_rule.xml',
         'views/transaction_monitoring_views.xml',
         'views/customer.xml',
@@ -41,6 +43,7 @@
         'views/cron_job.xml',
         'views/sql_view.xml', 
         'views/menus.xml',
+        'internal_control/static/src/dropdown.xml',
         
         
     ],

@@ -239,3 +239,40 @@ class TransactionMonitoring(models.Model):
             'context': {'search_default_group_branch': 1, 'default_state': 'new'}
         }
 
+    def action_screen(self):
+     
+        rules = self.env['res.transaction.screening.rule'].search(
+            [('state', '=', 'active')], order='priority')
+
+        if rules:
+            for rule in rules:
+                # try:
+                    query = rule.sql_query
+                    char_to_replace = {'#AMOUNT#': f"{self.amount}",
+                                    '#ACCOUNT_ID#': f"{self.account_id.id}",
+                                    "#CUSTOMER_ID#": f"{self.customer_id.id}",
+                                    "#TRAN_DATE#": f"{self.date_created}",
+                                    "#BRANCH_ID#": f"{self.branch_id.id}",
+                                    "#CURRENCY_ID#": f"{self.currency_id.id}"}
+                    # Iterate over all key-value pairs in dictionary
+                    for key, value in char_to_replace.items():
+                        # Replace key character with value character in string
+                        query = query.replace(key, value)
+                        
+                    self.env.cr.execute(query)
+                   
+                    records = self.env.cr.fetchall()
+                    
+                    
+                    for rec in records:
+
+                        record = self.env['res.customer.transaction'].browse(rec[0])  # rec[0] contains the ID of the record
+    
+                        # Make sure the record exists and then update it
+                        if record.exists() and not record.rule_id:
+                            record.write({
+                                'rule_id': rule.id,  # Assuming 'rule' is a record
+                                'risk_level': rule.risk_level,
+                            })
+                            print(f"Record {record.id}: rule_id updated to {rule.id}, risk_level updated to {rule.risk_level}, rule name: {rule.name}")
+                     

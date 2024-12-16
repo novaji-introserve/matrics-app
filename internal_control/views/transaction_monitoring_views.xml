@@ -6,8 +6,11 @@
         <field name="model">res.customer.transaction</field>
         <field name="inherit_id" ref="compliance_management.compliance_transaction_form" />
         <field name="arch" type="xml">
+
+
             <xpath expr="//sheet" position="replace">
                 <form string="Transaction Details" create="false" edit="false" delete="false">
+
                     
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -107,8 +110,10 @@
         <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
+
+
             <xpath expr="//tree" position="replace">
-                <tree string="Transaction Monitoring" create="false">
+                <tree string="Transaction Monitoring" create="False" >
                     <field name="refno_null" />
                     <field name="tran_date_null" />
                     <field name="valuedate_null" />
@@ -130,6 +135,8 @@
                     <field name="rrn_null" />
                 </tree>
             </xpath>
+
+           
            
         </field>
     </record>
