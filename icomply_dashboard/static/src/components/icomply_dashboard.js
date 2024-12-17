@@ -11,6 +11,7 @@ const { Component, useState, onWillStart, onWillUnmount, useRef, onMounted } =
 
 export class IcomplyDashboard extends Component {
   setup() {
+    
     this.api = useService("orm");
     this.navigate = useService("action");
     this.state = useState({
