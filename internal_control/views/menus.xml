@@ -5,11 +5,23 @@
 
     <!-- Dashboard Submenu -->
     <menuitem id="menu_internal_control_dashboard" name="Dashboard" parent="menu_internal_control_main" action="icomply_dashboard.dashboard_home" sequence="10"/>
-
+    
     <!-- ===================== -->
     <!-- 1. TRANSACTION MENU -->
     <!-- ===================== -->
     <!-- Transaction Monitoring Menu -->
+    <!-- Define a Client Action -->
+    <!-- <record id="action_multilevel_dropdown" model="ir.actions.client">
+        <field name="name">Transaction Monitoring</field>
+        <field name="tag">multilevel_dropdown_action</field>
+    </record>
+    
+    <menuitem id="menu_internal_control_transaction_dropdown" 
+        name="Transaction Dropdown" 
+        parent="menu_internal_control_main" 
+        action="action_multilevel_dropdown" 
+        sequence="20"
+    /> -->
     <menuitem id="menu_transaction_monitoring_root" name="Transaction Monitoring" parent="menu_internal_control_main" sequence="20"/>
 
     <!-- All transactions -->
@@ -18,12 +30,14 @@
     <menuitem id="menu_internal_control_all_transactions" name="All Transactions" sequence="10" parent="menu_all_transactions_root" action="action_all_transactions"/>
     <menuitem id="menu_internal_control_open_transactions" name="Transactions To Review" sequence="30" parent="menu_all_transactions_root" action="action_all_open_transactions"/>
     <menuitem id="menu_internal_control_transactions_reviewed" name="Transactions Reviewed" sequence="20" parent="menu_all_transactions_root" action="action_all_reviewed_transactions"/>
+    
+    <menuitem id="menu_internal_control_transactions_report" name="Reports" sequence="30" parent="menu_all_transactions_root" action="bi_sql_editor.action_bi_sql_view"/>
 
     <!-- 1. Transaction Monitoring Category -->
-    <menuitem id="menu_internal_control_transactions" name="Transaction Monitoring" parent="menu_transaction_monitoring_root" sequence="30"/>
+    <!-- <menuitem id="menu_internal_control_transactions" name="Transaction Monitoring" parent="menu_transaction_monitoring_root" sequence="30"/> -->
 
     <!-- Transaction Monitoring Submenus -->
-    <menuitem id="menu_internal_control_reversed_transactions" name="Reversed Transactions" parent="menu_internal_control_transactions" action="action_reversed_transactions" sequence="10"/>
+    <!-- <menuitem id="menu_internal_control_reversed_transactions" name="Reversed Transactions" parent="menu_internal_control_transactions" action="action_reversed_transactions" sequence="10"/>
     <menuitem id="menu_internal_control_backdated_transactions" name="Backdated Transactions" parent="menu_internal_control_transactions" action="action_backdated_transactions" sequence="20"/>
     
     <menuitem id="menu_internal_control_premature_liquidation" name="Premature Liquidation" parent="menu_internal_control_transactions" action="action_premature_liquidation" sequence="30"/>
@@ -36,9 +50,9 @@
     
     <menuitem id="menu_internal_control_crypto_transactions" name="Crypto Transactions" parent="menu_internal_control_transactions" action="action_crypto_transactions" sequence="70"/>
     
-    <menuitem id="menu_internal_control_betting_gambling_transactions" name="Betting/Gambling Transactions" parent="menu_internal_control_transactions" action="action_betting_gambling_transactions" sequence="80"/>
+    <menuitem id="menu_internal_control_betting_gambling_transactions" name="Betting/Gambling Transactions" parent="menu_internal_control_transactions" action="action_betting_gambling_transactions" sequence="80"/> -->
 
-    <menuitem
+    <!-- <menuitem
         id="menu_internal_control_cash_collateral_entries"
         name="Cash Collateral Entries"
         parent="menu_internal_control_transactions"
@@ -184,7 +198,7 @@
         action="action_unscanned_mandates"
         parent="menu_internal_control_transactions"
         sequence="290"/>
-        
+         -->
 
 
 
@@ -192,21 +206,21 @@
     <!-- 2. ACCOUNT STATUS MENU -->
     <!-- ===================== -->
     <!-- Account status category -->
-    <menuitem id="menu_account_status_monitoring" name="Account Status &amp; Monitoring" parent="menu_transaction_monitoring_root" sequence="40"/>
+    <!-- <menuitem id="menu_account_status_monitoring" name="Account Status &amp; Monitoring" parent="menu_transaction_monitoring_root" sequence="40"/>
 
     <menuitem id="menu_account_reactivations" name="Account Reactivations" parent="menu_account_status_monitoring" action="action_account_reactivations" sequence="10"/>
 
-    <menuitem id="menu_account_same_address" name="Same Address Accounts" parent="menu_account_status_monitoring" action="action_same_address_accounts" sequence="20"/>
+    <menuitem id="menu_account_same_address" name="Same Address Accounts" parent="menu_account_status_monitoring" action="action_same_address_accounts" sequence="20"/> -->
 
     <!-- ===================== -->
     <!-- 3. FRAUD MONITORING MENU -->
     <!-- ===================== -->
     <!-- Account status category -->
-    <menuitem id="menu_account_fraud_monitoring" name="Fraud Monitoring" parent="menu_transaction_monitoring_root" sequence="50"/>
+    <!-- <menuitem id="menu_account_fraud_monitoring" name="Fraud Monitoring" parent="menu_transaction_monitoring_root" sequence="50"/>
 
     <menuitem id="menu_fraud_ledger_entries" name="Fraud Ledger Entries" parent="menu_account_fraud_monitoring" action="action_fraud_ledger_entries" sequence="10"/>
 
-    <menuitem id="menu_fraud_postings" name="Fraud Postings" parent="menu_account_fraud_monitoring" action="action_fraud_postings" sequence="20"/>
+    <menuitem id="menu_fraud_postings" name="Fraud Postings" parent="menu_account_fraud_monitoring" action="action_fraud_postings" sequence="20"/> -->
 
 
     <!-- Alert Monitoring -->
@@ -305,6 +319,14 @@
             sequence="10"/>
     />
     
+
+
+<menuitem id="menu_internal_control_cron_tree_parent" 
+    name="Schedule Action"
+    parent="menu_internal_control_configurations"
+    action="action_ir_cron"
+    sequence="80" />
+
    
 
 </odoo>

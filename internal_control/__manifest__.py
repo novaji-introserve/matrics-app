@@ -27,6 +27,9 @@
         'views/alert_rules_view.xml',
         'views/alert_history.xml',
         'views/account_monitoring_views.xml',
+        'views/screen_rules_cron_job.xml',
+        'views/cron_schedule.xml',
+        # 'views/dropdown.xml', 
         'views/transaction_rule.xml',
         'views/transaction_monitoring_views.xml',
         'views/customer.xml',
@@ -56,10 +59,9 @@
     'license': 'LGPL-3',
     "assets":{
         'web.assets_backend': [
-           "internal_control/static/src/components/editor.js",
-           "internal_control/static/src/components/editor.css",
-           "internal_control/static/src/components/internal_control.js",
-           "internal_control/static/src/css/style.css"
+           "internal_control/static/src/components/**/*.js",
+           "internal_control/static/src/css/**/*.css",
+           "internal_control/static/src/components/**/*.xml"
         ]
     }
 }

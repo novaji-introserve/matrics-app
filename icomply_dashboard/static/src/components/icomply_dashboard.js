@@ -11,6 +11,7 @@ const { Component, useState, onWillStart, onWillUnmount, useRef, onMounted } =
 
 export class IcomplyDashboard extends Component {
   setup() {
+    
     this.api = useService("orm");
     this.navigate = useService("action");
     this.state = useState({
@@ -19,7 +20,7 @@ export class IcomplyDashboard extends Component {
         mediumrisk: 0,
         highrisk: 0,
         totaltransaction: 0,
-        alertrulestotal: 0,
+        alertrultstotal: 0,
         highriskbypercent: "0",
         mediumriskbypercent: "0",
         lowriskpercentage: "0",
@@ -57,8 +58,8 @@ export class IcomplyDashboard extends Component {
     if (
       this.state.current_datepicked === new Date().toLocaleDateString("en-US")
     ) {
-      let totalTransactionCount = await this.api.searchCount(
-        "res.customer.transaction",
+      let alerttulesCount = await this.api.searchCount(
+        "alert.rules",
         []
       );
       let lowriskCount = await this.api.searchCount(
@@ -73,16 +74,24 @@ export class IcomplyDashboard extends Component {
         "res.customer.transaction",
         [["risk_level", "=", "high"]]
       );
-      let alerttulesCount = await this.api.searchCount(
-        "alert.rules",
+      let totalScreenedTransactionCount = await this.api.searchCount(
+        "res.customer.transaction",
+        [["rule_id", "!=", null]]
+      );
+      let totalTransactionCount = await this.api.searchCount(
+        "res.customer.transaction",
         []
       );
+
+
 
       this.state.kpi.lowrisk = lowriskCount;
       this.state.kpi.mediumrisk = mediumriskCount;
       this.state.kpi.highrisk = highriskCount;
+      this.state.kpi.totalScreenedTransactionCount = totalScreenedTransactionCount;
       this.state.kpi.totaltransaction = totalTransactionCount;
       this.state.kpi.alertrulestotal = alerttulesCount;
+
 
       // each risk count in respect to all records
 
@@ -102,7 +111,12 @@ export class IcomplyDashboard extends Component {
         (highriskCount / totalTransactionCount) *
         100
       ).toFixed(1)}%`;
-    } else {
+    } 
+    else {
+      let alerttulesCount = await this.api.searchCount(
+         "alert.rules",
+        ["date_created", ">=", this.state.current_datepicked]
+      );
       let totalTransactionCount = await this.api.searchCount("alert.rules", [
         ["date_created", ">=", this.state.current_datepicked],
       ]);
@@ -119,10 +133,22 @@ export class IcomplyDashboard extends Component {
         ["date_created", ">=", this.state.current_datepicked],
       ]);
 
+       let totalScreenedTransactionCount = await this.api.searchCount(
+         "res.customer.transaction",
+         [
+           ["rule_id", "!=", null],
+           ["date_created", ">=", this.state.current_datepicked]
+         ]
+       );
+
+       novaji_admin_dev1
+
       this.state.kpi.lowrisk = lowriskCount;
       this.state.kpi.mediumrisk = mediumriskCount;
       this.state.kpi.highrisk = highriskCount;
+      // this.state.kpi.totalScreenedTransactionCount = totalScreenedTransactionCount;
       this.state.kpi.totaltransaction = totalTransactionCount;
+      this.state.kpi.alertrulestotal = alerttulesCount;
 
       // each risk count in respect to all records
 

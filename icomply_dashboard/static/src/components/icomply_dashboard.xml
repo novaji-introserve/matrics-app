@@ -33,7 +33,7 @@
                             percentage="state.kpi.lowriskpercentage" />
 
                         <KpiCard onclick.bind="displayAllOverdueCases" name="'Screened Transaction'"
-                            value="state.kpi.totaltransaction" percentage="state.kpi.totalrulespercentage" />
+                            value="state.kpi.totalScreenedTransactionCount" percentage="state.kpi.totalrulespercentage" />
 
                         <KpiCard onclick.bind="displayNothing" name="'High Risk(%)'"
                             value="state.kpi.highriskinRespectToTotalTransaction"
