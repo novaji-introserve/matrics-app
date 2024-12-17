@@ -19,7 +19,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
             </field>
             <field name="name" position="after">
                 <field name="technical_name" />
-                <field name="size" />
+                <!-- <field name="size" /> -->
             </field>
         </field>
     </record>
@@ -167,14 +167,14 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                 <attribute name="invisible">1</attribute>
             </field>
 
-            <page name="page_security" position="after">
-                        <page string="Action Settings">
+            <!-- <page name="page_security" position="after"> -->
+                        <!-- <page string="Action Settings">
                             <group string="Computed Context">
                                 <field
                             name="computed_action_context"
                             nolabel="1"
                             colspan="2"
-                        />
+                            />
                             </group>
                             <group string="Custom Context">
                                 <field
@@ -185,8 +185,8 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                             options="{'mode': 'python'}"
                         />
                             </group>
-                        </page>
-                        <page string="Extras Information">
+                        </page> -->
+                        <!-- <page string="Extras Information">
                             <group>
                                 <group string="Model">
                                     <field name="model_name" />
@@ -204,9 +204,9 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                                     <field name="menu_id" />
                                 </group>
                             </group>
-                        </page>
+                        </page> -->
 
-            </page>
+            <!-- </page> -->
         </field>
     </record>
 
