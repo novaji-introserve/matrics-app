@@ -211,7 +211,8 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
     </record>
 
     <record id="action_bi_sql_view" model="ir.actions.act_window">
-        <field name="name">SQL Views</field>
+        <!-- <field name="name">SQL Views</field> -->
+          <field name="name">Exception Monitoring Processes</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">bi.sql.view</field>
         <field name="view_mode">tree,form</field>
