@@ -39,7 +39,7 @@
         'views/frequency_view.xml',
         'views/process_view.xml',
         'views/process_category_view.xml',
-        'views/department.xml',
+        # 'views/department.xml',
         'views/cron_job.xml',
         'views/sql_view.xml', 
         'views/menus.xml',
