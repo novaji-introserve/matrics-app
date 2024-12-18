@@ -46,6 +46,7 @@
   <field name="comment">CCO oversees all branch compliance officers</field>
   <field name="category_id" ref="module_category_compliance"/>
 </record>
+
 <!--
 <record id="group_compliance_close_case" model="res.groups">
   <field name="name">Close Case</field>

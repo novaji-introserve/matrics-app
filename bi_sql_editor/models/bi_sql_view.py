@@ -342,6 +342,8 @@ class BiSQLView(models.Model):
         )
         self.menu_id = self.env["ir.ui.menu"].create(self._prepare_menu()).id
         self.write({"state": "ui_valid"})
+        
+        
 
     def button_update_model_access(self):
         self._drop_model_access()

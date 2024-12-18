@@ -38,7 +38,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                     type="object"
                     states="model_valid"
                     string="Delete SQL Elements"
-                    groups="sql_request_abstract.group_sql_request_manager"
+                    groups="internal_control.group_internal_control_tech_support"
                     confirm="It will delete the materialized view, and all the previous mapping realized with the columns"
                 />
                 <button
@@ -46,13 +46,14 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                     type="object"
                     states="ui_valid"
                     string="Delete UI"
-                    groups="sql_request_abstract.group_sql_request_manager"
+                    groups="internal_control.group_internal_control_tech_support"
                 />
                 <button
                     name="button_create_sql_view_and_model"
                     type="object"
                     states="sql_valid"
                     string="Create SQL Elements"
+                    groups="internal_control.group_internal_control_tech_support"
                     class="oe_highlight"
                     help="This will try to create an SQL View, based on the SQL request and the according Transient Model and fields, based on settings"
                 />
@@ -60,6 +61,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                     name="button_update_model_access"
                     type="object"
                     string="Update Model Access"
+                    groups="internal_control.group_internal_control_tech_support"
                     class="oe_highlight"
                     attrs="{'invisible': ['|', ('state', 'in', ('draft', 'sql_valid')), ('has_group_changed', '=', False)]}"
                     help="Update Model Access. Required if you changed groups list after having created the model"
@@ -69,6 +71,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                     type="object"
                     states="model_valid"
                     string="Create UI"
+                    groups="internal_control.group_internal_control_tech_support"
                     class="oe_highlight"
                     help="This will create Odoo View, Action and Menu"
                 />
@@ -83,12 +86,14 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                     name="button_refresh_materialized_view"
                     type="object"
                     string="Refresh"
+                    groups="internal_control.group_internal_control_tech_support"
                     help="Refresh Materialized View"
                     attrs="{'invisible': ['|', ('state', 'in', ('draft', 'sql_valid')), ('is_materialized', '=', False)]}"
                 />
             </xpath>
-            <group name="group_main_info" position="inside">
-                <group>
+            <group 
+                name="group_main_info" position="inside">
+                <group groups="internal_control.group_internal_control_tech_support">
                     <field
                         name="technical_name"
                         attrs="{'readonly': [('state', '!=', 'draft')]}"
