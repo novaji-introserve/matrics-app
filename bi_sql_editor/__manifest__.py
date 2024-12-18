@@ -18,7 +18,7 @@
         "security/ir.model.access.csv",
         "views/view_bi_sql_view.xml",
     ],
-    "demo": ["demo/res_groups_demo.xml", "demo/bi_sql_view_demo.xml"],
+    "demo": ["demo/res_groups_demo.xml"],
     "installable": True,
     "uninstall_hook": "uninstall_hook",
     "maintainers": ["legalsylvain"],
