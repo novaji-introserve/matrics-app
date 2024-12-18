@@ -22,19 +22,17 @@
 
 
     <!-- Tree View -->
-    <record id="view_customer_tree_inherited" model="ir.ui.view">
-        <field name="name">customer tree</field>
-        <field name="inherit_id" ref="compliance_management.compl_cust_tree_inherit_res_partner" />
-        <field name="model">res.partner</field>
+    <!-- <record id="view_transaction_monitoring_tree" model="ir.ui.view">
+        <field name="name">transaction.monitoring.tree</field>
+        <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
+        <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            
-          
-                <xpath expr="//field[@name='risk_level']" position="replace" />
-                <xpath expr="//field[@name='risk_score']" position="replace" />
-           
+            <xpath expr="//tree" position="replace">
+                
+            </xpath>
 
         </field>
-    </record>
+    </record> -->
 
 
 
