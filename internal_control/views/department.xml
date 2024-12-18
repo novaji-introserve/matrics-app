@@ -1,7 +1,7 @@
-<odoo>
-    <data>
+<!-- <odoo>
+    <data> -->
         <!-- Tree View for Department -->
-        <record id="view_department_tree" model="ir.ui.view">
+        <!-- <record id="view_department_tree" model="ir.ui.view">
             <field name="name">department.tree</field>
             <field name="model">hr.department</field>
             <field name="arch" type="xml">
@@ -13,10 +13,10 @@
                     <field name="create_date" />
                 </tree>
             </field>
-        </record>
+        </record> -->
 
         <!-- Form View for Department -->
-        <record id="view_department_form" model="ir.ui.view">
+        <!-- <record id="view_department_form" model="ir.ui.view">
             <field name="name">department.form</field>
             <field name="model">hr.department</field>
             <field name="arch" type="xml">
@@ -32,14 +32,14 @@
                     </group>
                 </form>
             </field>
-        </record>
+        </record> -->
 
 
         <!-- Action -->
-        <record id="action_department" model="ir.actions.act_window">
+        <!-- <record id="action_department" model="ir.actions.act_window">
             <field name="name">Departments</field>
             <field name="res_model">hr.department</field>
             <field name="view_mode">tree,form</field>
         </record>
     </data>
-</odoo>
+</odoo> -->
