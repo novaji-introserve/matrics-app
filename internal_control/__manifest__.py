@@ -18,7 +18,7 @@
     'version': '0.3',
 
     # any module necessary for this one to work correctly
-    'depends': ['icomply_dashboard', 'compliance_management', 'bi_sql_editor'],
+    'depends': ['icomply_dashboard', 'compliance_management', 'bi_sql_editor', 'psql_query_execute'],
 
     # always loaded
     'data': [
