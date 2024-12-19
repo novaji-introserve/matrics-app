@@ -38,7 +38,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                         type="object"
                         states="sql_valid"
                         string="Set to Draft"
-                        groups="sql_request_abstract.group_sql_request_manager"
+                        groups="internal_control.group_internal_control_tech_support"
                     />
                     <button
                         name="button_preview_sql_expression"
@@ -47,7 +47,9 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                         string="Preview Results"
                         groups="sql_request_abstract.group_sql_request_manager"
                     />
-                    <field name="state" widget="statusbar" />
+                    <field 
+                    
+                    name="state" widget="statusbar" />
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box" />
@@ -59,7 +61,8 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                             </div>
                         </h1>
                     </div>
-                    <group name="group_main_info" />
+                    <group
+                     name="group_main_info" />
                     
                     <notebook>
                         <page name="page_sql" string="SQL Settings">

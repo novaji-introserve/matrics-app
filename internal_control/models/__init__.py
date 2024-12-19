@@ -13,4 +13,5 @@ from . import alert_history
 from . import department
 from . import user_profile
 from . import branch
+from . import res_group
 

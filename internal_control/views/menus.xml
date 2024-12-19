@@ -227,6 +227,7 @@
     <menuitem id="menu_internal_control_alert_monitoring"
               name="Alert Monitoring"
               parent="menu_internal_control_main"
+               groups="compliance_management.group_compliance_chief_compliance_officer"
               sequence="30"/>
 
     <menuitem 
@@ -234,6 +235,7 @@
         name="Alert Rules" 
         parent="menu_internal_control_alert_monitoring" 
         action="action_alert_rules" 
+        groups="compliance_management.group_compliance_chief_compliance_officer"
         sequence="10"
         />
 
@@ -241,6 +243,7 @@
         id="menu_alert_history" name="Alert History" 
         parent="menu_internal_control_alert_monitoring"
         action="action_alert_history_status" 
+        groups="compliance_management.group_compliance_chief_compliance_officer"
         sequence="20" 
         />
 
@@ -260,39 +263,46 @@
         name="Alert Frequency" 
         parent="menu_internal_control_configurations" 
         action="action_alert_frequency" 
+        groups="compliance_management.group_compliance_chief_compliance_officer"
         sequence="20"/>
 
     <menuitem id="menu_internal_control_process" 
         name="Processes" 
         parent="menu_internal_control_configurations" 
         action="action_process" 
+        groups="compliance_management.group_compliance_chief_compliance_officer"
         sequence="30"/> 
 
     <menuitem id="menu_internal_control_process_category" 
         name="Process Category" 
         parent="menu_internal_control_configurations" 
         action="action_process_category" 
+        groups="compliance_management.group_compliance_chief_compliance_officer"
         sequence="40"/>
 
     <menuitem id="menu_internal_control_transaction_monitoring" 
         name="Transaction Monitoring" 
         parent="menu_internal_control_configurations" 
+        groups="compliance_management.group_compliance_chief_compliance_officer"
         sequence="60"/>
 
     <menuitem id="menu_internal_control_transaction_rules"
               name="Rules"
               parent="menu_internal_control_transaction_monitoring"
               action="action_internal_control_screening_rule"
+              groups="compliance_management.group_compliance_chief_compliance_officer"
               sequence="10"/>
 
     <menuitem id="process_sql" 
         name="Process SQL" 
         parent="menu_internal_control_configurations" 
+        groups="compliance_management.group_compliance_chief_compliance_officer"
         action="action_process_sql" sequence="50" />
 
     <menuitem id="menu_user_profile" 
             name="Users" 
-            parent="menu_internal_control_configurations" 
+            parent="menu_internal_control_configurations"
+            groups="compliance_management.group_compliance_chief_compliance_officer" 
             action="base.action_res_users" 
             sequence="90"/>
     />
@@ -300,7 +310,8 @@
 
     <menuitem id="menu_customer_management" 
             name="Customer Management"  
-            parent="menu_internal_control_main" 
+            parent="menu_internal_control_main"
+            groups="compliance_management.group_compliance_chief_compliance_officer" 
             sequence="20"/>
     />
    
@@ -308,6 +319,7 @@
             name="Customer"  
             parent="menu_customer_management" 
             action="compliance_management.contacts_action_contacts_inherit"
+            groups="compliance_management.group_compliance_chief_compliance_officer"
             sequence="10"/>
     />
    
@@ -316,6 +328,7 @@
             name="Account"  
             parent="menu_customer_management" 
             action="action_customer_account"
+            groups="compliance_management.group_compliance_chief_compliance_officer"
             sequence="10"/>
     />
     
@@ -324,6 +337,7 @@
 <menuitem id="menu_internal_control_cron_tree_parent" 
     name="Schedule Action"
     parent="menu_internal_control_configurations"
+    groups="compliance_management.group_compliance_chief_compliance_officer"
     action="action_ir_cron"
     sequence="80" />
 
