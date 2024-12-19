@@ -254,7 +254,6 @@
     <menuitem id="menu_internal_control_configurations"
               name="Configurations"
               parent="menu_internal_control_main"
-              groups="compliance_management.group_compliance_chief_compliance_officer"
               sequence="40"/>
 
 
