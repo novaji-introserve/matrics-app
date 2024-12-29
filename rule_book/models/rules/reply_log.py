@@ -1066,7 +1066,7 @@ class ReplyLog(models.Model):
                 "first_line_name": rulebook.first_line_escalation.name or "",
                 "second_line_escalation": rulebook.second_line_escalation.email or "",
                 "computed_date": self._compute_formatted_date(self.rulebook_compute_date) or "N/A",
-                "escalation_date": self.escalation_date or "N/A",
+                "escalation_date": self._compute_formatted_date(self.escalation_date) or "N/A",
                 "reg_due_date": self._compute_formatted_date(self.reg_due_date) or "N/A",
                 "datetime": self._compute_formatted_date(now_without_microseconds)
             }
