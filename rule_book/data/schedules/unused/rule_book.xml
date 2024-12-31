@@ -2,7 +2,7 @@
     <data>
         <!-- Email Template for Rulebook Due Dates -->
         <!-- Email Template for Rulebook Due Date Notification -->
-        <record id="rulebook_due_date_notification_template" model="mail.template">
+        <record id="rulebook_due_date_notification_template__1" model="mail.template">
             <field name="name">Rulebook Due Date Notification</field>
             <field name="email_from">{{object.data()['email_from']}}</field>
             <field name="email_cc">{{object.data()['email_cc']}}</field>
