@@ -168,6 +168,22 @@ class BiSQLView(models.Model):
     )
 
     sequence = fields.Integer(string="sequence")
+    
+    def action_view_result(self):
+        self.ensure_one()
+        self.env.cr.execute(self.query)
+        results = self.env.cr.dictfetchall()
+        
+        columns = list(results[0].keys()) if results else []
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": self.model_id.model,
+            "search_view_id": self.search_view_id.id,
+            # "view_mode": self.action_id.view_mode,
+            "view_mode": "tree",
+            "name": " ",
+            # "context": {"results": results}
+        }
 
     # Constrains Section
     @api.constrains("is_materialized")

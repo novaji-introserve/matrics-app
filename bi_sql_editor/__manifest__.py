@@ -17,6 +17,7 @@
     "data": [
         "security/ir.model.access.csv",
         "views/view_bi_sql_view.xml",
+        "views/query_result.xml",
     ],
     "demo": ["demo/res_groups_demo.xml"],
     "installable": True,
