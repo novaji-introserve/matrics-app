@@ -58,11 +58,12 @@
                     <div class="row">
                         <div class="col col-md-auto">
                             <label for="account_name" string="Account Name" />
-                            <div>
+                             <div>
                                 <field name="account_name" class="oe_inline" readonly="1" />
                             </div>
                         </div>
                     </div>
+                    
                     <notebook>
                         <page name="details" string="Account Information">
                             <group>
@@ -105,7 +106,7 @@
                         </page>
                     </notebook>
 
-                </sheet>
+                </sheet> 
                 <div class="oe_chatter">
                     <field name="message_follower_ids" />
                     <field name="activity_ids" />

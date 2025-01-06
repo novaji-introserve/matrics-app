@@ -4,7 +4,7 @@
     <menuitem id="menu_internal_control_main" name="Internal Control" sequence="-800"/>
 
     <!-- Dashboard Submenu -->
-    <menuitem id="menu_internal_control_dashboard" name="Dashboard" parent="menu_internal_control_main" action="icomply_dashboard.dashboard_home" sequence="10"/>
+    <!-- <menuitem id="menu_internal_control_dashboard" name="Dashboard" parent="menu_internal_control_main" action="icomply_dashboard.dashboard_home" sequence="10"/> -->
     
     <!-- ===================== -->
     <!-- 1. TRANSACTION MENU -->

@@ -141,7 +141,7 @@ export class IcomplyDashboard extends Component {
          ]
        );
 
-       novaji_admin_dev1
+//        novaji_admin_dev1
 
       this.state.kpi.lowrisk = lowriskCount;
       this.state.kpi.mediumrisk = mediumriskCount;
