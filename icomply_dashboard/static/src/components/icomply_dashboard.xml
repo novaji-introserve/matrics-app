@@ -21,7 +21,7 @@
                             </div>
                         </div>
                     </div>
-
+<!-- 
                     <div class="row mt-2 mt-md-4">
                         <KpiCard onclick.bind="displayAllCases" name="'High Risk Tran.'" value="state.kpi.highrisk"
                             percentage="state.kpi.highriskbypercent" />
@@ -99,7 +99,7 @@
                             </div>
                         </div>
 
-                    </div>
+                    </div> -->
 
 
                 </div>

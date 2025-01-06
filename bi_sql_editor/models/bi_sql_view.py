@@ -360,6 +360,7 @@ class BiSQLView(models.Model):
             "search_view_id": self.search_view_id.id,
             # "view_mode": self.action_id.view_mode,
             "view_mode": "tree,form",
+            "name": " "
 
         }
 
