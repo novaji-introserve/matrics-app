@@ -3,13 +3,13 @@
 
     <!-- Instant Due Date Notification when Due date is the current day -->
 
-    <record id="email_template_internal_due_date_immediate_" model="mail.template">
+    <record id="email_template_internal_due_date_" model="mail.template">
         <field name="name">Internal Due Date Reminder For Rulebook </field>
         <field name="email_from">{{object.data()['email_from']}}</field>
         <field name="email_cc">{{object.data()['email_cc']}}</field>
         <field name="email_to">{{object.data()['email_to']}}</field>
         <field name="subject">Reminder: Internal Due Date for {{object.data()['rulebook_return']}}</field>
-        <field name="model_id" ref="rule_book.model_rulebook" />
+        <field name="model_id" ref="rule_book.model_reply_log" />
         <field name="body_html" type="html">
             <div style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
                 <div style="text-align: center; padding: 10px 0;">

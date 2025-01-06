@@ -48,8 +48,8 @@
                             <!-- <field name="reply_date" readonly="1" string="original Reply date"/> -->
 
                             <!-- <field name="reminder_due_date" readonly="0" />
-                            <field name="formatted_reminder_date" readonly="0" /> -->
-                            <!-- <field name="escalation_date" readonly="0" />
+                            <field name="formatted_reminder_date" readonly="0" />
+                            <field name="escalation_date" readonly="0" />
                             <field name="formatted_escalation_date" readonly="0" /> -->
 
                             <!-- <field name="reply_date" readonly="1" widget="datetime" options="{'format': 'MMMM dd, yyyy HH:mm:ss'}"/> -->

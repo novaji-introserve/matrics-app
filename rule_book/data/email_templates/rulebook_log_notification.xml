@@ -6,6 +6,8 @@
         <field name="model_id" ref="rule_book.model_reply_log" />
         <field name="email_from">{{object.data()['email_from']}}</field>
         <field name="email_to">{{object.data()['email_to']}}</field>
+        <field name="email_cc">{{object.data()['email_cc']}}</field>
+
         <field name="subject">New Report Submitted:{{object.data()['rulebook_source']}}</field>
         <field name="body_html" type="html">
             <div class="email-container" style="font-family: Arial, sans-serif; background-color: #f0f8ff; color: #333333; margin: 0; padding: 0;">

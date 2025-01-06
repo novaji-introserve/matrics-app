@@ -44,12 +44,15 @@
         "views/rules/rulebook_title_views.xml",
         # "security/ir.model.access.csv",
         "views/risk/risk_category.xml",
+        "views/rules/rule_book.xml",
         #    "data/preloaded_data/rule_book_department.xml",
         #
         # "views/responsible.xml",
-        "views/rules/rule_book.xml",
         "data/email_templates/reminder_due_date_email.xml",
         "data/email_templates/internal_due_date_email.xml",
+        "data/email_templates/internal_due_date_for_rulebook.xml",
+        "data/email_templates/rulebook_log_notification.xml",
+        "data/email_templates/first_line_escalation.xml",
 
         "data/schedules/rule_book.xml",
         # "views/dashboard.xml",
@@ -57,8 +60,6 @@
         "data/preloaded_data/risk_categories.xml",
         # "data/preloaded_data/users.xml",
         "data/preloaded_data/rule_book_sources.xml",
-        "data/email_templates/rulebook_log_notification.xml",
-        "data/email_templates/first_line_escalation.xml",
         # "data/email_templates/escalation_notification.xml",
 
         "views/public/rule_book_submission.xml",
