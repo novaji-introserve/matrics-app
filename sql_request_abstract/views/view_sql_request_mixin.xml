@@ -8,6 +8,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
     <record id="view_sql_request_mixin_tree" model="ir.ui.view">
         <field name="model">sql.request.mixin</field>
+        <field name="name"></field>
         <field name="arch" type="xml">
             <!-- <tree
                 decoration-info="state=='draft'"
