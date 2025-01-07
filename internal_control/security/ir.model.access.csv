@@ -9,3 +9,4 @@ access_internal_control_sql_rule,access internal control sql rules,internal_cont
 access_internal_control_alert_history,access internal control alert history,internal_control.model_alert_history,base.group_user,1,1,1,1
 access_internal_control_screening_rule,access internal control screening rules,internal_control.model_res_transaction_screening_rule,base.group_user,1,1,1,1
 access_internal_control_alert_group,access internal control alert group,internal_control.model_alert_group,base.group_user,1,1,1,1
+access_internal_control_officer,access internal control officer,internal_control.model_control_officer,base.group_user,1,1,1,1

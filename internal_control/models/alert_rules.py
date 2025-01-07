@@ -28,7 +28,7 @@ class alert_rules(models.Model):
     narration = fields.Html(string="narration", required=True, tracking=True)
     sql_text = fields.Many2one("process.sql",string="SQL Query", required=True, tracking=True)
     frequency_id = fields.Many2one('exception.frequency', string="Frequency", required=True, tracking=True)
-    process_category_id = fields.Many2one('process.category', string="Process Category", required=True)
+    # process_category_id = fields.Many2one('process.category', string="Process Category", required=True)
     status = fields.Selection(
     [("1", "Active"), ("0", "Inactive")],
     default="1",  # The default value is an integer (1)
@@ -37,12 +37,8 @@ class alert_rules(models.Model):
     )
     specific_email_recipients = fields.Many2many('res.users', "alert_rules_email_rel", "alert_rules_id", "user_id", string="Specific Recipients", required=True, tracking=True)
     alert_id = fields.Many2one("alert.group", string="Alert Group")
-    first_owner = fields.Selection(selection=lambda self: [(user.id, user.display_name, user.login) 
-                                                       for user in self.env['res.users'].search([])], 
-                                   string="First Line Owner") 
-    second_owner = fields.Selection(selection=lambda self: [(user.id, user.display_name, user.login) 
-                                                       for user in self.env['res.users'].search([])], 
-                                   string="Second Line Owner") 
+    first_owner = fields.Many2one("res.users",string="First Line Owner") 
+    second_owner = fields.Many2one("res.users", string="Second Line Owner") 
     process_id = fields.Char(string="Process", tracking=True)
     risk_rating = fields.Selection(
         selection=[("low", "Low"),("medium", "Medium"), ("high", "High")],
@@ -70,7 +66,7 @@ class alert_rules(models.Model):
     
     @api.model
     def process_alert_rules(self):
-        pass
+    
         alert_rules = self.search([("status", "=", "1")])
     
         if len(alert_rules) > 0:

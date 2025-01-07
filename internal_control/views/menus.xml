@@ -282,6 +282,14 @@
         groups="compliance_management.group_compliance_chief_compliance_officer"
         sequence="30"/>
 
+    <menuitem id="menu_control_officer"
+        name="Control Officer"
+        parent="menu_internal_control_configurations"
+        action="action_control_officer"
+        groups="compliance_management.group_compliance_chief_compliance_officer"
+        sequence="35" 
+    />
+
     <menuitem id="menu_internal_control_process_category" 
         name="Process Category" 
         parent="menu_internal_control_configurations" 

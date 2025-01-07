@@ -14,4 +14,5 @@ from . import department
 from . import user_profile
 from . import branch
 from . import res_group
+from . import control_officer
 
