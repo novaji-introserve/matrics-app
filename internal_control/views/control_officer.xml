@@ -6,7 +6,7 @@
             <field name="name">control.officer.tree</field>
             <field name="model">control.officer</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree editable="bottom">
                     <field name="branch_id" />
                     <field name="alert_id" />
                     <field name="officer" />
