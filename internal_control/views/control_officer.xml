@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="control_officer_tree_view" model="ir.ui.view">
+            <field name="name">control.officer.tree</field>
+            <field name="model">control.officer</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="branch_id" />
+                    <field name="alert_id" />
+                    <field name="officer" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="control_officer_form_view" model="ir.ui.view">
+            <field name="name">control.officer.form</field>
+            <field name="model">control.officer</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group col="3">
+                            <group >
+                                <field name="branch_id" />
+                            </group>
+                            <group >
+                                <field name="alert_id" />
+                            </group>
+
+                            <group >
+                                <field name="officer" />
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_ids" widget="mail_thread" />
+                        <field name="activity_ids" widget="mail_activity" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_control_officer" model="ir.actions.act_window">
+            <field name="name">Control Officer</field>
+            <field name="res_model">control.officer</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+      
+
+      
+    </data>
+</odoo>

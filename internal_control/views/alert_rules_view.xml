@@ -5,18 +5,19 @@
         <field name="model">alert.rules</field>
         <field name="arch" type="xml">
             <tree string="Alert Rules">
-                <field name="name"/>
-                
+                <field name="name" />
+                <field name="alert_id" />
                 <field name="frequency_id" />
-                <field name="process_category_id" />
-                <field name="process_id" />
-                <field name="status" widget="selection" string="Status"/>
-                <field  name="risk_rating"
-                    decoration-success="risk_rating == 'low'"
-                    decoration-warning="risk_rating == 'medium'"
-                    decoration-danger="risk_rating == 'high'"
-                widget="badge"/>     
-            <field name="last_checked" string="Last Checked" widget="datetime" />
+                <field name="first_owner" />
+                <field name="second_owner" />
+                <field name="specific_email_recipients" />
+
+                <field name="process_id" string="Process" />
+                <field name="status" widget="selection" string="Status" />
+                <field name="risk_rating" decoration-success="risk_rating == 'low'"
+                    decoration-warning="risk_rating == 'medium'" decoration-danger="risk_rating == 'high'"
+                    widget="badge" />
+                <field name="last_checked" string="Last Checked" widget="datetime" />
                 <field name="date_created" string="Date Created" />
             </tree>
         </field>
@@ -33,43 +34,65 @@
                 </header>
                 <sheet>
                     <div class="oe_title">
-                        <label for="name" class="oe-edit-only"/>
+                        <label for="name" class="oe-edit-only" />
                         <h1>
                             <field name="name" placeholder="enter Title for the exception rule" />
                         </h1>
                     </div>
-                    
+
                     <group string="PROCESS DETAILS">
-                        <group class="">
-                            <field name="process_category_id" string="Process Category" />
-                        </group>
 
-                        <group >
-                            <field name="process_id"/>
-                            
+                        <group colspan="2">
+                            <field name="process_id" string="Process" />
                         </group>
-                    </group>
-
-                    <group>
-                        <group string="SQL">
-                            <field name="sql_text" />
-                        </group>
-                        <group string="RATING">
-                            <field name="risk_rating"  string="Rating"/>
-                        </group>
-                    </group>
-                    <group>
-                        <group string="INTERVALS">
+                        <group>
                             <field name="frequency_id" />
                         </group>
+
+                        <group>
+                            <field name="risk_rating" string="Rating" />
+                        </group>
+        
+                        <group string="SQL" colspan="2">
+                            <field name="sql_text" />
+                        </group>
+      
+
+                    </group>
+
+                    <group>
+
+                       
+                    </group>
+                    <group>
+
                         <group string="LAST CHECKED">
                             <field name="last_checked" string="Last Checked" widget="datetime" />
                         </group>
                     </group>
-                    
+
                     <notebook>
-                        <page string="NARRATION">
-                            <field name="narration" string="Narration" style="padding: 2rem;" placeholder="Enter narration here..." />
+                        <page string="Narration">
+                            <field name="narration" string="Narration" style="padding: 2rem;"
+                                placeholder="Enter narration here..." />
+                        </page>
+                        <page string="Receipients">
+                            <group>
+                                <group class="">
+                                    <field name="specific_email_recipients" widget="many2many_tags" />
+                                </group>
+                                <group>
+                                    <field name="alert_id" />
+                                </group>
+                            
+                                <group class="">
+                                    <field name="first_owner" />
+                                </group>
+                            
+                                <group class="">
+                                    <field name="second_owner" />
+                                </group>
+                            </group>
                         </page>
                     </notebook>
                 </sheet>

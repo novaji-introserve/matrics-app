@@ -234,7 +234,7 @@
 
     <menuitem 
         id="menu_internal_control_alert_rules_monitoring" 
-        name="Alert Rules" 
+        name="Processes" 
         parent="menu_internal_control_alert_monitoring" 
         action="action_alert_rules" 
         groups="compliance_management.group_compliance_chief_compliance_officer"
@@ -268,12 +268,27 @@
         groups="compliance_management.group_compliance_chief_compliance_officer"
         sequence="20"/>
 
-    <menuitem id="menu_internal_control_process" 
+    <!-- <menuitem id="menu_internal_control_process" 
         name="Processes" 
         parent="menu_internal_control_configurations" 
         action="action_process" 
         groups="compliance_management.group_compliance_chief_compliance_officer"
-        sequence="30"/> 
+        sequence="30"/>  -->
+
+    <menuitem id="menu_internal_control_alert_group" 
+        name="Alert Groups" 
+        parent="menu_internal_control_configurations" 
+        action="action_alert_group" 
+        groups="compliance_management.group_compliance_chief_compliance_officer"
+        sequence="30"/>
+
+    <menuitem id="menu_control_officer"
+        name="Control Officer"
+        parent="menu_internal_control_configurations"
+        action="action_control_officer"
+        groups="compliance_management.group_compliance_chief_compliance_officer"
+        sequence="35" 
+    />
 
     <menuitem id="menu_internal_control_process_category" 
         name="Process Category" 
