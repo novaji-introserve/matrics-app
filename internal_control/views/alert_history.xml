@@ -7,7 +7,6 @@
         <field name="arch" type="xml">
             <tree string="Alert History List" create="false">
                 <field name="alert_id" string="Alert Reference" />
-                <field name="process_category" />
                 <field name="process_id" />
                 <field name="risk_rating" />
                 <field name="narration" />
@@ -36,9 +35,6 @@
                     </h1>
                 </div>
                 <group>
-                    <group string="PROCESS CATEGORY">
-                        <field name="process_category" string="Category"/>
-                    </group>
                     <group string="RISK RATING">
                         <field name="risk_rating" string="Rating"/>
                     </group>
