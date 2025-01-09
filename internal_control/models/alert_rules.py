@@ -121,7 +121,7 @@ class alert_rules(models.Model):
     
     def send_alert(self, rule):
         try:
-
+            
                 # first query to create csv
                 self.env.cr.execute(f"{rule.sql_text.query}")
                 rows = self.env.cr.fetchall()
@@ -140,9 +140,7 @@ class alert_rules(models.Model):
                     raise ValidationError("subbranchcode column must be in the sql statement")
                 else:
                     branches = []
-                    mailto = []
-                    mailcc = []
-    
+                   
                     
                     # Loop through the rows and get the value of subbranchcode dynamically
                     for row in rows:
@@ -156,167 +154,190 @@ class alert_rules(models.Model):
                     # Initialize a dictionary to store the emails by branch
                     branch_emails = defaultdict(lambda: defaultdict(list))
                     
+                    
+                    if rule.alert_id.tag != "internal":
     
-                    branch_emails[rule.specific_email_recipients.branches_id.id]['emails'].append(rule.specific_email_recipients.email)
-                    branch_emails[rule.specific_email_recipients.branches_id.id]['type'].append("copy")
-                    
-                    branch_emails[rule.second_owner.branches_id.id]['emails'].append(rule.second_owner.email)
-                    branch_emails[rule.second_owner.branches_id.id]['type'].append("copy")
-                    
-                    branch_emails[rule.first_owner.branches_id.id]['emails'].append(rule.first_owner.email)
-                    branch_emails[rule.first_owner.branches_id.id]['type'].append("original")
-                    
-                    
-                 
-
-                    for branch in branches:
+                        branch_emails[rule.specific_email_recipients.branches_id.id]['emails'].append(rule.specific_email_recipients.email)
+                        branch_emails[rule.specific_email_recipients.branches_id.id]['type'].append("copy")
                         
-                    #     # Search for records in the control officer model that match the current branch
-        #             #    
-                        branch_officer = self.env['control.officer'].sudo().search([("branch_id", '=', int(branch))])
+                        # branch_emails[rule.second_owner.branches_id.id]['emails'].append(rule.second_owner.email)
+                        # branch_emails[rule.second_owner.branches_id.id]['type'].append("copy")
                         
-                        if branch_officer:
+                        # branch_emails[rule.first_owner.branches_id.id]['emails'].append(rule.first_owner.email)
+                        # branch_emails[rule.first_owner.branches_id.id]['type'].append("original")
+                        
+                        
+                    
+                        # distinct branch
+                        for branch in branches:
                             
-                                if rule.alert_id.id == branch_officer.alert_id.id and branch_officer.officer:
-                                
-                                        alert_group = branch_officer.alert_id.email_cc
+                            # Search for records in the control officer model that match the current branch
+        
+                            branch_officer = self.env['control.officer'].sudo().search([("branch_id", '=', int(branch))])
+                            
+                            if branch_officer and rule.alert_id.id == branch_officer.alert_id.id:
+                                    
+                                    alert_group_cc = branch_officer.alert_id.email_cc
                                         
                                     
-                                        branch_emails[branch_officer.branch_id.id]['emails'].append(branch_officer.officer.email)
-                                        branch_emails[branch_officer.branch_id.id]['type'].append("original")
+                                    branch_emails[branch_officer.branch_id.id]['emails'].append(branch_officer.officer.email)
+                                    branch_emails[branch_officer.branch_id.id]['type'].append("original")
                                         
-                                        
-                                        for user in alert_group:
-                                            
-                                            
-                                            branch_emails[user.branches_id.id]['emails'].append(user.email)  
-                                            branch_emails[user.branches_id.id]['type'].append("copy")  
-                                else:
-                               
-                                    alert_group = branch_officer.alert_id.email
-                                    alert_group_cc = branch_officer.alert_id.email_cc
-
-                                        
-                                    for user in alert_group:
-                                       
-                                            branch_emails[user.branches_id.id]['emails'].append(user.email)
-                                            branch_emails[user.branches_id.id]['type'].append("original")
                                         
                                     for user in alert_group_cc:
-                                          
-                                        branch_emails[user.branches_id.id]['emails'].append(user.email)
-                                        branch_emails[user.branches_id.id]['type'].append("copy")
-                                # branch_emails[branch].append(user.email)  
+                                            
+                                            
+                                        branch_emails[user.branches_id.id]['emails'].append(user.email)  
+                                        branch_emails[user.branches_id.id]['type'].append("copy")  
+                            else:
                                 
-                   
-                    print(branch_emails)
-        #             for key, bEmails in branch_emails.items():
-        #                 self.env.cr.execute(f"{rule.sql_text.query}")
-        #                 rowsForEachBranch = self.env.cr.fetchall()
-                
-        # #                 # Get column names dynamically
-        #                 columnsForEachBranch = [" ".join(desc[0].split("_")).title() for desc in self.env.cr.description]
-                        
-        # #                          # Create a CSV in memory
-        #                 csv_buffer = io.StringIO()
-        #                 csv_writer = csv.writer(csv_buffer)
-                        
+                                        alert_group = rule.alert_id.email
+                                        alert_group_cc = rule.alert_id.email_cc
 
-        # #                 # Write headers to the CSV
-        #                 csv_writer.writerow(columnsForEachBranch)
+                                            
+                                        for user in alert_group:
+                                        
+                                                branch_emails[user.branches_id.id]['emails'].append(user.email)
+                                                branch_emails[user.branches_id.id]['type'].append("original")
+                                            
+                                        for user in alert_group_cc:
+                                            
+                                            branch_emails[user.branches_id.id]['emails'].append(user.email)
+                                            branch_emails[user.branches_id.id]['type'].append("copy")
+                                    # branch_emails[branch].append(user.email)  
+                                    
+                                    
+                        for key, branch_data in branch_emails.items():
+                            
+                            emails = branch_data['emails']
+                            types = branch_data['type']
+                            
+                            mailto = set()
+                            mailcc = set()
+                            
+                            for email, type in zip(emails, types):
+                                if type == "original":
+                                    mailto.add(email)
+                                elif type == "copy":
+                                    mailcc.add(email)
+                                    
 
-        # #                 # Write data rows to the CSV
-        #                 for row in rowsForEachBranch:
-        #                     csv_writer.writerow(row)
-                        
-        #                 csv_content = csv_buffer.getvalue()
-        #                 csv_buffer.close()
-                        
-                        
-        # #                 # Step 3: Base64 encode the CSV content
-        #                 encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
-                        
-             
-        # #                 # Create the HTML table for the email
-                    
-        #                 table_html = """
-        #                 <table class="table table-bordered table-hover" style="width: 100%; max-width: 100vw; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #ddd; overflow:auto;">
-        #                     <thead style="background-color: #007046; color: #fff; padding: 12px;">
-        #                         <tr>
-        #                             <!-- Table headers -->
-        #                             {header_columns}
-        #                         </tr>
-        #                     </thead>
-        #                     <tbody>
-        #                         {table_rows}
-        #                     </tbody>
-        #                 </table>
-        #                 """
                                 
-        #                 # Generate the table header
-        #                 header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columnsForEachBranch])
-        #                 # Create the HTML table for the email
+                        
+                            # Send the email
+                            self.env.cr.execute(f"{rule.sql_text.query} WHERE subbranchcode = '{key}';")
+                            rowsForEachBranch = self.env.cr.fetchall()
                     
-                      
-        #                 # Generate the table rows
-        #                 rows_html = ""
-        #                 for row in rowsForEachBranch[:10]:
-        #                     rows_html += "<tr>"
-        #                     for cell in row:
-        #                         rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
-        #                     rows_html += "</tr>"
-                       
-        #                 # Insert the generated HTML into the main table structure
-        #                 table_html = table_html.format(header_columns=header_html, table_rows=rows_html)
-                       
-        #                 template = self.env.ref('internal_control.alert_rules_mail_template')
-                        
-                        
-        #                 if template:
+                            # Get column names dynamically
+                            columnsForEachBranch = [" ".join(desc[0].split("_")).title() for desc in self.env.cr.description]
+                            
+                                # Create a CSV in memory
+                            csv_buffer = io.StringIO()
+                            csv_writer = csv.writer(csv_buffer)
                             
 
-                                
-        # #                         # generate random string attached for each alert to be send
-        #                         alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
-                                
-                               
-                                
-        #                         attachment = {
-        #                             'name': f'{key}-report.csv',
-        #                             'mimetype': 'text/csv',  # The MIME type for CSV files
-        #                             'type': 'binary',
-        #                             'datas': encoded_content,
+                            # Write headers to the CSV
+                            csv_writer.writerow(columnsForEachBranch)
+
+                        # Write data rows to the CSV
+                            for row in rowsForEachBranch:
+                                csv_writer.writerow(row)
+                            
+                            csv_content = csv_buffer.getvalue()
+                            csv_buffer.close()
+                            
+                            
+                        # Step 3: Base64 encode the CSV content
+                            encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
+                            
+                
+                        # Create the HTML table for the email
+                        
+                            table_html = """
+                            <table class="table table-bordered table-hover" style="width: 100%; max-width: 100vw; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #ddd; overflow:auto;">
+                                <thead style="background-color: #007046; color: #fff; padding: 12px;">
+                                    <tr>
+                                        <!-- Table headers -->
+                                        {header_columns}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {table_rows}
+                                </tbody>
+                            </table>
+                            """
                                     
-        #                         }
+                            # Generate the table header
+                            header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columnsForEachBranch])
+                            # Create the HTML table for the email
+                        
+                        
+                            # Generate the table rows
+                            rows_html = ""
+                            for row in rowsForEachBranch[:10]:
+                                rows_html += "<tr>"
+                                for cell in row:
+                                    rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
+                                rows_html += "</tr>"
+                        
+                            # Insert the generated HTML into the main table structure
+                            table_html = table_html.format(header_columns=header_html, table_rows=rows_html)
+                        
+                            template = self.env.ref('internal_control.alert_rules_mail_template')
+                            
+                            
+                            if template:
                                 
-        #                         attachment_id = self.env['ir.attachment'].create(attachment)
+
+                                    
+                                    # generate random string attached for each alert to be send
+                                alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
+                                    
                                 
-        # #                         # record the history
-        #                         new_alert_history = self.env['alert.history'].create({
-        #                             "alert_id": alert_id,
-        #                             "attachment_data": attachment_id.id,
-        #                             "attachment_link": f"/web/content/{attachment_id.id}?download=true",
-        #                             "html_body": table_html,
-        #                             "alert_rule_id": rule.id,
-        #                             "process_id": rule.process_id.name,
-        #                             "process_category": rule.process_category_id.name,
-        #                             "risk_rating": rule.risk_rating,
-        #                             "date_created": rule.date_created,
-        #                             "last_checked": rule.last_checked,
-        #                             "email": ",".join(bEmails),
-        #                             "narration": rule.narration
+                                    
+                                attachment = {
+                                        'name': f'{key}-report.csv',
+                                        'mimetype': 'text/csv',  # The MIME type for CSV files
+                                        'type': 'binary',
+                                        'datas': encoded_content,
+                                        
+                                }
+                                    
+                                attachment_id = self.env['ir.attachment'].create(attachment)
+                                    
+                                # get the emails 
                                 
-        #                         })
-                                
-                               
+                                    
+                                # record the history
+                                new_alert_history = self.env['alert.history'].create({
+                                        "alert_id": alert_id,
+                                        "attachment_data": attachment_id.id,
+                                        "attachment_link": f"/web/content/{attachment_id.id}?download=true",
+                                        "html_body": table_html,
+                                        "alert_rule_id": rule.id,
+                                        "process_id": rule.process_id,
+                                        "risk_rating": rule.risk_rating,
+                                        "date_created": rule.date_created,
+                                        "last_checked": rule.last_checked,
+                                        "email": ",".join(list(mailto)) if mailto else "techsupport@novajii.com" ,
+                                        "email_cc": ",".join(list(mailcc)),
+                                        "narration": rule.narration
+                                    
+                                })
+                                    
+                                    
+                                template.send_mail(new_alert_history.id, force_send=True)
+                            
+                    
+                            else:
+                            raise ValidationError("Mail Template Not Found")
+                                    
+                
+                    else:
+                        pass               
                                 
                         
 
-        #                         template.send_mail(new_alert_history.id, force_send=True)
-                        
-                
-        #                 else:
-        #                   raise ValidationError("Mail Template Not Found")
                 
                      
                   

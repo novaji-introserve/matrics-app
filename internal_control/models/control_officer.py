@@ -6,7 +6,7 @@ class Control_officer(models.Model):
     _description = 'control officer'
     _rec_name = "officer"
     
-    branch_id = fields.Many2one("res.branch", string="Branch")
-    alert_id = fields.Many2one("alert.group", string="Alert Group")
-    officer = fields.Many2one("res.users", string="Control Officer")
+    branch_id = fields.Many2one("res.branch", string="Branch", required=True)
+    alert_id = fields.Many2one("alert.group", string="Alert Group", required=True)
+    officer = fields.Many2one("res.users", string="Control Officer", required=True)
     
