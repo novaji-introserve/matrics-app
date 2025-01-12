@@ -7,6 +7,7 @@
         <field name="subject">Mail Report From Icomply</field>
         <field name="email_from">noreply@covenantmfb.com.ng</field>
         <field name="email_to">{{ object.email }}</field>
+        <field name="email_cc">{{ object.email_cc }}</field>
         <field name="description">this is automation mail base on alert information in the database</field>
         <field name="body_html" type="html">
 

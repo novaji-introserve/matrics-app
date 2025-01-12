@@ -11,13 +11,13 @@ class alert_history(models.Model):
     attachment_link = fields.Char()
     html_body = fields.Html(string="html body")
     alert_rule_id = fields.Many2one("alert.rules")
-    process_category = fields.Char()
     last_checked = fields.Char()
     risk_rating = fields.Char()
     process_id = fields.Char()
     date_created = fields.Char()
     narration = fields.Char()
     email = fields.Char()
+    email_cc = fields.Char()
     
    
     def generate_csv(self):
