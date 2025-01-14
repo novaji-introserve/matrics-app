@@ -1,0 +1,16 @@
+2025-01-14 12:32:26,383 - INFO - Table sync_timestamps ensured.
+2025-01-14 12:32:26,394 - INFO - Table sync_attempts ensured.
+2025-01-14 12:32:26,402 - INFO - Table sync_logs ensured.
+2025-01-14 12:32:26,862 - DEBUG - Fetching last sync info for tbl_transactions
+2025-01-14 12:32:26,865 - DEBUG - Checking for changes in tbl_transactions since 2000-01-01 00:00:00
+2025-01-14 12:53:05,005 - ERROR - Error syncing table tbl_transactions: current transaction is aborted, commands ignored until end of transaction block
+
+2025-01-14 12:53:05,007 - ERROR - Error logging to sync_logs for tbl_transactions: current transaction is aborted, commands ignored until end of transaction block
+
+2025-01-14 12:53:05,009 - ERROR - Failed to sync tbl_transactions: current transaction is aborted, commands ignored until end of transaction block
+
+2025-01-14 12:53:06,790 - INFO - Sync cycle completed successfully.
+2025-01-14 12:58:50,487 - ERROR - Connection error: ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53)')
+2025-01-14 12:58:50,490 - ERROR - Error during sync cycle: ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53)')
+2025-01-14 13:04:20,496 - ERROR - Connection error: ('HYT00', '[HYT00] [Microsoft][ODBC SQL Server Driver]Login timeout expired (0) (SQLDriverConnect)')
+2025-01-14 13:04:20,498 - ERROR - Error during sync cycle: ('HYT00', '[HYT00] [Microsoft][ODBC SQL Server Driver]Login timeout expired (0) (SQLDriverConnect)')

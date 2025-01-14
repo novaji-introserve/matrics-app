@@ -330,7 +330,7 @@ class alert_rules(models.Model):
                             
                     
                             else:
-                            raise ValidationError("Mail Template Not Found")
+                             raise ValidationError("Mail Template Not Found")
                                     
                 
                     else:

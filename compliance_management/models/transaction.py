@@ -11,7 +11,7 @@ class Transaction(models.Model):
     ]
     _order = 'date_created desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    name = fields.Char(string="Reference Number", required=True, index=True)
+    name = fields.Char(string="Reference Number", index=True)
     account_id = fields.Many2one(
         comodel_name='res.partner.account', string='Account', index=True)
     currency_id = fields.Many2one(
