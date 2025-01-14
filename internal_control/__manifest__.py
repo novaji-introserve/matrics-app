@@ -23,7 +23,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/actions.xml',
+        # 'views/actions.xml',
         'views/alert_rules_view.xml',
         'views/alert_group.xml',
         'views/alert_history.xml',
@@ -47,7 +47,7 @@
         'views/sql_view.xml', 
         'views/menus.xml',
         
-        'security/groups.xml'
+        'security/groups.xml',
         
         
     ],

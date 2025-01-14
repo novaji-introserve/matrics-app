@@ -24,19 +24,19 @@
                         <!-- Title Section -->
                         <div class="oe_title">
                             <h1>
-                                <field name="accountnumber_null" readonly="1" placeholder="Account Number" />
+                                <field name="accountnumber" placeholder="Account Number" />
                             </h1>
                         </div>
                         <group>
                             <group>
-                                <field name="tran_date_null" readonly="1" />
-                                <field name="accountnumber_null" readonly="1" />
-                                <field name="tran_currency_null" readonly="1" />
+                                <field name="trandate"/>
+                                <field name="accountnumber"/>
+                                <field name="trancurrency" />
                             </group>
                             <group>
                                 <field name="likely_fraud" widget="boolean_toggle" readonly="1" />
-                                <field name="tellerno_null" readonly="1" />
-                                <field name="narration_null" readonly="1" />
+                                <field name="tellerno"/>
+                                <!-- <field name="narration"/> -->
                             </group>
                         </group>
                 
@@ -46,24 +46,24 @@
                             <page string="Transaction Details" name="transaction_details">
                                 <group>
                                     <group string="Date Information">
-                                        <field name="valuedate_null" readonly="1" />
-                                        <field name="actual_date_null" readonly="1" />
+                                        <field name="valuedate"/>
+                                        <field name="actualdate"/>
                                     </group>
                                     <group string="Amount Details">
-                                        <field name="amount" readonly="1" string="Amount" />
-                                        <field name="crossrate_null" readonly="1" />
-                                        <field name="charge_null" readonly="1" />
+                                        <field name="tranamount" string="Amount" />
+                                        <field name="crossrate"/>
+                                        <field name="charge"/>
                                     </group>
                                 </group>
                                 <group>
                                     <group string="Transaction Information">
-                                        <field name="account_module_null" readonly="1" />
-                                        <field name="tran_channel_null" readonly="1" />
-                                        <field name="reversal_null" readonly="1" />
+                                        <field name="accountmodule"/>
+                                        <field name="tran_channel"/>
+                                        <field name="reversal"/>
                                     </group>
                                     <group string="Reference Numbers">
-                                        <field name="batchno_null" readonly="1" />
-                                        <field name="chknum_null" readonly="1" />
+                                        <field name="batchno" />
+                                        <field name="chknum"/>
                                     </group>
                                 </group>
                             </page>
@@ -72,13 +72,13 @@
                             <page string="Processing Details" name="processing_details">
                                 <group>
                                     <group string="Authorization">
-                                        <field name="authid_null" readonly="1" />
-                                        <field name="overideid_null" readonly="1" />
-                                        <field name="status_null" readonly="1" />
+                                        <field name="authid"/>
+                                        <field name="overideid"/>
+                                        <field name="status"/>
                                     </group>
                                     <group string="Branch Information">
-                                        <field name="subbranchcode_null" readonly="1" />
-                                        <field name="deptcode_null" readonly="1" />
+                                        <field name="subbranchcode"/>
+                                        <field name="deptcode"/>
                                     </group>
                                 </group>
                             </page>
@@ -87,12 +87,12 @@
                             <page string="Reference Information" name="reference_info">
                                 <group>
                                     <group string="System References">
-                                        <field name="request_id_null" readonly="1" />
-                                        <field name="rrn_null" readonly="1" />
-                                        <field name="rem_null" readonly="1" />
+                                        <field name="request_id"/>
+                                        <field name="rrn"/>
+                                        <field name="rem"/>
                                     </group>
                                     <group string="Post Information">
-                                        <field name="Postseq" readonly="1" />
+                                        <field name="postseq" />
                                     </group>
                                 </group>
                             </page>
@@ -114,25 +114,25 @@
 
             <xpath expr="//tree" position="replace">
                 <tree string="Transaction Monitoring" create="false" >
-                    <field name="refno_null" />
-                    <field name="tran_date_null" />
-                    <field name="valuedate_null" />
-                    <field name="actual_date_null" />
-                    <field name="narration_null" />
-                    <field name="tran_currency_null" />
-                    <field name="crossrate_null" />
-                    <field name="reversal_null" />
-                    <field name="account_module_null" />
-                    <field name="tellerno_null" />
-                    <field name="accountnumber_null" />
-                    <field name="tran_channel_null" />
+                    <field name="refno" />
+                    <field name="trandate" />
+                    <field name="valuedate" />
+                    <field name="actualdate" />
+                    <!-- <field name="narration" /> -->
+                    <field name="trancurrency" />
+                    <field name="crossrate" />
+                    <field name="reversal" />
+                    <field name="accountmodule" />
+                    <field name="tellerno" />
+                    <field name="accountnumber" />
+                    <field name="tran_channel" />
                     <field name="likely_fraud" widget="boolean_toggle" readonly="1" />
                     <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                         decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('lowel')" />
                     <field name="state" widget="badge" decoration-warning="state in ('new')" decoration-success="state in ('done')" />
                     
-                    <field name="request_id_null" />
-                    <field name="rrn_null" />
+                    <field name="request_id" />
+                    <field name="rrn" />
                 </tree>
             </xpath>
 
