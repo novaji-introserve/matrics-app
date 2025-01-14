@@ -133,8 +133,9 @@ class Customer(models.Model):
             e.total_accounts = len(e.account_ids)
 
     def action_total_accounts(self):
+        
         return {
-            'name': _('Accounts'),
+            'name': 'Accounts',
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner.account',
             'view_mode': 'tree,form',

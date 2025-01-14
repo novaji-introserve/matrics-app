@@ -9,7 +9,7 @@
                 <field name="alert_id" string="Alert Reference" />
                 <field name="process_id" />
                 <field name="risk_rating" />
-                <field name="narration" />
+                <!-- <field name="narration" /> -->
                 <field name="email" />
                 <field name="date_created" />
 

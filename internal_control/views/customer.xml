@@ -8,8 +8,11 @@
         <field name="arch" type="xml">
            
             <xpath expr="//header" position="replace">
-                <header />
+                <header/>
             </xpath>
+            <xpath expr="//button[@name='get_risk_score']" position="replace" />
+            <xpath expr="//button[@name='action_view_partner_invoices']" position="replace" />
+            <xpath expr="//button[@name='action_view_sale_order']" position="replace" />
             <xpath expr="//page[@name='plans']" position="replace" />
              <xpath expr="//page[@name='accounts']" position="replace" /> 
             <xpath expr="//page[@name='risk_assessment']" position="replace" />
