@@ -48,29 +48,50 @@ export class ChartRenderer extends Component {
            const clickedIndex = elements[0].index;
            const filter = this.props.config.labels[clickedIndex];
 
-          if(filter == "High" || filter == "Medium" || filter == "Low"){
+          if(this.props.title == "Rating"){
+            
             this.navigate.doAction({
               type: "ir.actions.act_window",
-              name: "open_chart_by_priority",
-              res_model: "case.management",
+              name: "Transaction by priority",
+              res_model: "res.customer.transaction",
               domain:
                 this.props.datepicked > 0
-                  ? [["priority_level_id.name", "=", filter],["created_at", ">=", this.props.current_datepicked]]
-                  : [["priority_level_id.name", "=", filter]],
+                  ? [["risk_level", "=", filter],["created_at", ">=", this.props.current_datepicked]]
+                  : [["risk_level", "=", filter]],
               views: [
                 [false, "tree"],
                 [false, "form"],
               ],
             });
-          }else{
+          }else if(this.props.title == "Customer"){
+             
             this.navigate.doAction({
               type: "ir.actions.act_window",
-              name: "open_chart_by_priority",
-              res_model: "case.management",
+              name: "Customer by priority",
+              res_model: "res.partner",
               domain:
                 this.props.datepicked > 0
-                  ? [["case_status_id.name", "=", filter],["created_at", ">=", this.props.current_datepicked]]
-                  : [["case_status_id.name", "=", filter]],
+                  ? [
+                      ["risk_level", "=", filter],
+                      ["created_at", ">=", this.props.current_datepicked],
+                    ]
+                  : [["risk_level", "=", filter]],
+              views: [
+                [false, "tree"],
+                [false, "form"],
+              ],
+            });
+          }
+          else{
+           
+            this.navigate.doAction({
+              type: "ir.actions.act_window",
+              name: "Transaction state",
+              res_model: "res.customer.transaction",
+              domain:
+                this.props.datepicked > 0
+                  ? [["state", "=", filter],["created_at", ">=", this.props.current_datepicked]]
+                  : [["state", "=", filter]],
               views: [
                 [false, "tree"],
                 [false, "form"],
