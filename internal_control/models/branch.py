@@ -4,3 +4,4 @@ class Branch(models.Model):
     _inherit = "res.branch"
     _description = 'branch table'
     
+    

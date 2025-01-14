@@ -12,7 +12,7 @@ class CustomerAccount(models.Model):
          "Account Name already exists. Value must be unique!"),
     ]
     _order = "name"
-    name = fields.Char(string="Account Number", required=True)
+    name = fields.Char(string="Account Number")
     account_name = fields.Char(string='Account Name', index=True)
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
