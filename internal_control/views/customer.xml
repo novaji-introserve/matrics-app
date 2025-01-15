@@ -79,9 +79,9 @@
             
             -->
             <!--  -->
-            <xpath expr="//field[@name='phone']" position="replace">
+            <!-- <xpath expr="//field[@name='phone']" position="replace">
                 <field name="phone1" string="Phone" optional="show" />
-            </xpath>
+            </xpath> -->
 <xpath expr="//field[@name='registration_date']" position="replace">
     <field name="idissuedate" string="Issue Date"  />
 </xpath>
