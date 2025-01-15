@@ -7,7 +7,7 @@
         "primary_keys": ["refno"],               
         "track_changes": true,                 
         "timestamp_column": "", 
-        "batch_size": 30000,
+        "batch_size": 100000,
         "sync_strategy": "row_hash"  
     }
 }

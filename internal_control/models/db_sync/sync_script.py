@@ -43,11 +43,11 @@ class TableConfig:
     primary_keys: List[str]
     track_changes: bool
     timestamp_column: str
-    batch_size: int = 30000
+    batch_size: int = 100000
     retry_attempts: int = 3
     sync_interval: int = 120
-    min_batch_size: int = 30000
-    max_batch_size: int = 50000
+    min_batch_size: int = 100000
+    max_batch_size: int = 200000
     performance_threshold: float = 2.0
     sync_strategy: str = "row_hash"  # Default strategy
 
@@ -105,20 +105,17 @@ class DatabaseSync:
                 min_batch_size=settings.get('min_batch_size', 10000),
                 max_batch_size=settings.get('max_batch_size', 50000),
                 performance_threshold=settings.get('performance_threshold', 2.0),
-                sync_strategy=settings.get('sync_strategy')  # Load strategy from config
+                sync_strategy=settings.get('sync_strategy')
             )
             for name, settings in table_config.items() if isinstance(settings, dict)
         }
         
-        # Load independent and dependent tables from config
         self.independent_tables = table_config.get("independent_tables", [])
         self.dependent_tables = table_config.get("dependent_tables", [])
         
         self.default_start_date = datetime(2000, 1, 1)
         self.first_sync_tracker: Dict[str, bool] = {name: True for name in self.table_configs.keys()}
-
-        # Define sync_interval
-        self.sync_interval = table_config.get("sync_interval", 300)  # Default to 300 seconds if not set
+        self.sync_interval = table_config.get("sync_interval", 300)
 
     @contextmanager
     def get_connections(self):
@@ -136,6 +133,20 @@ class DatabaseSync:
                 mssql_conn.close()
             if pg_conn:
                 pg_conn.close()
+
+    def get_table_columns(self, cursor, table_name: str, is_postgres: bool = False) -> List[str]:
+        """Get column names for a table, normalized to lower case."""
+        if is_postgres:
+            cursor.execute("""
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name = %s
+                ORDER BY ordinal_position
+            """, (table_name,))
+            return [col[0].lower() for col in cursor.fetchall()]  # Convert to lower case
+        else:
+            cursor.execute(f"SELECT * FROM {table_name} WHERE 1=0")
+            return [column[0].lower() for column in cursor.description]  # Convert to lower case
 
     def create_sync_tables(self, pg_cursor):
         table_definitions = {
@@ -200,7 +211,6 @@ class DatabaseSync:
 
     def update_sync_info(self, pg_cursor, table_name: str, sync_time: datetime, new_hashes: Dict[str, str]):
         try:
-            # First get existing hashes
             pg_cursor.execute(
                 "SELECT row_hashes FROM sync_timestamps WHERE table_name = %s",
                 (table_name,)
@@ -210,7 +220,6 @@ class DatabaseSync:
             if result and result[0]:
                 existing_hashes = result[0]
 
-            # Merge existing hashes with new ones
             merged_hashes = {**existing_hashes, **new_hashes}
 
             pg_cursor.execute("""
@@ -236,120 +245,137 @@ class DatabaseSync:
         try:
             self.metrics[source_table_name] = SyncMetrics()
 
-            # Fetch last sync time and hashes
-            last_sync_time, last_hashes = self.get_last_sync_info(pg_cursor, source_table_name)
+            # Get columns from both source and target tables
+            source_columns = self.get_table_columns(mssql_cursor, source_table_name)
+            target_columns = self.get_table_columns(pg_cursor, target_table_name, is_postgres=True)
 
-            logging.debug(f"Checking for changes in {source_table_name} since {last_sync_time}")
+            # Normalize target columns to lower case for comparison
+            normalized_target_columns = [col.lower() for col in target_columns]
+
+            # Find common columns between source and target (case insensitive)
+            common_columns = [col for col in source_columns if col in normalized_target_columns]
+
+            # Log column differences if any
+            missing_columns = set(source_columns) - set(normalized_target_columns)
+            if missing_columns:
+                logging.warning(f"Columns in source but not in target for {source_table_name}: {missing_columns}")
+
+            # Get last sync info
+            last_sync_time, last_hashes = self.get_last_sync_info(pg_cursor, source_table_name)
+            
+            logging.info(f"Starting sync of {source_table_name}")
+            logging.debug(f"Checking for changes since {last_sync_time}")
 
             # Determine sync strategy
             is_first_sync = self.first_sync_tracker[source_table_name]
             params = None
 
             if is_first_sync:
-                # First sync uses row hash strategy
-                all_rows_query = f"SELECT * FROM {source_table_name}"
+                all_rows_query = f"SELECT {', '.join(common_columns)} FROM {source_table_name}"
                 sync_strategy_used = "row_hash"
                 self.first_sync_tracker[source_table_name] = False
             else:
-                # Subsequent syncs: check the strategy
                 if config.sync_strategy == "timestamp" and config.timestamp_column:
-                    all_rows_query = f"SELECT * FROM {source_table_name} WHERE {config.timestamp_column} > ?"
+                    all_rows_query = f"SELECT {', '.join(common_columns)} FROM {source_table_name} WHERE {config.timestamp_column} > ?"
                     params = (last_sync_time,)
                     sync_strategy_used = "timestamp"
                 else:
-                    all_rows_query = f"SELECT * FROM {source_table_name}"
+                    all_rows_query = f"SELECT {', '.join(common_columns)} FROM {source_table_name}"
                     sync_strategy_used = "row_hash"
 
-            # Execute the query to get rows from source
+            # Execute the query with common columns
             if params:
                 mssql_cursor.execute(all_rows_query, params)
             else:
                 mssql_cursor.execute(all_rows_query)
-                
-            columns = [column[0] for column in mssql_cursor.description]
+
             total_rows = 0
             current_hashes = {}
-            changed_rows = []
+            batch_count = 0
 
             while True:
+                logging.info(f"Fetching batch {batch_count + 1} from {source_table_name}")
                 rows = mssql_cursor.fetchmany(config.batch_size)
                 if not rows:
                     break
 
+                batch_count += 1
+                batch_start_time = time.time()
+                changed_rows_dict = {}  # Use dictionary to handle duplicates
+
+                # Process rows and collect changes
                 for row in rows:
-                    row_dict = dict(zip(columns, row))
+                    row_dict = dict(zip(common_columns, row))
                     pk_value = "_".join(str(row_dict[pk]) for pk in config.primary_keys)
                     row_hash = self.calculate_row_hash(row_dict)
                     current_hashes[pk_value] = row_hash
 
-                    # For row_hash strategy, check if hash has changed
                     if sync_strategy_used == "row_hash" and not is_first_sync:
                         if pk_value not in last_hashes or last_hashes[pk_value] != row_hash:
-                            changed_rows.append(row)
+                            # Keep only the latest row for each primary key
+                            changed_rows_dict[pk_value] = row
                             total_rows += 1
                     else:
-                        changed_rows.append(row)
+                        changed_rows_dict[pk_value] = row
                         total_rows += 1
 
-            self.metrics[source_table_name].total_rows = total_rows
+                # Convert dictionary values back to list
+                changed_rows = list(changed_rows_dict.values())
 
-            # Log the sync attempt
-            self.log_sync_attempt(pg_cursor, source_table_name, changes_found=(total_rows > 0), rows_processed=total_rows)
+                if changed_rows:
+                    # Prepare bulk insert query
+                    placeholders = []
+                    flat_values = []
+                    for row in changed_rows:
+                        placeholders.append(f"({', '.join(['%s'] * len(row))})")
+                        flat_values.extend(row)
 
-            if total_rows == 0:
-                logging.debug(f"No changes detected in {source_table_name}, skipping sync")
-                # Still update the sync info to maintain latest check time
-                self.update_sync_info(pg_cursor, source_table_name, datetime.now(), current_hashes)
-                pg_conn.commit()
-                return
-
-            # Process only the changed rows
-            batch_start_time = time.time()
-            changes_detected = False
-
-            # Process rows in batches
-            for i in range(0, len(changed_rows), config.batch_size):
-                batch_rows = changed_rows[i:i + config.batch_size]
-                
-                for row in batch_rows:
-                    # Perform upsert
-                    placeholders = ", ".join(["%s"] * len(row))
-                    update_cols = [f"{col} = EXCLUDED.{col}" for col in columns]
-
-                    upsert_query = f"""
-                        INSERT INTO {target_table_name} ({', '.join(columns)})
-                        VALUES ({placeholders})
-                        ON CONFLICT ({', '.join(config.primary_keys)})  -- Use the unique column(s) directly
-                        DO UPDATE SET {', '.join(update_cols)}
+                    # Construct the bulk upsert query
+                    bulk_upsert_query = f"""
+                        INSERT INTO {target_table_name} ({', '.join(common_columns)})
+                        VALUES {', '.join(placeholders)}
+                        ON CONFLICT ({', '.join(config.primary_keys)})
+                        DO UPDATE SET 
+                            {', '.join(f"{col} = EXCLUDED.{col}" for col in common_columns)}
                     """
 
+                    # Execute bulk upsert with retries
                     for attempt in range(config.retry_attempts):
                         try:
-                            pg_cursor.execute(upsert_query, row)
+                            pg_cursor.execute(bulk_upsert_query, flat_values)
+                            pg_conn.commit()
                             break
                         except Exception as e:
                             if attempt == config.retry_attempts - 1:
+                                pg_conn.rollback()  # Add explicit rollback
                                 raise
+                            logging.warning(f"Retry {attempt + 1} for batch {batch_count} due to: {str(e)}")
+                            pg_conn.rollback()  # Add explicit rollback
                             time.sleep(1)
 
                 batch_time = time.time() - batch_start_time
                 self.metrics[source_table_name].batch_times.append(batch_time)
-                self.metrics[source_table_name].processed_rows += len(batch_rows)
+                self.metrics[source_table_name].processed_rows += len(changed_rows)
+                
+                logging.info(f"Processed batch {batch_count} in {batch_time:.2f} seconds. "
+                            f"Rows in this batch: {len(changed_rows)}. Total rows processed: {total_rows}")
 
-                changes_detected = True
-
-            if changes_detected:
-                # Update sync info with the new hashes
+            if total_rows > 0:
                 self.update_sync_info(pg_cursor, source_table_name, datetime.now(), current_hashes)
-                self.log_sync(pg_cursor, source_table_name, target_table_name, "success", is_significant=True, strategy=sync_strategy_used)
+                self.log_sync(pg_cursor, source_table_name, target_table_name, "success", 
+                            is_significant=True, strategy=sync_strategy_used)
                 self.log_performance_metrics(source_table_name)
-
-            pg_conn.commit()
+            else:
+                logging.info(f"No changes detected in {source_table_name}")
+                self.update_sync_info(pg_cursor, source_table_name, datetime.now(), current_hashes)
+                self.log_sync(pg_cursor, source_table_name, target_table_name, "success", 
+                            is_significant=False, strategy=sync_strategy_used)
 
         except Exception as e:
             logging.error(f"Error syncing table {source_table_name}: {str(e)}")
-            self.log_sync(pg_cursor, source_table_name, target_table_name, "failure", str(e), is_significant=True, strategy=sync_strategy_used)
-            pg_conn.commit()
+            self.log_sync(pg_cursor, source_table_name, target_table_name, "failure", 
+                        str(e), is_significant=True, strategy=sync_strategy_used)
+            pg_conn.rollback()  # Ensure rollback on error
             raise
 
     def log_sync_attempt(self, pg_cursor, table_name: str, changes_found: bool, rows_processed: int = 0):
@@ -386,7 +412,7 @@ class DatabaseSync:
                 error_message,
                 json.dumps(metrics_data, cls=DateTimeEncoder) if metrics_data else None,
                 is_significant,
-                strategy  # Log the strategy used
+                strategy
             ))
         except Exception as e:
             logging.error(f"Error logging to sync_logs for {source_table_name}: {str(e)}")
@@ -470,7 +496,8 @@ if __name__ == "__main__":
     while True:
         try:
             sync_manager.sync_all_tables()
-            logging.info("Sync cycle completed successfully.")
+            logging.info("All tables synchronized successfully.")
         except Exception as e:
-            logging.error(f"Error during sync cycle: {str(e)}")
-        time.sleep(sync_manager.sync_interval)  # Sleep for the defined sync interval
+            logging.error(f"Error during synchronization: {str(e)}")
+        
+        time.sleep(sync_manager.sync_interval)
