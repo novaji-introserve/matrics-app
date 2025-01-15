@@ -6,7 +6,7 @@
         "pwd": "Op3n4321"
     },
     "postgres_connection": {
-        "dbname": "convenant_db",
+        "dbname": "convenant_mfb",
         "user": "postgres",
         "password": "postgres",
         "host": "localhost",

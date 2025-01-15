@@ -3,6 +3,10 @@ from odoo import models, fields, api
 class Branch(models.Model):
     _inherit = "res.branch"
     _description = 'branch table'
+    _sql_constraints = [
+        ('uniq_branch_code', 'unique(branchcode)',
+         "Branch Code already exists. Value must be unique!"),
+    ]
     
     branchname = fields.Char(string='Branch Name')
     branchcode = fields.Char(string='Branch Code')
