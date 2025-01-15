@@ -114,7 +114,7 @@
 
             <xpath expr="//tree" position="replace">
                 <tree string="Transaction Monitoring" create="false" >
-                    <field name="refno" />
+                    <field name="refno"/>
                     <field name="trandate" />
                     <field name="valuedate" />
                     <field name="actualdate" />

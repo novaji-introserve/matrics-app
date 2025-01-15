@@ -23,16 +23,16 @@
                     </div>
 
                     <div class="row mt-2 mt-md-4">
-                        <KpiCard onclick.bind="displayAllCases" name="'High Risk Tran.'" value="state.kpi.highrisk"
+                        <KpiCard onclick.bind="displayHighTransaction" name="'High Risk Tran.'" value="state.kpi.highrisk"
                             percentage="state.kpi.highriskbypercent" />
 
-                        <KpiCard onclick.bind="displayAllOpenCases" name="'Medium Risk Tran.'"
+                        <KpiCard onclick.bind="displayMediumTransaction" name="'Medium Risk Tran.'"
                             value="state.kpi.mediumrisk" percentage="state.kpi.mediumriskbypercent" />
 
-                        <KpiCard onclick.bind="displayAllCloseCases" name="'Low Risk Tran.'" value="state.kpi.lowrisk"
+                        <KpiCard onclick.bind="displayLowTransaction" name="'Low Risk Tran.'" value="state.kpi.lowrisk"
                             percentage="state.kpi.lowriskpercentage" />
 
-                        <KpiCard onclick.bind="displayAllOverdueCases" name="'Screened Transaction'"
+                        <KpiCard onclick.bind="displayScreenedTransaction" name="'Screened Transaction'"
                             value="state.kpi.totalScreenedTransactionCount" percentage="state.kpi.totalrulespercentage" />
 
                         <KpiCard onclick.bind="displayNothing" name="'High Risk(%)'"
@@ -47,7 +47,7 @@
                             value="state.kpi.lowriskinRespectToTotalTransaction"
                             percentage="state.kpi.lowriskiinRespectToTotalTransactionPercent" />
 
-                        <KpiCard onclick.bind="displayNothing" name="'Total Processes'"
+                        <KpiCard onclick.bind="displayTotalProcess" name="'Total Processes'"
                             value="state.kpi.alertrulestotal"
                             percentage="" />
                     </div>

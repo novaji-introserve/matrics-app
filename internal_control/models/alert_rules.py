@@ -298,7 +298,8 @@ class alert_rules(models.Model):
                                                 "last_checked": rule.last_checked,
                                                 "email": branch_officer.officer.email,
                                                 "email_cc": "",
-                                                "narration": rule.narration
+                                                "narration": rule.narration,
+                                                "name": rule.name
                                             
                                     })
                                             
@@ -428,7 +429,8 @@ class alert_rules(models.Model):
                                                 "last_checked": rule.last_checked,
                                                 "email": ",".join(list(mailto)) if len(list(mailto)) > 0 else "techsupport@novajii.com",
                                                 "email_cc": ",".join(list(mailcc)),
-                                                "narration": rule.narration
+                                                "narration": rule.narration,
+                                                "name": rule.name
                                             
                                     })
                                             
@@ -551,7 +553,8 @@ class alert_rules(models.Model):
                                     "last_checked": rule.last_checked,
                                     "email": ",".join(list(mailto)) if len(list(mailto)) else "techsupport@novajii.com",
                                     "email_cc": ",".join(list(mailcc)),
-                                    "narration": rule.narration
+                                    "narration": rule.narration,
+                                    "name": rule.name
                                 
                         })
                                 

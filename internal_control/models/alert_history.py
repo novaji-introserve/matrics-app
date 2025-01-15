@@ -14,6 +14,7 @@ class alert_history(models.Model):
     last_checked = fields.Char()
     risk_rating = fields.Char()
     process_id = fields.Char()
+    name = fields.Char()
     date_created = fields.Char()
     narration = fields.Char()
     email = fields.Char()

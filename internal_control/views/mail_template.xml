@@ -4,7 +4,7 @@
     <record id="alert_rules_mail_template" model="mail.template">
         <field name="name">Alert Mailing System</field>
         <field name="model_id" ref="internal_control.model_alert_history"/>
-        <field name="subject">Mail Report From Icomply</field>
+        <field name="subject">{{ object.name }}</field>
         <field name="email_from">noreply@covenantmfb.com.ng</field>
         <field name="email_to">{{ object.email }}</field>
         <field name="email_cc">{{ object.email_cc }}</field>
