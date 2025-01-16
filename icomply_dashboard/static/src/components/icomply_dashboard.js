@@ -113,120 +113,113 @@ export class IcomplyDashboard extends Component {
        
         
 
-        // let lowriskCount = await this.api.searchCount(
-        //   "res.customer.transaction",
-        //   [
-        //     ["risk_rating", "=", "low"],
-        //     ["create_date", ">=", this.state.current_datepicked],
-        //   ]
-        // );
+        let lowriskCount = await this.api.searchCount(
+          "res.customer.transaction",
+          [
+            ["risk_level", "=", "low"],
+            ["create_date", ">=", this.state.current_datepicked],
+          ]
+        );
         
         let mediumriskCount = await this.api.searchCount(
           "res.customer.transaction",
           [
-            ["risk_rating", "=", "medium"],
+            ["risk_level", "=", "medium"],
             ["create_date", ">=", this.state.current_datepicked],
           ]
         );
-        // let highriskCount = await this.api.searchCount(
-        //   "res.customer.transaction",
-        //   [
-        //     ["risk_rating", "=", "high"],
-        //     ["create_date", ">=", this.state.current_datepicked],
-        //   ]
-        // );
-        // let totalScreenedTransactionCount = await this.api.searchCount(
-        //   "res.customer.transaction",
-        //   [
-        //     ["rule_id", "!=", null],
-        //     ["create_date", ">=", this.state.current_datepicked],
-        //   ]
-        // );
+        let highriskCount = await this.api.searchCount(
+          "res.customer.transaction",
+          [
+            ["risk_level", "=", "high"],
+            ["create_date", ">=", this.state.current_datepicked],
+          ]
+        );
+        let totalScreenedTransactionCount = await this.api.searchCount(
+          "res.customer.transaction",
+          [
+            ["rule_id", "!=", null],
+            ["create_date", ">=", this.state.current_datepicked],
+          ]
+        );
+        alert(totalScreenedTransactionCount)
+        alert(highriskCount)
 
-        alert(lowriskCount)
-        // alert(totalScreenedTransactionCount)
-        // alert(highriskCount)
+        this.state.kpi.lowrisk = lowriskCount;
+        this.state.kpi.mediumrisk = mediumriskCount;
+        this.state.kpi.highrisk = highriskCount;
+        this.state.kpi.totalScreenedTransactionCount =
+          totalScreenedTransactionCount;
+        this.state.kpi.totaltransaction = totalTransactionCount;
+        this.state.kpi.alertrulestotal = alerttulesCount;
 
-        // this.state.kpi.lowrisk = lowriskCount;
-        // this.state.kpi.mediumrisk = mediumriskCount;
-        // this.state.kpi.highrisk = highriskCount;
-        // this.state.kpi.totalScreenedTransactionCount =
-        //   totalScreenedTransactionCount;
-        // this.state.kpi.totaltransaction = totalTransactionCount;
-        // this.state.kpi.alertrulestotal = alerttulesCount;
-
-        // alert("this is lowrisk "+lowriskCount);
-        // alert("this is medium "+mediumriskCount);
-        // alert("this is highrisk "+highriskCount);
-        // alert("this is totalscreened "+totalScreenedTransactionCount);
-        // alert("this is totaltransaction "+totalTransactionCount);
-        // alert("this is totaltransaction "+alerttulesCount);
-        // // each risk count in respect to all records
-        // this.state.kpi.lowriskinRespectToTotalTransaction = `${(
-        //   (lowriskCount / totalTransactionCount) *
-        //   100
-        // ).toFixed(1)}%`;
-        // this.state.kpi.mediumriskinRespectToTotalTransaction = `${(
-        //   (mediumriskCount / totalTransactionCount) *
-        //   100
-        // ).toFixed(1)}%`;
-        // this.state.kpi.highriskinRespectToTotalTransaction = `${(
-        //   (highriskCount / totalTransactionCount) *
-        //   100
-        // ).toFixed(1)}%`;
-        // // this calculate total data in range of the date filtered and last occurrence o the date
-        // let total_rules_prev_count = await this.api.searchCount("res.customer.transaction", [
-        //   ["created_date", "<", this.state.current_datepicked],
-        //   ["created_date", ">=", this.state.previous_datepicked],
-        // ]);
+  
+        // each risk count in respect to all records
+        this.state.kpi.lowriskinRespectToTotalTransaction = `${(
+          (lowriskCount / totalTransactionCount) *
+          100
+        ).toFixed(1)}%`;
+        this.state.kpi.mediumriskinRespectToTotalTransaction = `${(
+          (mediumriskCount / totalTransactionCount) *
+          100
+        ).toFixed(1)}%`;
+        this.state.kpi.highriskinRespectToTotalTransaction = `${(
+          (highriskCount / totalTransactionCount) *
+          100
+        ).toFixed(1)}%`;
+        // this calculate total data in range of the date filtered and last occurrence o the date
+        let total_rules_prev_count = await this.api.searchCount("res.customer.transaction", [
+          ["created_date", "<", this.state.current_datepicked],
+          ["created_date", ">=", this.state.previous_datepicked],
+        ]);
 
 
-        // let low_risk_prev_count = await this.api.searchCount("res.customer.transaction", [
-        //   ["risk_rating", "=", "low"],
-        //   ["created_date", "<", this.state.current_datepicked],
-        //   ["created_date", ">=", this.state.previous_datepicked],
-        // ]);
-        // let medium_risk_prev_count = await this.api.searchCount("res.customer.transaction", [
-        //   ["risk_rating", "=", "medium"],
-        //   ["created_date", "<", this.state.current_datepicked],
-        //   ["created_date", ">=", this.state.previous_datepicked],
-        // ]);
-        // let high_risk_prev_count = await this.api.searchCount("res.customer.transaction", [
-        //   ["risk_rating", "=", "high"],
-        //   ["created_date", "<", this.state.current_datepicked],
-        //   ["created_date", ">=", this.state.previous_datepicked],
-        // ]);
-        // this.state.kpi.totaltransactionpercentage =
-        //   total_rules_prev_count == 0
-        //     ? 0
-        //     : (
-        //         ((totalTransactionCount - total_rules_prev_count) /
-        //           total_rules_prev_count) *
-        //         100
-        //       ).toFixed(2);
-        // this.state.kpi.lowriskpercentage =
-        //   low_risk_prev_count == 0
-        //     ? 0
-        //     : (
-        //         ((lowriskCount - low_risk_prev_count) / low_risk_prev_count) *
-        //         100
-        //       ).toFixed(2);
-        // this.state.kpi.mediumriskbypercent =
-        //   medium_risk_prev_count == 0
-        //     ? 0
-        //     : (
-        //         ((mediumriskCount - medium_risk_prev_count) /
-        //           medium_risk_prev_count) *
-        //         100
-        //       ).toFixed(2);
-        // this.state.kpi.highriskbypercent =
-        //   high_risk_prev_count == 0
-        //     ? 0
-        //     : (
-        //         ((highriskCount - high_risk_prev_count) /
-        //           high_risk_prev_count) *
-        //         100
-        //       ).toFixed(2);
+        let low_risk_prev_count = await this.api.searchCount("res.customer.transaction", [
+          ["risk_level", "=", "low"],
+          ["created_date", "<", this.state.current_datepicked],
+          ["created_date", ">=", this.state.previous_datepicked],
+        ]);
+        let medium_risk_prev_count = await this.api.searchCount("res.customer.transaction", [
+          ["risk_level", "=", "medium"],
+          ["created_date", "<", this.state.current_datepicked],
+          ["created_date", ">=", this.state.previous_datepicked],
+        ]);
+        let high_risk_prev_count = await this.api.searchCount("res.customer.transaction", [
+          ["risk_level", "=", "high"],
+          ["created_date", "<", this.state.current_datepicked],
+          ["created_date", ">=", this.state.previous_datepicked],
+        ]);
+        this.state.kpi.totaltransactionpercentage =
+          total_rules_prev_count == 0
+            ? 0
+            : (
+                ((totalTransactionCount - total_rules_prev_count) /
+                  total_rules_prev_count) *
+                100
+              ).toFixed(2);
+        this.state.kpi.lowriskpercentage =
+          low_risk_prev_count == 0
+            ? 0
+            : (
+                ((lowriskCount - low_risk_prev_count) / low_risk_prev_count) *
+                100
+              ).toFixed(2);
+        this.state.kpi.mediumriskbypercent =
+          medium_risk_prev_count == 0
+            ? 0
+            : (
+                ((mediumriskCount - medium_risk_prev_count) /
+                  medium_risk_prev_count) *
+                100
+              ).toFixed(2);
+        this.state.kpi.highriskbypercent =
+          high_risk_prev_count == 0
+            ? 0
+            : (
+                ((highriskCount - high_risk_prev_count) /
+                  high_risk_prev_count) *
+                100
+              ).toFixed(2);
       }
       // reload chart on select change
       await this.getTransactionRiskRatingChart();
@@ -337,7 +330,7 @@ export class IcomplyDashboard extends Component {
         ["risk_level"] // Fields to group by (priority_level_id)
       );
 
-      console.log(results);
+    
       
 
       const groupedData = {};
@@ -377,8 +370,7 @@ export class IcomplyDashboard extends Component {
         ["risk_level"] // Fields to group by (priority_level_id)
       );
 
-       console.log(results);
-
+  
       const groupedData = {};
       results.forEach((record) => {
         const Name = record.risk_level; // Get priority_level_id.name (Name)
