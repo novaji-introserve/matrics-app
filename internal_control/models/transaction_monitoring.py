@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 import logging
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -209,41 +210,61 @@ class TransactionMonitoring(models.Model):
 
     @api.model
     def open_transactions(self):
+
+        branch_ids = [e.id for e in self.env.user.branches_id]
     
-        return {
-            'name': 'Transactions To Review',
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'view_mode': 'tree,form',
-            'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'new')],
-           'context': {'search_default_group_branch': 1, 'default_state': 'new'}
-        }
+      
+        if(len(branch_ids) > 0):
+                return {
+                'name': 'Transactions To Review',
+                'type': 'ir.actions.act_window',
+                'res_model': 'res.customer.transaction',
+                'view_mode': 'tree,form',
+                'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'new')],
+            'context': {'search_default_group_branch': 1, 'default_state': 'new'}
+                }
+    
+        else:
+            raise ValidationError("No transaction to display, user must be assigned to a branch")
 
     @api.model
     def open_transactions_done(self):
-        return {
-            'name': 'Reviewed Transactions',
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'view_mode': 'tree,form',
-            'domain': [('state', '=', 'done')],
-            'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'done')],
-            # 'context': {'search_default_group_by': ['subbranchcode']},
-            'context': {'search_default_group_branch': 1, 'default_state': 'new'}
-           
-        }
+        branch_ids = [e.id for e in self.env.user.branches_id]
+    
+      
+        if(len(branch_ids) > 0):
+            return {
+                'name': 'Reviewed Transactions',
+                'type': 'ir.actions.act_window',
+                'res_model': 'res.customer.transaction',
+                'view_mode': 'tree,form',
+                'domain': [('state', '=', 'done')],
+                'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id]),  ('state', '=', 'done')],
+                'context': {'search_default_group_by': ['subbranchcode']},
+                'context': {'search_default_group_branch': 1, 'default_state': 'new'}
+            
+            }
+        else:
+            raise ValidationError("No transaction to display, user must be assigned to a branch")
 
     @api.model
     def open_transactions_all(self):
+
+        branch_ids = [e.id for e in self.env.user.branches_id]
     
-        return {
-            'name': 'All Transactions',
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'view_mode': 'tree,form',
-            'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id])],
-            'context': {'search_default_group_branch': 1, 'default_state': 'new'}
-        }
+      
+        if(len(branch_ids) > 0):
+    
+            return {
+                'name': 'All Transactions',
+                'type': 'ir.actions.act_window',
+                'res_model': 'res.customer.transaction',
+                'view_mode': 'tree,form',
+                'domain': [('subbranchcode', 'in', [e.id for e in self.env.user.branches_id])],
+                'context': {'search_default_group_branch': 1, 'default_state': 'new'}
+            }
+        else:
+            raise ValidationError("No transaction to display, user must be assigned to a branch")
 
     def action_screen(self):
      
