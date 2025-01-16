@@ -8,7 +8,93 @@
             <p class="o_view_nocontent_smiling_face">
                 Create new customer account
             </p>
-           
+
+        </field>
+    </record>
+
+    <!-- Inherit the existing tree view -->
+    <record id="internal_control_customer_account_tree_inherit" model="ir.ui.view">
+        <field name="name">res_customer_account_tree_inherit</field>
+        <field name="model">res.partner.account</field>
+        <field name="inherit_id" ref="compliance_management.compliance_customer_account_tree" />
+        <field name="arch" type="xml">
+          
+            
+            <xpath expr="//field[@name='product_id']" position="replace">
+                <field name="productcode" />
+            </xpath>
+            <xpath expr="//field[@name='account_name']" position="replace">
+                <field name="accounttitle" />
+            </xpath>
+            <xpath expr="//field[@name='name']" position="replace">
+                <field name="accountnumber" />
+            </xpath>
+            <xpath expr="//field[@name='branch_id']" position="replace">
+                <field name="branchcode" />
+            </xpath>
+            <xpath expr="//field[@name='state']" position="replace">
+                <field name="Status" widget="boolean" />
+            </xpath>
+            <xpath expr="//field[@name='risk_score']" position="replace">
+                <field name="last_month_balance" string="Last Month Bal" />
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="replace">
+                <field name="currencycode" />
+            </xpath>
+
+        <xpath expr="//field[@name='risk_level']" position="replace">
+            <field name="riskrating" widget="badge" decoration-danger="riskrating == '3'" decoration-warning="riskrating == '2'"
+                decoration-success="riskrating == '1'" />
+        </xpath>
+        </field>
+    </record>
+    <!-- Inherit the existing form view -->
+    <record id="customer_account_view_form_inherit" model="ir.ui.view">
+        <field name="name">customer.account.view.form.inherit</field>
+        <field name="model">res.partner.account</field>
+        <field name="inherit_id" ref="compliance_management.customer_account_view_form" />
+        <field name="arch" type="xml">
+    
+            <xpath expr="//field[@name='state']" position="replace">
+                <field name="Status"/>
+            </xpath>
+            <xpath expr="//field[@name='risk_level']" position="replace">
+                <field name="riskrating" widget="badge" 
+                decoration-danger="riskrating == '3'"
+                decoration-warning="riskrating == '2'"
+                decoration-success="riskrating == '1'"
+                />
+            </xpath>
+            <xpath expr="//button[@name='get_risk_score']" position="replace"/>
+            <xpath expr="//field[@name='branch_id']" position="replace">
+                <field name="branchcode" />
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="replace">
+                <field name="currencycode" />
+            </xpath>
+            <xpath expr="//notebook/page[@name='details']//field[@name='date_created']" position="before">
+                <field name="account_tier" string="Tier" readonly="1" />
+            </xpath>
+            <xpath expr="//div[@class='col col-md-auto']" position="replace">
+                <div class="col col-md-auto">
+                    <label for="accounttitle" string="Account Name" />
+                    <div>
+                        <field name="accounttitle" class="oe_inline" readonly="1" />
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//div[@class='oe_title']" position="replace">
+                <label for="accountnumber" class="oe_edit_only" />
+                <h1>
+                    <field name="accountnumber" readonly="1" />
+                </h1>
+            </xpath>
+            <xpath expr="//button[@name='get_balance']" position="replace">
+                <button class="oe_stat_button" type="object" name="get_bal" icon="fa-money">
+                    <field string="Balance" name="bkbalance" widget="monetary" readonly="True" />
+                </button>
+            </xpath>
+            
         </field>
     </record>
 </odoo>

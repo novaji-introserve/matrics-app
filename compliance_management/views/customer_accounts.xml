@@ -23,6 +23,7 @@
             </tree>
         </field>
     </record>
+    
     <record id="customer_account_view_form" model="ir.ui.view">
         <field name="name">customer.account.view.form</field>
         <field name="model">res.partner.account</field>
