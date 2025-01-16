@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 import logging
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -72,6 +73,11 @@ class TransactionMonitoring(models.Model):
 
     @api.model
     def open_transactions_all(self):
+
+        branch_ids = [e.id for e in self.env.user.branches_id]
+    
+      
+        if(len(branch_ids) > 0):
     
         return {
             'name': 'All Transactions',
