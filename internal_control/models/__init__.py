@@ -28,5 +28,5 @@ from . import state
 from . import town
 from . import country
 from . import bank_product
-from .db_sync import sync_script
+from .legacy import sync_script
 

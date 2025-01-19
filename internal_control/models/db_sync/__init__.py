@@ -1,3 +1,3 @@
 # models/sync/__init__.py
 
-from . import sync_script
+from ..legacy import sync_script

@@ -1,0 +1,45 @@
+
+{
+    "tables": {
+        "tbl_officer": {
+            "source_table": "tbl_officer",
+            "target_table": "res_partner_account_officer",
+            "primary_key": "staffid",
+            "batch_size": 5000,
+            "dependencies": ["tbl_userstatus"],
+            "mappings": {
+                "staffid": {"target": "staff_id", "type": "direct"},
+                "officername": {"target": "officer_name", "type": "direct"},
+               "status": {
+                    "target": "status_id",
+                    "type": "lookup",
+                    "lookup_table": "res_user_status",
+                    "lookup_key": "status_code",
+                    "lookup_value": "id"},
+               "dept": {
+                    "target": "deptid",
+                    "type": "lookup",
+                    "lookup_table": "hr_department_pgsql",
+                    "lookup_key": "deptid",
+                    "lookup_value": "id"},
+                "branchcode": {
+                    "target": "branch_id",
+                    "type": "lookup",
+                    "lookup_table": "branch_pgsql",
+                    "lookup_key": "code",
+                    "lookup_value": "id"}
+            }
+        },
+        "tbl_userstatus": {
+            "source_table": "tbl_userstatus",
+            "target_table": "res_user_status",
+            "primary_key": "statuscode",
+            "batch_size": 5000,
+            "dependencies": [],
+            "mappings": {
+                "statusdesc": {"target": "description", "type": "direct"},
+                "statuscode": {"target": "status_code", "type": "direct"}
+            }
+        }
+    }
+}

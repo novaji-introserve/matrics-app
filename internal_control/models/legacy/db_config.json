@@ -6,10 +6,10 @@
         "pwd": "Op3n4321"
     },
     "postgres_connection": {
+        "dbname": "convenant_db",
+        "user": "openpg",
+        "password": "openpgpwd",
         "host": "localhost",
-        "port": "5432",
-        "dbname": "database_name_test",
-        "user": "postgres",
-        "password": "postgres"
+        "port": "5432"
     }
 }
