@@ -1,10 +1,10 @@
 from odoo import models, fields, api
 
 class Customer(models.Model):
-    _inherit = "res.partner"
+    _inherit = "res.partner" 
     
     customerid = fields.Char(string="Customer ID", index=True, tracking=True)
-    title = fields.Char(string="title", index=True, tracking=True)
+    # title = fields.Char(string="title", index=True, tracking=True)
     surname = fields.Char(string='surname')
     othername = fields.Char(string='Other Name')
     fullname = fields.Char(string="fullname", index=True, tracking=True)

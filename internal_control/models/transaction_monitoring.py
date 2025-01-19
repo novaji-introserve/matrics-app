@@ -10,7 +10,7 @@ class TransactionMonitoring(models.Model):
     _sql_constraints = [
         ('uniq_refno', 'unique(refno)',
          "Ref No already exists. Value must be unique!"),
-    ]
+    ] 
 
     # id = fields.Integer(string="id", readonly=True)
     refno = fields.Char(string="Ref Number", readonly=True, index=True)
