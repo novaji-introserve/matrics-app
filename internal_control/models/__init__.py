@@ -18,6 +18,7 @@ from . import control_officer
 from . import customer_account
 from . import customer
 from . import customer_tier
+from . import customer_type
 from . import transaction_type
 from . import users_status
 from . import gender
@@ -28,5 +29,6 @@ from . import state
 from . import town
 from . import country
 from . import bank_product
-from .legacy import sync_script
+from . import title
+# from .legacy import sync_script
 

@@ -1,44 +1,50 @@
-
 {
     "tables": {
-        "tbl_officer": {
-            "source_table": "tbl_officer",
-            "target_table": "res_partner_account_officer",
-            "primary_key": "staffid",
-            "batch_size": 5000,
-            "dependencies": ["tbl_userstatus"],
-            "mappings": {
-                "staffid": {"target": "staff_id", "type": "direct"},
-                "officername": {"target": "officer_name", "type": "direct"},
-               "status": {
-                    "target": "status_id",
-                    "type": "lookup",
-                    "lookup_table": "res_user_status",
-                    "lookup_key": "status_code",
-                    "lookup_value": "id"},
-               "dept": {
-                    "target": "deptid",
-                    "type": "lookup",
-                    "lookup_table": "hr_department_pgsql",
-                    "lookup_key": "deptid",
-                    "lookup_value": "id"},
-                "branchcode": {
-                    "target": "branch_id",
-                    "type": "lookup",
-                    "lookup_table": "branch_pgsql",
-                    "lookup_key": "code",
-                    "lookup_value": "id"}
-            }
-        },
-        "tbl_userstatus": {
-            "source_table": "tbl_userstatus",
-            "target_table": "res_user_status",
-            "primary_key": "statuscode",
+        "tbl_Department": {
+            "source_table": "tbl_Department",
+            "target_table": "hr_department",
+            "primary_key": "deptid",
             "batch_size": 5000,
             "dependencies": [],
             "mappings": {
-                "statusdesc": {"target": "description", "type": "direct"},
-                "statuscode": {"target": "status_code", "type": "direct"}
+                "DeptName": { "target": "name", "type": "direct" },
+                "Deptid": { "target": "deptid", "type": "direct" }
+            }
+        },
+        "tbl_Branch": {
+            "source_table": "tbl_Branch",
+            "target_table": "res_branch",
+            "primary_key": "branchcode",
+            "batch_size": 5000,
+            "dependencies": [],
+            "mappings": {
+                "branchcode": { "target": "code", "type": "direct" },
+                "branchname": { "target": "name", "type": "direct" },
+                "address": { "target": "address", "type": "direct" }
+            }
+        },
+        "tbl_Account_Tier": {
+            "source_table": "tbl_Account_Tier",
+            "target_table": "res_partner_tier",
+            "primary_key": "tierid",
+            "batch_size": 5000,
+            "dependencies": [],
+            "mappings": {
+                "tierid": { "target": "code", "type": "direct" },
+                "tierdescription": { "target": "name", "type": "direct" },
+                "depositmax": { "target": "depositmax", "type": "direct" },
+                "cummulativemax": { "target": "cummulativemax", "type": "direct" }
+            }
+        },
+        "tbl_sex": {
+            "source_table": "tbl_sex",
+            "target_table": "res_partner_gender",
+            "primary_key": "sexname",
+            "batch_size": 5000,
+            "dependencies": [],
+            "mappings": {
+                "sexname": { "target": "name", "type": "direct" },
+                "sexcode": { "target": "code", "type": "direct" }
             }
         }
     }

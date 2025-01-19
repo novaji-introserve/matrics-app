@@ -27,7 +27,7 @@
         'views/alert_rules_view.xml',
         'views/alert_group.xml',
         'views/alert_history.xml',
-        'views/branch_view.xml',
+        # 'views/branch_view.xml',
         # 'views/account_monitoring_views.xml',
         'views/screen_rules_cron_job.xml',
         'views/cron_schedule.xml',

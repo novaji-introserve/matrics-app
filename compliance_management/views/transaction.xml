@@ -13,21 +13,21 @@
                         confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" />
                 </header>
                 <field name="name" string="Reference Number" />
-                <field name="customer_id" />
-                <field name="account_id" />
-                <field name="branch_id" />
-                <field name="currency_id" />
-                <field name="amount" />
-                <field name="tran_type" />
-                <field name="rule_id" />
-                <field name="likely_fraud" widget="boolean_toggle"  readonly="1"/>
+                <field name="customer_id" optional="show" />
+                <field name="account_id" optional="show"/>
+                <field name="branch_id" optional="show"/>
+                <field name="currency_id" optional="show" />
+                <field name="amount" optional="show"/>
+                <field name="tran_type" optional="show"/>
+                <field name="rule_id" optional="show"/>
+                <field name="likely_fraud" widget="boolean_toggle"  readonly="1" optional="show"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                     decoration-warning="risk_level in ('medium')"
                     decoration-success="risk_level in ('lowel')" />
                 <field name="state" widget="badge"
                     decoration-warning="state in ('new')"
                     decoration-success="state in ('done')" />
-                <field name="date_created" />
+                <field name="date_created" optional="show"/>
             </tree>
         </field>
     </record>

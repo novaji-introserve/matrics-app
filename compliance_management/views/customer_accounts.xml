@@ -7,19 +7,19 @@
         <field name="arch" type="xml">
             <tree string="Account">
                 <field name="name" string="Account Number" />
-                <field name="account_name" />
-                <field name="branch_id" />
-                <field name="currency_id" />
-                <field name="account_type_id" />
-                <field name="product_id" />
-                <field name="risk_score" />
+                <field name="account_name" optional="show"/>
+                <field name="branch_id" optional="show"/>
+                <field name="currency_id" optional="show"/>
+                <field name="account_type_id" optional="show"/>
+                <field name="product_id" optional="show"/>
+                <field name="risk_score" optional="show"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                 decoration-warning="risk_level in ('medium')"
                 decoration-success="risk_level in ('lowel')" />
                 <field name="state" widget="badge" decoration-danger="state == 'locked'"
                 decoration-warning="state in ('dormant')"
-                decoration-success="state in ('active')" />
-                <field name="date_created" />
+                decoration-success="state in ('active')" optional="show"/>
+                <field name="date_created" optional="show"/>
             </tree>
         </field>
     </record>

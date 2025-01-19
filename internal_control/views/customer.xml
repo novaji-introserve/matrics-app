@@ -10,12 +10,12 @@
                 <attribute name="create">False</attribute>
             </tree>
 
-            <xpath expr="//field[@name='customer_id']" position="replace">
+            <!-- <xpath expr="//field[@name='customer_id']" position="replace">
                 <field name="customerid" />
-            </xpath>
-            <xpath expr="//field[@name='translated_display_name']" position="replace">
+            </xpath> -->
+            <!-- <xpath expr="//field[@name='translated_display_name']" position="replace">
                 <field name="fullname" string="Name"  />
-            </xpath>
+            </xpath> -->
             <xpath expr="//field[@name='risk_score']" position="replace"/>
             <xpath expr="//field[@name='risk_level']" position="replace"/>
             <xpath expr="//field[@name='email']" position="replace"/>
@@ -23,19 +23,19 @@
             <xpath expr="//field[@name='vat']" position="replace"/>
             <xpath expr="//field[@name='category_id']" position="replace"/>
             <xpath expr="//field[@name='branch_id']" position="replace"/>
-            <xpath expr="//field[@name='registration_date']" position="replace">
+            <!-- <xpath expr="//field[@name='registration_date']" position="replace">
                 <field  name="idissuedate" string="Issue Date" optional="show" />
-            </xpath>
-            <xpath expr="//field[@name='tier_id']" position="replace">
+            </xpath> -->
+            <!-- <xpath expr="//field[@name='tier_id']" position="replace">
                 <field  name="edulevel" string="Education" optional="show" />
-            </xpath>
+            </xpath> -->
             <xpath expr="//field[@name='phone']" position="replace">
                 <field  name="phone1" string="Phone" optional="show" />
             </xpath>
 
-            <xpath expr="//field[@name='city']" position="replace">
+            <!-- <xpath expr="//field[@name='city']" position="replace">
                 <field  name="statecode" string="State" optional="show" />
-            </xpath>
+            </xpath> -->
             <xpath expr="//field[@name='country_id']" position="replace">
                 <field  name="nationality" string="Country" optional="show" />
             </xpath>
@@ -61,9 +61,9 @@
             <xpath expr="//page[@name='edd_record']" position="replace" />
             <!-- <xpath expr="//page[@name='accounting']" position="replace" />  -->
 
-            <xpath expr="//field[@name='customer_id']" position="replace">
+            <!-- <xpath expr="//field[@name='customer_id']" position="replace">
                 <field name="customerid" />
-            </xpath>
+            </xpath> -->
             <!-- <xpath expr="//field[@name='translated_display_name']" position="replace">
                 <field name="fullname" string="Name" />
             </xpath> -->
@@ -82,17 +82,17 @@
             <!-- <xpath expr="//field[@name='phone']" position="replace">
                 <field name="phone1" string="Phone" optional="show" />
             </xpath> -->
-<xpath expr="//field[@name='registration_date']" position="replace">
+<!-- <xpath expr="//field[@name='registration_date']" position="replace">
     <field name="idissuedate" string="Issue Date"  />
-</xpath>
+</xpath> -->
             <xpath expr="//field[@name='middlename']" position="replace"/>
             <xpath expr="//field[@name='branch_id']" position="replace"/>
-            <xpath expr="//field[@name='education_level_id']" position="replace">
+            <!-- <xpath expr="//field[@name='education_level_id']" position="replace">
                 <field name="edulevel" string="Education" />
-            </xpath>
-            <xpath expr="//field[@name='lastname']" position="replace">
+            </xpath> -->
+            <!-- <xpath expr="//field[@name='lastname']" position="replace">
                 <field name="surname" string="Surname" />
-            </xpath>
+            </xpath> -->
 
             <xpath expr="//field[@name='bvn']" position="replace">
                 <field name="nin" string="NIN" />

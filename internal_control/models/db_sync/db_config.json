@@ -1,15 +1,15 @@
 {
     "mssql_connection": {
         "server": "192.168.5.203",
-        "database": "FIN_COVENANT",
+        "database": "FIN_COVENANT", 
         "uid": "sa",
         "pwd": "Op3n4321"
     },
     "postgres_connection": {
         "host": "localhost",
         "port": "5432",
-        "dbname": "database_name_test",
+        "dbname": "demo_convenant",
         "user": "postgres",
         "password": "postgres"
     }
-}
+} 
