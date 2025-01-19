@@ -6,6 +6,10 @@ class UsersStatus(models.Model):
     _description = _('Users Status')
     _rec_name = 'description'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _sql_constraints = [
+        ('uniq_status_code', 'unique(status_code)',
+         "Status already exists. Value must be unique!"),
+    ]
 
     status_code = fields.Char(string='Status Code',  readonly=True, index=True, unique=True)
     description = fields.Char(string='Description',  readonly=True, index=True)
