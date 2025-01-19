@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
+ <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-
+<!--
     <record id="view_branch_tree_inherit" model="ir.ui.view">
         <field name="name">res.branch.tree.inherit</field>
         <field name="model">res.branch</field>
-        <field name="inherit_id" ref="compliance_management.view_branch_tree" /> <!-- Reference to the existing view -->
+        <field name="inherit_id" ref="compliance_management.view_branch_tree" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='code']" position="replace">
                 <field name="branchcode" string="Branch Code" />
@@ -18,21 +18,20 @@
 <record id="view_branch_form_inherit" model="ir.ui.view">
     <field name="name">res.branch.form.inherit</field>
     <field name="model">res.branch</field>
-    <field name="inherit_id" ref="compliance_management.view_branch_form" /> <!-- Reference to the existing view -->
+    <field name="inherit_id" ref="compliance_management.view_branch_form" /> 
     <field name="arch" type="xml">
-        <!-- Update the title section -->
         <xpath expr="//div[@class='oe_title']//label[@for='name']" position="attributes">
             <attribute name="for">branchname</attribute>
         </xpath>
         <xpath expr="//div[@class='oe_title']//h1//field[@name='name']" position="replace">
             <field name="branchname" string="Branch" />
-        </xpath>
+        </xpath> -->
         <!-- Replace the existing code field if it exists -->
-        <xpath expr="//field[@name='code']" position="replace">
+        <!-- <xpath expr="//field[@name='code']" position="replace">
             <field name="branchcode" string="Branch Code" />
         </xpath>
     </field>
-</record>
+</record> -->
 
 <!-- <record id="view_tbl_branch_tree" model="ir.ui.view">
     <field name="name">res.branch.tree</field>

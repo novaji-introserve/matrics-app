@@ -28,11 +28,11 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
-        'data/department.xml',
+        # 'data/department.xml',
         'views/configuration.xml',
         'views/edd.xml',
         'views/kyc.xml',
-        'data/data.xml',
+        # 'data/data.xml',
         'views/risk_assessment.xml',
         'views/res_users.xml',
         'views/sanction_screening.xml',

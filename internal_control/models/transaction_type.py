@@ -2,7 +2,7 @@ from odoo import fields, models, api, _
 
 
 class TransactionType(models.Model):
-    _name = 'transaction.type'
+    _name = 'res.transaction.type'
     _description = _('Transaction Type')
     _rec_name = 'transcode'
     _inherit = ['mail.thread', 'mail.activity.mixin']

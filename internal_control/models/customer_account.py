@@ -3,39 +3,21 @@ from odoo import models, fields, api
 class CustomerAccount(models.Model):
     _inherit = "res.partner.account"
     
-    accountnumber = fields.Char()
-    accounttitle = fields.Char()
-    productcode = fields.Char()
-    branchcode = fields.Many2one("res.branch")
-    customerid = fields.Char()
-    officercode = fields.Char()
-    taxcode1 = fields.Char()
-    taxcode2= fields.Char()
-    cintrate = fields.Char()
-    cintrate = fields.Char()
-    currencycode = fields.Many2one("res.currency")
-    sectorcode = fields.Char()
-    dateopened = fields.Char() 
-    lnbalance = fields.Char()
-    bkbalance = fields.Char()
-    odlimit = fields.Char()
-    tod_limit = fields.Char()
-    unclearedbal = fields.Char()
-    holdbal = fields.Char()
-    sibal = fields.Char()
-    totdebit = fields.Char()
-    totcredit = fields.Char()
-    disableview = fields.Char()
-    oldacctno = fields.Char()
-    last_month_balance = fields.Char()
-    lien = fields.Char()
-    lastdatepay = fields.Char()
-    account_tier = fields.Char()
-    riskrating = fields.Char()
-    ID = fields.Char()
+    officercode = fields.Many2one(
+        comodel_name='res.account.officer', string='Account Officer', index=True)
+    sectorcode = fields.Many2one(
+        comodel_name='res.partner.sector', string='Sector', index=True)
+    lnbalance = fields.Char(string="Ln Bal.")
+    bkbalance = fields.Char(string="Bk Bal.")
+    unclearedbal = fields.Char(string="Total Creadit")
+    holdbal = fields.Char(string="Hold Bal.")
+    totdebit = fields.Char(string="Total Debit")
+    totcredit = fields.Char(string="Total Creadit")
+    last_month_balance = fields.Char(string="Last Month Bal.")
+    lien = fields.Char(string="Lien")
+    account_tier = fields.Many2one(
+        comodel_name='res.partner.tier', string='Account Tier', index=True)
+    source_account_id = fields.Char(string="Source Account ID", index=True)
     Status = fields.Boolean(default=False)
-    
-    def get_bal(self):
-        return  '{0:.2f}'.format(self.bkbalance)
     
         

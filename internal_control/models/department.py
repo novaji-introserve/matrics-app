@@ -3,6 +3,10 @@ from odoo import models, fields
 class Department(models.Model):
     _inherit = 'hr.department'  # The model name in Odoo
     # _description = 'Department'
+    _sql_constraints = [
+        ('uniq_deptid', 'unique(deptid)',
+         "Department already exists. Value must be unique!"),
+    ]
 
     # Define the fields based on the SQL table structure
     

@@ -1,0 +1,51 @@
+{
+    "tables": {
+        "tbl_Department": {
+            "source_table": "tbl_Department",
+            "target_table": "hr_department",
+            "primary_key": "deptid",
+            "batch_size": 5000,
+            "dependencies": [],
+            "mappings": {
+                "DeptName": { "target": "name", "type": "direct" },
+                "Deptid": { "target": "deptid", "type": "direct" }
+            }
+        },
+        "tbl_Branch": {
+            "source_table": "tbl_Branch",
+            "target_table": "res_branch",
+            "primary_key": "branchcode",
+            "batch_size": 5000,
+            "dependencies": [],
+            "mappings": {
+                "branchcode": { "target": "code", "type": "direct" },
+                "branchname": { "target": "name", "type": "direct" },
+                "address": { "target": "address", "type": "direct" }
+            }
+        },
+        "tbl_Account_Tier": {
+            "source_table": "tbl_Account_Tier",
+            "target_table": "res_partner_tier",
+            "primary_key": "tierid",
+            "batch_size": 5000,
+            "dependencies": [],
+            "mappings": {
+                "tierid": { "target": "code", "type": "direct" },
+                "tierdescription": { "target": "name", "type": "direct" },
+                "depositmax": { "target": "depositmax", "type": "direct" },
+                "cummulativemax": { "target": "cummulativemax", "type": "direct" }
+            }
+        },
+        "tbl_sex": {
+            "source_table": "tbl_sex",
+            "target_table": "res_partner_gender",
+            "primary_key": "sexname",
+            "batch_size": 5000,
+            "dependencies": [],
+            "mappings": {
+                "sexname": { "target": "name", "type": "direct" },
+                "sexcode": { "target": "code", "type": "direct" }
+            }
+        }
+    }
+}
