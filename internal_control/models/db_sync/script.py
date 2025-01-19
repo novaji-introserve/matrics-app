@@ -101,21 +101,9 @@ class ETLManager:
         # Add default start date for initial sync
         self.default_start_date = datetime(2000, 1, 1)
 
-        self.mssql_conn_string = (
-            f"Driver={{SQL Server}};"
-            f"Server={db_config['mssql_connection']['server']};"
-            f"Database={db_config['mssql_connection']['database']};"
-            f"UID={db_config['mssql_connection']['uid']};"
-            f"PWD={db_config['mssql_connection']['pwd']};"
-        )
-
-        self.pg_conn_string = (
-            f"dbname={db_config['postgres_connection']['dbname']} "
-            f"user={db_config['postgres_connection']['user']} "
-            f"password={db_config['postgres_connection']['password']} "
-            f"host={db_config['postgres_connection']['host']} "
-            f"port={db_config['postgres_connection']['port']}"
-        )
+        # Get connection strings from config and format them
+        self.mssql_conn_string = db_config['mssql_connection']['connection_string'].format(**db_config['mssql_connection'])
+        self.pg_conn_string = db_config['postgres_connection']['connection_string'].format(**db_config['postgres_connection'])
 
         self.table_configs = {
             name.lower(): TableConfig(

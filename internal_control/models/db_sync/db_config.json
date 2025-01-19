@@ -1,15 +1,20 @@
+
 {
     "mssql_connection": {
         "server": "192.168.5.203",
-        "database": "FIN_COVENANT", 
+        "database": "FIN_COVENANT",
         "uid": "sa",
-        "pwd": "Op3n4321"
+        "pwd": "Op3n4321",
+        "driver": "SQL Server",
+        "trust_certificate": "no",
+        "connection_string": "Driver={driver};Server={server};Database={database};UID={uid};PWD={pwd};TrustServerCertificate={trust_certificate};"
     },
     "postgres_connection": {
-        "host": "localhost",
-        "port": "5432",
         "dbname": "demo_convenant",
         "user": "postgres",
-        "password": "postgres"
+        "password": "postgres",
+        "host": "localhost",
+        "port": "5432",
+        "connection_string": "dbname={dbname} user={user} password={password} host={host} port={port}"
     }
-} 
+}
