@@ -114,25 +114,25 @@
 
             <xpath expr="//tree" position="replace">
                 <tree string="Transaction Monitoring" create="false" >
-                    <field name="refno"/>
-                    <field name="trandate" />
-                    <field name="valuedate" />
-                    <field name="actualdate" />
-                    <!-- <field name="narration" /> -->
-                    <field name="trancurrency" />
-                    <field name="crossrate" />
-                    <field name="reversal" />
-                    <field name="accountmodule" />
-                    <field name="tellerno" />
-                    <field name="accountnumber" />
-                    <field name="tran_channel" />
-                    <field name="likely_fraud" widget="boolean_toggle" readonly="1" />
+                    <field name="refno" optional="show"/>
+                    <field name="trandate" optional="show" />
+                    <field name="valuedate" optional="show" />
+                    <field name="actualdate" optional="show" />
+                    <!-- <field name="narration" optional="show" /> -->
+                    <field name="trancurrency" optional="show" />
+                    <field name="crossrate" optional="show" />
+                    <field name="reversal" optional="show" />
+                    <field name="accountmodule" optional="show" />
+                    <field name="tellerno" optional="show" />
+                    <field name="accountnumber" optional="show" />
+                    <field name="tran_channel" optional="show" />
+                    <field name="likely_fraud" widget="boolean_toggle" readonly="1" optional="show" />
                     <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
-                        decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('lowel')" />
-                    <field name="state" widget="badge" decoration-warning="state in ('new')" decoration-success="state in ('done')" />
+                        decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('lowel')" optional="show" />
+                    <field name="state" widget="badge" decoration-warning="state in ('new')" decoration-success="state in ('done')" optional="show" />
                     
-                    <field name="request_id" />
-                    <field name="rrn" />
+                    <field name="request_id" optional="show" />
+                    <field name="rrn" optional="show" />
                 </tree>
             </xpath>
 
