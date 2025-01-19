@@ -79,7 +79,7 @@ class TransactionMonitoring(models.Model):
       
         if(len(branch_ids) > 0):
     
-        return {
+         return {
             'name': 'All Transactions',
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
