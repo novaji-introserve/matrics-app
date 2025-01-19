@@ -17,5 +17,16 @@ from . import res_group
 from . import control_officer
 from . import customer_account
 from . import customer
+from . import customer_tier
+from . import transaction_type
+from . import users_status
+from . import gender
+from . import marital_status
+from . import transaction_status
+from . import default_transaction_limit
+from . import state
+from . import town
+from . import country
+from . import bank_product
 from .db_sync import sync_script
 

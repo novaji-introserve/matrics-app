@@ -10,7 +10,7 @@ class TransactionMonitoring(models.Model):
     _sql_constraints = [
         ('uniq_refno', 'unique(refno)',
          "Ref No already exists. Value must be unique!"),
-    ]
+    ] 
 
     # id = fields.Integer(string="id", readonly=True)
     refno = fields.Char(string="Ref Number", readonly=True, index=True)
@@ -79,7 +79,7 @@ class TransactionMonitoring(models.Model):
       
         if(len(branch_ids) > 0):
     
-        return {
+         return {
             'name': 'All Transactions',
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',

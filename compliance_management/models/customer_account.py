@@ -11,7 +11,7 @@ class CustomerAccount(models.Model):
         ('uniq_account_name', 'unique(name)',
          "Account Name already exists. Value must be unique!"),
     ]
-    _order = "name"
+    _order = "name" 
     name = fields.Char(string="Account Number")
     account_name = fields.Char(string='Account Name', index=True)
     currency_id = fields.Many2one(

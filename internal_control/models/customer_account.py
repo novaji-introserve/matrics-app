@@ -15,7 +15,7 @@ class CustomerAccount(models.Model):
     cintrate = fields.Char()
     currencycode = fields.Many2one("res.currency")
     sectorcode = fields.Char()
-    dateopened = fields.Char()
+    dateopened = fields.Char() 
     lnbalance = fields.Char()
     bkbalance = fields.Char()
     odlimit = fields.Char()

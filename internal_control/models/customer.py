@@ -1,7 +1,7 @@
 from odoo import models, fields, api
 
 class Customer(models.Model):
-    _inherit = "res.partner"
+    _inherit = "res.partner" 
     
     customerid = fields.Char(string="Customer ID", index=True, tracking=True)
     surname = fields.Char(string='surname')
