@@ -30,5 +30,6 @@ from . import town
 from . import country
 from . import bank_product
 from . import title
+from . import account_officer
 # from .legacy import sync_script
 
