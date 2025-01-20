@@ -325,6 +325,10 @@ class ETLManager:
         key_value: str
     ) -> Optional[Any]:
         """Look up a value in the PostgreSQL database with caching and retry."""
+        # Handle null/empty values
+        if key_value is None or (isinstance(key_value, str) and not key_value.strip()):
+            return None
+            
         cached_value = self.lookup_cache.get(table, key_value, key_column, value_column)
         if cached_value is not None:
             return cached_value
@@ -337,15 +341,17 @@ class ETLManager:
             self.lookup_cache.set(table, key_value, key_column, value_column, result[0])
             return result[0]
 
-        logging.error(f"Lookup failed for table {table}, key {key_column}={key_value}")
+        logging.debug(f"No matching record found in {table} for {key_column}={key_value}")
         return None
 
     def transform_value(self, mapping: dict, value: Any, pg_cursor) -> Any:
         """Transform a value based on mapping configuration."""
-        # First handle None values
-        if value is None:
-            return None
-            
+        # First handle None/empty values - return None for lookups, empty string for direct
+        if value is None or (isinstance(value, str) and not value.strip()):
+            if mapping['type'] == 'lookup':
+                return None
+            return value
+                
         # Handle string values - trim whitespace
         if isinstance(value, str):
             value = value.strip()
@@ -353,22 +359,30 @@ class ETLManager:
         if mapping['type'] == 'direct':
             return value
         elif mapping['type'] == 'lookup':
-            # Ensure lookup value is trimmed before searching
-            lookup_result = self.lookup_value(
-                pg_cursor,
-                mapping['lookup_table'],
-                mapping['lookup_key'],
-                mapping['lookup_value'],
-                str(value).strip()  # Ensure the lookup key is also trimmed
-            )
-            if lookup_result is None:
-                raise ValueError(
-                    f"Lookup failed for table {mapping['lookup_table']}, "
-                    f"key {mapping['lookup_key']}={value}"
+            try:
+                # Attempt lookup, return None if lookup fails
+                lookup_result = self.lookup_value(
+                    pg_cursor,
+                    mapping['lookup_table'],
+                    mapping['lookup_key'],
+                    mapping['lookup_value'],
+                    str(value).strip()  # Ensure the lookup key is also trimmed
                 )
-            return lookup_result
+                return lookup_result
+            except Exception as e:
+                logging.warning(
+                    f"Lookup failed for table {mapping['lookup_table']}, "
+                    f"key {mapping['lookup_key']}={value}. Setting value to None."
+                )
+                return None
         else:
             raise ValueError(f"Unknown transformation type: {mapping['type']}")
+
+    @backoff.on_exception(
+        backoff.expo,
+        (psycopg2.Error, ValueError),
+        max_tries=3
+    )
         
     def run_etl(self):
         """Run the complete ETL process."""
@@ -572,24 +586,81 @@ class ETLManager:
             return
 
         try:
+            # Verify table structure
+            pg_cursor.execute(f"""
+                SELECT column_name, data_type 
+                FROM information_schema.columns 
+                WHERE table_name = %s
+            """, (config.target_table,))
+            
+            table_columns = {row[0]: row[1] for row in pg_cursor.fetchall()}
+            logging.debug(f"Table columns for {config.target_table}: {table_columns}")
+
+            # Debug log the first row to see what we're working with
+            logging.debug(f"First row of batch: {rows[0]}")
+            
+            # Validate all columns exist in table
             columns = list(rows[0].keys())
+            for col in columns:
+                if col.lower() not in table_columns:
+                    raise ValueError(f"Column {col} not found in table {config.target_table}")
+
             placeholders = ', '.join(['%s'] * len(columns))
-            column_names = ', '.join(col.lower() for col in columns)  # Convert to lowercase
+            column_names = ', '.join(f'"{col.lower()}"' for col in columns)
             target_pk = config.get_target_primary_key()
+
+            # Build update SET clause excluding primary key
+            update_sets = []
+            for col in columns:
+                if col.lower() != target_pk.lower():
+                    update_sets.append(f'"{col}" = EXCLUDED."{col}"')
+            
+            update_clause = ', '.join(update_sets)
 
             insert_query = f"""
                 INSERT INTO {config.target_table} ({column_names})
                 VALUES ({placeholders})
                 ON CONFLICT ({target_pk})
                 DO UPDATE SET
-                    {', '.join(f"{col} = EXCLUDED.{col}" for col in columns if col.lower() != target_pk)}
+                    {update_clause}
             """
+            
+            logging.debug(f"Generated SQL: {insert_query}")
 
-            values = [[row[col] for col in columns] for row in rows]
-            pg_cursor.executemany(insert_query, values)
+            # Prepare and validate values
+            values = []
+            for i, row in enumerate(rows):
+                try:
+                    row_values = []
+                    for col in columns:
+                        val = row.get(col)
+                        # Add type validation here if needed
+                        row_values.append(val)
+                    values.append(row_values)
+                except Exception as e:
+                    logging.error(f"Error processing row {i}: {row}")
+                    logging.error(f"Error details: {str(e)}")
+                    raise
+
+            # Execute in smaller batches
+            batch_size = 1000
+            for i in range(0, len(values), batch_size):
+                batch = values[i:i + batch_size]
+                try:
+                    pg_cursor.executemany(insert_query, batch)
+                except Exception as e:
+                    logging.error(f"Error executing batch {i//batch_size + 1}: {str(e)}")
+                    # Log a few problem rows
+                    for problem_row in batch[:5]:
+                        logging.error(f"Problem row data: {dict(zip(columns, problem_row))}")
+                    raise
 
         except Exception as e:
             logging.error(f"Error in batch_update_rows: {str(e)}")
+            logging.error(f"Target table: {config.target_table}")
+            logging.error(f"Table structure: {table_columns}")
+            logging.error(f"Columns being updated: {columns}")
+            logging.error(f"Number of rows in batch: {len(rows)}")
             raise
 
 if __name__ == "__main__":

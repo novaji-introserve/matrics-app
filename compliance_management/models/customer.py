@@ -50,7 +50,7 @@ class Customer(models.Model):
         string='Identification Number', tracking=True)
     identification_expiry_date = fields.Date(
         string='Identification Expiry Date', index=True, tracking=True)
-    dob = fields.Date(
+    dob = fields.Char(
         string='Date of Birth', tracking=True)
     vat = fields.Char(string='Tax ID/TIN', index=True,
                       help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.")
