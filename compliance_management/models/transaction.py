@@ -19,7 +19,7 @@ class Transaction(models.Model):
     # date_created = fields.Date(string='Tran. Date', index=True)
     date_created = fields.Char(string='Tran. Date', index=True)
     customer_id = fields.Many2one(
-        comodel_name='res.partner', string='Customer', index=True)
+        comodel_name='res.partner', string='Customer', index=True) 
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True)
     amount = fields.Float(string='Transaction Amount', digits=(15, 2))
