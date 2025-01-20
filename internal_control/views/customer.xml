@@ -23,22 +23,25 @@
             <xpath expr="//field[@name='vat']" position="replace"/>
             <xpath expr="//field[@name='category_id']" position="replace"/>
             <xpath expr="//field[@name='branch_id']" position="replace"/>
-            <!-- <xpath expr="//field[@name='registration_date']" position="replace">
-                <field  name="idissuedate" string="Issue Date" optional="show" />
-            </xpath> -->
+            <xpath expr="//field[@name='registration_date']" position="replace"/>
             <!-- <xpath expr="//field[@name='tier_id']" position="replace">
-                <field  name="edulevel" string="Education" optional="show" />
+                <field  name="occupation" string="occupation" optional="show" />
             </xpath> -->
+
             <xpath expr="//field[@name='phone']" position="replace">
                 <field  name="phone1" string="Phone" optional="show" />
             </xpath>
 
-            <!-- <xpath expr="//field[@name='city']" position="replace">
-                <field  name="statecode" string="State" optional="show" />
-            </xpath> -->
+            <xpath expr="//field[@name='city']" position="replace">
+                <field  name="town_id" string="City" optional="show" />
+            </xpath>
             <xpath expr="//field[@name='country_id']" position="replace">
                 <field  name="nationality" string="Country" optional="show" />
             </xpath>
+            <xpath expr="//field[@name='nationality']" position="after">
+                <field  name="date_opened" string="Date Opened" optional="show" />
+            </xpath>
+            
         </field>
     </record>
     <!-- Form View -->
