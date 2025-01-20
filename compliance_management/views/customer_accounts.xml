@@ -15,7 +15,7 @@
                 <field name="risk_score" optional="show"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                 decoration-warning="risk_level in ('medium')"
-                decoration-success="risk_level in ('lowel')" />
+                decoration-success="risk_level in ('lowel')" optional="show"/>
                 <field name="state" widget="badge" decoration-danger="state == 'locked'"
                 decoration-warning="state in ('dormant')"
                 decoration-success="state in ('active')" optional="show"/>

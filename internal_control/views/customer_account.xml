@@ -17,9 +17,11 @@
         <field name="model">res.partner.account</field>
         <field name="inherit_id" ref="compliance_management.compliance_customer_account_tree" />
         <field name="arch" type="xml">
-            <xpath expr="//tree" position="inside">
-                <!-- <field name="officercode" string="Account Officer" optional="show"/> -->
-                <!-- <field name="sectorcode" string="Sector" optional="show"/> -->
+            <field name="account_name" position="replace">
+                <field name="accounttitle" string="Account Title" optional="show" />
+            </field>
+            
+            <tree position="inside">
                 <field name="lnbalance" string="Ln Balance" optional="show"/>
                 <field name="bkbalance" string="Bk Balance" optional="show"/>
                 <field name="unclearedbal" string="Uncleared Balance" optional="show"/>
@@ -28,10 +30,10 @@
                 <field name="totcredit" string="Total Credit" optional="show"/>
                 <field name="last_month_balance" string="Last Month Balance" optional="show"/>
                 <field name="lien" string="Lien" optional="show"/>
-                <!-- <field name="account_tier" string="Account Tier" optional="show"/> -->
+                <field name="account_tier" string="Account Tier" optional="show"/>
                 <field name="source_account_id" string="Source Account ID" optional="show"/>
                 <field name="Status" widget="boolean" string="Status" optional="show"/>
-            </xpath>
+            </tree>
         </field>
     </record>
 
