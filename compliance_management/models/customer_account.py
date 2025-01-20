@@ -38,7 +38,7 @@ class CustomerAccount(models.Model):
     risk_level = fields.Char(string='Risk Rating',related="customer_id.risk_level")
     state = fields.Selection(string='Status', selection=[('active', 'Active'), ('dormant', 'Dormant'),('locked','Locked')],tracking=True,default='active')
     
-    
+     
     @api.model
     def open_accounts(self):
         return {

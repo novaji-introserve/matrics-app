@@ -19,5 +19,5 @@ class CustomerAccount(models.Model):
         comodel_name='res.partner.tier', string='Account Tier', index=True)
     source_account_id = fields.Char(string="Source Account ID", index=True)
     Status = fields.Boolean(default=False)
-    
+    accounttitle = fields.Char(string="Account Title")
         
