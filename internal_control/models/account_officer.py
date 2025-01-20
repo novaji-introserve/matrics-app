@@ -4,10 +4,11 @@ from odoo import fields, models, api, _
 class AccountOfficer(models.Model):
     _name = 'res.account.officer'
     _description = _('Account Officer')
-    _rec_name = 'staff_id'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
-
-    staff_id = fields.Char(string='Staff ID',  readonly=True, index=True, unique=True)
+    _sql_constraints = [
+        ('uniq_staff_id', 'unique(staff_id)',
+         "Account Officer already exists. Value must be unique!"),
+    ]
+    staff_id = fields.Char(string='Staff ID',  readonly=True, index=True)
     officername = fields.Char(string='Staff Name',  readonly=True, index=True)
     status_id = fields.Many2one(comodel_name='res.user.status',
                               string='Staff Status', index=True)

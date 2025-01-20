@@ -63,7 +63,7 @@ class Customer(models.Model):
     firstname = fields.Char(string='Firstname')
     lastname = fields.Char(string='Lastname')
     middlename = fields.Char(string='Middle Name')
-    othername = fields.Char(string='Other Name')
+    othername = fields.Char(string='Other Name') 
     town = fields.Char(string='Town')
     registration_date = fields.Date(string='Registration Date', tracking=True)
     company_reg_date = fields.Date(
@@ -72,8 +72,10 @@ class Customer(models.Model):
         string='Risk Score', digits=(10, 2), tracking=True)
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
+    # account_officer_id = fields.Many2one(
+    #     comodel_name='res.users', string='Account Officer', index=True, tracking=True)
     account_officer_id = fields.Many2one(
-        comodel_name='res.users', string='Account Officer', index=True, tracking=True)
+        comodel_name='res.account.officer', string='Account Officer', index=True, tracking=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(
