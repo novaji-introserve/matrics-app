@@ -1,105 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Form View -->
-    <!-- <record id="view_transaction_monitoring_form" model="ir.ui.view">
-        <field name="name">transaction.monitoring.form</field>
-        <field name="model">res.customer.transaction</field>
-        <field name="inherit_id" ref="compliance_management.compliance_transaction_form" />
-        <field name="arch" type="xml">
-
-
-            <xpath expr="//sheet" position="replace">
-                <form string="Transaction Details" create="false" edit="false" delete="false">
-
-                    
-                    <sheet>
-                        <div class="oe_button_box" name="button_box">
-                            <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
-                                <span>Risk
-                                    <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
-                                        decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('lowel')" />
-                                </span>
-                            </button>
-                        </div> -->
-                        <!-- Title Section -->
-                        <!-- <div class="oe_title">
-                            <h1>
-                                <field name="accountnumber" placeholder="Account Number" />
-                            </h1>
-                        </div>
-                        <group>
-                            <group>
-                                <field name="trandate"/>
-                                <field name="accountnumber"/>
-                                <field name="trancurrency" />
-                            </group>
-                            <group>
-                                <field name="likely_fraud" widget="boolean_toggle" readonly="1" />
-                                <field name="tellerno"/>
-                            </group>
-                        </group>
-                
-                        <notebook> -->
-                            <!-- Transaction Details Page -->
-                            <!-- <page string="Transaction Details" name="transaction_details">
-                                <group>
-                                    <group string="Date Information">
-                                        <field name="valuedate"/>
-                                        <field name="actualdate"/>
-                                    </group>
-                                    <group string="Amount Details">
-                                        <field name="tranamount" string="Amount" />
-                                        <field name="crossrate"/>
-                                        <field name="charge"/>
-                                    </group>
-                                </group>
-                                <group>
-                                    <group string="Transaction Information">
-                                        <field name="accountmodule"/>
-                                        <field name="tran_channel"/>
-                                        <field name="reversal"/>
-                                    </group>
-                                    <group string="Reference Numbers">
-                                        <field name="batchno" />
-                                        <field name="chknum"/>
-                                    </group>
-                                </group>
-                            </page> -->
-                
-                            <!-- Processing Information Page -->
-                            <!-- <page string="Processing Details" name="processing_details">
-                                <group>
-                                    <group string="Authorization">
-                                        <field name="authid"/>
-                                        <field name="overideid"/>
-                                        <field name="status"/>
-                                    </group>
-                                    <group string="Branch Information">
-                                        <field name="subbranchcode"/>
-                                        <field name="deptcode"/>
-                                    </group>
-                                </group>
-                            </page> -->
-                
-                            <!-- Reference Information Page -->
-                            <!-- <page string="Reference Information" name="reference_info">
-                                <group>
-                                    <group string="System References">
-                                        <field name="request_id"/>
-                                        <field name="rrn"/>
-                                        <field name="rem"/>
-                                    </group>
-                                    <group string="Post Information">
-                                        <field name="postseq" />
-                                    </group>
-                                </group>
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-           </xpath>
-        </field>
-    </record> -->
 
     <record id="view_transaction_monitoring_form" model="ir.ui.view">
         <field name="name">transaction.monitoring.form</field>
@@ -137,42 +37,6 @@
         </field>
     </record>
 
-    <!-- Tree View -->
-    <!-- <record id="view_transaction_monitoring_tree" model="ir.ui.view">
-        <field name="name">transaction.monitoring.tree</field>
-        <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
-        <field name="model">res.customer.transaction</field>
-        <field name="arch" type="xml">
-
-
-            <xpath expr="//tree" position="replace">
-                <tree string="Transaction Monitoring" create="false" >
-                    <field name="refno" optional="show"/>
-                    <field name="trandate" optional="show" />
-                    <field name="valuedate" optional="show" />
-                    <field name="actualdate" optional="show" />
-                    <field name="trancurrency" optional="show" />
-                    <field name="crossrate" optional="show" />
-                    <field name="reversal" optional="show" />
-                    <field name="accountmodule" optional="show" />
-                    <field name="tellerno" optional="show" />
-                    <field name="accountnumber" optional="show" />
-                    <field name="tran_channel" optional="show" />
-                    <field name="likely_fraud" widget="boolean_toggle" readonly="1" optional="show" />
-                    <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
-                        decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('lowel')" optional="show" />
-                    <field name="state" widget="badge" decoration-warning="state in ('new')" decoration-success="state in ('done')" optional="show" />
-                    
-                    <field name="request_id" optional="show" />
-                    <field name="rrn" optional="show" />
-                </tree>
-            </xpath>
-
-           
-           
-        </field>
-    </record> -->
-
     <record id="view_transaction_monitoring_tree" model="ir.ui.view">
         <field name="name">transaction.monitoring.tree</field>
         <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
@@ -193,33 +57,7 @@
             </xpath>
         </field>
     </record>
-
-
-<!--   
-    <record id="action_all_transactions" model="ir.actions.server">
-        <field name="name">all.transactions</field>
-        <field name="model_id" ref="model_res_customer_transaction" /> 
-        <field name="state">code</field>
-        <field name="code">action = model.open_transactions_all()</field>
-    </record>
-
-   
-    <record id="action_all_open_transactions" model="ir.actions.server">
-        <field name="name">Open.transactions</field>
-        <field name="model_id" ref="model_res_customer_transaction" /> 
-        <field name="state">code</field>
-        <field name="code">action = model.open_transactions()</field>
-    </record>
-
     
-    <record id="action_all_reviewed_transactions" model="ir.actions.server">
-        <field name="name">Reviewed.transactions</field>
-        <field name="model_id" ref="model_res_customer_transaction" /> 
-        <field name="state">code</field>
-        <field name="code">action = model.open_transactions_done()</field>
-    </record>  -->
-
-
     <record id="action_all_transactions" model="ir.actions.server">
         <field name="name">All Transactions</field>
         <field name="model_id" ref="model_res_customer_transaction" />

@@ -5,10 +5,10 @@ from odoo import models, fields, api, _
 class Transaction(models.Model):
     _name = 'res.customer.transaction'
     _description = 'Transaction'
-    _sql_constraints = [
-        ('uniq_account_name', 'unique(name)',
-         "Account Name already exists. Value must be unique!"),
-    ]
+    # _sql_constraints = [
+    #     ('uniq_account_name', 'unique(name)',
+    #      "Account Name already exists. Value must be unique!"),
+    # ]
     _order = 'date_created desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     name = fields.Char(string="Reference Number", index=True)

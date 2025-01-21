@@ -36,9 +36,9 @@
             <!-- <xpath expr="//field[@name='city']" position="replace">
                 <field  name="statecode" string="State" optional="show" />
             </xpath> -->
-            <xpath expr="//field[@name='country_id']" position="replace">
+            <!-- <xpath expr="//field[@name='country_id']" position="replace">
                 <field  name="nationality" string="Country" optional="show" />
-            </xpath>
+            </xpath> -->
         </field>
     </record>
     <!-- Form View -->
