@@ -7,12 +7,12 @@ _logger = logging.getLogger(__name__)
 class TransactionMonitoring(models.Model):
     _inherit = 'res.customer.transaction'
     _sql_constraints = [
-        ('uniq_refno', 'unique(trans_id)',
+        ('uniq_refno', 'unique(refno)',
          "Transaction already exists. Value must be unique!"),
     ] 
 
     # id = fields.Integer(string="id", readonly=True)
-    # refno = fields.Char(string="Ref Number", readonly=True, index=True)
+    refno = fields.Char(string="Ref Number", readonly=True, index=True)
     valuedate = fields.Char(string="Value Date", readonly=True, index=True)
     actualdate = fields.Char(string="Actual Date", readonly=True, index=True)
     userid = fields.Char(string="User ID", readonly=True, index=True)

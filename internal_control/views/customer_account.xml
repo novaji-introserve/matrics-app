@@ -49,8 +49,8 @@
             <xpath expr="//sheet" position="inside">
                 <group string="Additional Details">
                     <group>
-                        <!-- <field name="officercode" string="Account Officer"/> -->
-                        <!-- <field name="sectorcode" string="Sector"/> -->
+                        <field name="officercode" string="Account Officer"/>
+                        <field name="sectorcode" string="Sector"/>
                         <field name="lnbalance" string="Ln Balance"/>
                         <field name="bkbalance" string="Bk Balance"/>
                         <field name="unclearedbal" string="Uncleared Balance"/>
@@ -64,7 +64,7 @@
                     </group>
                 </group>
                 <group string="Other Details">
-                    <!-- <field name="account_tier" string="Account Tier"/> -->
+                    <field name="account_tier" string="Account Tier"/>
                     <field name="source_account_id" string="Source Account ID"/>
                     <field name="Status" widget="boolean" string="Status"/>
                 </group>

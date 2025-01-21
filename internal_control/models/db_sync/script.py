@@ -13,6 +13,8 @@ import hashlib
 from decimal import Decimal
 from threading import Lock
 import backoff
+import psutil
+import threading
 
 # Configure logging
 logging.basicConfig(
@@ -28,6 +30,104 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
+@dataclass
+class ResourceMetrics:
+    cpu_percent: float
+    memory_percent: float
+    available_memory_gb: float
+    disk_io_percent: float
+
+class ResourceMonitor:
+    def __init__(self):
+        self.process = psutil.Process()
+        self._lock = threading.Lock()
+        self._metrics: Optional[ResourceMetrics] = None
+        self._last_update = 0
+        self.update_interval = 5  # seconds
+        
+    def get_metrics(self) -> ResourceMetrics:
+        """Get current system resource metrics with caching."""
+        current_time = time.time()
+        
+        with self._lock:
+            if self._metrics is None or (current_time - self._last_update) > self.update_interval:
+                try:
+                    cpu_percent = psutil.cpu_percent(interval=1) / psutil.cpu_count()
+                    memory = psutil.virtual_memory()
+                    memory_percent = memory.percent
+                    available_memory_gb = memory.available / (1024 ** 3)
+                    disk_io = psutil.disk_io_counters()
+                    disk_io_percent = self.process.io_counters().read_bytes / (1024 ** 2)
+                    
+                    self._metrics = ResourceMetrics(
+                        cpu_percent=cpu_percent,
+                        memory_percent=memory_percent,
+                        available_memory_gb=available_memory_gb,
+                        disk_io_percent=disk_io_percent
+                    )
+                    self._last_update = current_time
+                    
+                except Exception as e:
+                    logging.error(f"Error getting system metrics: {str(e)}")
+                    self._metrics = ResourceMetrics(50, 50, 4, 50)
+                    
+        return self._metrics
+
+class DynamicResourceManager:
+    def __init__(self, initial_batch_size: int = 5000, initial_thread_count: int = 4):
+        self.monitor = ResourceMonitor()
+        self.min_batch_size = 1000
+        self.max_batch_size = 50000
+        self.min_threads = 2
+        self.max_threads = 16
+        
+        self.current_batch_size = initial_batch_size
+        self.current_thread_count = initial_thread_count
+        
+        self.cpu_threshold = 75
+        self.memory_threshold = 80
+        self.io_threshold = 70
+        self.min_available_memory = 2
+        
+    def adjust_resources(self, table_name: str) -> tuple[int, int]:
+        """Dynamically adjust batch size and thread count based on system metrics."""
+        metrics = self.monitor.get_metrics()
+        
+        logging.info(
+            f"Resource metrics for {table_name}: CPU: {metrics.cpu_percent:.1f}%, "
+            f"Memory: {metrics.memory_percent:.1f}%, "
+            f"Available Memory: {metrics.available_memory_gb:.1f}GB, "
+            f"Disk I/O: {metrics.disk_io_percent:.1f}MB/s"
+        )
+        
+        new_batch_size = self.current_batch_size
+        new_thread_count = self.current_thread_count
+        
+        if metrics.cpu_percent > self.cpu_threshold:
+            new_thread_count = max(self.min_threads, self.current_thread_count - 1)
+        elif metrics.cpu_percent < 50 and metrics.memory_percent < 70:
+            new_thread_count = min(self.max_threads, self.current_thread_count + 1)
+            
+        if metrics.memory_percent > self.memory_threshold or metrics.available_memory_gb < self.min_available_memory:
+            new_batch_size = max(self.min_batch_size, int(self.current_batch_size * 0.8))
+        elif metrics.memory_percent < 60 and metrics.available_memory_gb > self.min_available_memory * 2:
+            new_batch_size = min(self.max_batch_size, int(self.current_batch_size * 1.2))
+            
+        if metrics.disk_io_percent > self.io_threshold:
+            new_batch_size = max(self.min_batch_size, int(self.current_batch_size * 0.8))
+            
+        if new_batch_size != self.current_batch_size or new_thread_count != self.current_thread_count:
+            logging.info(
+                f"Adjusting resources for {table_name}: "
+                f"Batch size: {self.current_batch_size} -> {new_batch_size}, "
+                f"Threads: {self.current_thread_count} -> {new_thread_count}"
+            )
+            
+        self.current_batch_size = new_batch_size
+        self.current_thread_count = new_thread_count
+        
+        return new_batch_size, new_thread_count
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -55,7 +155,7 @@ class TableConfig:
         normalized_mappings = {}
         for source_col, mapping in self.mappings.items():
             normalized_mapping = mapping.copy()
-            normalized_mapping['target'] = mapping['target'].lower()  # Normalize target to lowercase
+            normalized_mapping['target'] = mapping['target'].lower()
             normalized_mappings[source_col.lower()] = normalized_mapping
             
         self.mappings = normalized_mappings
@@ -98,10 +198,7 @@ class LookupCache:
 
 class ETLManager:
     def __init__(self, db_config: dict, etl_config: dict):
-        # Add default start date for initial sync
         self.default_start_date = datetime(2000, 1, 1)
-
-        # Get connection strings from config and format them
         self.mssql_conn_string = db_config['mssql_connection']['connection_string'].format(**db_config['mssql_connection'])
         self.pg_conn_string = db_config['postgres_connection']['connection_string'].format(**db_config['postgres_connection'])
 
@@ -120,9 +217,46 @@ class ETLManager:
         self.lookup_cache = LookupCache()
         self.processed_tables: Set[str] = set()
         self.processed_tables_lock = Lock()
+        self.resource_manager = DynamicResourceManager()
 
-        # Initialize database
         self._initialize_database()
+
+    def get_source_query(self, table_name: str, mapped_columns: List[str], last_sync_time: datetime) -> str:
+        """Generate optimized source query with change tracking."""
+        columns = ', '.join(mapped_columns)
+        config = self.table_configs[table_name]
+        
+        base_query = f"SELECT {columns} FROM {config.source_table}"
+        
+        try:
+            with self.get_connections() as (mssql_conn, _):
+                cursor = mssql_conn.cursor()
+                cursor.execute(f"SELECT TOP 0 * FROM {config.source_table}")
+                available_columns = {col[0].lower() for col in cursor.description}
+                
+                modified_columns = [
+                    'modified_date', 'last_modified', 'update_date', 
+                    'modification_date', 'modified_on', 'updated_at'
+                ]
+                
+                mod_column = next((col for col in modified_columns if col in available_columns), None)
+                
+                if mod_column:
+                    return f"""
+                        {base_query}
+                        WHERE {mod_column} >= ?
+                        OR {config.primary_key} IN (
+                            SELECT {config.primary_key} 
+                            FROM {config.source_table}
+                            WHERE {mod_column} IS NULL
+                        )
+                    """
+                
+                return base_query
+                
+        except Exception as e:
+            logging.warning(f"Error detecting modification columns for {table_name}: {str(e)}")
+            return base_query
 
     def get_source_columns(self, mssql_cursor, table_name: str) -> List[str]:
         """Get all column names from source table and normalize them to lowercase."""
@@ -317,7 +451,7 @@ class ETLManager:
     @backoff.on_exception(
         backoff.expo,
         (psycopg2.Error, ValueError),
-        max_tries=3
+        max_tries=5
     )
     def lookup_value(
         self, pg_cursor, table: str,
@@ -433,152 +567,107 @@ class ETLManager:
             self.lookup_cache.clear()
 
     def process_table(self, table_name: str):
-        """Process a single table using continuous change detection."""
-        start_time = time.time()
+        """Process a single table using dynamic resource management."""
         config = self.table_configs[table_name.lower()]
         
         for dep in config.dependencies:
             if dep.lower() not in self.processed_tables:
-                logging.info(f"Processing dependency {dep} for {table_name}")
                 self.process_table(dep)
 
-        logging.info(f"Starting to process table {table_name}")
-        
         with self.get_connections() as (mssql_conn, pg_conn):
             try:
                 mssql_cursor = mssql_conn.cursor()
                 pg_cursor = pg_conn.cursor()
                 
-                mssql_cursor.arraysize = config.batch_size
-                
-                available_source_columns = self.get_source_columns(mssql_cursor, config.source_table)
-                mapped_columns = []
-                
-                for source_col in config.mappings.keys():
-                    if source_col not in available_source_columns:
-                        logging.warning(
-                            f"Mapped column {source_col} not found in source table {config.source_table}. "
-                            "Skipping this column."
-                        )
-                        continue
-                    mapped_columns.append(source_col)
-
-                if not mapped_columns:
-                    raise ValueError(f"No valid mapped columns found for table {table_name}")
-
                 last_sync_time, last_hashes = self.get_last_sync_info(pg_cursor, table_name)
+                available_columns = self.get_source_columns(mssql_cursor, config.source_table)
+                mapped_columns = [col for col in config.mappings.keys() 
+                                if col in available_columns]
                 
-                query = f"SELECT {', '.join(mapped_columns)} FROM {config.source_table}"
-                # logging.debug(f"Executing query: {query}")
-                mssql_cursor.execute(query)
-
-                current_hashes = {}
-                stats = {
-                    'new_rows': 0,
-                    'updated_rows': 0,
-                    'deleted_rows': 0,
-                    'total_rows': 0,
-                    'error_rows': 0
-                }
-                rows_to_update = []
-                batch_count = 0
-
+                if not mapped_columns:
+                    raise ValueError(f"No valid mapped columns for {table_name}")
+                
+                query = self.get_source_query(table_name, mapped_columns, last_sync_time)
+                
+                if "WHERE" in query:
+                    mssql_cursor.execute(query, (last_sync_time,))
+                else:
+                    mssql_cursor.execute(query)
+                
+                total_rows_processed = 0
+                start_time = time.time()
+                
                 while True:
-                    rows = mssql_cursor.fetchmany(config.batch_size)
+                    batch_size, thread_count = self.resource_manager.adjust_resources(table_name)
+                    
+                    rows = mssql_cursor.fetchmany(batch_size)
                     if not rows:
                         break
-
-                    batch_count += 1
-                    if batch_count % 10 == 0:
+                        
+                    total_rows_processed += len(rows)
+                    
+                    elapsed_time = time.time() - start_time
+                    if elapsed_time > 0:
+                        rows_per_second = total_rows_processed / elapsed_time
                         logging.info(
-                            f"Processing batch {batch_count} of {table_name}. "
-                            f"Processed {stats['total_rows']} rows so far"
+                            f"Processing {table_name}: {total_rows_processed:,} rows "
+                            f"({rows_per_second:.0f} rows/sec)"
                         )
-
-                    for row in rows:
-                        try:
-                            row_dict = {col.lower(): val for col, val in zip(mapped_columns, row)}
-                            
-                            pk_value = row_dict.get(config.primary_key)
-                            if pk_value is None:
-                                logging.error(
-                                    f"Primary key {config.primary_key} not found in row: {row_dict}. "
-                                    "Skipping row."
+                    
+                    with ThreadPoolExecutor(max_workers=thread_count) as executor:
+                        futures = []
+                        for row in rows:
+                            futures.append(
+                                executor.submit(
+                                    self.transform_row,
+                                    row,
+                                    mapped_columns,
+                                    config,
+                                    pg_cursor
                                 )
-                                stats['error_rows'] += 1
-                                continue
-
-                            transformed_row = {}
-                            for source_col, mapping in config.mappings.items():
-                                source_value = row_dict.get(source_col)
-                                if source_value is not None:
-                                    try:
-                                        transformed_value = self.transform_value(mapping, source_value, pg_cursor)
-                                        transformed_row[mapping['target']] = transformed_value
-                                    except Exception as e:
-                                        logging.error(
-                                            f"Error transforming column {source_col} in {table_name}: {str(e)}. "
-                                            "Skipping this column."
-                                        )
-                                        continue
-
-                            row_hash = self.calculate_row_hash(transformed_row)
-                            str_pk_value = str(pk_value)
-                            current_hashes[str_pk_value] = row_hash
+                            )
                             
-                            if str_pk_value not in last_hashes:
-                                stats['new_rows'] += 1
-                                rows_to_update.append(transformed_row)
-                            elif last_hashes[str_pk_value] != row_hash:
-                                stats['updated_rows'] += 1
-                                rows_to_update.append(transformed_row)
+                        transformed_batch = []
+                        for future in as_completed(futures):
+                            result = future.result()
+                            if result:
+                                transformed_batch.append(result)
+                                
+                        if transformed_batch:
+                            self.batch_update_rows(pg_cursor, config, transformed_batch)
+                            pg_conn.commit()
                             
-                            stats['total_rows'] += 1
-
-                            if len(rows_to_update) >= config.batch_size:
-                                self.batch_update_rows(pg_cursor, config, rows_to_update)
-                                rows_to_update = []
-                                pg_conn.commit()
-
-                        except Exception as e:
-                            logging.error(f"Error processing row in {table_name}: {str(e)}")
-                            stats['error_rows'] += 1
-
-                # Final batch update
-                if rows_to_update:
-                    self.batch_update_rows(pg_cursor, config, rows_to_update)
-                    pg_conn.commit()
-
-                # Update sync information
-                sync_time = datetime.now()
-                self.update_sync_info(pg_cursor, table_name, sync_time, current_hashes)
-
-                # Log the synchronization results
-                self.log_sync_info(pg_cursor, table_name, stats['total_rows'], 
-                                   stats['new_rows'], stats['updated_rows'], 
-                                   stats['deleted_rows'], None)
-
-                logging.info(
-                    f"Completed processing table {table_name}. "
-                    f"Total rows: {stats['total_rows']}, New rows: {stats['new_rows']}, "
-                    f"Updated rows: {stats['updated_rows']}, Deleted rows: {stats['deleted_rows']}, "
-                    f"Errors: {stats['error_rows']}"
-                )
-
-            except Exception as e:
-                logging.error(f"Error processing table {table_name}: {str(e)}")
-                self.log_sync_info(pg_cursor, table_name, stats['total_rows'], 
-                                   stats['new_rows'], stats['updated_rows'], 
-                                   stats['deleted_rows'], str(e))
-                raise
-
+                self.update_sync_info(pg_cursor, table_name, datetime.now(), {})
+                pg_conn.commit()
+                
             finally:
-                mssql_cursor.close()
-                pg_cursor.close()
+                with self.processed_tables_lock:
+                    self.processed_tables.add(table_name)
 
-        # Mark the table as processed
-        with self.processed_tables_lock:
-            self.processed_tables.add(table_name)
+    def transform_row(self, row: tuple, columns: List[str], 
+                     config: TableConfig, pg_cursor) -> Optional[Dict[str, Any]]:
+        """Transform a single row with error handling."""
+        try:
+            row_dict = {col: val for col, val in zip(columns, row)}
+            
+            if not row_dict.get(config.primary_key):
+                return None
+                
+            transformed = {}
+            for source_col, mapping in config.mappings.items():
+                if source_col not in row_dict:
+                    continue
+                    
+                value = row_dict[source_col]
+                transformed[mapping['target']] = self.transform_value(
+                    mapping, value, pg_cursor
+                )
+                
+            return transformed
+            
+        except Exception as e:
+            logging.error(f"Error transforming row: {str(e)}")
+            return None
 
     def batch_update_rows(self, pg_cursor, config: TableConfig, rows: List[Dict[str, Any]]):
         """Batch update rows into the target PostgreSQL table."""
@@ -643,7 +732,7 @@ class ETLManager:
                     raise
 
             # Execute in smaller batches
-            batch_size = 1000
+            batch_size = 20000
             for i in range(0, len(values), batch_size):
                 batch = values[i:i + batch_size]
                 try:
@@ -663,6 +752,24 @@ class ETLManager:
             logging.error(f"Number of rows in batch: {len(rows)}")
             raise
 
+# if __name__ == "__main__":
+#     with open('db_config.json', 'r') as f:
+#         db_config = json.load(f)
+    
+#     with open('etl_config.json', 'r') as f:
+#         etl_config = json.load(f)
+    
+#     etl_manager = ETLManager(db_config, etl_config)
+    
+#     while True:
+#          try:
+#             etl_manager.run_etl()
+#             logging.info("ETL cycle completed successfully")
+#          except Exception as e:
+#             logging.error(f"ETL cycle failed: {str(e)}")
+        
+#          time.sleep(120)  # 2 minutes between cycles
+
 if __name__ == "__main__":
     with open('db_config.json', 'r') as f:
         db_config = json.load(f)
@@ -670,13 +777,23 @@ if __name__ == "__main__":
     with open('etl_config.json', 'r') as f:
         etl_config = json.load(f)
     
-    etl_manager = ETLManager(db_config, etl_config)
+    # Create config with only transactions table
+    transactions_config = {
+        'tables': {
+            'tbl_transactions': etl_config['tables']['tbl_transactions']
+        }
+    }
+    
+    # Remove dependencies since lookup tables are already populated
+    transactions_config['tables']['tbl_transactions']['dependencies'] = []
+    
+    etl_manager = ETLManager(db_config, transactions_config)
     
     while True:
         try:
             etl_manager.run_etl()
-            logging.info("ETL cycle completed successfully")
+            logging.info("Transactions sync completed successfully")
         except Exception as e:
-            logging.error(f"ETL cycle failed: {str(e)}")
+            logging.error(f"Transactions sync failed: {str(e)}")
         
         time.sleep(120)  # 2 minutes between cycles
