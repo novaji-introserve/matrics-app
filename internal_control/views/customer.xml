@@ -28,7 +28,7 @@
                 <field  name="occupation" string="occupation" optional="show" />
             </xpath> -->
 
-            <xpath expr="//field[@name='phone']" position="replace">
+            <!-- <xpath expr="//field[@name='phone']" position="replace">
                 <field  name="phone1" string="Phone" optional="show" />
             </xpath>
 
@@ -40,7 +40,7 @@
             </xpath>
             <xpath expr="//field[@name='nationality']" position="after">
                 <field  name="date_opened" string="Date Opened" optional="show" />
-            </xpath>
+            </xpath> -->
             
         </field>
     </record>
@@ -97,9 +97,9 @@
                 <field name="surname" string="Surname" />
             </xpath> -->
 
-            <xpath expr="//field[@name='bvn']" position="replace">
+            <!-- <xpath expr="//field[@name='bvn']" position="replace">
                 <field name="nin" string="NIN" />
-            </xpath>
+            </xpath> -->
           
         </field>
     </record>
@@ -117,6 +117,7 @@
 
         </field>
     </record> -->
+
 
 
 
