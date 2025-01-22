@@ -1,6 +1,8 @@
 from odoo import models, fields, api
 import logging
 from odoo.exceptions import ValidationError
+from datetime import datetime, timedelta
+
 
 _logger = logging.getLogger(__name__)
 
@@ -29,51 +31,64 @@ class TransactionMonitoring(models.Model):
     
 
     # @api.model
-    # def open_transactions(self):
-    
+    # def search(self, args, offset=0, limit=None, order=None, count=False):
+    #     # Default filter for last 7 days if no date filter present
+    #     if not any(arg[0] == 'valuedate' for arg in args):
+    #         date_from = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d 00:00:00')
+    #         args.append(('valuedate', '>=', date_from))
+    #     return super().search(args, offset=offset, limit=limit, order=order, count=count)
 
-        
-    
-    #     return {
-    #         'name': 'Transactions To Review',
-    #         'type': 'ir.actions.act_window',
-    #         'res_model': 'res.customer.transaction',
-    #         'view_mode': 'tree,form',
-    #         'domain': [('subbranchcode', 'in', [e.branchcode.strip() for e in self.env.user.branches_id]),  ('state', '=', 'new')],
-    #        'context': {'search_default_group_branch': 1, 'default_state': 'new'}
-    #     }
+# class TransactionMonitoring(models.Model):
+#     _inherit = 'res.customer.transaction'
 
     # @api.model
-    # def open_transactions_done(self):
-    #     return {
-    #         'name': 'Reviewed Transactions',
-    #         'type': 'ir.actions.act_window',
-    #         'res_model': 'res.customer.transaction',
-    #         'view_mode': 'tree,form',
-    #         'domain': [('state', '=', 'done')],
-    #         'domain': [('subbranchcode', 'in', [e.branchcode.strip() for e in self.env.user.branches_id]),  ('state', '=', 'done')],
-    #         # 'context': {'search_default_group_by': ['subbranchcode']},
-    #         'context': {'search_default_group_branch': 1, 'default_state': 'new'}
-           
-    #     }
+    # def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+    #     _logger.info(f"""
+    #     Read Group Called:
+    #     Domain: {domain}
+    #     Fields: {fields}
+    #     Groupby: {groupby}
+    #     Offset: {offset}
+    #     Limit: {limit}
+    #     """)
+    #     return super().read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
     # @api.model
-    # def open_transactions_all(self):
+    # def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None):
+    #     _logger.info(f"""
+    #     Search Read Called:
+    #     Domain: {domain}
+    #     Fields: {fields}
+    #     Offset: {offset}
+    #     Limit: {limit}
+    #     Order: {order}
+    #     """)
+    #     return super().search_read(domain=domain, fields=fields, offset=offset, limit=limit, order=order)
+    
 
-    #     branch_ids = [e.id for e in self.env.user.branches_id]
-    
-      
-    #     if(len(branch_ids) > 0):
-    
-    #      return {
-    #         'name': 'All Transactions',
-    #         'type': 'ir.actions.act_window',
-    #         'res_model': 'res.customer.transaction',
-    #         'view_mode': 'tree,form',
-    #         'domain': [('subbranchcode', 'in', [e.branchcode.strip() for e in self.env.user.branches_id])],
-    #         'context': {'search_default_group_branch': 1, 'default_state': 'new'}
-    #     }
-    
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        try:
+            _logger.info(f"Read Group Called: Domain: {domain}, Fields: {fields}, Groupby: {groupby}")
+            return super().read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+        except AttributeError as e:
+            # Log detailed information about Many2one fields and their invalid data
+            many2one_fields = [f for f in self._fields if self._fields[f].type == 'many2one']
+            invalid_fields = {}
+            
+            for field in many2one_fields:
+                for record in self.search(domain):  # Iterate over matching records
+                    value = getattr(record, field, None)
+                    if value and not value.exists():  # Check if the record exists
+                        invalid_fields.setdefault(field, []).append(record.id)
+
+            if invalid_fields:
+                _logger.error(f"Invalid Many2one field(s) causing issue: {invalid_fields}")
+            
+            _logger.error(f"Error in read_group: {e}")
+            raise ValidationError("A Many2one field contains invalid or missing data. Check the logs for more details.")
+
+
     def action_screen(self):
      
         rules = self.env['res.transaction.screening.rule'].search(
