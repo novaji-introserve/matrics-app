@@ -5,7 +5,7 @@
         <field name="name">res_cust_transaction_tree</field>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <tree string="Transactions">
+            <tree string="Transactions" create="false">
                 <header>
                     <button name="done" class="oe_highlight" type="object"
                         string="Mark Reviewed"
@@ -36,7 +36,7 @@
         <field name="name">Transaction Form</field>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <form>
+            <form create="false">
                 <header>
                     <button name="action_screen" class="oe_highlight" type="object"
                         string="Run Transaction Screening"

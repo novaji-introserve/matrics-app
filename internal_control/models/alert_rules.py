@@ -52,9 +52,6 @@ class alert_rules(models.Model):
     last_checked = fields.Datetime(string="last_checked", default=fields.Datetime.now())
 
 
-
-
-
     @api.onchange('sql_text')
     def onchange_sql_text(self):
         if self.sql_text:
@@ -127,7 +124,7 @@ class alert_rules(models.Model):
                     
                     query = rule.sql_text.query
                     
-                elif "subbranchcode" not in rule.sql_text.query:
+                elif "branch_id" not in rule.sql_text.query:
                     
                     columns = rule.sql_text.query.split(",")
                     
@@ -135,39 +132,42 @@ class alert_rules(models.Model):
                     query_string = ', '.join(columns)
                     
                     # Insert 'subbranchcode' before 'from'
-                    query_string = query_string.replace(' from ', ', subbranchcode from ')
+                    query_string = query_string.replace(' from ', ', branch_id from ')
                     
                     query = query_string
+                
                     
-            
                 # first query to create csv
                 self.env.cr.execute(f"{query}")
                 rows = self.env.cr.fetchall()
+                
+                
                 
                 # Get column names dynamically
                 columns = [desc[0] for desc in self.env.cr.description]
 
                 # Find the index of subbranchcode dynamically
-                subbranchcode_index = None
+                branchcode_index = None
                 for i, column in enumerate(columns):
-                    if 'subbranchcode' in column.lower():  # Case insensitive search
-                        subbranchcode_index = i
+                    if 'branch_id' in column.lower():  # Case insensitive search
+                        branchcode_index = i
                         break
 
-                if subbranchcode_index is None:
+                if branchcode_index is None:
                     raise ValidationError("subbranchcode column must be in the sql statement")
                 else:
                     branches = []
                    
                     
-                    # Loop through the rows and get the value of subbranchcode dynamically
+                    # Loop through the rows and get the value of branchcode dynamically
                     for row in rows:
-                        subbranchcode = row[subbranchcode_index]  # Accessing subbranchcode dynamically by index
+                        branchcode = row[branchcode_index]  # Accessing branchcode dynamically by index
                         
-                        if subbranchcode == "" or subbranchcode == None:
+                        if branchcode == "" or branchcode == None:
                             raise ValidationError("fix empty subbranchcode in the table and try again")
-                        elif subbranchcode not in branches:
-                            branches.append(subbranchcode)
+                        elif branchcode not in branches:
+                            branches.append(branchcode)
+                            
 
                     # Initialize a dictionary to store the emails 
                     mailto = set()
@@ -192,19 +192,19 @@ class alert_rules(models.Model):
                                 alert_group_cc = branch_officer.alert_id.email_cc
                                 # specific mail recepients
                                 for user in rule.specific_email_recipients:
-                                    mailcc.add(user.email)
+                                    mailcc.add(user.login)
                                 
                                 
                                 for user in alert_group:
                                         
-                                    mailcc.add(user.email) 
+                                    mailcc.add(user.login) 
                                      
                                 for user in alert_group_cc:
                                         
-                                    mailcc.add(user.email) 
+                                    mailcc.add(user.login) 
                                 
                                             # Send the email
-                                self.env.cr.execute(f"{query} WHERE subbranchcode = '{branch_officer.branch_id.id}';")
+                                self.env.cr.execute(f"{query} WHERE branch_id = '{branch_officer.branch_id.id}';")
                                 rows = self.env.cr.fetchall()
                             
                                     # Get column names dynamically
@@ -444,21 +444,23 @@ class alert_rules(models.Model):
                                 
                     else:
                         # internal user
-                        mailto.add(rule.first_owner)
-                         # specific mail recepients
+                        mailto.add(rule.first_owner.login)
+                        #  # specific mail recepients
                         for user in rule.specific_email_recipients:
-                            mailto.add(user.email)
+                            mailto.add(user.login)
                         
-                        mailcc.add(rule.second_owner)
-                        for user in rule.alert_id.alert_group_cc:
+                        
+                        mailcc.add(rule.second_owner.login)
+                        for user in rule.alert_id.email_cc:
                                             
-                            mailcc.add(user.email) 
-                        
+                            mailcc.add(user.login) 
+                    
+                   
                         
                     
                 
 
-                     # Send the email
+                    #  Send the email
                     self.env.cr.execute(f"{query}")
                     rows = self.env.cr.fetchall()
                 

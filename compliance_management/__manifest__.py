@@ -47,7 +47,7 @@
         'views/customer_accounts.xml',
         'views/transaction.xml',
         'views/transaction_screening_rule.xml',
-                ],
+    ],
     # only loaded in demonstration mode
     'demo': [
         # 'demo/demo.xml',

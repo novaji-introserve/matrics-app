@@ -6,6 +6,9 @@
         <field name="model">res.customer.transaction</field>
         <field name="inherit_id" ref="compliance_management.compliance_transaction_form" />
         <field name="arch" type="xml">
+            <!-- <xpath expr="//button[@name='action_create']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> -->
             <xpath expr="//page[@name='details']//group/group[last()]" position="after">
                 <!-- Transaction Details -->
                 <group string="Transaction Information">
@@ -42,6 +45,9 @@
         <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
+            <!-- <xpath expr="//button[@name='action_create']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> -->
             <xpath expr="//field[@name='date_created']" position="after">
                 <field name="valuedate" optional="show" />
                 <field name="actualdate" optional="show" />
