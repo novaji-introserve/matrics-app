@@ -13,8 +13,8 @@
                 <!-- <field name="reply_date" widget="datetime" options="{'format': 'MMMM dd, yyyy HH:mm:ss'}" /> -->
                 <field name="formatted_rulebook_date" string="Internal Due Date" />
                 <field name="formatted_reply_date" string="Reply date"/>
-                <field name="submission_timing" widget="badge" decoration-light="submission_timing == 'pending'" decoration-success="submission_timing == 'early'" decoration-warning="submission_timing == 'late'" decoration-danger="submission_timing == 'not_responded'" decoration-info="submission_timing == 'after_internal'" />
-                <field name="rulebook_status" widget="badge" decoration-light="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'" />
+                <!-- <field name="submission_timing" widget="badge" decoration-light="submission_timing == 'pending'" decoration-success="submission_timing == 'early'" decoration-warning="submission_timing == 'late'" decoration-danger="submission_timing == 'not_responded'"  /> -->
+                <!-- <field name="rulebook_status" widget="badge" decoration-dark="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'" /> -->
                 <field name="reporter" string="Officer Responsible" />
                 <field name="reg_due_date" optional="hide" string="Regulatory Due Date"/>
 
