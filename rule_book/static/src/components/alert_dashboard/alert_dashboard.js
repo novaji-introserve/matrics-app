@@ -16,7 +16,7 @@ export class AlertDashboard extends Component {
         [
           "submission_timing",
           "in",
-          ["early", "pending", "late", "not_responded"],
+          ["early", "after_internal", "pending", "late", "not_responded"],
         ],
       ];
 
@@ -30,6 +30,7 @@ export class AlertDashboard extends Component {
       // Initialize counters for each status
       const groupedData = {
         early: { count: 0, name: "Early Submission" },
+        after_internal: { count: 0, name: "Submitted After Internal Due Date" },
         pending: { count: 0, name: "Pending" },
         late: { count: 0, name: "Late Submission" },
         not_responded: { count: 0, name: "Not Responded" },
@@ -50,12 +51,14 @@ export class AlertDashboard extends Component {
       const counts = [];
       const backgroundColors = [
         "rgba(66, 255, 51, 0.3)", // Early - Green
+        "rgba(255, 165, 0, 0.3)", //Submitted After Internal Due Date
         "rgba(51, 100, 255, 0.3)", // On Time - Blue
         "rgba(255, 73, 51, 0.3)", // Late - Red
         "rgba(255, 233, 51, 0.3)", // Not Responded - Yellow
       ];
       const borderColors = [
         "rgba(0, 128, 0)", // Early - Green
+        "rgba(255, 165, 0,)", // Submitted After Internal Due Date
         "rgba(0, 0, 255)", // On Time - Blue
         "rgba(255, 0, 0)", // Late - Red
         "rgba(255, 255, 0)", // Not Responded - Yellow
@@ -193,6 +196,10 @@ export class AlertDashboard extends Component {
         value: 10,
         percentage: 6,
       },
+      AfterInternal: {
+        value: 1,
+        percentage: 1,
+      },
       lateReply: {
         value: 10,
         percentage: 6,
@@ -205,6 +212,7 @@ export class AlertDashboard extends Component {
         value: 1,
         percentage: 1,
       },
+
       pending: {
         value: 1,
         percentage: 1,
@@ -234,6 +242,7 @@ export class AlertDashboard extends Component {
       await this.getEarlyReply();
       await this.getNoReply();
       await this.getPendingReply();
+      await this.getAfterInternalReply();
 
       // await this.getPendingReply();
       await this.getRulebookResponseTiming();
@@ -274,6 +283,9 @@ export class AlertDashboard extends Component {
     await this.getLateReply();
     await this.getEarlyReply();
     await this.getNoReply();
+    await this.getPendingReply();
+    await this.getAfterInternalReply();
+
     //
     await this.getRulebookState();
     //
@@ -283,8 +295,6 @@ export class AlertDashboard extends Component {
     await this.getCompletedRulebook();
     await this.getReviewedRulebook();
     await this.getSubmittedRulebook();
-
-    await this.getPendingReply();
   }
 
   async getPendingReply() {
@@ -447,6 +457,48 @@ export class AlertDashboard extends Component {
     console.log("current date", current_date, "previous date", previous_date);
   }
 
+  // Get Rulebooks Submmited after Internal due date
+  async getAfterInternalReply() {
+    const current_date = this.state.current_date;
+    const period = this.state.period;
+    const previous_date = this.state.previous_date;
+
+    const domain = [["submission_timing", "in", ["after_internal"]]];
+
+    if (period > 0) {
+      domain.push(["reply_date", ">", current_date]);
+    }
+    // Debug log
+    console.log("domain: ", domain);
+    console.log("Period: ", period);
+    console.log("fORMATTED DATE: ", current_date);
+
+    const data = await this.orm.searchCount("reply.log", domain);
+
+    this.state.AfterInternal.value = data;
+
+    const prev_domain = [["submission_timing", "in", ["after_internal"]]];
+
+    if (period > 0) {
+      prev_domain.push(
+        ["reply_date", ">", previous_date],
+        ["reply_date", "<=", previous_date]
+      );
+    }
+    // Debug log
+    console.log("prev domain: ", prev_domain);
+    console.log("prev fORMATTED DATE: ", previous_date);
+
+    const prev_data = await this.orm.searchCount("reply.log", prev_domain);
+    const percentage = ((data - prev_data) / prev_data) * 100;
+    // this.state.earlyReply.percentage = percentage.toFixed(2);
+    this.state.noReply.percentage = isFinite(percentage)
+      ? percentage.toFixed(2)
+      : "0.00";
+
+    console.log("current date", current_date, "previous date", previous_date);
+  }
+
   //   Rulebook that was replied to Late
   async viewLateReply() {
     const domain = [["submission_timing", "in", ["late"]]];
@@ -551,8 +603,33 @@ export class AlertDashboard extends Component {
     });
   }
 
-  //   Rulebook Status View Count
+  //   Rulebook that is submmited afer internal due date
+  async viewAfterInternalReply() {
+    const domain = [["submission_timing", "in", ["after_internal"]]];
 
+    if (this.state.period > 0) {
+      domain.push(["reply_date", ">", this.state.current_date]);
+    }
+
+    let list_view = await this.orm.searchRead(
+      "ir.model.data",
+      [["name", "=", "view_reply_log_tree"]],
+      ["res_id"]
+    );
+
+    this.actionService.doAction({
+      type: "ir.actions.act_window",
+      name: "Submitted After Internal Due Date",
+      res_model: "reply.log",
+      domain,
+      views: [
+        [list_view.length > 0 ? list_view[0].res_id : false, "list"],
+        [false, "form"],
+      ],
+    });
+  }
+
+  //   Rulebook Status View Count
   async getPendingRulebook() {
     const current_date = this.state.current_date;
     const period = this.state.period;
@@ -789,8 +866,6 @@ export class AlertDashboard extends Component {
       ],
     });
   }
-
-
 }
 
 AlertDashboard.template = "AlertDashboard";

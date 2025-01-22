@@ -68,21 +68,18 @@ class ReplyLog(models.Model):
         string="Reply Note", help="The content of the reply provided by the inputer.",
         tracking=True,
         store=True,
-
-
     )
 
     # The name of the person who submitted the reply (inputter)
     reporter = fields.Many2one(
         "res.users",
+        related='rulebook_id.officer_responsible',  # Pointing to the rulebook's field
         tracking=True,
         string="Inputer",
         required=True,
         help="The primary user responsible for this rulebook reply.",
-        store=True,
-
+        # store=True,
     )
-   
 
     # Attached document for the reply (binary file)
     document = fields.Binary(
@@ -90,11 +87,15 @@ class ReplyLog(models.Model):
         help="Any document (e.g., image, doc, xlsx) attached to the reply.",
         tracking=True,
         store=True,
-
+        attachment=True,
+        copy=False
     )
 
     document_filename = fields.Char(string="Document Filename", tracking=True,        store=True,
                                     )
+
+    document_url = fields.Char(
+        string="Document URL", compute="_compute_document_url", store=False)
 
     # The regulatory date as computed from the rulebook (related field)
     rulebook_compute_date = fields.Datetime(
@@ -110,7 +111,6 @@ class ReplyLog(models.Model):
         store=True,
         tracking=True,
         help="The last escalation date calculated from the related rulebook.",
-
         # related='rulebook_id.last_escalation_sent',
     )
 
@@ -119,7 +119,6 @@ class ReplyLog(models.Model):
         store=True,
         tracking=True,
         help="Next due date.",
-
         # related='rulebook_id.next_compute_date'
     )
 
@@ -135,7 +134,6 @@ class ReplyLog(models.Model):
         default="pending",
         help="The current status of the related rulebook.",
         tracking=True,
-
     )
 
     # Field to track the timing of submission compared to the regulatory date (early, on time, late)
@@ -143,7 +141,8 @@ class ReplyLog(models.Model):
         [
             ("early", "Early Submission"),
             ("on_time", "Right on Time"),
-            ("pending", "Pending"),
+            ("after_internal", "Submitted After Internal Due Date"),
+            ("pending", "Pending Not Yet Due"),
             ("late", "Late Submission"),
             ("not_responded", "Over Due/ Not Responded "),
         ],
@@ -152,21 +151,18 @@ class ReplyLog(models.Model):
         store=True,
         help="Indicates whether the reply was submitted early, on time, or late based on the regulatory date.",
         tracking=True,
-
     )
 
     formatted_reply_date = fields.Char(
         string="Formatted Reply Date",
         compute="_compute_formatted_reply_date",
         # store=True
-
     )
 
     formatted_rulebook_date = fields.Char(
         string="Formatted Rulebook Date",
         compute="_compute_formatted_rulebook_date",
         # store=True
-
     )
 
     formatted_regulatory_date = fields.Char(
@@ -193,7 +189,6 @@ class ReplyLog(models.Model):
         readonly=True,
         help="Frequency type from the associated rulebook",
         store=True,
-
     )
 
     escalation_date_value = fields.Integer(
@@ -201,7 +196,6 @@ class ReplyLog(models.Model):
         # required=True,
         help="Enter the value for the escalation date.",
         store=True,
-
     )
 
     escalation_date_unit = fields.Selection(
@@ -229,12 +223,35 @@ class ReplyLog(models.Model):
         help="The calculated escalation date based on the provided internal due date values.",
     )
 
+    first_line_escalation = fields.Many2many(
+        "res.users",
+        related='rulebook_id.first_line_escalation',  # Pointing to the rulebook's field
+        string="First Line Escalation",
+        # required=True,
+        tracking=True,
+        help="Select the user responsible for the first line escalation.",
+        # store=True,
+
+    )
+
+    second_line_escalation = fields.Many2one(
+        "res.users",
+        string="Second Line Escalation",
+        related='rulebook_id.second_line_escalation',  # Pointing to the rulebook's field
+        # required=True,
+        tracking=True,
+        help="Select the user responsible for the second line escalation.",
+        # store=True,
+
+    )
+
     officer_cc = fields.Many2many(
         'res.users',  # Assuming you are linking to the res.users model
+        related='rulebook_id.officer_cc',  # Pointing to the rulebook's field
         string="Officers To Copy",
         tracking=True,
         help="Select the person(s) to copy for this rulebook.",
-        store=True,
+        # store=True,
 
     )
 
@@ -325,26 +342,6 @@ class ReplyLog(models.Model):
         compute="_compute_reminder_due_date",
         store=True,
         help="The calculated reminder date based on the provided internal due date values.",
-    )
-
-    first_line_escalation = fields.Many2one(
-        "res.users",
-        string="First Line Escalation",
-        # required=True,
-        tracking=True,
-        help="Select the user responsible for the first line escalation.",
-        store=True,
-
-    )
-
-    second_line_escalation = fields.Many2one(
-        "res.users",
-        string="Second Line Escalation",
-        # required=True,
-        tracking=True,
-        help="Select the user responsible for the second line escalation.",
-        store=True,
-
     )
 
     status = fields.Selection(
@@ -495,26 +492,26 @@ class ReplyLog(models.Model):
                 'default_department_id': self.env.user.department_id.id if self.env.user.department_id else False,
             }
         }
-        
+
     def write(self, vals):
         """Overrides the default write method to enforce rules."""
         vals = self._validate_update_conditions(vals)
-        
+
         # Perform the write operation
         result = super(ReplyLog, self).write(vals)
-        
+
         # Iterate through the records being updated
         for record in self:
             rulebook = request.env["rulebook"].sudo().browse(
                 int(record.rulebook_id))
             url = request.env["rulebook"]._record_link(
                 record.id, model_name='reply.log')
-            
+
             now = datetime.now()
             now_without_microseconds = now.replace(microsecond=0)
-            
+
             global global_data
-            
+
             global_data = {
                 "email_from":  os.getenv("EMAIL_FROM"),
                 # "email_to": rulebook.first_line_escalation.email,
@@ -530,17 +527,21 @@ class ReplyLog(models.Model):
                 "content": record.reply_content,
                 "url_link": url,
                 "current_year": datetime.now().year,
-                "first_line_escalation_name": rulebook.first_line_escalation.name,
+                "first_line_escalation_name": ", ".join(record.first_line_escalation.mapped('name')) or "",
                 "datetime": self._compute_formatted_date(now_without_microseconds)
+                # "first_line_escalation_name": rulebook.first_line_escalation.name,
             }
-            
-            self.set_global_data(global_data)
-            
-            if record.rulebook_status == 'submitted' and rulebook.first_line_escalation:
-                self.trigger_escalation_alert(record)
-        
-        return result
 
+            self.set_global_data(global_data)
+
+            if record.rulebook_status == 'submitted' and record.first_line_escalation:
+                self.trigger_escalation_alert(record)
+
+            # if 'document' in vals:
+            #     # Clean old attachments before write
+            #     self._clean_old_attachments(self.id)
+
+        return result
 
     def trigger_escalation_alert(self, report):
         # Logic for sending email to escalation officers
@@ -607,7 +608,6 @@ class ReplyLog(models.Model):
     def set_global_data(self, data):
         global global_data
         global_data = data
-        
 
     def create(self, vals):
 
@@ -617,7 +617,7 @@ class ReplyLog(models.Model):
 
         return record
 
-    @api.depends("reply_date", "rulebook_compute_date")
+    @api.depends("reply_date", "rulebook_compute_date","reply_content","document")
     def _compute_submission_timing(self):
         """Compute the submission timing based on the full datetime of reply_date and rulebook_compute_date."""
         for record in self:
@@ -625,30 +625,53 @@ class ReplyLog(models.Model):
             today = datetime.now().replace(microsecond=0)
 
             try:
-                if not record.reply_date:
+                # if not record.reply_date:
                     # If there's no reply date and the due date has passed, mark as not responded
-                    if (
-                        not record.reply_date and record.rulebook_compute_date
-                        and record.rulebook_compute_date < today
-                    ):
-                        record.submission_timing = "not_responded"
-                    continue
+                    # if (
+                    #     not record.reply_date and record.rulebook_compute_date
+                    #     and record.rulebook_compute_date < today
+                    # ):
+                    #     record.submission_timing = "not_responded"
+                    # continue
                 # Convert reply_date to a datetime object
-                reply_datetime = (record.reply_date)
-                # Convert rulebook_compute_date to a datetime object
-                internal_due_date = (record.rulebook_compute_date)
+                # reply_datetime = (record.reply_date)
+                # # Convert rulebook_compute_date to a datetime object
+                # internal_due_date = (record.rulebook_compute_date)
+                # reg_due_date = (record.reg_due_date)
+                # _logger.critical(
+                #     f" internal date {internal_due_date}  .... reply date {reply_datetime}")
 
-                # Compare the reply datetime with the computed rulebook datetime
-                if reply_datetime and reply_datetime > internal_due_date:
-                    record.submission_timing = "late"
-                elif reply_datetime and reply_datetime < internal_due_date:
-                    record.submission_timing = "early"
+                # # Compare the reply datetime with the computed rulebook datetime
+                # if reply_datetime and reply_datetime > reg_due_date:
+                #     record.submission_timing = "late"
+                # elif reply_datetime and reply_datetime < internal_due_date:
+                #     record.submission_timing = "early"
+                # elif reply_datetime and reply_datetime > internal_due_date:
+                #     record.submission_timing = "after_internal"
+                # else:
+                #     record.submission_timing = "pending"
+                reply_datetime = record.reply_date
+                internal_due_date = record.rulebook_compute_date
+                reg_due_date = record.reg_due_date
+
+                # Log values for debugging
+                _logger.critical(f"internal date: {internal_due_date}  .... reply date: {reply_datetime}")
+
+                if reply_datetime:
+                    if reg_due_date and reply_datetime > reg_due_date:
+                        record.submission_timing = "late"
+                    elif internal_due_date and reply_datetime < internal_due_date:
+                        record.submission_timing = "early"
+                    elif internal_due_date and reply_datetime > internal_due_date:
+                        record.submission_timing = "after_internal"
+                    else:
+                        record.submission_timing = "pending"
                 else:
+                    # Handle case where reply_datetime is None
                     record.submission_timing = "pending"
             except Exception as e:
                 _logger.critical(
                     f"CRITICAL Error computing submission timing for record {record.id}: {e}")
-                record.submission_timing = "error"
 
     @api.model
     def _update_submission_timing(self):
@@ -670,8 +693,14 @@ class ReplyLog(models.Model):
             try:
                 # If there's no reply date and the due date has passed, mark as not responded
                 if not record.reply_date:
-                    if record.rulebook_compute_date and record.rulebook_compute_date < today and record.submission_timing != "not_responded":
+                    if (not record.reg_due_date and record.rulebook_compute_date and record.rulebook_compute_date.date() < today 
+                        or record.reg_due_date and record.reg_due_date.date() < today) and record.submission_timing != "not_responded":
                         record.submission_timing = "not_responded"
+                    # if not record.reg_due_date and record.rulebook_compute_date and record.rulebook_compute_date < today and record.submission_timing != "not_responded":
+                    #     record.submission_timing = "not_responded"
+                    # elif record.reg_due_date and record.reg_due_date < today and record.submission_timing != "not_responded":
+                    #     record.submission_timing = "not_responded"
+
 
                         record.sudo().write({
                             'submission_timing': record.submission_timing,
@@ -923,7 +952,10 @@ class ReplyLog(models.Model):
 
                 rulebook_compute_date = (record.rulebook_compute_date)
                 # Check if the time difference is exactly 5 minutes (or within 1 second tolerance for precision)
-                if rulebook_compute_date and today.date() == rulebook_compute_date.date():
+                if record.reg_due_date and today.date() == record.reg_due_date.date():
+                    if abs((record.reg_due_date - today).total_seconds()) <= 250:
+                        record._compute_next_due_date()
+                elif not record.reg_due_date and rulebook_compute_date and today.date() == rulebook_compute_date.date() :
                     if abs((rulebook_compute_date - today).total_seconds()) <= 250:
                         record._compute_next_due_date()
 
@@ -1061,9 +1093,9 @@ class ReplyLog(models.Model):
                                        "ooyewunmi@boi.ng", "MAderibigbe@boi.ng", "uchukwuneke@boi.ng",
                                        "aalhassan@boi.ng", "rezeani@boi.ng", "cdavid@boi.ng",
                                        "makhator@boi.ng"]),
-                "first_line_escalation": ", ".join(["asanda@boi.ng", "iabubakar@boi.ng"]),
+                "first_line_escalation":  ", ".join(rulebook.first_line_escalation.mapped('email')) or "",
                 "email_from": os.getenv("EMAIL_FROM"),
-                "first_line_name": rulebook.first_line_escalation.name or "",
+                "first_line_name":  ", ".join(rulebook.first_line_escalation.mapped('name')) or "",
                 "second_line_escalation": rulebook.second_line_escalation.email or "",
                 "computed_date": self._compute_formatted_date(self.rulebook_compute_date) or "N/A",
                 "escalation_date": self._compute_formatted_date(self.escalation_date) or "N/A",
@@ -1357,13 +1389,13 @@ class ReplyLog(models.Model):
 
         for record in self:
             # Date validation checks only when updating reply content or document
-            if updating_reply_content or updating_document:
-                if record.reminder_due_date and record.reminder_due_date.date() > datetime.today().date():
-                    raise UserError(
-                        _("You cannot modify the reply or upload documents as the Reminder Due Date is in the future."))
-                elif not record.reminder_due_date and record.rulebook_compute_date.date() > datetime.today().date():
-                    raise UserError(
-                        _("You cannot modify the reply or upload documents as the Internal Due Date is in the future."))
+            # if updating_reply_content or updating_document:
+            #     if record.reminder_due_date and record.reminder_due_date.date() > datetime.today().date():
+            #         raise UserError(
+            #             _("You cannot modify the reply or upload documents as the Reminder Due Date is in the future."))
+            #     elif not record.reminder_due_date and record.rulebook_compute_date.date() > datetime.today().date():
+            #         raise UserError(
+            #             _("You cannot modify the reply or upload documents as the Internal Due Date is in the future."))
 
             # Check if the record has never been submitted before
             is_first_submission = not record.document and not record.reply_content
@@ -1424,3 +1456,55 @@ class ReplyLog(models.Model):
                     ))
 
         return vals
+    
+    @api.depends('document', 'write_date')  # Add write_date dependency
+    def _compute_document_url(self):
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        for record in self:
+            if record.document:
+                attachment = self.env['ir.attachment'].search([
+                    ('res_model', '=', self._name),
+                    ('res_id', '=', record.id),
+                    ('res_field', '=', 'document')
+                ], limit=1, order='create_date desc')  # Add order to get the latest
+                if attachment:
+                    # Add timestamp to prevent caching
+                    timestamp = fields.Datetime.now().strftime('%Y%m%d%H%M%S')
+                    record.document_url = f'{base_url}/web/content/{attachment.id}?download=false&t={timestamp}'
+                else:
+                    record.document_url = False
+            else:
+                record.document_url = False
+
+    def action_view_document(self):
+        self.ensure_one()
+        if not self.document:
+            return
+
+        attachment = self.env['ir.attachment'].search([
+            ('res_model', '=', self._name),
+            ('res_id', '=', self.id),
+            ('res_field', '=', 'document')
+        ], limit=1, order='create_date desc')
+
+        if not attachment:
+            return
+
+        # Add timestamp to prevent caching
+        timestamp = fields.Datetime.now().strftime('%Y%m%d%H%M%S')
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=false&t={timestamp}',
+            'target': 'new',
+        }
+        
+    def _clean_old_attachments(self, record_id):
+        """Clean up old attachments when updating the document"""
+        domain = [
+            ('res_model', '=', self._name),
+            ('res_id', '=', record_id),
+            ('res_field', '=', 'document')
+        ]
+        old_attachments = self.env['ir.attachment'].search(domain)
+        if old_attachments:
+            old_attachments.unlink()

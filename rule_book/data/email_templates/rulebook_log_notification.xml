@@ -18,7 +18,7 @@
                     <div class="content" style="padding: 20px;">
                         <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear<strong style="color: #006400;">
                             <t t-out="object.data()['first_line_escalation_name']" />
-                        </strong>,
+                        </strong>
                     </p>
                     <div class="highlight-box" style="background-color: #f0fff0; padding: 20px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
                         <p style="font-size: 16px; color: #333333; line-height: 1.6;">A new report has been submitted for the rulebook return 

@@ -216,11 +216,16 @@ class RulebookTitle(models.Model):
         # Prepare the data for saving
        
 
+        
         existing_title = self.env["rulebook.title"].search(
-                        [("file_name", "=", filename_title)], limit=1
-                    )
-        if existing_title:
-            print(f"Skipping, file '{filename_title}' already exists.")
+            [("file_name", "=", filename_title)], limit=1)
+
+
+        existing_name = self.env["rulebook.title"].search(
+            [("name", "=", filename)], limit=1)
+
+        if existing_title or existing_name:
+            _logger.critical(f"Skipping, file '{filename_title}' already exists.")
                     
         else:
              # Write the PDF file and save the data to the database
@@ -295,11 +300,18 @@ class RulebookTitle(models.Model):
                         published_date = published_tokens[0].strip()
 
                     # Check if the reference already exists in the rulebook.title model
+                    # existing_title = self.env["rulebook.title"].search(
+                    #     [("file_name", "=", reference)], limit=1
+                    # )
                     existing_title = self.env["rulebook.title"].search(
-                        [("file_name", "=", reference)], limit=1
-                    )
-                    if existing_title:
-                        print(f"Skipping, file '{reference}' already exists.")
+                        [("file_name", "=", reference)], limit=1)
+
+                    existing_name = self.env["rulebook.title"].search(
+                        [("name", "=", title)], limit=1)
+
+                    if existing_title or existing_name:
+                        _logger.critical(
+                            f"Skipping, file '{reference}' already exists.")
                         continue  # Skip the current iteration if the file already exists
 
                     # Download the resource
@@ -437,12 +449,21 @@ class RulebookTitle(models.Model):
                         with open(filepath, "wb") as f:
                             f.write(pdf_response.content)
 
+                    # existing_title = self.env["rulebook.title"].search(
+                    #     [("file_name", "=", spaced_name)], limit=1
+                    # )
                     existing_title = self.env["rulebook.title"].search(
-                        [("file_name", "=", spaced_name)], limit=1
-                    )
-                    if existing_title:
-                        print(f"Skipping, file '{spaced_name}' already exists.")  
-                        _logger.debug(f"Skipping, file '{spaced_name}' already exists.")
+                        [("file_name", "=", filename)], limit=1)
+
+                    existing_name = self.env["rulebook.title"].search(
+                        [("name", "=", spaced_name)], limit=1)
+
+                    if existing_title or existing_name:
+                        _logger.critical(
+                            f"Skipping, file '{spaced_name}' already exists.")                        
+                    # if existing_title:
+                    #     print(f"Skipping, file '{spaced_name}' already exists.")  
+                    #     _logger.debug(f"Skipping, file '{spaced_name}' already exists.")
                     else:          
 
                         file_binary_data = self.download_file_as_binary(pdf_url)
@@ -602,12 +623,22 @@ class RulebookTitle(models.Model):
                         os.makedirs(storage_path)
 
                     filepath = os.path.join(storage_path, filename)
+                    # existing_title = self.env["rulebook.title"].search(
+                    #     [("file_name", "=", file_name.replace("_", " "))], limit=1
+                    # )
                     existing_title = self.env["rulebook.title"].search(
-                        [("file_name", "=", file_name.replace("_", " "))], limit=1
-                    )
-                    if existing_title:
-                        print("Skipping, file already exists.")
-                        _logger.debug('Skipping, file already exists.')
+                        [("file_name", "=", filename)], limit=1)
+
+                    existing_name = self.env["rulebook.title"].search(
+                        [("name", "=", file_name.replace("_", " "))], limit=1)
+
+                    if existing_title or existing_name:
+                        _logger.critical(
+                            f"Skipping, file already exists.")
+                        
+                    # if existing_title:
+                    #     print("Skipping, file already exists.")
+                    #     _logger.debug('Skipping, file already exists.')
 
                     else:    
                         if not os.path.exists(filepath):
@@ -720,122 +751,6 @@ class RulebookTitle(models.Model):
         except ValueError as e:
             raise ValueError(f"Error processing date '{date_str}': {e}")
 
-    # def get_date_from_url(self, url):
-    #     date_pattern1 = re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}")
-    #     date_pattern2 = re.compile(r"\d{1,2}-[A-Za-z]{1,15}-\d{4}")
-    #     date_pattern3 = re.compile(r"[A-Za-z]{1,15}-\d{1,2}-\d{4}")
-    #     date_pattern4 = re.compile(r"\d{1,2}[A-Za-z]{3}\d{4}")
-    #     date_pattern5 = re.compile(r"[A-Za-z]{3,10}-\d{4}")
-    #     date_pattern6 = re.compile(r"\d{4}/\d{2}")
-    #     date_pattern7 = re.compile(r"\([A-Za-z]{3,10}\d{4}\)")
-    #     date_pattern8 = re.compile(r"\b\d{4}\b")
-    #     date_pattern9 = re.compile(r"\d{4}-\d{2}")
-
-
-
-    #     match1 = date_pattern1.search(url)
-    #     match2 = date_pattern2.search(url)
-    #     match3 = date_pattern3.search(url)
-    #     match4 = date_pattern4.search(url)
-    #     match5 = date_pattern5.search(url)
-    #     match6 = date_pattern6.search(url)
-    #     match7 = date_pattern7.search(url)
-    #     match8 = date_pattern8.search(url)
-    #     match9 = date_pattern9.search(url)
-
-    #     if match1:
-    #         date = match1.group(0)
-    #         # return date
-    #         try:
-    #             date_obj = datetime.strptime(date, "%b-%d-%Y")
-    #             formatted_date = date_obj.strftime("%d-%m-%Y")
-    #             return formatted_date
-    #         except ValueError:
-    #             pass  # Invalid date format, continue to the next pattern
-
-    #     if match2:
-    #         date = match2.group(0)
-    #         # return date
-    #         try:
-    #             date_obj = datetime.strptime(date, "%d-%B-%Y")
-    #             formatted_date = date_obj.strftime("%d-%m-%Y")
-    #             return formatted_date
-    #         except ValueError:
-    #             pass  # Invalid date format
-    #     if match3:
-    #         date = match3.group(0)
-    #         # return date
-    #         try:
-    #             date_obj = datetime.strptime(date, "%B-%d-%Y")
-    #             formatted_date = date_obj.strftime("%d-%m-%Y")
-    #             return formatted_date
-    #         except ValueError:
-    #             pass  # Invalid date format
-    #     if match4:
-    #         date = match4.group(0)
-    #         # return date
-    #         try:
-    #             date_obj = datetime.strptime(date, "%d%b%Y")
-    #             formatted_date = date_obj.strftime("%d-%m-%Y")
-
-    #             return formatted_date
-    #         except ValueError:
-    #             pass  # Invalid date format, continue to the next pattern
-    #     if match5:
-    #         date = match5.group(0)
-    #         # return date
-    #         try:
-    #             date_obj = datetime.strptime(date, "%b-%Y")
-    #             formatted_date = date_obj.strftime("%m-%Y")
-
-    #             return formatted_date
-    #         except ValueError:
-    #             pass  # Invalid date format, continue to the next pattern
-    #     if match6:
-    #         date = match6.group(0)
-    #         # return date
-    #         try:
-    #             # date_obj = datetime.strptime(date, "%b-%Y")
-    #             # formatted_date = date_obj.strftime("%m-%Y")
-    #             date_obj = datetime.strptime(date, "%Y/%m")
-    #             formatted_date = date_obj.strftime("%Y-%m-01")
-
-    #             return formatted_date
-        
-    #         except ValueError:
-    #             pass  # Invalid date format, continue to the next pattern
-            
-
-    #     if match7:
-    #         date = match7.group(0)
-    #         # return date
-    #         try:
-
-    #             date_obj = datetime.strptime(date, "(%B%Y)")
-    #             formatted_date = date_obj.strftime("%m-%Y")
-
-    #             return formatted_date
-    #         except ValueError:
-    #             pass  # Invalid date format, continue to the next pattern
-    #     if match8:
-    #         try:
-
-    #             extracted_year = match8.group()
-    #             return extracted_year
-    #         except ValueError:
-    #             pass
-
-    #     if match9:
-    #         date = match9.group(0)
-    #         try:
-    #             date_obj = datetime.strptime(date, "%Y-%m")
-    #             formatted_date = date_obj.strftime("%Y-%m-01")  # Assuming day is 1
-    #             return formatted_date
-    #         except ValueError:
-    #             pass
-
-
-    #     return ""
 
 
     def get_date_from_url(self, url):
