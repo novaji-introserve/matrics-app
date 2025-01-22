@@ -5,23 +5,37 @@
         <field name="name">reply.log.tree</field>
         <field name="model">reply.log</field>
         <field name="arch" type="xml">
-            <tree string="Rulebook Log" create="false">
+            <tree string="Rulebook Log" create="false" delete="false">
                 <field name="rulebook_id" string="Source"/>
-                <field name="rulebook_name" string="Rulebook Returns" />
-
-                <!-- <field name="rulebook_compute_date" widget="datetime" /> -->
-                <!-- <field name="reply_date" widget="datetime" options="{'format': 'MMMM dd, yyyy HH:mm:ss'}" /> -->
-                <field name="formatted_rulebook_date" string="Internal Due Date" />
+                <field name="rulebook_name" string="Rulebook Returns"/>
+                <field name="formatted_rulebook_date" string="Internal Due Date"/>
                 <field name="formatted_reply_date" string="Reply date"/>
-                <!-- <field name="submission_timing" widget="badge" decoration-light="submission_timing == 'pending'" decoration-success="submission_timing == 'early'" decoration-warning="submission_timing == 'late'" decoration-danger="submission_timing == 'not_responded'"  /> -->
-                <!-- <field name="rulebook_status" widget="badge" decoration-dark="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'" /> -->
-                <field name="reporter" string="Officer Responsible" />
+                <field name="submission_timing" widget="badge" decoration-muted="submission_timing == 'pending'" decoration-success="submission_timing == 'early'" decoration-warning="submission_timing == 'after_internal'" decoration-danger="submission_timing in ['not_responded','late']"/>
+                <field name="rulebook_status" widget="badge" decoration-muted="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'"/>
+                <field name="reporter" string="Officer Responsible"/>
                 <field name="reg_due_date" optional="hide" string="Regulatory Due Date"/>
-
-
-                <field name="active" invisible="1" />
-
+                <field name="active" invisible="1"/>
             </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_reply_log_search" model="ir.ui.view">
+        <field name="name">reply.log.search</field>
+        <field name="model">reply.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="rulebook_id"/>
+                <field name="submission_timing"/>
+                <field name="reply_content" string="Reply Note"/>
+                <searchpanel>
+                    <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1"/>
+                    <field name="submission_timing" icon="fa-clock" string="Submission Timing" enable_counters="1"/>
+                </searchpanel>
+                <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">
+                    <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -30,58 +44,39 @@
         <field name="name">reply.log.form</field>
         <field name="model">reply.log</field>
         <field name="arch" type="xml">
-            <form string="Reply Log" class="oe_form_custom">
+            <form string="Reply Log">
                 <sheet>
                     <header>
-                        <field name="rulebook_status" widget="statusbar" statusbar_visible="pending,submitted,reviewed,completed" options="{'clickable': 'True'}" groups="rule_book.group_compliance_manager_" />
+                        <field name="rulebook_status" widget="statusbar" statusbar_visible="pending,submitted,reviewed,completed" options="{'clickable': '1'}" groups="rule_book.group_compliance_manager_"/>
                     </header>
                     <div class="oe_title">
                         <h1>
                             <field name="rulebook_id" readonly="1"/>
                         </h1>
-
                     </div>
                     <group>
-                        <group class="mt-3">
-                            <field name="rulebook_name" class="text_field" />
-                            <field name="formatted_reply_date" readonly="1" string="Reply date"/>                            
-                            <!-- <field name="reply_date" readonly="1" string="original Reply date"/> -->
-
+                        <group>
+                            <field name="rulebook_name"/>
+                            <field name="formatted_reply_date" readonly="1" string="Reply date"/>
+                            <field name="reply_content"/>
+                            <field name="submission_timing" string="Submission Timing"/>
                             <!-- <field name="reminder_due_date" readonly="0" />
                             <field name="formatted_reminder_date" readonly="0" />
                             <field name="escalation_date" readonly="0" />
                             <field name="formatted_escalation_date" readonly="0" /> -->
-
-                            <!-- <field name="reply_date" readonly="1" widget="datetime" options="{'format': 'MMMM dd, yyyy HH:mm:ss'}"/> -->
-                            <field name="reply_content" class="text_field" />
-                            <field name="document_filename" invisible="1" />
-                            <field name="submission_timing" string="Submission Timing" />
-
                         </group>
-                        <group class="mt-3">
-                            <field name="reporter" readonly="1" string="Officer Responsible" />
-                            <!-- <field name="officer_cc" widget="many2many_tags" readonly="1" string="Officer(s) Copied To This Return"/> -->
-                            <field name="officer_cc" widget="many2many_tags" readonly="1" string="Officer(s) Included in This Return" attrs="{'invisible': [('officer_cc', '=', [])]}" />
-
-
-                            <field name="department_id" readonly="1" string="Department Responsible" />
-
-                            <!-- <field name="rulebook_compute_date" string="computed date" readonly="0"/> -->
-                            <field name="formatted_rulebook_date" readonly="1" string="Internal Due Date" />
-                            <field name="formatted_regulatory_date" readonly="1" string="Regulatory Due Date" />
-
-
+                        <group>
+                            <field name="reporter" readonly="1" string="Officer Responsible"/>
+                            <field name="officer_cc" widget="many2many_tags" readonly="1" string="Officer(s) Included in This Return" attrs="{'invisible': [('officer_cc', '=', [])]}"/>
+                            <field name="department_id" readonly="1" string="Department Responsible"/>
+                            <field name="formatted_rulebook_date" readonly="1" string="Internal Due Date"/>
+                            <field name="formatted_regulatory_date" readonly="1" string="Regulatory Due Date"/>
                             <field name="frequency_type" readonly="1"/>
-
-
-
                         </group>
-
                     </group>
 
-
-                   <group>
-                        <field name="document" filename="document_filename" widget="binary" string="Attached Document" />
+                    <group>
+                        <field name="document" filename="document_filename" widget="binary" string="Attached Document"/>
                         <field name="document_filename" invisible="1"/>
                         <field name="document_url" invisible="1"/>
                         <div attrs="{'invisible': [('document', '=', False)]}">
@@ -91,17 +86,14 @@
                             </button>
                         </div>
                     </group>
-
                 </sheet>
                 <div class="oe_chatter" groups="rule_book.group_compliance_manager_">
-                    <!-- <field name="message_follower_ids"/> -->
                     <field name="activity_ids" widget="mail_activity"/>
                     <field name="message_ids" widget="mail_thread"/>
                 </div>
             </form>
         </field>
     </record>
-
 
     <!-- Action Definition -->
     <record id="action_reply_log" model="ir.actions.act_window">
@@ -115,32 +107,4 @@
             </p>
         </field>
     </record>
-
-    <!-- Search View -->
-    <record id="view_reply_log_search" model="ir.ui.view">
-        <field name="name">reply.log.search</field>
-        <field name="model">reply.log</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="rulebook_id" />
-                <field name="submission_timing" />
-                <!-- <field name="rulebook_compute_date" /> -->
-                <searchpanel>
-                    <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1" options='{"counters": true}' />
-                    <field name="submission_timing" icon="fa-clock" string="Submission Timing" enable_counters="1" options='{"counters": true}' />
-                    <!-- <field name="rulebook_compute_date" icon="fa-clock" string="Internal due date Timing" enable_counters="1" options='{"counters": true}' /> -->
-
-                </searchpanel>
-
-                <field name="reply_content" string="Reply Note" />
-
-                <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">
-                    <!-- Archive filter -->
-                    <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
-                </group>
-
-            </search>
-        </field>
-    </record>
-
 </odoo>
