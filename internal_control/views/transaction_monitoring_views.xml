@@ -40,30 +40,65 @@
         </field>
     </record>
 
+    <!-- Inherit Search View -->
+    <record id="view_transaction_monitoring_search" model="ir.ui.view">
+        <field name="name">transaction.monitoring.search</field>
+        <field name="model">res.customer.transaction</field>
+        <field name="inherit_id" ref="compliance_management.view_customer_trans_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='customer_id']" position="after">
+                <field name="valuedate"/>
+                <field name="userid"/>
+                <field name="refno"/>
+            </xpath>
+            
+            <xpath expr="//filter[@name='state_done']" position="after">
+                <separator/>
+                <filter string="Today" 
+                        name="today" 
+                        domain="[('valuedate', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="Last 7 Days" 
+                        name="last_week" 
+                        domain="[('valuedate', '&gt;=', (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d 00:00:00'))]"/>
+            </xpath>
+            
+            <!-- <xpath expr="//filter[@name='group_state']" position="after">
+                <filter string="Value Date" name="group_date" context="{'group_by': 'valuedate:day'}"/>
+                <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+            </xpath> -->
+        </field>
+    </record>
+
+    <!-- Tree View -->
     <record id="view_transaction_monitoring_tree" model="ir.ui.view">
         <field name="name">transaction.monitoring.tree</field>
-        <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
+        <field name="inherit_id" ref="compliance_management.compliance_transaction_tree"/>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
             <!-- <xpath expr="//button[@name='action_create']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath> -->
+            <xpath expr="//tree" position="attributes">
+                <attribute name="default_order">valuedate desc</attribute>
+                <!-- <attribute name="limit">80</attribute> -->
+            </xpath>
+
             <xpath expr="//field[@name='date_created']" position="after">
-                <field name="valuedate" optional="show" />
-                <field name="actualdate" optional="show" />
-                <field name="userid" optional="show" />
-                <field name="reversal" optional="show" />
-                <field name="accountmodule" optional="show" />
-                <field name="tellerno" optional="show" />
-                <field name="deptcode" optional="show" />
-                <field name="status" optional="show" />
-                <field name="tran_channel" optional="show" />
-                <field name="request_id" optional="show" />
-                <field name="trans_id" optional="show" />
+                <field name="valuedate"/>
+                <field name="actualdate"/>
+                <field name="userid" optional="show"/>
+                <field name="reversal" optional="hide"/>
+                <field name="accountmodule" optional="hide"/>
+                <field name="tellerno" optional="hide"/>
+                <field name="deptcode" optional="hide"/>
+                <field name="status"/>
+                <field name="tran_channel" optional="hide"/>
+                <field name="request_id" optional="hide"/>
+                <field name="trans_id" optional="hide"/>
             </xpath>
         </field>
     </record>
-    
+
     <record id="action_all_transactions" model="ir.actions.server">
         <field name="name">All Transactions</field>
         <field name="model_id" ref="model_res_customer_transaction" />
