@@ -3,7 +3,7 @@ access_report_rulebook_source,report.rulebook.department.user,model_rulebook_sou
 access_report_rulebook_reply_log,report.rulebook.compliance,model_reply_log,base.group_user,1,1,0,0
 access_report_rulebook_rulebook_title,report.rulebook.compliance,model_rulebook_title,base.group_user,1,1,1,0
 access_report_rulebook_risk_category,report.rulebook.compliance,rule_book.model_rulebook_risk_category,base.group_user,1,1,1,0
-access_report_rulebook_rulebook,report.rulebook.department.user,model_rulebook,base.group_user,1,1,1,0
+access_report_rulebook_rulebook,report.rulebook.department.user,model_rulebook,base.group_user,1,1,0,0
 access_report_rulebook_pdf_chat,report.rulebook.compliance,model_pdf_chat,base.group_user,1,1,1,0
 access_report_rulebook_pdf_chat_log,report.rulebook.compliance,model_pdf_chat_log,base.group_user,1,1,1,0
 access_report_rulebook_report_rulebook,report.rulebook.compliance,model_report_rulebook,base.group_user,1,1,1,1

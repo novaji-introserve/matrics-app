@@ -4,7 +4,7 @@
     <!-- Instant Due Date Notification when Due date is the current day -->
 
     <record id="email_template_internal_due_date_" model="mail.template">
-        <field name="name">Internal Due Date Reminder For Rulebook </field>
+        <field name="name">Internal Due Date Reminder For Rulebook Logs</field>
         <field name="email_from">{{object.data()['email_from']}}</field>
         <field name="email_cc">{{object.data()['email_cc']}}</field>
         <field name="email_to">{{object.data()['email_to']}}</field>
@@ -62,7 +62,7 @@
                     View Rulebook Details</a>
         </p>
         <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can upload
-                            the document at the following link: <a t-attf-href="#{object.data()['upload_link']}" style="display: inline-block;  color: #004225; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
+                            the document at the following link: <a t-attf-href="#{object.data()['url_link']}" style="display: inline-block;  color: #004225; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
                             Document</a>
         </p>
 

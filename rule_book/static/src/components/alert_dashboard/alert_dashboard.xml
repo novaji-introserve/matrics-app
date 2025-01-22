@@ -37,9 +37,10 @@
                     <div class="row">
                         <KpiCard onClick.bind="viewEarlyReply" name="'Early Submission'" value="state.earlyReply.value" />
                         <!-- <KpiCard name="'Right on Time'" value="20" percentage="20"/> -->
+                        <KpiCard onClick.bind="viewAfterInternalReply" name="'Submitted After Internal Due Date'" value="state.AfterInternal.value"/>
                         <KpiCard onClick.bind="viewLateReply" name="'Late Submission'" value="state.lateReply.value" />
                         <KpiCard onClick.bind="viewNoReply" name="'Not Responded'" value="state.noReply.value"/>
-                        <KpiCard onClick.bind="viewPendingReply" name="'Pending'" value="state.pendingReply.value"/>
+                        <KpiCard onClick.bind="viewPendingReply" name="'Pending/Not Yet Due'" value="state.pendingReply.value"/>
                     </div>
 
                     <div class="row">

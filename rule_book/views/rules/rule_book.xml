@@ -133,8 +133,8 @@
 
                     <page string="Escalation Details" style="font-weight: bold;">
                         <group col="2">
-                            <field name="first_line_escalation" help="First line escalation contact" placeholder="First line escalation contact" />
-                            <field name="second_line_escalation" help="Second line escalation contact" placeholder="First line escalation contact"/>
+                            <field name="first_line_escalation" help="First line escalation contact" widget="many2many_tags" />
+                            <field name="second_line_escalation" help="Second line escalation contact" placeholder="second line escalation contact"/>
                         </group>
                         <group col="2">
                             <field name="escalation_date_value" placeholder="Enter escalation date value" help="Date value for when this rulebook should be escalated" />
