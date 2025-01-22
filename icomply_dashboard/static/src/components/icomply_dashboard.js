@@ -30,7 +30,7 @@ export class IcomplyDashboard extends Component {
     });
 
     onMounted(() => this.filterByDate());
-    onWillStart(() => this.loadInitialData());
+    // onWillStart(() => this.loadInitialData());
   }
 
   // Helper function to fetch transaction counts based on domain
@@ -93,7 +93,7 @@ export class IcomplyDashboard extends Component {
         totalScreenedTransactionCount,
         totalTransactionCount,
       } = await this.fetchTransactionCounts(domain);
-
+      
       this.state.kpi = {
         lowrisk: lowriskCount,
         mediumrisk: mediumriskCount,
@@ -115,6 +115,8 @@ export class IcomplyDashboard extends Component {
         ),
       };
 
+  
+
       // Update chart data
       await this.getTransactionRiskRatingChart();
       await this.getCustomerRatingChart();
@@ -123,6 +125,11 @@ export class IcomplyDashboard extends Component {
       console.error("Error fetching alert rules count:", error);
     }
   };
+
+
+
+
+
 
   // Calculate the percentage of a value in respect to the total
   calculatePercentage = (count, total) => {
@@ -146,18 +153,26 @@ export class IcomplyDashboard extends Component {
           ]
         : [["risk_level", "=", riskLevel]];
 
-    this.navigate.doAction({
-      type: "ir.actions.act_window",
-      res_model: "res.customer.transaction",
-      name: `${
-        riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)
-      } Transaction`,
-      domain,
-      views: [
-        [false, "tree"],
-        [false, "form"],
-      ],
-    });
+   if(riskLevel == ''){
+    return;
+   }else if(riskLevel == 'process'){
+
+   }else if(riskLevel == 'screened'){
+
+   }else{
+     this.navigate.doAction({
+       type: "ir.actions.act_window",
+       res_model: "res.customer.transaction",
+       name: `${
+         riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)
+       } Transaction`,
+       domain,
+       views: [
+         [false, "tree"],
+         [false, "form"],
+       ],
+     });
+   }
   };
 
   // Unified chart rendering function
