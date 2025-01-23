@@ -514,13 +514,14 @@ class ReplyLog(models.Model):
 
             global_data = {
                 "email_from":  os.getenv("EMAIL_FROM"),
-                # "email_to": rulebook.first_line_escalation.email,
-                "email_to": ", ".join(["asanda@boi.ng", "iabubakar@boi.ng"]),
-                "email_cc": ", ".join(["MAkeju@boi.ng",  "MMuntaka@boi.ng",
-                                       "himam@boi.ng", "fakindele@boi.ng", "oabiola@boi.ng",
-                                       "ooyewunmi@boi.ng", "MAderibigbe@boi.ng", "uchukwuneke@boi.ng",
-                                       "aalhassan@boi.ng", "rezeani@boi.ng", "cdavid@boi.ng",
-                                       "makhator@boi.ng"]),
+                # "email_to": rulebook.first_line_escalation.email, 
+                "email_to": ", ".join(record.first_line_escalation.mapped('email')) or "",
+                # "email_to": ", ".join(["asanda@boi.ng", "iabubakar@boi.ng"]),
+                # "email_cc": ", ".join(["MAkeju@boi.ng",  "MMuntaka@boi.ng",
+                #                        "himam@boi.ng", "fakindele@boi.ng", "oabiola@boi.ng",
+                #                        "ooyewunmi@boi.ng", "MAderibigbe@boi.ng", "uchukwuneke@boi.ng",
+                #                        "aalhassan@boi.ng", "rezeani@boi.ng", "cdavid@boi.ng",
+                #                        "makhator@boi.ng"]),
 
                 "type_of_return": re.sub(r'(<[^>]+>|&\w+;)', '', rulebook.type_of_return),
                 "rulebook_source":  rulebook.name.name,
