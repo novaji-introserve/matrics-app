@@ -2047,6 +2047,6 @@ class Rulebook(models.Model):
         compliance_group = self.env.ref('rule_book.group_compliance_manager_')
         cco_group = self.env.ref('rule_book.group_chief_compliance_officer_')
 
-        if user.id not in compliance_group.users.ids or user.id not in cco_group.users.ids:
+        if user.id not in compliance_group.users.ids and user.id not in cco_group.users.ids:
             raise AccessError(
                 "Action Unauthorized. You do not belong to the compliance department.")
