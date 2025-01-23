@@ -3,7 +3,8 @@ from odoo import fields, models, api, _
 
 class TransactionType(models.Model):
     _name = 'res.transaction.type'
-    _description = _('Transaction Type')
+    _description = 'Transaction Type'
+    _rec_name = 'tranname'
     _sql_constraints = [
         ('uniq_trancode', 'unique(trancode)',
          "Transaction type already exists. Value must be unique!"),
