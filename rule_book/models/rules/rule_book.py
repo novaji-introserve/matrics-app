@@ -2049,4 +2049,4 @@ class Rulebook(models.Model):
 
         if user.id not in compliance_group.users.ids and user.id not in cco_group.users.ids:
             raise AccessError(
-                "Action Unauthorized. You do not belong to the compliance department.")
+                "Action Unauthorized. You do not have access right.")
