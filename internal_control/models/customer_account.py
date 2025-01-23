@@ -2,6 +2,7 @@ from odoo import models, fields, api
 
 class CustomerAccount(models.Model):
     _inherit = "res.partner.account"
+    _rec_name = 'accounttitle'
     
     officercode = fields.Many2one(
         comodel_name='res.account.officer', string='Account Officer', index=True)
