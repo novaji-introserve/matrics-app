@@ -5,21 +5,28 @@
 
             <div class="row g-5">
                 <div class="col-12">
-                    <div class="col-12 m-0 p-0 ">
-                        <div
-                            class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
-                            <h3 class="lead fw-bold">DASHBOARD</h3>
-                            <div>
-                                <select name="" id="" class="form-select" t-model="state.datepicked"
-                                    t-on-change="filterByDate">
-                                    <option value="0" selected="selected">current</option>
-                                    <option value="7">7 Days</option>
-                                    <option value="14">last 14 Days</option>
-                                    <option value="30">last month</option>
-                                    <option value="60">2 months</option>
-                                </select>
-                            </div>
-                        </div>
+                  <div class="col-12 m-0 p-0">
+    <div class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
+        <!-- <h3 class="lead fw-bold me-3">DASHBOARD</h3> -->
+        
+        <div class="flex-grow-1 me-3">
+            <img t-att-src="'/icomply_dashboard/static/src/img/logov.png'" 
+                 alt="Dashboard Icon" 
+                 class="img-fluid" 
+                 style="width: 300; max-height: 80px; object-fit: contain; "/>
+        </div>
+        
+        <div class="ms-3">
+            <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
+                <option value="0" selected="selected">current</option>
+                <option value="7">7 Days</option>
+                <option value="14">last 14 Days</option>
+                <option value="30">last month</option>
+                <option value="60">2 months</option>
+            </select>
+        </div>
+    </div>
+</div>
                     </div>
 
                     <div class="row mt-2 mt-md-4">
