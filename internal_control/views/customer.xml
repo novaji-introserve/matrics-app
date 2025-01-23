@@ -59,7 +59,7 @@
             <xpath expr="//page[@name='risk_assessment']" position="replace" />
             <xpath expr="//page[@name='sanction_screening']" position="replace" />
             <xpath expr="//page[@name='edd_record']" position="replace" />
-            <!-- <xpath expr="//page[@name='accounting']" position="replace" />  -->
+            <!-- <xpath expr="//page[@name='user_id']" position="replace" />  -->
 
             <!-- <xpath expr="//field[@name='customer_id']" position="replace">
                 <field name="customerid" />
