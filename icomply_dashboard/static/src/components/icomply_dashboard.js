@@ -73,8 +73,9 @@ export class IcomplyDashboard extends Component {
   filterByDate = async () => {
     const currentDate = moment().subtract(this.state.datepicked, "days");
     const previousDate = moment().subtract(this.state.datepicked * 2, "days");
-    this.state.current_datepicked = currentDate.format("L");
-    this.state.previous_datepicked = previousDate.format("L");
+
+    this.state.current_datepicked = currentDate.format("DD/MM/YY"); // Format as dd/mm/yy
+    this.state.previous_datepicked = previousDate.format("DD/MM/YY"); 
     this.fetchcasestatus();
   };
 
