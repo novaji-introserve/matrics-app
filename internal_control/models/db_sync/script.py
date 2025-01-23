@@ -752,24 +752,6 @@ class ETLManager:
             logging.error(f"Number of rows in batch: {len(rows)}")
             raise
 
-# if __name__ == "__main__":
-#     with open('db_config.json', 'r') as f:
-#         db_config = json.load(f)
-    
-#     with open('etl_config.json', 'r') as f:
-#         etl_config = json.load(f)
-    
-#     etl_manager = ETLManager(db_config, etl_config)
-    
-#     while True:
-#          try:
-#             etl_manager.run_etl()
-#             logging.info("ETL cycle completed successfully")
-#          except Exception as e:
-#             logging.error(f"ETL cycle failed: {str(e)}")
-        
-#          time.sleep(120)  # 2 minutes between cycles
-
 if __name__ == "__main__":
     with open('db_config.json', 'r') as f:
         db_config = json.load(f)
@@ -777,23 +759,41 @@ if __name__ == "__main__":
     with open('etl_config.json', 'r') as f:
         etl_config = json.load(f)
     
-    # Create config with only transactions table
-    transactions_config = {
-        'tables': {
-            'tbl_transactions': etl_config['tables']['tbl_transactions']
-        }
-    }
-    
-    # Remove dependencies since lookup tables are already populated
-    transactions_config['tables']['tbl_transactions']['dependencies'] = []
-    
-    etl_manager = ETLManager(db_config, transactions_config)
+    etl_manager = ETLManager(db_config, etl_config)
     
     while True:
-        try:
+         try:
             etl_manager.run_etl()
-            logging.info("Transactions sync completed successfully")
-        except Exception as e:
-            logging.error(f"Transactions sync failed: {str(e)}")
+            logging.info("ETL cycle completed successfully")
+         except Exception as e:
+            logging.error(f"ETL cycle failed: {str(e)}")
         
-        time.sleep(120)  # 2 minutes between cycles
+         time.sleep(120)  # 2 minutes between cycles
+
+# if __name__ == "__main__":
+#     with open('db_config.json', 'r') as f:
+#         db_config = json.load(f)
+    
+#     with open('etl_config.json', 'r') as f:
+#         etl_config = json.load(f)
+    
+#     # Create config with only transactions table
+#     transactions_config = {
+#         'tables': {
+#             'tbl_transactions': etl_config['tables']['tbl_transactions']
+#         }
+#     }
+    
+#     # Remove dependencies since lookup tables are already populated
+#     transactions_config['tables']['tbl_transactions']['dependencies'] = []
+    
+#     etl_manager = ETLManager(db_config, transactions_config)
+    
+#     while True:
+#         try:
+#             etl_manager.run_etl()
+#             logging.info("Transactions sync completed successfully")
+#         except Exception as e:
+#             logging.error(f"Transactions sync failed: {str(e)}")
+        
+#         time.sleep(120)  # 2 minutes between cycles
