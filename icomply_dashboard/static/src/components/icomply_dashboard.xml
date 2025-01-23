@@ -13,7 +13,7 @@
             <img t-att-src="'/icomply_dashboard/static/src/img/logov.png'" 
                  alt="Dashboard Icon" 
                  class="img-fluid" 
-                 style="width: 300; max-height: 80px; object-fit: contain; "/>
+                 style="width: 300; max-height: 70px; object-fit: contain; "/>
         </div>
         
         <div class="ms-3">
