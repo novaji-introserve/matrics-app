@@ -49,9 +49,11 @@ class alert_rules(models.Model):
         string="created_at",
         default=fields.Datetime.now()
     )
+    
     last_checked = fields.Datetime(string="last_checked", default=fields.Datetime.now())
-
-
+    
+    
+   
     @api.onchange('sql_text')
     def onchange_sql_text(self):
         if self.sql_text:
@@ -138,15 +140,15 @@ class alert_rules(models.Model):
                 
                     
                 # first query to create csv
-                self.env.cr.execute(f"{query}")
+                self.env.cr.execute(f'{query}')
                 rows = self.env.cr.fetchall()
-                
                 
                 
                 # Get column names dynamically
                 columns = [desc[0] for desc in self.env.cr.description]
+                
 
-                # Find the index of subbranchcode dynamically
+                # Find the index of branch_id dynamically
                 branchcode_index = None
                 for i, column in enumerate(columns):
                     if 'branch_id' in column.lower():  # Case insensitive search
@@ -157,17 +159,17 @@ class alert_rules(models.Model):
                     raise ValidationError("subbranchcode column must be in the sql statement")
                 else:
                     branches = []
-                   
                     
-                    # Loop through the rows and get the value of branchcode dynamically
+                #     # Loop through the rows and get distinct branch_id neglecting null field 
                     for row in rows:
+
                         branchcode = row[branchcode_index]  # Accessing branchcode dynamically by index
                         
+                
                         if branchcode == "" or branchcode == None:
-                            raise ValidationError("fix empty subbranchcode in the table and try again")
+                            pass
                         elif branchcode not in branches:
-                            branches.append(branchcode)
-                            
+                            branches.append(branchcode) 
 
                     # Initialize a dictionary to store the emails 
                     mailto = set()
@@ -180,8 +182,7 @@ class alert_rules(models.Model):
                         # distinct branch
                         for branch in branches:
                             
-                            
-                            
+                        
                             # Search for records in the control officer model that match the current branch
         
                             branch_officer = self.env['control.officer'].sudo().search([("branch_id", '=', int(branch))])
