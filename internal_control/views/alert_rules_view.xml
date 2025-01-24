@@ -28,11 +28,13 @@
         <field name="name">alert.rules.form</field>
         <field name="model">alert.rules</field>
         <field name="arch" type="xml">
-            <form string="Alert Rule">
+            <form string="Alert Rule" create="False">
                 <header>
+                   
                     <field name="status" widget="statusbar" options="{'clickable':'1'}" />
                 </header>
                 <sheet>
+                    
                     <div class="oe_title">
                         <label for="name" class="oe-edit-only" />
                         <h1>
