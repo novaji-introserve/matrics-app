@@ -1,53 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="contacts.action_contacts" model="ir.actions.act_window">
-        <field name="name">Customers</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">kanban,tree,form,activity</field>
-        <field name="search_view_id" ref="base.view_res_partner_filter"/>
-        <field name="context">{'default_is_company': True}</field>
-       <!-- <field name="domain">[('branch_id','=',[168])]</field>-->
-        <field name="help" type="html">
-          <p class="o_view_nocontent_smiling_face">
-            No customers
-          </p><p>
-           Track all activities related to your customers
-          </p>
-        </field>
-    </record>
-    <!-- Customer Tree -->
     <record id="compl_cust_tree_inherit_res_partner" model="ir.ui.view">
         <field name="name">model_res_partner_tree_inherit</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_tree" />
         <field name="arch" type="xml">
-            <tree position="attributes">
-                <attribute name="create">true</attribute>
-            </tree>
+            <!-- Update the tree attributes instead of replacing the entire tree -->
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">false</attribute>
+            </xpath>
 
+            <!-- Replace the phone field with custom fields -->
             <xpath expr="//field[@name='phone']" position="before">
                 <field name="customer_id" optional="hide" />
-                <field name="risk_score" widget="badge" decoration-info="1"/>
+                <field name="firstname" optional="hide" />
+                <field name="lastname" optional="hide" />
+                <field name="risk_score" widget="badge" decoration-info="1" />
                 <field name="risk_level" 
-                widget="badge"
-                decoration-danger="risk_level == 'high'"
-                decoration-warning="risk_level in ('medium')"
-                decoration-success="risk_level in ('lowel')"
+                    widget="badge"
+                    decoration-danger="risk_level == 'high'"
+                    decoration-warning="risk_level in ('medium')"
+                    decoration-success="risk_level in ('low')"
                 />
                 <field name="branch_id" />
                 <field name="registration_date" />
                 <field name="tier_id" />
             </xpath>
+
+            <!-- Modify activity_ids field -->
             <xpath expr="//field[@name='activity_ids']" position="replace">
-                <field name="activity_ids" invisible="1" widget="list_activity"/>
+                <field name="activity_ids" invisible="1" widget="list_activity" />
             </xpath>
+
+            <!-- Modify user_id field -->
             <xpath expr="//field[@name='user_id']" position="replace">
-                <field name="user_id" optional="show" invisible="1" widget="many2one_avatar_user" domain="[('share', '=', False)]"/>
+                <field name="user_id" optional="show" invisible="1" widget="many2one_avatar_user" domain="[('share', '=', False)]" />
             </xpath>
-            
         </field>
     </record>
+
 
     <record id="customer_actions_inherit_res_partner" model="ir.ui.view">
         <field name="name">res_partner_compliance_actions</field>
@@ -203,7 +194,7 @@
         <field name="inherit_id" ref="base.res_partner_kanban_view"/>
         <field name="arch" type="xml">
             <kanban position="attributes">
-                <attribute name="create">true</attribute>
+                <attribute name="create">false</attribute>
             </kanban>
         </field>
     </record>

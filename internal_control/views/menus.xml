@@ -6,223 +6,72 @@
     <!-- Dashboard Submenu -->
     <menuitem id="menu_internal_control_dashboard" name="Dashboard" parent="menu_internal_control_main" action="icomply_dashboard.dashboard_home" sequence="10"/>
     
-    <!-- ===================== -->
-    <!-- 1. TRANSACTION MENU -->
-    <!-- ===================== -->
-    <!-- Transaction Monitoring Menu -->
-    <!-- Define a Client Action -->
-    <!-- <record id="action_multilevel_dropdown" model="ir.actions.client">
-        <field name="name">Transaction Monitoring</field>
-        <field name="tag">multilevel_dropdown_action</field>
-    </record>
-    
-    <menuitem id="menu_internal_control_transaction_dropdown" 
-        name="Transaction Dropdown" 
-        parent="menu_internal_control_main" 
-        action="action_multilevel_dropdown" 
-        sequence="20"
-    /> -->
     <menuitem id="menu_transaction_monitoring_root" name="Transaction Monitoring" parent="menu_internal_control_main" sequence="20"/>
 
     <!-- All transactions -->
     <menuitem id="menu_all_transactions_root" name="Transaction Review" sequence="20" parent="menu_transaction_monitoring_root"/>
     
-    <menuitem id="menu_internal_control_all_transactions" name="All Transactions" sequence="10" parent="menu_all_transactions_root" action="action_all_transactions"/>
+    <!-- <menuitem id="menu_internal_control_all_transactions" name="All Transactions" sequence="10" parent="menu_all_transactions_root" action="action_all_transactions"/>
     <menuitem id="menu_internal_control_open_transactions" name="Awaiting Review" sequence="20" parent="menu_all_transactions_root" action="action_all_open_transactions"/>
-    <menuitem id="menu_internal_control_transactions_reviewed" name="Reviewed" sequence="30" parent="menu_all_transactions_root" action="action_all_reviewed_transactions"/>
+    <menuitem id="menu_internal_control_transactions_reviewed" name="Reviewed" sequence="30" parent="menu_all_transactions_root" action="action_all_reviewed_transactions"/> -->
     
+<!-- All Transactions menus -->
+<menuitem id="menu_internal_control_all_transactions" 
+          name="All Transactions" 
+          sequence="10" 
+          parent="menu_all_transactions_root"/>
+
+<menuitem id="menu_all_transactions_today" 
+          name="Today" 
+          sequence="11" 
+          parent="menu_internal_control_all_transactions" 
+          action="action_all_transactions_today"/>
+
+<menuitem id="menu_all_transactions_last_7_days" 
+          name="Last 7 Days" 
+          sequence="12" 
+          parent="menu_internal_control_all_transactions" 
+          action="action_all_transactions_last_7_days"/>
+
+<!-- Awaiting Review menus -->
+<menuitem id="menu_internal_control_awaiting_review" 
+          name="Awaiting Review" 
+          sequence="20" 
+          parent="menu_all_transactions_root"/>
+
+<menuitem id="menu_awaiting_review_today" 
+          name="Today" 
+          sequence="21" 
+          parent="menu_internal_control_awaiting_review" 
+          action="action_awaiting_review_today"/>
+
+<menuitem id="menu_awaiting_review_last_7_days" 
+          name="Last 7 Days" 
+          sequence="22" 
+          parent="menu_internal_control_awaiting_review" 
+          action="action_awaiting_review_last_7_days"/>
+
+<!-- Reviewed menus -->
+<menuitem id="menu_internal_control_reviewed" 
+          name="Reviewed" 
+          sequence="30" 
+          parent="menu_all_transactions_root"/>
+
+<menuitem id="menu_reviewed_today" 
+          name="Today" 
+          sequence="31" 
+          parent="menu_internal_control_reviewed" 
+          action="action_reviewed_today"/>
+
+<menuitem id="menu_reviewed_last_7_days" 
+          name="Last 7 Days" 
+          sequence="32" 
+          parent="menu_internal_control_reviewed" 
+          action="action_reviewed_last_7_days"/>
+
     <menuitem id="menu_internal_control_transactions_report_root" name="Reporting" sequence="40" parent="menu_all_transactions_root"/>
 
     <menuitem id="menu_internal_control_transactions_report" name="Reports" sequence="10" parent="menu_internal_control_transactions_report_root" action="bi_sql_editor.action_bi_sql_view"/>
-
-    <!-- 1. Transaction Monitoring Category -->
-    <!-- <menuitem id="menu_internal_control_transactions" name="Transaction Monitoring" parent="menu_transaction_monitoring_root" sequence="30"/> -->
-
-    <!-- Transaction Monitoring Submenus -->
-    <!-- <menuitem id="menu_internal_control_reversed_transactions" name="Reversed Transactions" parent="menu_internal_control_transactions" action="action_reversed_transactions" sequence="10"/>
-    <menuitem id="menu_internal_control_backdated_transactions" name="Backdated Transactions" parent="menu_internal_control_transactions" action="action_backdated_transactions" sequence="20"/>
-    
-    <menuitem id="menu_internal_control_premature_liquidation" name="Premature Liquidation" parent="menu_internal_control_transactions" action="action_premature_liquidation" sequence="30"/>
-    
-    <menuitem id="menu_internal_control_reactivated_accounts" name="Reactivated Accounts" parent="menu_internal_control_transactions" action="action_reactivated_accounts" sequence="40"/>
-    
-    <menuitem id="menu_internal_control_cancelled_accounts" name="Cancelled Accounts" parent="menu_internal_control_transactions" action="action_cancelled_accounts" sequence="50"/>
-    
-    <menuitem id="menu_internal_control_date_vs_value_date_accounts" name="Date Mismatch" parent="menu_internal_control_transactions" action="action_date_vs_value_date_accounts" sequence="60"/>
-    
-    <menuitem id="menu_internal_control_crypto_transactions" name="Crypto Transactions" parent="menu_internal_control_transactions" action="action_crypto_transactions" sequence="70"/>
-    
-    <menuitem id="menu_internal_control_betting_gambling_transactions" name="Betting/Gambling Transactions" parent="menu_internal_control_transactions" action="action_betting_gambling_transactions" sequence="80"/> -->
-
-    <!-- <menuitem
-        id="menu_internal_control_cash_collateral_entries"
-        name="Cash Collateral Entries"
-        parent="menu_internal_control_transactions"
-        action="action_cash_collateral_entries"
-        sequence="90"/>
-        
-        <menuitem
-        id="menu_internal_control_reversal_from_income_ledgers"
-        name="Reversal from Income Ledgers"
-        action="action_reversal_from_income_ledgers"
-        parent="menu_internal_control_transactions"
-        sequence="100"/>
-        
-        <menuitem
-        id="menu_internal_control_collateral_before_guarantee"
-        name="Collateral Before Guarantee"
-        action="action_collateral_before_guarantee"
-        parent="menu_internal_control_transactions"
-        sequence="110"/>
-        
-        <menuitem
-        id="menu_internal_control_reportable_limit_monitoring"
-        name="Reportable Limit Monitoring"
-        action="action_reportable_limit_monitoring"
-        parent="menu_internal_control_transactions"
-        sequence="120"/>
-        
-        <menuitem
-        id="menu_internal_control_tier_1_transactions_over_limit"
-        name="Tier 1 Transactions Over Limit"
-        action="action_tier_1_transactions_over_limit"
-        parent="menu_internal_control_transactions"
-        sequence="130"/>
-        
-        <menuitem
-        id="menu_internal_control_tier_2_transactions_over_limit"
-        name="Tier 2 Transactions Over Limit"
-        action="action_tier_2_transactions_over_limit"
-        parent="menu_internal_control_transactions"
-        sequence="140"/>
-    
-        <menuitem
-        id="menu_internal_control_large_individual_withdrawals"
-        name="Large Individual Withdrawals"
-        action="action_large_individual_withdrawals"
-        parent="menu_internal_control_transactions"
-        sequence="150"/>
-        
-        <menuitem
-        id="menu_internal_control_large_corporate_withdrawals"
-        name="Large Corporate Withdrawals"
-        action="action_large_corporate_withdrawals"
-        parent="menu_internal_control_transactions"
-        sequence="160"/>
-
-    <menuitem
-    id="menu_internal_control_e_payment_to_staff"
-        name="E-payment to Staff"
-        action="action_e_payment_to_staff"
-        parent="menu_internal_control_transactions"
-        sequence="170"/>
-
-    <menuitem
-        id="menu_internal_control_e_payment_to_customers"
-        name="E-payment to Customers"
-        action="action_e_payment_to_customers"
-        parent="menu_internal_control_transactions"
-        sequence="180"/>
-
-        <menuitem
-        id="menu_internal_control_atm_ledger_limits"
-        name="ATM Ledger Limits"
-        action="action_atm_ledger_limits"
-        parent="menu_internal_control_transactions"
-        sequence="190"/>
-        
-        <menuitem
-        id="menu_internal_control_tier_1_to_tier_2_upgrades"
-        name="Tier 1 to Tier 2 Upgrades"
-        action="action_tier_1_to_tier_2_upgrades"
-        parent="menu_internal_control_transactions"
-        sequence="200"/>
-        
-        <menuitem
-        id="menu_internal_control_tier_2_to_tier_3_upgrades"
-        name="Tier 2 to Tier 3 Upgrades"
-        action="action_tier_2_to_tier_3_upgrades"
-        parent="menu_internal_control_transactions"
-        sequence="210"/>
-        
-        <menuitem
-        id="menu_internal_control_savings_account_in_debit"
-        name="Savings Account in Debit"
-        action="action_savings_account_in_debit"
-        parent="menu_internal_control_transactions"
-        sequence="220"/>
-        
-        <menuitem
-        id="menu_internal_control_suspense_ledger_withdrawals"
-        name="Suspense Ledger Withdrawals"
-        action="action_suspense_ledger_withdrawals"
-        parent="menu_internal_control_transactions"
-        sequence="230"/>
-        
-        <menuitem
-        id="menu_internal_control_large_cheque_deposits"
-        name="Large Cheque Deposits"
-        action="action_large_cheque_deposits"
-        parent="menu_internal_control_transactions"
-        sequence="240"/>
-        
-        <menuitem
-        id="menu_internal_control_collection_account_postings"
-        name="Collection Account Postings"
-        action="action_collection_account_postings"
-        parent="menu_internal_control_transactions"
-        sequence="250"/>
-        
-        <menuitem
-        id="menu_internal_control_multiple_deposits_monitoring"
-        name="Multiple Deposits Monitoring"
-        action="action_multiple_deposits_monitoring"
-        parent="menu_internal_control_transactions"
-        sequence="260"/>
-        
-        <menuitem
-        id="menu_internal_control_large_account_inflows"
-        name="Large Account Inflows"
-        action="action_large_account_inflows"
-        parent="menu_internal_control_transactions"
-        sequence="270"/>
-        
-        <menuitem
-        id="menu_internal_control_e_payment_debit_transactions"
-        name="E-payment Debit Transactions"
-        action="action_e_payment_debit_transactions"
-        parent="menu_internal_control_transactions"
-        sequence="280"/>
-
-        <menuitem
-        id="menu_internal_control_unscanned_mandates"
-        name="Unscanned Mandates"
-        action="action_unscanned_mandates"
-        parent="menu_internal_control_transactions"
-        sequence="290"/>
-         -->
-
-
-
-    <!-- ===================== -->
-    <!-- 2. ACCOUNT STATUS MENU -->
-    <!-- ===================== -->
-    <!-- Account status category -->
-    <!-- <menuitem id="menu_account_status_monitoring" name="Account Status &amp; Monitoring" parent="menu_transaction_monitoring_root" sequence="40"/>
-
-    <menuitem id="menu_account_reactivations" name="Account Reactivations" parent="menu_account_status_monitoring" action="action_account_reactivations" sequence="10"/>
-
-    <menuitem id="menu_account_same_address" name="Same Address Accounts" parent="menu_account_status_monitoring" action="action_same_address_accounts" sequence="20"/> -->
-
-    <!-- ===================== -->
-    <!-- 3. FRAUD MONITORING MENU -->
-    <!-- ===================== -->
-    <!-- Account status category -->
-    <!-- <menuitem id="menu_account_fraud_monitoring" name="Fraud Monitoring" parent="menu_transaction_monitoring_root" sequence="50"/>
-
-    <menuitem id="menu_fraud_ledger_entries" name="Fraud Ledger Entries" parent="menu_account_fraud_monitoring" action="action_fraud_ledger_entries" sequence="10"/>
-
-    <menuitem id="menu_fraud_postings" name="Fraud Postings" parent="menu_account_fraud_monitoring" action="action_fraud_postings" sequence="20"/> -->
 
 
     <!-- Alert Monitoring -->

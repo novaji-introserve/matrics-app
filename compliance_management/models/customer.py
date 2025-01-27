@@ -5,7 +5,7 @@ from odoo import models, fields, api, _
 LOW_RISK_THRESHOLD = 10
 MEDIUM_RISK_THRESHOLD = 15
 HIGH_RISK_THRESHOLD = 25
-
+ 
 
 class Shareholders(models.Model):
     _name = 'res.partner.shareholders'

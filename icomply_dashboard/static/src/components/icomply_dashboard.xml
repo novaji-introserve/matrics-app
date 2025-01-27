@@ -18,11 +18,11 @@
         
         <div class="ms-3">
             <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
-                <option value="0" selected="selected">current</option>
+                <option value="0" selected="selected">Today</option>
                 <option value="7">7 Days</option>
-                <option value="14">last 14 Days</option>
-                <option value="30">last month</option>
-                <option value="60">2 months</option>
+                <option value="14">Last 14 Days</option>
+                <option value="30">Last Month</option>
+                <option value="60">Last 2 Months</option>
             </select>
         </div>
     </div>
@@ -30,13 +30,13 @@
                     </div>
 
                     <div class="row mt-2 mt-md-4">
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('high')" name="'High Risk Tran.'" value="state.kpi.highrisk"
+                        <KpiCard t-on-click="() => displayTransactionsByRisk('high')" name="'High Risk Transactions'" value="state.kpi.highrisk"
                             percentage="state.kpi.highriskbypercent" />
 
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('medium')" name="'Medium Risk Tran.'"
+                        <KpiCard t-on-click="() => displayTransactionsByRisk('medium')" name="'Medium Risk Transactions'"
                             value="state.kpi.mediumrisk" percentage="state.kpi.mediumriskbypercent" />
 
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('low')" name="'Low Risk Tran.'" value="state.kpi.lowrisk"
+                        <KpiCard t-on-click="() => displayTransactionsByRisk('low')" name="'Low Risk Transactions'" value="state.kpi.lowrisk"
                             percentage="state.kpi.lowriskpercentage" />
 
                         <KpiCard t-on-click="() => displayTransactionsByRisk('screened')" name="'Screened Transaction'"
