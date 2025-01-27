@@ -42,7 +42,7 @@
 
     <!-- Action to open the tree view -->
     <record id="action_process_category" model="ir.actions.act_window">
-        <field name="name">Process category</field>
+        <field name="name">Process Category</field>
         <field name="res_model">process.category</field>
         <field name="view_mode">tree,form</field>
     </record>

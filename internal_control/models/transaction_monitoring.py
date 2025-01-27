@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 import logging
 from odoo.exceptions import ValidationError
 from datetime import datetime, timedelta
@@ -28,65 +28,191 @@ class TransactionMonitoring(models.Model):
     tran_channel = fields.Char(string="Transaction Channel", readonly=True, index=True)
     request_id = fields.Char(string="Request ID", readonly=True, index=True)
     trans_id = fields.Char(string="Transaction ID", readonly=True, index=True)
-    
 
-    # @api.model
-    # def search(self, args, offset=0, limit=None, order=None, count=False):
-    #     # Default filter for last 7 days if no date filter present
-    #     if not any(arg[0] == 'valuedate' for arg in args):
-    #         date_from = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d 00:00:00')
-    #         args.append(('valuedate', '>=', date_from))
-    #     return super().search(args, offset=offset, limit=limit, order=order, count=count)
 
-# class TransactionMonitoring(models.Model):
-#     _inherit = 'res.customer.transaction'
+    # Methods for All Transactions
+    @api.model
+    def open_all_transactions_today(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        return {
+            'name': _('All Transactions - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('valuedate', 'like', today),
+                ('currency_id', '=', 1)  # NGN currency
+            ],
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
 
-    # @api.model
-    # def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-    #     _logger.info(f"""
-    #     Read Group Called:
-    #     Domain: {domain}
-    #     Fields: {fields}
-    #     Groupby: {groupby}
-    #     Offset: {offset}
-    #     Limit: {limit}
-    #     """)
-    #     return super().read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+    @api.model
+    def open_all_transactions_last_7_days(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        return {
+            'name': _('All Transactions - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('valuedate', '>=', last_7_days),
+                ('valuedate', '<=', today_str + ' 23:59:59'),
+                ('currency_id', '=', 1)  # NGN currency
+            ],
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
 
-    # @api.model
-    # def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None):
-    #     _logger.info(f"""
-    #     Search Read Called:
-    #     Domain: {domain}
-    #     Fields: {fields}
-    #     Offset: {offset}
-    #     Limit: {limit}
-    #     Order: {order}
-    #     """)
-    #     return super().search_read(domain=domain, fields=fields, offset=offset, limit=limit, order=order)
+    # Methods for Awaiting Review
+    @api.model
+    def open_awaiting_review_today(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        return {
+            'name': _('Transactions To Review - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('state', '=', 'new'),
+                ('valuedate', 'like', today),
+                ('currency_id', '=', 1)  # NGN currency
+            ],
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_awaiting_review_last_7_days(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        return {
+            'name': _('Transactions To Review - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('state', '=', 'new'),
+                ('valuedate', '>=', last_7_days),
+                ('valuedate', '<=', today_str + ' 23:59:59'),
+                ('currency_id', '=', 1)  # NGN currency
+            ],
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    # Methods for Reviewed
+    @api.model
+    def open_reviewed_today(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        return {
+            'name': _('Transactions Reviewed - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('state', '=', 'done'),
+                ('valuedate', 'like', today),
+                ('currency_id', '=', 1)  # NGN currency
+            ],
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_reviewed_last_7_days(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        return {
+            'name': _('Transactions Reviewed - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('state', '=', 'done'),
+                ('valuedate', '>=', last_7_days),
+                ('valuedate', '<=', today_str + ' 23:59:59'),
+                ('currency_id', '=', 1)  # NGN currency
+            ],
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    # @api.constrains('deptcode', 'status', 'branch_id')
+    # def _check_related_records(self):
+    #     for record in self:
+    #         if record.deptcode and not self.env['hr.department'].browse(record.deptcode.id).exists():
+    #             raise ValidationError("Invalid Department")
+    #         if record.status and not self.env['res.transaction.status'].browse(record.status.id).exists():
+    #             raise ValidationError("Invalid Transaction Status")
+    #         if record.branch_id and not self.env['res.branch'].browse(record.branch_id.id).exists():
+    #             raise ValidationError("Invalid Branch")
+
+    # In Odoo shell
+    def diagnose_branch_references(self):
+        transactions = self.search([('branch_id', '!=', False)])
+        print(f"Total transactions with branch: {len(transactions)}")
+        for t in transactions[:10]:
+            print(f"Transaction ID: {t.id}, Branch: {t.branch_id.id if t.branch_id else 'None'}")
     
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         try:
-            _logger.info(f"Read Group Called: Domain: {domain}, Fields: {fields}, Groupby: {groupby}")
+            # Detailed logging for branch_id
+            branch_records = self.env['res.branch'].search([])
+            _logger.error(f"Total Branch Records: {len(branch_records)}")
+            
+            # Find transactions with problematic branch references
+            invalid_branch_records = self.search([
+                ('branch_id', '!=', False),
+                ('branch_id.id', '=', False)
+            ])
+            
+            if invalid_branch_records:
+                _logger.error(f"Transactions with Invalid Branch: {invalid_branch_records.ids}")
+                for record in invalid_branch_records:
+                    _logger.error(f"Record ID: {record.id}, Branch Value: {record.branch_id}")
+            
             return super().read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
-        except AttributeError as e:
-            # Log detailed information about Many2one fields and their invalid data
-            many2one_fields = [f for f in self._fields if self._fields[f].type == 'many2one']
-            invalid_fields = {}
-            
-            for field in many2one_fields:
-                for record in self.search(domain):  # Iterate over matching records
-                    value = getattr(record, field, None)
-                    if value and not value.exists():  # Check if the record exists
-                        invalid_fields.setdefault(field, []).append(record.id)
-
-            if invalid_fields:
-                _logger.error(f"Invalid Many2one field(s) causing issue: {invalid_fields}")
-            
-            _logger.error(f"Error in read_group: {e}")
-            raise ValidationError("A Many2one field contains invalid or missing data. Check the logs for more details.")
+        
+        except Exception as e:
+            _logger.error(f"Detailed Error: {str(e)}")
+            raise
 
 
     def action_screen(self):
@@ -114,7 +240,7 @@ class TransactionMonitoring(models.Model):
                     records = self.env.cr.fetchall()
                     
                     
-                    for rec in records:
+                    for rec in records: 
 
                         record = self.env['res.customer.transaction'].browse(rec[0])  # rec[0] contains the ID of the record
     

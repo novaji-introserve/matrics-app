@@ -5,7 +5,7 @@
         <field name="name">res_customer_account_tree</field>
         <field name="model">res.partner.account</field>
         <field name="arch" type="xml">
-            <tree string="Account">
+            <tree string="Account" create="false">
                 <field name="name" string="Account Number" />
                 <field name="account_name" optional="show"/>
                 <field name="branch_id" optional="show"/>

@@ -3,7 +3,7 @@ from odoo import fields, models, api, _
 
 class UsersStatus(models.Model):
     _name = 'res.user.status'
-    _description = _('Users Status')
+    _description = 'Users Status'
     _rec_name = 'description'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _sql_constraints = [
