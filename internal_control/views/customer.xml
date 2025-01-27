@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
+    <!-- Tree View -->
     <record id="view_customer_tree_inherited" model="ir.ui.view">
         <field name="name">customer.tree</field>
         <field name="model">res.partner</field>
@@ -9,13 +9,6 @@
             <tree position="attributes">
                 <attribute name="create">False</attribute>
             </tree>
-
-            <!-- <xpath expr="//field[@name='customer_id']" position="replace">
-                <field name="customerid" />
-            </xpath> -->
-            <!-- <xpath expr="//field[@name='translated_display_name']" position="replace">
-                <field name="fullname" string="Name"  />
-            </xpath> -->
             <xpath expr="//field[@name='risk_score']" position="replace" />
             <xpath expr="//field[@name='risk_level']" position="replace" />
             <xpath expr="//field[@name='email']" position="replace" />
@@ -23,31 +16,18 @@
             <xpath expr="//field[@name='vat']" position="replace" />
             <xpath expr="//field[@name='category_id']" position="replace" />
             <xpath expr="//field[@name='branch_id']" position="replace" />
-            <!-- <xpath expr="//field[@name='registration_date']" position="replace">
-                <field  name="idissuedate" string="Issue Date" optional="show" />
-            </xpath> -->
-            <!-- <xpath expr="//field[@name='tier_id']" position="replace">
-                <field  name="edulevel" string="Education" optional="show" />
-            </xpath> -->
             <xpath expr="//field[@name='phone']" position="replace">
                 <field name="phone1" string="Phone" optional="show" />
             </xpath>
-
-            <!-- <xpath expr="//field[@name='city']" position="replace">
-                <field  name="statecode" string="State" optional="show" />
-            </xpath> -->
-            <!-- <xpath expr="//field[@name='country_id']" position="replace">
-                <field  name="nationality" string="Country" optional="show" />
-            </xpath> -->
         </field>
     </record>
+
     <!-- Form View -->
     <record id="view_customer_form_inherited" model="ir.ui.view">
         <field name="name">customer.form</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="compliance_management.customer_actions_inherit_res_partner" />
         <field name="arch" type="xml">
-
             <xpath expr="//header" position="replace">
                 <header />
             </xpath>
@@ -59,63 +39,9 @@
             <xpath expr="//page[@name='risk_assessment']" position="replace" />
             <xpath expr="//page[@name='sanction_screening']" position="replace" />
             <xpath expr="//page[@name='edd_record']" position="replace" />
-            <!-- <xpath expr="//page[@name='user_id']" position="replace" />  -->
-
-            <!-- <xpath expr="//field[@name='customer_id']" position="replace">
-                <field name="customerid" />
-            </xpath> -->
-            <!-- <xpath expr="//field[@name='translated_display_name']" position="replace">
-                <field name="fullname" string="Name" />
-            </xpath> -->
-
-            <!-- <xpath expr="//field[@name='risk_level']" position="replace" />
-            <xpath expr="//field[@name='email']" position="replace" />
-            <xpath expr="//field[@name='state_id']" position="replace" />
-            <xpath expr="//field[@name='vat']" position="replace" />
-            <xpath expr="//field[@name='category_id']" position="replace" />
-            
-           
-           
-            
-            -->
-            <!--  -->
-            <!-- <xpath expr="//field[@name='phone']" position="replace">
-                <field name="phone1" string="Phone" optional="show" />
-            </xpath> -->
-            <!-- <xpath expr="//field[@name='registration_date']" position="replace">
-    <field name="idissuedate" string="Issue Date"  />
-</xpath> -->
-            <xpath expr="//field[@name='middlename']" position="replace" />
-            <xpath expr="//field[@name='branch_id']" position="replace" />
-            <!-- <xpath expr="//field[@name='education_level_id']" position="replace">
-                <field name="edulevel" string="Education" />
-            </xpath> -->
-            <!-- <xpath expr="//field[@name='lastname']" position="replace">
-                <field name="surname" string="Surname" />
-            </xpath> -->
-
             <xpath expr="//field[@name='bvn']" position="replace">
                 <field name="nin" string="NIN" />
             </xpath>
-
         </field>
     </record>
-
-
-    <!-- Tree View -->
-    <!-- <record id="view_transaction_monitoring_tree" model="ir.ui.view">
-        <field name="name">transaction.monitoring.tree</field>
-        <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
-        <field name="model">res.customer.transaction</field>
-        <field name="arch" type="xml">
-            <xpath expr="//tree" position="replace">
-                
-            </xpath>
-
-        </field>
-    </record> -->
-
-
-
-
 </odoo>

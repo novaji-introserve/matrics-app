@@ -30,8 +30,8 @@ class BiSQLView(models.Model):
     _sql_request_users_relation = "bi_sql_view_users_rel"
 
     _STATE_SQL_EDITOR = [
-        ("model_valid", "SQL View and Model Created"),
-        ("ui_valid", "Views, Action and Menu Created"),
+        ("model_valid", "Created"),
+        ("ui_valid", "Published"),
     ]
 
     technical_name = fields.Char(
@@ -152,7 +152,7 @@ class BiSQLView(models.Model):
     )
 
     cron_id = fields.Many2one(
-        string="Odoo Cron",
+        string="Automation Job",
         comodel_name="ir.cron",
         readonly=True,
         help="Cron Task that will refresh the materialized view",

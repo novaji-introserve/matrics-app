@@ -16,7 +16,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
       <field name="name" position="before">
         <field name="sequence" widget="handle" />
       </field>
-      <field name="name" position="after">
+      <field name="state" position="after">
     
         <!-- <field name="size" /> -->
         <button type="object" string="Show Report" class="btn-primary" name="action_view_result" />
@@ -40,7 +40,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
           name="button_reset_to_sql_valid"
           type="object"
           states="model_valid"
-          string="Delete SQL Elements"
+          string="Reset To Validate"
           groups="internal_control.group_internal_control_tech_support"
           confirm="It will delete the materialized view, and all the previous mapping realized with the columns"
         />
@@ -48,7 +48,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
           name="button_reset_to_model_valid"
           type="object"
           states="ui_valid"
-          string="Delete UI"
+          string="Unpublish"
           groups="internal_control.group_internal_control_tech_support"
         />
         <button
