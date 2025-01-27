@@ -12,12 +12,15 @@
             <xpath expr="//field[@name='risk_score']" position="replace" />
             <xpath expr="//field[@name='risk_level']" position="replace" />
             <xpath expr="//field[@name='email']" position="replace" />
-            <xpath expr="//field[@name='state_id']" position="replace" />
+            <!-- <xpath expr="//field[@name='state_id']" position="replace" /> -->
             <xpath expr="//field[@name='vat']" position="replace" />
             <xpath expr="//field[@name='category_id']" position="replace" />
-            <xpath expr="//field[@name='branch_id']" position="replace" />
+            <!-- <xpath expr="//field[@name='branch_id']" position="replace" /> -->
             <xpath expr="//field[@name='phone']" position="replace">
                 <field name="phone1" string="Phone" optional="show" />
+            </xpath>
+             <xpath expr="//field[@name='registration_date']" position="replace">
+                <field name="date_opened" string="Date Opened" optional="show" />
             </xpath>
         </field>
     </record>
