@@ -1908,8 +1908,9 @@ class Rulebook(models.Model):
                     submission_time='pending',
                 )
                 if rulebook.computed_date and not rulebook.computed_date_adjusted:
-                    adjusted_computed_date = rulebook.computed_date + \
-                        timedelta(hours=1)
+                    adjusted_computed_date = rulebook.computed_date
+                    # + \
+                    #     timedelta(hours=2)
 
                 else:
                     adjusted_computed_date = rulebook.computed_date
