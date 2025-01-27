@@ -412,6 +412,8 @@ class ReplyLog(models.Model):
         help="Select the risk category for this rulebook.",
         default="Compliance Risk"
     )
+    
+    
 
     @api.depends("rulebook_compute_date")
     def _compute_formatted_rulebook_date(self):
