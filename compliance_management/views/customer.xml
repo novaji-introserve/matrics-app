@@ -22,9 +22,9 @@
                     decoration-warning="risk_level in ('medium')"
                     decoration-success="risk_level in ('low')"
                 />
-                <field name="branch_id" />
-                <field name="registration_date" />
-                <field name="tier_id" />
+                <field name="branch_id" optional="hide" />
+                <field name="registration_date" optional="hide"  />
+                <field name="tier_id" optional="hide" />
             </xpath>
 
             <!-- Modify activity_ids field -->
