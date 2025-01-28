@@ -198,7 +198,7 @@
             sequence="10"/>
     /> -->
 
-    <menuitem id="menu_account"
+   <menuitem id="menu_account"
         name="Accounts"  
         parent="menu_customer_management"
         groups="compliance_management.group_compliance_chief_compliance_officer"
@@ -224,6 +224,15 @@
         action="action_open_accounts_tier_3"
         groups="compliance_management.group_compliance_chief_compliance_officer"
         sequence="3"/>
+    
+
+    <menuitem id="menu_internal_control_cron_tree_parent" 
+        name="Schedule Action"
+        parent="menu_internal_control_configurations"
+        groups="compliance_management.group_compliance_chief_compliance_officer"
+        action="action_ir_cron"
+        sequence="80" />
+
     
 
     <menuitem id="menu_internal_control_cron_tree_parent" 
