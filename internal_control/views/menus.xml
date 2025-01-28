@@ -193,7 +193,7 @@
     <menuitem id="menu_account" 
             name="Account"  
             parent="menu_customer_management" 
-            action="action_customer_account"
+            action="action_open_accounts"
             groups="compliance_management.group_compliance_chief_compliance_officer"
             sequence="10"/>
     />
