@@ -1,6 +1,6 @@
 <odoo>
     <!-- Action Window -->
-    <record id="action_customer_account" model="ir.actions.act_window">
+    <!-- <record id="action_customer_account" model="ir.actions.act_window">
         <field name="name">Customer Account</field>
         <field name="res_model">res.partner.account</field>
         <field name="view_mode">tree,form</field>
@@ -9,9 +9,16 @@
                 Customers account shows here
             </p>
         </field>
-    </record>
+    </record> -->
 
-    <!-- Add fields to the Tree View -->
+    <record id="action_open_accounts" model="ir.actions.server">
+        <field name="name">Account</field>
+        <field name="model_id" ref="model_res_partner_account" />
+        <field name="state">code</field>
+        <field name="code">action = env['res.partner.account'].open_accounts()</field>
+    </record> 
+    
+       <!-- Add fields to the Tree View -->
     <record id="internal_control_customer_account_tree_inherit" model="ir.ui.view">
         <field name="name">res.customer.account.tree.inherit</field>
         <field name="model">res.partner.account</field>
@@ -38,7 +45,7 @@
                 <field name="Status" widget="boolean" string="Status" optional="show"/>
             </tree>
         </field>
-    </record>
+    </record> 
 
     <!-- Add fields to the Form View -->
     <record id="customer_account_view_form_inherit" model="ir.ui.view">
@@ -46,6 +53,14 @@
         <field name="model">res.partner.account</field>
         <field name="inherit_id" ref="compliance_management.customer_account_view_form" />
         <field name="arch" type="xml">
+        <!-- Replace the original account_name label -->
+        <xpath expr="//label[@for='account_name']" position="replace">
+            <label for="accounttitle" string="Account Title" />
+        </xpath>
+        <!-- Replace the original account_name field -->
+        <xpath expr="//field[@name='account_name']" position="replace">
+            <field name="accounttitle" class="oe_inline" readonly="1" />
+        </xpath>
             <xpath expr="//sheet" position="inside">
                 <group string="Additional Details">
                     <group>
@@ -65,8 +80,8 @@
                 </group>
                 <group string="Other Details">
                     <field name="account_tier" string="Account Tier"/>
-                    <field name="source_account_id" string="Source Account ID"/>
-                    <field name="Status" widget="boolean" string="Status"/>
+                    <!-- <field name="source_account_id" string="Source Account ID"/> -->
+                    <field name="Status" string="Status"/>
                 </group>
             </xpath>
         </field>
