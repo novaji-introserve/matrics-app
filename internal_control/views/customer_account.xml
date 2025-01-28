@@ -46,6 +46,14 @@
         <field name="model">res.partner.account</field>
         <field name="inherit_id" ref="compliance_management.customer_account_view_form" />
         <field name="arch" type="xml">
+        <!-- Replace the original account_name label -->
+        <xpath expr="//label[@for='account_name']" position="replace">
+            <label for="accounttitle" string="Account Title" />
+        </xpath>
+        <!-- Replace the original account_name field -->
+        <xpath expr="//field[@name='account_name']" position="replace">
+            <field name="accounttitle" class="oe_inline" readonly="1" />
+        </xpath>
             <xpath expr="//sheet" position="inside">
                 <group string="Additional Details">
                     <group>
@@ -65,8 +73,8 @@
                 </group>
                 <group string="Other Details">
                     <field name="account_tier" string="Account Tier"/>
-                    <field name="source_account_id" string="Source Account ID"/>
-                    <field name="Status" widget="boolean" string="Status"/>
+                    <!-- <field name="source_account_id" string="Source Account ID"/> -->
+                    <field name="Status" string="Status"/>
                 </group>
             </xpath>
         </field>
