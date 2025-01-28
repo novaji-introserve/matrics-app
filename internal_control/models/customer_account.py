@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 class CustomerAccount(models.Model):
     _inherit = "res.partner.account"
@@ -22,3 +22,45 @@ class CustomerAccount(models.Model):
     Status = fields.Boolean(default=False)
     accounttitle = fields.Char(string="Account Title")
         
+
+    @api.model
+    def open_accounts_tier_1(self):
+        return {
+            'name': _('Tier 1 Accounts'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner.account',
+            'view_mode': 'tree,form',
+            'domain': [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('account_tier', '=', 1)
+            ],
+            'context': {'search_default_group_branch': 1}
+        }
+
+    @api.model
+    def open_accounts_tier_2(self):
+        return {
+            'name': _('Tier 2 Accounts'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner.account',
+            'view_mode': 'tree,form',
+            'domain': [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('account_tier', '=', 2)
+            ],
+            'context': {'search_default_group_branch': 1}
+        }
+
+    @api.model
+    def open_accounts_tier_3(self):
+        return {
+            'name': _('Tier 3 Accounts'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner.account',
+            'view_mode': 'tree,form',
+            'domain': [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('account_tier', '=', 3)
+            ],
+            'context': {'search_default_group_branch': 1}
+        }
