@@ -46,7 +46,6 @@
         'views/settings.xml',
         'views/customer_accounts.xml',
         'views/transaction.xml',
-        'views/sql_panel.xml',
         'views/transaction_screening_rule.xml',
     ],
     # only loaded in demonstration mode
