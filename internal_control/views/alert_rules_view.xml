@@ -38,7 +38,7 @@
                     <div class="oe_title">
                         <label for="name" class="oe-edit-only" />
                         <h1>
-                            <field name="name" placeholder="enter Title for the exception rule" />
+                            <field name="name" placeholder="Enter exception rule title" />
                         </h1>
                     </div>
 

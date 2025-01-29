@@ -30,21 +30,183 @@ class TransactionMonitoring(models.Model):
     trans_id = fields.Char(string="Transaction ID", readonly=True, index=True)
 
 
-    # Methods for All Transactions
+    # Methods for Customer Transactions - All Transactions
     @api.model
-    def open_all_transactions_today(self):
+    def open_customers_all_transactions_today_ngn(self):
         today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '=', 121),  # NGN currency
+            ('tran_type', '=', 90)
+        ]
+        
         return {
-            'name': _('All Transactions - Today'),
+            'name': _('Customer Transactions NGN - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'limit': 50,
             'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('valuedate', 'like', today),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new',
+            }
+        }
+
+    @api.model
+    def open_customers_all_transactions_today_other(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '!=', 121),  # Other currencies
+            ('tran_type', '=', 90)
+        ]
+        
+        return {
+            'name': _('Customer Transactions Other Currencies - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new',
+            }
+        }
+
+    # @api.model
+    # def open_customers_all_transactions_7days_ngn(self):
+    #     today = datetime.now()
+    #     last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+    #     today_str = today.strftime('%Y-%m-%-d')
+        
+    #     domain = [
+    #         ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+    #         ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+    #         ('valuedate', '<=', today_str + ' 23:59:59'),
+    #         ('currency_id', '=', 121),
+    #         ('tran_type', '=', 90)
+    #     ]
+        
+    #     return {
+    #         'name': _('Customer Transactions NGN - Last 7 Days'),
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'res.customer.transaction',
+    #         'limit': 50,
+    #         'view_mode': 'tree,form',
+    #         'domain': domain,
+    #         'context': {
+    #             'search_default_group_branch': 1,
+    #             'search_default_group_currency': 1,
+    #             'default_state': 'new',
+    #         }
+    #     }
+    
+    # @api.model
+    # def open_customers_all_transactions_7days_other(self):
+    #     today = datetime.now()
+    #     last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+    #     today_str = today.strftime('%Y-%m-%-d')
+        
+    #     domain = [
+    #         ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+    #         ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+    #         ('valuedate', '<=', today_str + ' 23:59:59'),
+    #         ('currency_id', '!=', 121),
+    #         ('tran_type', '=', 90)
+    #     ]
+        
+    #     return {
+    #         'name': _('Customer Transactions Other Currencies - Last 7 Days'),
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'res.customer.transaction',
+    #         'limit': 50,
+    #         'view_mode': 'tree,form',
+    #         'domain': domain,
+    #         'context': {
+    #             'search_default_group_branch': 1,
+    #             'search_default_group_currency': 1,
+    #             'default_state': 'new',
+    #         }
+    #     }
+
+    @api.model
+    def open_customers_all_transactions_7days_ngn(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '=', 121),  # NGN currency
+            ('tran_type', '=', 90)
+        ]
+        
+        return {
+            'name': _('Customer Transactions NGN - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new',
+            }
+        }
+
+    @api.model
+    def open_customers_all_transactions_7days_other(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '!=', 121),  # Other currencies
+            ('tran_type', '=', 90)
+        ]
+        
+        return {
+            'name': _('Customer Transactions Other Currencies - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new',
+            }
+        }
+    
+        # Methods for Customer Transactions - Awaiting Review
+    @api.model
+    def open_customers_awaiting_review_today_ngn(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'new'),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 90)
+        ]
+        
+        return {
+            'name': _('Customer Transactions To Review NGN - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -53,45 +215,53 @@ class TransactionMonitoring(models.Model):
         }
 
     @api.model
-    def open_all_transactions_last_7_days(self):
+    def open_customers_awaiting_review_today_other(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'new'),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 90)
+        ]
+        
+        return {
+            'name': _('Customer Transactions To Review Other Currencies - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_customers_awaiting_review_7days_ngn(self):
         today = datetime.now()
         last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
         today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'new'),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 90)
+        ]
+        
         return {
-            'name': _('All Transactions - Last 7 Days'),
+            'name': _('Customer Transactions To Review NGN - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'limit': 50,
             'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('valuedate', '>=', last_7_days),
-                ('valuedate', '<=', today_str + ' 23:59:59'),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
-            'context': {
-                'search_default_group_branch': 1,
-                'search_default_group_currency': 1,
-                'default_state': 'new'
-            }
-        }
-
-    # Methods for Awaiting Review
-    @api.model
-    def open_awaiting_review_today(self):
-        today = datetime.now().strftime('%Y-%m-%d')
-        return {
-            'name': _('Transactions To Review - Today'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'limit': 50,
-            'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('state', '=', 'new'),
-                ('valuedate', 'like', today),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
+            'domain': domain,
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -100,23 +270,27 @@ class TransactionMonitoring(models.Model):
         }
 
     @api.model
-    def open_awaiting_review_last_7_days(self):
+    def open_customers_awaiting_review_7days_other(self):
         today = datetime.now()
         last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
         today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'new'),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 90)
+        ]
+        
         return {
-            'name': _('Transactions To Review - Last 7 Days'),
+            'name': _('Customer Transactions To Review Other Currencies - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'limit': 50,
             'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('state', '=', 'new'),
-                ('valuedate', '>=', last_7_days),
-                ('valuedate', '<=', today_str + ' 23:59:59'),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
+            'domain': domain,
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -124,22 +298,26 @@ class TransactionMonitoring(models.Model):
             }
         }
 
-    # Methods for Reviewed
+    # Methods for Customer Transactions - Reviewed
     @api.model
-    def open_reviewed_today(self):
+    def open_customers_reviewed_today_ngn(self):
         today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'done'),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 90)
+        ]
+        
         return {
-            'name': _('Transactions Reviewed - Today'),
+            'name': _('Customer Transactions Reviewed NGN - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'limit': 50,
             'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('state', '=', 'done'),
-                ('valuedate', 'like', today),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
+            'domain': domain,
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -148,23 +326,53 @@ class TransactionMonitoring(models.Model):
         }
 
     @api.model
-    def open_reviewed_last_7_days(self):
+    def open_customers_reviewed_today_other(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'done'),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 90)
+        ]
+        
+        return {
+            'name': _('Customer Transactions Reviewed Other Currencies - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_customers_reviewed_7days_ngn(self):
         today = datetime.now()
         last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
         today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'done'),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 90)
+        ]
+        
         return {
-            'name': _('Transactions Reviewed - Last 7 Days'),
+            'name': _('Customer Transactions Reviewed NGN - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'limit': 50,
             'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('state', '=', 'done'),
-                ('valuedate', '>=', last_7_days),
-                ('valuedate', '<=', today_str + ' 23:59:59'),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
+            'domain': domain,
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -172,15 +380,364 @@ class TransactionMonitoring(models.Model):
             }
         }
 
-    # @api.constrains('deptcode', 'status', 'branch_id')
-    # def _check_related_records(self):
-    #     for record in self:
-    #         if record.deptcode and not self.env['hr.department'].browse(record.deptcode.id).exists():
-    #             raise ValidationError("Invalid Department")
-    #         if record.status and not self.env['res.transaction.status'].browse(record.status.id).exists():
-    #             raise ValidationError("Invalid Transaction Status")
-    #         if record.branch_id and not self.env['res.branch'].browse(record.branch_id.id).exists():
-    #             raise ValidationError("Invalid Branch")
+    @api.model
+    def open_customers_reviewed_7days_other(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'done'),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 90)
+        ]
+        
+        return {
+            'name': _('Customer Transactions Reviewed Other Currencies - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    # Methods for Internal Transactions - All Transactions
+    @api.model
+    def open_internal_all_transactions_today_ngn(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions NGN - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new',
+            }
+        }
+
+    @api.model
+    def open_internal_all_transactions_today_other(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions Other Currencies - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new',
+            }
+        }
+
+    @api.model
+    def open_internal_all_transactions_7days_ngn(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions NGN - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new',
+            }
+        }
+
+    @api.model
+    def open_internal_all_transactions_7days_other(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions Other Currencies - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new',
+            }
+        }
+
+    # Methods for Internal Transactions - Awaiting Review
+    @api.model
+    def open_internal_awaiting_review_today_ngn(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'new'),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions To Review NGN - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_internal_awaiting_review_today_other(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'new'),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions To Review Other Currencies - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_internal_awaiting_review_7days_ngn(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'new'),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions To Review NGN - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_internal_awaiting_review_7days_other(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'new'),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions To Review Other Currencies - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    # Methods for Internal Transactions - Reviewed
+    @api.model
+    def open_internal_reviewed_today_ngn(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'done'),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions Reviewed NGN - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_internal_reviewed_today_other(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'done'),
+            ('valuedate', '=', f"{today} 00:00:00"),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions Reviewed Other Currencies - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_internal_reviewed_7days_ngn(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'done'),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions Reviewed NGN - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
+    @api.model
+    def open_internal_reviewed_7days_other(self):
+        today = datetime.now()
+        last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        
+        domain = [
+            ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+            ('state', '=', 'done'),
+            ('valuedate', '>=', f"{last_7_days} 00:00:00"),
+            ('valuedate', '<=', today_str + ' 23:59:59'),
+            ('currency_id', '!=', 121),
+            ('tran_type', '=', 15)
+        ]
+        
+        return {
+            'name': _('Internal Transactions Reviewed Other Currencies - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'limit': 50,
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+
 
     # In Odoo shell
     def diagnose_branch_references(self):

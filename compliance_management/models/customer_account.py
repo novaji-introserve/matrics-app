@@ -48,7 +48,7 @@ class CustomerAccount(models.Model):
             'view_mode': 'tree,form',
             'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
             'context': {'search_default_group_branch': 1}
-        }
+        } 
         
     def get_balance(self):
         return  '{0:.2f}'.format(self.balance)

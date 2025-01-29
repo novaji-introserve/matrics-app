@@ -32,5 +32,6 @@ from . import bank_product
 from . import title
 from . import account_officer
 from . import account_product
+from . import currency
 # from .legacy import sync_script 
 
