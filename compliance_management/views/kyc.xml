@@ -210,7 +210,7 @@
                 <!-- </notebook> -->
             </xpath>
 
-        </field>
+        </field> 
     </record>
 
     <record id="open_customers" model="ir.actions.server">

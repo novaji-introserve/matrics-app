@@ -45,6 +45,7 @@
         'views/control_officer.xml',
         'data/cron_job.xml',
         'views/sql_view.xml', 
+        'views/sql_panel.xml', 
         'views/menus.xml',
         
         'security/groups.xml',
