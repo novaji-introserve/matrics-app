@@ -305,7 +305,17 @@ class alert_rules(models.Model):
                                     })
                                             
                                             
-                                    template.send_mail(new_alert_history.id, force_send=True)
+                                    try:
+                                        mail_id =  template.send_mail(new_alert_history.id, force_send=True)
+                                        if not mail_id:
+                                            history = self.env['alert.history'].browse(new_alert_history.id)
+                                            
+                                            if history.exists():
+                                                history.unlink()
+                                            
+                                    except Exception as e:
+                                        raise ValidationError(f"mail failed to send {str(e)}")
+                                        
                                     
                             
                                 else:
@@ -436,7 +446,16 @@ class alert_rules(models.Model):
                                     })
                                             
                                             
-                                    template.send_mail(new_alert_history.id, force_send=True)
+                                    try:
+                                        mail_id =  template.send_mail(new_alert_history.id, force_send=True)
+                                        if not mail_id:
+                                            history = self.env['alert.history'].browse(new_alert_history.id)
+                                            
+                                            if history.exists():
+                                                history.unlink()
+                                            
+                                    except Exception as e:
+                                        raise ValidationError(f"mail failed to send {str(e)}")
                                     
                             
                                 else:
@@ -562,7 +581,16 @@ class alert_rules(models.Model):
                         })
                                 
                                 
-                        template.send_mail(new_alert_history.id, force_send=True)
+                        try:
+                                mail_id =  template.send_mail(new_alert_history.id, force_send=True)
+                                if not mail_id:
+                                    history = self.env['alert.history'].browse(new_alert_history.id)
+                                            
+                                    if history.exists():
+                                        history.unlink()
+                                            
+                        except Exception as e:
+                            raise ValidationError(f"mail failed to send {str(e)}")
                         
                 
                     else:
