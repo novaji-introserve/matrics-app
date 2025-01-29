@@ -9,7 +9,7 @@
             <xpath expr="//tree" position="attributes">
                 <attribute name="create">false</attribute>
             </xpath>
-
+ 
             <!-- Replace the phone field with custom fields -->
             <xpath expr="//field[@name='phone']" position="before">
                 <field name="customer_id" optional="hide" />
