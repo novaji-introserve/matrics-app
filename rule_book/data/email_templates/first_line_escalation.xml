@@ -9,11 +9,14 @@
             <field name="email_to">{{object.data()['first_line_escalation']}}</field>
             <field name="subject">Escalation Due Date for {{object.data()['rulebook_return']}}</field>
             <field name="model_id" ref="rule_book.model_reply_log"/>
+            <field name="description">Send Escalation Due Date Alert</field>
+
 
             <field name="body_html" type="html">
                 <div style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
                     <div style="text-align: center; padding: 10px 0;">
-                        <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg" alt="Bank of Industry" style="max-width: 100px;" />
+                        <!-- <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg" alt="Bank of Industry" style="max-width: 100px;" /> -->
+                        <img src="rule_book/static/src/img/boi.jpeg" alt="Bank of Industry" style="max-width: 100px;" />
                     </div>
 
                     <div style="padding: 20px;">

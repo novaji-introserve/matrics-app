@@ -14,6 +14,8 @@ import threading
 from datetime import datetime, timedelta
 from odoo.tools import html_escape
 import logging
+from odoo.exceptions import AccessError
+
 
 _logger = logging.getLogger(__name__)
 # _logger.debug('This is a debug message')
@@ -51,6 +53,89 @@ class RulebookTitle(models.Model):
 
     # Add the external_resource_url field if it's not already defined
     external_resource_url = fields.Char("External Resource URL")
+    # Add email-related fields
+    email_recipient_ids = fields.Many2many('res.users', 'rulebook_email_recipient_rel',
+                                           string='Email Recipients')
+    email_cc_ids = fields.Many2many('res.users', 'rulebook_email_cc_rel',
+                                    string='CC Recipients')
+    email_subject = fields.Char('Email Subject')
+    email_body = fields.Html('Email Body')
+    
+    global_data = {}
+
+    # to send the data in the global variable to the template
+    def data(self):
+        global global_data
+        # send the global value to the email template
+        return global_data
+
+    def set_global_data(self, data):
+        global global_data
+        global_data = data
+    
+    
+   
+            
+    def action_send_email(self):
+        self.ensure_one()
+        if not self.email_recipient_ids:
+            raise AccessError("Please select at least one recipient.")
+        
+        if not self.file:
+            raise AccessError("No file attached to send.")
+
+        # Create attachment from the current file
+        attachment = self.env['ir.attachment'].create({
+            'name': self.file_name or 'Rulebook',
+            'datas': self.file,
+            'res_model': 'rulebook.title',
+            'res_id': self.id,
+        })
+
+
+        # Replace with the actual template ID
+        template = self.env.ref('rule_book.email_template_share_document_')
+        now = datetime.now()
+        now_without_microseconds = now.replace(microsecond=0)
+        timestamp = self.env["reply.log"]._compute_formatted_date(
+            now_without_microseconds)
+
+
+        # Send email to each recipient
+        # for recipient in self.email_recipient_ids:
+        global global_data            
+
+        global_data = {
+            "email_from":  os.getenv("EMAIL_FROM"),
+            'subject': self.email_subject or f"Rulebook: {self.name}",
+            'body_html': self.email_body,
+            'email_to': ','.join(self.email_recipient_ids.mapped('email')),
+            'email_cc': ','.join(self.email_cc_ids.mapped('email')),
+            'datetime': timestamp,
+            "current_year": datetime.now().year,
+            'attachment_ids': [(4, attachment.id)],
+        }
+        # template.send_mail(self.id, force_send=True)
+        template.send_mail(self.id, force_send=True, email_values={
+                           'attachment_ids': global_data['attachment_ids']})
+
+            # mail = self.env['mail.mail'].create(mail_values)
+            # mail.send()
+
+        # Post a note in chatter
+        recipients_names = ', '.join(self.email_recipient_ids.mapped('name'))
+        message = f"Rulebook sent by email to: {recipients_names}"
+        # self.message_post(body=message, message_type='notification')
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': 'Emails sent successfully',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     @api.model
     def fetch_new_ai_titles(self):
@@ -174,7 +259,7 @@ class RulebookTitle(models.Model):
         for thread in threads:
             thread.join()
 
-        return "Scrape successful!"
+        return "Scrape successful for Sec!"
         
     def sec_scrape_file_type(self, file_type):
         secBaseUrl= os.getenv("SEC_BASE_URL")
