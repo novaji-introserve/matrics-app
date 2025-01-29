@@ -182,7 +182,7 @@
         <field name="inherit_id" ref="base.view_partner_tree"/>
         <field name="arch" type="xml">
             <tree position="attributes">
-                <attribute name="create">true</attribute>
+                <attribute name="create">false</attribute>
             </tree>
         </field>
     </record>

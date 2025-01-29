@@ -179,7 +179,7 @@
             sequence="20"/>
     />
    
-    <menuitem id="menu_customer" 
+    <menuitem id="menu_customer"  
             name="Customer"  
             parent="menu_customer_management" 
             action="compliance_management.contacts_action_contacts_inherit"
