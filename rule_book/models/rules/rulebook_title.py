@@ -81,6 +81,9 @@ class RulebookTitle(models.Model):
         if not self.email_recipient_ids:
             raise AccessError("Please select at least one recipient.")
         
+        if not self.email_body:
+            raise AccessError("email body is required.")
+        
         if not self.file:
             raise AccessError("No file attached to send.")
 
@@ -119,23 +122,65 @@ class RulebookTitle(models.Model):
         template.send_mail(self.id, force_send=True, email_values={
                            'attachment_ids': global_data['attachment_ids']})
 
-            # mail = self.env['mail.mail'].create(mail_values)
-            # mail.send()
 
         # Post a note in chatter
         recipients_names = ', '.join(self.email_recipient_ids.mapped('name'))
         message = f"Rulebook sent by email to: {recipients_names}"
         # self.message_post(body=message, message_type='notification')
+        
+        # Reset the form fields after sending the email
+        try:
+            # Your existing email sending logic here
 
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'message': 'Emails sent successfully',
-                'type': 'success',
-                'sticky': False,
+            # Show success message
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Success',
+                    'message': 'Email sent successfully',
+                    'type': 'success',
+                    'sticky': False,
+                    'next': {
+                        'type': 'ir.actions.client',
+                        'tag': 'reload',
+                        'params': {
+                            'model': 'rulebook.title',
+                            'id': self.id,
+                            'values': {
+                                'email_recipient_ids': [(5, 0, 0)],
+                                'email_cc_ids': [(5, 0, 0)],
+                                'email_subject': False,
+                                'email_body': False,
+                            },
+                            'context': self.env.context,
+                        }
+                    }
+                }
             }
-        }
+
+        except Exception as e:
+            # Show error message if email sending fails
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Error',
+                    'message': str(e),
+                    'type': 'danger',
+                    'sticky': True,
+                }
+            }
+
+        finally:
+            # Update the record to clear fields
+            self.write({
+                'email_recipient_ids': [(5, 0, 0)],
+                'email_cc_ids': [(5, 0, 0)],
+                'email_subject': False,
+                'email_body': False,
+            })
+
 
     @api.model
     def fetch_new_ai_titles(self):

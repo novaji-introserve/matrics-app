@@ -27,9 +27,6 @@
 
 
                 <sheet>
-                    <!-- <header>
-                        <button name="action_send_email" string="Send Email" type="object" class="oe_highlight" attrs="{'invisible': [('file', '=', False)]}"/>
-                    </header> -->
 
                     <notebook>
 
@@ -59,15 +56,11 @@
 
                             </group>
 
-                            <group>
-                                <div>
-                                    <button name="action_send_email" type="object" icon="fa-envelope" string="Send Email" attrs="{'invisible': [('file', '=', False)]}"/>
+                                <div class="mb-4">
+                                    <button name="action_send_email" class="btn btn-primary" type="object" icon="fa-envelope" string=" Send Email" attrs="{'invisible': [('file', '=', False)]}"/>
                                 </div>
-                            </group>
 
-                            <!-- <group>
-                                <button name="action_send_email" type="object" icon="fa-envelope" string="Send Email" attrs="{'invisible': [('file', '=', False)]}"/>
-                            </group> -->
+                            
                             <div class="alert alert-info" role="alert">
                                 <i class="fa fa-info-circle"/>
  The current file will be automatically attached to the email.
