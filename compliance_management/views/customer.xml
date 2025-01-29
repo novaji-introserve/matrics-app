@@ -9,12 +9,12 @@
             <xpath expr="//tree" position="attributes">
                 <attribute name="create">false</attribute>
             </xpath>
-
+ 
             <!-- Replace the phone field with custom fields -->
             <xpath expr="//field[@name='phone']" position="before">
-                <field name="customer_id" optional="hide" />
-                <field name="firstname" optional="hide" />
-                <field name="lastname" optional="hide" />
+                <field name="customer_id" optional="show" />
+                <field name="firstname" optional="show" />
+                <field name="lastname" optional="show" />
                 <field name="risk_score" widget="badge" decoration-info="1" />
                 <field name="risk_level" 
                     widget="badge"

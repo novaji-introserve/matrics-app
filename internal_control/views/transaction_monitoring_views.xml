@@ -60,7 +60,7 @@
                 <field name="userid"/>
                 <field name="refno"/>
             </xpath>
-            
+             
             <xpath expr="//filter[@name='group_currency']" position="replace">
                         <filter name="group_currency" string="" domain="[]"
                         context="{'group_by': 'currency_id'}" />

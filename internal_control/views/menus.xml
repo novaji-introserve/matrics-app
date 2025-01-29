@@ -182,7 +182,7 @@
     <menuitem id="menu_customer"  
             name="Customer"  
             parent="menu_customer_management" 
-            action="compliance_management.contacts_action_contacts_inherit"
+            action="action_open_customers"
             groups="compliance_management.group_compliance_chief_compliance_officer"
             sequence="10"/>
     />

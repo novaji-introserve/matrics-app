@@ -12,15 +12,21 @@
             <xpath expr="//field[@name='risk_score']" position="replace" />
             <xpath expr="//field[@name='risk_level']" position="replace" />
             <xpath expr="//field[@name='email']" position="replace" />
-            <!-- <xpath expr="//field[@name='state_id']" position="replace" /> -->
+            <xpath expr="//field[@name='state_id']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
             <xpath expr="//field[@name='vat']" position="replace" />
             <xpath expr="//field[@name='category_id']" position="replace" />
             <!-- <xpath expr="//field[@name='branch_id']" position="replace" /> -->
-            <xpath expr="//field[@name='phone']" position="replace">
-                <field name="phone1" string="Phone" optional="show" />
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="invisible">show</attribute>
             </xpath>
+            <xpath expr="//field[@name='tier_id']" position="replace" />
              <xpath expr="//field[@name='registration_date']" position="replace">
                 <field name="date_opened" string="Date Opened" optional="show" />
+            </xpath>
+            <xpath expr="//field[@name='country_id']" position="replace">
+                <field name="nationality" string="Nationality" optional="show" />
             </xpath>
         </field>
     </record>
@@ -74,5 +80,13 @@
                 <field name="date_opened" string="Date Opened" />
             </xpath>
         </field>
+    </record>
+
+        <record id="action_open_customers" model="ir.actions.server">
+        <field name="name">Open Customers</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = env['res.partner'].open_all_customers()</field>
     </record>
 </odoo>
