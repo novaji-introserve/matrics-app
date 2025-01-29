@@ -30,25 +30,39 @@ class TransactionMonitoring(models.Model):
     trans_id = fields.Char(string="Transaction ID", readonly=True, index=True)
 
 
+
+
     # Methods for All Transactions
     @api.model
     def open_all_transactions_today(self):
         today = datetime.now().strftime('%Y-%m-%d')
-        return {
+        
+        domain = [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('valuedate', '=', f"{today} 00:00:00"),
+                ('currency_id', '=', 121)  # NGN currency
+            ]
+        
+        chk_if_empty = self.env['res.customer.transaction'].search(domain)
+        
+
+    
+
+        if len(chk_if_empty) == 0:
+            raise ValidationError("No record found")
+        else:
+            return {
             'name': _('All Transactions - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'limit': 50,
             'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('valuedate', 'like', today),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
+            'domain': domain,
             'context': {
-                'search_default_group_branch': 1,
-                'search_default_group_currency': 1,
-                'default_state': 'new'
+                'search_default_group_branch': 1,  # Automatically apply "Group by Branch"
+                'search_default_group_currency': 1,  # Automatically apply "Group by Currency"
+                'default_state': 'new',
+                'group_by': 'branch_id',
             }
         }
 
@@ -57,120 +71,160 @@ class TransactionMonitoring(models.Model):
         today = datetime.now()
         last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
         today_str = today.strftime('%Y-%m-%d')
-        return {
-            'name': _('All Transactions - Last 7 Days'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'limit': 50,
-            'view_mode': 'tree,form',
-            'domain': [
+        
+        domain = [
                 ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('valuedate', '>=', last_7_days),
+                ('valuedate', '>=', f"{last_7_days} 00:00:00"),
                 ('valuedate', '<=', today_str + ' 23:59:59'),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
-            'context': {
-                'search_default_group_branch': 1,
-                'search_default_group_currency': 1,
-                'default_state': 'new'
+                ('currency_id', '=', 121)  # NGN currency
+            ]
+
+        chk_if_empty = self.env['res.customer.transaction'].search(domain)
+        
+        if len(chk_if_empty) == 0:
+            raise ValidationError("No record found")
+        else:
+            return {
+                'name': _('All Transactions - Last 7 Days'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'res.customer.transaction',
+                'limit': 50,
+                'view_mode': 'tree,form',
+                'domain': domain,
+                'context': {
+                    'search_default_group_branch': 1,
+                    'search_default_group_currency': 1,
+                    'default_state': 'new'
+                }
             }
-        }
 
     # Methods for Awaiting Review
     @api.model
     def open_awaiting_review_today(self):
         today = datetime.now().strftime('%Y-%m-%d')
-        return {
-            'name': _('Transactions To Review - Today'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'limit': 50,
-            'view_mode': 'tree,form',
-            'domain': [
+        
+        domain = [
                 ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
                 ('state', '=', 'new'),
-                ('valuedate', 'like', today),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
-            'context': {
-                'search_default_group_branch': 1,
-                'search_default_group_currency': 1,
-                'default_state': 'new'
+                ('valuedate', '=', f"{today} 00:00:000"),
+                ('currency_id', '=', 121)  # NGN currency
+            ]
+        
+        chk_if_empty = self.env['res.customer.transaction'].search(domain)
+        
+        if len(chk_if_empty) == 0:
+            raise ValidationError("No record found")
+        else:
+        
+            return {
+                'name': _('Transactions To Review - Today'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'res.customer.transaction',
+                'limit': 50,
+                'view_mode': 'tree,form',
+                'domain': domain,
+                'context': {
+                    'search_default_group_branch': 1,
+                    'search_default_group_currency': 1,
+                    'default_state': 'new'
+                }
             }
-        }
 
     @api.model
     def open_awaiting_review_last_7_days(self):
         today = datetime.now()
         last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
         today_str = today.strftime('%Y-%m-%d')
-        return {
-            'name': _('Transactions To Review - Last 7 Days'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'limit': 50,
-            'view_mode': 'tree,form',
-            'domain': [
+        
+        domain = [
                 ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
                 ('state', '=', 'new'),
-                ('valuedate', '>=', last_7_days),
+                ('valuedate', '>=', f"{last_7_days} 00:00:00"),
                 ('valuedate', '<=', today_str + ' 23:59:59'),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
-            'context': {
-                'search_default_group_branch': 1,
-                'search_default_group_currency': 1,
-                'default_state': 'new'
+                ('currency_id', '=', 121)  # NGN currency
+            ]
+        
+        chk_if_empty = self.env['res.customer.transaction'].search(domain)
+        
+        if len(chk_if_empty) == 0:
+            raise ValidationError("No record found")
+        else:
+            return {
+                'name': _('Transactions To Review - Last 7 Days'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'res.customer.transaction',
+                'limit': 50,
+                'view_mode': 'tree,form',
+                'domain': domain,
+                'context': {
+                    'search_default_group_branch': 1,
+                    'search_default_group_currency': 1,
+                    'default_state': 'new'
+                }
             }
-        }
 
     # Methods for Reviewed
     @api.model
     def open_reviewed_today(self):
         today = datetime.now().strftime('%Y-%m-%d')
-        return {
-            'name': _('Transactions Reviewed - Today'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'limit': 50,
-            'view_mode': 'tree,form',
-            'domain': [
+        domain = [
                 ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
                 ('state', '=', 'done'),
-                ('valuedate', 'like', today),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
-            'context': {
-                'search_default_group_branch': 1,
-                'search_default_group_currency': 1,
-                'default_state': 'new'
+                ('valuedate', '=', f"{today} 00:00:00"),
+                ('currency_id', '=', 121)  # NGN currency
+            ]
+        
+        chk_if_empty = self.env['res.customer.transaction'].search(domain)
+        
+        if len(chk_if_empty) == 0:
+            raise ValidationError("No record found")
+        else:
+            return {
+                'name': _('Transactions Reviewed - Today'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'res.customer.transaction',
+                'limit': 50,
+                'view_mode': 'tree,form',
+                'domain': domain,
+                'context': {
+                    'search_default_group_branch': 1,
+                    'search_default_group_currency': 1,
+                    'default_state': 'new'
+                }
             }
-        }
 
     @api.model
     def open_reviewed_last_7_days(self):
         today = datetime.now()
         last_7_days = (today - timedelta(days=7)).strftime('%Y-%m-%d')
         today_str = today.strftime('%Y-%m-%d')
-        return {
-            'name': _('Transactions Reviewed - Last 7 Days'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'limit': 50,
-            'view_mode': 'tree,form',
-            'domain': [
+        
+        domain = [
                 ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
                 ('state', '=', 'done'),
-                ('valuedate', '>=', last_7_days),
+                ('valuedate', '>=', f"{last_7_days} 00:00:00"),
                 ('valuedate', '<=', today_str + ' 23:59:59'),
-                ('currency_id', '=', 1)  # NGN currency
-            ],
-            'context': {
-                'search_default_group_branch': 1,
-                'search_default_group_currency': 1,
-                'default_state': 'new'
+                ('currency_id', '=', 121)  # NGN currency
+            ]
+
+        chk_if_empty = self.env['res.customer.transaction'].search(domain)
+        
+        if len(chk_if_empty) == 0:
+            raise ValidationError("No record found")
+        else:
+            return {
+                'name': _('Transactions Reviewed - Last 7 Days'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'res.customer.transaction',
+                'limit': 50,
+                'view_mode': 'tree,form',
+                'domain': domain,
+                'context': {
+                    'search_default_group_branch': 1,
+                    'search_default_group_currency': 1,
+                    'default_state': 'new'
+                }
             }
-        }
 
     # @api.constrains('deptcode', 'status', 'branch_id')
     # def _check_related_records(self):
