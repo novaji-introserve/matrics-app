@@ -9,12 +9,12 @@
             <xpath expr="//tree" position="attributes">
                 <attribute name="create">false</attribute>
             </xpath>
-
+ 
             <!-- Replace the phone field with custom fields -->
             <xpath expr="//field[@name='phone']" position="before">
-                <field name="customer_id" optional="hide" />
-                <field name="firstname" optional="hide" />
-                <field name="lastname" optional="hide" />
+                <field name="customer_id" optional="show" />
+                <field name="firstname" optional="show" />
+                <field name="lastname" optional="show" />
                 <field name="risk_score" widget="badge" decoration-info="1" />
                 <field name="risk_level" 
                     widget="badge"
@@ -22,9 +22,9 @@
                     decoration-warning="risk_level in ('medium')"
                     decoration-success="risk_level in ('low')"
                 />
-                <field name="branch_id" />
-                <field name="registration_date" />
-                <field name="tier_id" />
+                <field name="branch_id" optional="hide" />
+                <field name="registration_date" optional="hide"  />
+                <field name="tier_id" optional="hide" />
             </xpath>
 
             <!-- Modify activity_ids field -->
@@ -182,7 +182,7 @@
         <field name="inherit_id" ref="base.view_partner_tree"/>
         <field name="arch" type="xml">
             <tree position="attributes">
-                <attribute name="create">true</attribute>
+                <attribute name="create">false</attribute>
             </tree>
         </field>
     </record>

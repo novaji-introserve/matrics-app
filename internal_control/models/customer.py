@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 # import logging
 # import traceback
 # _logger = logging.getLogger(__name__)
@@ -22,6 +22,19 @@ class Customer(models.Model):
     identification_issue_date = fields.Char(string='identification Issue Date', index=True, tracking=True)
     town_id = fields.Many2one(
     comodel_name='res.partner.town', string='Town', index=True)
+
+
+    @api.model
+    def open_all_customers(self):
+        return {
+            'name': _('Customers'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': [('create_uid','=',False)],
+            'context': {'search_default_group_branch': 1}
+        }
+            # 'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('create_uid','=',False)],
 
 
     # Script to check field data integrity
