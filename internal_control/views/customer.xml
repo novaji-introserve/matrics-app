@@ -18,9 +18,9 @@
             <xpath expr="//field[@name='vat']" position="replace" />
             <xpath expr="//field[@name='category_id']" position="replace" />
             <!-- <xpath expr="//field[@name='branch_id']" position="replace" /> -->
-            <xpath expr="//field[@name='phone']" position="attributes">
+            <!-- <xpath expr="//field[@name='phone']" position="attributes">
                 <attribute name="invisible">show</attribute>
-            </xpath>
+            </xpath> -->
             <xpath expr="//field[@name='tier_id']" position="replace" />
              <xpath expr="//field[@name='registration_date']" position="replace">
                 <field name="date_opened" string="Date Opened" optional="show" />
