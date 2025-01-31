@@ -49,7 +49,7 @@ class alert_rules(models.Model):
         string="Created_Date",
         read_only=True,
         default=lambda self: self._get_local_time())
-    last_checked = fields.Datetime(string="Last_Checked", read_only=True  default=lambda self: self._get_local_time())
+    last_checked = fields.Datetime(string="Last_Checked", read_only=True, default=lambda self: self._get_local_time())
     
     
     def write(self,vals):
