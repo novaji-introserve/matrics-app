@@ -46,11 +46,18 @@ class alert_rules(models.Model):
         string="Risk Rating"
     )
     date_created = fields.Datetime(
-        string="created_at",
-        default=fields.Datetime.now()
-    )
+        string="Created_Date",
+        read_only=True,
+        default=lambda self: self._get_local_time())
+    last_checked = fields.Datetime(string="Last_Checked", read_only=True  default=lambda self: self._get_local_time())
     
-    last_checked = fields.Datetime(string="last_checked", default=fields.Datetime.now())
+    
+    def write(self,vals):
+        if 'last_checked' in vals:
+            user_tz = self.env.user.tz or 'Africa/Lagos'
+            local_tz = timezone(user_tz)
+            val['last_checked'] = fields.DateTime.context_timestamp(self, fields.Datetime.from_string(vals['last_checked']))
+            val['date_created'] = fields.DateTime.context_timestamp(self, fields.Datetime.from_string(vals['date_created']))
     
     
    
