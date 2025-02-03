@@ -104,14 +104,14 @@
              </xpath>
 
             <xpath expr="//field[@name='date_created']" position="after">
-                <field name="valuedate"/>
-                <field name="actualdate"/>
-                <field name="userid" optional="show"/>
+                <field name="valuedate" string="Value Date" optional="show"/>
+                <field name="actualdate" string="Actual Date" optional="hide"/>
+                <field name="userid" optional="hide"/>
                 <field name="reversal" optional="hide"/>
                 <field name="accountmodule" optional="hide"/>
                 <field name="tellerno" optional="hide"/>
                 <field name="deptcode" optional="hide"/>
-                <field name="status"/>
+                <field name="status" optional="hide"/>
                 <field name="tran_channel" optional="hide"/>
                 <field name="request_id" optional="hide"/>
                 <field name="trans_id" optional="hide"/>
