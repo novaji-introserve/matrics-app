@@ -940,34 +940,69 @@ class ReplyLog(models.Model):
                 # If computed_date is not available, set reg_due_date to False or handle accordingly
                 record.reminder_due_date = None
 
+    # @api.model
+    # def check_rulebook_and_update_due_date(self):
+    #     """Check rulebooks with today's regulatory date and update next due date."""
+
+    #     today = datetime.now().replace(microsecond=0)
+
+
+    #     # Perform the search
+    #     rulebooks = self.env["reply.log"].search([
+    #         ("rulebook_id.is_recurring", "=", True),
+    #         # Only process records not yet computed
+    #         ('next_due_date_computed', '=', False)
+    #     ])
+    #     _logger.critical(
+    #         f"Rulebooks to update {rulebooks}.., today;s timedate {today}..")
+
+    #     for record in rulebooks:
+    #         try:
+    #             # Check if today exactly matches due date
+    #             if (record.reg_due_date and today.date() == record.reg_due_date.date()) or \
+    #             (not record.reg_due_date and record.rulebook_compute_date and today.date() == record.rulebook_compute_date.date()):
+
+    #                 record._compute_next_due_date()
+    #                 record.sudo().write({
+    #                     'next_due_date_computed': True
+    #                 })
+
+    #                 _logger.critical(f"Record updated: {record.rulebook_id}")
+
+    #         except Exception as e:
+    #             _logger.critical(f"Failed to update rulebook {record.id}: {e}")
+    
+
     @api.model
     def check_rulebook_and_update_due_date(self):
-        """Check rulebooks with today's regulatory date and update next due date."""
+        """Check rulebooks with today's or past regulatory dates and update next due date."""
 
         today = datetime.now().replace(microsecond=0)
 
-
-        # Perform the search
+        # Perform the search for unprocessed records with due dates <= today
         rulebooks = self.env["reply.log"].search([
             ("rulebook_id.is_recurring", "=", True),
-            # Only process records not yet computed
-            ('next_due_date_computed', '=', False)
+            ("next_due_date_computed", "=", False),
+            "|",
+            "&",
+            ("reg_due_date", "!=", False),
+            ("reg_due_date", "<=", today.date()),
+            "&",
+            ("reg_due_date", "=", False),
+            ("rulebook_compute_date", "<=", today.date())
         ])
+
         _logger.critical(
-            f"Rulebooks to update {rulebooks}.., today;s timedate {today}..")
+            f"Rulebooks to update {rulebooks}.., today's datetime {today}..")
 
         for record in rulebooks:
             try:
-                # Check if today exactly matches due date
-                if (record.reg_due_date and today.date() == record.reg_due_date.date()) or \
-                (not record.reg_due_date and record.rulebook_compute_date and today.date() == record.rulebook_compute_date.date()):
+                record._compute_next_due_date()
+                record.sudo().write({
+                    'next_due_date_computed': True
+                })
 
-                    record._compute_next_due_date()
-                    record.sudo().write({
-                        'next_due_date_computed': True
-                    })
-
-                    _logger.critical(f"Record updated: {record.rulebook_id}")
+                _logger.critical(f"Record updated: {record.rulebook_id}")
 
             except Exception as e:
                 _logger.critical(f"Failed to update rulebook {record.id}: {e}")
