@@ -1,7 +1,7 @@
 from odoo import models, fields, api, _
-# import logging
+import logging
 # import traceback
-# _logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 class Customer(models.Model): 
     _inherit = "res.partner" 
@@ -13,13 +13,13 @@ class Customer(models.Model):
     state_id = fields.Many2one(
         comodel_name='res.country.state', string='State', tracking=True, index=True)
     occupation = fields.Char(string='Occupation', index=True, tracking=True)
-    date_opened = fields.Char(string='Date Opened', index=True, tracking=True)
+    date_opened = fields.Date(string='Date Opened', index=True, tracking=True)
     address = fields.Char(string='Address', index=True, tracking=True)
     nin = fields.Char(string='NIN', index=True, tracking=True)
     status = fields.Many2one(
         comodel_name='res.user.status', string='Status', tracking=True, index=True)
     phone1 = fields.Char(string='Phone', index=True, tracking=True)
-    identification_issue_date = fields.Char(string='identification Issue Date', index=True, tracking=True)
+    identification_issue_date = fields.Date(string='identification Issue Date', index=True, tracking=True)
     town_id = fields.Many2one(
     comodel_name='res.partner.town', string='Town', index=True)
 
@@ -37,15 +37,43 @@ class Customer(models.Model):
             # 'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('create_uid','=',False)],
 
 
-    # Script to check field data integrity
-    def check_record_fields(record):
-        for field_name in record._fields:
-            try:
-                value = record[field_name]
-                # Check if value is a recordset or has unexpected type
-                print(f"Field {field_name}: {type(value)}")
-            except Exception as e:
-                print(f"Issue with field: {field_name}, Error: {e}")
+
+    def _sync_branch_id_from_accounts_sql(self):
+        """
+        Sync branch_id using direct SQL query
+        """
+        try:
+            query = """
+                UPDATE res_partner rp
+                SET branch_id = rpa.branch_id
+                FROM res_partner_account rpa
+                WHERE rp.customer_id::numeric = rpa.customer_id
+                AND rp.branch_id IS NULL
+                AND rp.customer_id IS NOT NULL
+                AND rpa.branch_id IS NOT NULL
+                RETURNING rp.id, rp.customer_id, rpa.branch_id;
+            """
+            
+            self.env.cr.execute(query)
+            updated_records = self.env.cr.fetchall()
+            self.env.cr.commit()
+            
+            _logger.info(f"Branch ID sync completed. Updated {len(updated_records)} records")
+            
+            # Log detailed updates
+            for record in updated_records:
+                _logger.info(f"Updated partner ID {record[0]}, customer_id {record[1]} with branch_id {record[2]}")
+                
+        except Exception as e:
+            _logger.error(f"Error in branch ID sync: {str(e)}")
+            raise e
+
+    # Updated cron method that uses SQL approach
+    def sync_branch_id_from_accounts(self):
+        """
+        Main cron job method - uses SQL approach by default
+        """
+        return self._sync_branch_id_from_accounts_sql()
 
     # @api.model
     # def read(self, fields=None, load='_classic_read'):

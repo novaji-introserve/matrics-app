@@ -76,3 +76,48 @@ class CustomerAccount(models.Model):
             ],
             'context': {'search_default_group_branch': 1}
         }
+    
+    def update_account_statistics(self):
+        """
+        Update transaction statistics for all accounts using the max transaction date as reference
+        """
+        self.env.cr.execute("""
+            WITH account_dates AS (
+                -- First get the latest transaction date for each account
+                SELECT 
+                    account_id,
+                    MAX(date_created::date) as reference_date
+                FROM res_customer_transaction
+                GROUP BY account_id
+            ),
+            stats AS (
+                SELECT 
+                    t.account_id,
+                    -- Last 6 months from latest transaction
+                    COUNT(CASE WHEN t.date_created::date >= (ad.reference_date - INTERVAL '180 days') THEN 1 END) as num_6m,
+                    COALESCE(AVG(CASE WHEN t.date_created::date >= (ad.reference_date - INTERVAL '180 days') THEN amount END), 0) as avg_6m,
+                    COALESCE(MAX(CASE WHEN t.date_created::date >= (ad.reference_date - INTERVAL '180 days') THEN amount END), 0) as max_6m,
+                    COALESCE(SUM(CASE WHEN t.date_created::date >= (ad.reference_date - INTERVAL '180 days') THEN amount END), 0) as tot_6m,
+                    -- Last 1 year from latest transaction
+                    COUNT(CASE WHEN t.date_created::date >= (ad.reference_date - INTERVAL '365 days') THEN 1 END) as num_1y,
+                    COALESCE(AVG(CASE WHEN t.date_created::date >= (ad.reference_date - INTERVAL '365 days') THEN amount END), 0) as avg_1y,
+                    COALESCE(MAX(CASE WHEN t.date_created::date >= (ad.reference_date - INTERVAL '365 days') THEN amount END), 0) as max_1y,
+                    COALESCE(SUM(CASE WHEN t.date_created::date >= (ad.reference_date - INTERVAL '365 days') THEN amount END), 0) as tot_1y
+                FROM res_customer_transaction t
+                JOIN account_dates ad ON t.account_id = ad.account_id
+                GROUP BY t.account_id
+            )
+            UPDATE res_partner_account rpa
+            SET 
+                num_tran_last6m = stats.num_6m,
+                avg_tran_last6m = ROUND(stats.avg_6m::numeric, 2),
+                max_tran_last6m = stats.max_6m,
+                tot_tran_last6m = stats.tot_6m,
+                num_tran_last1y = stats.num_1y,
+                avg_tran_last1y = ROUND(stats.avg_1y::numeric, 2),
+                max_tran_last1y = stats.max_1y,
+                tot_tran_last1y = stats.tot_1y,
+                write_date = NOW()
+            FROM stats
+            WHERE rpa.id = stats.account_id
+        """)

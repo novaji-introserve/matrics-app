@@ -16,8 +16,7 @@ class Transaction(models.Model):
         comodel_name='res.partner.account', string='Account', index=True)
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
-    # date_created = fields.Date(string='Tran. Date', index=True)
-    date_created = fields.Char(string='Tran. Date', index=True)
+    date_created = fields.Date(string='Tran. Date', index=True)
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', index=True) 
     branch_id = fields.Many2one(
