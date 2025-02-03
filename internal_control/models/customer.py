@@ -23,23 +23,7 @@ class Customer(models.Model):
     town_id = fields.Many2one(
     comodel_name='res.partner.town', string='Town', index=True)
     
-    def read(self, fields=None, load='_classic_read'):
-        # Call the super method to get the default behavior
-        records = super(Customer, self).read(fields, load)
-
-        # Process the records to convert datetime to date format
-        for record in records:
-            if 'date_opened' in record:
-                record['date_opened'] = self._convert_to_date(record['date_opened'])
-            
-        return records
-
-    def _convert_to_date(self, datetime_value):
-        """Convert a datetime string to a date string in YYYY-MM-DD format."""
-        if datetime_value:
-            datetime_obj = datetime.fromisoformat(datetime_value)
-            return datetime_obj.date().isoformat()  # Return as YYYY-MM-DD
-        return None  #
+ 
    
 
 
