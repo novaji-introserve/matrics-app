@@ -967,12 +967,15 @@ class ReplyLog(models.Model):
 
                 rulebook_compute_date = (record.rulebook_compute_date)
                 # Check if the time difference is exactly 5 minutes (or within 1 second tolerance for precision)
-                if record.reg_due_date and today.date() == record.reg_due_date.date():
-                    if abs((record.reg_due_date - today).total_seconds()) <= 250:
+                if record.reg_due_date and today > record.reg_due_date:
+                    # if abs((record.reg_due_date - today).total_seconds()) <= 250:
                         record._compute_next_due_date()
-                elif not record.reg_due_date and rulebook_compute_date and today.date() == rulebook_compute_date.date() :
-                    if abs((rulebook_compute_date - today).total_seconds()) <= 250:
+                        _logger.critical(f"record updated {record.rulebook_id}")
+                elif not record.reg_due_date and rulebook_compute_date and today > rulebook_compute_date :
+                    # if abs((rulebook_compute_date - today).total_seconds()) <= 250:
                         record._compute_next_due_date()
+                        _logger.critical(f"record updated {record.rulebook_id}")
+
 
             except Exception as e:
                 _logger.critical(f"Failed to update rulebook {record.id}: {e}")

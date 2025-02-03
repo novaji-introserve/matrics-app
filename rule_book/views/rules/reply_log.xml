@@ -32,6 +32,7 @@
                 <field name="rulebook_id"/>
                 <field name="submission_timing"/>
                 <field name="reply_content" string="Reply Note"/>
+                <field name="rulebook_name" string="Type of return"/>
                 <searchpanel>
                     <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1"/>
                     <field name="submission_timing" icon="fa-clock" string="Submission Timing" enable_counters="1"/>
