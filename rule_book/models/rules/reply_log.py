@@ -412,7 +412,13 @@ class ReplyLog(models.Model):
         help="Select the risk category for this rulebook.",
         default="Compliance Risk"
     )
+    # can_archive = fields.Boolean(store=False)
     
+    def toggle_active(self):
+        # Check if user has compliance manager rights
+        if not self.env.user.has_group('rule_book.group_chief_compliance_officer_'):
+            return False
+        return super(ReplyLog, self).toggle_active()    
     
 
     @api.depends("rulebook_compute_date")
@@ -680,7 +686,8 @@ class ReplyLog(models.Model):
     def _update_submission_timing(self):
         """Cron job to compute the submission timing for all rulebook logs."""
         # today = fields.Datetime.now()
-        today = datetime.now().replace(microsecond=0)
+        # today = datetime.now().replace(microsecond=0)
+        today = datetime.combine(datetime.today(), datetime.min.time())
 
         rulebook_logs = self.env['reply.log'].search([
             ('reply_date', '=', False)
@@ -693,26 +700,31 @@ class ReplyLog(models.Model):
             _logger.critical(
                 f"reply datetime {record.reply_date}:  computed date {record.rulebook_compute_date}  today date {today} id of record {record.id}")
 
-            try:
-                # If there's no reply date and the due date has passed, mark as not responded
-                if not record.reply_date:
-                    if (not record.reg_due_date and record.rulebook_compute_date and record.rulebook_compute_date.date() < today 
-                        or record.reg_due_date and record.reg_due_date.date() < today) and record.submission_timing != "not_responded":
-                        record.submission_timing = "not_responded"
                     # if not record.reg_due_date and record.rulebook_compute_date and record.rulebook_compute_date < today and record.submission_timing != "not_responded":
                     #     record.submission_timing = "not_responded"
                     # elif record.reg_due_date and record.reg_due_date < today and record.submission_timing != "not_responded":
                     #     record.submission_timing = "not_responded"
-
-
+            try:
+                if not record.reply_date:
+                    
+                    is_overdue = False
+                    if not record.reg_due_date and record.rulebook_compute_date:
+                        is_overdue = record.rulebook_compute_date < today
+                    elif record.reg_due_date:
+                        # Convert today to date for comparison with reg_due_date
+                        today_date = today.date()
+                        is_overdue = record.reg_due_date.date() < today_date
+                    
+                    if is_overdue and record.submission_timing != "not_responded":
+                        record.submission_timing = "not_responded"
                         record.sudo().write({
                             'submission_timing': record.submission_timing,
                         })
-
+                        
                         _logger.critical(
                             f"submission timing updated {record.submission_timing}:  computed date {record.rulebook_compute_date}  today date {today} id: {record.id}")
-
-                    continue  # Skip to the next record if no reply_date is available
+                    
+                    continue
 
             except Exception as e:
                 _logger.critical(
@@ -1389,17 +1401,17 @@ class ReplyLog(models.Model):
         # Check if user is attempting to update either reply content or document
         updating_reply_content = "reply_content" in vals
         updating_document = "document" in vals or "document_filename" in vals
+        one_month_from_today = datetime.today().date() + relativedelta(months=1)
+
 
         for record in self:
             # Date validation checks only when updating reply content or document
-            # if updating_reply_content or updating_document:
-            #     if record.reminder_due_date and record.reminder_due_date.date() > datetime.today().date():
-            #         raise UserError(
-            #             _("You cannot modify the reply or upload documents as the Reminder Due Date is in the future."))
-            #     elif not record.reminder_due_date and record.rulebook_compute_date.date() > datetime.today().date():
-            #         raise UserError(
-            #             _("You cannot modify the reply or upload documents as the Internal Due Date is in the future."))
-
+            if updating_reply_content or updating_document:
+                if (record.reg_due_date and record.reg_due_date.date() < one_month_from_today) or \
+                        (record.rulebook_compute_date and record.rulebook_compute_date.date() < one_month_from_today):
+                    raise AccessError(
+                        _("You cannot modify the reply or upload documents as the Due Date is older than a month.")
+                    )
             # Check if the record has never been submitted before
             is_first_submission = not record.document and not record.reply_content
 
