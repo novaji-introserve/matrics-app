@@ -115,6 +115,19 @@
         </record>
     </data>
 
+    <data>
+        <!-- cron job to clear last internal due date alert -->
+        <record id="clear_last_internal_due_date_sent_" model="ir.cron">
+            <field name="name">Clear last internal due date </field>
+            <field name="model_id" ref="model_reply_log"/>
+            <field name="state">code</field>
+            <field name="code">model.clear_last_internal_due_date_sent()</field>
+            <field name="active" eval="False" />
+            <field name="interval_type">days</field>
+            <field name="interval_number">1</field>
+            <field name="numbercall">-1</field>
+        </record>
+    </data>
 
 
 </odoo>

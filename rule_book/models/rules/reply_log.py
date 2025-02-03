@@ -1526,3 +1526,22 @@ class ReplyLog(models.Model):
         old_attachments = self.env['ir.attachment'].search(domain)
         if old_attachments:
             old_attachments.unlink()
+
+    @api.model
+    def clear_last_internal_due_date_sent(self):
+        # Get today's date at midnight (start of today)
+        today_start = datetime.combine(datetime.today(), datetime.min.time())
+
+        # Search records where last_internal_due_date_sent is today
+        records = self.search([
+            ('last_internal_due_date_sent', '>=', today_start),
+            ('last_internal_due_date_sent', '<', today_start + timedelta(days=1))
+        ])
+
+        # Set 'last_internal_due_date_sent' to None for all matching records
+        records.write({
+            'last_internal_due_date_sent': None
+        })
+
+        # Optionally, log the number of records updated
+        _logger.info(f"Cleared 'last_internal_due_date_sent' (set to NULL) for {len(records)} records where the date is today.") 
