@@ -47,18 +47,23 @@ class alert_rules(models.Model):
     )
     date_created = fields.Datetime(
         string="Created_Date",
-        read_only=True,
-        default=lambda self: self._get_local_time())
-    last_checked = fields.Datetime(string="Last_Checked", read_only=True, default=lambda self: self._get_local_time())
+        read_only=True)
+    last_checked = fields.Datetime(string="Last_Checked", read_only=True)
     
-    
-    def write(self,vals):
-        if 'last_checked' in vals:
-            user_tz = self.env.user.tz or 'Africa/Lagos'
-            local_tz = timezone(user_tz)
-            val['last_checked'] = fields.DateTime.context_timestamp(self, fields.Datetime.from_string(vals['last_checked']))
-            val['date_created'] = fields.DateTime.context_timestamp(self, fields.Datetime.from_string(vals['date_created']))
-    
+   
+
+    @api.model
+    def create(self,vals_list):
+       
+        vals_list['last_checked'] = fields.Datetime.now()
+        
+        if 'date_created' not in vals_list:
+           vals_list['date_created'] = fields.Datetime.now()
+        
+
+            
+        res = super(alert_rules, self).create(vals_list)
+        return res
     
    
     @api.onchange('sql_text')
@@ -301,7 +306,6 @@ class alert_rules(models.Model):
                                                 "alert_rule_id": rule.id,
                                                 "process_id": rule.process_id,
                                                 "risk_rating": rule.risk_rating,
-                                                "date_created": rule.date_created,
                                                 "last_checked": rule.last_checked,
                                                 "email": branch_officer.officer.email,
                                                 "email_cc": "",

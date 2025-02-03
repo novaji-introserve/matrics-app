@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="internal_control.modal" owl="1">
+        <Dialog title="Dialog Title" size="medium" t-att-is-open="state.dialogIsOpen" t-on-closed="closeDialog">
+            <t t-slot="body">
+                <p t-esc="state.dialogMessage" />
+                <input type="text" t-att-value="state.dialogInputValue" t-on-input="updateInputValue" />
+            </t>
+            <t t-slot="footer">
+                <button class="btn btn-secondary" t-on-click="cancelDialog">Cancel</button>
+                <button class="btn btn-primary" t-on-click="confirmDialog">Confirm</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

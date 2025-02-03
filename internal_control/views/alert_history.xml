@@ -11,7 +11,8 @@
                 <field name="risk_rating" />
                 <!-- <field name="narration" /> -->
                 <field name="email" />
-                <field name="date_created" />
+                <field name="last_checked" string="Date"   />
+                <field name="time" string="Time"/>
 
             </tree>
         </field>
