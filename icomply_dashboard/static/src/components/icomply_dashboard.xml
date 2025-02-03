@@ -5,114 +5,109 @@
 
             <div class="row g-5">
                 <div class="col-12">
-                  <div class="col-12 m-0 p-0">
-    <div class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
-        <!-- <h3 class="lead fw-bold me-3">DASHBOARD</h3> -->
-        
-        <div class="flex-grow-1 me-3">
-            <img t-att-src="'/icomply_dashboard/static/src/img/logov.png'" 
-                 alt="Dashboard Icon" 
-                 class="img-fluid" 
-                 style="width: 300; max-height: 70px; object-fit: contain; "/>
-        </div>
-        
-        <div class="ms-3">
-            <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
-                <option value="0" selected="selected">Today</option>
-                <option value="7">7 Days</option>
-                <option value="14">Last 14 Days</option>
-                <option value="30">Last Month</option>
-                <option value="60">Last 2 Months</option>
-            </select>
-        </div>
-    </div>
-</div>
-                    </div>
+                    <div class="col-12 m-0 p-0">
+                        <div
+                            class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
+                            <!-- <h3 class="lead fw-bold me-3">DASHBOARD</h3> -->
 
-                    <div class="row mt-2 mt-md-4">
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('high')" name="'High Risk Transactions'" value="state.kpi.highrisk"
-                            percentage="state.kpi.highriskbypercent" />
-
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('medium')" name="'Medium Risk Transactions'"
-                            value="state.kpi.mediumrisk" percentage="state.kpi.mediumriskbypercent" />
-
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('low')" name="'Low Risk Transactions'" value="state.kpi.lowrisk"
-                            percentage="state.kpi.lowriskpercentage" />
-
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('screened')" name="'Screened Transaction'"
-                            value="state.kpi.totalScreenedTransactionCount" percentage="state.kpi.totalrulespercentage" />
-
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('')" name="'High Risk(%)'"
-                            value="state.kpi.highriskinRespectToTotalTransaction"
-                            percentage="state.kpi.highriskiinRespectToTotalTransactionPercentage" />
-
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('')" name="'Medium Risk(%)'"
-                            value="state.kpi.mediumriskinRespectToTotalTransaction"
-                            percentage="state.kpi.mediumriskiinRespectToTotalTransactionPercentage" />
-
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('')" name="'Low Risk(%)'"
-                            value="state.kpi.lowriskinRespectToTotalTransaction"
-                            percentage="state.kpi.lowriskiinRespectToTotalTransactionPercent"/>
-
-                        <KpiCard t-on-click="() => displayTransactionsByRisk('process')" name="'Total Processes'"
-                            value="state.kpi.alertrulestotal"
-                            percentage=""/>
-                    </div>
-
-                    <div class="row mt-3">
-
-                        <div class="col-md-4 ">
-                            <div
-                                class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                                <h3 class="lead fw-bold text-primary">Transaction Risk Ratings </h3>
-                                <button class="btn btn-primary">
-                                    <i class="fa fa-angle-right"></i>
-                                </button>
+                            <div class="flex-grow-1 me-3">
+                                <img t-att-src="'/icomply_dashboard/static/src/img/logov.png'" alt="Dashboard Icon"
+                                    class="img-fluid" style="width: 300; max-height: 70px; object-fit: contain; " />
                             </div>
 
-                            <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                                <ChartRenderer datepicked="state.datepicked"
-                                    current_datepicked="state.current_datepicked" config="state.riskratingchart" type="'bar'"
-                                    title="'Rating'" />
+                            <div class="ms-3">
+                                <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
+                                    <option value="0" selected="selected">current</option>
+                                    <option value="7">7 Days</option>
+                                    <option value="14">last 14 Days</option>
+                                    <option value="30">last month</option>
+                                    <option value="60">2 months</option>
+                                </select>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="col-md-4 ">
-                            <div
-                                class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                                <h3 class="lead fw-bold text-primary">Customers Risk Rating</h3>
-                                <button class="btn btn-primary">
-                                    <i class="fa fa-angle-right"></i>
-                                </button>
-                            </div>
-                            <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                                <ChartRenderer datepicked="state.datepicked"
-                                    current_datepicked="state.current_datepicked" config="state.customerchart"
-                                    type="'bar'" title="'Customer'" />
-                            </div>
-                        </div>
-                        <div class="col-md-4 ">
-                            <div
-                                class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                                <h3 class="lead fw-bold text-primary">Transaction State</h3>
-                                <button class="btn btn-primary">
-                                    <i class="fa fa-angle-right"></i>
-                                </button>
-                            </div>
-                            <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                                <ChartRenderer datepicked="state.datepicked"
-                                    current_datepicked="state.current_datepicked" config="state.frequencychart"
-                                    type="'pie'" title="'State'" />
-                            </div>
+                <div class="row mt-2 mt-md-4 m-auto">
+                    <KpiCard t-on-click="() => displayTransactionsByRisk('high')" name="'High Risk Tran.'"
+                        value="state.kpi.highrisk" percentage="state.kpi.highriskbypercent" />
+
+                    <KpiCard t-on-click="() => displayTransactionsByRisk('medium')" name="'Medium Risk Tran.'"
+                        value="state.kpi.mediumrisk" percentage="state.kpi.mediumriskbypercent" />
+
+                    <KpiCard t-on-click="() => displayTransactionsByRisk('low')" name="'Low Risk Tran.'"
+                        value="state.kpi.lowrisk" percentage="state.kpi.lowriskpercentage" />
+
+                    <KpiCard t-on-click="() => displayTransactionsByRisk('screened')" name="'Screened Transaction'"
+                        value="state.kpi.totalScreenedTransactionCount" percentage="state.kpi.totalrulespercentage" />
+
+                    <KpiCard t-on-click="() => displayTransactionsByRisk('')" name="'High Risk(%)'"
+                        value="state.kpi.highriskinRespectToTotalTransaction"
+                        percentage="state.kpi.highriskiinRespectToTotalTransactionPercentage" />
+
+                    <KpiCard t-on-click="() => displayTransactionsByRisk('')" name="'Medium Risk(%)'"
+                        value="state.kpi.mediumriskinRespectToTotalTransaction"
+                        percentage="state.kpi.mediumriskiinRespectToTotalTransactionPercentage" />
+
+                    <KpiCard t-on-click="() => displayTransactionsByRisk('')" name="'Low Risk(%)'"
+                        value="state.kpi.lowriskinRespectToTotalTransaction"
+                        percentage="state.kpi.lowriskiinRespectToTotalTransactionPercent" />
+
+                    <KpiCard t-on-click="() => displayTransactionsByRisk('process')" name="'Total Processes'"
+                        value="state.kpi.alertrulestotal" percentage="" />
+                </div>
+
+                <div class="row mt-3 m-auto">
+
+                    <div class="col-md-4 ">
+                        <div
+                            class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                            <h3 class="lead fw-bold text-primary">Transaction Risk Ratings </h3>
+                            <button class="btn btn-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
                         </div>
 
+                        <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"
+                                config="state.riskratingchart" type="'bar'" title="'Rating'" />
+                        </div>
                     </div>
 
+                    <div class="col-md-4 ">
+                        <div
+                            class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                            <h3 class="lead fw-bold text-primary">Customers Risk Rating</h3>
+                            <button class="btn btn-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"
+                                config="state.customerchart" type="'bar'" title="'Customer'" />
+                        </div>
+                    </div>
+                    <div class="col-md-4 ">
+                        <div
+                            class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                            <h3 class="lead fw-bold text-primary">Transaction State</h3>
+                            <button class="btn btn-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"
+                                config="state.frequencychart" type="'pie'" title="'State'" />
+                        </div>
+                    </div>
 
                 </div>
 
 
             </div>
+
+
+        </div>
 
 
 
