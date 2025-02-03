@@ -412,6 +412,13 @@ class ReplyLog(models.Model):
         help="Select the risk category for this rulebook.",
         default="Compliance Risk"
     )
+    
+    next_due_date_computed = fields.Boolean(
+        string='Next Due Date Computed',
+        default=False,
+        help='Flag to ensure next due date is computed only once on the exact due date'
+    )
+
     # can_archive = fields.Boolean(store=False)
     
     def toggle_active(self):
@@ -700,10 +707,7 @@ class ReplyLog(models.Model):
             _logger.critical(
                 f"reply datetime {record.reply_date}:  computed date {record.rulebook_compute_date}  today date {today} id of record {record.id}")
 
-                    # if not record.reg_due_date and record.rulebook_compute_date and record.rulebook_compute_date < today and record.submission_timing != "not_responded":
-                    #     record.submission_timing = "not_responded"
-                    # elif record.reg_due_date and record.reg_due_date < today and record.submission_timing != "not_responded":
-                    #     record.submission_timing = "not_responded"
+                  
             try:
                 if not record.reply_date:
                     
@@ -940,42 +944,30 @@ class ReplyLog(models.Model):
     def check_rulebook_and_update_due_date(self):
         """Check rulebooks with today's regulatory date and update next due date."""
 
-        today = datetime.now().date()
-
-        _logger.critical(
-            f"rulebooks with today's regulatory date  {today}, plus one day {today + timedelta(days=1)}")
-
         today = datetime.now().replace(microsecond=0)
 
-        # .astimezone(
-        #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
 
         # Perform the search
-        rulebooks = self.env["reply.log"].search(
-            [
-                ("rulebook_id.is_recurring", "=", True)
-            ]
-        )
+        rulebooks = self.env["reply.log"].search([
+            ("rulebook_id.is_recurring", "=", True),
+            # Only process records not yet computed
+            ('next_due_date_computed', '=', False)
+        ])
         _logger.critical(
             f"Rulebooks to update {rulebooks}.., today;s timedate {today}..")
 
         for record in rulebooks:
             try:
-                rulebook_model = record.rulebook_id
-                _logger.critical(
-                    f"To Update rulebook {record.id}:,  type of return : {re.sub(r'<[^>]+>', '', rulebook_model.type_of_return)} frequency : {rulebook_model.frequency_type}")
+                # Check if today exactly matches due date
+                if (record.reg_due_date and today.date() == record.reg_due_date.date()) or \
+                (not record.reg_due_date and record.rulebook_compute_date and today.date() == record.rulebook_compute_date.date()):
 
-                rulebook_compute_date = (record.rulebook_compute_date)
-                # Check if the time difference is exactly 5 minutes (or within 1 second tolerance for precision)
-                if record.reg_due_date and today > record.reg_due_date:
-                    # if abs((record.reg_due_date - today).total_seconds()) <= 250:
-                        record._compute_next_due_date()
-                        _logger.critical(f"record updated {record.rulebook_id}")
-                elif not record.reg_due_date and rulebook_compute_date and today > rulebook_compute_date :
-                    # if abs((rulebook_compute_date - today).total_seconds()) <= 250:
-                        record._compute_next_due_date()
-                        _logger.critical(f"record updated {record.rulebook_id}")
+                    record._compute_next_due_date()
+                    record.sudo().write({
+                        'next_due_date_computed': True
+                    })
 
+                    _logger.critical(f"Record updated: {record.rulebook_id}")
 
             except Exception as e:
                 _logger.critical(f"Failed to update rulebook {record.id}: {e}")
