@@ -12,6 +12,7 @@ import { session } from "@web/session"
 export class IcomplyDashboard extends Component {
   setup() {
     this.api = useService("orm");
+    this.rpc = useService("rpc");
     this.navigate = useService("action");
     this.state = useState({
       kpi: {
@@ -30,11 +31,13 @@ export class IcomplyDashboard extends Component {
       },
       datepicked: 0,
       branches_id: [],
+      cc:false,
+      chartDomain: [],
       current_datepicked: null,
       previous_datepicked: null,
       riskratingchart: null,
       customerchart: null,
-      frequencychart: null,
+      transationstatechart: null,
     });
 
     onMounted(async () => {
@@ -42,18 +45,19 @@ export class IcomplyDashboard extends Component {
     });
     
     onWillStart(async () => {
+       
       await this.getcurrentuser();
       this.filterByDate();
     });
   }
 
   async getcurrentuser() {
-    const result = await this.api.searchRead(
-      "res.users",
-      [["id", "=", session.uid]],
-      ["branches_id"]
-    );
-    this.state.branches_id = result[0].branches_id;
+
+    let result = await this.rpc("/dashboard/user");
+    this.state.branches_id = result.branch;
+    this.state.cc = result.group
+
+    
   }
 
   async fetchTransactionCounts(domain) {
@@ -106,10 +110,10 @@ export class IcomplyDashboard extends Component {
     this.state.previous_datepicked = previousDate.format("YYYY-MM-DD"); // YYYY-MM-DD format
 
     await this.fetchcasestatus(this.state.branches_id);
+    
   };
 
   fetchcasestatus = async (ids) => {
-
 
     try {
       const dateFilter =
@@ -118,8 +122,10 @@ export class IcomplyDashboard extends Component {
           : [];
 
       const branchFilter =
-        ids.length > 0 ? [["branch_id", "in", Array.from(ids)]] : [];
+        ids.length > 0  && this.state.cc == false ? [["branch_id", "in", Array.from(ids)]] : [];
       const domain = [...dateFilter, ...branchFilter];
+
+      this.state.chartDomain = domain
 
     
 
@@ -176,13 +182,13 @@ export class IcomplyDashboard extends Component {
       this.state.datepicked > 0
         ? [
             ["created_at", ">=", this.state.current_datepicked],
-            ["branch_id", "in", Array.from(this.state.branches_id)],
+            [this.state.cc == false && "branch_id", "in", Array.from(this.state.branches_id)],
             riskLevel == "screened"
               ? ["rule_id", "!=", null]
               : ["risk_level", "=", riskLevel],
           ]
         : [
-            ["branch_id", "in", Array.from(this.state.branches_id)],
+            [this.state.cc == false && "branch_id", "in", Array.from(this.state.branches_id)],
             riskLevel == "screened"
               ? ["rule_id", "!=", null]
               : ["risk_level", "=", riskLevel],
@@ -199,9 +205,9 @@ export class IcomplyDashboard extends Component {
           this.state.datepicked > 0
             ? [
                 ["created_at", ">=", this.state.current_datepicked],
-                ["branch_id", "in", Array.from(this.state.branches_id)],
+                [this.state.cc == false && "branch_id", "in", Array.from(this.state.branches_id)],
               ]
-            : [["branch_id", "in", Array.from(this.state.branches_id)]],
+            : [[this.state.cc == false && "branch_id", "in", Array.from(this.state.branches_id)]],
         views: [
           [false, "tree"],
           [false, "form"],
@@ -241,13 +247,9 @@ export class IcomplyDashboard extends Component {
 
   // Transaction Risk Rating Chart
   getTransactionRiskRatingChart = async () => {
-    const domain =
-      this.state.datepicked > 0
-        ? [
-            ["date_created", ">=", this.state.current_datepicked],
-            ["branch_id", "in", Array.from(this.state.branches_id)],
-          ]
-        : [["branch_id", "in", Array.from(this.state.branches_id)]];
+   
+     let domain = this.state.chartDomain;
+
 
     const { labels, counts } = await this.getChartData(
       "res.customer.transaction",
@@ -262,14 +264,9 @@ export class IcomplyDashboard extends Component {
 
   // Customer Risk Rating Chart
   getCustomerRatingChart = async () => {
-    const domain =
-      this.state.datepicked > 0
-        ? [
-            ["date_created", ">=", this.state.current_datepicked],
-            ["branch_id", "in", Array.from(this.state.branches_id)],
-          ]
-        : [["branch_id", "in", Array.from(this.state.branches_id)]];
-
+    
+    let domain = this.state.chartDomain
+    
     const { labels, counts } = await this.getChartData(
       "res.partner",
       "risk_level",
@@ -283,20 +280,14 @@ export class IcomplyDashboard extends Component {
 
   // Transaction State Chart
   getTransactionStateChart = async () => {
-    const domain =
-      this.state.datepicked > 0
-        ? [
-            ["date_created", ">=", this.state.current_datepicked],
-            ["branch_id", "in", Array.from(this.state.branches_id)],
-          ]
-        : [["branch_id", "in", Array.from(this.state.branches_id)]];
+    let domain = this.state.chartDomain;
 
     const { labels, counts } = await this.getChartData(
       "res.customer.transaction",
       "state",
       domain
     );
-    this.state.frequencychart = {
+    this.state.transationstatechart = {
       labels,
       datasets: [
         {

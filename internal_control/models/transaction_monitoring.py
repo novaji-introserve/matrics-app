@@ -37,6 +37,8 @@ class TransactionMonitoring(models.Model):
     def open_all_transactions_today(self):
         today = fields.Date.today()
         
+       
+        
         # Get NGN currency ID dynamically
         ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
         if not ngn_currency:

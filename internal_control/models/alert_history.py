@@ -21,7 +21,37 @@ class alert_history(models.Model):
     email_cc = fields.Char()
     time = fields.Char(compute='get_time', store=False)
     
-    
+    user_in_emails = fields.Boolean(compute='_compute_user_in_emails', search='_search_user_in_emails')
+
+    @api.depends('email', 'email_cc')
+    def _compute_user_in_emails(self):
+        for rec in self:
+            if self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer'):  # Replace with your group's XML ID
+                rec.user_in_emails = True  # Chief Compliance Officer sees all
+            else:
+                current_user_email = self.env.user.email
+                rec.user_in_emails = current_user_email and (current_user_email in (rec.email or "").split(',')) or (current_user_email and current_user_email in (rec.email_cc or "").split(',')) or False
+
+
+    @api.model
+    def _search_user_in_emails(self, operator, value):
+        if self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer'):
+            return [('id', '!=', False)] # Return all records for CCO.
+
+        if operator == '=':
+            if value: # True
+                domain = ['|', ('email', 'ilike', self.env.user.email), ('email_cc', 'ilike', self.env.user.email)]
+            else: # False
+                domain = ['&', ('email', 'not ilike', self.env.user.email), ('email_cc', 'not ilike', self.env.user.email)]
+            return domain
+        elif operator == '!=':
+            if value: # True
+                domain = ['&', ('email', 'not ilike', self.env.user.email), ('email_cc', 'not ilike', self.env.user.email)]
+            else: # False
+                domain = ['|', ('email', 'ilike', self.env.user.email), ('email_cc', 'ilike', self.env.user.email)]
+            return domain
+
+        return [] # If operator is not = or != return empty domain.
     @api.onchange("last_checked")
     def get_time(self):
         for record in self:

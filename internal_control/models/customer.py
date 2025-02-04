@@ -22,8 +22,42 @@ class Customer(models.Model):
     identification_issue_date = fields.Date(string='identification Issue Date', index=True, tracking=True)
     town_id = fields.Many2one(
     comodel_name='res.partner.town', string='Town', index=True)
+    user_in_branch = fields.Boolean(compute='_compute_user_in_branch')
     
- 
+    @api.depends('branch_id')
+    def _compute_user_in_branch(self):
+        for rec in self:
+            if self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer'):  # Replace with your group's XML ID
+                rec.user_in_branch = True  # Chief Compliance Officer sees all
+            else:
+                branches_id = self.env.user.branches_id
+                rec.user_in_branch = any(each.id == rec.branch_id.id for each in branches_id)
+
+    
+    # @api.model
+    # def _search_user_in_branch(self, operator, value):
+    #     if self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer'):
+    #         return [('id', '!=', False)]  # CCO sees all
+
+    #     user_branches = self.env.user.branches_id  # Get user's branches ONCE
+    #     if not user_branches:  # Handle case where user has no branches
+    #         if operator == '=' and value:
+    #             return [('id', '=', False)]  # No branches, so no matches for True
+    #         elif operator == '!=' and value:
+    #             return [('id', '!=', False)] # No branches, so all matches for False
+    #         return []  # Return empty domain for other cases (no branches)
+
+    #     if operator == '=':
+    #         if value:  # True: User is in the customer's branch
+    #             return [('branch_id', 'in', user_branches.ids)] # Use ids
+    #         else:  # False: User is NOT in the customer's branch
+    #             return [('branch_id', 'not in', user_branches.ids)] # use ids
+    #     elif operator == '!=':
+    #         if value:  # True: User is NOT in the customer's branch
+    #             return [('branch_id', 'not in', user_branches.ids)] # use ids
+    #         else:  # False: User IS in the customer's branch
+    #             return [('branch_id', 'in', user_branches.ids)] # use ids
+    #     return []  # Other operators not supported
    
 
 
@@ -34,7 +68,7 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('create_uid','=',False)],
+            'domain': [('create_uid','=',False), ('user_in_branch', '=', True)],
             'context': {'search_default_group_branch': 1}
         }
             # 'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('create_uid','=',False)],

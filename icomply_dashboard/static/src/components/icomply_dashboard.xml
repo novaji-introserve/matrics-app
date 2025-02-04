@@ -69,7 +69,7 @@
                         </div>
 
                         <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"
+                            <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" current_datepicked="state.current_datepicked"
                                 config="state.riskratingchart" type="'bar'" title="'Rating'" />
                         </div>
                     </div>
@@ -83,8 +83,8 @@
                             </button>
                         </div>
                         <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"
-                                config="state.customerchart" type="'bar'" title="'Customer'" />
+                            <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" current_datepicked="state.current_datepicked"
+                                config="state.customerchart" type="'bar'" title="'Customer'"  />
                         </div>
                     </div>
                     <div class="col-md-4 ">
@@ -96,8 +96,8 @@
                             </button>
                         </div>
                         <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                            <ChartRenderer datepicked="state.datepicked" current_datepicked="state.current_datepicked"
-                                config="state.frequencychart" type="'pie'" title="'State'" />
+                            <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" current_datepicked="state.current_datepicked"
+                                config="state.transationstatechart" type="'pie'" title="'State'" />
                         </div>
                     </div>
 
