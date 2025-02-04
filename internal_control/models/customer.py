@@ -22,17 +22,6 @@ class Customer(models.Model):
     identification_issue_date = fields.Date(string='identification Issue Date', index=True, tracking=True)
     town_id = fields.Many2one(
     comodel_name='res.partner.town', string='Town', index=True)
-    user_in_branch = fields.Boolean(compute='_compute_user_in_branch')
-    
-    @api.depends('branch_id')
-    def _compute_user_in_branch(self):
-        for rec in self:
-            if self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer'):  # Replace with your group's XML ID
-                rec.user_in_branch = True  # Chief Compliance Officer sees all
-            else:
-                branches_id = self.env.user.branches_id
-                rec.user_in_branch = any(each.id == rec.branch_id.id for each in branches_id)
-
     
     # @api.model
     # def _search_user_in_branch(self, operator, value):

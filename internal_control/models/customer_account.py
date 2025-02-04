@@ -23,6 +23,19 @@ class CustomerAccount(models.Model):
     source_account_id = fields.Char(string="Source Account ID", index=True)
     Status = fields.Boolean(default=False)
     accounttitle = fields.Char(string="Account Title")
+    
+    user_in_branch = fields.Boolean(compute='_compute_user_in_branch')
+    
+    @api.depends('branch_id')
+    def _compute_user_in_branch(self):
+        for rec in self:
+            if self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer'):  # Replace with your group's XML ID
+                rec.user_in_branch = True  # Chief Compliance Officer sees all
+            else:
+                branches_id = self.env.user.branches_id
+                rec.user_in_branch = any(each.id == rec.branch_id.id for each in branches_id)
+
+    
 
     @api.model
     def open_accounts_tier_1(self):
