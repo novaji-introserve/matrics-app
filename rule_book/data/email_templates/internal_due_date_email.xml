@@ -65,7 +65,7 @@
                     View Rulebook Details</a>
         </p>
         <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can upload
-                            the document at the following link: <a t-attf-href="#{object.data()['upload_link']}" style="display: inline-block;  color: #004225; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
+                            the document at the following link: <a t-attf-href="#{object.data()['record_link']}" style="display: inline-block;  color: #004225; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
                             Document</a>
         </p>
 

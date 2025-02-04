@@ -549,13 +549,10 @@ class ReplyLog(models.Model):
             }
 
             self.set_global_data(global_data)
-
+            _logger.critical(f"escalation test got here")
             if record.rulebook_status == 'submitted' and record.first_line_escalation:
                 self.trigger_escalation_alert(record)
 
-            # if 'document' in vals:
-            #     # Clean old attachments before write
-            #     self._clean_old_attachments(self.id)
 
         return result
 
@@ -565,6 +562,7 @@ class ReplyLog(models.Model):
             "rule_book.email_template_rulebook_log_notification_")
         if template:
             template.sudo().send_mail(report.id, force_send=True)
+            _logger.critical(f"Report notification sent to escalation officer! ")
         else:
             _logger.critical(
                 "Email template 'rule_book.email_template_rulebook_log_notification_' not found.")
@@ -641,31 +639,7 @@ class ReplyLog(models.Model):
             today = datetime.now().replace(microsecond=0)
 
             try:
-                # if not record.reply_date:
-                    # If there's no reply date and the due date has passed, mark as not responded
-                    # if (
-                    #     not record.reply_date and record.rulebook_compute_date
-                    #     and record.rulebook_compute_date < today
-                    # ):
-                    #     record.submission_timing = "not_responded"
-                    # continue
-                # Convert reply_date to a datetime object
-                # reply_datetime = (record.reply_date)
-                # # Convert rulebook_compute_date to a datetime object
-                # internal_due_date = (record.rulebook_compute_date)
-                # reg_due_date = (record.reg_due_date)
-                # _logger.critical(
-                #     f" internal date {internal_due_date}  .... reply date {reply_datetime}")
-
-                # # Compare the reply datetime with the computed rulebook datetime
-                # if reply_datetime and reply_datetime > reg_due_date:
-                #     record.submission_timing = "late"
-                # elif reply_datetime and reply_datetime < internal_due_date:
-                #     record.submission_timing = "early"
-                # elif reply_datetime and reply_datetime > internal_due_date:
-                #     record.submission_timing = "after_internal"
-                # else:
-                #     record.submission_timing = "pending"
+               
                 reply_datetime = record.reply_date
                 internal_due_date = record.rulebook_compute_date
                 reg_due_date = record.reg_due_date
@@ -703,11 +677,7 @@ class ReplyLog(models.Model):
         _logger.critical(
             f"Cron job to compute the submission timing for all rulebook logs started NOW {today} rulebook logs found {rulebook_logs}")
 
-        for record in rulebook_logs:
-            _logger.critical(
-                f"reply datetime {record.reply_date}:  computed date {record.rulebook_compute_date}  today date {today} id of record {record.id}")
-
-                  
+        for record in rulebook_logs:                  
             try:
                 if not record.reply_date:
                     
@@ -845,12 +815,12 @@ class ReplyLog(models.Model):
                     })
 
                 # Optionally, compute escalation date and due date for the new record
-                new_record._compute_escalation_date()
-                new_record._compute_reg_due_date()
-                new_record._compute_reminder_due_date()
+                    new_record._compute_escalation_date()
+                    new_record._compute_reg_due_date()
+                    new_record._compute_reminder_due_date()
 
-                _logger.critical(
-                    f"Record {new_record}: Computed next due date as {next_compute_date}.")
+                    _logger.critical(
+                        f"Record {new_record}: Computed next due date as {next_compute_date}.")
 
             except Exception as e:
                 _logger.critical(
@@ -1026,20 +996,14 @@ class ReplyLog(models.Model):
             ('rulebook_status', '!=', 'completed'),
         ])
 
-        _logger.critical(
-            f"INcomplete Rulebooks LOGS IDS {incomplete_rulebook_logs}")
 
         for rulebook in incomplete_rulebook_logs:
-            _logger.critical(
-                f"Incomplete Rulebook logs to process type of return : {rulebook}  compute_date {rulebook.rulebook_compute_date}.. today {today}... due date {rulebook.reg_due_date}")
+            
             try:
 
                 # Reminder Email: Check if reg_due_date matches today
                 computed_date = rulebook.rulebook_compute_date
                 time_diff = abs((computed_date - today).total_seconds())
-
-                _logger.critical(
-                    f"Incomplete Rulebook logs to process type of return : {rulebook}  compute_date {rulebook.rulebook_compute_date}.. today {today}... time difference date {time_diff}")
 
                 # Internal Email: Check if Internal_due_date matches today
 
@@ -1431,7 +1395,9 @@ class ReplyLog(models.Model):
         # Check if user is attempting to update either reply content or document
         updating_reply_content = "reply_content" in vals
         updating_document = "document" in vals or "document_filename" in vals
-        one_month_from_today = datetime.today().date() + relativedelta(months=1)
+        # one_month_from_today = datetime.today().date() + relativedelta(months=1)
+        one_month_from_today = datetime.today().date() - relativedelta(months=1)
+
 
 
         for record in self:
