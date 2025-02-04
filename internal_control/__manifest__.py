@@ -51,6 +51,7 @@
      
         # cron job
         'data/cron_job.xml',
+        'data/schedule/account_trans_metrics.xml',
     ],
 
     'images': [

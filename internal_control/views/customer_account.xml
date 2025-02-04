@@ -72,8 +72,8 @@
                 <field name="bkbalance" string="Bk Balance" optional="hide"/>
                 <field name="unclearedbal" string="Uncleared Balance" optional="hide"/>
                 <field name="holdbal" string="Hold Balance" optional="hide"/>
-                <field name="totdebit" string="Total Debit" optional="show"/>
-                <field name="totcredit" string="Total Credit" optional="show"/>
+                <field name="totdebit" string="Total Debit" optional="hide"/>
+                <field name="totcredit" string="Total Credit" optional="hide"/>
                 <field name="last_month_balance" string="Last Month Balance" optional="hide"/>
                 <field name="lien" string="Lien" optional="hide"/>
                 <field name="source_account_id" string="Source Account ID" optional="hide"/>
@@ -90,12 +90,12 @@
 
         <field name="arch" type="xml">
             <!-- Add "Update Statistics" button inside the header -->
-            <xpath expr="//header" position="inside">
+            <!-- <xpath expr="//header" position="inside">
                 <button name="update_account_statistics"
                         string="Update Statistics"
                         type="object"
                         class="oe_highlight"/>
-            </xpath>
+            </xpath>  -->
 
             <!-- Replace the original account_name label -->
             <xpath expr="//label[@for='account_name']" position="replace">
@@ -108,8 +108,10 @@
             </xpath>
             
             <xpath expr="//field[@name='ledger_id']" position="replace" />
+            <xpath expr="//field[@name='customer_id']" position="replace" />
             <xpath expr="//field[@name='risk_assessment']" position="replace" />
-
+            <xpath expr="//sheet//button[@name='get_risk_level']" position="replace" />
+            <xpath expr="//sheet//button[@name='get_risk_score']" position="replace" />
             <!-- Add new fields inside the sheet -->
             <xpath expr="//sheet" position="inside">
                 <group string="Additional Details">
