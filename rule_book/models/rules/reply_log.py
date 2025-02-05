@@ -414,10 +414,13 @@ class ReplyLog(models.Model):
     )
 
     next_due_date_computed = fields.Boolean(
-        string='Next Due Date Computed',
+        string='Internal Due Date Processed',
         default=False,
-        help='Flag to ensure next due date is computed only once on the exact due date'
+        help='Flag to ensure next internal due date is computed only once on the exact due date'
     )
+    
+    reg_due_date_processed = fields.Boolean("Reg Due Date Processed", default=False)
+
 
     # can_archive = fields.Boolean(store=False)
 
@@ -516,9 +519,9 @@ class ReplyLog(models.Model):
 
         # Iterate through the records being updated
         for record in self:
-            rulebook = request.env["rulebook"].sudo().browse(
+            rulebook = self.env["rulebook"].sudo().browse(
                 int(record.rulebook_id))
-            url = request.env["rulebook"]._record_link(
+            url = self.env["rulebook"]._record_link(
                 record.id, model_name='reply.log')
 
             now = datetime.now()
@@ -663,47 +666,7 @@ class ReplyLog(models.Model):
                 _logger.critical(
                     f"CRITICAL Error computing submission timing for record {record.id}: {e}")
 
-    # @api.model
-    # def _update_submission_timing(self):
-    #     """Cron job to compute the submission timing for all rulebook logs."""
-    #     # today = fields.Datetime.now()
-    #     # today = datetime.now().replace(microsecond=0)
-    #     today = datetime.combine(datetime.today(), datetime.min.time())
-
-    #     rulebook_logs = self.env['reply.log'].search([
-    #         ('reply_date', '=', False)
-    #     ])
-
-    #     _logger.critical(
-    #         f"Cron job to compute the submission timing for all rulebook logs started NOW {today} rulebook logs found {rulebook_logs}")
-
-    #     for record in rulebook_logs:
-    #         try:
-    #             if not record.reply_date:
-
-    #                 is_overdue = False
-    #                 if not record.reg_due_date and record.rulebook_compute_date:
-    #                     is_overdue = record.rulebook_compute_date < today
-    #                 elif record.reg_due_date:
-    #                     # Convert today to date for comparison with reg_due_date
-    #                     today_date = today.date()
-    #                     is_overdue = record.reg_due_date.date() < today_date
-
-    #                 if is_overdue and record.submission_timing != "not_responded":
-    #                     record.submission_timing = "not_responded"
-    #                     record.sudo().write({
-    #                         'submission_timing': record.submission_timing,
-    #                     })
-
-    #                     _logger.critical(
-    #                         f"submission timing updated {record.submission_timing}:  computed date {record.rulebook_compute_date}  today date {today} id: {record.id}")
-
-    #                 continue
-
-    #         except Exception as e:
-    #             _logger.critical(
-    #                 f"CRITICAL Error computing submission timing for record {record.id}: {e}")
-
+   
     @api.model
     def _update_submission_timing(self):
         today = datetime.now().replace(microsecond=0)
@@ -744,6 +707,7 @@ class ReplyLog(models.Model):
                 _logger.critical(
                     f"CRITICAL Error computing submission timing for record {record.id}: {str(e)}")
 
+    
     def _compute_next_due_date(self):
         _logger.critical("Updating next due date...")
 
@@ -894,7 +858,7 @@ class ReplyLog(models.Model):
                     **delta_args
                 )
                 _logger.critical(
-                    f"writing NEW escalation date Here{record.escalation_date}")
+                    f"writing NEW escalation date Here .. {record.escalation_date}")
 
                 record.sudo().write({
                     'escalation_date': record.escalation_date,
@@ -922,7 +886,7 @@ class ReplyLog(models.Model):
                         **delta_args
                     )
                     _logger.critical(
-                        f"writing NEW Regulatory Due date HERE {record.next_compute_date} value is {record.reg_due_date_value}")
+                        f"writing NEW Regulatory Due date HERE.. {record.next_compute_date} value is {record.reg_due_date_value}")
                     record.sudo().write({
                         'reg_due_date': record.reg_due_date,
                     })
@@ -949,7 +913,7 @@ class ReplyLog(models.Model):
                         **delta_args
                     )
                     _logger.critical(
-                        f"writing NEW Reminder Due date  HERE{record.reminder_due_date}")
+                        f"writing NEW Reminder Due date HERE ..{record.reminder_due_date}")
                     record.sudo().write({
                         'reminder_due_date': record.reminder_due_date,
                     })
@@ -958,40 +922,140 @@ class ReplyLog(models.Model):
                 # If computed_date is not available, set reg_due_date to False or handle accordingly
                 record.reminder_due_date = None
 
+    # @api.model
+    # def check_rulebook_and_update_due_date(self):
+    #     """Check rulebooks with today's or past regulatory dates and update next due date."""
+
+    #     today = datetime.now().replace(microsecond=0)
+
+    #     # Perform the search for unprocessed records with due dates <= today
+    #     rulebooks = self.env["reply.log"].search([
+    #         ("rulebook_id.is_recurring", "=", True),
+    #         ("next_due_date_computed", "=", False),
+    #         "|",
+    #         "&",
+    #         ("reg_due_date", "!=", False),
+    #         ("reg_due_date", "<=", today.date()),
+    #         "&",
+    #         ("reg_due_date", "=", False),
+    #         ("rulebook_compute_date", "<=", today.date())
+    #     ])
+
+    #     _logger.critical(
+    #         f"Rulebooks to update {rulebooks}.., today's datetime {today}..")
+
+    #     for record in rulebooks:
+    #         try:
+    #             record._compute_next_due_date()
+    #             record.sudo().write({
+    #                 'next_due_date_computed': True
+    #             })
+
+    #             _logger.critical(f"Record updated: {record.rulebook_id}")
+
+    #         except Exception as e:
+    #             _logger.critical(f"Failed to update rulebook {record.id}: {e}")
+
+    # @api.model
+    # def check_rulebook_and_update_due_date(self):
+    #     """Check rulebooks with today's or past regulatory dates and update next due date."""
+    #     today = datetime.now().replace(microsecond=0)
+
+    #     # Search for records that haven't been processed yet
+    #     rulebooks = self.env["reply.log"].search([
+    #         ("rulebook_id.is_recurring", "=", True),
+    #         "|",
+    #         "&",
+    #         ("reg_due_date", "!=", False),
+    #         ("reg_due_date", "<=", today),
+    #         "&",
+    #         ("reg_due_date", "=", False),
+    #         ("rulebook_compute_date", "<=", today)
+    #     ])
+
+    #     _logger.critical(
+    #         f"Rulebooks to update {rulebooks}.., today's datetime {today}..")
+
+    #     records_to_update = []
+
+    #     for record in rulebooks:
+    #         try:
+    #             # Check if we should process reg_due_date
+    #             if record.reg_due_date and not record.reg_due_date_processed and record.reg_due_date <= today:
+    #                 record._compute_next_due_date()
+    #                 records_to_update.append((record.id, {
+    #                     'next_due_date_computed': True,
+    #                     'reg_due_date_processed': True
+    #                 }))
+    #                 _logger.critical(f"Record updated: {record.rulebook_id} - Reg Due Date")
+
+    #             # Check if we should process rulebook_compute_date
+    #             elif not record.reg_due_date and record.rulebook_compute_date and not record.next_due_date_computed and record.rulebook_compute_date <= today:
+    #                 record._compute_next_due_date()
+    #                 records_to_update.append((record.id, {
+    #                     'next_due_date_computed': True,
+    #                 }))
+    #                 _logger.critical(f"Record updated: {record.rulebook_id} - Compute Date")
+    #         except Exception as e:
+    #             _logger.critical(f"Failed to update rulebook {record.id}: {e}")
+
+    #     # Batch write
+    #     if records_to_update:
+    #         self.env['reply.log'].browse([r[0] for r in records_to_update]).sudo().write({
+    #             id: vals for id, vals in records_to_update
+    #         })
+    
     @api.model
     def check_rulebook_and_update_due_date(self):
-        """Check rulebooks with today's or past regulatory dates and update next due date."""
-
         today = datetime.now().replace(microsecond=0)
 
-        # Perform the search for unprocessed records with due dates <= today
         rulebooks = self.env["reply.log"].search([
             ("rulebook_id.is_recurring", "=", True),
-            ("next_due_date_computed", "=", False),
             "|",
             "&",
             ("reg_due_date", "!=", False),
-            ("reg_due_date", "<=", today.date()),
+            ("reg_due_date", "<=", today),
             "&",
             ("reg_due_date", "=", False),
-            ("rulebook_compute_date", "<=", today.date())
+            ("rulebook_compute_date", "<=", today)
         ])
 
         _logger.critical(
             f"Rulebooks to update {rulebooks}.., today's datetime {today}..")
 
+        records_to_update = []
+
         for record in rulebooks:
             try:
-                record._compute_next_due_date()
-                record.sudo().write({
-                    'next_due_date_computed': True
-                })
+                if record.reg_due_date and not record.reg_due_date_processed and record.reg_due_date <= today:
+                    # Add context here
+                    record.with_context(
+                        allow_auto_update=True)._compute_next_due_date()
+                    records_to_update.append((record.id, {
+                        'next_due_date_computed': True,
+                        'reg_due_date_processed': True
+                    }))
+                    _logger.critical(
+                        f"Record updated: {record.rulebook_id} - Reg Due Date")
 
-                _logger.critical(f"Record updated: {record.rulebook_id}")
-
+                elif not record.reg_due_date and record.rulebook_compute_date and not record.next_due_date_computed and record.rulebook_compute_date <= today:
+                    # Add context here
+                    record.with_context(
+                        allow_auto_update=True)._compute_next_due_date()
+                    records_to_update.append((record.id, {
+                        'next_due_date_computed': True,
+                    }))
+                    _logger.critical(
+                        f"Record updated: {record.rulebook_id} - Compute Date")
             except Exception as e:
                 _logger.critical(f"Failed to update rulebook {record.id}: {e}")
 
+          # Correct write operation
+        if records_to_update:
+            for record_id, vals in records_to_update:
+                self.env['reply.log'].browse(record_id).with_context(
+                    allow_auto_update=True).sudo().write(vals)
+    
     @api.model
     def send_reminder_email(self):
         """Send reminder and escalation emails for due or escalated rulebooks."""
@@ -1379,10 +1443,14 @@ class ReplyLog(models.Model):
                 # if not ('submission_timing' in vals or 'next_due_date_computed' in vals or 'reminder_due_date' in vals or 'reg_due_date' in vals or 'escalation_date' in vals) and not (updating_reply_content or updating_document):
                 #     raise AccessError('Action not allowed.')
                 allowed_columns = ['submission_timing', 'next_due_date_computed',
-                                   'reminder_due_date', 'reg_due_date', 'escalation_date', 'last_internal_due_date_sent', 'last_escalation_sent', 'last_reminder_due_date_sent']
+                                   'reminder_due_date', 'reg_due_date', 'escalation_date', 'last_internal_due_date_sent',
+                                   'last_escalation_sent', 'last_reminder_due_date_sent', 'reg_due_date_processed']
 
-                if not any(key in vals for key in allowed_columns) and not (updating_reply_content or updating_document):
+                # if not any(key in vals for key in allowed_columns) and not (updating_reply_content or updating_document):
+                #     raise AccessError('Action not allowed.')
+                if not self.env.context.get('allow_auto_update', False) and not any(key in vals for key in allowed_columns) and not (updating_reply_content or updating_document):
                     raise AccessError('Action not allowed.')
+
 
                 # For first submission, both reply content and document must be provided together
                 if updating_reply_content and not updating_document:
