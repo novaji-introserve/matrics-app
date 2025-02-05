@@ -1059,8 +1059,8 @@ class ReplyLog(models.Model):
                 return {}
             now = datetime.now()
             now_without_microseconds = now.replace(microsecond=0)
-            url = request.env["rulebook"]._record_link(
-                rulebook.id, model_name='reply.log')
+            # url = request.env["rulebook"]._record_link(
+            #     rulebook.id, model_name='reply.log')
             
             global global_data            
             global_data = {
@@ -1091,7 +1091,7 @@ class ReplyLog(models.Model):
                 "escalation_date": self._compute_formatted_date(self.escalation_date) or "N/A",
                 "reg_due_date": self._compute_formatted_date(self.reg_due_date) or "N/A",
                 "datetime": self._compute_formatted_date(now_without_microseconds),
-                "url_link": url
+                # "url_link": url
             }
 
             # Optional CC handling
@@ -1346,8 +1346,10 @@ class ReplyLog(models.Model):
             # First-time submission validation
             if is_first_submission:
                     # Prevent status change if reply content or document is not updated
-                if not (updating_reply_content or updating_document):
-                    raise AccessError(('Action not allowed.'))
+                
+                if not ('submission_timing' in vals or 'next_due_date_computed' in vals) and not (updating_reply_content or updating_document):
+                    raise AccessError('Action not allowed for first submission.')
+
                 
                 # For first submission, both reply content and document must be provided together
                 if updating_reply_content and not updating_document:
