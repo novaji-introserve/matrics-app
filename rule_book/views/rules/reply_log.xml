@@ -15,7 +15,7 @@
                 <field name="rulebook_status" string="Status" widget="badge" decoration-muted="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'"/>
                 <field name="reporter" string="Officer Responsible"/>
                 <field name="frequency_type" string="frequency"/>
-                <field name="reg_due_date" optional="hide" string="Regulatory Due Date"/>
+                <field name="formatted_regulatory_date" optional="hide" string="Regulatory Due Date"/>
                 <!-- <field name="active" invisible="1"/> -->
                 <field name="active" invisible="1" groups="rule_book.group_chief_compliance_officer_"/>
                 <!-- <button name="toggle_active" type="object" icon="fa-archive" groups="rule_book.group_chief_compliance_officer_"/> -->
@@ -68,10 +68,10 @@
                             <field name="reply_content"/>
                             <field name="submission_timing" string="Submission Timing"/>
 
-                            <!-- <field name="rulebook_compute_date" readonly="0"/>
+                            <field name="rulebook_compute_date" readonly="0"/>
                             <field name="reminder_due_date" readonly="0" />
                             <field name="escalation_date" readonly="0" />
-                            <field name="reg_due_date" readonly="0" /> -->
+                            <field name="reg_due_date" readonly="0" />
                         </group>
                         <group>
                             <field name="reporter" readonly="1" string="Officer Responsible"/>

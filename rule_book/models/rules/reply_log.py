@@ -359,7 +359,7 @@ class ReplyLog(models.Model):
     )
 
     quarter_day = fields.Integer(string='Day of Quarter', default=7,   store=True,
-)
+                                 )
 
     last_escalation_sent = fields.Datetime(string="Last Escalation Sent")
 
@@ -412,7 +412,7 @@ class ReplyLog(models.Model):
         help="Select the risk category for this rulebook.",
         default="Compliance Risk"
     )
-    
+
     next_due_date_computed = fields.Boolean(
         string='Next Due Date Computed',
         default=False,
@@ -420,13 +420,12 @@ class ReplyLog(models.Model):
     )
 
     # can_archive = fields.Boolean(store=False)
-    
+
     def toggle_active(self):
         # Check if user has compliance manager rights
         if not self.env.user.has_group('rule_book.group_chief_compliance_officer_'):
             return False
-        return super(ReplyLog, self).toggle_active()    
-    
+        return super(ReplyLog, self).toggle_active()
 
     @api.depends("rulebook_compute_date")
     def _compute_formatted_rulebook_date(self):
@@ -527,15 +526,15 @@ class ReplyLog(models.Model):
 
             global global_data
 
-                # "email_to": ", ".join(["asanda@boi.ng", "iabubakar@boi.ng"]),
-                # "email_cc": ", ".join(["MAkeju@boi.ng",  "MMuntaka@boi.ng",
-                #                        "himam@boi.ng", "fakindele@boi.ng", "oabiola@boi.ng",
-                #                        "ooyewunmi@boi.ng", "MAderibigbe@boi.ng", "uchukwuneke@boi.ng",
-                #                        "aalhassan@boi.ng", "rezeani@boi.ng", "cdavid@boi.ng",
-                #                        "makhator@boi.ng"]),
+            # "email_to": ", ".join(["asanda@boi.ng", "iabubakar@boi.ng"]),
+            # "email_cc": ", ".join(["MAkeju@boi.ng",  "MMuntaka@boi.ng",
+            #                        "himam@boi.ng", "fakindele@boi.ng", "oabiola@boi.ng",
+            #                        "ooyewunmi@boi.ng", "MAderibigbe@boi.ng", "uchukwuneke@boi.ng",
+            #                        "aalhassan@boi.ng", "rezeani@boi.ng", "cdavid@boi.ng",
+            #                        "makhator@boi.ng"]),
             global_data = {
                 "email_from":  os.getenv("EMAIL_FROM"),
-                "email_cc": rulebook.second_line_escalation.email or "", 
+                "email_cc": rulebook.second_line_escalation.email or "",
                 "email_to": ", ".join(record.first_line_escalation.mapped('email')) or "",
 
                 "type_of_return": re.sub(r'(<[^>]+>|&\w+;)', '', rulebook.type_of_return),
@@ -553,7 +552,6 @@ class ReplyLog(models.Model):
             if record.rulebook_status == 'submitted' and record.first_line_escalation:
                 self.trigger_escalation_alert(record)
 
-
         return result
 
     def trigger_escalation_alert(self, report):
@@ -562,7 +560,8 @@ class ReplyLog(models.Model):
             "rule_book.email_template_rulebook_log_notification_")
         if template:
             template.sudo().send_mail(report.id, force_send=True)
-            _logger.critical(f"Report notification sent to escalation officer! ")
+            _logger.critical(
+                f"Report notification sent to escalation officer! ")
         else:
             _logger.critical(
                 "Email template 'rule_book.email_template_rulebook_log_notification_' not found.")
@@ -631,7 +630,7 @@ class ReplyLog(models.Model):
 
         return record
 
-    @api.depends("reply_date", "rulebook_compute_date","reply_content","document")
+    @api.depends("reply_date", "rulebook_compute_date", "reply_content", "document")
     def _compute_submission_timing(self):
         """Compute the submission timing based on the full datetime of reply_date and rulebook_compute_date."""
         for record in self:
@@ -639,13 +638,14 @@ class ReplyLog(models.Model):
             today = datetime.now().replace(microsecond=0)
 
             try:
-               
+
                 reply_datetime = record.reply_date
                 internal_due_date = record.rulebook_compute_date
                 reg_due_date = record.reg_due_date
 
                 # Log values for debugging
-                _logger.critical(f"internal date: {internal_due_date}  .... reply date: {reply_datetime}")
+                _logger.critical(
+                    f"internal date: {internal_due_date}  .... reply date: {reply_datetime}")
 
                 if reply_datetime:
                     if reg_due_date and reply_datetime > reg_due_date:
@@ -663,46 +663,86 @@ class ReplyLog(models.Model):
                 _logger.critical(
                     f"CRITICAL Error computing submission timing for record {record.id}: {e}")
 
+    # @api.model
+    # def _update_submission_timing(self):
+    #     """Cron job to compute the submission timing for all rulebook logs."""
+    #     # today = fields.Datetime.now()
+    #     # today = datetime.now().replace(microsecond=0)
+    #     today = datetime.combine(datetime.today(), datetime.min.time())
+
+    #     rulebook_logs = self.env['reply.log'].search([
+    #         ('reply_date', '=', False)
+    #     ])
+
+    #     _logger.critical(
+    #         f"Cron job to compute the submission timing for all rulebook logs started NOW {today} rulebook logs found {rulebook_logs}")
+
+    #     for record in rulebook_logs:
+    #         try:
+    #             if not record.reply_date:
+
+    #                 is_overdue = False
+    #                 if not record.reg_due_date and record.rulebook_compute_date:
+    #                     is_overdue = record.rulebook_compute_date < today
+    #                 elif record.reg_due_date:
+    #                     # Convert today to date for comparison with reg_due_date
+    #                     today_date = today.date()
+    #                     is_overdue = record.reg_due_date.date() < today_date
+
+    #                 if is_overdue and record.submission_timing != "not_responded":
+    #                     record.submission_timing = "not_responded"
+    #                     record.sudo().write({
+    #                         'submission_timing': record.submission_timing,
+    #                     })
+
+    #                     _logger.critical(
+    #                         f"submission timing updated {record.submission_timing}:  computed date {record.rulebook_compute_date}  today date {today} id: {record.id}")
+
+    #                 continue
+
+    #         except Exception as e:
+    #             _logger.critical(
+    #                 f"CRITICAL Error computing submission timing for record {record.id}: {e}")
+
     @api.model
     def _update_submission_timing(self):
-        """Cron job to compute the submission timing for all rulebook logs."""
-        # today = fields.Datetime.now()
-        # today = datetime.now().replace(microsecond=0)
-        today = datetime.combine(datetime.today(), datetime.min.time())
-
-        rulebook_logs = self.env['reply.log'].search([
-            ('reply_date', '=', False)
-        ])
+        today = datetime.now().replace(microsecond=0)
+        rulebook_logs = self.env['reply.log'].search(
+            [('reply_date', '=', False)])
 
         _logger.critical(
-            f"Cron job to compute the submission timing for all rulebook logs started NOW {today} rulebook logs found {rulebook_logs}")
+            f"Cron job to compute the submission timing for all rulebook logs started NOW {today} rulebook logs found {len(rulebook_logs)}")
 
-        for record in rulebook_logs:                  
+        for record in rulebook_logs:
             try:
+                # Check if record still exists
+                if not record.exists():
+                    _logger.warning(
+                        f"Record {record.id} no longer exists, skipping.")
+                    continue
+
                 if not record.reply_date:
-                    
                     is_overdue = False
                     if not record.reg_due_date and record.rulebook_compute_date:
                         is_overdue = record.rulebook_compute_date < today
                     elif record.reg_due_date:
-                        # Convert today to date for comparison with reg_due_date
-                        today_date = today.date()
-                        is_overdue = record.reg_due_date.date() < today_date
-                    
+                        is_overdue = record.reg_due_date < today
+
                     if is_overdue and record.submission_timing != "not_responded":
                         record.submission_timing = "not_responded"
+                        # Using sudo to bypass access rights
                         record.sudo().write({
                             'submission_timing': record.submission_timing,
                         })
-                        
+
                         _logger.critical(
-                            f"submission timing updated {record.submission_timing}:  computed date {record.rulebook_compute_date}  today date {today} id: {record.id}")
-                    
+                            f"submission timing updated to {record.submission_timing}: computed date {record.rulebook_compute_date} today {today} id: {record.id}")
+
                     continue
 
             except Exception as e:
                 _logger.critical(
-                    f"CRITICAL Error computing submission timing for record {record.id}: {e}")
+                    f"CRITICAL Error computing submission timing for record {record.id}: {str(e)}")
 
     def _compute_next_due_date(self):
         _logger.critical("Updating next due date...")
@@ -788,7 +828,7 @@ class ReplyLog(models.Model):
 
                 else:
                     next_compute_date = record.rulebook_compute_date
-                    
+
                 if record.rulebook_compute_date:
                     # Your code to compute next date
                     if not next_compute_date:
@@ -823,14 +863,12 @@ class ReplyLog(models.Model):
 
                     _logger.critical(
                         f"Record {new_record}: Computed next due date as {next_compute_date}.")
-                    
+
                     _logger.critical(
                         f"rulebook_compute_date date found for record {record.id}... date is {record.rulebook_compute_date}")
                 else:
                     _logger.critical(
                         f"rulebook_compute_date is not set for record {record.id}")
-
-                
 
             except Exception as e:
                 _logger.critical(
@@ -920,8 +958,6 @@ class ReplyLog(models.Model):
                 # If computed_date is not available, set reg_due_date to False or handle accordingly
                 record.reminder_due_date = None
 
-    
-
     @api.model
     def check_rulebook_and_update_due_date(self):
         """Check rulebooks with today's or past regulatory dates and update next due date."""
@@ -975,9 +1011,8 @@ class ReplyLog(models.Model):
             ('rulebook_status', '!=', 'completed'),
         ])
 
-
         for rulebook in incomplete_rulebook_logs:
-            
+
             try:
 
                 # Reminder Email: Check if reg_due_date matches today
@@ -1037,7 +1072,6 @@ class ReplyLog(models.Model):
             except Exception as e:
                 _logger.critical(
                     f"Failed to process Rulebook {rulebook.id}: {e}")
-        
 
     def _prepare_email_data(self):
         """Prepare email data dictionary"""
@@ -1061,8 +1095,8 @@ class ReplyLog(models.Model):
             now_without_microseconds = now.replace(microsecond=0)
             # url = request.env["rulebook"]._record_link(
             #     rulebook.id, model_name='reply.log')
-            
-            global global_data            
+
+            global global_data
             global_data = {
                 "officer_responsible": rulebook.officer_responsible.name or "N/A",
                 "responsible_id": rulebook.responsible_id.name or "N/A",
@@ -1310,7 +1344,6 @@ class ReplyLog(models.Model):
             _logger.critical(traceback.format_exc())
             return False
 
-
     def _validate_update_conditions(self, vals):
         """
         Validate update conditions for reply content and document.
@@ -1324,8 +1357,6 @@ class ReplyLog(models.Model):
         # one_month_from_today = datetime.today().date() + relativedelta(months=1)
         one_month_from_today = datetime.today().date() - relativedelta(months=1)
 
-
-
         for record in self:
             # Date validation checks only when updating reply content or document
             if updating_reply_content or updating_document:
@@ -1335,22 +1366,24 @@ class ReplyLog(models.Model):
                         _("You cannot modify the reply or upload documents as the Due Date is older than a month.")
                     )
                 if not self._check_access(record):
-                    raise AccessError(_('You cannot submit because you are neither responsible or copied in this return.'))
-            
+                    raise AccessError(
+                        _('You cannot submit because you are neither responsible or copied in this return.'))
 
-                
-                    
             # Check if the record has never been submitted before
             is_first_submission = not record.document and not record.reply_content
 
             # First-time submission validation
             if is_first_submission:
-                    # Prevent status change if reply content or document is not updated
-                
-                if not ('submission_timing' in vals or 'next_due_date_computed' in vals) and not (updating_reply_content or updating_document):
-                    raise AccessError('Action not allowed for first submission.')
+                # Prevent status change if reply content or document is not updated
 
-                
+                # if not ('submission_timing' in vals or 'next_due_date_computed' in vals or 'reminder_due_date' in vals or 'reg_due_date' in vals or 'escalation_date' in vals) and not (updating_reply_content or updating_document):
+                #     raise AccessError('Action not allowed.')
+                allowed_columns = ['submission_timing', 'next_due_date_computed',
+                                   'reminder_due_date', 'reg_due_date', 'escalation_date', 'last_internal_due_date_sent', 'last_escalation_sent', 'last_reminder_due_date_sent']
+
+                if not any(key in vals for key in allowed_columns) and not (updating_reply_content or updating_document):
+                    raise AccessError('Action not allowed.')
+
                 # For first submission, both reply content and document must be provided together
                 if updating_reply_content and not updating_document:
                     raise AccessError(
@@ -1386,7 +1419,7 @@ class ReplyLog(models.Model):
                 is_emptying_reply_content = (
                     updating_reply_content and
                     (vals.get("reply_content") ==
-                    '' or vals.get("reply_content") is False)
+                     '' or vals.get("reply_content") is False)
                 )
 
                 is_emptying_document = (
@@ -1394,7 +1427,7 @@ class ReplyLog(models.Model):
                     (
                         (vals.get("document") is False) and
                         (vals.get("document_filename") ==
-                        '' or vals.get("document_filename") is False or vals.get("document") == '')
+                         '' or vals.get("document_filename") is False or vals.get("document") == '')
                     )
                 )
 
@@ -1403,16 +1436,17 @@ class ReplyLog(models.Model):
                     raise AccessError(_(
                         "Your reply note and the document cannot be empty. "
                     ))
-                    
+
                 if not self._can_update_rulebook_log_status(record, vals):
                     raise AccessError(
                         _('You do not have permission to update the status of this return since you are either responsible or copied in the return.'))
 
         return vals
-    
+
     @api.depends('document', 'write_date')  # Add write_date dependency
     def _compute_document_url(self):
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo(
+        ).get_param('web.base.url')
         for record in self:
             if record.document:
                 attachment = self.env['ir.attachment'].search([
@@ -1450,7 +1484,7 @@ class ReplyLog(models.Model):
             'url': f'/web/content/{attachment.id}?download=false&t={timestamp}',
             'target': 'new',
         }
-        
+
     def _clean_old_attachments(self, record_id):
         """Clean up old attachments when updating the document"""
         domain = [
@@ -1479,8 +1513,9 @@ class ReplyLog(models.Model):
         })
 
         # Optionally, log the number of records updated
-        _logger.info(f"Cleared 'last_internal_due_date_sent' (set to NULL) for {len(records)} records where the date is today.") 
-        
+        _logger.info(
+            f"Cleared 'last_internal_due_date_sent' (set to NULL) for {len(records)} records where the date is today.")
+
     def _check_access(self, record):
         user_id = self.env.user.id
         coo_group = self.env.ref('rule_book.group_chief_compliance_officer_')
@@ -1492,7 +1527,7 @@ class ReplyLog(models.Model):
             return False
 
         return True
-    
+
     def _can_update_rulebook_log_status(self, record, vals):
         user = self.env.user
         coo_group = self.env.ref('rule_book.group_chief_compliance_officer_')
