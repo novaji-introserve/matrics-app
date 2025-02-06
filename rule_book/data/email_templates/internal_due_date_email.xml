@@ -41,6 +41,10 @@
                 <t t-out="object.data()['datetime']"></t>
             </p>
             <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                <strong style="color: #004225;">Rulebook Source:</strong>
+                <t t-out="object.data()['rulebook_name']" />
+            </p>
+            <p style="font-size: 16px; color: #333333; line-height: 1.6;">
                 <strong style="color: #004225;">Regulatory Agency:</strong>
                 <t t-out="object.data()['regulatory_name']" />
             </p>

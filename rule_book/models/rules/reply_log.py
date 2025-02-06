@@ -922,89 +922,7 @@ class ReplyLog(models.Model):
                 # If computed_date is not available, set reg_due_date to False or handle accordingly
                 record.reminder_due_date = None
 
-    # @api.model
-    # def check_rulebook_and_update_due_date(self):
-    #     """Check rulebooks with today's or past regulatory dates and update next due date."""
-
-    #     today = datetime.now().replace(microsecond=0)
-
-    #     # Perform the search for unprocessed records with due dates <= today
-    #     rulebooks = self.env["reply.log"].search([
-    #         ("rulebook_id.is_recurring", "=", True),
-    #         ("next_due_date_computed", "=", False),
-    #         "|",
-    #         "&",
-    #         ("reg_due_date", "!=", False),
-    #         ("reg_due_date", "<=", today.date()),
-    #         "&",
-    #         ("reg_due_date", "=", False),
-    #         ("rulebook_compute_date", "<=", today.date())
-    #     ])
-
-    #     _logger.critical(
-    #         f"Rulebooks to update {rulebooks}.., today's datetime {today}..")
-
-    #     for record in rulebooks:
-    #         try:
-    #             record._compute_next_due_date()
-    #             record.sudo().write({
-    #                 'next_due_date_computed': True
-    #             })
-
-    #             _logger.critical(f"Record updated: {record.rulebook_id}")
-
-    #         except Exception as e:
-    #             _logger.critical(f"Failed to update rulebook {record.id}: {e}")
-
-    # @api.model
-    # def check_rulebook_and_update_due_date(self):
-    #     """Check rulebooks with today's or past regulatory dates and update next due date."""
-    #     today = datetime.now().replace(microsecond=0)
-
-    #     # Search for records that haven't been processed yet
-    #     rulebooks = self.env["reply.log"].search([
-    #         ("rulebook_id.is_recurring", "=", True),
-    #         "|",
-    #         "&",
-    #         ("reg_due_date", "!=", False),
-    #         ("reg_due_date", "<=", today),
-    #         "&",
-    #         ("reg_due_date", "=", False),
-    #         ("rulebook_compute_date", "<=", today)
-    #     ])
-
-    #     _logger.critical(
-    #         f"Rulebooks to update {rulebooks}.., today's datetime {today}..")
-
-    #     records_to_update = []
-
-    #     for record in rulebooks:
-    #         try:
-    #             # Check if we should process reg_due_date
-    #             if record.reg_due_date and not record.reg_due_date_processed and record.reg_due_date <= today:
-    #                 record._compute_next_due_date()
-    #                 records_to_update.append((record.id, {
-    #                     'next_due_date_computed': True,
-    #                     'reg_due_date_processed': True
-    #                 }))
-    #                 _logger.critical(f"Record updated: {record.rulebook_id} - Reg Due Date")
-
-    #             # Check if we should process rulebook_compute_date
-    #             elif not record.reg_due_date and record.rulebook_compute_date and not record.next_due_date_computed and record.rulebook_compute_date <= today:
-    #                 record._compute_next_due_date()
-    #                 records_to_update.append((record.id, {
-    #                     'next_due_date_computed': True,
-    #                 }))
-    #                 _logger.critical(f"Record updated: {record.rulebook_id} - Compute Date")
-    #         except Exception as e:
-    #             _logger.critical(f"Failed to update rulebook {record.id}: {e}")
-
-    #     # Batch write
-    #     if records_to_update:
-    #         self.env['reply.log'].browse([r[0] for r in records_to_update]).sudo().write({
-    #             id: vals for id, vals in records_to_update
-    #         })
-    
+   
     @api.model
     def check_rulebook_and_update_due_date(self):
         today = datetime.now().replace(microsecond=0)
@@ -1088,50 +1006,73 @@ class ReplyLog(models.Model):
                 if computed_date and today.date() == computed_date.date():
                     if computed_date < today:
                         if not rulebook.last_internal_due_date_sent or rulebook.last_internal_due_date_sent.date() != today.date():
-                            rulebook._send_internal_due_date_email()
-                            _logger.critical(
-                                f" Interanal  Due date email sent!  {rulebook}")
+                            if_success = rulebook._send_internal_due_date_email()
 
-                            rulebook.sudo().write({
-                                'last_internal_due_date_sent': today
-                            })
+                            if if_success :
+                                rulebook.sudo().write({
+                                    'last_internal_due_date_sent': today
+                                })
+                                _logger.critical(
+                                    f" Interanal Due date email sent!  {rulebook} .. Updated last_internal_due_date_sent for rulebook log {rulebook.ids}")
 
-                            _logger.critical(
-                                f"Updated last_internal_due_date_sent for rulebook log {rulebook.ids}")
 
                 # Escalation Email: Check if escalation_date matches today
                 if rulebook.escalation_date and today.date() == rulebook.escalation_date.date():
                     if rulebook.escalation_date < today:
                         if not rulebook.last_escalation_sent or rulebook.last_escalation_sent.date() != today.date():
-                            rulebook._send_escalation_due_date_email()
-                            _logger.critical(
-                                f" Escalation email sent!  {rulebook}")
+                            if_success = rulebook._send_escalation_due_date_email()
 
-                            rulebook.sudo().write({
-                                'last_escalation_sent': today
-                            })
+                            if if_success :
+                                rulebook.sudo().write({
+                                    'last_escalation_sent': today
+                                })
+                                _logger.critical(
+                                    f" Escalation email sent!  {rulebook} .. Updated last_escalation_sent for rulebook log {rulebook.ids}")
 
-                            _logger.critical(
-                                f"Updated last_escalation_sent for rulebook log {rulebook.ids}")
+            
 
-                # Check if reminder_due_date is due today
-                if rulebook.reminder_due_date and rulebook.reminder_due_date.date() == today.date():
-                    due_time_today = rulebook.reminder_due_date.time()
-
+                # Check if reminder_due_date is due today                
+                if rulebook.reminder_due_date:
                     _logger.critical(
-                        f" due time today  {due_time_today}")
-                    if due_time_today <= today.time() and rulebook.reminder_due_date < rulebook.reg_due_date:
-                        if (not rulebook.last_reminder_due_date_sent or rulebook.last_reminder_due_date_sent.date() != today.date()):
-                            rulebook._send_reminder_email()
-                            _logger.critical(
-                                f" Reminder email sent!  {rulebook}")
+                        f" Checking reminder for rulebook {rulebook.id}: reminder_due_date {rulebook.reminder_due_date}, today {today}")
 
-                            rulebook.sudo().write({
-                                'last_reminder_due_date_sent': today
-                            })
+                    comparison_date = rulebook.reg_due_date or rulebook.rulebook_compute_date
 
-                            _logger.critical(
-                                f"Updated last_reminder_due_date_sent for rulebook log {rulebook.ids}")
+                    # Check if we're between reminder_due_date and the due date
+                    if rulebook.reminder_due_date.date() <= today.date() and comparison_date and today.date() < comparison_date.date():
+                        due_time_today = rulebook.reminder_due_date.time()
+
+                        # Check if the current time is at or later than the reminder due time
+                        if today.time() >= due_time_today:
+                            if (not rulebook.last_reminder_due_date_sent or rulebook.last_reminder_due_date_sent.date() != today.date()):
+                                if_success = rulebook._send_reminder_email()
+
+                                if if_success:
+                                    rulebook.sudo().write({
+                                        'last_reminder_due_date_sent': today
+                                    })
+                                    _logger.critical(
+                                        f" Reminder email sent! {rulebook} .. Updated last_reminder_due_date_sent for rulebook log {rulebook.id}")
+                    
+                # if rulebook.reminder_due_date and rulebook.reminder_due_date.date() == today.date():
+                #     due_time_today = rulebook.reminder_due_date.time()
+                #     _logger.critical(
+                #         f" due time today  {due_time_today}")
+
+                #     comparison_date = rulebook.reg_due_date or rulebook.rulebook_compute_date
+                    
+                #     if due_time_today <= today.time() and (comparison_date and rulebook.reminder_due_date < comparison_date):
+                #         if (not rulebook.last_reminder_due_date_sent or rulebook.last_reminder_due_date_sent.date() != today.date()):
+                #             if_success = rulebook._send_reminder_email()
+
+                #             if if_success :
+                #                 rulebook.sudo().write({
+                #                     'last_reminder_due_date_sent': today
+                #                 })
+                #                 _logger.critical(
+                #                     f" Reminder email sent!  {rulebook} .. Updated last_reminder_due_date_sent for rulebook log {rulebook.ids}")
+
+                            
 
             except Exception as e:
                 _logger.critical(
@@ -1157,8 +1098,9 @@ class ReplyLog(models.Model):
                 return {}
             now = datetime.now()
             now_without_microseconds = now.replace(microsecond=0)
-            # url = request.env["rulebook"]._record_link(
-            #     rulebook.id, model_name='reply.log')
+            
+            url = self.env["rulebook"]._record_link(
+                rulebook.id, model_name='reply.log')
 
             global global_data
             global_data = {
@@ -1189,7 +1131,7 @@ class ReplyLog(models.Model):
                 "escalation_date": self._compute_formatted_date(self.escalation_date) or "N/A",
                 "reg_due_date": self._compute_formatted_date(self.reg_due_date) or "N/A",
                 "datetime": self._compute_formatted_date(now_without_microseconds),
-                # "url_link": url
+                "url_link": url
             }
 
             # Optional CC handling
@@ -1388,19 +1330,19 @@ class ReplyLog(models.Model):
                     "rule_book.reminder_email_template_")
             except ValueError:
                 _logger.critical(
-                    " regulatory_due_date Email template not found")
+                    " reminder_email_template_ Email template not found")
                 return False
 
             # Detailed logging for debugging
             _logger.critical(
-                f"Attempting to send regulatory_due_date email for record {self.id}")
+                f"Attempting to send reminder_ email for record {self.id}")
             _logger.critical(f"Email data: {email_data}")
 
             # Send the email
             email_result = template.send_mail(self.id, force_send=True)
 
             _logger.critical(
-                f"regulatory_due_date Email sent successfully. Result: {email_result}")
+                f"reminder_due_date Email sent successfully. Result: {email_result}")
             return True
         except Exception as e:
             _logger.critical(f"Comprehensive email send failure: {str(e)}")

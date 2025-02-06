@@ -56,7 +56,7 @@
                                     Please ensure you upload the proof of completion before the aforementioned date.</p>
             </div>
             <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can
-                                upload the document here: <a t-attf-href="#{object.data()['url_link']}" style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
+                                upload the document here: <a t-attf-href="#{object.data()['record_link']}" style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
                                 Document</a>
             </p>
             <p style="font-size: 16px; color: #333333; line-height: 1.6;">Thank you.</p>
