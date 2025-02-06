@@ -20,7 +20,7 @@ export class IcomplyDashboard extends Component {
         mediumrisk: 0,
         highrisk: 0,
         totaltransaction: 0,
-        alertrultstotal: 0,
+        alertrulestotal: 0,
         highriskbypercent: "0",
         mediumriskbypercent: "0",
         lowriskpercentage: "0",
@@ -29,9 +29,10 @@ export class IcomplyDashboard extends Component {
         mediumriskinRespectToTotalRulesPercentage: "0",
         highriskinRespectToTotalRulesPercentage: "0",
       },
-      datepicked: 0,
+      datepicked: 14,
       branches_id: [],
-      cc:false,
+      cc: false,
+      alert_rules_domain: null,
       chartDomain: [],
       current_datepicked: null,
       previous_datepicked: null,
@@ -43,21 +44,18 @@ export class IcomplyDashboard extends Component {
     onMounted(async () => {
       await this.loadInitialData();
     });
-    
+
     onWillStart(async () => {
-       
       await this.getcurrentuser();
       this.filterByDate();
     });
   }
 
   async getcurrentuser() {
-
     let result = await this.rpc("/dashboard/user");
     this.state.branches_id = result.branch;
-    this.state.cc = result.group
-
-    
+    this.state.cc = result.group;
+    this.state.alert_rules_domain = result.alert_rules_domain;
   }
 
   async fetchTransactionCounts(domain) {
@@ -110,11 +108,9 @@ export class IcomplyDashboard extends Component {
     this.state.previous_datepicked = previousDate.format("YYYY-MM-DD"); // YYYY-MM-DD format
 
     await this.fetchcasestatus(this.state.branches_id);
-    
   };
 
   fetchcasestatus = async (ids) => {
-
     try {
       const dateFilter =
         this.state.datepicked > 0
@@ -122,12 +118,12 @@ export class IcomplyDashboard extends Component {
           : [];
 
       const branchFilter =
-        ids.length > 0  && this.state.cc == false ? [["branch_id", "in", Array.from(ids)]] : [];
+        ids.length > 0 && this.state.cc == false
+          ? [["branch_id", "in", Array.from(ids)]]
+          : [];
       const domain = [...dateFilter, ...branchFilter];
 
-      this.state.chartDomain = domain
-
-    
+      this.state.chartDomain = domain;
 
       const {
         lowriskCount,
@@ -144,7 +140,10 @@ export class IcomplyDashboard extends Component {
         highrisk: highriskCount,
         totalScreenedTransactionCount,
         totaltransaction: totalTransactionCount,
-        alertrulestotal: await this.api.searchCount("alert.rules", [...dateFilter]),
+        alertrulestotal: await this.api.searchCount("alert.rules", [
+          ...this.state.alert_rules_domain,
+          ...dateFilter,
+        ]),
         lowriskinRespectToTotalTransaction: this.calculatePercentage(
           lowriskCount,
           totalTransactionCount
@@ -178,36 +177,51 @@ export class IcomplyDashboard extends Component {
   };
   // Display transactions based on risk level
   displayTransactionsByRisk = (riskLevel = "") => {
-    const domain =
-      this.state.datepicked > 0
-        ? [
-            ["created_at", ">=", this.state.current_datepicked],
-            [this.state.cc == false && "branch_id", "in", Array.from(this.state.branches_id)],
-            riskLevel == "screened"
-              ? ["rule_id", "!=", null]
-              : ["risk_level", "=", riskLevel],
-          ]
-        : [
-            [this.state.cc == false && "branch_id", "in", Array.from(this.state.branches_id)],
-            riskLevel == "screened"
-              ? ["rule_id", "!=", null]
-              : ["risk_level", "=", riskLevel],
-          ];
+    let domain = [];
 
-    if (riskLevel == "") {
+    if (this.state.datepicked > 0) {
+      
+      domain.push([
+        "create_date",
+        ">=",
+        new Date(this.state.current_datepicked),
+      ]);
+    }
+
+    if (!this.state.cc) {
+      // Correct condition check
+      domain.push([...this.state.alert_rules_domain]);
+    }
+
+    if (riskLevel === "screened") {
+      // Use strict equality
+      domain.push(["rule_id", "!=", null]);
+    } else if (riskLevel) {
+      // Check if riskLevel is not empty
+      domain.push(["risk_level", "=", riskLevel]);
+    }
+
+    if (riskLevel === "") {
+      // Use strict equality
       return;
-    } else if (riskLevel == "process") {
+    } else if (riskLevel === "process") {
+      let processDomain = [];
+      if (this.state.datepicked > 0) {
+        processDomain.push(["created_date", ">=", this.state.current_datepicked]);
+      }
+      if (!this.state.cc) {
+        processDomain.push([
+          "branch_id",
+          "in",
+          Array.from(this.state.branches_id),
+        ]);
+      }
+
       this.navigate.doAction({
         type: "ir.actions.act_window",
         res_model: "alert.rules",
         name: "processes",
-        domain:
-          this.state.datepicked > 0
-            ? [
-                ["created_at", ">=", this.state.current_datepicked],
-                [this.state.cc == false && "branch_id", "in", Array.from(this.state.branches_id)],
-              ]
-            : [[this.state.cc == false && "branch_id", "in", Array.from(this.state.branches_id)]],
+        domain: processDomain, // Use the correctly constructed domain
         views: [
           [false, "tree"],
           [false, "form"],
@@ -220,7 +234,7 @@ export class IcomplyDashboard extends Component {
         name: `${
           riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)
         } Transaction`,
-        domain,
+        domain: domain, // Use the correctly constructed domain
         views: [
           [false, "tree"],
           [false, "form"],
@@ -228,7 +242,6 @@ export class IcomplyDashboard extends Component {
       });
     }
   };
-
   // Unified chart rendering function
   async getChartData(model, field, domain) {
     const results = await this.api.searchRead(model, domain, [field]);
@@ -247,9 +260,7 @@ export class IcomplyDashboard extends Component {
 
   // Transaction Risk Rating Chart
   getTransactionRiskRatingChart = async () => {
-   
-     let domain = this.state.chartDomain;
-
+    let domain = this.state.chartDomain;
 
     const { labels, counts } = await this.getChartData(
       "res.customer.transaction",
@@ -264,9 +275,8 @@ export class IcomplyDashboard extends Component {
 
   // Customer Risk Rating Chart
   getCustomerRatingChart = async () => {
-    
-    let domain = this.state.chartDomain
-    
+    let domain = this.state.chartDomain;
+
     const { labels, counts } = await this.getChartData(
       "res.partner",
       "risk_level",

@@ -1,11 +1,14 @@
 from odoo import models, fields, api, _
 import logging
+from odoo.exceptions import UserError
+from datetime import date,timedelta,datetime,time
 # import traceback
 _logger = logging.getLogger(__name__)
 
+
 class Customer(models.Model): 
     _inherit = "res.partner" 
-      
+
     customertype = fields.Many2one(
         comodel_name='res.customer.type', string='Customer Type', tracking=True, index=True)
     nationality = fields.Many2one(
@@ -22,43 +25,66 @@ class Customer(models.Model):
     identification_issue_date = fields.Date(string='identification Issue Date', index=True, tracking=True)
     town_id = fields.Many2one(
     comodel_name='res.partner.town', string='Town', index=True)
-    
-    # @api.model
-    # def _search_user_in_branch(self, operator, value):
-    #     if self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer'):
-    #         return [('id', '!=', False)]  # CCO sees all
-
-    #     user_branches = self.env.user.branches_id  # Get user's branches ONCE
-    #     if not user_branches:  # Handle case where user has no branches
-    #         if operator == '=' and value:
-    #             return [('id', '=', False)]  # No branches, so no matches for True
-    #         elif operator == '!=' and value:
-    #             return [('id', '!=', False)] # No branches, so all matches for False
-    #         return []  # Return empty domain for other cases (no branches)
-
-    #     if operator == '=':
-    #         if value:  # True: User is in the customer's branch
-    #             return [('branch_id', 'in', user_branches.ids)] # Use ids
-    #         else:  # False: User is NOT in the customer's branch
-    #             return [('branch_id', 'not in', user_branches.ids)] # use ids
-    #     elif operator == '!=':
-    #         if value:  # True: User is NOT in the customer's branch
-    #             return [('branch_id', 'not in', user_branches.ids)] # use ids
-    #         else:  # False: User IS in the customer's branch
-    #             return [('branch_id', 'in', user_branches.ids)] # use ids
-    #     return []  # Other operators not supported
-   
+    account_officer_id = fields.Many2one(
+        comodel_name='res.account.officer', string='Account Officer', index=True, tracking=True)
 
 
     @api.model
-    def open_all_customers(self):
+    def open_all_customers_today(self):
+        
+        today = fields.Date().today()
+    
+
+        domain = [("create_uid", "=", False), ("create_date", ">=", datetime.combine(today, time.min)), ("create_date", "<=", datetime.combine(today, time.max))]
+        
+
+         # Check if the current user is a Chief Compliance Officer
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+
+        if not is_cco:  # Only apply branch filtering if not a CCO
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+            
         return {
-            'name': _('Customers'),
+            'name': _('Customers - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('create_uid','=',False), ('user_in_branch', '=', True)],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
+        }
+            # 'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('create_uid','=',False)],
+    @api.model
+    def open_all_customers_last_7days(self):
+        today = fields.Date().today()
+
+        # Calculate the START of the 7-day period (inclusive of the 7th day)
+        last_7_days_start = today - timedelta(days=7)
+
+        # Calculate the END of the 7-day period (inclusive of today)
+        today_end = today
+        
+
+
+        domain = [
+            ("create_uid", "=", False),
+            ("create_date", ">=", datetime.combine(last_7_days_start, time.min)), # Start of the 7 day period
+            ("create_date", "<=", datetime.combine(today_end, time.max)), # End of today
+        ]
+
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+
+        if not is_cco:
+            branch_ids = self.env.user.branches_id.ids
+            if branch_ids:
+                domain.append(('branch_id', 'in', branch_ids))
+
+        return {
+            'name': _('Customers - Last 7Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {'search_default_group_branch': 1}  # Test if still needed
         }
             # 'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('create_uid','=',False)],
 
@@ -79,17 +105,17 @@ class Customer(models.Model):
                 AND rpa.branch_id IS NOT NULL
                 RETURNING rp.id, rp.customer_id, rpa.branch_id;
             """
-            
+
             self.env.cr.execute(query)
             updated_records = self.env.cr.fetchall()
             self.env.cr.commit()
-            
+
             _logger.info(f"Branch ID sync completed. Updated {len(updated_records)} records")
-            
+
             # Log detailed updates
             for record in updated_records:
                 _logger.info(f"Updated partner ID {record[0]}, customer_id {record[1]} with branch_id {record[2]}")
-                
+
         except Exception as e:
             _logger.error(f"Error in branch ID sync: {str(e)}")
             raise e
@@ -109,11 +135,11 @@ class Customer(models.Model):
     #             field for field in fields 
     #             if isinstance(field, str)  # Ensure only string field names
     #         ]
-            
+
     #         # Log problematic inputs
     #         if len(fields) != len(valid_fields):
     #             _logger.error(f"Invalid fields detected: {fields}")
-            
+
     #         return super().read(fields=valid_fields, load=load)
     #     except Exception as e:
     #         _logger.error(f"Read error: {str(e)}")
@@ -126,7 +152,7 @@ class Customer(models.Model):
     #         _logger.error(f"Record {record_id} does not exist")
     #         return False
     #     return True
-        
+
     # def check_record_integrity(self, record_id):
     #     record = self.browse(record_id)
     #     if not record.exists():

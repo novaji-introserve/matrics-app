@@ -1,7 +1,7 @@
 from odoo import models, fields, api, _
 import logging
 from odoo.exceptions import ValidationError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,date
 
 
 _logger = logging.getLogger(__name__)
@@ -28,6 +28,8 @@ class TransactionMonitoring(models.Model):
     tran_channel = fields.Char(string="Transaction Channel", readonly=True, index=True)
     request_id = fields.Char(string="Request ID", readonly=True, index=True)
     trans_id = fields.Char(string="Transaction ID", readonly=True, index=True)
+    tran_type = fields.Many2one(comodel_name='res.transaction.type',
+                              string='Tran. Type', index=True)
 
 
 
@@ -44,11 +46,13 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('date_created', '=', today),
-                ('currency_id', '=', ngn_currency.id)
-            ]
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+
+        domain = [('date_created', '=', today), ('currency_id', '=', ngn_currency.id)]
+
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
         
         return {
             'name': _('All Transactions - Today'),
@@ -74,13 +78,17 @@ class TransactionMonitoring(models.Model):
         ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+            
         
-        domain = [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('date_created', '>=', last_7_days),
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+
+        domain = [('date_created', '>=', last_7_days),
                 ('date_created', '<=', today),
-                ('currency_id', '=', ngn_currency.id)
-            ]
+                ('currency_id', '=', ngn_currency.id)]
+
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
 
         return {
             'name': _('All Transactions - Last 7 Days'),
@@ -106,12 +114,14 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('state', '=', 'new'),
-                ('date_created', '=', today),
-                ('currency_id', '=', ngn_currency.id)
-            ]
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+
+        domain = [('date_created', '=', today), ('currency_id', '=', ngn_currency.id),('state', '=', 'new')]
+
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+    
         
         return {
             'name': _('Transactions To Review - Today'),
@@ -136,14 +146,18 @@ class TransactionMonitoring(models.Model):
         ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
-        
-        domain = [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('state', '=', 'new'),
+            
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+
+        domain = [('state', '=', 'new'),
                 ('date_created', '>=', last_7_days),
                 ('date_created', '<=', today),
-                ('currency_id', '=', ngn_currency.id)
-            ]
+                ('currency_id', '=', ngn_currency.id)]
+
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+    
         
         return {
             'name': _('Transactions To Review - Last 7 Days'),
@@ -168,13 +182,17 @@ class TransactionMonitoring(models.Model):
         ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
-        
-        domain = [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('state', '=', 'done'),
+            
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+
+        domain = [('state', '=', 'done'),
                 ('date_created', '=', today),
-                ('currency_id', '=', ngn_currency.id)
-            ]
+                ('currency_id', '=', ngn_currency.id)]
+
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+    
         
         return {
             'name': _('Transactions Reviewed - Today'),
@@ -199,14 +217,19 @@ class TransactionMonitoring(models.Model):
         ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+            
         
-        domain = [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('state', '=', 'done'),
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+
+        domain = [('state', '=', 'done'),
                 ('date_created', '>=', last_7_days),
                 ('date_created', '<=', today),
-                ('currency_id', '=', ngn_currency.id)
-            ]
+                ('currency_id', '=', ngn_currency.id)]
+
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+
 
         return {
             'name': _('Transactions Reviewed - Last 7 Days'),

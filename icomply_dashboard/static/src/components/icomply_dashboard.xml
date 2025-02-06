@@ -17,11 +17,11 @@
 
                             <div class="ms-3">
                                 <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
-                                    <option value="0" selected="selected">current</option>
-                                    <option value="7">7 Days</option>
-                                    <option value="14">last 14 Days</option>
-                                    <option value="30">last month</option>
-                                    <option value="60">2 months</option>
+                                    <option value="0" selected="selected">Today</option>
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="14">Last 14 Days</option>
+                                    <option value="30">Last Month</option>
+                                    <option value="60">2 Months</option>
                                 </select>
                             </div>
                         </div>

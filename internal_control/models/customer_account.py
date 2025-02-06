@@ -23,19 +23,9 @@ class CustomerAccount(models.Model):
     source_account_id = fields.Char(string="Source Account ID", index=True)
     Status = fields.Boolean(default=False)
     accounttitle = fields.Char(string="Account Title")
-    
-    user_in_branch = fields.Boolean(compute='_compute_user_in_branch')
-    
-    @api.depends('branch_id')
-    def _compute_user_in_branch(self):
-        for rec in self:
-            if self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer'):  # Replace with your group's XML ID
-                rec.user_in_branch = True  # Chief Compliance Officer sees all
-            else:
-                branches_id = self.env.user.branches_id
-                rec.user_in_branch = any(each.id == rec.branch_id.id for each in branches_id)
-
-    
+    product_id = fields.Many2one(
+        comodel_name='res.bank.product', string='Product',index=True)
+ 
 
     @api.model
     def open_accounts_tier_1(self):
@@ -43,15 +33,20 @@ class CustomerAccount(models.Model):
         if not tier_1:
             return False
 
+        domain = [('account_tier', '=', tier_1.id)]  # Start with the base domain
+        
+         # Check if the current user is a Chief Compliance Officer
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+        
+        if not is_cco:  # Only apply branch filtering if not a CCO
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
         return {
             'name': _('Tier 1 Accounts'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner.account',
             'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('account_tier', '=', tier_1.id)  # This will match the foreign key in res_partner_account
-            ],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
 
@@ -60,16 +55,21 @@ class CustomerAccount(models.Model):
         tier_2 = self.env['res.partner.tier'].search([('code', '=', '002')], limit=1)
         if not tier_2:
             return False
+        
+        domain = [('account_tier', '=', tier_2.id)]  # Start with the base domain
+        
+         # Check if the current user is a Chief Compliance Officer
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+        
+        if not is_cco:  # Only apply branch filtering if not a CCO
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
 
         return {
             'name': _('Tier 2 Accounts'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner.account',
             'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('account_tier', '=', tier_2.id)
-            ],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
 
@@ -78,16 +78,21 @@ class CustomerAccount(models.Model):
         tier_3 = self.env['res.partner.tier'].search([('code', '=', '003')], limit=1)
         if not tier_3:
             return False
+        
+        domain = [('account_tier', '=', tier_3.id)]  # Start with the base domain
+        
+         # Check if the current user is a Chief Compliance Officer
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+        
+        if not is_cco:  # Only apply branch filtering if not a CCO
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
 
         return {
             'name': _('Tier 3 Accounts'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner.account',
             'view_mode': 'tree,form',
-            'domain': [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('account_tier', '=', tier_3.id)
-            ],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
     

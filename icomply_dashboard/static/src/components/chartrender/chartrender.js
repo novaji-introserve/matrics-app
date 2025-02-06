@@ -41,7 +41,11 @@ export class ChartRenderer extends Component {
     let domain = [["risk_level", "=", filter]]; // Start with the common condition
 
     if (this.props.datepicked > 0) {
-      domain.push(["created_at", ">=", this.props.current_datepicked]);
+      domain.push([
+        "create_date",
+        ">=",
+        new Date(this.props.current_datepicked),
+      ]);
     }
 
     if (!this.props.admin) {
@@ -92,9 +96,9 @@ export class ChartRenderer extends Component {
             action.domain = [["state", "=", filter]]; // Simplified for this case. You can use getDomain if needed
             if (this.props.datepicked > 0) {
               action.domain.push([
-                "created_at",
+                "create_date",
                 ">=",
-                this.props.current_datepicked,
+                new Date(this.props.current_datepicked),
               ]);
             }
           }

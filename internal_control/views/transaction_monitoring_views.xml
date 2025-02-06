@@ -173,7 +173,7 @@
 </record>
 
 <!-- Actions for Customer Transactions - All Transactions -->
-<!-- <record id="action_customers_all_transactions_today_ngn" model="ir.actions.server">
+<record id="action_customers_all_transactions_today_ngn" model="ir.actions.server">
     <field name="name">Today NGN - All Customer Transactions</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="state">code</field>
@@ -203,10 +203,10 @@
     <field name="type">ir.actions.server</field>
     <field name="state">code</field>
     <field name="code">action = env['res.customer.transaction'].open_customers_all_transactions_7days_other()</field>
-</record> -->
+</record>
 
 <!-- Actions for Customer Transactions - Awaiting Review -->
-<!-- <record id="action_customers_awaiting_review_today_ngn" model="ir.actions.server">
+<record id="action_customers_awaiting_review_today_ngn" model="ir.actions.server">
     <field name="name">Today NGN - Customer Awaiting Review</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="type">ir.actions.server</field>
@@ -236,10 +236,10 @@
     <field name="type">ir.actions.server</field>
     <field name="state">code</field>
     <field name="code">action = env['res.customer.transaction'].open_customers_awaiting_review_7days_other()</field>
-</record> -->
+</record>
 
 <!-- Actions for Customer Transactions - Reviewed -->
-<!-- <record id="action_customers_reviewed_today_ngn" model="ir.actions.server">
+<record id="action_customers_reviewed_today_ngn" model="ir.actions.server">
     <field name="name">Today NGN - Customer Reviewed</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="type">ir.actions.server</field>
@@ -269,10 +269,10 @@
     <field name="type">ir.actions.server</field>
     <field name="state">code</field>
     <field name="code">action = env['res.customer.transaction'].open_customers_reviewed_7days_other()</field>
-</record> -->
+</record>
 
 <!-- Actions for Internal Transactions - All Transactions -->
-<!-- <record id="action_internal_all_transactions_today_ngn" model="ir.actions.server">
+<record id="action_internal_all_transactions_today_ngn" model="ir.actions.server">
     <field name="name">Today NGN - All Internal Transactions</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="state">code</field>
@@ -302,10 +302,10 @@
     <field name="type">ir.actions.server</field>
     <field name="state">code</field>
     <field name="code">action = env['res.customer.transaction'].open_internal_all_transactions_7days_other()</field>
-</record> -->
+</record>
 
 <!-- Actions for Internal Transactions - Awaiting Review -->
-<!-- <record id="action_internal_awaiting_review_today_ngn" model="ir.actions.server">
+<record id="action_internal_awaiting_review_today_ngn" model="ir.actions.server">
     <field name="name">Today NGN - Internal Awaiting Review</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="type">ir.actions.server</field>
@@ -335,10 +335,10 @@
     <field name="type">ir.actions.server</field>
     <field name="state">code</field>
     <field name="code">action = env['res.customer.transaction'].open_internal_awaiting_review_7days_other()</field>
-</record> -->
+</record>
 
 <!-- Actions for Internal Transactions - Reviewed -->
-<!-- <record id="action_internal_reviewed_today_ngn" model="ir.actions.server">
+<record id="action_internal_reviewed_today_ngn" model="ir.actions.server">
     <field name="name">Today NGN - Internal Reviewed</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="type">ir.actions.server</field>
@@ -368,7 +368,7 @@
     <field name="type">ir.actions.server</field>
     <field name="state">code</field>
     <field name="code">action = env['res.customer.transaction'].open_internal_reviewed_7days_other()</field>
-</record> -->
+</record>
 
 <!-- Continue with similar pattern for all other actions... -->
 
