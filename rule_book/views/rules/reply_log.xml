@@ -78,9 +78,9 @@
                             <field name="officer_cc" widget="many2many_tags" readonly="1" string="Officer(s) Included in This Return" attrs="{'invisible': [('officer_cc', '=', [])]}"/>
                             <field name="department_id" readonly="1" string="Department Responsible"/>
                             <field name="formatted_rulebook_date" readonly="1" string="Internal Due Date"/>
-                            <!-- <field name="formatted_reminder_date" readonly="1"/> -->
                             <!-- <field name="rulebook_compute_date" readonly="0" string="Internal Due Date1"/> -->
                             <field name="formatted_regulatory_date" readonly="1" string="Regulatory Due Date"/>
+                            <!-- <field name="formatted_reminder_date" readonly="1" string="Reminder Date"/> -->
                             <field name="frequency_type" readonly="1"/>
                         </group>
                     </group>

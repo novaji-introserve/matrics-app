@@ -60,7 +60,7 @@ class ReplyLog(models.Model):
         tracking=True,
         help="The date when the reply was submitted. It is automatically set to the current date.",
         store=True,
-
+        copy=False
     )
 
     # The textual content of the reply submitted by the reporter
@@ -68,6 +68,7 @@ class ReplyLog(models.Model):
         string="Reply Note", help="The content of the reply provided by the inputer.",
         tracking=True,
         store=True,
+        copy=False
     )
 
     # The name of the person who submitted the reply (inputter)
@@ -91,7 +92,8 @@ class ReplyLog(models.Model):
         copy=False
     )
 
-    document_filename = fields.Char(string="Document Filename", tracking=True,        store=True,
+    document_filename = fields.Char(string="Document Filename", tracking=True, store=True,  copy=False
+
                                     )
 
     document_url = fields.Char(
@@ -111,6 +113,8 @@ class ReplyLog(models.Model):
         store=True,
         tracking=True,
         help="The last escalation date calculated from the related rulebook.",
+        copy=False
+
         # related='rulebook_id.last_escalation_sent',
     )
 
@@ -134,6 +138,8 @@ class ReplyLog(models.Model):
         default="pending",
         help="The current status of the related rulebook.",
         tracking=True,
+        copy=False
+
     )
 
     # Field to track the timing of submission compared to the regulatory date (early, on time, late)
@@ -151,6 +157,8 @@ class ReplyLog(models.Model):
         store=True,
         help="Indicates whether the reply was submitted early, on time, or late based on the regulatory date.",
         tracking=True,
+        copy=False
+
     )
 
     formatted_reply_date = fields.Char(
@@ -287,7 +295,6 @@ class ReplyLog(models.Model):
         tracking=True,
         store=True,
 
-
     )
 
     last_internal_due_date_sent = fields.Datetime(
@@ -361,7 +368,8 @@ class ReplyLog(models.Model):
     quarter_day = fields.Integer(string='Day of Quarter', default=7,   store=True,
                                  )
 
-    last_escalation_sent = fields.Datetime(string="Last Escalation Sent")
+    last_escalation_sent = fields.Datetime(string="Last Escalation Sent", copy=False
+)
 
     semi_annual_month1 = fields.Integer(
         string='First Month', default=1)  # January
@@ -551,8 +559,11 @@ class ReplyLog(models.Model):
             }
 
             self.set_global_data(global_data)
-            _logger.critical(f"escalation test got here")
-            if record.rulebook_status == 'submitted' and record.first_line_escalation:
+            
+            submitted_report = (record.document and len(record.document) > 0) or (
+                record.reply_content and record.reply_content.strip() != "")
+            
+            if record.rulebook_status == 'submitted' and record.first_line_escalation and submitted_report:
                 self.trigger_escalation_alert(record)
 
         return result
@@ -815,9 +826,14 @@ class ReplyLog(models.Model):
 
                 if not existing_record:
                     new_record = record.copy({
+                        'reply_date': None,
                         'next_compute_date': next_compute_date,
                         'rulebook_compute_date': next_compute_date,
-                        'submission_timing': "pending"
+                        'submission_timing': "pending",
+                        'rulebook_status':"pending",
+                        'reply_content': None,
+                        'document': None,
+                        'document_filename': None
                     })
 
                 # Optionally, compute escalation date and due date for the new record
@@ -977,8 +993,7 @@ class ReplyLog(models.Model):
     @api.model
     def send_reminder_email(self):
         """Send reminder and escalation emails for due or escalated rulebooks."""
-        # today = fields.Datetime.now().astimezone(
-        #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
+       
         today = datetime.now().replace(microsecond=0)
 
         _logger.critical(
@@ -987,7 +1002,6 @@ class ReplyLog(models.Model):
         # Get all rulebook IDs in the current recordset
         rulebook_ = self.env["rulebook"].search([])
         rulebook_ids = rulebook_.ids
-        _logger.critical(f"ALL Rulebook ids {rulebook_ids}")
 
         incomplete_rulebook_logs = self.env['reply.log'].search([
             ('rulebook_status', '!=', 'completed'),
@@ -1000,12 +1014,19 @@ class ReplyLog(models.Model):
                 # Reminder Email: Check if reg_due_date matches today
                 computed_date = rulebook.rulebook_compute_date
                 time_diff = abs((computed_date - today).total_seconds())
+                # not_submitted = not rulebook.document_filename and not rulebook.reply_content
+                not_submitted = not rulebook.document or len(
+                    rulebook.document) == 0 or not rulebook.reply_content or rulebook.reply_content.strip() == ""
+
 
                 # Internal Email: Check if Internal_due_date matches today
-
+                
                 if computed_date and today.date() == computed_date.date():
-                    if computed_date < today:
-                        if not rulebook.last_internal_due_date_sent or rulebook.last_internal_due_date_sent.date() != today.date():
+                    _logger.critical(
+                        f" Checking Internal date for rulebook {rulebook.id}: internal_due_date {computed_date}, today {today}")
+                    if today.time() >= computed_date.time():  # Check if current time is at or after computed time
+                        if not_submitted and (not rulebook.last_internal_due_date_sent or rulebook.last_internal_due_date_sent.date() != today.date()):
+
                             if_success = rulebook._send_internal_due_date_email()
 
                             if if_success :
@@ -1017,9 +1038,14 @@ class ReplyLog(models.Model):
 
 
                 # Escalation Email: Check if escalation_date matches today
+                
                 if rulebook.escalation_date and today.date() == rulebook.escalation_date.date():
-                    if rulebook.escalation_date < today:
-                        if not rulebook.last_escalation_sent or rulebook.last_escalation_sent.date() != today.date():
+                    _logger.critical(
+                        f" Checking escalation for rulebook {rulebook.id}: escalation_date {rulebook.escalation_date}, today {today}")
+                    # Use time comparison instead of date for escalation check:
+                    if today.time() >= rulebook.escalation_date.time():
+                        if not_submitted and (not rulebook.last_escalation_sent or rulebook.last_escalation_sent.date() != today.date()):
+
                             if_success = rulebook._send_escalation_due_date_email()
 
                             if if_success :
@@ -1031,7 +1057,8 @@ class ReplyLog(models.Model):
 
             
 
-                # Check if reminder_due_date is due today                
+                # Check if reminder_due_date is due today    
+                                            
                 if rulebook.reminder_due_date:
                     _logger.critical(
                         f" Checking reminder for rulebook {rulebook.id}: reminder_due_date {rulebook.reminder_due_date}, today {today}")
@@ -1041,38 +1068,21 @@ class ReplyLog(models.Model):
                     # Check if we're between reminder_due_date and the due date
                     if rulebook.reminder_due_date.date() <= today.date() and comparison_date and today.date() < comparison_date.date():
                         due_time_today = rulebook.reminder_due_date.time()
+                        
+                        _logger.critical(
+                            f"Document: {bool(rulebook.document)}, Reply Content: {bool(rulebook.reply_content)}")
 
                         # Check if the current time is at or later than the reminder due time
                         if today.time() >= due_time_today:
-                            if (not rulebook.last_reminder_due_date_sent or rulebook.last_reminder_due_date_sent.date() != today.date()):
+                            
+                             if not_submitted and (not rulebook.last_reminder_due_date_sent or rulebook.last_reminder_due_date_sent.date() != today.date()):
                                 if_success = rulebook._send_reminder_email()
 
                                 if if_success:
                                     rulebook.sudo().write({
                                         'last_reminder_due_date_sent': today
                                     })
-                                    _logger.critical(
-                                        f" Reminder email sent! {rulebook} .. Updated last_reminder_due_date_sent for rulebook log {rulebook.id}")
-                    
-                # if rulebook.reminder_due_date and rulebook.reminder_due_date.date() == today.date():
-                #     due_time_today = rulebook.reminder_due_date.time()
-                #     _logger.critical(
-                #         f" due time today  {due_time_today}")
-
-                #     comparison_date = rulebook.reg_due_date or rulebook.rulebook_compute_date
-                    
-                #     if due_time_today <= today.time() and (comparison_date and rulebook.reminder_due_date < comparison_date):
-                #         if (not rulebook.last_reminder_due_date_sent or rulebook.last_reminder_due_date_sent.date() != today.date()):
-                #             if_success = rulebook._send_reminder_email()
-
-                #             if if_success :
-                #                 rulebook.sudo().write({
-                #                     'last_reminder_due_date_sent': today
-                #                 })
-                #                 _logger.critical(
-                #                     f" Reminder email sent!  {rulebook} .. Updated last_reminder_due_date_sent for rulebook log {rulebook.ids}")
-
-                            
+                                                
 
             except Exception as e:
                 _logger.critical(
@@ -1109,7 +1119,7 @@ class ReplyLog(models.Model):
                 "rulebook_name": rulebook.name.name or "N/A",
                 "reg_due_date": self._compute_formatted_date(self.reg_due_date) or "N/A",
                 "record_link": self._record_link(self.id) or "N/A",
-                "upload_link": self._compute_upload_link(self.id) or "N/A",
+                # "upload_link": self._compute_upload_link(self.id) or "N/A",
                 "current_year": fields.Date.today().year,
                 "rulebook_return": re.sub(r'(<[^>]+>|&\w+;)', '', self.rulebook_name) or "N/A",
                 "regulatory_name": rulebook.regulatory_agency_id.name or "N/A",
@@ -1135,9 +1145,6 @@ class ReplyLog(models.Model):
             }
 
             # Optional CC handling
-
-            # Extensive logging of prepared email data
-            _logger.critical(f"Prepared email data: {global_data}")
 
             return global_data
 
@@ -1251,26 +1258,47 @@ class ReplyLog(models.Model):
                     "rule_book.email_template_first_line_escalation_")
             except ValueError:
                 _logger.critical(
-                    " escalation_due_date Email template not found")
+                    "Escalation due date Email template not found")
                 return False
 
             # Detailed logging for debugging
             _logger.critical(
-                f"Attempting to send escalation_due_date email for record {self.id}")
+                f"Attempting to send Escalation due date email for record {self.id}")
             _logger.critical(f"Email data: {email_data}")
 
-            # Send the email
-            email_result = template.send_mail(self.id, force_send=True)
+            # Send the email with more detailed error handling
+            try:
+                email_result = template.send_mail(
+                    self.id, force_send=True, raise_exception=True)
+                if email_result:
+                    # Check if the email was actually sent (in Odoo 14+, this will return the mail.mail id)
+                    mail = self.env['mail.mail'].browse(email_result)
+                    if mail.state == 'sent':
+                        _logger.critical(
+                            f"Escalation due date email sent successfully. Mail ID: {email_result}, State: {mail.state}")
+                        return True
+                    else:
+                        _logger.critical(
+                            f"Escalation due date email was not sent immediately, it's in state: {mail.state}. Mail ID: {email_result}")
+                        return False
+                else:
+                    _logger.critical("Email sending returned no result.")
+                    return False
+            except Exception as e:
+                _logger.critical(
+                    f"Failed to send Escalation due date email: {str(e)}")
+                # Check if this is an SMTP authentication issue or network issue
+                if "SMTP Authentication Error" in str(e) or "Connection refused" in str(e):
+                    raise UserError(
+                        _("Escalation due date Email sending failed due to SMTP or network issues: %s", str(e)))
+                return False
 
-            _logger.critical(
-                f"escalation_due_date Email sent successfully. Result: {email_result}")
-            return True
         except Exception as e:
             _logger.critical(f"Comprehensive email send failure: {str(e)}")
             # Log the full traceback for more detailed debugging
             _logger.critical(traceback.format_exc())
             return False
-
+    
     def _send_internal_due_date_email(self):
         """Send internal_due_date notification email"""
         try:
@@ -1290,28 +1318,49 @@ class ReplyLog(models.Model):
                 template = self.env.ref(
                     "rule_book.email_template_internal_due_date_")
             except ValueError:
-                _logger.critical("internal_due_date Email template not found")
+                _logger.critical(
+                    " internal due date Email template not found")
                 return False
 
             # Detailed logging for debugging
             _logger.critical(
-                f"Attempting to send internal_due_date email for record {self.id}")
+                f"Attempting to send Internal due date email for record {self.id}")
             _logger.critical(f"Email data: {email_data}")
 
-            # Send the email
-            email_result = template.send_mail(self.id, force_send=True)
-            if email_result:
-                _logger.critical(
-                    f"internal_due_date Email sent successfully. Result: {email_result}")
-            return True
+            # Send the email with more detailed error handling
+            try:
+                email_result = template.send_mail(
+                    self.id, force_send=True, raise_exception=True)
+                if email_result:
+                    # Check if the email was actually sent (in Odoo 14+, this will return the mail.mail id)
+                    mail = self.env['mail.mail'].browse(email_result)
+                    if mail.state == 'sent':
+                        _logger.critical(
+                            f"internal due date email sent successfully. Mail ID: {email_result}, State: {mail.state}")
+                        return True
+                    else:
+                        _logger.critical(
+                            f"Internal due date email was not sent immediately, it's in state: {mail.state}. Mail ID: {email_result}")
+                        return False
+                else:
+                    _logger.critical("Email sending returned no result.")
+                    return False
+            except Exception as e:
+                _logger.critical(f"Failed to send Internal due date email: {str(e)}")
+                # Check if this is an SMTP authentication issue or network issue
+                if "SMTP Authentication Error" in str(e) or "Connection refused" in str(e):
+                    raise UserError(
+                        _("Internal due date Email sending failed due to SMTP or network issues: %s", str(e)))
+                return False
+
         except Exception as e:
             _logger.critical(f"Comprehensive email send failure: {str(e)}")
             # Log the full traceback for more detailed debugging
             _logger.critical(traceback.format_exc())
             return False
-
+    
     def _send_reminder_email(self):
-        """Send regulatory_due_date notification email"""
+        """Send regulatory_due_date notification email, returning True only if email was sent successfully."""
         try:
             # Ensure the record exists and is valid
             if not self:
@@ -1335,21 +1384,41 @@ class ReplyLog(models.Model):
 
             # Detailed logging for debugging
             _logger.critical(
-                f"Attempting to send reminder_ email for record {self.id}")
+                f"Attempting to send reminder email for record {self.id}")
             _logger.critical(f"Email data: {email_data}")
 
-            # Send the email
-            email_result = template.send_mail(self.id, force_send=True)
+            # Send the email with more detailed error handling
+            try:
+                email_result = template.send_mail(
+                    self.id, force_send=True, raise_exception=True)
+                if email_result:
+                    # Check if the email was actually sent (in Odoo 14+, this will return the mail.mail id)
+                    mail = self.env['mail.mail'].browse(email_result)
+                    if mail.state == 'sent':
+                        _logger.critical(
+                            f"Reminder email sent successfully. Mail ID: {email_result}, State: {mail.state}")
+                        return True
+                    else:
+                        _logger.critical(
+                            f"Reminder email was not sent immediately, it's in state: {mail.state}. Mail ID: {email_result}")
+                        return False
+                else:
+                    _logger.critical("Email sending returned no result.")
+                    return False
+            except Exception as e:
+                _logger.critical(f"Failed to send Reminder email: {str(e)}")
+                # Check if this is an SMTP authentication issue or network issue
+                if "SMTP Authentication Error" in str(e) or "Connection refused" in str(e):
+                    raise UserError(
+                        _("Reminder Email sending failed due to SMTP or network issues: %s", str(e)))
+                return False
 
-            _logger.critical(
-                f"reminder_due_date Email sent successfully. Result: {email_result}")
-            return True
         except Exception as e:
             _logger.critical(f"Comprehensive email send failure: {str(e)}")
             # Log the full traceback for more detailed debugging
             _logger.critical(traceback.format_exc())
             return False
-
+    
     def _validate_update_conditions(self, vals):
         """
         Validate update conditions for reply content and document.
@@ -1382,14 +1451,10 @@ class ReplyLog(models.Model):
             if is_first_submission:
                 # Prevent status change if reply content or document is not updated
 
-                # if not ('submission_timing' in vals or 'next_due_date_computed' in vals or 'reminder_due_date' in vals or 'reg_due_date' in vals or 'escalation_date' in vals) and not (updating_reply_content or updating_document):
-                #     raise AccessError('Action not allowed.')
                 allowed_columns = ['submission_timing', 'next_due_date_computed',
                                    'reminder_due_date', 'reg_due_date', 'escalation_date', 'last_internal_due_date_sent',
                                    'last_escalation_sent', 'last_reminder_due_date_sent', 'reg_due_date_processed']
 
-                # if not any(key in vals for key in allowed_columns) and not (updating_reply_content or updating_document):
-                #     raise AccessError('Action not allowed.')
                 if not self.env.context.get('allow_auto_update', False) and not any(key in vals for key in allowed_columns) and not (updating_reply_content or updating_document):
                     raise AccessError('Action not allowed.')
 

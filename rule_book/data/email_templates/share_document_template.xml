@@ -14,7 +14,8 @@
             <field name="body_html" type="html">
                 <div style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
                     <div style="text-align: center; padding: 10px 0;">
-                        <img src="https://www.boi.ng//wp-content/uploads/2022/06/BOI-logo.png" alt="Bank of Industry" style="max-width: 100px;" />
+                        <img src="https://www.boi.ng/wp-content/uploads/2024/10/boi-logo.svg" alt="Bank of Industry logo" style="max-width: 100px;" />
+                        <!-- <img src="https://www.boi.ng//wp-content/uploads/2022/06/BOI-logo.png" alt="Bank of Industry logo" style="max-width: 100px;" /> -->
                         <!-- <img src="rule_book/static/src/img/boi.jpeg" alt="Bank of Industry" style="max-width: 100px;" /> -->
                     </div>
 
