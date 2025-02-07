@@ -22,10 +22,8 @@ class Transaction(models.Model):
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True)
     amount = fields.Float(string='Transaction Amount', digits=(15, 2))
-    # tran_type = fields.Selection(string='Tran. Type', selection=[
-    #                              ('dr', 'Debit'), ('cr', 'Credit')], index=True)
-    tran_type = fields.Many2one(comodel_name='res.transaction.type',
-                              string='Tran. Type', index=True)
+    tran_type = fields.Selection(string='Tran. Type', selection=[
+                                 ('dr', 'Debit'), ('cr', 'Credit')], index=True)
     narration = fields.Text(string='Narration')
     batch_code = fields.Char(string='Batch Code', index=True)
     rule_id = fields.Many2one(comodel_name='res.transaction.screening.rule',

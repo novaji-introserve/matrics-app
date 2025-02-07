@@ -4,6 +4,7 @@ from odoo import fields, models, api, _
 class AccountOfficer(models.Model):
     _name = 'res.account.officer'
     _description = _('Account Officer')
+    _rec_name = "officername"
     _sql_constraints = [
         ('uniq_staff_id', 'unique(staff_id)',
          "Account Officer already exists. Value must be unique!"),

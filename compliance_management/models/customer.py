@@ -72,10 +72,8 @@ class Customer(models.Model):
         string='Risk Score', digits=(10, 2), tracking=True)
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
-    # account_officer_id = fields.Many2one(
-    #     comodel_name='res.users', string='Account Officer', index=True, tracking=True)
     account_officer_id = fields.Many2one(
-        comodel_name='res.account.officer', string='Account Officer', index=True, tracking=True)
+        comodel_name='res.users', string='Account Officer', index=True, tracking=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(
@@ -132,6 +130,7 @@ class Customer(models.Model):
     @api.depends('account_ids')
     def _total_accounts(self):
         for e in self:
+
             e.total_accounts = len(e.account_ids)
 
     def action_total_accounts(self):

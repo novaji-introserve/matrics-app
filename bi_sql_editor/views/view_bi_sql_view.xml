@@ -214,6 +214,10 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                         </page> -->
 
       <!-- </page> -->
+      <!-- <div class="oe_chatter">
+        <field name="message_ids" widget="mail_thread" />
+        <field name="activity_ids" widget="mail_activity" />
+      </div> -->
     </field>
   </record>
 
@@ -242,3 +246,4 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
     sequence="5"
   />
 </odoo>
+
