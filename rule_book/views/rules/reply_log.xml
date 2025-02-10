@@ -35,6 +35,8 @@
                 <field name="reply_content" string="Reply Note"/>
                 <field name="rulebook_name" string="Type of return"/>
                 <field name="frequency_type" string="frequency"/>
+                <field name="reporter" string="Officer Responsible"/>
+                <field name="department_id" string="Department Responsible"/>
                 <searchpanel>
                     <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1"/>
                     <field name="submission_timing" icon="fa-clock" string="Submission Timing" enable_counters="1"/>

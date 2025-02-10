@@ -570,7 +570,7 @@ class ReplyLog(models.Model):
 
     def trigger_escalation_alert(self, report):
         # Logic for sending email to escalation officers
-        template = request.env.ref(
+        template = self.env.ref(
             "rule_book.email_template_rulebook_log_notification_")
         if template:
             template.sudo().send_mail(report.id, force_send=True)

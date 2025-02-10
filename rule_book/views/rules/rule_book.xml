@@ -226,6 +226,8 @@
                 <field name="description" string="Description" />
                 <field name="type_of_return" string="Type Of Return" />
                 <field name="frequency_type" string="Frequency Type" />
+                <field name="officer_responsible" string="Responsible officer" />
+                <field name="responsible_id" string="Responsible Department"/>
                 
                 <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">
 
