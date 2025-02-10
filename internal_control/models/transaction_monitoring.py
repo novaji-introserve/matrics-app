@@ -244,6 +244,584 @@ class TransactionMonitoring(models.Model):
                 'default_state': 'new'
             }
         }
+        
+    def open_customers_all_transactions_today_ngn(self):
+        today = fields.Date.today()
+        
+        domain = [('currency_id', '=', 121),('date_created', '=', today)]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Naira Transactions '),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_customers_all_transactions_today_other(self):
+        today = fields.Date.today()
+        
+        domain = [('currency_id', '!=', 121),('date_created', '=', today)]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Currency Transactions '),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_customers_all_transactions_7days_ngn(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        domain = [('currency_id', '=', 121),  ('date_created', '>=', last_7_days),
+                ('date_created', '<', today)]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Naira Transactions - Last 7 Days '),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    def open_customers_all_transactions_7days_other(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        domain = [('currency_id', '!=', 121),  ('date_created', '>=', last_7_days),
+                ('date_created', '<', today)]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Currency Transactions -Last 7 Days '),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    def open_customers_awaiting_review_today_ngn(self):
+        today = fields.Date.today()
+
+        
+        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('NGN Awaiting Transactions'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_customers_awaiting_review_today_other(self):
+        today = fields.Date.today()
+
+        
+        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '!=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Currency Awaiting Transactions'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_customers_awaiting_review_7days_ngn(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        domain = [('state', '=', 'new'),('date_created', '>=', last_7_days),
+                ('date_created', '<', today), ('currency_id', '=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('NGN Awaiting Transactions - Last 7 Day'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    def open_customers_awaiting_review_7days_other(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        domain = [('state', '=', 'new'),('date_created', '>=', last_7_days),
+                ('date_created', '<', today), ('currency_id', '!=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Currency Awaiting Transactions - Last 7 Day'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_customers_reviewed_today_ngn(self):
+        today = fields.Date.today()
+
+        
+        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('NGN Reviewed Transactions'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_customers_reviewed_today_other(self):
+        today = fields.Date.today()
+
+        
+        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '!=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('NGN Reviewed Transactions'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    
+    def open_customers_reviewed_7days_ngn(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        domain = [('state', '=', 'done'),('date_created', '>=', last_7_days),
+                ('date_created', '<', today), ('currency_id', '=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('NGN Reviewed Transactions - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    def open_customers_reviewed_7days_other(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        domain = [('state', '=', 'done'),('date_created', '>=', last_7_days),
+                ('date_created', '<', today), ('currency_id', '!=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Reviewed Transactions - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_internal_all_transactions_today_ngn(self):
+        today = fields.Date.today()
+
+        
+        domain = [('date_created', '=', today), ('account_id.name', '>=', '14'), ('currency_id', '=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Naira Internal Transactions Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    def open_internal_all_transactions_today_other(self):
+        today = fields.Date.today()
+
+        
+        domain = [('date_created', '=', today), ('account_id.name', '>=', '14'), ('currency_id', '!=', '121')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Internal Transactions Foreign Currency'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_internal_all_transactions_7days_ngn(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        domain = [('date_created', '>=', last_7_days),
+                ('date_created', '<', today), ('currency_id', '=', '121'),('account_id.name', '>=', 14)]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Internal Transactions - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    def open_internal_all_transactions_7days_other(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        domain = [('date_created', '>=', last_7_days),
+                ('date_created', '<', today), ('currency_id', '!=', '121'),('account_id.name', '>=', 14)]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Internal Transactions - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    def open_internal_awaiting_review_today_ngn(self):
+        today = fields.Date.today()
+        
+        domain = [('date_created', '=', today),('currency_id', '=', '121'),('account_id.name', '>=', 14), ('state', '=', 'new')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Internal Transactions Awaiting Review - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    def open_internal_awaiting_review_today_other(self):
+        today = fields.Date.today()
+        
+        domain = [('date_created', '=', today),('currency_id', '!=', '121'),('account_id.name', '>=', 14), ('state', '=', 'new')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Internal Transactions Awaiting Review - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_internal_awaiting_review_7days_ngn(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        
+        domain = [('date_created', '>=', last_7_days),
+                ('date_created', '<', today),('currency_id', '=', '121'),('account_id.name', '>=', 14), ('state', '=', 'new')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Naira Internal Transactions Awaiting Review - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_internal_awaiting_review_7days_other(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        
+        domain = [('date_created', '>=', last_7_days),
+                ('date_created', '<', today),('currency_id', '!=', '121'),('account_id.name', '>=', 14), ('state', '=', 'new')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Internal Transactions Awaiting Review - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_internal_reviewed_today_ngn(self):
+        today = fields.Date.today()
+        
+        domain = [('date_created', '=', today),('currency_id', '=', '121'),('account_id.name', '>=', 14), ('state', '=', 'done')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Internal Transactions Reviewed - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+    def open_internal_reviewed_today_other(self):
+        today = fields.Date.today()
+        
+        domain = [('date_created', '=', today),('currency_id', '!=', '121'),('account_id.name', '>=', 14), ('state', '=', 'done')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Internal Transactions Reviewed - Today'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_internal_reviewed_7days_ngn(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        
+        domain = [('date_created', '>=', last_7_days),
+                ('date_created', '<', today),('currency_id', '=', '121'),('account_id.name', '>=', 14), ('state', '=', 'done')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Naira Internal Transactions Reviewed - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
+    def open_internal_reviewed_7days_other(self):
+        today = fields.Date.today()
+        last_7_days = today - timedelta(days=7)
+        
+        
+        domain = [('date_created', '>=', last_7_days),
+                ('date_created', '<', today),('currency_id', '!=', '121'),('account_id.name', '>=', 14), ('state', '=', 'done')]
+        
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+        if not is_cco:
+            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+        return {
+            'name': _('Foreign Internal Transactions Reviewed - Last 7 Days'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+                'default_state': 'new'
+            }
+        }
+        
 
     # In Odoo shell
     def diagnose_branch_references(self):
