@@ -19,9 +19,9 @@ from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urljoin
 import hashlib
 import psycopg2
-from odoo.addons.queue.queue_job import delay  # Import the job decorator
+# from odoo.addons.queue.queue_job import delay  # Import the job decorator
 # from odoo.addons.queue.queue_job import job, with_delay
-from odoo.addons.queue.queue_job.exception import RetryableJobError
+# from odoo.addons.queue.queue_job.exception import RetryableJobError
 
 _logger = logging.getLogger(__name__)
 
