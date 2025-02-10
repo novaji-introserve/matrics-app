@@ -214,6 +214,7 @@ class RulebookTitle(models.Model):
             form_url = f"{base_url}web#id={title.id}&model=rulebook.title&view_type=form"
 
             results.append({
+                'id':title.id,
                 'name': title.name,
                 'source': title.source_id.name if title.source_id else 'N/A',
                 'created_on': title.created_on,
