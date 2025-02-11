@@ -76,7 +76,7 @@
                 <field name="scope" />
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="d-flex mb-2" style="justify-content: space-between; min-height: 30vh;">
+                        <div class="d-flex mb-2" style="justify-content: space-between;">
                             <field name="name" class="fw-bolder fs-5" /><br/>
                             <field name="val" widget="badge" decoration-info="1"  />
                         </div>

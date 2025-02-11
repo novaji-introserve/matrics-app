@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.ComplianceDashboard" owl="1">
+        <div class="vh-100 overflow-auto bg-muted ">
+            <!-- first section -->
+            <div class="col-12">
+                <div class="col-12 m-0 p-0">
+                    <div class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
+
+                        <div class="flex-grow-1 me-3">
+                            <img t-att-src="'/compliance_management/static/src/img/logov.png'" alt="Dashboard Icon"
+                                class="img-fluid" style="width: 300; max-height: 70px; object-fit: contain; " />
+                        </div>
+
+                        <div class="ms-3">
+                            <select class="form-select">
+                                <option value="0" selected="selected">Today</option>
+                                <option value="7">Last 7 Days</option>
+                                <option value="14">Last 14 Days</option>
+                                <option value="30">Last Month</option>
+                                <option value="60">2 Months</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- second section -->
+
+            <div class="container">
+
+                <div class="row">
+
+
+                    <div class="col-md-9 ">
+
+                        <div class="d-flex card-container gap-3 py-4">
+
+                            <Card title="'transaction'" scope="'bank'" total="1200" bgcolor="'#FEEEF1'" />
+                            <Card title="'transaction'" scope="'risk'" total="1200" bgcolor="'#FEF2DC'" />
+                            <Card title="'transaction'" scope="'branch'" total="1200" bgcolor="'#D9FAE7'" />
+                            <Card title="'transaction'" scope="'compliance'" total="1200" bgcolor="'#8BB8D9'" />
+                            <Card title="'transaction'" scope="'regulatory'" total="1200" bgcolor="'#F7E8BD'" />
+
+                        </div>
+
+                        <div class="chart">
+                            <ChartRenderer type="'line'" title="Transaction" />
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3 rightside position-fixed end-0 vh-100  p-4">
+
+
+                        <div class="shadow shadow-lg p-4 d-flex gap-md-3 flex-col flex-md-row">
+
+                            <div class="circle">
+                                5
+                            </div>
+
+                            <div>
+
+                                <div t-on-click="() => displaybycategory('bank')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Bank</h5>
+                                    <div style="background-color: #FEEEF1; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+                                <div t-on-click="() => displaybycategory('risk')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Risk</h5>
+                                    <div style="background-color: #FEF2DC; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+                                <div t-on-click="() => displaybycategory('compliance')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Compliance</h5>
+                                    <div style="background-color: #8BB8D9; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+                                <div t-on-click="() => displaybycategory('branch')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Branch</h5>
+                                    <div style="background-color: #D9FAE7; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+                                <div t-on-click="() => displaybycategory('regulatory')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Regulatory</h5>
+                                    <div style="background-color: #F7E8BD; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="shadow shadow-lg mt-3 chart">
+
+                            <ChartRenderer type="'doughnut'" title="'Users Report'" />
+
+                        </div>
+
+
+
+                    </div>
+                    <!-- Modal trigger button -->
+
+
+                    <!-- Modal Body -->
+                    <!-- if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard -->
+                    <div class="modal fade" id="modalId" tabindex="-1" data-bs-backdrop="static"
+                        data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg"
+                            role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalTitleId">
+                                        Modal title
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">Body</div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Close
+                                    </button>
+                                    <button type="button" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+    </t>
+</templates>

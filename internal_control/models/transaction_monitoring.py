@@ -42,10 +42,11 @@ class TransactionMonitoring(models.Model):
        
         
         # Get NGN currency ID dynamically
-        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')]) 
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
+
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
 
         domain = [('date_created', '=', today), ('currency_id', '=', ngn_currency.id)]
@@ -74,17 +75,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
-        # Get NGN currency ID dynamically
-        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
-        if not ngn_currency:
-            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
-            
+
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
 
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<=', today),
-                ('currency_id', '=', ngn_currency.id)]
+                ('date_created', '<=', today)]
 
         if not is_cco:
             domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
@@ -109,14 +105,11 @@ class TransactionMonitoring(models.Model):
     def open_awaiting_review_today(self):
         today = fields.Date.today()
         
-        # Get NGN currency ID dynamically
-        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
-        if not ngn_currency:
-            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
 
-        domain = [('date_created', '=', today), ('currency_id', '=', ngn_currency.id),('state', '=', 'new')]
+        domain = [('date_created', '=', today),('state', '=', 'new')]
 
         if not is_cco:
             domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
@@ -142,17 +135,13 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
-        # Get NGN currency ID dynamically
-        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
-        if not ngn_currency:
-            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+    
             
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
 
         domain = [('state', '=', 'new'),
                 ('date_created', '>=', last_7_days),
-                ('date_created', '<=', today),
-                ('currency_id', '=', ngn_currency.id)]
+                ('date_created', '<=', today)]
 
         if not is_cco:
             domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
@@ -178,16 +167,11 @@ class TransactionMonitoring(models.Model):
     def open_reviewed_today(self):
         today = fields.Date.today()
         
-        # Get NGN currency ID dynamically
-        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
-        if not ngn_currency:
-            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
             
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
 
         domain = [('state', '=', 'done'),
-                ('date_created', '=', today),
-                ('currency_id', '=', ngn_currency.id)]
+                ('date_created', '=', today)]
 
         if not is_cco:
             domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
@@ -213,18 +197,13 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
-        # Get NGN currency ID dynamically
-        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
-        if not ngn_currency:
-            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
-            
+        
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
 
         domain = [('state', '=', 'done'),
                 ('date_created', '>=', last_7_days),
-                ('date_created', '<=', today),
-                ('currency_id', '=', ngn_currency.id)]
+                ('date_created', '<=', today)]
 
         if not is_cco:
             domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
@@ -248,7 +227,11 @@ class TransactionMonitoring(models.Model):
     def open_customers_all_transactions_today_ngn(self):
         today = fields.Date.today()
         
-        domain = [('currency_id', '=', 121),('date_created', '=', today)]
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
+        domain = [('currency_id', '=', ngn_currency.id),('date_created', '=', today)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -271,7 +254,12 @@ class TransactionMonitoring(models.Model):
     def open_customers_all_transactions_today_other(self):
         today = fields.Date.today()
         
-        domain = [('currency_id', '!=', 121),('date_created', '=', today)]
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
+        domain = [('currency_id', '!=', ngn_currency.id),('date_created', '=', today)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -295,7 +283,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
-        domain = [('currency_id', '=', 121),  ('date_created', '>=', last_7_days),
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
+        
+        domain = [('currency_id', '=', ngn_currency.id),('date_created', '>=', last_7_days),
                 ('date_created', '<', today)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
@@ -319,7 +312,13 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
-        domain = [('currency_id', '!=', 121),  ('date_created', '>=', last_7_days),
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+            
+        print(ngn_currency)
+        
+        domain = [('currency_id', '!=', ngn_currency.id),  ('date_created', '>=', last_7_days),
                 ('date_created', '<', today)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
@@ -328,7 +327,7 @@ class TransactionMonitoring(models.Model):
             domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
         
         return {
-            'name': _('Foreign Currency Transactions -Last 7 Days '),
+            'name': _('Foreign Currency Transactions - Last 7 Days '),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
@@ -341,9 +340,13 @@ class TransactionMonitoring(models.Model):
         }
     def open_customers_awaiting_review_today_ngn(self):
         today = fields.Date.today()
+        
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
 
         
-        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '=', '121')]
+        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -365,9 +368,13 @@ class TransactionMonitoring(models.Model):
         
     def open_customers_awaiting_review_today_other(self):
         today = fields.Date.today()
+        
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
 
         
-        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '!=', '121')]
+        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '!=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -391,8 +398,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
         domain = [('state', '=', 'new'),('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '=', '121')]
+                ('date_created', '<', today), ('currency_id', '=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -415,8 +426,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
         domain = [('state', '=', 'new'),('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '!=', '121')]
+                ('date_created', '<', today), ('currency_id', '!=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -439,8 +454,11 @@ class TransactionMonitoring(models.Model):
     def open_customers_reviewed_today_ngn(self):
         today = fields.Date.today()
 
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '=', '121')]
+        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -462,9 +480,13 @@ class TransactionMonitoring(models.Model):
         
     def open_customers_reviewed_today_other(self):
         today = fields.Date.today()
+        
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
 
         
-        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '!=', '121')]
+        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '!=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -488,8 +510,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
         domain = [('state', '=', 'done'),('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '=', '121')]
+                ('date_created', '<', today), ('currency_id', '=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -512,8 +538,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
         domain = [('state', '=', 'done'),('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '!=', '121')]
+                ('date_created', '<', today), ('currency_id', '!=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -536,8 +566,11 @@ class TransactionMonitoring(models.Model):
     def open_internal_all_transactions_today_ngn(self):
         today = fields.Date.today()
 
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('date_created', '=', today), ('account_id.name', '>=', '14'), ('currency_id', '=', '121')]
+        domain = [('date_created', '=', today), ('account_id.name', '>=', '14'), ('currency_id', '=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -559,8 +592,11 @@ class TransactionMonitoring(models.Model):
     def open_internal_all_transactions_today_other(self):
         today = fields.Date.today()
 
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('date_created', '=', today), ('account_id.name', '>=', '14'), ('currency_id', '!=', '121')]
+        domain = [('date_created', '=', today), ('account_id.name', '>=', '14'), ('currency_id', '!=', ngn_currency.id)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -584,8 +620,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '=', '121'),('account_id.name', '>=', 14)]
+                ('date_created', '<', today), ('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -608,8 +648,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '!=', '121'),('account_id.name', '>=', 14)]
+                ('date_created', '<', today), ('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14)]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -631,7 +675,11 @@ class TransactionMonitoring(models.Model):
     def open_internal_awaiting_review_today_ngn(self):
         today = fields.Date.today()
         
-        domain = [('date_created', '=', today),('currency_id', '=', '121'),('account_id.name', '>=', 14), ('state', '=', 'new')]
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
+        domain = [('date_created', '=', today),('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'new')]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -653,7 +701,11 @@ class TransactionMonitoring(models.Model):
     def open_internal_awaiting_review_today_other(self):
         today = fields.Date.today()
         
-        domain = [('date_created', '=', today),('currency_id', '!=', '121'),('account_id.name', '>=', 14), ('state', '=', 'new')]
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
+        domain = [('date_created', '=', today),('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'new')]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -677,9 +729,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('currency_id', '=', '121'),('account_id.name', '>=', 14), ('state', '=', 'new')]
+                ('date_created', '<', today),('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'new')]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -703,9 +758,12 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('currency_id', '!=', '121'),('account_id.name', '>=', 14), ('state', '=', 'new')]
+                ('date_created', '<', today),('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'new')]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -728,7 +786,11 @@ class TransactionMonitoring(models.Model):
     def open_internal_reviewed_today_ngn(self):
         today = fields.Date.today()
         
-        domain = [('date_created', '=', today),('currency_id', '=', '121'),('account_id.name', '>=', 14), ('state', '=', 'done')]
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
+        domain = [('date_created', '=', today),('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'done')]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -750,7 +812,11 @@ class TransactionMonitoring(models.Model):
     def open_internal_reviewed_today_other(self):
         today = fields.Date.today()
         
-        domain = [('date_created', '=', today),('currency_id', '!=', '121'),('account_id.name', '>=', 14), ('state', '=', 'done')]
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
+        domain = [('date_created', '=', today),('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'done')]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -774,9 +840,13 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('currency_id', '=', '121'),('account_id.name', '>=', 14), ('state', '=', 'done')]
+                ('date_created', '<', today),('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'done')]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
@@ -800,9 +870,13 @@ class TransactionMonitoring(models.Model):
         today = fields.Date.today()
         last_7_days = today - timedelta(days=7)
         
+        ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+        if not ngn_currency:
+            ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('currency_id', '!=', '121'),('account_id.name', '>=', 14), ('state', '=', 'done')]
+                ('date_created', '<', today),('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'done')]
         
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
         
