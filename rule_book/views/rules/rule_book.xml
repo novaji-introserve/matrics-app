@@ -216,8 +216,8 @@
                     <!-- <field name="officer_responsible" icon="fa-user-tie" enable_counters="1" options='{"counters": true}' string="Officer Responsible" /> -->
                     <field name="regulatory_agency_id" icon="fa-building" enable_counters="1" options='{"counters": true}' string="Regulatory Agency" />
 
-                    <field name="risk_category" icon="fa-exclamation-triangle" enable_counters="1" options='{"counters": true}' string="Risk Category" />
-                    <field name="risk_rating" icon="fa-thermometer-half" enable_counters="1" options='{"counters": true}' string="Risk Rating" />
+                    <!-- <field name="risk_category" icon="fa-exclamation-triangle" enable_counters="1" options='{"counters": true}' string="Risk Category" /> -->
+                    <!-- <field name="risk_rating" icon="fa-thermometer-half" enable_counters="1" options='{"counters": true}' string="Risk Rating" /> -->
                     <field name="frequency_type" icon="fa-calendar-alt" enable_counters="1" options='{"counters": true}' string="Frequency Type" />
                     <!-- <field name="theme_id" icon="fa-book" enable_counters="1" options='{"counters": true}' string="Theme" /> -->
                     <field name="status" icon="fa-toggle-on" enable_counters="1" options='{"counters": true}' string="Status" />
