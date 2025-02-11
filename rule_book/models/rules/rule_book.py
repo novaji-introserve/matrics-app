@@ -1088,6 +1088,34 @@ class Rulebook(models.Model):
                 # If computed_date is not available, set reg_due_date to False or handle accordingly
                 record.reminder_due_date = None
 
+    def _compute_reminder_due_date_for_cron_job(self):
+        for record in self:
+            if record.computed_date and record.reminder_due_date_unit in [
+                "days",
+                "hours",
+                "minutes",
+                "seconds",
+                "weeks",
+                "months",
+                "years",
+            ]:
+                if record.reminder_due_date_value:
+                    delta_args = {
+                        record.reminder_due_date_unit: -record.reminder_due_date_value
+                    }
+                    record.reminder_due_date = record.computed_date + relativedelta(
+                        **delta_args
+                    )
+                    _logger.critical(
+                        f"writing NEW Reminder Due date for rulebook ..{record.reminder_due_date}")
+                    record.sudo().write({
+                        'reminder_due_date': record.reminder_due_date,
+                    })
+
+            else:
+                # If computed_date is not available, set reg_due_date to False or handle accordingly
+                record.reminder_due_date = None
+    
     @api.depends("computed_date")
     def _compute_formatted_rulebook_date(self):
         for record in self:
@@ -1717,53 +1745,82 @@ class Rulebook(models.Model):
             raise ValueError(
                 f"Error extracting rulebook ID from event: {event.name}. Error: {str(e)}")
 
+    # @api.model
+    # def check_rulebook_and_update_due_date(self):
+    #     """Check rulebooks with today's regulatory date and update next due date."""
+
+    #     today = datetime.now().date()
+
+    #     _logger.critical(
+    #         f"rulebooks with today's regulatory date  {today}, plus one day {today + timedelta(days=1)}")
+
+    #     today = fields.Datetime.now()
+    #     # .astimezone(
+    #     #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
+
+    #     # Adjust to local midnight without timezone conversion
+    #     day_start = today.replace(hour=0, minute=0, second=0)
+    #     day_end = today.replace(hour=23, minute=59, second=59)
+    #     time_in_15_minutes = today + timedelta(minutes=15)
+
+    #     day_start = day_start.replace(
+    #         tzinfo=None, microsecond=0)  # Remove timezone info
+    #     day_end = day_end.replace(tzinfo=None, microsecond=0)
+
+    #     time_in_15_minutes = time_in_15_minutes.replace(
+    #         tzinfo=None, microsecond=0)
+
+    #     # Perform the search
+    #     rulebooks = self.env["rulebook"].search(
+    #         [
+    #             ("computed_date", ">=", day_start),
+    #             ("computed_date", "<", day_end),
+    #             ("is_recurring", "=", True),
+    #         ]
+    #     )
+
+    #     for record in rulebooks:
+    #         try:
+    #             _logger.critical(
+    #                 f"To Update rulebook {record.id}:,  type of return : {re.sub(r'<[^>]+>', '', record.type_of_return)} frequency : {record.frequency_type}")
+
+    #             computed_date = (record.computed_date)
+    #             time_in_5_minutes = computed_date - timedelta(minutes=5)
+
+    #             if today >= time_in_5_minutes and computed_date:
+    #                 record._compute_next_due_date()
+
+    #         except Exception as e:
+    #             _logger.critical(f"Failed to update rulebook {record.id}: {e}")
+                
     @api.model
-    def check_rulebook_and_update_due_date(self):
-        """Check rulebooks with today's regulatory date and update next due date."""
+    def check_and_update_overdue_dates(self):
+        """Check and update rulebooks where computed_date or regulatory_date has passed"""
+        today = datetime.now().replace(microsecond=0)
+        self = self.sudo()
 
-        today = datetime.now().date()
+        # Search for rulebooks where either date has passed
+        rulebooks = self.env["rulebook"].search([
+            ("is_recurring", "=", True),
+            "|",  # OR condition
+            "&",
+            ("computed_date", "!=", False),
+            ("computed_date", "<=", today),
+            "&",
+            ("reg_due_date", "!=", False),
+            ("reg_due_date", "<=", today)
+        ])
 
-        _logger.critical(
-            f"rulebooks with today's regulatory date  {today}, plus one day {today + timedelta(days=1)}")
+        _logger.info(f"Found {len(rulebooks)} overdue rulebooks to update")
 
-        today = fields.Datetime.now()
-        # .astimezone(
-        #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-
-        # Adjust to local midnight without timezone conversion
-        day_start = today.replace(hour=0, minute=0, second=0)
-        day_end = today.replace(hour=23, minute=59, second=59)
-        time_in_15_minutes = today + timedelta(minutes=15)
-
-        day_start = day_start.replace(
-            tzinfo=None, microsecond=0)  # Remove timezone info
-        day_end = day_end.replace(tzinfo=None, microsecond=0)
-
-        time_in_15_minutes = time_in_15_minutes.replace(
-            tzinfo=None, microsecond=0)
-
-        # Perform the search
-        rulebooks = self.env["rulebook"].search(
-            [
-                ("computed_date", ">=", day_start),
-                ("computed_date", "<", day_end),
-                ("is_recurring", "=", True),
-            ]
-        )
-
+        # Update each rulebook
         for record in rulebooks:
             try:
-                _logger.critical(
-                    f"To Update rulebook {record.id}:,  type of return : {re.sub(r'<[^>]+>', '', record.type_of_return)} frequency : {record.frequency_type}")
-
-                computed_date = (record.computed_date)
-                time_in_5_minutes = computed_date - timedelta(minutes=5)
-
-                if today >= time_in_5_minutes and computed_date:
-                    record._compute_next_due_date()
-
+                record.sudo()._compute_next_due_date()
+                _logger.info(f"Updated rulebook: {record.id}")
             except Exception as e:
-                _logger.critical(f"Failed to update rulebook {record.id}: {e}")
+                _logger.error(f"Failed to update rulebook {record.id}: {e}")
+                
 
     def _compute_next_due_date(self):
         _logger.critical("Updating next due date...")
@@ -1865,6 +1922,7 @@ class Rulebook(models.Model):
 
                 record._compute_escalation_date_for_cron_job()
                 record._compute_reg_due_date_for_cron_job()
+                record._compute_reminder_due_date_for_cron_job()
 
                 _logger.critical(
                     f"Record {record.id}: Computed next due date as {next_compute_date}.")
