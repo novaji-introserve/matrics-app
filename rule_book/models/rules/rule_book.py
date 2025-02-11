@@ -37,6 +37,7 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Rulebook Source document.",
+        index= True
         # default=""
     )
 
@@ -45,14 +46,18 @@ class Rulebook(models.Model):
 
     formatted_rulebook_date = fields.Char(
         string="Formatted Rulebook Date",
-        compute="_compute_formatted_rulebook_date",        # store=True
+        compute="_compute_formatted_rulebook_date",   
+        index=True,
+        # store=True
 
     )
 
     formatted_regulatory_date = fields.Char(
         string="Formatted Regulatory Date",
         compute="_compute_formatted_regulatory_date",
-        # store=True
+        # store=True,
+        index=True,
+
     )
 
     formatted_reminder_date = fields.Char(
@@ -109,6 +114,7 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Type of return for this rulebook.",
+        index= True,
     )
 
     regulatory_agency_id = fields.Many2one(
@@ -134,6 +140,7 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Primary person responsible for this rulebook.",
+        index= True,
         # default=''
     )
 
@@ -303,6 +310,7 @@ class Rulebook(models.Model):
         string="Frequency Type",
         required=True,
         help="Select the frequency type for the regulatory action.",
+        index= True,
     )
 
     is_recurring = fields.Boolean(
@@ -2051,3 +2059,4 @@ class Rulebook(models.Model):
         if user.id not in compliance_group.users.ids and user.id not in cco_group.users.ids:
             raise AccessError(
                 "Action Unauthorized. You do not have access right.")
+    

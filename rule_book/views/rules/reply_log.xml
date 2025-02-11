@@ -37,12 +37,18 @@
                 <field name="frequency_type" string="frequency"/>
                 <field name="reporter" string="Officer Responsible"/>
                 <field name="department_id" string="Department Responsible"/>
+                <field name="formatted_rulebook_date" string="Internal Due Date" filter_domain="['|',('formatted_rulebook_date','ilike',self),('rulebook_compute_date','ilike',self)]"/>
+                <field name="formatted_regulatory_date" string="Regulatory Due Date" filter_domain="['|',('formatted_regulatory_date','ilike',self),('reg_due_date','ilike',self)]"/>
+
                 <searchpanel>
                     <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1"/>
                     <field name="submission_timing" icon="fa-clock" string="Submission Timing" enable_counters="1"/>
                 </searchpanel>
                 <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">
                     <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                    <filter string="Internal Due Date" name="group_computed_date" context="{'group_by': 'rulebook_compute_date:day'}"/>
+                    <filter string="Regulatory Due Date" name="group_reg_due_date" context="{'group_by': 'reg_due_date:day'}"/>
+
                 </group>
             </search>
         </field>

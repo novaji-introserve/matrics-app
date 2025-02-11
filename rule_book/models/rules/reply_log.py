@@ -1,6 +1,6 @@
 import re
 from odoo import models, fields, api, _
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, time
 import pytz
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
@@ -60,7 +60,8 @@ class ReplyLog(models.Model):
         tracking=True,
         help="The date when the reply was submitted. It is automatically set to the current date.",
         store=True,
-        copy=False
+        copy=False,
+        index= True
     )
 
     # The textual content of the reply submitted by the reporter
@@ -68,7 +69,8 @@ class ReplyLog(models.Model):
         string="Reply Note", help="The content of the reply provided by the inputer.",
         tracking=True,
         store=True,
-        copy=False
+        copy=False,
+        index= True
     )
 
     # The name of the person who submitted the reply (inputter)
@@ -89,7 +91,8 @@ class ReplyLog(models.Model):
         tracking=True,
         store=True,
         attachment=True,
-        copy=False
+        copy=False,
+        index=True
     )
 
     document_filename = fields.Char(string="Document Filename", tracking=True, store=True,  copy=False
@@ -138,7 +141,8 @@ class ReplyLog(models.Model):
         default="pending",
         help="The current status of the related rulebook.",
         tracking=True,
-        copy=False
+        copy=False,
+        index= True
 
     )
 
@@ -157,7 +161,8 @@ class ReplyLog(models.Model):
         store=True,
         help="Indicates whether the reply was submitted early, on time, or late based on the regulatory date.",
         tracking=True,
-        copy=False
+        copy=False,
+        index= True
 
     )
 
@@ -170,13 +175,16 @@ class ReplyLog(models.Model):
     formatted_rulebook_date = fields.Char(
         string="Formatted Rulebook Date",
         compute="_compute_formatted_rulebook_date",
-        # store=True
+        # store=True,
+        index=True
+
     )
 
     formatted_regulatory_date = fields.Char(
         string="Formatted Regulatory Date",
         compute="_compute_formatted_regulatory_date",
-        # store=True
+        # store=True,
+        index= True
     )
 
     formatted_reminder_date = fields.Char(
@@ -318,6 +326,7 @@ class ReplyLog(models.Model):
         store=True,
         tracking=True,
         help="due date.",
+        index= True
     )
 
     reminder_due_date_value = fields.Integer(
@@ -1036,14 +1045,19 @@ class ReplyLog(models.Model):
                 # Escalation Email: Check if escalation_date matches today
 
                 # if rulebook.escalation_date and today.date() == rulebook.escalation_date.date():
-                if (rulebook.escalation_date and today == rulebook.escalation_date.date()) or \
-                        (rulebook.reg_due_date and today == rulebook.reg_due_date.date()):
+                if (rulebook.escalation_date and today.date() == rulebook.escalation_date.date()) or (rulebook.reg_due_date and today.date() == rulebook.reg_due_date.date()):
                     _logger.critical(
-                        f" Checking escalation for rulebook {rulebook.id}: escalation_date {rulebook.escalation_date}, today {today}")
-                    # Use time comparison instead of date for escalation check:
-                    if today.time() >= rulebook.escalation_date.time():
-                        if not_submitted and (not rulebook.last_escalation_sent or rulebook.last_escalation_sent.date() != today.date()):
+                        f" Checking escalation for rulebook {rulebook.id}: escalation_date {rulebook.escalation_date}, reg_due_date {rulebook.reg_due_date}, today {today}")
 
+                    # Use time comparison for escalation check:
+                    if rulebook.escalation_date:
+                        escalation_time = rulebook.escalation_date.time()
+                    else:
+                        # If there's no escalation_date, use the time from reg_due_date if available, otherwise default to 4 PM
+                        escalation_time = rulebook.reg_due_date.time() if rulebook.reg_due_date else time(16, 0)  # Default to 4 PM
+
+                    if today.time() >= escalation_time:
+                        if not_submitted and (not rulebook.last_escalation_sent or rulebook.last_escalation_sent.date() != today.date()):
                             if_success = rulebook._send_escalation_due_date_email()
 
                             if if_success:
@@ -1053,7 +1067,6 @@ class ReplyLog(models.Model):
                                 _logger.critical(
                                     f" Escalation email sent!  {rulebook} .. Updated last_escalation_sent for rulebook log {rulebook.ids}")
 
-                
                 # Check if reminder_due_date is due today
 
                 if rulebook.reminder_due_date:
@@ -1082,7 +1095,6 @@ class ReplyLog(models.Model):
                                     rulebook.sudo().write({
                                         'last_reminder_due_date_sent': today
                                     })
-
 
             except Exception as e:
                 _logger.critical(
@@ -1456,7 +1468,6 @@ class ReplyLog(models.Model):
                                    'reminder_due_date', 'reg_due_date', 'escalation_date', 'last_internal_due_date_sent',
                                    'last_escalation_sent', 'last_reminder_due_date_sent', 'reg_due_date_processed']
 
-              
                 if not self.env.user.has_group('rule_book.group_chief_compliance_officer_') and \
                         not self.env.context.get('allow_auto_update', False) and \
                         not any(key in vals for key in allowed_columns) and \

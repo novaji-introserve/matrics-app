@@ -52,6 +52,11 @@
                     </p>
                     
                     <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                        <strong style="color: #004225;">Rulebook Source:</strong>
+                        <t t-out="object.data()['rulebook_return']" />
+                    </p>
+                    
+                    <p style="font-size: 16px; color: #333333; line-height: 1.6;">
                         <strong style="color: #004225;">Escalation Due Date:</strong>
                         <t t-out="object.data()['escalation_date']" />
                     </p>

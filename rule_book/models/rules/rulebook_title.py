@@ -33,12 +33,11 @@ class RulebookTitle(models.Model):
     _name = 'rulebook.title'
     _description = 'Rulebook Sources'
     _rec_name = 'name'
-    # _inherit = ['queue.job']
-    # _inherit = ['queue.job.mapping']
-
-    name = fields.Char(string='Title', required=True)
-    file = fields.Binary(string='File', attachment=True, required=False)
-    file_name = fields.Char(string='File Name')
+   
+    name = fields.Char(string='Title', required=True, index=True)
+    file = fields.Binary(string='File', attachment=True,
+                         required=False, index=True)
+    file_name = fields.Char(string='File Name', index=True)
     ref_number = fields.Char(string='Reference Number', required=False)
     released_date = fields.Date(string='Released Date', required=False)
     status = fields.Selection([
@@ -47,7 +46,7 @@ class RulebookTitle(models.Model):
         ('deleted', 'Deleted')
     ], string='Status', default='active', required=True)
     source_id = fields.Many2one(
-        'rulebook.sources', string='Source', required=True)
+        'rulebook.sources', string='Source', required=True, index=True)
     created_on = fields.Datetime(
         string='Created On', default=fields.Datetime.now, required=True)
     created_by = fields.Many2one(
