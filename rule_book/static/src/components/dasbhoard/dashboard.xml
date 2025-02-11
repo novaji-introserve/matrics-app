@@ -525,7 +525,7 @@ RuleBook Source
 										</div>
 									</div>
 
-									<t t-if="state.newlyUploadedTitle.length === 0">
+									<t t-if="state.newlyUploadedTitle.length == 0">
 										<div class="alert alert-light mt-2">
                 No newly uploaded titles available for this reply.
 										</div>
@@ -533,7 +533,9 @@ RuleBook Source
 									<t t-else="">
 										<div class="card-body pt-4" style="max-height: 300px; overflow-y: auto;">
 											<ul class="p-0 m-0">
-												<t t-foreach="state.newlyUploadedTitle" t-as="title" t-key="title.id+title.create_date">
+											<!-- <t t-foreach="state.newlyUploadedTitle || []" t-as="title" t-key="title.id || Math.random()"></t> -->
+												<t t-foreach="state.newlyUploadedTitle" t-as="title" t-key="title.id">
+												<!-- <t t-foreach="state.newlyUploadedTitle" t-as="title" t-key="JSON.stringify([title.id, title.created_on])"></t> -->
 													<li class="d-flex align-items-center mb-2">
 														<div class="avatar flex-shrink-0 me-3">
 															<img src="/rule_book/static/assets/img/icons/object/rulebook.png" alt="rulebook" class="rounded" />

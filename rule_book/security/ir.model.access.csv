@@ -1,9 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_report_rulebook_source,report.rulebook.department.user,model_rulebook_sources,base.group_user,1,1,1,0
-access_report_rulebook_reply_log,report.rulebook.compliance,model_reply_log,base.group_user,1,1,0,0
+access_report_rulebook_reply_log,report.rulebook.compliance,model_reply_log,base.group_user,1,1,1,0
 access_report_rulebook_rulebook_title,report.rulebook.compliance,model_rulebook_title,base.group_user,1,1,1,0
 access_report_rulebook_risk_category,report.rulebook.compliance,rule_book.model_rulebook_risk_category,base.group_user,1,1,1,0
-access_report_rulebook_rulebook,report.rulebook.department.user,model_rulebook,base.group_user,1,1,1,0
+access_report_rulebook_rulebook,report.rulebook.department.user,model_rulebook,base.group_user,1,1,0,0
 access_report_rulebook_pdf_chat,report.rulebook.compliance,model_pdf_chat,base.group_user,1,1,1,0
 access_report_rulebook_pdf_chat_log,report.rulebook.compliance,model_pdf_chat_log,base.group_user,1,1,1,0
 access_report_rulebook_report_rulebook,report.rulebook.compliance,model_report_rulebook,base.group_user,1,1,1,1
@@ -27,6 +27,9 @@ access_res_users_employee_department_user,hr employees department user,hr.model_
 access_hr_employee_hr,hr.employee.hr,hr.model_hr_employee,rule_book.group_human_resource_,1,1,1,1
 access_hr_department_department,hr department hr,hr.model_hr_department,rule_book.group_human_resource_,1,1,1,1
 access_hr_rulebook_res_users,hr user access,model_res_users,rule_book.group_human_resource_,1,1,1,1
+access_rulebook_theme_user,rulebook.theme user,model_rulebook_theme,base.group_user,1,1,0,0
+access_rulebook_theme_deptuser,rulebook.theme user,model_rulebook_theme,rule_book.group_department_user_,1,1,0,0
+
 
 access_report_rulebook_reply_log_cco,reply log cco user,model_reply_log,rule_book.group_chief_compliance_officer_,1,1,1,1
 access_report_rulebook_pdf_chat_cco,pdf chat cco user,model_pdf_chat,rule_book.group_chief_compliance_officer_,1,1,1,1
@@ -42,7 +45,7 @@ access_res_users_department_cco,hr department cco user,hr.model_hr_department,ru
 access_res_users_employee_cco,hr employees cco user,hr.model_hr_employee,rule_book.group_chief_compliance_officer_,1,1,1,1
 
 access_rulebook_rulebook_manager,report.rulebook.compliance.manager,model_rulebook,rule_book.group_compliance_manager_,1,1,1,1
-rulebook_reply_log_manager,report.rulebook.compliance.manager,model_reply_log,rule_book.group_compliance_manager_,1,1,1,1
+rulebook_reply_log_manager,report.rulebook.compliance.manager,model_reply_log,rule_book.group_compliance_manager_,1,1,0,0
 rulebook_title_manager,title manager user,model_rulebook_title,rule_book.group_compliance_manager_,1,1,1,1
 
 

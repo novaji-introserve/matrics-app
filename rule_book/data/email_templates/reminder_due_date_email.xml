@@ -10,10 +10,15 @@
         <field name="email_to">{{object.data()['email_to']}}</field>
         <field name="subject">Reminder Due Date for {{object.data()['rulebook_return']}}</field>
         <field name="body_html" type="html">
+        <field name="description">Rulebook Reminder Alert</field>
+
             <div style="font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0;">
                 <div style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border: 1px solid #E0E0E0; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
                     <div style="text-align: center; padding: 10px 0;">
-                        <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg" style="max-width: 150px;" />
+                       <img src="https://www.boi.ng/wp-content/uploads/2024/10/boi-logo.svg" alt="Bank of Industry logo" style="max-width: 100px;" />
+                       <!-- <img src="https://www.boi.ng//wp-content/uploads/2022/06/BOI-logo.png" alt="Bank of Industry logo" style="max-width: 100px;" /> -->
+                        <!-- <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg" style="max-width: 150px;" /> -->
+                        <!-- <img src="rule_book/static/src/img/boi.jpeg" style="max-width: 150px;" /> -->
                     </div>
                     <div style="padding: 20px;">
                         <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong style="color: #006400;">
@@ -53,7 +58,7 @@
                                     Please ensure you upload the proof of completion before the aforementioned date.</p>
             </div>
             <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can
-                                upload the document here: <a t-attf-href="#{object.data()['upload_link']}" style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
+                                upload the document here: <a t-attf-href="#{object.data()['record_link']}" style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
                                 Document</a>
             </p>
             <p style="font-size: 16px; color: #333333; line-height: 1.6;">Thank you.</p>

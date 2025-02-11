@@ -25,11 +25,15 @@ class PdfChat(models.Model):
     _rec_name="pdf_file_name"
 
     user_id = fields.Many2one('res.users', string='User', required=True, default=lambda self: self.env.user)
-    rulebook_id = fields.Many2one('rulebook.title', string='Rulebook', required=True)
-    pdf_file_name = fields.Char(string='PDF File Name', compute='_compute_pdf_file_name', store=True)
-    extracted_text = fields.Text(string='Extracted Text', readonly=True)
-    chat_logs = fields.One2many('pdf.chat.log', 'pdf_chat_id', string='Chat Logs')
-    user_question = fields.Text(string='User Question')  # Temporary field for user input
+    rulebook_id = fields.Many2one(
+        'rulebook.title', string='Rulebook', required=True, index=True)
+    pdf_file_name = fields.Char(string='PDF File Name', compute='_compute_pdf_file_name' )
+    extracted_text = fields.Text(
+        string='Extracted Text', readonly=True, index=True)
+    chat_logs = fields.One2many(
+        'pdf.chat.log', 'pdf_chat_id', string='Chat Logs', index=True)
+    # Temporary field for user input
+    user_question = fields.Text(string='User Question')
 
     @api.depends('rulebook_id')
     def _compute_pdf_file_name(self):
