@@ -231,8 +231,8 @@
                 <field name="officer_responsible" string="Responsible officer" />
                 <field name="responsible_id" string="Responsible Department"/>
                 <!-- <field name="formatted_rulebook_date" string="Internal Due Date" widget="daterange"/> -->
-                <field name="formatted_rulebook_date" string="Internal Due Date" filter_domain="['|',('formatted_rulebook_date','ilike',self),('computed_date','ilike',self)]"/>
-                <field name="formatted_regulatory_date" string="Regulatory Due Date" filter_domain="['|',('formatted_regulatory_date','ilike',self),('reg_due_date','ilike',self)]"/>
+                <!-- <field name="formatted_rulebook_date" string="Internal Due Date" filter_domain="['|',('formatted_rulebook_date','ilike',self),('computed_date','ilike',self)]"/>
+                <field name="formatted_regulatory_date" string="Regulatory Due Date" filter_domain="['|',('formatted_regulatory_date','ilike',self),('reg_due_date','ilike',self)]"/> -->
 
                 
                 <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">

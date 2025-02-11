@@ -37,8 +37,8 @@
                 <field name="frequency_type" string="frequency"/>
                 <field name="reporter" string="Officer Responsible"/>
                 <field name="department_id" string="Department Responsible"/>
-                <field name="formatted_rulebook_date" string="Internal Due Date" filter_domain="['|',('formatted_rulebook_date','ilike',self),('rulebook_compute_date','ilike',self)]"/>
-                <field name="formatted_regulatory_date" string="Regulatory Due Date" filter_domain="['|',('formatted_regulatory_date','ilike',self),('reg_due_date','ilike',self)]"/>
+                <!-- <field name="formatted_rulebook_date" string="Internal Due Date" filter_domain="['|',('formatted_rulebook_date','ilike',self),('rulebook_compute_date','ilike',self)]"/>
+                <field name="formatted_regulatory_date" string="Regulatory Due Date" filter_domain="['|',('formatted_regulatory_date','ilike',self),('reg_due_date','ilike',self)]"/> -->
 
                 <searchpanel>
                     <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1"/>
