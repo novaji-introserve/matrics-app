@@ -37,7 +37,7 @@ class RulebookTitle(models.Model):
     name = fields.Char(string='Title', required=True, index=True)
     file = fields.Binary(string='File', attachment=True,
                          required=False, index=True)
-    file_name = fields.Char(string='File Name', index=True)
+    file_name = fields.Char(string='File Name', index=True) 
     ref_number = fields.Char(string='Reference Number', required=False)
     released_date = fields.Date(string='Released Date', required=False)
     status = fields.Selection([
