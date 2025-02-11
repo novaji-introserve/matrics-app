@@ -42,7 +42,7 @@
             <field name="numbercall">-1</field>
             <field name="nextcall" eval="DateTime.now().replace(hour=16, minute=30)" />
             <field name="doall" eval="False"/>
-            <!-- <field name="user_id" ref="base.user_admin"/> -->
+            <field name="user_id" ref="base.user_admin"/>
             <!-- Run as admin -->
 
         </record>
