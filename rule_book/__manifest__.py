@@ -53,6 +53,7 @@
         "data/email_templates/internal_due_date_for_rulebook.xml",
         "data/email_templates/rulebook_log_notification.xml",
         "data/email_templates/first_line_escalation.xml",
+        "data/email_templates/share_document_template.xml",
 
         "data/schedules/rule_book.xml",
         # "views/dashboard.xml",
@@ -87,6 +88,7 @@
     "installable": True,
     "application": True,
     "auto_install": False,
+    "images": ['static/src/img/boi.jpeg'],
     "assets": {"web.assets_backend": [
         "rule_book/static/src/js/my_script.js",
         'rule_book/static/src/components/*/*.js',

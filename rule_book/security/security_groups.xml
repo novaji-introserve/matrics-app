@@ -41,9 +41,10 @@
             <field name="name">Users: View Department Members</field>
             <field name="model_id" ref="base.model_res_users"/>
             <field name="domain_force">[('employee_ids.department_id', '=', user.employee_ids.department_id.id)]</field>
+            <!-- <field name="domain_force">[(1, '=', 1)]</field> -->
             <field name="groups" eval="[(4, ref('rule_book.group_department_user_'))]"/>
             <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
+            <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
@@ -52,7 +53,8 @@
         <record id="res_users_department_user_rule" model="ir.rule">
             <field name="name">Users: Read/Write Own User Record</field>
             <field name="model_id" ref="base.model_res_users"/>
-            <field name="domain_force">[('id', '=', user.id)]</field>
+            <!-- <field name="domain_force">[('id', '=', user.id)]</field> -->
+            <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('rule_book.group_department_user_'))]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
@@ -68,7 +70,7 @@
             <field name="domain_force">[('user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('rule_book.group_department_user_'))]"/>
             <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
+            <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
@@ -81,7 +83,7 @@
             <field name="domain_force">[('department_id', '=', user.department_id.id)]</field>
             <field name="groups" eval="[(4, ref('rule_book.group_department_user_'))]"/>
             <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
+            <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
@@ -92,7 +94,8 @@
         <record id="reply_log_reporter_rule" model="ir.rule">
             <field name="name">Reply Log Reporter Rule</field>
             <field name="model_id" ref="model_reply_log"/>
-            <field name="domain_force">[('reporter', '=', user.id)]</field>
+            <!-- <field name="domain_force">[('reporter', '=', user.id)]</field> -->
+            <field name="domain_force">['|', ('reporter', '=', user.id), ('officer_cc', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('rule_book.group_department_user_'))]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
@@ -107,7 +110,7 @@
             <field name="domain_force">[('department_id', '=', user.department_id.id)]</field>
             <field name="groups" eval="[(4, ref('rule_book.group_department_user_'))]"/>
             <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
+            <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
@@ -137,8 +140,8 @@
         </record>
 
 
-        <record id="rule_rulebook_full_access" model="ir.rule">
-            <field name="name">Compliance and COO: Full Rulebook Access</field>
+        <!-- <record id="rule_rulebook_full_access" model="ir.rule">
+            <field name="name">Compliance Full Rulebook Access</field>
             <field name="model_id" ref="rule_book.model_rulebook"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[
@@ -148,20 +151,33 @@
             <field name="perm_create" eval="True"/>
             <field name="perm_unlink" eval="True"/>
 
-        </record>
+        </record> -->
 
         <record id="rule_rulebook_log_full_access" model="ir.rule">
-            <field name="name">Compliance and COO: Full Rulebook Log Access</field>
+            <field name="name">Compliance Rulebook Log Access</field>
             <field name="model_id" ref="rule_book.model_reply_log"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[
         Command.link(ref('rule_book.group_compliance_manager_')) ]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_rulebook_log_full_access_cco" model="ir.rule">
+            <field name="name">CCO Rulebook Log Access</field>
+            <field name="model_id" ref="rule_book.model_reply_log"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[
+        Command.link(ref('rule_book.group_chief_compliance_officer_')) ]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>
             <field name="perm_unlink" eval="True"/>
         </record>
+      
 
-
+    
     </data>
 </odoo>

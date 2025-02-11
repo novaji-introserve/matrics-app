@@ -24,9 +24,14 @@
         <field name="model">rulebook.title</field>
         <field name="arch" type="xml">
             <form>
+
+
                 <sheet>
-                    <div class="row">
-                        <div class="col-md-6">
+
+                    <notebook>
+
+                        <page string="General Information">
+
                             <group>
                                 <field name="name" />
                                 <field name="ref_number" />
@@ -40,13 +45,44 @@
                                 <field name="created_on" readonly="1" />
                                 <field name="status" />
                             </group>
-                        </div>
-                        <div class="col-md-6">
+                        </page>
+
+                        <page string="Share Document" attrs="{'invisible': [('file', '=', False)]}">
                             <group>
-                                <field name="file" filename="file_name" widget="pdf_viewer" options="{'preview_image': 'file'}" />
+                                <field name="email_recipient_ids" widget="many2many_tags" placeholder="Select recipients..."/>
+                                <field name="email_cc_ids" widget="many2many_tags" placeholder="Select CC recipients..."/>
+                                <field name="email_subject" placeholder="Email subject..."/>
+                                <field name="email_body" widget="html"/>
+
                             </group>
-                        </div>
-                    </div>
+
+                                <div class="mb-4">
+                                    <button name="action_send_email" class="btn btn-primary" type="object" icon="fa-envelope" string=" Send Email" attrs="{'invisible': [('file', '=', False)]}"/>
+                                </div>
+
+                            
+                            <div class="alert alert-info" role="alert">
+                                <i class="fa fa-info-circle"/>
+ The current file will be automatically attached to the email.
+                            </div>
+                        </page>
+
+                        <page string="View Document">
+
+                            <div class="row">
+
+                                <div class="col">
+                                    <group>
+                                        <field name="file" filename="file_name" widget="pdf_viewer" options="{'preview_image': 'file'}" />
+                                    </group>
+                                </div>
+
+
+                            </div>
+                        </page>
+
+                    </notebook>
+
                 </sheet>
             </form>
         </field>
@@ -60,6 +96,8 @@
                 <field name="name" />
                 <field name="status" />
                 <field name="source_id" />
+                <field name="external_resource_url" />
+                <field name="created_on" />
                 <group expand="1" string="Group By">
                     <filter string="Created By" name="created_by" />
                     <filter string="Source" name="source_id" />
