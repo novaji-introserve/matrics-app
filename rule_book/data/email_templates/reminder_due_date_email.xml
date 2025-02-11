@@ -21,7 +21,7 @@
                         <!-- <img src="rule_book/static/src/img/boi.jpeg" style="max-width: 150px;" /> -->
                     </div>
                     <div style="padding: 20px;">
-                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear111 <strong style="color: #006400;">
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong style="color: #006400;">
                             <t t-out="object.data()['officer_responsible']"></t>
                             <strong/>
                         </strong>

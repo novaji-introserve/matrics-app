@@ -711,7 +711,7 @@ class RulebookTitle(models.Model):
                     })
                 except requests.RequestException as e:
                     _logger.error(f"Failed to download {filename}: {e}")
-            return {"records": records}
+            return {"records": True}
 
         for file_type in scrape_config:
             urls = file_type["urls"]
@@ -756,7 +756,7 @@ class RulebookTitle(models.Model):
             try:
                 # Logging each record's data for debugging
                 for record in all_records_to_create:
-                    _logger.debug(f"Creating record with data: {record}")
+                    _logger.debug(f"Creating new NFIU record with data: {True}")
 
                 self.sudo().create(all_records_to_create)
                 _logger.info(
