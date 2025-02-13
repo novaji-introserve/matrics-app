@@ -1,0 +1,61 @@
+:root {
+  --blush-pink: #FEEEF1;
+  --light-beige: #FEF2DC;
+  --light-mint: #D9FAE7;
+  --sky-blue: #8BB8D9;
+}
+
+
+.card-container{
+    overflow: scroll;
+}
+
+.card-container::-webkit-scrollbar{
+    display: none;
+}
+
+.box{
+    min-width: 22rem;
+    min-height: 12rem;
+    border-radius: 0.7rem;
+    transition: all 5s ease-in-out;
+}
+
+.box:hover{
+    transform: scale(1.2);
+    transition: all 5s ease-in-out;
+}
+
+.catbox{
+    top: 0.6rem;
+    right: 1rem;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    justify-content: center;
+    align-items: center;
+}
+
+ .circle {
+            min-width: 12rem; /* Adjust size as needed */
+            min-height: 12rem; /* Adjust size as needed */
+            border: 10px solid #000; /* Transparent border */
+            border-radius: 50%!important; /* Makes it a circle */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.4rem;
+            font-weight: bold;
+}
+
+.chart{
+    min-height: 45vh;
+}
+
+@media (max-width: 768px) {
+    .rightside{
+        position: relative!important;
+    }
+}

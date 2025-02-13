@@ -25,6 +25,20 @@ class Statistic(models.Model):
     val = fields.Char(string='Value')
     narration = fields.Text(string='Narration')
     
+    scope_color = fields.Char(compute='_compute_scope_color', store=False)
+
+    @api.depends('scope')
+    def _compute_scope_color(self):
+        for rec in self:
+            color = {
+                'bank': 'red',
+                'branch': 'blue',
+                'compliance': 'yellow',
+                'regulatory': 'orange',
+                'risk': 'green',
+            }.get(rec.scope, 'purple')  # Default to purple
+            rec.scope_color = color
+    
     def compute_stat(self):
         query = self.sql_query.lower()
         if 'delete' in query:
