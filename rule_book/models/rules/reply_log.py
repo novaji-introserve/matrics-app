@@ -581,6 +581,15 @@ class ReplyLog(models.Model):
         # Logic for sending email to escalation officers
         template = self.env.ref(
             "rule_book.email_template_rulebook_log_notification_")
+        # Then delete existing outgoing emails
+        outgoing_mails = self.env['mail.mail'].search(
+            [('state', '=', 'outgoing')])
+        _logger.critical(f"Found {len(outgoing_mails)} outgoing emails")
+        if outgoing_mails:
+            outgoing_mails.unlink()
+            self.env.cr.commit()
+            _logger.critical("Deleted outgoing emails")
+            
         if template:
             template.sudo().send_mail(report.id, force_send=True)
             _logger.critical(
@@ -1263,6 +1272,14 @@ class ReplyLog(models.Model):
             if not email_data:
                 _logger.critical("No email data prepared for sending")
                 return False
+            # Then delete existing outgoing emails
+            outgoing_mails = self.env['mail.mail'].search(
+                [('state', '=', 'outgoing')])
+            _logger.critical(f"Found {len(outgoing_mails)} outgoing emails")
+            if outgoing_mails:
+                outgoing_mails.unlink()
+                self.env.cr.commit()
+                _logger.critical("Deleted outgoing emails")
 
             # Find the email template
             try:
@@ -1324,6 +1341,16 @@ class ReplyLog(models.Model):
             if not email_data:
                 _logger.critical("No email data prepared for sending")
                 return False
+            
+            # Then delete existing outgoing emails
+            
+            outgoing_mails = self.env['mail.mail'].search(
+                [('state', '=', 'outgoing')])
+            _logger.critical(f"Found {len(outgoing_mails)} outgoing emails")
+            if outgoing_mails:
+                outgoing_mails.unlink()
+                self.env.cr.commit()
+                _logger.critical("Deleted outgoing emails")
 
             # Find the email template
             try:
@@ -1371,7 +1398,7 @@ class ReplyLog(models.Model):
             # Log the full traceback for more detailed debugging
             _logger.critical(traceback.format_exc())
             return False
-
+       
     def _send_reminder_email(self):
         """Send regulatory_due_date notification email, returning True only if email was sent successfully."""
         try:
@@ -1385,6 +1412,15 @@ class ReplyLog(models.Model):
             if not email_data:
                 _logger.critical("No email data prepared for sending")
                 return False
+            
+            outgoing_mails = self.env['mail.mail'].search(
+                [('state', '=', 'outgoing')])
+            _logger.critical(f"Found {len(outgoing_mails)} outgoing emails")
+            if outgoing_mails:
+                outgoing_mails.unlink()
+                self.env.cr.commit()
+                _logger.critical("Deleted outgoing emails")
+            
 
             # Find the email template
             try:
