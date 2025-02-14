@@ -230,11 +230,9 @@
                 <field name="frequency_type" string="Frequency Type" />
                 <field name="officer_responsible" string="Responsible officer" />
                 <field name="responsible_id" string="Responsible Department"/>
-                <!-- <field name="formatted_rulebook_date" string="Internal Due Date" widget="daterange"/> -->
-                <!-- <field name="formatted_rulebook_date" string="Internal Due Date" filter_domain="['|',('formatted_rulebook_date','ilike',self),('computed_date','ilike',self)]"/>
-                <field name="formatted_regulatory_date" string="Regulatory Due Date" filter_domain="['|',('formatted_regulatory_date','ilike',self),('reg_due_date','ilike',self)]"/> -->
-
-                
+                <field name="officer_cc" string="Officers in copy" filter_domain="[('officer_cc', 'ilike', self)]"/>
+         
+         
                 <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">
                     <filter string="Internal Due Date" name="group_computed_date" context="{'group_by': 'computed_date:day'}"/>                   
                     <filter string="Regulatory Due Date" name="group_reg_due_date" context="{'group_by': 'reg_due_date:day'}"/>                   
