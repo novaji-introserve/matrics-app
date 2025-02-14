@@ -28,8 +28,8 @@ class TransactionMonitoring(models.Model):
     tran_channel = fields.Char(string="Transaction Channel", readonly=True, index=True)
     request_id = fields.Char(string="Request ID", readonly=True, index=True)
     trans_id = fields.Char(string="Transaction ID", readonly=True, index=True)
-    tran_type = fields.Many2one(comodel_name='res.transaction.type',
-                              string='Tran. Type', index=True)
+    # tran_type = fields.Many2one(comodel_name='res.transaction.type',
+    #                           string='Tran. Type', index=True)
 
 
 

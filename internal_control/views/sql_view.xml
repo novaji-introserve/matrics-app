@@ -16,7 +16,7 @@
         <field name="name">process.sql.form</field>
         <field name="model">process.sql</field>
         <field name="arch" type="xml">
-            <form string="SQL Query" create="false" editable="false">
+            <form string="SQL Query" create="false" edit="false" readonly="1">
                 <header>
                     <button name="Validate" string="Validate Expression" class="btn btn-primary" type="object" attrs="{'invisible': [('is_valid', '=', True)]}" />
 

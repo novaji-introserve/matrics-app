@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class Statistic(models.Model):
@@ -24,21 +25,51 @@ class Statistic(models.Model):
         'active', 'Active'), ('inactive', 'Inactive')], default='active')
     val = fields.Char(string='Value')
     narration = fields.Text(string='Narration')
+  
     
-    scope_color = fields.Char(compute='_compute_scope_color', store=False)
+    scope_color = fields.Char()
 
-    @api.depends('scope')
-    def _compute_scope_color(self):
-        for rec in self:
-            color = {
-                'bank': 'red',
-                'branch': 'blue',
-                'compliance': 'yellow',
-                'regulatory': 'orange',
-                'risk': 'green',
-            }.get(rec.scope, 'purple')  # Default to purple
-            rec.scope_color = color
-    
+    @api.model
+    def create(self, vals):
+        sql_query = vals.get('sql_query')  # Get the sql_query from the values
+        scope = vals.get('scope')
+
+        if sql_query:  # Check if sql_query is provided
+            try:
+                query = sql_query.strip().lower()
+
+                if not query.startswith('select'):
+                    raise ValidationError('Query not supported.\nHint: Start with SELECT')
+                
+                self.env.cr.execute(query)
+
+                if "count('*')" in sql_query or 'count(*)' in sql_query:
+                    count = self.env.cr.fetchone()[0]
+                    vals['val'] = count  # Store the count of records
+                else:
+                    records = self.env.cr.fetchall()
+                    if records:
+                            vals['val'] = len(records)  # Store the length of the records
+                    else:
+                        vals['val'] = 0  # Store 0 if no records
+
+                # assign the color
+                if scope:
+                    vals['scope_color'] = {
+                        'bank': '#FEEEF1',
+                        'branch': '#D9FAE7',
+                        'compliance': '#8BB8D9',
+                        'regulatory': '#F7E8BD',
+                        'risk': '#FEF2DC',
+                    }.get(scope, '#00F2AD')
+
+            except Exception as e:
+                self.env.cr.rollback() # Important: rollback on error
+                raise ValidationError(f'Invalid SQL query:\n{str(e)}')
+        
+        return super(Statistic, self).create(vals)
+
+
     def compute_stat(self):
         query = self.sql_query.lower()
         if 'delete' in query:
@@ -50,3 +81,16 @@ class Statistic(models.Model):
             rec = self.env.cr.fetchone()
             result = rec[0] if rec is not None else 0.0
             self.write({"val":result})
+
+    
+
+
+
+    def ViewInTableForm(self):
+       
+        try:
+                
+            raise ValidationError(f'Failed to execute query:\n{str(e)}')
+        finally:
+            self.env.cr.rollback() #Rollback the cursor to prevent any unintended changes
+

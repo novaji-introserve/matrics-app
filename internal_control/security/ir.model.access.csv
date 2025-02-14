@@ -22,7 +22,6 @@ access_res_customer_type,access res customer type,internal_control.model_res_cus
 access_res_partner_tier,access res partner tier,internal_control.model_res_partner_tier,base.group_user,1,1,1,1
 access_res_partner_account,access res partner account,internal_control.model_res_partner_account,base.group_user,1,1,1,1
 access_res_transaction_status,access res transaction status,internal_control.model_res_transaction_status,base.group_user,1,1,1,1
-access_res_transaction_type,access res transaction type,internal_control.model_res_transaction_type,base.group_user,1,1,1,1
 access_res_user_status,access res user status,internal_control.model_res_user_status,base.group_user,1,1,1,1
 access_res_account_officer,access res account officer,internal_control.model_res_account_officer,base.group_user,1,1,1,1
 access_res_partner_account_product,access res partner account product,internal_control.model_res_partner_account_product,base.group_user,1,1,1,1

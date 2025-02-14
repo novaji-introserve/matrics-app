@@ -4,7 +4,7 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { Card } from "./card/card";
 import { ChartRenderer } from "./chart";
-const { Component, useState, useRef, onMounted, onWillStart } = owl;
+const { Component, useState, useEffect, useRef, onMounted, onWillStart } = owl;
 
 
 export class ComplianceDashboard extends Component {
@@ -12,56 +12,83 @@ export class ComplianceDashboard extends Component {
     this.api = useService("orm");
     this.rpc = useService("rpc");
     this.navigate = useService("action");
-    this.modalRef = useRef("modalId");
-    this.bsModal = null;
     this.state = useState({
-      showModal: false, // Initially, the modal is hidden
-      modalTitle: "",
-      modalContent: "",
-      modalInitialized: false
+      isCategorySortingEnabled: false,
+      cco: false,
+      branches_id: [],
+      stats: [],
+      totalstat: 0,
+      datepicked: 7,
+      chartData: []
     });
 
     onMounted(async () => {
-      // Initialize the Bootstrap Modal *after* the component is mounted
-      const modal = this.modalRef.el;
-      if (modal) {
-        this.bsModal = new bootstrap.Modal(modal); // Initialize only once
-        this.state.modalInitialized = true; // Set the flag to true
-      } else {
-        console.error("Modal element STILL not found after mount!");
-      }
     });
-
-    // onWillStart(async () => {
-    //   await this.getcurrentuser();
-    //   this.filterByDate();
-    // });
+    
+    onWillStart(async () => {
+      await this.getcurrentuser();
+      await this.filterByDate();
+      
+    });
   }
 
-  //   async getcurrentuser() {
-  //     let result = await this.rpc("/dashboard/user");
-  //     this.state.branches_id = result.branch;
-  //     this.state.cc = result.group;
-  //     this.state.alert_rules_domain = result.alert_rules_domain;
-  //   }
+  async getcurrentuser() {
+    let result = await this.rpc("/dashboard/user");
+    this.state.branches_id = result.branch;
+    this.state.cco = result.group;
+  }
+  async getAllStats() {
+    let result = await this.rpc(`/dashboard/stats`, {
+      cco: this.state.cco,
+      branches_id: this.state.branches_id,
+      datepicked: Number(this.state.datepicked),
+    });
+
+    this.state.stats = result.data;
+    this.state.totalstat = result.total;
+  }
+  async getAllStatsByCategory(name) {
+    let result = await this.rpc(`/dashboard/statsbycategory`, {
+      cco: this.state.cco,
+      branches_id: this.state.branches_id,
+      category: name,
+      datepicked: Number(this.state.datepicked),
+    });
+
+    this.state.stats = result.data;
+    this.state.totalstat = result.total;
+  }
 
   displaybycategory = async (name) => {
-      if (this.state.modalInitialized) {
-        // Check if bsModal is initialized
-        this.bsModal.show();
-      } else {
-        console.error("Bootstrap Modal not initialized!");
-      }
+    this.state.isCategorySortingEnabled = false;
+
+    if (name == "all") {
+      await this.getAllStats();
+      this.state.isCategorySortingEnabled = false;
+    } else {
+      this.state.isCategorySortingEnabled = true;
+      await this.getAllStatsByCategory(name);
+    }
   };
 
-  closeModal = () =>{
-     const modal = this.modalRef.el;
-     if (modal) {
-       const bsModal = bootstrap.Modal.getInstance(modal); // Get the existing instance
-       if (bsModal) {
-         bsModal.hide();
-       }
-     } 
+  filterByDate = async () => {
+    await this.getAllStats();
+    await this.fetchChartData();
+
+    
+  };
+
+  async fetchChartData() {
+    const response = await this.rpc("/dashboard/get_scope_data", {
+      cco: this.state.cco,
+      branches_id: this.state.branches_id,
+      datepicked: Number(this.state.datepicked)
+    });
+
+  
+    
+    this.state.chartData = Array.from(response)?.map((item) => item);
+   
   }
 }
 
