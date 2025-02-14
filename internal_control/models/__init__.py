@@ -19,7 +19,7 @@ from . import customer_account
 from . import customer
 from . import customer_tier
 from . import customer_type
-from . import transaction_type
+# from . import transaction_type
 from . import users_status
 from . import gender
 from . import marital_status

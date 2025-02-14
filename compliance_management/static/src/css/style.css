@@ -39,8 +39,8 @@
 }
 
  .circle {
-            min-width: 12rem; /* Adjust size as needed */
-            min-height: 12rem; /* Adjust size as needed */
+            min-width: 13rem; /* Adjust size as needed */
+            min-height: 13rem; /* Adjust size as needed */
             border: 10px solid #000; /* Transparent border */
             border-radius: 50%!important; /* Makes it a circle */
             display: flex;
@@ -52,6 +52,9 @@
 
 .chart{
     min-height: 45vh;
+}
+.doughnut{
+    min-height: 35vh;
 }
 
 @media (max-width: 768px) {

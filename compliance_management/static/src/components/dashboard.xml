@@ -13,7 +13,7 @@
                         </div>
 
                         <div class="ms-3">
-                            <select class="form-select">
+                            <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
                                 <option value="0" selected="selected">Today</option>
                                 <option value="7">Last 7 Days</option>
                                 <option value="14">Last 14 Days</option>
@@ -34,18 +34,23 @@
 
                     <div class="col-md-9 ">
 
-                        <div class="d-flex card-container gap-3 py-4">
-
-                            <Card title="'transaction'" scope="'bank'" total="1200" bgcolor="'#FEEEF1'" />
-                            <Card title="'transaction'" scope="'risk'" total="1200" bgcolor="'#FEF2DC'" />
-                            <Card title="'transaction'" scope="'branch'" total="1200" bgcolor="'#D9FAE7'" />
-                            <Card title="'transaction'" scope="'compliance'" total="1200" bgcolor="'#8BB8D9'" />
-                            <Card title="'transaction'" scope="'regulatory'" total="1200" bgcolor="'#F7E8BD'" />
-
+                     
+                        <div  class="d-flex card-container gap-3 py-4">
+                            
+                               <t t-if="state.stats and state.stats.length > 0">
+                                <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                                    <Card title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
+                                </t>
+                               </t>
+                               <t t-else="">
+                                <h4 class="text-warning p-5">No Data!! Please click on the configuration  menu and start creating</h4>
+                               </t>
+                            
                         </div>
+                       
 
-                        <div class="chart">
-                            <ChartRenderer type="'line'" title="Transaction" />
+                        <div class="chart mt-4">
+                            <ChartRenderer date='state.datepicked'  type="'bar'" title="'Statistic'" data="state.chartData" />
                         </div>
 
                     </div>
@@ -53,10 +58,10 @@
                     <div class="col-md-3 rightside position-fixed end-0 vh-100  p-4">
 
 
-                        <div class="shadow shadow-lg p-4 d-flex gap-md-3 flex-col flex-md-row">
+                        <div class="shadow shadow-lg p-4 d-flex justify-content-between gap-md-3 flex-col flex-md-row">
 
                             <div class="circle">
-                                5
+                                <t t-out="state.totalstat" />
                             </div>
 
                             <div>
@@ -86,47 +91,26 @@
                                     <h5>Regulatory</h5>
                                     <div style="background-color: #F7E8BD; min-height: 1rem; min-width:2rem"></div>
                                 </div>
+                                <div t-on-click="() => displaybycategory('all')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>ALL</h5>
+                                    <div style="background-color: rgb(155, 22, 22); min-height: 1rem; min-width:2rem"></div>
+                                </div>
 
                             </div>
 
                         </div>
 
-                        <div class="shadow shadow-lg mt-3 chart">
+                        <div class="shadow shadow-lg mt-3 p-3 doughnut">
 
-                            <ChartRenderer type="'doughnut'" title="'Users Report'" />
+                            <ChartRenderer type="'doughnut'" title="'Users Report'" data="state.chartData" />
 
                         </div>
 
 
 
                     </div>
-                    <!-- Modal trigger button -->
-
-
-                    <!-- Modal Body -->
-                    <!-- if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard -->
-                    <div class="modal fade" id="modalId" tabindex="-1" data-bs-backdrop="static"
-                        data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg"
-                            role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="modalTitleId">
-                                        Modal title
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">Body</div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                        Close
-                                    </button>
-                                    <button type="button" class="btn btn-primary">Save</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                   
 
 
                 </div>

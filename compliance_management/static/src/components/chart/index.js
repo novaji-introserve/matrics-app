@@ -8,22 +8,19 @@ import { useService } from "@web/core/utils/hooks";
 export class ChartRenderer extends Component {
   setup() {
     this.navigate = useService("action");
-    this.chartRef = useRef("icomply_chart");
+    this.chartRef = useRef("compliance_chart");
     onWillStart(async () => {
       await loadJS(
         "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"
       );
     });
 
-    onMounted(() => this.renderChart());
 
     useEffect(
       () => {
-        this.renderChart();
+        this.props.data && this.renderChart();
       },
-      () => [
-        
-      ]
+      () => [this.props.data]
     );
 
     onWillUnmount(() => {
@@ -36,6 +33,11 @@ export class ChartRenderer extends Component {
 
   
   renderChart() {
+    
+    // Prepare data for the chart
+    const labels = this.props.data.map((item) => item.scope);
+    const counts = this.props.data.map((item) => item.count);
+
     if (this.mychart) {
       this.mychart.destroy();
       this.mychart = null;
@@ -44,27 +46,14 @@ export class ChartRenderer extends Component {
     this.mychart = new Chart(this.chartRef.el, {
       type: this.props.type,
       data: {
-        labels: this.props.type !== "doughnut" &&
-          this.props.type !== "pie" && [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
-          ],
+        labels: labels,
         datasets: [
           {
-            label: "My First Dataset",
-            data: [65, 59, 80, 81, 56, 55, 40],
+            label: this.props.title,
+            data: [34, 67, 89],
             fill: false,
-            borderColor: "rgb(75, 192, 192)",
+            backgroundColor: "rgba(128, 0, 128, 0.1)",
+            borderColor: "rgb(100, 202, 192)",
             tension: 0.1,
           },
         ],
@@ -85,7 +74,7 @@ export class ChartRenderer extends Component {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: this.props.type === "pie" ? "right" : "top",
+            position: this.props.type === "doughnut" ? "right" : "top",
           },
           title: {
             display: true,
