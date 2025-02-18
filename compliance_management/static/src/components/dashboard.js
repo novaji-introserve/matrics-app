@@ -20,12 +20,8 @@ export class ComplianceDashboard extends Component {
       totalstat: 0,
       datepicked: 0,
       chartData: [],
-      scrollLeft: sessionStorage.getItem("user_scroll_left")
-        ? sessionStorage.getItem("user_scroll")
-        : true,
-      scroll: sessionStorage.getItem("user_scroll")
-        ? sessionStorage.getItem("user_scroll")
-        : false,
+      scrollLeft: true,
+      scroll: false,
     });
 
 
@@ -65,15 +61,14 @@ export class ComplianceDashboard extends Component {
     if (atRight) {
       this.state.scroll = true;
       this.state.scrollLeft = false;
-      sessionStorage.setItem("user_scroll", true);
-      sessionStorage.setItem("user_scroll_left", false);
+      
       // Your logic here (e.g., load more data)
     } 
     
     if(atLeft){
       this.state.scrollLeft = true;
       this.state.scroll = false;
-      sessionStorage.setItem("user_scroll_left", true);
+     
     }
   };
 
