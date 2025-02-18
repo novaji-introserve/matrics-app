@@ -165,6 +165,7 @@ class Compliance(http.Controller):
             
 
 
+
             return chart_data
         else:
             # fetch data for branches
@@ -200,8 +201,83 @@ class Compliance(http.Controller):
                 })
 
             return chart_data
+    
+    @http.route('/dashboard/get_transaction', auth='public', type='json')
+    def get_transaction_data(self, cco, branches_id, datepicked, **kw):
 
-           
+        today = datetime.now().date()  # Get today's date
+        prevDate = today - timedelta(days=datepicked)  # Get previous date
+
+        # Convert to datetime for start and end of the day
+        start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
+
+        end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
+
+
+    
+        if cco == True:
+            # fetch all data for chief compliance officer
+            transactions = request.env["res.customer.transaction"].search([('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today)])
+
+            # Initialize a dictionary to hold the grouped data
+            grouped_data = {}
+            
+            # Loop through the records and group by scope and name
+            for transaction in transactions:
+                if transaction.risk_level not in grouped_data:
+                    grouped_data[transaction.risk_level] = 1  # Start with 1 for the first occurrence
+                    
+                else:
+                    grouped_data[transaction.risk_level] += 1  # Increment total_value
+            
+            labels = []
+            values = []
+
+            for key, value in grouped_data.items():
+
+                labels.append(key)
+                values.append(value)
+
+            return {
+                "labels": labels,
+                "values": values
+            }
+        
+        else:
+            transactions = request.env["res.customer.transaction"].search([('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today), ('create_uid.branches_id', 'in', branches_id)])
+
+            # Initialize a dictionary to hold the grouped data
+            grouped_data = {}
+
+            for transaction in transactions:
+                if transaction.risk_level not in grouped_data:
+                    grouped_data[transaction.risk_level] = 1  # Start with 1 for the first occurrence
+                    
+                else:
+                    grouped_data[transaction.risk_level] += 1  # Increment total_value
+            
+            labels = []
+            values = []
+
+            for key, value in grouped_data.items():
+
+                labels.append(key)
+                values.append(value)
+
+            return {
+                "labels": labels,
+                "values": values
+            }
+                   
+
+
+
+
+
+        
+
+     
+   
 
 
 
