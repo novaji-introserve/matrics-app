@@ -12,6 +12,26 @@
 
 .card-container::-webkit-scrollbar{
     display: none;
+   
+}
+
+.overflow-indicator{
+    font-size: 3rem;
+    float: right;
+}
+.overflow-indicator-right{
+    font-size: 3rem;
+}
+
+/* More Controlled Blink (Fade In/Out) */
+.fade-blink {
+  animation: fadeBlink 1.5s ease-in-out infinite; /* Adjust duration, easing */
+}
+
+@keyframes fadeBlink {
+  0% { opacity: 1; } /* Fully visible */
+  50% { opacity: 0; } /* Fully invisible */
+  100% { opacity: 1; } /* Fully visible */
 }
 
 .box{
@@ -39,8 +59,10 @@
 }
 
  .circle {
-            min-width: 13rem; /* Adjust size as needed */
-            min-height: 13rem; /* Adjust size as needed */
+            max-width: 7rem; /* Adjust size as needed */
+            min-width: 7rem; /* Adjust size as needed */
+            max-height: 7rem; /* Adjust size as needed */
+            max-height: 7rem; /* Adjust size as needed */
             border: 10px solid #000; /* Transparent border */
             border-radius: 50%!important; /* Makes it a circle */
             display: flex;

@@ -62,8 +62,8 @@
                     <div class="col-md-4 ">
                         <div
                             class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                            <h3 class="lead fw-bold text-primary">Transaction Risk Ratings </h3>
-                            <button class="btn btn-primary">
+                            <h3 class="lead fw-bold text-dark">Top 10 Branches By Customer </h3>
+                            <button class="btn btn-dark">
                                 <i class="fa fa-angle-right"></i>
                             </button>
                         </div>
@@ -77,8 +77,8 @@
                     <div class="col-md-4 ">
                         <div
                             class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                            <h3 class="lead fw-bold text-primary">Customers Risk Rating</h3>
-                            <button class="btn btn-primary">
+                            <h3 class="lead fw-bold text-dark">Top 10 Screened Transaction By Rules</h3>
+                            <button class="btn btn-dark">
                                 <i class="fa fa-angle-right"></i>
                             </button>
                         </div>
@@ -90,8 +90,8 @@
                     <div class="col-md-4 ">
                         <div
                             class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                            <h3 class="lead fw-bold text-primary">Transaction State</h3>
-                            <button class="btn btn-primary">
+                            <h3 class="lead fw-bold text-dark">Top 10 High-Risk Branches</h3>
+                            <button class="btn btn-dark">
                                 <i class="fa fa-angle-right"></i>
                             </button>
                         </div>

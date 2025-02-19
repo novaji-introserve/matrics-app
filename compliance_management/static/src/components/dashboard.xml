@@ -27,35 +27,58 @@
 
             <!-- second section -->
 
-            <div class="container">
+            <div class="container-fluid ">
 
-                <div class="row">
+                <div class="row w-100">
 
 
-                    <div class="col-md-9 ">
+                    <div class="col-md-9 position-relative">
 
                      
-                        <div  class="d-flex card-container gap-3 py-4">
+                            <div  class="d-flex position-relative card-container gap-3 py-4">
                             
                                <t t-if="state.stats and state.stats.length > 0">
                                 <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
-                                    <Card title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
+                                    <Card t-on-click="() => displayOdooView(stat.scope)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
                                 </t>
                                </t>
                                <t t-else="">
                                 <h4 class="text-warning p-5">No Data!! Please click on the configuration  menu and start creating</h4>
                                </t>
-                            
-                        </div>
-                       
+                                 
+                            </div>
+                            <t t-if="state.stats and state.stats.length > 3 and !state.scroll">
+                                <div class="overflow-indicator fade-blink">&#x2192;</div>
+                            </t>
+                            <t t-if="state.stats and state.stats.length > 3 and !state.scrollLeft">
+                                <div class="overflow-indicator-right fade-blink">&#x2190;</div>
+                            </t>
 
-                        <div class="chart mt-4">
-                            <ChartRenderer date='state.datepicked'  type="'bar'" title="'Statistic'" data="state.chartData" />
+                       
+                        <div class="row g-1">
+                            <t if="state.transactionchart">
+                            <div class="col-md-6">
+                                <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                                    <h3 class="lead fw-bold text-dark">Transaction By Risk Level</h3>
+                                    <button class="btn btn-dark">
+                                        <i class="fa fa-angle-right"></i>
+                                    </button>
+                                </div>
+                                <div class="chart mt-4 ml-1 bg-white shadow shadow-1">
+                                    <ChartRenderer date='state.datepicked' type="'bar'" title="'Transaction By Risk Level'" data="state.transactionchart" />
+                                </div>
+                            </div>
+                            </t>
+                            <!-- <div class="col-md-6">
+                                <div class="chart mt-4 ml-1">
+                                    <ChartRenderer date='state.datepicked' type="'bar'" title="'Statistic'" data="state.chartData" />
+                                </div>
+                            </div> -->
                         </div>
 
                     </div>
 
-                    <div class="col-md-3 rightside position-fixed end-0 vh-100  p-4">
+                    <div class="col-md-3 position-fixed top-10 rightside end-0 vh-100  p-4 ">
 
 
                         <div class="shadow shadow-lg p-4 d-flex justify-content-between gap-md-3 flex-col flex-md-row">
@@ -93,15 +116,15 @@
                                 </div>
                                 <div t-on-click="() => displaybycategory('all')"
                                     class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
-                                    <h5>ALL</h5>
-                                    <div style="background-color: rgb(155, 22, 22); min-height: 1rem; min-width:2rem"></div>
+                                    <h5>All</h5>
+                                    <div style="background-color: rgb(0, 0, 0); min-height: 1rem; min-width:2rem"></div>
                                 </div>
 
                             </div>
 
                         </div>
 
-                        <div class="shadow shadow-lg mt-3 p-3 doughnut">
+                        <div class="shadow shadow-lg mt-3  doughnut">
 
                             <ChartRenderer type="'doughnut'" title="'Users Report'" data="state.chartData" />
 
