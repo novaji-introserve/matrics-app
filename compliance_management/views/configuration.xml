@@ -756,6 +756,8 @@
 
         <menuitem id="menu_compliance_risk_settings" name="Configuration"
             parent="menu_compliance_configuration" sequence="500" />
+       
+      
 
     </data>
 </odoo>

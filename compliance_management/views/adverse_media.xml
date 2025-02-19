@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Adverse Media Tree View -->
+    <record id="view_adverse_media_tree" model="ir.ui.view">
+        <field name="name">adverse.media.tree</field>
+        <field name="model">adverse.media</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id"/>
+                <field name="partner_risk_level" widget="badge" decoration-danger="partner_risk_level == 'high'" decoration-warning="partner_risk_level in ('medium')" decoration-success="partner_risk_level in ('low')" />
+                <!-- <field name="partner_risk_level"/> -->
+                <!-- <field name="partner_risk_score" /> -->
+                <field name="risk_score_decoration" invisible="1"/>
+
+                <field name="partner_risk_score" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'" />
+                <field name="monitoring_status"/>
+                <field name="monitoring_frequency"/>
+                <field name="last_scan_date" />
+
+
+            </tree>
+        </field>
+    </record>
+
+    <!-- Adverse Media Form View -->
+    <record id="view_adverse_media_form" model="ir.ui.view">
+        <field name="name">adverse.media.form</field>
+        <field name="model">adverse.media</field>
+        <field name="arch" type="xml">
+            <form string="Media Watchlist">
+
+                <header>
+                    <button type="object" class="oe_highlight bg-dark" name="open_media_log" string="View Media Log(s)" attrs="{'invisible': [('id', '=', False)]}" />
+                    <button type="object" class="oe_highlight bg-dark" name="scan_news_articles" string="Run Media Screening" attrs="{'invisible': [('id', '=', False)]}" />
+                </header>
+
+
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id" string="Partner"/>
+                            <!-- <field name="partner_risk_level" readonly="1"/> -->
+                            <field name="risk_score_decoration" invisible="1"/>
+
+                            <field name="partner_risk_level" widget="badge" decoration-danger="partner_risk_level == 'high'" decoration-warning="partner_risk_level in ('medium')" decoration-success="partner_risk_level in ('low')" />
+                            <!-- <field name="partner_risk_score"/> -->
+                            <field name="partner_risk_score" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'" />
+
+                            <field name="monitoring_status"/>
+
+                        </group>
+                        <group>
+                            <field name="monitoring_frequency"/>
+                            <field name="last_scan_date" readonly="1"/>
+                            <!-- <field name="keyword_id"/> -->
+                            <field name="keyword_id" widget="many2many_tags" />
+
+                        </group>
+                    </group>
+
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_adverse_media_search" model="ir.ui.view">
+        <field name="name">adverse.media.search</field>
+        <field name="model">adverse.media</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <separator/>
+                <filter string="Active Monitoring" name="active_monitoring" domain="[('monitoring_status', '=', 'active')]"/>
+                <filter string="Inactive Monitoring" name="inactive_monitoring" domain="[('monitoring_status', '=', 'inactive')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Risk Level" name="group_risk" context="{'group_by': 'partner_risk_level'}"/>
+                    <filter string="Monitoring Status" name="group_monitoring_status" context="{'group_by': 'monitoring_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Adverse Media -->
+    <record id="action_adverse_media" model="ir.actions.act_window">
+        <field name="name">Media Watchlist</field>
+        <field name="res_model">adverse.media</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_adverse_media_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No data found
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <!-- <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499"/> -->
+    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499"/>
+
+    <menuitem id="menu_adverse_media" name="Media Watchlist" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/>
+    <!-- <menuitem id="menu_adverse_media" name="Monitoring Configuration" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/> -->
+</odoo>
