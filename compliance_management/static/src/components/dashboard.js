@@ -9,6 +9,7 @@ const { Component, useState, useEffect, useRef, onMounted, onWillStart } = owl;
 
 export class ComplianceDashboard extends Component {
   setup() {
+    this.left_indicator = useRef("left");
     this.api = useService("orm");
     this.rpc = useService("rpc");
     this.navigate = useService("action");
@@ -20,19 +21,32 @@ export class ComplianceDashboard extends Component {
       totalstat: 0,
       datepicked: 0,
       chartData: [],
-      scrollLeft: true,
-      scroll: false,
+      scrollLeft: sessionStorage.getItem("user_scroll_left")
+        ? sessionStorage.getItem("user_scroll_left")
+        : true,
+      scrollRight: sessionStorage.getItem("user_scroll_right")
+        ? sessionStorage.getItem("user_scroll_right")
+        : false,
+      transactionchart: [],
+      topbranch: [],
     });
 
 
-    useEffect(
-      () => {
+    useEffect(() => {
       
         let cardContainer = document.querySelector(".card-container");
-        cardContainer.addEventListener(
-          "scroll",
-          this._onHorizontalScroll.bind(this)
-        );
+        if(cardContainer){
+
+          cardContainer.addEventListener("scroll",this._onHorizontalScroll.bind(this));
+        }
+         return () => {
+           if (cardContainer) {
+             cardContainer.removeEventListener(
+               "scroll",
+               this._onHorizontalScroll
+             );
+           }
+         };
 
       },
       () => []
@@ -58,17 +72,20 @@ export class ComplianceDashboard extends Component {
 
     const atLeft = container.scrollLeft <= 5; // Left end
 
-    if (atRight) {
-      this.state.scroll = true;
+  
+
+
+    if (atRight && !sessionStorage.getItem("user_scroll_left")) {
+      this.state.scrollRight = true;
       this.state.scrollLeft = false;
-      
-      // Your logic here (e.g., load more data)
+      sessionStorage.setItem("user_scroll_right", true)
+    }else{
+      this.state.scrollLeft = true;
     } 
     
     if(atLeft){
       this.state.scrollLeft = true;
-      this.state.scroll = false;
-     
+      sessionStorage.setItem("user_scroll_left", true);
     }
   };
 
@@ -151,20 +168,10 @@ export class ComplianceDashboard extends Component {
 
   filterByDate = async () => {
     await this.getAllStats();
-    // await this.fetchChartData();
-
     await this.fetchTransChart();
+    await this.TopBranches();
   };
 
-  // async fetchChartData() {
-  //   const response = await this.rpc("/dashboard/get_scope_data", {
-  //     cco: this.state.cco,
-  //     branches_id: this.state.branches_id,
-  //     datepicked: Number(this.state.datepicked),
-  //   });
-
-  //   this.state.chartData = Array.from(response)?.map((item) => item);
-  // }
 
   async fetchTransChart() {
     const response = await this.rpc("/dashboard/get_transaction", {
@@ -173,7 +180,24 @@ export class ComplianceDashboard extends Component {
       datepicked: Number(this.state.datepicked),
     });  
 
-    this.state.transactionchart = response
+    this.state.transactionchart = {
+      labels: Object.keys(response),
+      values: Object.values(response)
+    };
+
+  }
+  async TopBranches() {
+    const response = await this.rpc("/dashboard/get_branch_by_customer", {
+      cco: this.state.cco,
+      branches_id: this.state.branches_id,
+      datepicked: Number(this.state.datepicked),
+    });  
+
+
+    
+
+    this.state.topbranch = response
+
   }
 }
 

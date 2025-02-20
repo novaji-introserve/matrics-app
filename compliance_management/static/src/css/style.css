@@ -15,12 +15,12 @@
    
 }
 
-.overflow-indicator{
+.overflow-indicator-left{
     font-size: 3rem;
-    float: right;
 }
 .overflow-indicator-right{
     font-size: 3rem;
+   
 }
 
 /* More Controlled Blink (Fade In/Out) */
@@ -76,7 +76,7 @@
     min-height: 45vh;
 }
 .doughnut{
-    min-height: 35vh;
+    min-height: 45vh;
 }
 
 @media (max-width: 768px) {
