@@ -1,41 +1,107 @@
 /** @odoo-module */
 
 import { loadJS } from "@web/core/assets";
-const { Component, onWillStart, useRef, onMounted, useEffect, onWillUnmount } =
-  owl;
+const { Component, onWillStart, useRef, useEffect, onWillUnmount } = owl;
 import { useService } from "@web/core/utils/hooks";
+
+// Consider using a constant for CDN URLs for maintainability
+const CHARTJS_CDN =
+  "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js";
+
+
+// Define constants for date formats to ensure consistency
+const DATE_FORMAT_YYYY_MM_DD = "YYYY-MM-DD";
+const TIME_00_00_00 = "00:00:00";
+const TIME_23_59_59 = "23:59:59";
 
 export class ChartRenderer extends Component {
   setup() {
     this.navigate = useService("action");
     this.chartRef = useRef("compliance_chart");
-    onWillStart(async () => {
-      await loadJS(
-        "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"
-      );
-    });
+    this.myChartInstance = null; // Renamed to avoid shadowing and be more explicit
 
+    onWillStart(async () => {
+      await loadJS(CHARTJS_CDN);
+    });
 
     useEffect(
       () => {
-        this.props.data && this.renderChart();
+        if (this.props.data) {
+          this.renderChart();
+        }
       },
-      () => [this.props.data]
+      () => [this.props.data, this.props.type, this.props.title] // Add type and title to dependencies if they can change and require re-render
     );
 
     onWillUnmount(() => {
-      if (this.mychart) {
-        this.mychart.destroy();
-        this.mychart = null;
-      }
+      this.destroyChart(); // Use a dedicated method for chart destruction
     });
   }
 
-  
-  
+  destroyChart() {
+    if (this.myChartInstance) {
+      this.myChartInstance.destroy();
+      this.myChartInstance = null;
+    }
+  }
+
   renderChart() {
+    this.destroyChart(); // Destroy existing chart before rendering a new one
+
+    if (this.props.title === "Top 10 Branches By Customer") {
+      // Use constant for comparison
+      this.renderTopBranchesChart();
+    } else {
+      // General chart rendering logic can be added here if needed for other chart types
+      console.warn(
+        `Chart type for title "${this.props.title}" is not specifically handled. Rendering default chart.`
+      );
+      this.renderDefaultChart(); // Or handle error, or have a truly general case
+    }
+  }
+
+  renderDefaultChart() {
+    if (!this.props.data) {
+      return; // Exit if no data to render
+    }
+
+    const labels = this.props.data.map((item) => item.label); // Example: Adapt based on your data structure
+    const values = this.props.data.map((item) => item.value); // Example: Adapt based on your data structure
+
+    this.myChartInstance = new Chart(this.chartRef.el, {
+      type: this.props.type || "bar", // Default type if not provided
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Data", // Default label if not provided
+            data: values,
+          },
+        ],
+      },
+      options: this.getDefaultChartOptions(), // Use default options, can be customized further
+    });
+  }
+
+  renderTopBranchesChart() {
+
+
+    if (!this.props.data) {
+      return; // Exit if no data to render
+    }
+
+    let labels = [];
+    let values = [];
+    let branch_ids = [];
+
+    for (let item of this.props.data) {
+      labels.push(item.branch_name);
+      values.push(item.customer_count);
+      branch_ids.push(item.id);
+    }
+
+
     
-    let {labels, values}= this.props.data 
 
     const formatDate = (date) => date.toISOString().slice(0, 10);
 
@@ -44,87 +110,86 @@ export class ChartRenderer extends Component {
     if (this.props.date > 0) {
       prevDate = moment()
         .subtract(this.props.date, "days")
-        .format("YYYY-MM-DD");
-      currentDate = formatDate(new Date()); // Today's date
+        .format(DATE_FORMAT_YYYY_MM_DD); // Use constant for date format
+      currentDate = formatDate(new Date());
     } else {
-      currentDate = formatDate(new Date()); // Today's date
-      prevDate = currentDate; // Same as today if datepicked is 0
+      currentDate = formatDate(new Date());
+      prevDate = currentDate;
     }
 
-    const odooPrevDate = `${prevDate} 00:00:00`; // For Odoo's datetime field
-    const odooCurrentDate = `${currentDate} 23:59:59`; // For Odoo's datetime field
- 
+    const odooPrevDate = `${prevDate} ${TIME_00_00_00}`; // Use constants for time and date format
+    const odooCurrentDate = `${currentDate} ${TIME_23_59_59}`;
+    
 
-    if (this.mychart) {
-      this.mychart.destroy();
-      this.mychart = null;
-
-    }else{
-      this.mychart = new Chart(this.chartRef.el, {
-        type: this.props.type,
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: "",
-              data: Array.from(values),
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          onClick: (event, elements) => {
-            if (!elements || elements.length === 0) return; // Handle no element click
-
-            const clickedIndex = elements[0].index;
-
-            const filter = labels[clickedIndex];
-
-            let action = {
-              type: "ir.actions.act_window",
-              views: [
-                [false, "tree"],
-                [false, "form"],
-              ],
-            };
-
-            if (this.props.title === "Transaction By Risk Level") {
-              action.name = "Transaction By Risk Level";
-              action.res_model = "res.customer.transaction";
-              action.domain = [
-                ["risk_level", "=", filter],
-                ["create_date", ">=", odooPrevDate], // Use the formatted dates
-                ["create_date", "<=", odooCurrentDate], // Use <= for inclusive end date
-              ];
-            } 
-
-            this.navigate.doAction(action);
+    this.myChartInstance = new Chart(this.chartRef.el, {
+      type: this.props.type,
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "", // Consider making label configurable if needed
+            data: values,
           },
-          scales: {
-            y: {
-              ticks: {
-                stepSize: 100,
-                callback: function (value) {
-                  // Simplified callback
-                  return value;
-                },
+        ],
+      },
+      options: {
+        ...this.getDefaultChartOptions(), // Start with default options
+        onClick: (event, elements) => {
+          if (!elements || elements.length === 0) return;
+
+          const clickedIndex = elements[0].index;
+          const filter = branch_ids[clickedIndex];
+
+          let action = {
+            type: "ir.actions.act_window",
+            name: "Top 10 Branches", // Use constant for action name
+            res_model: "res.partner", // Use constant for model name
+            domain: [
+              ["branch_id", "=", filter],
+              ["create_date", ">=", odooPrevDate],
+              ["create_date", "<=", odooCurrentDate],
+            ],
+            views: [
+              [false, "tree"], // Use constants for view types
+              [false, "form"],
+            ],
+          };
+
+          this.navigate.doAction(action);
+        },
+        scales: {
+          y: {
+            ticks: {
+              stepSize: 100,
+              callback: function (value) {
+                return value;
               },
             },
           },
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: this.props.type === "doughnut" ? "bottom" : "top",
-            },
-            title: {
-              display: true,
-              text: this.props.title,
-              position: "bottom",
-            },
+        },
+        plugins: {
+          title: {
+            text: this.props.title,
           },
         },
-      });
-    }
+      },
+    });
+  }
+
+  getDefaultChartOptions() {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: true,
+          position: "bottom",
+        },
+      },
+    };
   }
 }
 

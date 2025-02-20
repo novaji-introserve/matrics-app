@@ -230,21 +230,9 @@ class Compliance(http.Controller):
                 else:
                     grouped_data[transaction.risk_level] += 1  # Increment total_value
             
-            labels = []
-            values = []
-
-            for key, value in grouped_data.items():
-
-                labels.append(key)
-                values.append(value)
-
-            return {
-                "labels": labels,
-                "values": values
-            }
-        
+            return grouped_data
         else:
-            transactions = request.env["res.customer.transaction"].search([('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today), ('create_uid.branches_id', 'in', branches_id)])
+            transactions = request.env["res.customer.transaction"].search([('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today), ('branch_id', 'in', branches_id)])
 
             # Initialize a dictionary to hold the grouped data
             grouped_data = {}
@@ -255,20 +243,72 @@ class Compliance(http.Controller):
                     
                 else:
                     grouped_data[transaction.risk_level] += 1  # Increment total_value
-            
-            labels = []
-            values = []
+            return grouped_data
 
-            for key, value in grouped_data.items():
 
-                labels.append(key)
-                values.append(value)
+    @http.route('/dashboard/get_branch_by_customer', auth='public', type='json')
+    def get_branch_data(self, cco, branches_id, datepicked, **kw):
 
-            return {
-                "labels": labels,
-                "values": values
-            }
-                   
+        today = datetime.now().date()  # Get today's date
+        prevDate = today - timedelta(days=datepicked)  # Get previous date
+
+        # Convert to datetime for start and end of the day
+        start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
+
+        end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
+
+        
+
+        if cco ==True:
+            sql = """
+            SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
+            FROM res_branch rb
+            JOIN res_partner rp ON rb.id = rp.branch_id
+            WHERE rp.create_date BETWEEN %s AND %s
+            GROUP BY rb.id, rb.name
+            ORDER BY customer_count DESC
+            LIMIT 10;
+        """
+            request.env.cr.execute(sql,(start_of_prev_day, end_of_today))
+
+            results = request.env.cr.fetchall()
+
+            customer_counts = []
+
+            for row in results:
+                customer_counts.append({
+                    "id": row[0],
+                    'branch_name': row[1],
+                    'customer_count': row[2]
+                })
+
+            return customer_counts
+
+        else:
+            sql = """
+            SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
+            FROM res_branch rb
+            JOIN res_partner rp ON rb.id = rp.branch_id
+            WHERE rb.id IN %s AND rp.create_date BETWEEN %s AND %s
+            GROUP BY rb.id, rb.name
+            ORDER BY customer_count DESC;
+
+        """
+            request.env.cr.execute(sql, (tuple(branches_id),start_of_prev_day, end_of_today))
+            results = request.env.cr.fetchall()
+
+            customer_counts = []
+
+            for row in results:
+                customer_counts.append({
+                    "id": row[0],
+                    'branch_name': row[1],
+                    'customer_count': row[2]
+                })
+
+            return customer_counts
+
+
 
 
 
