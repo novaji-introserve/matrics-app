@@ -224,6 +224,49 @@ class TransactionMonitoring(models.Model):
     #         }
     #     }
         
+    # def open_customers_all_transactions_today_ngn(self):
+    #     today = fields.Date.today()
+        
+    #     ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
+    #     if not ngn_currency:
+    #         ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+        
+    #     domain = [('currency_id', '=', ngn_currency.id),('date_created', '=', today),('account_id.name', 'length', 10)]
+        
+    #     is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        
+    #     if not is_cco:
+    #         domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        
+    #     return {
+    #         'name': _('All NGN Transactions - Today '),
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'res.customer.transaction',
+    #         'view_mode': 'tree,form',
+    #         'domain': domain,
+    #         'context': {
+    #             'search_default_group_branch': 1,
+    #             'search_default_group_currency': 1,
+    #             'default_state': 'new'
+    #         }
+    #     }
+    def _check_cco_and_get_branch_domain(self):
+        """Helper method to check CCO access and return branch domain if needed"""
+        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+        if not is_cco:
+            return [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])]
+        return []
+
+    def _filter_account_length_10(self, domain):
+        """Helper method to filter records with account number length of 10"""
+        records = self.env['res.customer.transaction'].search(domain)
+        return records.filtered(lambda r: len(str(r.account_id.name)) == 10)
+    
+    def _filter_account_length_14(self, domain):
+        """Helper method to filter records with account number length of 14"""
+        records = self.env['res.customer.transaction'].search(domain)
+        return records.filtered(lambda r: len(str(r.account_id.name)) == 14)
+
     def open_customers_all_transactions_today_ngn(self):
         today = fields.Date.today()
         
@@ -231,26 +274,28 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('currency_id', '=', ngn_currency.id),('date_created', '=', today),('account_id.name', '=', 10)]
+        domain = [
+            ('currency_id', '=', ngn_currency.id),
+            ('date_created', '=', today)
+        ]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('All NGN Transactions - Today '),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
                 'default_state': 'new'
             }
         }
-        
+
     def open_customers_all_transactions_today_other(self):
         today = fields.Date.today()
         
@@ -259,19 +304,18 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('currency_id', '!=', ngn_currency.id),('date_created', '=', today),('account_id.name', '=', 10)]
+        domain = [('currency_id', '!=', ngn_currency.id),('date_created', '=', today)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
-        
+        filtered_records = self._filter_account_length_10(domain)
+
         return {
             'name': _('All Foreign Transactions - Today '),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -289,19 +333,18 @@ class TransactionMonitoring(models.Model):
         
         
         domain = [('currency_id', '=', ngn_currency.id),('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('account_id.name', '=', 10)]
+                ('date_created', '<', today)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('All NGN Transactions - Last 7 Days '),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -315,23 +358,20 @@ class TransactionMonitoring(models.Model):
         ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
-            
-        # print(ngn_currency)
-        
+                    
         domain = [('currency_id', '!=', ngn_currency.id),  ('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('account_id.name', '=', 10)]
+                ('date_created', '<', today)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
-        
+        filtered_records = self._filter_account_length_10(domain)
+
         return {
             'name': _('All Foreign Transactions - Last 7 Days '),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -346,19 +386,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
 
         
-        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '=', ngn_currency.id),('account_id.name', '=', 10)]
+        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('NGN Transactions Awaiting Review - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -374,19 +413,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
 
         
-        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '!=', ngn_currency.id),('account_id.name', '=', 10)]
+        domain = [('state', '=', 'new'),('date_created', '=', today), ('currency_id', '!=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('Foreign Transactions Awaiting Review - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -403,19 +441,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('state', '=', 'new'),('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '=', ngn_currency.id),('account_id.name', '=', 10)]
+                ('date_created', '<', today), ('currency_id', '=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('NGN Transactions Awaiting Review - Last 7 Day'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -431,19 +468,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('state', '=', 'new'),('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '!=', ngn_currency.id),('account_id.name', '=', 10)]
+                ('date_created', '<', today), ('currency_id', '!=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('Foreign Transactions Awaiting Review - Last 7 Day'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -458,19 +494,18 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '=', ngn_currency.id),('account_id.name', '=', 10)]
+        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('NGN Reviewed Transactions - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -486,19 +521,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
 
         
-        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '!=', ngn_currency.id),('account_id.name', '=', 10)]
+        domain = [('state', '=', 'done'),('date_created', '=', today), ('currency_id', '!=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('Foreign Reviewed Transactions- Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -515,19 +549,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('state', '=', 'done'),('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '=', ngn_currency.id),('account_id.name', '=', 10)]
+                ('date_created', '<', today), ('currency_id', '=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('NGN Reviewed Transactions - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -543,19 +576,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('state', '=', 'done'),('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '!=', ngn_currency.id),('account_id.name', '=', 10)]
+                ('date_created', '<', today), ('currency_id', '!=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_10(domain)
         
         return {
             'name': _('Foreign Reviewed Transactions - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -570,19 +602,18 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('date_created', '=', today), ('account_id.name', '>=', '14'), ('currency_id', '=', ngn_currency.id)]
+        domain = [('date_created', '=', today), ('currency_id', '=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('All NGN Internal Transactions - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -596,19 +627,18 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('date_created', '=', today), ('account_id.name', '>=', '14'), ('currency_id', '!=', ngn_currency.id)]
+        domain = [('date_created', '=', today), ('currency_id', '!=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('All Foreign Internal Transactions - Today '),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -625,19 +655,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14)]
+                ('date_created', '<', today), ('currency_id', '=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('All NGN Internal Transactions - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -653,19 +682,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today), ('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14)]
+                ('date_created', '<', today), ('currency_id', '!=', ngn_currency.id)]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('All Foreign Internal Transactions - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -679,19 +707,18 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('date_created', '=', today),('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'new')]
+        domain = [('date_created', '=', today),('currency_id', '=', ngn_currency.id), ('state', '=', 'new')]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('Internal NGN Transactions Awaiting Review - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -705,19 +732,18 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('date_created', '=', today),('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'new')]
+        domain = [('date_created', '=', today),('currency_id', '!=', ngn_currency.id), ('state', '=', 'new')]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('Internal Foreign Transactions Awaiting Review - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -734,19 +760,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'new')]
+                ('date_created', '<', today),('currency_id', '=', ngn_currency.id), ('state', '=', 'new')]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('Internal NGN Transactions Awaiting Review - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -763,19 +788,18 @@ class TransactionMonitoring(models.Model):
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'new')]
+                ('date_created', '<', today),('currency_id', '!=', ngn_currency.id), ('state', '=', 'new')]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('Internal Foreign Transactions Awaiting Review - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -790,19 +814,18 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('date_created', '=', today),('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'done')]
+        domain = [('date_created', '=', today),('currency_id', '=', ngn_currency.id), ('state', '=', 'done')]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('Internal NGN Transactions Reviewed - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -816,19 +839,18 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
         
-        domain = [('date_created', '=', today),('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'done')]
+        domain = [('date_created', '=', today),('currency_id', '!=', ngn_currency.id), ('state', '=', 'done')]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('Internal Foreign Transactions Reviewed - Today'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -846,19 +868,18 @@ class TransactionMonitoring(models.Model):
         
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('currency_id', '=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'done')]
+                ('date_created', '<', today),('currency_id', '=', ngn_currency.id), ('state', '=', 'done')]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('Internal NGN Transactions Reviewed - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
@@ -876,19 +897,18 @@ class TransactionMonitoring(models.Model):
         
         
         domain = [('date_created', '>=', last_7_days),
-                ('date_created', '<', today),('currency_id', '!=', ngn_currency.id),('account_id.name', '>=', 14), ('state', '=', 'done')]
+                ('date_created', '<', today),('currency_id', '!=', ngn_currency.id), ('state', '=', 'done')]
         
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')  # Replace with your CCO group ID
+        domain.extend(self._check_cco_and_get_branch_domain())
         
-        if not is_cco:
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+        filtered_records = self._filter_account_length_14(domain)
         
         return {
             'name': _('Internal Foreign Transactions Reviewed - Last 7 Days'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
-            'domain': domain,
+            'domain': [('id', 'in', filtered_records.ids)],
             'context': {
                 'search_default_group_branch': 1,
                 'search_default_group_currency': 1,
