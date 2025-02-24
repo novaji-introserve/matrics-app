@@ -359,7 +359,7 @@ class TransactionMonitoring(models.Model):
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
                     
-        domain = [('currency_id', '!=', ngn_currency.id),  ('date_created', '>=', last_7_days),
+        domain = [('currency_id', '!=', ngn_currency.id),('date_created', '>=', last_7_days),
                 ('date_created', '<', today)]
         
         domain.extend(self._check_cco_and_get_branch_domain())
