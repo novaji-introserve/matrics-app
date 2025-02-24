@@ -7,7 +7,7 @@
                 <div class="col-12">
                     <div class="col-12 m-0 p-0">
                         <div
-                            class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
+                            class="d-flex bg-white rounded shadow p-2 px-4 shadow-1 justify-content-between align-items-center">
                             <!-- <h3 class="lead fw-bold me-3">DASHBOARD</h3> -->
 
                             <div class="flex-grow-1 me-3">
@@ -17,7 +17,7 @@
 
                             <div class="ms-3">
                                 <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
-                                    <option value="0" selected="selected">Today</option>
+                                    <option value="0" selected="selected">From Today</option>
                                     <option value="7">Last 7 Days</option>
                                     <option value="14">Last 14 Days</option>
                                     <option value="30">Last Month</option>
@@ -38,6 +38,7 @@
                     <KpiCard t-on-click="() => displayTransactionsByRisk('low')" name="'Low Risk Tran.'"
                         value="state.kpi.lowrisk" percentage="state.kpi.lowriskpercentage" />
 
+                
                     <KpiCard t-on-click="() => displayTransactionsByRisk('screened')" name="'Screened Transaction'"
                         value="state.kpi.totalScreenedTransactionCount" percentage="state.kpi.totalrulespercentage" />
 
@@ -69,8 +70,10 @@
                         </div>
 
                         <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                            <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" current_datepicked="state.current_datepicked"
-                                config="state.riskratingchart" type="'bar'" title="'Rating'" />
+                            <t t-if="state.topbranch.length > 0">
+                                <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" config="state.topbranch"
+                                    type="'line'" title="'Top 10 Branches By Customer'" />
+                            </t>
                         </div>
                     </div>
 
@@ -83,8 +86,10 @@
                             </button>
                         </div>
                         <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                            <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" current_datepicked="state.current_datepicked"
-                                config="state.customerchart" type="'bar'" title="'Customer'"  />
+                           <t t-if="state.topscreened.length > 0">
+                            <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked"
+                                current_datepicked="state.current_datepicked" config="state.topscreened" type="'bar'" title="'Top 10 Screened Transaction By Rules'" />
+                           </t>
                         </div>
                     </div>
                     <div class="col-md-4 ">
@@ -96,8 +101,10 @@
                             </button>
                         </div>
                         <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
-                            <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" current_datepicked="state.current_datepicked"
-                                config="state.transationstatechart" type="'pie'" title="'State'" />
+                            <t t-if="state.highriskcustomer.length > 0">
+                                <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" current_datepicked="state.current_datepicked"
+                                    config="state.highriskcustomer" type="'pie'" title="'Top 10 High-Risk Branches'" />
+                            </t>
                         </div>
                     </div>
 

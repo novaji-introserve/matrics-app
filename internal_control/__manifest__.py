@@ -51,6 +51,8 @@
      
         # cron job
         'data/schedule/cron_job.xml',
+        'data/schedule/cron_trans_screening.xml',
+        'data/schedule/cron_branch_sync.xml',
         'data/schedule/account_trans_metrics.xml',
     ],
 
