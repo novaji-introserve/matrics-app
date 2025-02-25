@@ -972,8 +972,8 @@ class Rulebook(models.Model):
                     record.reg_due_date = record.computed_date + relativedelta(
                         **delta_args
                     )
-                    _logger.critical(
-                        f"writing escalation date {record.reg_due_date}")
+                    # _logger.critical(
+                    #     f"writing escalation date {record.reg_due_date}")
                     record.sudo().write({
                         'reg_due_date': record.reg_due_date,
                     })
