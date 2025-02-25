@@ -32,9 +32,6 @@ class Mydashboard(http.Controller):
     @http.route('/dashboard/get_branch_by_customer', auth='public', type='json')
     def get_branch_data(self, cco, branches_id, datepicked, **kw):
 
-        print(type(datepicked))
-        print(datepicked)
-
 
         today = datetime.now().date()  # Get today's date
         prevDate = today - timedelta(days=datepicked)  # Get previous date
@@ -45,6 +42,7 @@ class Mydashboard(http.Controller):
         end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
         
         if cco == True and datepicked == 0:
+            print(45678)
             sql = """
             SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
             FROM res_branch rb
@@ -146,8 +144,7 @@ class Mydashboard(http.Controller):
 
         today = datetime.now().date()  # Get today's date
         prevDate = today - timedelta(days=datepicked)  # Get previous date
-
-        
+       
 
         if cco ==True and datepicked > 0:
             sql = """

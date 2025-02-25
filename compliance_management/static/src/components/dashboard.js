@@ -27,7 +27,7 @@ export class ComplianceDashboard extends Component {
       scrollRight: sessionStorage.getItem("user_scroll_right")
         ? sessionStorage.getItem("user_scroll_right")
         : false,
-      transactionchart: [],
+      screenedchart: [],
       topbranch: [],
     });
 
@@ -168,22 +168,21 @@ export class ComplianceDashboard extends Component {
 
   filterByDate = async () => {
     await this.getAllStats();
-    await this.fetchTransChart();
+    await this.fetchScreenedChart();
     await this.TopBranches();
   };
 
 
-  async fetchTransChart() {
-    const response = await this.rpc("/dashboard/get_transaction", {
+  async fetchScreenedChart() {
+    const response = await this.rpc("/dashboard/get_top_screened_rules", {
       cco: this.state.cco,
       branches_id: this.state.branches_id,
       datepicked: Number(this.state.datepicked),
     });  
 
-    this.state.transactionchart = {
-      labels: Object.keys(response),
-      values: Object.values(response)
-    };
+   
+    this.state.screenedchart = response
+    
 
   }
   async TopBranches() {

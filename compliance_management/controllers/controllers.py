@@ -3,23 +3,7 @@ from odoo import http
 from odoo.http import request
 from datetime import datetime, timedelta
 from odoo import fields
-# class CustomerManagement(http.Controller):
-#     @http.route('/customer_management/customer_management', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
 
-#     @http.route('/customer_management/customer_management/objects', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('customer_management.listing', {
-#             'root': '/customer_management/customer_management',
-#             'objects': http.request.env['customer_management.customer_management'].search([]),
-#         })
-
-#     @http.route('/customer_management/customer_management/objects/<model("customer_management.customer_management"):obj>', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('customer_management.object', {
-#             'object': obj
-#         })
 
 class Compliance(http.Controller):
     @http.route('/dashboard/user', auth='public', type='json')
@@ -202,48 +186,64 @@ class Compliance(http.Controller):
 
             return chart_data
     
-    @http.route('/dashboard/get_transaction', auth='public', type='json')
+    @http.route('/dashboard/get_top_screened_rules', auth='public', type='json')
     def get_transaction_data(self, cco, branches_id, datepicked, **kw):
 
         today = datetime.now().date()  # Get today's date
         prevDate = today - timedelta(days=datepicked)  # Get previous date
 
-        # Convert to datetime for start and end of the day
-        start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
-
-        end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
-
-
     
         if cco == True:
             # fetch all data for chief compliance officer
-            transactions = request.env["res.customer.transaction"].search([('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today)])
+            sql = """
+                SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+                FROM res_transaction_screening_rule rtsr
+                JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+                WHERE rct.date_created BETWEEN %s AND %s
+                GROUP BY rtsr.id, rtsr.name
+                ORDER BY hit_count DESC
+                LIMIT 10;
+            """
+            request.env.cr.execute(sql,(prevDate, today))
 
-            # Initialize a dictionary to hold the grouped data
-            grouped_data = {}
-            
-            # Loop through the records and group by scope and name
-            for transaction in transactions:
-                if transaction.risk_level not in grouped_data:
-                    grouped_data[transaction.risk_level] = 1  # Start with 1 for the first occurrence
-                    
-                else:
-                    grouped_data[transaction.risk_level] += 1  # Increment total_value
-            
-            return grouped_data
+            results = request.env.cr.fetchall()
+
+            customer_counts = []
+
+            for row in results:
+                customer_counts.append({
+                    "id": row[0],
+                    'name': row[1],
+                    'count': row[2]
+                })
+
+            return customer_counts
+
         else:
-            transactions = request.env["res.customer.transaction"].search([('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today), ('branch_id', 'in', branches_id)])
+            sql = """
+            SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+            FROM res_transaction_screening_rule rtsr
+            JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+            WHERE rct.date_created BETWEEN %s AND %s AND rct.branch_id IN %s
+            GROUP BY rtsr.id, rtsr.name
+            ORDER BY hit_count DESC
+            LIMIT 10;
+            """
+            request.env.cr.execute(sql,(prevDate, today, tuple(branches_id)))
 
-            # Initialize a dictionary to hold the grouped data
-            grouped_data = {}
+            results = request.env.cr.fetchall()
 
-            for transaction in transactions:
-                if transaction.risk_level not in grouped_data:
-                    grouped_data[transaction.risk_level] = 1  # Start with 1 for the first occurrence
-                    
-                else:
-                    grouped_data[transaction.risk_level] += 1  # Increment total_value
-            return grouped_data
+            customer_counts = []
+
+            for row in results:
+                customer_counts.append({
+                    "id": row[0],
+                    'name': row[1],
+                    'count': row[2]
+                })
+
+            return customer_counts
+
 
 
     @http.route('/dashboard/get_branch_by_customer', auth='public', type='json')

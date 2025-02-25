@@ -32,6 +32,7 @@
     "auto_install": False,
     'assets':{
         'web.assets_backend': [
+            'icomply_dashboard/static/src/css/style.css',
             'icomply_dashboard/static/src/components/**/*.js',
             'icomply_dashboard/static/src/components/**/*.xml',
             'icomply_dashboard/static/src/img/logov.png',
