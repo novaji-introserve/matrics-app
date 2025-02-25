@@ -1088,8 +1088,8 @@ class ReplyLog(models.Model):
 
                         due_time_today = rulebook.reminder_due_date.time()
 
-                        _logger.critical(
-                            f"Document: {bool(rulebook.document)}, Reply Content: {bool(rulebook.reply_content)}")
+                        # _logger.critical(
+                        #     f"Document: {bool(rulebook.document)}, Reply Content: {bool(rulebook.reply_content)}")
 
                         # Check if the current time is at or later than the reminder due time
                         if today.time() >= due_time_today:
