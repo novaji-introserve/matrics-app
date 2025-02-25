@@ -50,13 +50,17 @@ class AdverseMedia(models.Model):
     
     keyword_id = fields.Many2many(
         'media.keyword', string='Keywords for Monitoring', required=True,
-        tracking=True, index=True)
+        tracking=True, index=True,        default=lambda self: self._default_keywords())
 
     alert_ids = fields.One2many(
         'adverse.media.alert', 'media_id', string='Alerts', index=True)
 
     risk_score_decoration = fields.Char(
         compute='_compute_risk_score_decoration')
+    
+    def _default_keywords(self):
+        """Return all records from media.keyword as default value."""
+        return self.env['media.keyword'].search([]).ids
     
     @api.depends('partner_risk_score')
     def _compute_risk_score_decoration(self):
@@ -378,8 +382,7 @@ class AdverseMedia(models.Model):
                     f"Error scanning news for partner {record.partner_id.name}: {str(e)}", exc_info=True)
                 continue
     
-    
-       
+          
     @api.model
     def scan_adverse_media(self):
         """Cron job method to scan adverse media based on frequency"""
@@ -494,6 +497,8 @@ class MediaKeyword(models.Model):
 
     risk_score_decoration = fields.Char(
         compute='_compute_risk_score_decoration')
+    
+    
 
     @api.depends('risk_score')
     def _compute_risk_score_decoration(self):

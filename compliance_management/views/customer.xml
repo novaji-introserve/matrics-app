@@ -105,6 +105,11 @@
                         string="Compute Risk Score"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Compute Risk Score: Using your defined Risk Plan, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
+                    
+                    <button name="scan_news_articles" class="oe_highlight" type="object"
+                        string="Run Media Screening"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Run Media Screening: Are you sure?" />
                 </header>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">

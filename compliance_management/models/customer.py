@@ -127,6 +127,24 @@ class Customer(models.Model):
     #     self.invalidate_recordset(['risk_score','risk_level'])
     #     return result
         
+    def scan_news_articles(self):
+        """Trigger news scanning via adverse.media"""
+        self.ensure_one()  # Ensure we're working with a single record
+        # adverse_media = self.adverse_media_id
+        # if not adverse_media:
+            # Create or find an adverse.media record if no direct link exists
+        adverse_media = self.env['adverse.media'].search(
+            [('partner_id', '=', self.id)], limit=1)
+        if not adverse_media:
+            adverse_media = self.env['adverse.media'].create({
+                'partner_id': self.id,
+                # Add other required fields for adverse.media if any
+                'monitoring_status': 'active',  # Example default
+            })
+
+        # Call the original method from adverse.media
+        return adverse_media.scan_news_articles()
+    
     @api.depends('account_ids')
     def _total_accounts(self):
         for e in self:
