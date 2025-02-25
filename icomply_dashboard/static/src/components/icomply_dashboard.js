@@ -99,8 +99,8 @@ export class IcomplyDashboard extends Component {
   }
 
   filterByDate = async () => {
-    const currentDate = moment().subtract(this.state.datepicked, "days");
-    const previousDate = moment().subtract(this.state.datepicked * 2, "days");
+    const currentDate = moment();
+    const previousDate = moment().subtract(this.state.datepicked, "days");
 
     this.state.current_datepicked = currentDate.format("YYYY-MM-DD"); // YYYY-MM-DD format
     this.state.previous_datepicked = previousDate.format("YYYY-MM-DD"); // YYYY-MM-DD format
@@ -112,7 +112,7 @@ export class IcomplyDashboard extends Component {
     try {
       const dateFilter =
         this.state.datepicked > 0
-          ? [["create_date", ">=", this.state.current_datepicked]]
+          ? [('date_created', '>=', this.state.previous_datepicked),('date_created', '<=', this.state.current_datepicked)]
           : [];
 
       const branchFilter =
@@ -158,9 +158,9 @@ export class IcomplyDashboard extends Component {
       };
 
   
-      await this.TopBranches();
       await this.TopTransactionRules();
       await this.highriskcustomer();
+      await this.TopBranches();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -173,7 +173,7 @@ export class IcomplyDashboard extends Component {
   loadInitialData = async () => {
     await this.TopBranches();
     await this.TopTransactionRules();
-    await this.highriskcustomer()
+    await this.highriskcustomer();
   };
   // Display transactions based on risk level
   displayTransactionsByRisk = (riskLevel = "") => {

@@ -25,7 +25,8 @@ access_res_transaction_status,access res transaction status,internal_control.mod
 access_res_user_status,access res user status,internal_control.model_res_user_status,base.group_user,1,1,1,1
 access_res_account_officer,access res account officer,internal_control.model_res_account_officer,base.group_user,1,1,1,1
 access_res_partner_account_product,access res partner account product,internal_control.model_res_partner_account_product,base.group_user,1,1,1,1
-access_res_bank_product,access res bank product,internal_control.model_res_bank_product,base.group_user,1,1,1,1
+access_res_sub_branch,access res sub branch,internal_control.model_res_subbranch,base.group_user,1,1,1,1
+access_res_branchtype,access res branch type,internal_control.model_res_branchtype,base.group_user,1,1,1,1
 
 
 

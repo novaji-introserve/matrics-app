@@ -5,7 +5,7 @@
             <!-- first section -->
             <div class="col-12">
                 <div class="col-12 m-0 p-0">
-                    <div class="d-flex bg-white rounded shadow p-4 shadow-1 justify-content-between align-items-center">
+                    <div class="d-flex bg-white rounded shadow px-4 py-1 shadow-1 justify-content-between align-items-center">
 
                         <div class="flex-grow-1 me-3">
                             <img t-att-src="'/compliance_management/static/src/img/logov.png'" alt="Dashboard Icon"
@@ -27,7 +27,7 @@
 
             <!-- second section -->
 
-            <div class="container ">
+            <div class="container-fluid ">
 
                 <div class="row">
 
@@ -59,19 +59,20 @@
 
                        
                         <div class="row g-md-2 mt-md-0 mt-5 ">
-                            <t t-if="state.transactionchart">
                             <div class="col-md-6">
+                               
                                 <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                                    <h3 class="lead fw-bold text-dark">Transaction By Risk Level</h3>
+                                    <h3 class="lead fw-bold text-dark">Top 10 Screened Transaction By Rules</h3>
                                     <button class="btn btn-dark">
                                         <i class="fa fa-angle-right"></i>
                                     </button>
                                 </div>
+                            <t t-if="state.screenedchart.length > 0">
                                 <div class="chart mt-4 ml-1 bg-white shadow shadow-1">
-                                    <!-- <ChartRenderer date='state.datepicked' type="'bar'" title="'Transaction By Risk Level'" data="state.transactionchart" /> -->
+                                    <ChartRenderer date='state.datepicked' type="'bar'" title="'Top 10 Screened Transaction By Rules'" data="state.screenedchart" />
                                 </div>
-                            </div>
                             </t>
+                            </div>
                             <div class="col-md-6">
                                 <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
                                     <h3 class="lead fw-bold text-dark">Top 10 Branches By Customer</h3>
@@ -93,7 +94,7 @@
                     <div class="col-md-3 rightside end-0 vh-100  p-4 ">
 
 
-                        <div class="shadow shadow-lg p-4 d-flex justify-content-between gap-md-3 flex-col flex-md-row">
+                        <div class="shadow bg-white shadow-lg p-4 d-flex justify-content-between gap-md-3 flex-col flex-md-row">
 
                             <div class="circle">
                                 <t t-out="state.totalstat" />
@@ -104,27 +105,27 @@
                                 <div t-on-click="() => displaybycategory('bank')"
                                     class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Bank</h5>
-                                    <div style="background-color: #FEEEF1; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: #FFD700; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('risk')"
                                     class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Risk</h5>
-                                    <div style="background-color: #FEF2DC; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: #999999; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('compliance')"
                                     class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Compliance</h5>
-                                    <div style="background-color: #8BB8D9; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: #C8102E; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('branch')"
                                     class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Branch</h5>
-                                    <div style="background-color: #D9FAE7; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: #66B2FF; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('regulatory')"
                                     class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Regulatory</h5>
-                                    <div style="background-color: #F7E8BD; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: #4CAF50; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('all')"
                                     class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
@@ -136,7 +137,7 @@
 
                         </div>
 
-                        <div class="shadow shadow-lg mt-3 doughnut">
+                        <div class="shadow shadow-lg mt-3 bg-white doughnut">
 
                             <ChartRenderer type="'doughnut'" title="'Users Report'" data="state.chartData" />
 

@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="owl.IcomplyDashboard" owl="1">
-        <div class="vh-100 p-4 overflow-auto bg-muted ">
+        <div class="vh-100 p-1 overflow-auto bg-muted ">
 
             <div class="row g-5">
                 <div class="col-12">
                     <div class="col-12 m-0 p-0">
                         <div
                             class="d-flex bg-white rounded shadow p-2 px-4 shadow-1 justify-content-between align-items-center">
-                            <!-- <h3 class="lead fw-bold me-3">DASHBOARD</h3> -->
-
+                            
                             <div class="flex-grow-1 me-3">
                                 <img t-att-src="'/icomply_dashboard/static/src/img/logov.png'" alt="Dashboard Icon"
                                     class="img-fluid" style="width: 300; max-height: 70px; object-fit: contain; " />

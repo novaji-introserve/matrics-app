@@ -265,7 +265,9 @@ class TransactionMonitoring(models.Model):
     def _filter_account_length_14(self, domain):
         """Helper method to filter records with account number length of 14"""
         records = self.env['res.customer.transaction'].search(domain)
+        # print(records)
         return records.filtered(lambda r: len(str(r.account_id.name)) == 14)
+        
 
     def open_customers_all_transactions_today_ngn(self):
         today = fields.Date.today()
@@ -282,6 +284,8 @@ class TransactionMonitoring(models.Model):
         domain.extend(self._check_cco_and_get_branch_domain())
         
         filtered_records = self._filter_account_length_10(domain)
+
+   
         
         return {
             'name': _('All NGN Transactions - Today '),
@@ -330,12 +334,14 @@ class TransactionMonitoring(models.Model):
         ngn_currency = self.env['res.currency'].search([('code', '=', '001')], limit=1)
         if not ngn_currency:
             ngn_currency = self.env['res.currency'].search([('name', '=', 'NGN')], limit=1)
+
         
         
         domain = [('currency_id', '=', ngn_currency.id),('date_created', '>=', last_7_days),
                 ('date_created', '<', today)]
         
         domain.extend(self._check_cco_and_get_branch_domain())
+
         
         filtered_records = self._filter_account_length_10(domain)
         
@@ -607,6 +613,8 @@ class TransactionMonitoring(models.Model):
         domain.extend(self._check_cco_and_get_branch_domain())
         
         filtered_records = self._filter_account_length_14(domain)
+
+        
         
         return {
             'name': _('All NGN Internal Transactions - Today'),

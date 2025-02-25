@@ -33,5 +33,7 @@ from . import title
 from . import account_officer
 from . import account_product
 from . import currency
+from . import res_subbranch
+from . import branch_type
 # from .legacy import sync_script 
 
