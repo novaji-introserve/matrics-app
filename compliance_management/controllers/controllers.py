@@ -246,20 +246,78 @@ class Compliance(http.Controller):
 
 
 
-    @http.route('/dashboard/get_branch_by_customer', auth='public', type='json')
-    def get_branch_data(self, cco, branches_id, datepicked, **kw):
+    # @http.route('/dashboard/get_branch_by_customer', auth='public', type='json')
+    # def get_branch_data(self, cco, branches_id, datepicked, **kw):
 
-        today = datetime.now().date()  # Get today's date
-        prevDate = today - timedelta(days=datepicked)  # Get previous date
+    #     today = datetime.now().date()  # Get today's date
+    #     prevDate = today - timedelta(days=datepicked)  # Get previous date
 
-        # Convert to datetime for start and end of the day
-        start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
+    #     # Convert to datetime for start and end of the day
+    #     start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
 
-        end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
+    #     end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
 
         
 
-        if cco ==True:
+    #     if cco ==True:
+    #         sql = """
+    #         SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
+    #         FROM res_branch rb
+    #         JOIN res_partner rp ON rb.id = rp.branch_id
+    #         WHERE rp.create_date BETWEEN %s AND %s
+    #         GROUP BY rb.id, rb.name
+    #         ORDER BY customer_count DESC
+    #         LIMIT 10;
+    #     """
+    #         request.env.cr.execute(sql,(start_of_prev_day, end_of_today))
+
+    #         results = request.env.cr.fetchall()
+
+    #         customer_counts = []
+
+    #         for row in results:
+    #             customer_counts.append({
+    #                 "id": row[0],
+    #                 'branch_name': row[1],
+    #                 'customer_count': row[2]
+    #             })
+
+    #         return customer_counts
+
+    #     else:
+    #         sql = """
+    #         SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
+    #         FROM res_branch rb
+    #         JOIN res_partner rp ON rb.id = rp.branch_id
+    #         WHERE rb.id IN %s AND rp.create_date BETWEEN %s AND %s
+    #         GROUP BY rb.id, rb.name
+    #         ORDER BY customer_count DESC;
+
+    #     """
+    #         request.env.cr.execute(sql, (tuple(branches_id),start_of_prev_day, end_of_today))
+    #         results = request.env.cr.fetchall()
+
+    #         customer_counts = []
+
+    #         for row in results:
+    #             customer_counts.append({
+    #                 "id": row[0],
+    #                 'branch_name': row[1],
+    #                 'customer_count': row[2]
+    #             })
+
+    #         return customer_counts
+
+    @http.route('/dashboard/get_branch_by_customer', auth='public', type='json')
+    def get_branch_data(self, cco, branches_id, datepicked, **kw):
+        today = datetime.now().date()
+        prevDate = today - timedelta(days=datepicked)
+        
+        start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
+        end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
+        
+        if cco == True:
+            # This part of the code works fine
             sql = """
             SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
             FROM res_branch rb
@@ -268,23 +326,27 @@ class Compliance(http.Controller):
             GROUP BY rb.id, rb.name
             ORDER BY customer_count DESC
             LIMIT 10;
-        """
-            request.env.cr.execute(sql,(start_of_prev_day, end_of_today))
-
+            """
+            request.env.cr.execute(sql, (start_of_prev_day, end_of_today))
+            
             results = request.env.cr.fetchall()
-
+            
             customer_counts = []
-
+            
             for row in results:
                 customer_counts.append({
                     "id": row[0],
                     'branch_name': row[1],
                     'customer_count': row[2]
                 })
-
+            
             return customer_counts
-
+        
         else:
+            # Check if branches_id is empty
+            if not branches_id:
+                return []  # Return empty result if no branches provided
+            
             sql = """
             SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
             FROM res_branch rb
@@ -292,20 +354,19 @@ class Compliance(http.Controller):
             WHERE rb.id IN %s AND rp.create_date BETWEEN %s AND %s
             GROUP BY rb.id, rb.name
             ORDER BY customer_count DESC;
-
-        """
-            request.env.cr.execute(sql, (tuple(branches_id),start_of_prev_day, end_of_today))
+            """
+            request.env.cr.execute(sql, (tuple(branches_id), start_of_prev_day, end_of_today))
             results = request.env.cr.fetchall()
-
+            
             customer_counts = []
-
+            
             for row in results:
                 customer_counts.append({
                     "id": row[0],
                     'branch_name': row[1],
                     'customer_count': row[2]
                 })
-
+            
             return customer_counts
 
 
