@@ -2,6 +2,7 @@
 from odoo import http
 from odoo.http import request
 from datetime import datetime, timedelta
+from odoo import fields
 
 class Mydashboard(http.Controller):
     @http.route('/dashboard/user', auth='public', type='json')
@@ -28,331 +29,207 @@ class Mydashboard(http.Controller):
             "alert_rules_domain": domain 
         }
         return result
-
-    @http.route('/dashboard/get_branch_by_customer', auth='public', type='json')
-    def get_branch_data(self, cco, branches_id, datepicked, **kw):
-
-
-        today = datetime.now().date()  # Get today's date
-        prevDate = today - timedelta(days=datepicked)  # Get previous date
-
-        # Convert to datetime for start and end of the day
-        start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
-
-        end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
-        
-        if cco == True and datepicked == 0:
-            print(45678)
-            sql = """
-            SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
-            FROM res_branch rb
-            JOIN res_partner rp ON rb.id = rp.branch_id
-            GROUP BY rb.id, rb.name
-            ORDER BY customer_count DESC
-            LIMIT 10;
-            """
-            request.env.cr.execute(sql)
-
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'branch_name': row[1],
-                    'customer_count': row[2]
-                })
-
-            return customer_counts
-
-        elif cco ==True and datepicked > 0:
-            sql = """
-            SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
-            FROM res_branch rb
-            JOIN res_partner rp ON rb.id = rp.branch_id
-            WHERE rp.create_date BETWEEN %s AND %s
-            GROUP BY rb.id, rb.name
-            ORDER BY customer_count DESC
-            LIMIT 10;
-        """
-            request.env.cr.execute(sql,(start_of_prev_day, end_of_today))
-
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'branch_name': row[1],
-                    'customer_count': row[2]
-                })
-
-            return customer_counts
-
-        elif cco == False and datepicked > 0:
-            sql = """
-            SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
-            FROM res_branch rb
-            JOIN res_partner rp ON rb.id = rp.branch_id
-            WHERE rb.id IN %s AND rp.create_date BETWEEN %s AND %s
-            GROUP BY rb.id, rb.name
-            ORDER BY customer_count DESC;
-
-        """
-            request.env.cr.execute(sql, (tuple(branches_id),start_of_prev_day, end_of_today))
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'branch_name': row[1],
-                    'customer_count': row[2]
-                })
-
-            return customer_counts
-
-        elif cco == False and datepicked == 0:
-            sql = """
-            SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
-            FROM res_branch rb
-            JOIN res_partner rp ON rb.id = rp.branch_id
-            WHERE rb.id IN %s
-            GROUP BY rb.id, rb.name
-            ORDER BY customer_count DESC;
-
-        """
-            request.env.cr.execute(sql, (tuple(branches_id)))
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'branch_name': row[1],
-                    'customer_count': row[2]
-                })
-
-            return customer_counts
+    
     
     @http.route('/dashboard/get_top_screening_rules', auth='public', type='json')
     def get_top_screening(self, cco, branches_id, datepicked, **kw):
 
         today = datetime.now().date()  # Get today's date
-        prevDate = today - timedelta(days=datepicked)  # Get previous date
-       
-
-        if cco ==True and datepicked > 0:
-            sql = """
-            SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-            FROM res_transaction_screening_rule rtsr
-            JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-            WHERE rct.date_created BETWEEN %s AND %s
-            GROUP BY rtsr.id, rtsr.name
-            ORDER BY hit_count DESC
-            LIMIT 10;
-        """
-            request.env.cr.execute(sql,(prevDate, today))
-
+        prev_date = today - timedelta(days=datepicked)  # Get previous date
+        
+        def _execute_query(sql, params=None):
+            request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
             results = request.env.cr.fetchall()
+            return [{
+                "id": row[0],
+                'name': row[1],
+                'count': row[2]
+            } for row in results]
 
-            customer_counts = []
+        if cco:
+            if datepicked > 0:
+                sql = """
+                    SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+                    FROM res_transaction_screening_rule rtsr
+                    JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+                    WHERE rct.date_created BETWEEN %s AND %s
+                    GROUP BY rtsr.id, rtsr.name
+                    ORDER BY hit_count DESC
+                    LIMIT 10;
+                """
+                return _execute_query(sql, (prev_date, today))
+            else:  # datepicked == 0
+                sql = """
+                    SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+                    FROM res_transaction_screening_rule rtsr
+                    JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+                    GROUP BY rtsr.id, rtsr.name
+                    ORDER BY hit_count DESC
+                    LIMIT 10;
+                """
+                return _execute_query(sql)
+        
 
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'name': row[1],
-                    'count': row[2]
-                })
+        else: # cco == False
+            if datepicked > 0:
+                sql = """
+                SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+                FROM res_transaction_screening_rule rtsr
+                JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+                WHERE rct.date_created BETWEEN %s AND %s AND rct.branch_id IN %s
+                GROUP BY rtsr.id, rtsr.name
+                ORDER BY hit_count DESC
+                LIMIT 10;
+                """
+                return _execute_query(sql, (prev_date, today, tuple(branches_id))) 
+            else:
+                sql = """
+                SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+                FROM res_transaction_screening_rule rtsr
+                JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+                WHERE rct.branch_id IN %s
+                GROUP BY rtsr.id, rtsr.name
+                ORDER BY hit_count DESC
+                LIMIT 10;
 
-            return customer_counts
-
-        elif cco == True and datepicked == 0:
-            sql = """
-            SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-            FROM res_transaction_screening_rule rtsr
-            JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-            GROUP BY rtsr.id, rtsr.name
-            ORDER BY hit_count DESC
-            LIMIT 10;
-        """
-            request.env.cr.execute(sql)
-
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'name': row[1],
-                    'count': row[2]
-                })
-
-            return customer_counts
-
-        elif cco == False and datepicked > 0:
-            sql = """
-             SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-            FROM res_transaction_screening_rule rtsr
-            JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-            WHERE rct.date_created BETWEEN %s AND %s AND rct.branch_id IN %s
-            GROUP BY rtsr.id, rtsr.name
-            ORDER BY hit_count DESC
-            LIMIT 10;
-
-        """
-            request.env.cr.execute(sql, (prevDate, today,tuple(branches_id)))
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'name': row[1],
-                    'count': row[2]
-                })
-
-            return customer_counts
-        elif cco == False and datepicked == 0:
-            sql = """
-             SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-            FROM res_transaction_screening_rule rtsr
-            JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-            WHERE rct.branch_id IN %s
-            GROUP BY rtsr.id, rtsr.name
-            ORDER BY hit_count DESC
-            LIMIT 10;
-
-        """
-            request.env.cr.execute(sql, (tuple(branches_id)))
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'name': row[1],
-                    'count': row[2]
-                })
-
-            return customer_counts
-
+                """
+                return _execute_query(sql, (tuple(branches_id))) 
 
     @http.route('/dashboard/get_high_risk_customer_by_branch', auth='public', type='json')
     def get_high_risk(self, cco, branches_id, datepicked, **kw):
 
+        
+
         today = datetime.now().date()  # Get today's date
-        prevDate = today - timedelta(days=datepicked)  # Get previous date
+        prev_date = today - timedelta(days=datepicked)  # Get previous date
 
         
+        def _execute_query(sql, params=None):
+            request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
+            results = request.env.cr.fetchall()
+            return [{
+                "id": row[0],
+                'name': row[1],
+                'count': row[2]
+            } for row in results]
+
+
+        if cco:
+            if datepicked > 0:
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rp.risk_level = 'high' AND rp.create_date BETWEEN %s AND %s 
+                    GROUP BY rb.id, rb.name
+                    ORDER BY high_risk_customers DESC
+                    LIMIT 10
+                """
+                return _execute_query(sql, (prev_date, today))
+           
+
+            else:
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rp.risk_level = 'high'
+                    GROUP BY rb.id, rb.name
+                    ORDER BY high_risk_customers DESC
+                    LIMIT 10
+                """
+                return _execute_query(sql)
+
+        else:
+            if datepicked == 0:
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rp.risk_level = 'high' AND rb.id IN %s
+                    GROUP BY rb.id, rb.name
+                    ORDER BY high_risk_customers DESC
+                    LIMIT 10
+
+                    """
+                return _execute_query(sql, (tuple(branches_id)))
+            
+            else:
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rp.risk_level = 'high' AND rp.create_date BETWEEN %s AND %s AND rb.id IN %s
+                    GROUP BY rb.id, rb.name
+                    ORDER BY high_risk_customers DESC
+                    LIMIT 10
+
+                    """
+                return _execute_query(sql, (prev_date, today,tuple(branches_id)))
+                
+
+    @http.route('/dashboard/branch_by_customer', auth='public', type='json')
+    def get_branch_by_customer(self, cco, branches_id, datepicked, **kw):
+
+        today = datetime.now().date()  # Get today's date
+        prev_date = today - timedelta(days=datepicked)  # Get previous date
 
         
+        start_of_prev_day = fields.Datetime.to_string(datetime.combine(prev_date, datetime.min.time()))
+        end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
 
-        if cco ==True and datepicked > 0:
-            sql = """
-            SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
-            FROM res_branch rb
-            JOIN res_partner rp ON rb.id = rp.branch_id
-            WHERE rp.risk_level = 'high' AND rp.create_date BETWEEN %s AND %s 
-            GROUP BY rb.id, rb.name
-            ORDER BY high_risk_customers DESC
-            LIMIT 10
-        """
-            request.env.cr.execute(sql,(prevDate, today))
 
+        def _execute_query(sql, params=None):
+            request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
             results = request.env.cr.fetchall()
+            return [{
+                "id": row[0],
+                'branch_name': row[1],
+                'customer_count': row[2]
+            } for row in results]
 
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'name': row[1],
-                    'count': row[2]
-                })
-
-            return customer_counts
-
-        elif cco == True and datepicked == 0:
-            sql = """
-            SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
-            FROM res_branch rb
-            JOIN res_partner rp ON rb.id = rp.branch_id
-            WHERE rp.risk_level = 'high'
-            GROUP BY rb.id, rb.name
-            ORDER BY high_risk_customers DESC
-            LIMIT 10
-        """
-            request.env.cr.execute(sql)
-
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'name': row[1],
-                    'count': row[2]
-                })
-
-            return customer_counts
-
-
-        elif cco == False and datepicked == 0:
-            sql = """
-             SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
-            FROM res_branch rb
-            JOIN res_partner rp ON rb.id = rp.branch_id
-            WHERE rp.risk_level = 'high' AND rb.id IN %s
-            GROUP BY rb.id, rb.name
-            ORDER BY high_risk_customers DESC
-            LIMIT 10
-
-        """
-            request.env.cr.execute(sql, (tuple(branches_id)))
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'name': row[1],
-                    'count': row[2]
-                })
-
-            return customer_counts
+        if cco:
+            if datepicked == 0:
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    GROUP BY rb.id, rb.name
+                    ORDER BY customer_count DESC
+                    LIMIT 10;
+                """
+                return _execute_query(sql)
+            else:  # datepicked > 0
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rp.create_date BETWEEN %s AND %s
+                    GROUP BY rb.id, rb.name
+                    ORDER BY customer_count DESC
+                    LIMIT 10;
+                """
+                return _execute_query(sql, (start_of_prev_day, end_of_today))
+        else:  # cco == False
+            if datepicked == 0:
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rb.id IN %s
+                    GROUP BY rb.id, rb.name
+                    ORDER BY customer_count DESC;
+                """
+                return _execute_query(sql, (tuple(branches_id),))  # Ensure tuple even for single ID
+            else:  # datepicked > 0
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rb.id IN %s AND rp.create_date BETWEEN %s AND %s
+                    GROUP BY rb.id, rb.name
+                    ORDER BY customer_count DESC;
+                """
+                return _execute_query(sql, (tuple(branches_id), start_of_prev_day, end_of_today))
         
-        elif cco == False and datepicked > 0:
-            sql = """
-             SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
-            FROM res_branch rb
-            JOIN res_partner rp ON rb.id = rp.branch_id
-            WHERE rp.risk_level = 'high' AND rp.create_date BETWEEN %s AND %s AND rb.id IN %s
-            GROUP BY rb.id, rb.name
-            ORDER BY high_risk_customers DESC
-            LIMIT 10
-
-        """
-            request.env.cr.execute(sql, (prevDate, today,tuple(branches_id)))
-            results = request.env.cr.fetchall()
-
-            customer_counts = []
-
-            for row in results:
-                customer_counts.append({
-                    "id": row[0],
-                    'name': row[1],
-                    'count': row[2]
-                })
-
-            return customer_counts
-
+        

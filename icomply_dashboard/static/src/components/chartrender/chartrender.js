@@ -219,10 +219,7 @@ export class ChartRenderer extends Component {
         .subtract(this.props.datepicked, "days")
         .format(DATE_FORMAT_YYYY_MM_DD); // Use constant for date format
       currentDate = formatDate(new Date());
-    } else {
-      currentDate = formatDate(new Date());
-      prevDate = currentDate;
-    }
+    } 
 
     const odooPrevDate = `${prevDate} ${TIME_00_00_00}`; // Use constants for time and date format
     const odooCurrentDate = `${currentDate} ${TIME_23_59_59}`;
@@ -246,15 +243,19 @@ export class ChartRenderer extends Component {
           const clickedIndex = elements[0].index;
           const filter = branch_ids[clickedIndex];
 
+          let domain = [["branch_id", "=", filter]];
+
+          if(this.props.datepicked > 0){
+            domain.push(["create_date", ">=", odooPrevDate]);
+            domain.push(["create_date", "<=", odooCurrentDate]);
+          }
+          
+
           let action = {
             type: "ir.actions.act_window",
             name: "Top 10 Branches", // Use constant for action name
             res_model: "res.partner", // Use constant for model name
-            domain: [
-              ["branch_id", "=", filter],
-              ["create_date", ">=", odooPrevDate],
-              ["create_date", "<=", odooCurrentDate],
-            ],
+            domain: domain,
             views: [
               [false, "tree"], // Use constants for view types
               [false, "form"],
@@ -306,10 +307,7 @@ export class ChartRenderer extends Component {
         .subtract(this.props.datepicked, "days")
         .format(DATE_FORMAT_YYYY_MM_DD); // Use constant for date format
       currentDate = formatDate(new Date());
-    } else {
-      currentDate = formatDate(new Date());
-      prevDate = currentDate;
-    }
+    } 
 
     this.myChartInstance = new Chart(this.chartRef.el, {
       type: this.props.type,
@@ -330,15 +328,20 @@ export class ChartRenderer extends Component {
           const clickedIndex = elements[0].index;
           const filter = trans_id[clickedIndex];
 
+          let domain = [["rule_id", "=", filter]];
+
+          if (this.props.datepicked > 0) {
+            domain.push(["create_date", ">=", prevDate]);
+            domain.push(["create_date", "<=", currentDate]);
+          }
+
+          alert(this.props.datepicked)
+
           let action = {
             type: "ir.actions.act_window",
             name: "Top 10 Screened Transaction By Rules", // Use constant for action name
             res_model: "res.customer.transaction", // Use constant for model name
-            domain: [
-              ["rule_id", "=", filter],
-              ["create_date", ">=", prevDate],
-              ["create_date", "<=", currentDate],
-            ],
+            domain: domain,
             views: [
               [false, "tree"], // Use constants for view types
               [false, "form"],
@@ -380,11 +383,7 @@ export class ChartRenderer extends Component {
       branch_ids.push(item.id);
     }
 
-    console.log(labels);
-    console.log(values);
-    console.log(branch_ids);
-    
-    
+
     
 
     const formatDate = (date) => date.toISOString().slice(0, 10);
@@ -396,10 +395,7 @@ export class ChartRenderer extends Component {
         .subtract(this.props.datepicked, "days")
         .format(DATE_FORMAT_YYYY_MM_DD); // Use constant for date format
       currentDate = formatDate(new Date());
-    } else {
-      currentDate = formatDate(new Date());
-      prevDate = currentDate;
-    }
+    } 
 
     this.myChartInstance = new Chart(this.chartRef.el, {
       type: this.props.type,
@@ -409,6 +405,7 @@ export class ChartRenderer extends Component {
           {
             label: "", // Consider making label configurable if needed
             data: values,
+            border: "none",
           },
         ],
       },
@@ -420,16 +417,23 @@ export class ChartRenderer extends Component {
           const clickedIndex = elements[0].index;
           const filter = branch_ids[clickedIndex];
 
+          let domain = [
+              ["branch_id", "=", filter],
+              ["risk_level", "=", "high"],
+            ];
+
+            if(this.props.datepicked > 0){
+              domain.push(["create_date", ">=", prevDate]);
+              domain.push(["create_date", "<=", currentDate]);
+            }
+
+           
+
           let action = {
             type: "ir.actions.act_window",
             name: "Top 10 High-Risk Branches", // Use constant for action name
             res_model: "res.partner", // Use constant for model name
-            domain: [
-              ["branch_id", "=", filter],
-              ["risk_level", "=", 'high'],
-              ["create_date", ">=", prevDate],
-              ["create_date", "<=", currentDate],
-            ],
+            domain: domain,
             views: [
               [false, "tree"], // Use constants for view types
               [false, "form"],
@@ -452,6 +456,10 @@ export class ChartRenderer extends Component {
           title: {
             text: this.props.title,
           },
+          legend: {
+            position: "right",
+            align: "center",
+          },
         },
       },
     });
@@ -461,15 +469,6 @@ export class ChartRenderer extends Component {
     return {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: "bottom",
-        },
-        title: {
-          display: true,
-          position: "bottom",
-        },
-      },
     };
   }
 }
