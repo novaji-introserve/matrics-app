@@ -250,6 +250,68 @@ class TransactionMonitoring(models.Model):
     #             'default_state': 'new'
     #         }
     #     }
+
+    def _sync_transaction_branch_id_sql(self):
+        """
+        Sync branch_id in res_customer_transaction table using direct SQL query
+        """
+        try:
+            # Query to handle both regular users and special cases (channels/E-Fincore)
+            query = """
+                -- First handle regular cases - match with hr_employee
+                UPDATE res_customer_transaction rct
+                SET branch_id = he.branch_id
+                FROM hr_employee he
+                WHERE rct.userid = he.userid
+                AND rct.branch_id IS NULL
+                AND rct.userid IS NOT NULL
+                AND rct.userid NOT IN ('channels', 'E-Fincore')
+                AND he.branch_id IS NOT NULL
+                RETURNING rct.id, rct.userid, he.branch_id;
+            """
+            
+            self.env.cr.execute(query)
+            updated_records_regular = self.env.cr.fetchall()
+            
+            # Query to handle special cases - channels and E-Fincore cases
+            special_query = """
+                UPDATE res_customer_transaction rct
+                SET branch_id = rb.id
+                FROM res_branch rb
+                WHERE rb.code = '001'
+                AND rct.branch_id IS NULL
+                AND rct.userid IN ('channels', 'E-Fincore')
+                RETURNING rct.id, rct.userid, rb.id;
+            """
+            
+            self.env.cr.execute(special_query)
+            updated_records_special = self.env.cr.fetchall()
+            
+            self.env.cr.commit()
+            
+            total_updated = len(updated_records_regular) + len(updated_records_special)
+            _logger.info(f"Transaction Branch ID sync completed. Updated {total_updated} records")
+            
+            # Log detailed updates for regular cases
+            for record in updated_records_regular:
+                _logger.info(f"Updated transaction ID {record[0]}, userid {record[1]} with branch_id {record[2]} (via employee)")
+                
+            # Log detailed updates for special cases
+            for record in updated_records_special:
+                _logger.info(f"Updated transaction ID {record[0]}, userid {record[1]} with branch_id {record[2]} (special case)")
+                
+        except Exception as e:
+            _logger.error(f"Error in transaction branch ID sync: {str(e)}")
+            raise e
+
+    # Main cron method
+    def sync_transaction_branch_id(self):
+        """
+        Main cron job method for transaction branch_id sync
+        """
+        return self._sync_transaction_branch_id_sql()
+    
+
     def _check_cco_and_get_branch_domain(self):
         """Helper method to check CCO access and return branch domain if needed"""
         is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')

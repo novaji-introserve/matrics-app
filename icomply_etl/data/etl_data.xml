@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- MSSQL Connection String -->
+        <record id="etl_mssql_connection_string" model="ir.config_parameter">
+            <field name="key">etl.mssql_connection_string</field>
+            <field name="value">Driver={SQL Server};Server=server_name;Database=database_name;UID=username;PWD=password;TrustServerCertificate=yes;</field>
+        </record>
+
+        <!-- PostgreSQL Connection String -->
+        <record id="etl_postgres_connection_string" model="ir.config_parameter">
+            <field name="key">etl.postgres_connection_string</field>
+            <field name="value">dbname=dbname user=user password=password host=localhost port=5432</field>
+        </record>
+
+        <!-- Default Batch Size -->
+        <record id="etl_default_batch_size" model="ir.config_parameter">
+            <field name="key">etl.default_batch_size</field>
+            <field name="value">2000</field>
+        </record>
+    </data>
+</odoo>
