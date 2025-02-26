@@ -36,7 +36,7 @@ export class IcomplyDashboard extends Component {
       previous_datepicked: null,
       topbranch: [],
       topscreened: [],
-      highriskcustomer: []
+      highriskcustomer: [],
     });
 
     onMounted(async () => {
@@ -112,7 +112,10 @@ export class IcomplyDashboard extends Component {
     try {
       const dateFilter =
         this.state.datepicked > 0
-          ? [('date_created', '>=', this.state.previous_datepicked),('date_created', '<=', this.state.current_datepicked)]
+          ? [
+              ["date_created", ">=", this.state.previous_datepicked],
+              ["date_created", "<=", this.state.current_datepicked],
+            ]
           : [];
 
       const branchFilter =
@@ -138,11 +141,8 @@ export class IcomplyDashboard extends Component {
         highrisk: highriskCount,
         totalScreenedTransactionCount,
         totaltransaction: totalTransactionCount,
-        alertrulestotal: await this.api.searchCount("alert.rules", []),
-        // alertrulestotal: await this.api.searchCount("alert.rules", [
-        //   ...this.state.alert_rules_domain,
-        //   ...dateFilter,
-        // ]),
+        alertrulestotal: await this.api.searchCount("alert.rules", dateFilter),
+
         lowriskinRespectToTotalTransaction: this.calculatePercentage(
           lowriskCount,
           totalTransactionCount
@@ -157,10 +157,10 @@ export class IcomplyDashboard extends Component {
         ),
       };
 
-  
       await this.TopTransactionRules();
       await this.highriskcustomer();
       await this.TopBranches();
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -174,63 +174,49 @@ export class IcomplyDashboard extends Component {
     await this.TopBranches();
     await this.TopTransactionRules();
     await this.highriskcustomer();
+    
   };
   // Display transactions based on risk level
   displayTransactionsByRisk = (riskLevel = "") => {
-    let domain = [];
+     const dateFilter =
+       this.state.datepicked > 0
+         ? [
+             ["date_created", ">=", this.state.previous_datepicked],
+             ["date_created", "<=", this.state.current_datepicked],
+           ]
+         : [];
 
-    if (this.state.datepicked > 0) {
-      domain.push([
-        "create_date",
-        ">=",
-        new Date(this.state.current_datepicked),
-      ]);
-    }
+     const branchFilter =
+       this.state.branches_id.length > 0 && this.state.cc == false
+         ? [["branch_id", "in", Array.from(this.state.branches_id)]]
+         : [];
 
-    if (!this.state.cc) {
-      // Correct condition check
-      domain.push([...this.state.alert_rules_domain]);
-    }
+      const domain = [
+        ...dateFilter,
+        ...branchFilter
+      ];
 
-    if (riskLevel === "screened") {
-      // Use strict equality
-      domain.push(["rule_id", "!=", null]);
-    } else if (riskLevel) {
-      // Check if riskLevel is not empty
-      domain.push(["risk_level", "=", riskLevel]);
-    }
+      if (riskLevel === "") {
+    //   // Use strict equality
+          return;
 
-    if (riskLevel === "") {
-      // Use strict equality
-      return;
-    } else if (riskLevel === "process") {
-      let processDomain = [];
-      if (this.state.datepicked > 0) {
-        processDomain.push([
-          "created_date",
-          ">=",
-          this.state.current_datepicked,
-        ]);
-      }
-      if (!this.state.cc) {
-        processDomain.push([
-          "branch_id",
-          "in",
-          Array.from(this.state.branches_id),
-        ]);
-      }
+      }else if(riskLevel === "screened"){
 
-      this.navigate.doAction({
+        domain.push(["rule_id", "!=", null]);
+
+       this.navigate.doAction({
         type: "ir.actions.act_window",
-        res_model: "alert.rules",
-        name: "processes",
-        domain: processDomain, // Use the correctly constructed domain
+        res_model: "res.customer.transaction",
+        name: "Screened Transaction",
+        domain: domain, // Use the correctly constructed domain
         views: [
           [false, "tree"],
           [false, "form"],
         ],
-      });
-    } else {
+       })
+
+      }else{
+        domain.push(["risk_level", "=", riskLevel]);
       this.navigate.doAction({
         type: "ir.actions.act_window",
         res_model: "res.customer.transaction",
@@ -244,22 +230,45 @@ export class IcomplyDashboard extends Component {
         ],
       });
     }
-  };
-  // Unified chart rendering function
 
+  };
+
+  displayProcessOdooView = () =>{
+    const dateFilter =
+       this.state.datepicked > 0
+         ? [
+             ["date_created", ">=", this.state.previous_datepicked],
+             ["date_created", "<=", this.state.current_datepicked],
+           ]
+         : [];
+
+        const domain = [...dateFilter];
+
+        this.navigate.doAction({
+        type: "ir.actions.act_window",
+        res_model: "alert.rules",
+        name: "processes",
+        domain: domain, // Use the correctly constructed domain
+        views: [
+          [false, "tree"],
+          [false, "form"],
+        ],
+      });
+      
+  }
+
+  // Unified chart rendering function
 
   // top branches
   async TopBranches() {
-    const response = await this.rpc("/dashboard/get_branch_by_customer", {
+    const response = await this.rpc("/dashboard/branch_by_customer", {
       cco: this.state.cc,
       branches_id: this.state.branches_id,
       datepicked: Number(this.state.datepicked),
     });
-
     
     
     this.state.topbranch = response;
-    
   }
   async TopTransactionRules() {
     const response = await this.rpc("/dashboard/get_top_screening_rules", {
@@ -268,10 +277,7 @@ export class IcomplyDashboard extends Component {
       datepicked: Number(this.state.datepicked),
     });
 
-
-    
     this.state.topscreened = response;
-    
   }
   async highriskcustomer() {
     const response = await this.rpc(
@@ -283,12 +289,12 @@ export class IcomplyDashboard extends Component {
       }
     );
 
-
-   
-
-    this.state.highriskcustomer = response;
+    console.log(response);
     
+    this.state.highriskcustomer = response;
   }
+
+ 
 }
 
 IcomplyDashboard.template = "owl.IcomplyDashboard";

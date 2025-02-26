@@ -3,11 +3,11 @@
     <t t-name="owl.IcomplyDashboard" owl="1">
         <div class="vh-100 p-1 overflow-auto bg-muted ">
 
-            <div class="row g-5">
+            <div class="row">
                 <div class="col-12">
                     <div class="col-12 m-0 p-0">
                         <div
-                            class="d-flex bg-white rounded shadow p-2 px-4 shadow-1 justify-content-between align-items-center">
+                            class="d-flex bg-white rounded shadow p-1 px-4 shadow-1 justify-content-between align-items-center">
                             
                             <div class="flex-grow-1 me-3">
                                 <img t-att-src="'/icomply_dashboard/static/src/img/logov.png'" alt="Dashboard Icon"
@@ -38,8 +38,8 @@
                         value="state.kpi.lowrisk" percentage="state.kpi.lowriskpercentage" />
 
                 
-                    <KpiCard t-on-click="() => displayTransactionsByRisk('screened')" name="'Screened Transaction'"
-                        value="state.kpi.totalScreenedTransactionCount" percentage="state.kpi.totalrulespercentage" />
+                    <KpiCard t-on-click="() => displayProcessOdooView()" name="'Total Processes'"
+                        value="state.kpi.alertrulestotal" percentage="" />
 
                     <KpiCard t-on-click="() => displayTransactionsByRisk('')" name="'High Risk(%)'"
                         value="state.kpi.highriskinRespectToTotalTransaction"
@@ -52,23 +52,25 @@
                     <KpiCard t-on-click="() => displayTransactionsByRisk('')" name="'Low Risk(%)'"
                         value="state.kpi.lowriskinRespectToTotalTransaction"
                         percentage="state.kpi.lowriskiinRespectToTotalTransactionPercent" />
+                    
+                    <KpiCard t-on-click="() => displayTransactionsByRisk('screened')" name="'Screened Transaction'"
+                            value="state.kpi.totalScreenedTransactionCount" percentage="state.kpi.totalrulespercentage" />
 
-                    <KpiCard t-on-click="() => displayTransactionsByRisk('process')" name="'Total Processes'"
-                        value="state.kpi.alertrulestotal" percentage="" />
+                    
                 </div>
 
                 <div class="row mt-3 m-auto">
 
                     <div class="col-md-4 ">
                         <div
-                            class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                            class="d-flex bg-white shadow shadow-1  p-2 rounded justify-content-between align-items-center">
                             <h3 class="lead fw-bold text-dark">Top 10 Branches By Customer </h3>
                             <button class="btn btn-dark">
                                 <i class="fa fa-angle-right"></i>
                             </button>
                         </div>
 
-                        <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                        <div class="my-2 p-3 bg-white shadow shadow-2" style="height: 33vh;">
                             <t t-if="state.topbranch.length > 0">
                                 <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" config="state.topbranch"
                                     type="'line'" title="'Top 10 Branches By Customer'" />
@@ -78,13 +80,13 @@
 
                     <div class="col-md-4 ">
                         <div
-                            class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                            class="d-flex bg-white shadow shadow-1  p-2 rounded justify-content-between align-items-center">
                             <h3 class="lead fw-bold text-dark">Top 10 Screened Transaction By Rules</h3>
                             <button class="btn btn-dark">
                                 <i class="fa fa-angle-right"></i>
                             </button>
                         </div>
-                        <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                        <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 33vh;">
                            <t t-if="state.topscreened.length > 0">
                             <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked"
                                 current_datepicked="state.current_datepicked" config="state.topscreened" type="'bar'" title="'Top 10 Screened Transaction By Rules'" />
@@ -93,13 +95,13 @@
                     </div>
                     <div class="col-md-4 ">
                         <div
-                            class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                            class="d-flex bg-white shadow shadow-1  p-2 rounded justify-content-between align-items-center">
                             <h3 class="lead fw-bold text-dark">Top 10 High-Risk Branches</h3>
                             <button class="btn btn-dark">
                                 <i class="fa fa-angle-right"></i>
                             </button>
                         </div>
-                        <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 40vh;">
+                        <div class="mt-2 p-3 bg-white shadow shadow-2" style="height: 33vh;">
                             <t t-if="state.highriskcustomer.length > 0">
                                 <ChartRenderer admin="state.cc" branch="state.branches_id" datepicked="state.datepicked" current_datepicked="state.current_datepicked"
                                     config="state.highriskcustomer" type="'pie'" title="'Top 10 High-Risk Branches'" />
