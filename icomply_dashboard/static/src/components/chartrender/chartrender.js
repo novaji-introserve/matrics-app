@@ -245,11 +245,15 @@ export class ChartRenderer extends Component {
 
           let domain = [["branch_id", "=", filter]];
 
-          if(this.props.datepicked > 0){
+          if (this.props.datepicked > 0) {
             domain.push(["create_date", ">=", odooPrevDate]);
             domain.push(["create_date", "<=", odooCurrentDate]);
           }
-          
+
+          // Admin Check and Branch Filtering
+          if (!this.props.admin) {
+            domain.push(["branch_id", "in", this.props.branch]);
+          }
 
           let action = {
             type: "ir.actions.act_window",
@@ -331,11 +335,14 @@ export class ChartRenderer extends Component {
           let domain = [["rule_id", "=", filter]];
 
           if (this.props.datepicked > 0) {
-            domain.push(["create_date", ">=", prevDate]);
-            domain.push(["create_date", "<=", currentDate]);
+            domain.push(["date_created", ">=", prevDate]);
+            domain.push(["date_created", "<=", currentDate]);
+          }
+          // Admin Check and Branch Filtering
+          if (!this.props.admin) {
+            domain.push(["branch_id", "in", this.props.branch]);
           }
 
-          alert(this.props.datepicked)
 
           let action = {
             type: "ir.actions.act_window",
@@ -418,16 +425,19 @@ export class ChartRenderer extends Component {
           const filter = branch_ids[clickedIndex];
 
           let domain = [
-              ["branch_id", "=", filter],
-              ["risk_level", "=", "high"],
-            ];
+            ["branch_id", "=", filter],
+            ["risk_level", "=", "high"],
+          ];
 
-            if(this.props.datepicked > 0){
-              domain.push(["create_date", ">=", prevDate]);
-              domain.push(["create_date", "<=", currentDate]);
-            }
+          if (this.props.datepicked > 0) {
+            domain.push(["create_date", ">=", prevDate]);
+            domain.push(["create_date", "<=", currentDate]);
+          }
 
-           
+          // Admin Check and Branch Filtering
+          if (!this.props.admin) {
+            domain.push(["branch_id", "in", this.props.branch]);
+          }
 
           let action = {
             type: "ir.actions.act_window",

@@ -98,6 +98,7 @@ class Mydashboard(http.Controller):
     @http.route('/dashboard/get_high_risk_customer_by_branch', auth='public', type='json')
     def get_high_risk(self, cco, branches_id, datepicked, **kw):
 
+        print(789)
         
 
         today = datetime.now().date()  # Get today's date
@@ -180,13 +181,17 @@ class Mydashboard(http.Controller):
 
 
         def _execute_query(sql, params=None):
-            request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
-            results = request.env.cr.fetchall()
-            return [{
-                "id": row[0],
-                'branch_name': row[1],
-                'customer_count': row[2]
-            } for row in results]
+            try:
+                request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
+                results = request.env.cr.fetchall()
+                return [{
+                    "id": row[0],
+                    'branch_name': row[1],
+                    'customer_count': row[2]
+                } for row in results]
+                
+            except Exception as e:
+                print(e)
 
         if cco:
             if datepicked == 0:
@@ -220,6 +225,7 @@ class Mydashboard(http.Controller):
                     GROUP BY rb.id, rb.name
                     ORDER BY customer_count DESC;
                 """
+                
                 return _execute_query(sql, (tuple(branches_id),))  # Ensure tuple even for single ID
             else:  # datepicked > 0
                 sql = """
