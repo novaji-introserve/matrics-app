@@ -3,6 +3,11 @@ from odoo import api, fields, models
 class Res_subbranch(models.Model):
     _name = 'res.subbranch'
     _description = 'sub branch'
+    _sql_constraints = [
+        ('uniq_subbranchCode', 'unique(subbranchCode)',
+         "Product already exists. Value must be unique!"),
+    ]
+
     
     subbranchCode = fields.Char()
     subBranchName = fields.Char()
