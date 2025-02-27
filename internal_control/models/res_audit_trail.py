@@ -21,4 +21,8 @@ class AuditTrail(models.Model):
     accountaffected = fields.Char(string='Account Affected', size=50)
     authid = fields.Char(string='Authorization ID', size=50)
 
+    _sql_constraints = [
+        ('audit_rail_audit_trail_id_unique', 'unique(audit_trail_id)', 'Audit Trail_ID must be unique!')
+    ]
+
     # ID is automatically created by Odoo as a primary key

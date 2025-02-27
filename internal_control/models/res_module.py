@@ -1,8 +1,8 @@
 from odoo import models, fields
 
 class Module(models.Model):
-    _name = 'res.account.module'
-    _description = 'Account Module'
+    _name = 'res.module'
+    _description = 'Res Module'
 
     moduledesc = fields.Char(string='Module Description', required=True, size=100)
     modulecode = fields.Char(string='Module Code', required=True, size=10)

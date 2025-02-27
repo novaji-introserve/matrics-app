@@ -12,6 +12,10 @@ class ReActivation(models.Model):
     authid = fields.Char()
     systemdate = fields.Datetime()
     actualdate = fields.Datetime()
+
+    _sql_constraints = [
+        ('reactivation_id_unique', 'unique(reactivation_id)', 'ID must be unique!')
+    ]
    
 
    
