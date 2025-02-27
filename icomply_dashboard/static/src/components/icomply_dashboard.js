@@ -51,6 +51,8 @@ export class IcomplyDashboard extends Component {
 
   async getcurrentuser() {
     let result = await this.rpc("/dashboard/user");
+    console.log(result);
+    
     this.state.branches_id = result.branch;
     this.state.cc = result.group;
     this.state.alert_rules_domain = result.alert_rules_domain;
@@ -157,9 +159,9 @@ export class IcomplyDashboard extends Component {
         ),
       };
 
+      await this.TopBranches();
       await this.TopTransactionRules();
       await this.highriskcustomer();
-      await this.TopBranches();
       
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -289,7 +291,7 @@ export class IcomplyDashboard extends Component {
       }
     );
 
-    console.log(response);
+  
     
     this.state.highriskcustomer = response;
   }
@@ -301,3 +303,9 @@ IcomplyDashboard.template = "owl.IcomplyDashboard";
 IcomplyDashboard.components = { KpiCard, ChartRenderer };
 
 registry.category("actions").add("owl.icomply_dashboard", IcomplyDashboard);
+
+
+
+
+
+
