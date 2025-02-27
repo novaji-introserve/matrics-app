@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 class TransactionMonitoring(models.Model):
     _inherit = 'res.customer.transaction'
     _sql_constraints = [
-        ('uniq_refno', 'unique(refno)',
+        ('uniq_trans_id', 'unique(trans_id)',
          "Transaction already exists. Value must be unique!"),
     ] 
 
