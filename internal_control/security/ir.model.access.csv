@@ -26,7 +26,7 @@ access_res_user_status,access res user status,internal_control.model_res_user_st
 access_res_account_officer,access res account officer,internal_control.model_res_account_officer,base.group_user,1,1,1,1
 access_res_partner_account_product,access res partner account product,internal_control.model_res_partner_account_product,base.group_user,1,1,1,1
 access_res_sub_branch,access res sub branch,internal_control.model_res_subbranch,base.group_user,1,1,1,1
-access_res_account_module,access res account module,internal_control.model_res_account_module,base.group_user,1,1,1,1
+access_res_module,access res module,internal_control.model_res_module,base.group_user,1,1,1,1
 access_res_audit_trail,access res audit trail,internal_control.model_res_audit_trail,base.group_user,1,1,1,1
 access_res_glclasslv2,access res glclasslv2,internal_control.model_res_glclasslv2,base.group_user,1,1,1,1
 access_res_glclasslv3,access res glclasslv3,internal_control.model_res_glclasslv3,base.group_user,1,1,1,1

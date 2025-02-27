@@ -20,4 +20,7 @@ class MandatePicts(models.Model):
     mandatedesc1 = fields.Char(string='Mandate Description 1', size=100)
     createdate = fields.Datetime(string='Create Date')
 
-    # ID is automatically created by Odoo as a primary key
+    _sql_constraints = [
+        ('mandatepicts_id_unique', 'unique(mandatepicts_id)', 'ID must be unique!')
+    ]
+   

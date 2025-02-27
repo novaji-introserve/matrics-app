@@ -12,3 +12,7 @@ class GLClassLV3(models.Model):
     authid = fields.Char(string='Authorization ID', size=50)
     createdate = fields.Datetime(string='Create Date')
     lastnumber = fields.Integer(string='Last Number')
+
+    _sql_constraints = [
+        ('glclasslv3_gl_classcode_unique', 'unique(gl_classcode)', 'GL_classCode must be unique!')
+    ]

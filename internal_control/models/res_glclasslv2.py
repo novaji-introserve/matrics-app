@@ -11,3 +11,8 @@ class GLClassLV2(models.Model):
     userid = fields.Char(string='User ID', size=50)
     authid = fields.Char(string='Authorization ID', size=50)
     createdate = fields.Datetime(string='Create Date')
+
+    
+    _sql_constraints = [
+        ('glclasslv2_gl_nodecode_unique', 'unique(gl_nodecode)', 'GL_NodeCode must be unique!')
+    ]
