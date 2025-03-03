@@ -28,6 +28,7 @@ export class ComplianceDashboard extends Component {
         ? sessionStorage.getItem("user_scroll_right")
         : false,
       screenedchart: [],
+      highriskchart: [],
       topbranch: [],
     });
 
@@ -170,6 +171,7 @@ export class ComplianceDashboard extends Component {
     await this.getAllStats();
     await this.fetchScreenedChart();
     await this.TopBranches();
+    await this.highRiskBranches();
   };
 
 
@@ -196,6 +198,19 @@ export class ComplianceDashboard extends Component {
     
 
     this.state.topbranch = response
+
+  }
+  async highRiskBranches() {
+    const response = await this.rpc("/dashboard/get_high_risk_customer_by_branch",
+      {
+        cco: this.state.cco,
+        branches_id: this.state.branches_id,
+        datepicked: Number(this.state.datepicked),
+      }
+    );  
+
+
+    this.state.highriskchart = response
 
   }
 }

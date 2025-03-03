@@ -28,6 +28,9 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
+        # 'security/ir.rule.xml',
+        # 'security/groups.xml',
+        # 'security/ir.model.access.csv',
         # 'data/department.xml',
         'views/configuration.xml',
         'views/edd.xml',
@@ -52,6 +55,7 @@
     'demo': [
         # 'demo/demo.xml',
     ],
+    
     "installable": True,
     "application": True,
     "auto_install": False,
