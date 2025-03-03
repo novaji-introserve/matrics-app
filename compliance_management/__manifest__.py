@@ -28,6 +28,9 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
+        # 'security/ir.rule.xml',
+        # 'security/groups.xml',
+        # 'security/ir.model.access.csv',
         # 'data/department.xml',
         'views/configuration.xml',
         'views/edd.xml',
@@ -52,7 +55,16 @@
     'demo': [
         # 'demo/demo.xml',
     ],
+    
     "installable": True,
     "application": True,
     "auto_install": False,
+    'assets':{
+        'web.assets_backend': [
+            'compliance_management/static/src/css/style.css',
+            'compliance_management/static/src/components/**/*.js',
+            'compliance_management/static/src/components/**/*.xml',
+            'compliance_management/static/src/img/logov.png',
+        ]
+    }
 }

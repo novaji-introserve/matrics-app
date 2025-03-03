@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.ComplianceDashboard" owl="1">
+        <div class="vh-100 overflow-auto bg-muted ">
+            <!-- first section -->
+            <div class="col-12">
+                <div class="col-12 m-0 p-0">
+                    <div class="d-flex bg-white rounded shadow px-4 py-1 shadow-1 justify-content-between align-items-center">
+
+                        <div class="flex-grow-1 me-3">
+                            <img t-att-src="'/compliance_management/static/src/img/logov.png'" alt="Dashboard Icon"
+                                class="img-fluid" style="width: 300; max-height: 70px; object-fit: contain; " />
+                        </div>
+
+                        <div class="ms-3">
+                            <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
+                                <option value="0" selected="selected">Today</option>
+                                <option value="7">Last 7 Days</option>
+                                <option value="14">Last 14 Days</option>
+                                <option value="30">Last Month</option>
+                                <option value="60">2 Months</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- second section -->
+
+            <div class="container-fluid ">
+
+                <div class="row">
+
+
+                    <div class="col-md-9 position-relative">
+
+                     
+                            <div  class="d-flex position-relative card-container gap-3 py-4">
+                            
+                               <t t-if="state.stats and state.stats.length > 0">
+                                <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                                    <Card t-on-click="() => displayOdooView(stat.scope)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
+                                </t>
+                               </t>
+                               <t t-else="">
+                                <h4 class="" style="padding: 5rem;">No Data!! Please click on the configuration  menu and start creating</h4>
+                               </t>
+                                 
+                            </div>
+                            
+                            <div class="position-relative">
+                                <t t-if="state.stats and state.stats.length > 3 and !state.scrollRight">
+                                    <div class="overflow-indicator-right mt-1 fade-blink">&#x2192;</div>
+                                </t>
+                                <t t-if="state.stats and state.stats.length > 3 and !state.scrollLeft">
+                                    <div  class="overflow-indicator-left mt-1 fade-blink">&#x2190;</div>
+                                </t>
+                            </div>
+
+                       
+                        <div class="row g-md-2 mt-md-0 mt-5 ">
+                            <div class="col-md-6">
+                               
+                                <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                                    <h3 class="lead fw-bold text-dark">Top 10 Screened Transaction By Rules</h3>
+                                    <button class="btn btn-dark">
+                                        <i class="fa fa-angle-right"></i>
+                                    </button>
+                                </div>
+                            <t t-if="state.screenedchart.length > 0">
+                                <div class="chart mt-4 ml-1 bg-white shadow shadow-1">
+                                    <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'bar'" title="'Top 10 Screened Transaction By Rules'" data="state.screenedchart" />
+                                </div>
+                            </t>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                                    <h3 class="lead fw-bold text-dark">Top 10 Branches By Customer</h3>
+                                    <button class="btn btn-dark">
+                                        <i class="fa fa-angle-right"></i>
+                                    </button>
+                                </div>
+                                <t t-if="state.topbranch.length > 0">
+                                    <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
+                                        <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'line'" title="'Top 10 Branches By Customer'"
+                                            data="state.topbranch" />
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3 rightside  p-4 ">
+
+
+                        <div class="shadow bg-white shadow-lg p-4 d-flex justify-content-between gap-md-3 flex-col flex-md-row">
+
+                            <div class="circle">
+                                <t t-out="state.totalstat" />
+                            </div>
+
+                            <div>
+
+                                <div t-on-click="() => displaybycategory('bank')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Bank</h5>
+                                    <div style="background-color: #FFD700; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+                                <div t-on-click="() => displaybycategory('risk')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Risk</h5>
+                                    <div style="background-color: #999999; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+                                <div t-on-click="() => displaybycategory('compliance')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Compliance</h5>
+                                    <div style="background-color: #C8102E; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+                                <div t-on-click="() => displaybycategory('branch')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Branch</h5>
+                                    <div style="background-color: #66B2FF; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+                                <div t-on-click="() => displaybycategory('regulatory')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>Regulatory</h5>
+                                    <div style="background-color: #4CAF50; min-height: 1rem; min-width:2rem"></div>
+                                </div>
+                                <div t-on-click="() => displaybycategory('all')"
+                                    class="d-flex gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
+                                    <h5>All</h5>
+                                    <div style="background-color: rgb(0, 0, 0); min-height: 1rem; min-width:2rem"></div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="shadow shadow-lg mt-3 bg-white doughnut">
+
+                            <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
+                                <h6 class="lead fw-bold text-dark">Top 10 High-Risk Customer By Branch</h6>
+                                <button class="btn btn-dark">
+                                    <i class="fa fa-angle-right"></i>
+                                </button>
+                            </div>
+                            <t t-if="state.highriskchart.length > 0">
+                                <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
+                                <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="'Top 10 High-Risk Customer By Branch'"
+                                    data="state.highriskchart" />
+                                </div>
+                            </t>
+
+                            
+
+                        </div>
+
+
+
+                    </div>
+                   
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+    </t>
+</templates>

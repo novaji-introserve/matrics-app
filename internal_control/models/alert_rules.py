@@ -14,6 +14,7 @@ import smtplib
 from time import sleep
 import logging
 from collections import defaultdict
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -46,12 +47,24 @@ class alert_rules(models.Model):
         string="Risk Rating"
     )
     date_created = fields.Datetime(
-        string="created_at",
-        default=fields.Datetime.now()
-    )
+        string="Created_Date",
+        read_only=True)
+    last_checked = fields.Datetime(string="Last_Checked", read_only=True)
     
-    last_checked = fields.Datetime(string="last_checked", default=fields.Datetime.now())
-    
+   
+
+    @api.model
+    def create(self,vals_list):
+       
+        vals_list['last_checked'] = fields.Datetime.now()
+        
+        if 'date_created' not in vals_list:
+           vals_list['date_created'] = fields.Datetime.now()
+        
+
+            
+        res = super(alert_rules, self).create(vals_list)
+        return res
     
    
     @api.onchange('sql_text')
@@ -120,48 +133,75 @@ class alert_rules(models.Model):
     def send_alert(self, rule):
         try:
                 query = ""
-                
+
                 if "*" in rule.sql_text.query:
                     
                     query = rule.sql_text.query
-                    
-                elif "branch_id" not in rule.sql_text.query:
-                    
-                    columns = rule.sql_text.query.split(",")
-                    
-                    # join the columns into string
-                    query_string = ', '.join(columns)
-                    
-                    # Insert 'subbranchcode' before 'from'
-                    query_string = query_string.replace(' from ', ', branch_id from ')
-                    
-                    query = query_string
                 
+                elif re.search(r"\w+\.\w+\s+AS\s+\w+", rule.sql_text.query, re.IGNORECASE): 
+                    query_lower = rule.sql_text.query.lower()
+                    select_clause, from_clause = rule.sql_text.query.split("FROM", 1)
+                    select_clause = select_clause.strip()
+
+                     # Check if 'alias.branch_id' 
+                    check_pattern = re.search(r"(\w+)\.branch_id\b", rule.sql_text.query)
+
+                    if not check_pattern:
+                        # Find the alias for res_branch
+                        match = re.search(r"res_branch\s+(\w+)", from_clause.lower())
+
+                        if match:
+                            branch_alias = match.group(1)
+                            modified_select_clause = f"{select_clause}, {branch_alias}.id AS branch_id"
+                            query = f"{modified_select_clause} FROM {from_clause}"
                     
-                # first query to create csv
+                    else:
+                        match = check_pattern
+                        branch_alias = match.group(1)
+                        modified_select_clause = f"{select_clause}, {branch_alias}.branch_id AS branch_id"
+                        query = f"{modified_select_clause} FROM {from_clause}"
+
+                else:
+                    
+                    if "branch_id" not in rule.sql_text.query:
+                        
+                        columns = rule.sql_text.query.split(",")
+                        
+                        # join the columns into string
+                        query_string = ', '.join(columns)
+                        
+                        # Insert 'subbranchcode' before 'from'
+                        query_string = query_string.replace(' from ', ', branch_id from ')
+                        
+                        query = query_string
+
+                    else:
+                        
+                        query = rule.sql_text.query
+                        
+                    # first query to create csv
                 self.env.cr.execute(f'{query}')
                 rows = self.env.cr.fetchall()
                 
                 
                 # Get column names dynamically
                 columns = [desc[0] for desc in self.env.cr.description]
-                
 
                 # Find the index of branch_id dynamically
                 branchcode_index = None
+        
                 for i, column in enumerate(columns):
+                    
                     if 'branch_id' in column.lower():  # Case insensitive search
                         branchcode_index = i
                         break
-
                 if branchcode_index is None:
-                    raise ValidationError("subbranchcode column must be in the sql statement")
+                    raise ValidationError("branchcode column must be in the sql statement")
                 else:
                     branches = []
                     
-                #     # Loop through the rows and get distinct branch_id neglecting null field 
+                    # Loop through the rows and get distinct branch_id neglecting null field 
                     for row in rows:
-
                         branchcode = row[branchcode_index]  # Accessing branchcode dynamically by index
                         
                 
@@ -169,7 +209,6 @@ class alert_rules(models.Model):
                             pass
                         elif branchcode not in branches:
                             branches.append(branchcode) 
-
                     # Initialize a dictionary to store the emails 
                     mailto = set()
                     mailcc = set()
@@ -198,7 +237,7 @@ class alert_rules(models.Model):
                                 for user in alert_group:
                                         
                                     mailcc.add(user.login) 
-                                     
+                                    
                                 for user in alert_group_cc:
                                         
                                     mailcc.add(user.login) 
@@ -294,7 +333,6 @@ class alert_rules(models.Model):
                                                 "alert_rule_id": rule.id,
                                                 "process_id": rule.process_id,
                                                 "risk_rating": rule.risk_rating,
-                                                "date_created": rule.date_created,
                                                 "last_checked": rule.last_checked,
                                                 "email": branch_officer.officer.email,
                                                 "email_cc": "",
@@ -304,7 +342,17 @@ class alert_rules(models.Model):
                                     })
                                             
                                             
-                                    template.send_mail(new_alert_history.id, force_send=True)
+                                    try:
+                                        mail_id =  template.send_mail(new_alert_history.id, force_send=True)
+                                        if not mail_id:
+                                            history = self.env['alert.history'].browse(new_alert_history.id)
+                                            
+                                            if history.exists():
+                                                history.unlink()
+                                            
+                                    except Exception as e:
+                                        raise ValidationError(f"mail failed to send {str(e)}")
+                                        
                                     
                             
                                 else:
@@ -312,7 +360,7 @@ class alert_rules(models.Model):
                                             
                                         
                                 
-                                  
+                                
                             else:
                                 
                                 alert_group = rule.alert_id.email
@@ -325,7 +373,7 @@ class alert_rules(models.Model):
                                 for user in alert_group:
                                         
                                     mailto.add(user.email) 
-                                     
+                                    
                                 for user in alert_group_cc:
                                         
                                     mailcc.add(user.email) 
@@ -427,7 +475,7 @@ class alert_rules(models.Model):
                                                 "risk_rating": rule.risk_rating,
                                                 "date_created": rule.date_created,
                                                 "last_checked": rule.last_checked,
-                                                "email": ",".join(list(mailto)) if len(list(mailto)) > 0 else "jimohkayodeyusuf@gmail.com",
+                                                "email": ",".join(list(mailto)) if len(list(mailto)) > 0 else "techsupport@novajii.com",
                                                 "email_cc": ",".join(list(mailcc)),
                                                 "narration": rule.narration,
                                                 "name": rule.name
@@ -435,12 +483,21 @@ class alert_rules(models.Model):
                                     })
                                             
                                             
-                                    template.send_mail(new_alert_history.id, force_send=True)
+                                    try:
+                                        mail_id =  template.send_mail(new_alert_history.id, force_send=True)
+                                        if not mail_id:
+                                            history = self.env['alert.history'].browse(new_alert_history.id)
+                                            
+                                            if history.exists():
+                                                history.unlink()
+                                            
+                                    except Exception as e:
+                                        raise ValidationError(f"mail failed to send {str(e)}")
                                     
                             
                                 else:
                                     raise ValidationError("Mail Template Not Found")
-                                       
+                                    
                                 
                     else:
                         # internal user
@@ -455,11 +512,10 @@ class alert_rules(models.Model):
                                             
                             mailcc.add(user.login) 
                     
-                   
+                
                         
                     
                 
-
                     #  Send the email
                     self.env.cr.execute(f"{query}")
                     rows = self.env.cr.fetchall()
@@ -471,9 +527,9 @@ class alert_rules(models.Model):
                     csv_buffer = io.StringIO()
                     csv_writer = csv.writer(csv_buffer)
                     
-        #                # Write headers to the CSV
+            #               # Write headers to the CSV
                     csv_writer.writerow(columns)
-        #                # Write data rows to the CSV
+            #               # Write data rows to the CSV
                     for row in rows:
                         csv_writer.writerow(row)
                     
@@ -481,7 +537,7 @@ class alert_rules(models.Model):
                     csv_buffer.close()
                     
                     
-        #                # Step 3: Base64 encode the CSV content
+            #               # Step 3: Base64 encode the CSV content
                     encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
                     
                     
@@ -561,17 +617,26 @@ class alert_rules(models.Model):
                         })
                                 
                                 
-                        template.send_mail(new_alert_history.id, force_send=True)
+                        try:
+                                mail_id =  template.send_mail(new_alert_history.id, force_send=True)
+                                if not mail_id:
+                                    history = self.env['alert.history'].browse(new_alert_history.id)
+                                            
+                                    if history.exists():
+                                        history.unlink()
+                                            
+                        except Exception as e:
+                            raise ValidationError(f"mail failed to send {str(e)}")
                         
                 
                     else:
                         raise ValidationError("Mail Template Not Found")
+                                    
                                 
-                              
-                
-                      
-                       
-                            
+                    
+                        
+                        
+                                
         except BaseException as e:
             raise ValueError(str(e))
         

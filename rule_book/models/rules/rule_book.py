@@ -151,6 +151,8 @@ class Rulebook(models.Model):
         string="Officers To Copy",
         tracking=True,
         help="Select the person(s) to copy for this rulebook.",
+        # index= True,
+        # store= True
     )
 
     description = fields.Text(

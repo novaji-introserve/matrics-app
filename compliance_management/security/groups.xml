@@ -3,6 +3,12 @@
   <field name="name">Compliance</field>
   <field name="sequence">200</field>
 </record>
+
+<!-- <record id="group_compliance_group_manager" model="res.groups">
+  <field name="name">Compliance Group Manager</field>
+  <field name="category_id" ref="module_category_compliance" />
+</record> -->
+
 <!-- Activate only compliance groups for now -->
 <!--
 <record id="group_compliance_aml_regulations" model="res.groups">

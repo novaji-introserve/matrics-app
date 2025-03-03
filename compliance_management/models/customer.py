@@ -50,7 +50,7 @@ class Customer(models.Model):
         string='Identification Number', tracking=True)
     identification_expiry_date = fields.Date(
         string='Identification Expiry Date', index=True, tracking=True)
-    dob = fields.Char(
+    dob = fields.Date(
         string='Date of Birth', tracking=True)
     vat = fields.Char(string='Tax ID/TIN', index=True,
                       help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.")
@@ -72,10 +72,8 @@ class Customer(models.Model):
         string='Risk Score', digits=(10, 2), tracking=True)
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
-    # account_officer_id = fields.Many2one(
-    #     comodel_name='res.users', string='Account Officer', index=True, tracking=True)
     account_officer_id = fields.Many2one(
-        comodel_name='res.account.officer', string='Account Officer', index=True, tracking=True)
+        comodel_name='res.users', string='Account Officer', index=True, tracking=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(
@@ -116,22 +114,25 @@ class Customer(models.Model):
 
     @api.model_create_multi
     def create(self, values):
+        
         result = super(Customer, self).create(values)
         for customer in result:
             customer.action_compute_risk_score_with_plan()
         return result
 
     def write(self, values):
-        result = super(Customer, self).write(values)
-        score = self._get_risk_score_from_plan()
-        risk_level = self.env['res.partner']._get_risk_level_from_score(score)
-        self.env.cr.execute('update res_partner set risk_score = %s,risk_level=%s where id = %s',(score,risk_level,self.id))
-        self.invalidate_recordset(['risk_score','risk_level'])
-        return result
+        pass
+        # result = super(Customer, self).write(values)
+        # score = self._get_risk_score_from_plan()
+        # risk_level = self.env['res.partner']._get_risk_level_from_score(score)
+        # self.env.cr.execute('update res_partner set risk_score = %s,risk_level=%s where id = %s',(score,risk_level,self.id))
+        # self.invalidate_recordset(['risk_score','risk_level'])
+        # return result
         
     @api.depends('account_ids')
     def _total_accounts(self):
         for e in self:
+
             e.total_accounts = len(e.account_ids)
 
     def action_total_accounts(self):
@@ -324,47 +325,47 @@ class Customer(models.Model):
 
     def action_compute_risk_score_with_plan(self):
         self.ensure_one()
-        score = self._get_risk_score_from_plan()
-        self.write({'risk_score':score})
-        risk_level = self.compute_risk_level()
-        self.write({'risk_level':risk_level})
+        # score = self._get_risk_score_from_plan()
+        # self.write({'risk_score':score})
+        # risk_level = self.compute_risk_level()
+        # self.write({'risk_level':risk_level})
     
-    def _get_risk_score_from_plan(self):
-        setting = self.env['res.compliance.settings'].search(
-            [('code', '=', 'risk_plan_computation')], limit=1)
-        for e in setting:
-            plan_setting = e.val
-        record_id = self.id
-        self.env["res.partner.risk.plan.line"].search([('partner_id','=',record_id)]).unlink()
-        scores = []
-        plans = self.env['res.compliance.risk.assessment.plan'].search(
-            [('state', '=', 'active')], order='priority')
-        if plans:
-            for pl in plans:
-                score = 0
-                try:
-                    self.env.cr.execute(pl.sql_query, (record_id,))
-                    rec = self.env.cr.fetchone()
-                    if rec is not None:
-                        # we have a hit
-                        if pl.compute_score_from == 'dynamic':
-                            score =  float(rec[0]) if rec is not None else score
-                        if pl.compute_score_from == 'static':
-                            score = pl.risk_score
-                    scores.append(score)
-                    line_id = self.env['res.partner.risk.plan.line'].create({
-                    'partner_id': record_id,
-                    'plan_line_id': pl.id,
-                    'risk_score': score,
-                    })
+    # def _get_risk_score_from_plan(self):
+    #     setting = self.env['res.compliance.settings'].search(
+    #         [('code', '=', 'risk_plan_computation')], limit=1)
+    #     for e in setting:
+    #         plan_setting = e.val
+    #     record_id = self.id
+    #     self.env["res.partner.risk.plan.line"].search([('partner_id','=',record_id)]).unlink()
+    #     scores = []
+    #     plans = self.env['res.compliance.risk.assessment.plan'].search(
+    #         [('state', '=', 'active')], order='priority')
+    #     if plans:
+    #         for pl in plans:
+    #             score = 0
+    #             try:
+    #                 self.env.cr.execute(pl.sql_query, (record_id,))
+    #                 rec = self.env.cr.fetchone()
+    #                 if rec is not None:
+    #                     # we have a hit
+    #                     if pl.compute_score_from == 'dynamic':
+    #                         score =  float(rec[0]) if rec is not None else score
+    #                     if pl.compute_score_from == 'static':
+    #                         score = pl.risk_score
+    #                 scores.append(score)
+    #                 line_id = self.env['res.partner.risk.plan.line'].create({
+    #                 'partner_id': record_id,
+    #                 'plan_line_id': pl.id,
+    #                 'risk_score': score,
+    #                 })
                     
-                except:
-                    pass
+    #             except:
+    #                 pass
                 
-        if len(scores) > 0:
-            if plan_setting == 'avg':
-                self.env.cr.execute(f"select avg(risk_score) from res_partner_risk_plan_line where partner_id={record_id} and risk_score > 0")
-            if plan_setting == 'max':
-                self.env.cr.execute(f"select max(risk_score) from res_partner_risk_plan_line where partner_id={record_id}")
-            records = self.env.cr.fetchone()
-        return records[0] if records is not None else 0.00
+    #     if len(scores) > 0:
+    #         if plan_setting == 'avg':
+    #             self.env.cr.execute(f"select avg(risk_score) from res_partner_risk_plan_line where partner_id={record_id} and risk_score > 0")
+    #         if plan_setting == 'max':
+    #             self.env.cr.execute(f"select max(risk_score) from res_partner_risk_plan_line where partner_id={record_id}")
+    #         records = self.env.cr.fetchone()
+    #     return records[0] if records is not None else 0.00
