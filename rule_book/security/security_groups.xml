@@ -31,7 +31,7 @@
         <record id="group_chief_compliance_officer_" model="res.groups">
             <field name="name">Chief Compliance Officer</field>
             <field name="category_id" ref="module_category_rule_book"/>
-            <field name="implied_ids" eval="[Command.link(ref('rule_book.group_compliance_manager_'))]"/>
+            <field name="implied_ids" eval="[Command.link(ref('rule_book.group_compliance_manager_')),Command.link(ref('base.group_system'))]"/>
         </record>
 
 
