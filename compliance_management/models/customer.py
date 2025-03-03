@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from psycopg2 import ProgrammingError
+import logging
+from dotenv import load_dotenv
+
+
+load_dotenv()
+_logger = logging.getLogger(__name__)
+
 
 LOW_RISK_THRESHOLD = 10
 MEDIUM_RISK_THRESHOLD = 15
@@ -126,6 +134,60 @@ class Customer(models.Model):
     #     self.env.cr.execute('update res_partner set risk_score = %s,risk_level=%s where id = %s',(score,risk_level,self.id))
     #     self.invalidate_recordset(['risk_score','risk_level'])
     #     return result
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Create records
+        records = super(Customer, self).create(vals_list)
+
+        # Create a context to prevent recursion
+        new_ctx = dict(self.env.context, computing_risk=True)
+        self = self.with_context(new_ctx)
+
+        # Update risk score and level for all created records
+        for record in records:
+            score = record._get_risk_score_from_plan()
+            risk_level = record.compute_risk_level()
+
+            # Use direct SQL update to avoid triggering write()
+            self.env.cr.execute(
+                """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+                WHERE id = %%s""" % self._table,
+                (score, risk_level, record.id)
+            )
+
+            # Invalidate cache for these fields
+            record.invalidate_cache(['risk_score', 'risk_level'])
+
+        return records
+
+    def write(self, vals):
+        # Apply updates from vals
+        result = super(Customer, self).write(vals)
+
+        # Only update risk scores if we're not already in a risk score update
+        # This prevents recursion
+        if not self.env.context.get('computing_risk', False):
+            # Create a new context to mark that we're computing risk
+            new_ctx = dict(self.env.context, computing_risk=True)
+            self = self.with_context(new_ctx)
+
+            # Update risk score and level for all records
+            for record in self:
+                score = record._get_risk_score_from_plan()
+                risk_level = record.compute_risk_level()
+
+                # Use direct SQL update to avoid triggering write() again
+                self.env.cr.execute(
+                    """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+                    WHERE id = %%s""" % self._table,
+                    (score, risk_level, record.id)
+                )
+
+                # Invalidate cache for these fields
+                record.invalidate_cache(['risk_score', 'risk_level'])
+
+        return result
         
     def scan_news_articles(self):
         """Trigger news scanning via adverse.media"""
@@ -339,12 +401,42 @@ class Customer(models.Model):
     def get_risk_level_name(self):
         return '%s risk' % (self.risk_level)
 
+    # def action_compute_risk_score_with_plan(self):
+    #     self.ensure_one()
+    #     score = self._get_risk_score_from_plan()
+    #     self.write({'risk_score':score})
+    #     risk_level = self.compute_risk_level()
+    #     self.write({'risk_level':risk_level})
+    
+    # def action_compute_risk_score_with_plan(self):
+    #     self.ensure_one()
+    #     score = self._get_risk_score_from_plan()
+    #     risk_level = self.compute_risk_level()
+    #     # Single write call for both fields
+    #     self.update({
+    #         'risk_score': score,
+    #         'risk_level': risk_level,
+    #     })
+        
     def action_compute_risk_score_with_plan(self):
-        self.ensure_one()
-        score = self._get_risk_score_from_plan()
-        self.write({'risk_score':score})
-        risk_level = self.compute_risk_level()
-        self.write({'risk_level':risk_level})
+        """Manual action to compute risk score"""
+        for record in self:
+            score = record._get_risk_score_from_plan()
+            risk_level = record.compute_risk_level()
+
+            # Use direct SQL update to avoid triggering write()
+            self.env.cr.execute(
+                """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+                WHERE id = %%s""" % self._table,
+                (score, risk_level, record.id)
+            )
+
+            # Invalidate cache for these fields
+            record.invalidate_cache(['risk_score', 'risk_level'])
+
+        return True
+        
+        
     
     def _get_risk_score_from_plan(self):
         setting = self.env['res.compliance.settings'].search(

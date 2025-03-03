@@ -2,7 +2,6 @@ from odoo import models, fields, api
 from odoo.exceptions import AccessError
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError, ValidationError
-import logging
 from datetime import timedelta, datetime, time
 import re
 from dotenv import load_dotenv
@@ -14,6 +13,7 @@ import requests
 from requests.exceptions import RequestException, HTTPError, ConnectionError, Timeout
 from odoo.modules.module import get_module_resource
 import base64
+import logging
 
 
 load_dotenv()
