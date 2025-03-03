@@ -188,6 +188,7 @@ class Customer(models.Model):
                 record.invalidate_cache(['risk_score', 'risk_level'])
 
         return result
+
         
     def scan_news_articles(self):
         """Trigger news scanning via adverse.media"""

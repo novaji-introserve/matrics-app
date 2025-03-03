@@ -6,8 +6,6 @@ import { ChartRenderer } from "./chartrender/chartrender";
 import { useService } from "@web/core/utils/hooks";
 
 const { Component, useState, onMounted, onWillStart } = owl;
-import { session } from "@web/session"
-
 
 export class IcomplyDashboard extends Component {
   setup() {
@@ -36,9 +34,9 @@ export class IcomplyDashboard extends Component {
       chartDomain: [],
       current_datepicked: null,
       previous_datepicked: null,
-      riskratingchart: null,
-      customerchart: null,
-      transationstatechart: null,
+      topbranch: [],
+      topscreened: [],
+      highriskcustomer: [],
     });
 
     onMounted(async () => {
@@ -53,6 +51,8 @@ export class IcomplyDashboard extends Component {
 
   async getcurrentuser() {
     let result = await this.rpc("/dashboard/user");
+    console.log(result);
+    
     this.state.branches_id = result.branch;
     this.state.cc = result.group;
     this.state.alert_rules_domain = result.alert_rules_domain;
@@ -101,8 +101,8 @@ export class IcomplyDashboard extends Component {
   }
 
   filterByDate = async () => {
-    const currentDate = moment().subtract(this.state.datepicked, "days");
-    const previousDate = moment().subtract(this.state.datepicked * 2, "days");
+    const currentDate = moment();
+    const previousDate = moment().subtract(this.state.datepicked, "days");
 
     this.state.current_datepicked = currentDate.format("YYYY-MM-DD"); // YYYY-MM-DD format
     this.state.previous_datepicked = previousDate.format("YYYY-MM-DD"); // YYYY-MM-DD format
@@ -114,7 +114,10 @@ export class IcomplyDashboard extends Component {
     try {
       const dateFilter =
         this.state.datepicked > 0
-          ? [["create_date", ">=", this.state.current_datepicked]]
+          ? [
+              ["date_created", ">=", this.state.previous_datepicked],
+              ["date_created", "<=", this.state.current_datepicked],
+            ]
           : [];
 
       const branchFilter =
@@ -140,10 +143,8 @@ export class IcomplyDashboard extends Component {
         highrisk: highriskCount,
         totalScreenedTransactionCount,
         totaltransaction: totalTransactionCount,
-        alertrulestotal: await this.api.searchCount("alert.rules", [
-          ...this.state.alert_rules_domain,
-          ...dateFilter,
-        ]),
+        alertrulestotal: await this.api.searchCount("alert.rules", dateFilter),
+
         lowriskinRespectToTotalTransaction: this.calculatePercentage(
           lowriskCount,
           totalTransactionCount
@@ -158,9 +159,10 @@ export class IcomplyDashboard extends Component {
         ),
       };
 
-      await this.getTransactionRiskRatingChart();
-      await this.getCustomerRatingChart();
-      await this.getTransactionStateChart();
+      await this.TopBranches();
+      await this.TopTransactionRules();
+      await this.highriskcustomer();
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -171,63 +173,52 @@ export class IcomplyDashboard extends Component {
   };
 
   loadInitialData = async () => {
-    await this.getTransactionRiskRatingChart();
-    await this.getCustomerRatingChart();
-    await this.getTransactionStateChart();
+    await this.TopBranches();
+    await this.TopTransactionRules();
+    await this.highriskcustomer();
+    
   };
   // Display transactions based on risk level
   displayTransactionsByRisk = (riskLevel = "") => {
-    let domain = [];
+     const dateFilter =
+       this.state.datepicked > 0
+         ? [
+             ["date_created", ">=", this.state.previous_datepicked],
+             ["date_created", "<=", this.state.current_datepicked],
+           ]
+         : [];
 
-    if (this.state.datepicked > 0) {
-      
-      domain.push([
-        "create_date",
-        ">=",
-        new Date(this.state.current_datepicked),
-      ]);
-    }
+     const branchFilter =
+       this.state.branches_id.length > 0 && this.state.cc == false
+         ? [["branch_id", "in", Array.from(this.state.branches_id)]]
+         : [];
 
-    if (!this.state.cc) {
-      // Correct condition check
-      domain.push([...this.state.alert_rules_domain]);
-    }
+      const domain = [
+        ...dateFilter,
+        ...branchFilter
+      ];
 
-    if (riskLevel === "screened") {
-      // Use strict equality
-      domain.push(["rule_id", "!=", null]);
-    } else if (riskLevel) {
-      // Check if riskLevel is not empty
-      domain.push(["risk_level", "=", riskLevel]);
-    }
+      if (riskLevel === "") {
+    //   // Use strict equality
+          return;
 
-    if (riskLevel === "") {
-      // Use strict equality
-      return;
-    } else if (riskLevel === "process") {
-      let processDomain = [];
-      if (this.state.datepicked > 0) {
-        processDomain.push(["created_date", ">=", this.state.current_datepicked]);
-      }
-      if (!this.state.cc) {
-        processDomain.push([
-          "branch_id",
-          "in",
-          Array.from(this.state.branches_id),
-        ]);
-      }
+      }else if(riskLevel === "screened"){
 
-      this.navigate.doAction({
+        domain.push(["rule_id", "!=", null]);
+
+       this.navigate.doAction({
         type: "ir.actions.act_window",
-        res_model: "alert.rules",
-        name: "processes",
-        domain: processDomain, // Use the correctly constructed domain
+        res_model: "res.customer.transaction",
+        name: "Screened Transaction",
+        domain: domain, // Use the correctly constructed domain
         views: [
           [false, "tree"],
           [false, "form"],
         ],
-      });
-    } else {
+       })
+
+      }else{
+        domain.push(["risk_level", "=", riskLevel]);
       this.navigate.doAction({
         type: "ir.actions.act_window",
         res_model: "res.customer.transaction",
@@ -241,91 +232,80 @@ export class IcomplyDashboard extends Component {
         ],
       });
     }
+
   };
-  // Unified chart rendering function
-  async getChartData(model, field, domain) {
-    const results = await this.api.searchRead(model, domain, [field]);
-    const groupedData = results.reduce((acc, record) => {
-      const key = record[field];
-      acc[key] = acc[key] || { count: 0, name: key };
-      acc[key].count++;
-      return acc;
-    }, {});
 
-    const labels = Object.values(groupedData).map((data) => data.name);
-    const counts = Object.values(groupedData).map((data) => data.count);
+  displayProcessOdooView = () =>{
+    const dateFilter =
+       this.state.datepicked > 0
+         ? [
+             ["date_created", ">=", this.state.previous_datepicked],
+             ["date_created", "<=", this.state.current_datepicked],
+           ]
+         : [];
 
-    return { labels, counts };
+        const domain = [...dateFilter];
+
+        this.navigate.doAction({
+        type: "ir.actions.act_window",
+        res_model: "alert.rules",
+        name: "processes",
+        domain: domain, // Use the correctly constructed domain
+        views: [
+          [false, "tree"],
+          [false, "form"],
+        ],
+      });
+      
   }
 
-  // Transaction Risk Rating Chart
-  getTransactionRiskRatingChart = async () => {
-    let domain = this.state.chartDomain;
+  // Unified chart rendering function
 
-    const { labels, counts } = await this.getChartData(
-      "res.customer.transaction",
-      "risk_level",
-      domain
+  // top branches
+  async TopBranches() {
+    const response = await this.rpc("/dashboard/branch_by_customer", {
+      cco: this.state.cc,
+      branches_id: this.state.branches_id,
+      datepicked: Number(this.state.datepicked),
+    });
+    
+    
+    this.state.topbranch = response;
+  }
+  async TopTransactionRules() {
+    const response = await this.rpc("/dashboard/get_top_screening_rules", {
+      cco: this.state.cc,
+      branches_id: this.state.branches_id,
+      datepicked: Number(this.state.datepicked),
+    });
+
+    this.state.topscreened = response;
+  }
+  async highriskcustomer() {
+    const response = await this.rpc(
+      "/dashboard/get_high_risk_customer_by_branch",
+      {
+        cco: this.state.cc,
+        branches_id: this.state.branches_id,
+        datepicked: Number(this.state.datepicked),
+      }
     );
-    this.state.riskratingchart = {
-      labels,
-      datasets: [{ label: "", data: counts, hoverOffset: 4 }],
-    };
-  };
 
-  // Customer Risk Rating Chart
-  getCustomerRatingChart = async () => {
-    let domain = this.state.chartDomain;
+  
+    
+    this.state.highriskcustomer = response;
+  }
 
-    const { labels, counts } = await this.getChartData(
-      "res.partner",
-      "risk_level",
-      domain
-    );
-    this.state.customerchart = {
-      labels,
-      datasets: [{ label: "", data: counts, hoverOffset: 4 }],
-    };
-  };
-
-  // Transaction State Chart
-  getTransactionStateChart = async () => {
-    let domain = this.state.chartDomain;
-
-    const { labels, counts } = await this.getChartData(
-      "res.customer.transaction",
-      "state",
-      domain
-    );
-    this.state.transationstatechart = {
-      labels,
-      datasets: [
-        {
-          label: "",
-          data: counts,
-          backgroundColor: [
-            "rgba(75, 192, 0, 0.5)",
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 0.2)",
-          ],
-          borderColor: [
-            "rgba(75, 192, 192, 1)",
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-          ],
-          borderWidth: 1,
-        },
-      ],
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        legend: { position: "right" },
-      },
-    };
-  };
+ 
 }
 
 IcomplyDashboard.template = "owl.IcomplyDashboard";
 IcomplyDashboard.components = { KpiCard, ChartRenderer };
 
 registry.category("actions").add("owl.icomply_dashboard", IcomplyDashboard);
+
+
+
+
+
+

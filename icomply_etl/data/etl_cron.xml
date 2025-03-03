@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Hourly Sync -->
+        <record id="ir_cron_etl_sync_hourly" model="ir.cron">
+            <field name="name">ETL: Sync Hourly Tables</field>
+            <field name="model_id" ref="model_etl_manager"/>
+            <field name="state">code</field>
+            <field name="code">model.run_scheduled_sync('hourly')</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Daily Sync -->
+        <record id="ir_cron_etl_sync_daily" model="ir.cron">
+            <field name="name">ETL: Sync Daily Tables</field>
+            <field name="model_id" ref="model_etl_manager"/>
+            <field name="state">code</field>
+            <field name="code">model.run_scheduled_sync('daily')</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=1, minute=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Weekly Sync -->
+        <record id="ir_cron_etl_sync_weekly" model="ir.cron">
+            <field name="name">ETL: Sync Weekly Tables</field>
+            <field name="model_id" ref="model_etl_manager"/>
+            <field name="state">code</field>
+            <field name="code">model.run_scheduled_sync('weekly')</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=1, minute=0) + timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

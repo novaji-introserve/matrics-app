@@ -33,5 +33,14 @@ from . import title
 from . import account_officer
 from . import account_product
 from . import currency
+from . import res_subbranch
+from . import branch_type
+from . import res_module
+from . import res_audit_trail
+from . import res_glclasslv2
+from . import res_glclasslv3
+from . import res_mandatepicts
+from . import res_reactivation
+from . import bankgl
 # from .legacy import sync_script 
 

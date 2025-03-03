@@ -46,6 +46,9 @@
         'views/res_users.xml',
         'views/sanction_screening.xml',
         'views/customer.xml',
+        'data/res.country.state.csv',
+        # 'data/res.branch.csv',
+        'security/security.xml',
         'views/statistics.xml',
         'views/dashboard.xml',
         'views/risk_assessment_plan.xml',
@@ -58,6 +61,7 @@
     'demo': [
         # 'demo/demo.xml',
     ],
+    
     "installable": True,
     "application": True,
     "auto_install": False,

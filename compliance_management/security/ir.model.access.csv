@@ -101,3 +101,4 @@ access_adverse_media_alert_user,adverse.media.alert.user,model_adverse_media_ale
 compliance_management.access_adverse_media,access_adverse_media,compliance_management.model_adverse_media,base.group_user,1,1,1,0
 compliance_management.chief_access_adverse_media,chief_access_adverse_media,compliance_management.model_adverse_media,compliance_management.group_compliance_chief_compliance_officer,1,1,1,1
 compliance_management.media_keywords,media_keywords,compliance_management.model_media_keyword,base.group_user,1,1,1,1
+

@@ -25,7 +25,15 @@ access_res_transaction_status,access res transaction status,internal_control.mod
 access_res_user_status,access res user status,internal_control.model_res_user_status,base.group_user,1,1,1,1
 access_res_account_officer,access res account officer,internal_control.model_res_account_officer,base.group_user,1,1,1,1
 access_res_partner_account_product,access res partner account product,internal_control.model_res_partner_account_product,base.group_user,1,1,1,1
-access_res_bank_product,access res bank product,internal_control.model_res_bank_product,base.group_user,1,1,1,1
+access_res_sub_branch,access res sub branch,internal_control.model_res_subbranch,base.group_user,1,1,1,1
+access_res_module,access res module,internal_control.model_res_module,base.group_user,1,1,1,1
+access_res_audit_trail,access res audit trail,internal_control.model_res_audit_trail,base.group_user,1,1,1,1
+access_res_glclasslv2,access res glclasslv2,internal_control.model_res_glclasslv2,base.group_user,1,1,1,1
+access_res_glclasslv3,access res glclasslv3,internal_control.model_res_glclasslv3,base.group_user,1,1,1,1
+access_res_mandatepicts,access res mandatepicts,internal_control.model_res_mandatepicts,base.group_user,1,1,1,1
+access_res_reactivation,access res reactivation,internal_control.model_res_reactivation,base.group_user,1,1,1,1
+access_bankgl,access bankgl,internal_control.model_res_bankgl,base.group_user,1,1,1,1
+access_bank_product,access bank product,internal_control.model_res_bank_product,base.group_user,1,1,1,1
 
 
 

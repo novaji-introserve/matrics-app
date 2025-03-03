@@ -92,3 +92,19 @@ If you encounter any issues:
 - Do not alter the order in which views are called in the manifest.
 - Always ensure that actions are loaded before menus.
 - This means that if you're adding actions in your views, they must be loaded prior to the menus.
+
+
+# Must have module
+ - git clone -b 16.0 https://github.com/OCA/queue.git (clone in odoo addons folder)
+
+ 
+ - add this config to conf file # Increase timeout limits to prevent worker restarts
+ ####
+limit_time_real = 600
+limit_time_cpu = 300
+
+# Queue job specific settings
+[queue_job]
+channels = root:1
+
+####

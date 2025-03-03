@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Main Menu -->
-    <menuitem id="menu_internal_control_main" name="Internal Control" sequence="-800"/>
+    <menuitem web_icon="internal_control,static/description/icon.png" id="menu_internal_control_main"  name="Internal Control" sequence="-800"/>
 
     <!-- Dashboard Submenu -->
     <menuitem id="menu_internal_control_dashboard" name="Dashboard" parent="menu_internal_control_main" action="icomply_dashboard.dashboard_home" sequence="10"/>
@@ -9,10 +9,10 @@
     <menuitem id="menu_transaction_monitoring_root" name="Transaction Monitoring" parent="menu_internal_control_main" sequence="30"/>
 
        <!-- All transactions -->
-    <menuitem id="menu_all_transactions_root" name="Transaction Review" sequence="20" parent="menu_transaction_monitoring_root"/>
+    <!-- <menuitem id="menu_all_transactions_root" name="Transaction Review" sequence="20" parent="menu_transaction_monitoring_root"/> -->
     
 <!-- All Transactions menus -->
-<menuitem id="menu_internal_control_all_transactions" 
+<!-- <menuitem id="menu_internal_control_all_transactions" 
           name="All Transactions" 
           sequence="10" 
           parent="menu_all_transactions_root"/>
@@ -27,10 +27,10 @@
           name="Last 7 Days" 
           sequence="12" 
           parent="menu_internal_control_all_transactions" 
-          action="action_all_transactions_last_7_days"/>
+          action="action_all_transactions_last_7_days"/> -->
 
 <!-- Awaiting Review menus -->
-<menuitem id="menu_internal_control_awaiting_review" 
+<!-- <menuitem id="menu_internal_control_awaiting_review" 
           name="Awaiting Review" 
           sequence="20" 
           parent="menu_all_transactions_root"/>
@@ -45,10 +45,10 @@
           name="Last 7 Days" 
           sequence="22" 
           parent="menu_internal_control_awaiting_review" 
-          action="action_awaiting_review_last_7_days"/>
+          action="action_awaiting_review_last_7_days"/> -->
 
 <!-- Reviewed menus -->
-<menuitem id="menu_internal_control_reviewed" 
+<!-- <menuitem id="menu_internal_control_reviewed" 
           name="Reviewed" 
           sequence="30" 
           parent="menu_all_transactions_root"/>
@@ -63,65 +63,72 @@
           name="Last 7 Days" 
           sequence="32" 
           parent="menu_internal_control_reviewed" 
-          action="action_reviewed_last_7_days"/>
+          action="action_reviewed_last_7_days"/> -->
 
     <!-- start here -->
 
     <menuitem id="menu_transaction_review_root" name="Transaction Review" parent="menu_transaction_monitoring_root" sequence="20"/>
 
-    <menuitem id="menu_customers_root" name="Customers" sequence="10" parent="menu_transaction_review_root"/>
-    <menuitem id="menu_customers_all_transactions" name="All Transactions" sequence="10" parent="menu_customers_root"/>
-    <menuitem id="menu_customers_all_transactions_today" name="Today" sequence="11" parent="menu_customers_all_transactions"/>
+    <menuitem id="menu_all_transactions" name="All Transactions" sequence="10" parent="menu_transaction_review_root"/>
+    <menuitem id="menu_customers_all_transactions" name="Customers" sequence="10" parent="menu_all_transactions"/>
+    <menuitem id="menu_customers_all_transactions_today" name="Today" sequence="10" parent="menu_customers_all_transactions"/>
     <menuitem id="menu_customers_all_transactions_today_ngn" name="NGN" sequence="1" parent="menu_customers_all_transactions_today" action="action_customers_all_transactions_today_ngn"/>
     <menuitem id="menu_customers_all_transactions_today_other" name="Other Currencies" sequence="2" parent="menu_customers_all_transactions_today" action="action_customers_all_transactions_today_other"/>
 
-    <menuitem id="menu_customers_all_transactions_7days" name="Last 7 Days" sequence="12" parent="menu_customers_all_transactions"/>
+    <menuitem id="menu_customers_all_transactions_7days" name="Last 7 Days" sequence="20" parent="menu_customers_all_transactions"/>
     <menuitem id="menu_customers_all_transactions_7days_ngn" name="NGN" sequence="1" parent="menu_customers_all_transactions_7days" action="action_customers_all_transactions_7days_ngn"/>
     <menuitem id="menu_customers_all_transactions_7days_other" name="Other Currencies" sequence="2" parent="menu_customers_all_transactions_7days" action="action_customers_all_transactions_7days_other"/>
 
-    <menuitem id="menu_customers_awaiting_review" name="Awaiting Review" sequence="20" parent="menu_customers_root"/>
-    <menuitem id="menu_customers_awaiting_review_today" name="Today" sequence="21" parent="menu_customers_awaiting_review"/>
-    <menuitem id="menu_customers_awaiting_review_today_ngn" name="NGN" sequence="1" parent="menu_customers_awaiting_review_today" action="action_customers_awaiting_review_today_ngn"/>
-    <menuitem id="menu_customers_awaiting_review_today_other" name="Other Currencies" sequence="2" parent="menu_customers_awaiting_review_today" action="action_customers_awaiting_review_today_other"/>
 
-    <menuitem id="menu_customers_awaiting_review_7days" name="Last 7 Days" sequence="22" parent="menu_customers_awaiting_review"/>
-    <menuitem id="menu_customers_awaiting_review_7days_ngn" name="NGN" sequence="1" parent="menu_customers_awaiting_review_7days" action="action_customers_awaiting_review_7days_ngn"/>
-    <menuitem id="menu_customers_awaiting_review_7days_other" name="Other Currencies" sequence="2" parent="menu_customers_awaiting_review_7days" action="action_customers_awaiting_review_7days_other"/>
-
-    <menuitem id="menu_customers_reviewed" name="Reviewed" sequence="30" parent="menu_customers_root"/>
-    <menuitem id="menu_customers_reviewed_today" name="Today" sequence="31" parent="menu_customers_reviewed"/>
-    <menuitem id="menu_customers_reviewed_today_ngn" name="NGN" sequence="1" parent="menu_customers_reviewed_today" action="action_customers_reviewed_today_ngn"/>
-    <menuitem id="menu_customers_reviewed_today_other" name="Other Currencies" sequence="2" parent="menu_customers_reviewed_today" action="action_customers_reviewed_today_other"/>
-
-    <menuitem id="menu_customers_reviewed_7days" name="Last 7 Days" sequence="32" parent="menu_customers_reviewed"/>
-    <menuitem id="menu_customers_reviewed_7days_ngn" name="NGN" sequence="1" parent="menu_customers_reviewed_7days" action="action_customers_reviewed_7days_ngn"/>
-    <menuitem id="menu_customers_reviewed_7days_other" name="Other Currencies" sequence="2" parent="menu_customers_reviewed_7days" action="action_customers_reviewed_7days_other"/>
-
-    <menuitem id="menu_internal_accounts_root" name="Internal Accounts" sequence="20" parent="menu_transaction_review_root"/>
-    <menuitem id="menu_internal_all_transactions" name="All Transactions" sequence="10" parent="menu_internal_accounts_root"/>
-    <menuitem id="menu_internal_all_transactions_today" name="Today" sequence="11" parent="menu_internal_all_transactions"/>
+ <menuitem id="menu_internal_accounts_all_transactions" name="Internal Accounts" sequence="20" parent="menu_all_transactions"/>
+    <menuitem id="menu_internal_all_transactions_today" name="Today" sequence="10" parent="menu_internal_accounts_all_transactions"/>
     <menuitem id="menu_internal_all_transactions_today_ngn" name="NGN" sequence="1" parent="menu_internal_all_transactions_today" action="action_internal_all_transactions_today_ngn"/>
     <menuitem id="menu_internal_all_transactions_today_other" name="Other Currencies" sequence="2" parent="menu_internal_all_transactions_today" action="action_internal_all_transactions_today_other"/>
 
-    <menuitem id="menu_internal_all_transactions_7days" name="Last 7 Days" sequence="12" parent="menu_internal_all_transactions"/>
+    <menuitem id="menu_internal_all_transactions_7days" name="Last 7 Days" sequence="20" parent="menu_internal_accounts_all_transactions"/>
     <menuitem id="menu_internal_all_transactions_7days_ngn" name="NGN" sequence="1" parent="menu_internal_all_transactions_7days" action="action_internal_all_transactions_7days_ngn"/>
     <menuitem id="menu_internal_all_transactions_7days_other" name="Other Currencies" sequence="2" parent="menu_internal_all_transactions_7days" action="action_internal_all_transactions_7days_other"/>
 
-    <menuitem id="menu_internal_awaiting_review" name="Awaiting Review" sequence="20" parent="menu_internal_accounts_root"/>
-    <menuitem id="menu_internal_awaiting_review_today" name="Today" sequence="21" parent="menu_internal_awaiting_review"/>
+
+    <menuitem id="menu_awaiting_review" name="Awaiting Review" sequence="20" parent="menu_transaction_review_root"/>
+
+    <menuitem id="menu_customers_awaiting_review" name="Customers" sequence="10" parent="menu_awaiting_review"/>
+    <menuitem id="menu_customers_awaiting_review_today" name="Today" sequence="10" parent="menu_customers_awaiting_review"/>
+    <menuitem id="menu_customers_awaiting_review_today_ngn" name="NGN" sequence="1" parent="menu_customers_awaiting_review_today" action="action_customers_awaiting_review_today_ngn"/>
+    <menuitem id="menu_customers_awaiting_review_today_other" name="Other Currencies" sequence="2" parent="menu_customers_awaiting_review_today" action="action_customers_awaiting_review_today_other"/>
+
+    <menuitem id="menu_customers_awaiting_review_7days" name="Last 7 Days" sequence="20" parent="menu_customers_awaiting_review"/>
+    <menuitem id="menu_customers_awaiting_review_7days_ngn" name="NGN" sequence="1" parent="menu_customers_awaiting_review_7days" action="action_customers_awaiting_review_7days_ngn"/>
+    <menuitem id="menu_customers_awaiting_review_7days_other" name="Other Currencies" sequence="2" parent="menu_customers_awaiting_review_7days" action="action_customers_awaiting_review_7days_other"/>
+
+  <menuitem id="menu_internal_awaiting_review" name="Internal Accounts" sequence="20" parent="menu_awaiting_review"/>
+    <menuitem id="menu_internal_awaiting_review_today" name="Today" sequence="10" parent="menu_internal_awaiting_review"/>
     <menuitem id="menu_internal_awaiting_review_today_ngn" name="NGN" sequence="1" parent="menu_internal_awaiting_review_today" action="action_internal_awaiting_review_today_ngn"/>
     <menuitem id="menu_internal_awaiting_review_today_other" name="Other Currencies" sequence="2" parent="menu_internal_awaiting_review_today" action="action_internal_awaiting_review_today_other"/>
 
-    <menuitem id="menu_internal_awaiting_review_7days" name="Last 7 Days" sequence="22" parent="menu_internal_awaiting_review"/>
+    <menuitem id="menu_internal_awaiting_review_7days" name="Last 7 Days" sequence="20" parent="menu_internal_awaiting_review"/>
     <menuitem id="menu_internal_awaiting_review_7days_ngn" name="NGN" sequence="1" parent="menu_internal_awaiting_review_7days" action="action_internal_awaiting_review_7days_ngn"/>
     <menuitem id="menu_internal_awaiting_review_7days_other" name="Other Currencies" sequence="2" parent="menu_internal_awaiting_review_7days" action="action_internal_awaiting_review_7days_other"/>
 
-    <menuitem id="menu_internal_reviewed" name="Reviewed" sequence="30" parent="menu_internal_accounts_root"/>
-    <menuitem id="menu_internal_reviewed_today" name="Today" sequence="31" parent="menu_internal_reviewed"/>
+
+
+<menuitem id="menu_reviewed" name="Reviewed" sequence="30" parent="menu_transaction_review_root"/>
+    <menuitem id="menu_customers_reviewed" name="Customers" sequence="10" parent="menu_reviewed"/>
+    <menuitem id="menu_customers_reviewed_today" name="Today" sequence="10" parent="menu_customers_reviewed"/>
+    <menuitem id="menu_customers_reviewed_today_ngn" name="NGN" sequence="1" parent="menu_customers_reviewed_today" action="action_customers_reviewed_today_ngn"/>
+    <menuitem id="menu_customers_reviewed_today_other" name="Other Currencies" sequence="2" parent="menu_customers_reviewed_today" action="action_customers_reviewed_today_other"/>
+
+    <menuitem id="menu_customers_reviewed_7days" name="Last 7 Days" sequence="20" parent="menu_customers_reviewed"/>
+    <menuitem id="menu_customers_reviewed_7days_ngn" name="NGN" sequence="1" parent="menu_customers_reviewed_7days" action="action_customers_reviewed_7days_ngn"/>
+    <menuitem id="menu_customers_reviewed_7days_other" name="Other Currencies" sequence="2" parent="menu_customers_reviewed_7days" action="action_customers_reviewed_7days_other"/>
+
+
+    <menuitem id="menu_internal_reviewed" name="Internal Accounts" sequence="20" parent="menu_reviewed"/>
+    <menuitem id="menu_internal_reviewed_today" name="Today" sequence="10" parent="menu_internal_reviewed"/>
     <menuitem id="menu_internal_reviewed_today_ngn" name="NGN" sequence="1" parent="menu_internal_reviewed_today" action="action_internal_reviewed_today_ngn"/>
     <menuitem id="menu_internal_reviewed_today_other" name="Other Currencies" sequence="2" parent="menu_internal_reviewed_today" action="action_internal_reviewed_today_other"/>
 
-    <menuitem id="menu_internal_reviewed_7days" name="Last 7 Days" sequence="32" parent="menu_internal_reviewed"/>
+    <menuitem id="menu_internal_reviewed_7days" name="Last 7 Days" sequence="20" parent="menu_internal_reviewed"/>
     <menuitem id="menu_internal_reviewed_7days_ngn" name="NGN" sequence="1" parent="menu_internal_reviewed_7days" action="action_internal_reviewed_7days_ngn"/>
     <menuitem id="menu_internal_reviewed_7days_other" name="Other Currencies" sequence="2" parent="menu_internal_reviewed_7days" action="action_internal_reviewed_7days_other"/> 
 
@@ -288,19 +295,13 @@
     <menuitem id="menu_internal_control_cron_tree_parent" 
         name="Schedule Action"
         parent="menu_internal_control_configurations"
-        groups="compliance_management.group_compliance_chief_compliance_officer"
+        groups="internal_control.group_internal_control_tech_support"
         action="action_ir_cron"
         sequence="80" />
 
     
 
-    <menuitem id="menu_internal_control_cron_tree_parent" 
-        name="Schedule Action"
-        parent="menu_internal_control_configurations"
-        groups="compliance_management.group_compliance_chief_compliance_officer"
-        action="action_ir_cron"
-        sequence="80" />
-
+    
    
 
 </odoo>
