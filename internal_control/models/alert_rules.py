@@ -143,6 +143,8 @@ class alert_rules(models.Model):
                     select_clause, from_clause = rule.sql_text.query.split("FROM", 1)
                     select_clause = select_clause.strip()
 
+                    # select a.name from res_partner a left join res_branch d on d.id = a.branch_id 
+
                      # Check if 'alias.branch_id' 
                     check_pattern = re.search(r"(\w+)\.branch_id\b", rule.sql_text.query)
 
@@ -248,6 +250,8 @@ class alert_rules(models.Model):
                             
                                     # Get column names dynamically
                                 columns = [" ".join(desc[0].split("_")).title() for desc in self.env.cr.description]
+
+                                branch_id_index = columns.index('branch_id') if 'branch_id' in columns else -1
                                 
                                         # Create a CSV in memory
                                 csv_buffer = io.StringIO()
@@ -285,7 +289,7 @@ class alert_rules(models.Model):
                                     """
                                             
                                     # Generate the table header
-                                header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columns])
+                                header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columns if header != 'branch_id'])
                                     # Create the HTML table for the email
                                 
                                 
@@ -293,8 +297,9 @@ class alert_rules(models.Model):
                                 rows_html = ""
                                 for row in rows[:10]:
                                     rows_html += "<tr>"
-                                    for cell in row:
-                                        rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
+                                    for index, cell in enumerate(row):
+                                        if index != branch_id_index:
+                                            rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
                                     rows_html += "</tr>"
                                 
                                 # Insert the generated HTML into the main table structure
@@ -388,6 +393,7 @@ class alert_rules(models.Model):
                             
                                     # Get column names dynamically
                                 columns = [" ".join(desc[0].split("_")).title() for desc in self.env.cr.description]
+                                branch_id_index = columns.index('branch_id') if 'branch_id' in columns else -1
                                 
                                         # Create a CSV in memory
                                 csv_buffer = io.StringIO()
@@ -425,7 +431,7 @@ class alert_rules(models.Model):
                                     """
                                             
                                     # Generate the table header
-                                header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columns])
+                                header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columns if header != 'branch_id'])
                                     # Create the HTML table for the email
                                 
                                 
@@ -433,8 +439,9 @@ class alert_rules(models.Model):
                                 rows_html = ""
                                 for row in rows[:10]:
                                     rows_html += "<tr>"
-                                    for cell in row:
-                                        rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
+                                    for index, cell in enumerate(row):
+                                        if index != branch_id_index:
+                                            rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
                                     rows_html += "</tr>"
                                 
                                 # Insert the generated HTML into the main table structure
@@ -522,6 +529,7 @@ class alert_rules(models.Model):
                 
                         # Get column names dynamically
                     columns = [" ".join(desc[0].split("_")).title() for desc in self.env.cr.description]
+                    branch_id_index = columns.index('branch_id') if 'branch_id' in columns else -1
                     
                                # Create a CSV in memory
                     csv_buffer = io.StringIO()
@@ -559,7 +567,7 @@ class alert_rules(models.Model):
                         """
                                 
                         # Generate the table header
-                    header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columns])
+                    header_html = "".join([f"<th style='padding: 8px;'>{header}</th>" for header in columns if header != 'branch_id'])
                         # Create the HTML table for the email
                     
                     
@@ -567,8 +575,9 @@ class alert_rules(models.Model):
                     rows_html = ""
                     for row in rows[:10]:
                         rows_html += "<tr>"
-                        for cell in row:
-                            rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
+                        for index, cell in enumerate(row):
+                            if index != branch_id_index:
+                                rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
                         rows_html += "</tr>"
                     
                     # Insert the generated HTML into the main table structure
