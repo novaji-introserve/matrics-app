@@ -41,7 +41,7 @@
         'views/sanction_screening.xml',
         'views/customer.xml',
         'data/res.country.state.csv',
-        'data/res.branch.csv',
+        # 'data/res.branch.csv',
         'security/security.xml',
         'views/statistics.xml',
         'views/dashboard.xml',

@@ -25,7 +25,9 @@ class Customer(models.Model):
     identification_issue_date = fields.Date(string='identification Issue Date', index=True, tracking=True)
     town_id = fields.Many2one(
     comodel_name='res.partner.town', string='Town', index=True)
-    account_officer_id = fields.Many2one(
+    # account_officer_id = fields.Many2one(
+    #     comodel_name='res.account.officer', string='Account Officer', index=True, tracking=True)
+    officer_code = fields.Many2one(
         comodel_name='res.account.officer', string='Account Officer', index=True, tracking=True)
 
 

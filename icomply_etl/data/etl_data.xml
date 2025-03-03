@@ -4,7 +4,7 @@
         <!-- MSSQL Connection String -->
         <record id="etl_mssql_connection_string" model="ir.config_parameter">
             <field name="key">etl.mssql_connection_string</field>
-            <field name="value">Driver={SQL Server};Server=server_name;Database=database_name;UID=username;PWD=password;TrustServerCertificate=yes;</field>
+            <field name="value">Driver={ODBC Driver 18 for SQL Server};Server=server_name;Database=database_name;UID=username;PWD=password;TrustServerCertificate=yes;</field>
         </record>
 
         <!-- PostgreSQL Connection String -->

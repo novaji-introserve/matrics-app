@@ -35,6 +35,8 @@
                             class="oe_highlight"
                             confirm="Are you sure you want to sync this table now?"/>
                     <field name="last_sync_status" widget="statusbar"/>
+                    <!-- Add this inside the form view, perhaps in a group after last_sync_status -->
+<field name="progress_percentage" widget="progressbar" attrs="{'invisible': [('last_sync_status', '!=', 'running')]}"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -105,6 +107,25 @@
             </form>
         </field>
     </record>
+
+
+    <!-- ETL Source Table Form View Extension for Queue Job -->
+<record id="view_etl_source_table_form_job" model="ir.ui.view">
+    <field name="name">etl.source.table.form.job</field>
+    <field name="model">etl.source.table</field>
+    <field name="inherit_id" ref="view_etl_source_table_form"/>
+    <field name="arch" type="xml">
+        <notebook position="inside">
+            <page string="Job Information" attrs="{'invisible': [('job_uuid', '=', False)]}">
+                <group>
+                    <field name="job_uuid" readonly="1"/>
+                    <field name="job_status" readonly="1"/>
+                </group>
+                <button name="action_view_jobs" string="View Jobs" type="object" class="oe_highlight" attrs="{'invisible': [('job_uuid', '=', False)]}"/>
+            </page>
+        </notebook>
+    </field>
+</record>
 
     <!-- ETL Source Table Search View -->
     <record id="view_etl_source_table_search" model="ir.ui.view">
