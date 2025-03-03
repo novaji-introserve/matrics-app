@@ -33,6 +33,7 @@ access_res_glclasslv3,access res glclasslv3,internal_control.model_res_glclasslv
 access_res_mandatepicts,access res mandatepicts,internal_control.model_res_mandatepicts,base.group_user,1,1,1,1
 access_res_reactivation,access res reactivation,internal_control.model_res_reactivation,base.group_user,1,1,1,1
 access_bankgl,access bankgl,internal_control.model_res_bankgl,base.group_user,1,1,1,1
+access_bank_product,access bank product,internal_control.model_res_bank_product,base.group_user,1,1,1,1
 
 
 

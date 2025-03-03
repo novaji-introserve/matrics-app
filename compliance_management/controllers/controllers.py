@@ -243,6 +243,52 @@ class Compliance(http.Controller):
                 })
 
             return customer_counts
+    
+    @http.route('/dashboard/get_high_risk_customer_by_branch', auth='public', type='json')
+    def get_high_risk(self, cco, branches_id, datepicked, **kw):
+
+        today = datetime.now().date()  # Get today's date
+        prev_date = today - timedelta(days=datepicked)  # Get previous date
+
+        
+        def _execute_query(sql, params=None):
+            request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
+            results = request.env.cr.fetchall()
+            return [{
+                "id": row[0],
+                'name': row[1],
+                'count': row[2]
+            } for row in results]
+
+
+        if cco:
+            sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rp.risk_level = 'high' AND rp.create_date BETWEEN %s AND %s 
+                    GROUP BY rb.id, rb.name
+                    ORDER BY high_risk_customers DESC
+                    LIMIT 10
+                """
+            return _execute_query(sql, (prev_date, today))
+           
+
+
+        else:
+           
+            sql = """
+                    SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rp.risk_level = 'high' AND rp.create_date BETWEEN %s AND %s AND rb.id IN %s
+                    GROUP BY rb.id, rb.name
+                    ORDER BY high_risk_customers DESC
+                    LIMIT 10
+
+                    """
+            return _execute_query(sql, (prev_date, today,tuple(branches_id)))
+                
 
 
 

@@ -53,13 +53,12 @@ export class ChartRenderer extends Component {
       this.renderTopBranchesChart();
     } else if (this.props.title === "Top 10 Screened Transaction By Rules") {
       this.renderScreenedChart();
+    } else if (this.props.title === "Top 10 High-Risk Customer By Branch") {
+      this.renderHighRiskchart()
     }
   }
 
-
   renderTopBranchesChart() {
-
-
     if (!this.props.data) {
       return; // Exit if no data to render
     }
@@ -69,13 +68,10 @@ export class ChartRenderer extends Component {
     let branch_ids = [];
 
     for (let item of this.props.data) {
-      labels.push(item.branch_name );
+      labels.push(item.branch_name);
       values.push(item.customer_count);
       branch_ids.push(item.id);
     }
-
-
-    
 
     const formatDate = (date) => date.toISOString().slice(0, 10);
 
@@ -93,7 +89,6 @@ export class ChartRenderer extends Component {
 
     const odooPrevDate = `${prevDate} ${TIME_00_00_00}`; // Use constants for time and date format
     const odooCurrentDate = `${currentDate} ${TIME_23_59_59}`;
-    
 
     this.myChartInstance = new Chart(this.chartRef.el, {
       type: this.props.type,
@@ -121,15 +116,23 @@ export class ChartRenderer extends Component {
           const clickedIndex = elements[0].index;
           const filter = branch_ids[clickedIndex];
 
+           let domain = [["branch_id", "=", filter]];
+
+           if (this.props.date > 0) {
+             domain.push(["create_date", ">=", prevDate]);
+             domain.push(["create_date", "<=", currentDate]);
+           }
+
+           // Admin Check and Branch Filtering
+           if (!this.props.admin) {
+             domain.push(["branch_id", "in", this.props.branches_id]);
+           }
+
           let action = {
             type: "ir.actions.act_window",
             name: "Top 10 Branches", // Use constant for action name
             res_model: "res.partner", // Use constant for model name
-            domain: [
-              ["branch_id", "=", filter],
-              ["create_date", ">=", odooPrevDate],
-              ["create_date", "<=", odooCurrentDate],
-            ],
+            domain: domain,
             views: [
               [false, "tree"], // Use constants for view types
               [false, "form"],
@@ -157,8 +160,6 @@ export class ChartRenderer extends Component {
     });
   }
   renderScreenedChart() {
-
-
     if (!this.props.data) {
       return; // Exit if no data to render
     }
@@ -168,13 +169,10 @@ export class ChartRenderer extends Component {
     let rules_ids = [];
 
     for (let item of this.props.data) {
-      labels.push(item.name );
+      labels.push(item.name);
       values.push(item.count);
       rules_ids.push(item.id);
     }
-
-
-    
 
     const formatDate = (date) => date.toISOString().slice(0, 10);
 
@@ -190,7 +188,6 @@ export class ChartRenderer extends Component {
       prevDate = currentDate;
     }
 
-
     this.myChartInstance = new Chart(this.chartRef.el, {
       type: this.props.type,
       data: {
@@ -200,7 +197,6 @@ export class ChartRenderer extends Component {
             label: "", // Consider making label configurable if needed
             data: values,
             backgroundColor: "#d9d9d9", // Set the background color to grey
-  
           },
         ],
       },
@@ -212,15 +208,120 @@ export class ChartRenderer extends Component {
           const clickedIndex = elements[0].index;
           const filter = rules_ids[clickedIndex];
 
+          alert(filter)
+
+           let domain = [
+             ["rule_id", "=", filter]
+           ];
+
+           if (this.props.date > 0) {
+             domain.push(["create_date", ">=", prevDate]);
+             domain.push(["create_date", "<=", currentDate]);
+           }
+
+           // Admin Check and Branch Filtering
+           if (!this.props.admin) {
+             domain.push(["branch_id", "in", this.props.branches_id]);
+           }
+
+          // let action = {
+          //   type: "ir.actions.act_window",
+          //   name: "Top 10 Screened Transaction By Rules", // Use constant for action name
+          //   res_model: "res.customer.transaction", // Use constant for model name
+          //   domain: domain,
+          //   views: [
+          //     [false, "tree"], // Use constants for view types
+          //     [false, "form"],
+          //   ],
+          // };
+
+          // this.navigate.doAction(action);
+        },
+        scales: {
+          y: {
+            ticks: {
+              stepSize: 100,
+              callback: function (value) {
+                return value;
+              },
+            },
+          },
+        },
+        plugins: {
+          title: {
+            text: this.props.title,
+          },
+        },
+      },
+    });
+  }
+
+  renderHighRiskchart() {
+    if (!this.props.data) {
+      return; // Exit if no data to render
+    }
+
+    let labels = [];
+    let values = [];
+    let branch_ids = [];
+
+    for (let item of this.props.data) {
+      labels.push(item.name.split(" ")[0]);
+      values.push(item.count);
+      branch_ids.push(item.id);
+    }
+
+    const formatDate = (date) => date.toISOString().slice(0, 10);
+
+    let prevDate, currentDate;
+
+    if (this.props.date > 0) {
+      prevDate = moment()
+        .subtract(this.props.date, "days")
+        .format(DATE_FORMAT_YYYY_MM_DD); // Use constant for date format
+      currentDate = formatDate(new Date());
+    }
+
+    this.myChartInstance = new Chart(this.chartRef.el, {
+      type: this.props.type,
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "", // Consider making label configurable if needed
+            data: values,
+            border: "none",
+          },
+        ],
+      },
+      options: {
+        ...this.getDefaultChartOptions(), // Start with default options
+        onClick: (event, elements) => {
+          if (!elements || elements.length === 0) return;
+
+          const clickedIndex = elements[0].index;
+          const filter = branch_ids[clickedIndex];
+
+          let domain = [
+            ["branch_id", "=", filter],
+            ["risk_level", "=", "high"],
+          ];
+
+          if (this.props.date > 0) {
+            domain.push(["create_date", ">=", prevDate]);
+            domain.push(["create_date", "<=", currentDate]);
+          }
+
+          // Admin Check and Branch Filtering
+          if (!this.props.admin) {
+            domain.push(["branch_id", "in", this.props.branches_id]);
+          }
+
           let action = {
             type: "ir.actions.act_window",
-            name: "Top 10 Screened Transaction By Rules", // Use constant for action name
-            res_model: "res.customer.transaction", // Use constant for model name
-            domain: [
-              ["rule_id", "=", filter],
-              ["create_date", ">=", prevDate],
-              ["create_date", "<=", currentDate],
-            ],
+            name: "Top 10 High-Risk Branches", // Use constant for action name
+            res_model: "res.partner", // Use constant for model name
+            domain: domain,
             views: [
               [false, "tree"], // Use constants for view types
               [false, "form"],
@@ -242,6 +343,10 @@ export class ChartRenderer extends Component {
         plugins: {
           title: {
             text: this.props.title,
+          },
+          legend: {
+            position: "right",
+            align: "center",
           },
         },
       },
