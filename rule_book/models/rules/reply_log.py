@@ -1,7 +1,6 @@
 import re
 from odoo import models, fields, api, _
 from datetime import timedelta, datetime, time
-import pytz
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
 import logging

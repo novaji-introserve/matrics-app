@@ -1,0 +1,12 @@
+.o_form_statusbar > .o_statusbar_status > .o_arrow_button[data-state="new"] {
+    color: red !important;  /* For 'new' status */
+}
+.o_form_statusbar > .o_statusbar_status > .o_arrow_button[data-state="under_review"] {
+    color: orange !important; /* For 'under_review' status */
+}
+.o_form_statusbar > .o_statusbar_status > .o_arrow_button[data-state="confirmed"] {
+    color: green !important; /* For 'confirmed' status */
+}
+.o_form_statusbar > .o_statusbar_status > .o_arrow_button[data-state="closed"] {
+    color: grey !important; /* For 'closed' status */
+}

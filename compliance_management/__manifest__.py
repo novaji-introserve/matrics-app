@@ -28,13 +28,19 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
-        # 'security/ir.rule.xml',
-        # 'security/groups.xml',
-        # 'security/ir.model.access.csv',
+        'data/res.country.state.csv',
+        'data/res.branch.csv',
+        'data/media_keywords.xml',
+        'security/security.xml',
+        'data/schedules/adverse_media_cron.xml',
+        'data/email_templates/adverse_media_alert_template.xml',
         # 'data/department.xml',
         'views/configuration.xml',
         'views/edd.xml',
         'views/kyc.xml',
+        'views/adverse_media.xml',
+        'views/adverse_media_logs.xml',
+        'views/adverse_media_keywords.xml',
         # 'data/data.xml',
         'views/risk_assessment.xml',
         'views/res_users.xml',
@@ -61,10 +67,14 @@
     "auto_install": False,
     'assets':{
         'web.assets_backend': [
+            'compliance_management/static/src/scss/custom_status_bar.scss',
             'compliance_management/static/src/css/style.css',
             'compliance_management/static/src/components/**/*.js',
             'compliance_management/static/src/components/**/*.xml',
             'compliance_management/static/src/img/logov.png',
+            'compliance_management/static/img/alt_bank_logo.png',
+            'compliance_management/static/img/alt_bank_logo_.png',
+
         ]
     }
 }
