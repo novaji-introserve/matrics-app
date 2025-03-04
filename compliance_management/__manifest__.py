@@ -34,6 +34,7 @@
         'security/security.xml',
         'data/schedules/adverse_media_cron.xml',
         'data/email_templates/adverse_media_alert_template.xml',
+
         # 'data/department.xml',
         'views/configuration.xml',
         'views/edd.xml',
@@ -46,6 +47,7 @@
         'views/res_users.xml',
         'views/sanction_screening.xml',
         'views/customer.xml',
+
         'views/statistics.xml',
         'views/dashboard.xml',
         'views/risk_assessment_plan.xml',
@@ -58,6 +60,7 @@
     'demo': [
         # 'demo/demo.xml',
     ],
+    
     "installable": True,
     "application": True,
     "auto_install": False,

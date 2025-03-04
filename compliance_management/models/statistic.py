@@ -53,15 +53,24 @@ class Statistic(models.Model):
                     else:
                         vals['val'] = 0  # Store 0 if no records
 
+
                 # assign the color
                 if scope:
+                    # vals['scope_color'] = {
+                    #     'bank': '#FEEEF1',
+                    #     'branch': '#D9FAE7',
+                    #     'compliance': '#8BB8D9',
+                    #     'regulatory': '#F7E8BD',
+                    #     'risk': '#FEF2DC',
+                    # }.get(scope, '#00F2AD')
+                    
                     vals['scope_color'] = {
-                        'bank': '#FEEEF1',
-                        'branch': '#D9FAE7',
-                        'compliance': '#8BB8D9',
-                        'regulatory': '#F7E8BD',
-                        'risk': '#FEF2DC',
-                    }.get(scope, '#00F2AD')
+                        'bank': '#FFD700',
+                        'branch': '#66B2FF',
+                        'compliance': '#C8102E',
+                        'regulatory': '#4CAF50',
+                        'risk': '#999999',
+                    }.get(scope, '#FFD700')
 
             except Exception as e:
                 self.env.cr.rollback() # Important: rollback on error

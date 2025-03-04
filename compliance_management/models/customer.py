@@ -13,7 +13,7 @@ _logger = logging.getLogger(__name__)
 LOW_RISK_THRESHOLD = 10
 MEDIUM_RISK_THRESHOLD = 15
 HIGH_RISK_THRESHOLD = 25
- 
+
 
 class Shareholders(models.Model):
     _name = 'res.partner.shareholders'
@@ -71,7 +71,7 @@ class Customer(models.Model):
     firstname = fields.Char(string='Firstname')
     lastname = fields.Char(string='Lastname')
     middlename = fields.Char(string='Middle Name')
-    othername = fields.Char(string='Other Name') 
+    othername = fields.Char(string='Other Name')
     town = fields.Char(string='Town')
     registration_date = fields.Date(string='Registration Date', tracking=True)
     company_reg_date = fields.Date(
@@ -210,13 +210,11 @@ class Customer(models.Model):
     @api.depends('account_ids')
     def _total_accounts(self):
         for e in self:
-
             e.total_accounts = len(e.account_ids)
 
     def action_total_accounts(self):
-        
         return {
-            'name': 'Accounts',
+            'name': _('Accounts'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner.account',
             'view_mode': 'tree,form',
