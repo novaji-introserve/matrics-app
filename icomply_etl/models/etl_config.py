@@ -3,8 +3,10 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import json
 import logging
-from odoo.addons.queue_job.job import Job
+from odoo.addons.queue.queue_job.job import Job
 import math
+import psycopg2
+
 _logger = logging.getLogger(__name__)
 
 
@@ -36,18 +38,6 @@ class ETLSourceTable(models.Model):
         ('canceled', 'Canceled'),
     ], string='Job Status', readonly=True, copy=False)
     
-    # category = fields.Selection([
-    #     ('master', 'Master Data'),
-    #     ('customer', 'Customer Data'),
-    #     ('account', 'Account Data'),
-    #     ('transaction', 'Transaction Data')
-    # ], required=True, default='master')
-    
-    # frequency = fields.Selection([
-    #     ('hourly', 'Hourly'),
-    #     ('daily', 'Daily'),
-    #     ('weekly', 'Weekly')
-    # ], required=True, default='daily')
     
     dependency_ids = fields.Many2many(
         'etl.source.table', 
@@ -107,52 +97,28 @@ class ETLSourceTable(models.Model):
             'mappings': normalized_mappings
         }
     
-    # def action_test_connection(self):
-    #     """Test database connections"""
-    #     self.ensure_one()
-    #     try:
-    #         etl_manager = self.env['etl.manager']
-    #         with etl_manager.get_connections() as (mssql_conn, pg_conn):
-    #             mssql_cursor = mssql_conn.cursor()
-    #             pg_cursor = pg_conn.cursor()
-                
-    #             return {
-    #                 'type': 'ir.actions.client',
-    #                 'tag': 'display_notification',
-    #                 'params': {
-    #                     'title': _('Success'),
-    #                     'message': _('Successfully connected to both databases!'),
-    #                     'type': 'success',
-    #                     'sticky': False,
-    #                 }
-    #             }
-    #     except Exception as e:
-    #         return {
-    #             'type': 'ir.actions.client',
-    #             'tag': 'display_notification',
-    #             'params': {
-    #                 'title': _('Error'),
-    #                 'message': str(e),
-    #                 'type': 'danger',
-    #                 'sticky': True,
-    #             }
-    #         }
-
     def action_test_connection(self):
         """Test database connections"""
         self.ensure_one()
         try:
             etl_manager = self.env['etl.manager']
-            with etl_manager.get_connections() as (mssql_conn, pg_conn):
-                mssql_cursor = mssql_conn.cursor()
+            with etl_manager.get_connections() as (source_conn, pg_conn):
+                source_cursor = source_conn.cursor()
                 pg_cursor = pg_conn.cursor()
-                
+
+                # Optional: Test a simple query on both connections
+                is_postgres_source = isinstance(
+                    source_conn, psycopg2.extensions.connection)
+                test_query = "SELECT 1" if is_postgres_source else "SELECT 1 AS test"
+                source_cursor.execute(test_query)
+                pg_cursor.execute("SELECT 1")
+
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
                         'title': _('Success'),
-                        'message': _('Successfully connected to both databases!'),
+                        'message': _('Successfully connected to both source and target databases!'),
                         'type': 'success',
                         'sticky': False,
                     }
@@ -168,51 +134,30 @@ class ETLSourceTable(models.Model):
                     'sticky': True,
                 }
             }
-        
-    # def action_sync_table(self):
-    #     """Manual sync action"""
-    #     self.ensure_one()
-    #     try:
-    #         etl_manager = self.env['etl.manager']
-    #         etl_manager.process_table(self)
-            
-    #         return {
-    #             'type': 'ir.actions.client',
-    #             'tag': 'display_notification',
-    #             'params': {
-    #                 'title': _('Success'),
-    #                 'message': _('Table synchronization started successfully'),
-    #                 'type': 'success',
-    #                 'sticky': False,
-    #             }
-    #         }
-    #     except Exception as e:
-    #         return {
-    #             'type': 'ir.actions.client',
-    #             'tag': 'display_notification',
-    #             'params': {
-    #                 'title': _('Error'),
-    #                 'message': str(e),
-    #                 'type': 'danger',
-    #                 'sticky': True,
-    #             }
-    #         }
 
     def action_sync_table(self):
         """Queue a sync job with chunking for very large tables"""
         self.ensure_one()
-        
+
         try:
             # Check if table is large to determine if queue_job should be used
             try:
                 etl_manager = self.env['etl.manager']
-                with etl_manager.get_connections() as (mssql_conn, pg_conn):
+                with etl_manager.get_connections() as (source_conn, pg_conn):
                     config = self.get_config_json()
-                    mssql_cursor = mssql_conn.cursor()
-                    count_query = f"SELECT COUNT(*) FROM [{config['source_table']}]"
-                    mssql_cursor.execute(count_query)
-                    total_count = mssql_cursor.fetchone()[0]
-                    
+                    source_cursor = source_conn.cursor()
+
+                    # Determine source DB type for query syntax
+                    is_postgres_source = isinstance(
+                        source_conn, psycopg2.extensions.connection)
+                    table_delimiter = '"' if is_postgres_source else '['
+                    table_delimiter_end = '"' if is_postgres_source else ']'
+
+                    # Count total records
+                    count_query = f"SELECT COUNT(*) FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
+                    source_cursor.execute(count_query)
+                    total_count = source_cursor.fetchone()[0]
+
                     # For small tables (< 20,000 rows), run synchronously
                     if total_count < 20000:
                         etl_manager.process_table(self)
@@ -226,42 +171,52 @@ class ETLSourceTable(models.Model):
                                 'sticky': False,
                             }
                         }
-                    
+
                     # Get primary key for chunking
                     primary_key = config['primary_key']
                     primary_key_original = None
-                    
+
                     # Get original column name with proper case
-                    query = f"SELECT TOP 1 * FROM [{config['source_table']}]"
-                    mssql_cursor.execute(query)
-                    for col in mssql_cursor.description:
+                    query = (
+                        f"SELECT TOP 1 * FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
+                        if not is_postgres_source
+                        else f'SELECT * FROM "{config["source_table"]}" LIMIT 1'
+                    )
+                    source_cursor.execute(query)
+                    for col in source_cursor.description:
                         if col[0].lower() == primary_key.lower():
                             primary_key_original = col[0]
                             break
-                    
+
                     if not primary_key_original:
-                        raise ValueError(f"Could not find primary key {primary_key} in table")
-                    
+                        raise ValueError(
+                            f"Could not find primary key {primary_key} in table")
+
                     # For very large tables (> 500,000 rows), split into chunks
                     if total_count > 500000:
                         chunk_size = 150000  # Process 150k records per job
                         chunks = math.ceil(total_count / chunk_size)
-                        
+
                         # Get range of primary key values
-                        min_query = f"SELECT MIN([{primary_key_original}]) FROM [{config['source_table']}]"
-                        max_query = f"SELECT MAX([{primary_key_original}]) FROM [{config['source_table']}]"
-                        mssql_cursor.execute(min_query)
-                        min_id = mssql_cursor.fetchone()[0]
-                        mssql_cursor.execute(max_query)
-                        max_id = mssql_cursor.fetchone()[0]
-                        
-                        _logger.info(f"Splitting table {self.name} into {chunks} chunks (min_id={min_id}, max_id={max_id})")
-                        
+                        min_query = (
+                            f"SELECT MIN({table_delimiter}{primary_key_original}{table_delimiter_end}) FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
+                        )
+                        max_query = (
+                            f"SELECT MAX({table_delimiter}{primary_key_original}{table_delimiter_end}) FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
+                        )
+                        source_cursor.execute(min_query)
+                        min_id = source_cursor.fetchone()[0]
+                        source_cursor.execute(max_query)
+                        max_id = source_cursor.fetchone()[0]
+
+                        _logger.info(
+                            f"Splitting table {self.name} into {chunks} chunks (min_id={min_id}, max_id={max_id})")
+
                         # Create a main job record for tracking overall progress
                         main_job = self.with_delay(
                             description=f"Main sync job for table: {self.name}"
                         ).sync_table_job_main(chunks)
-                        
+
                         # Update the main job UUID
                         self.write({
                             'job_uuid': main_job.uuid,
@@ -270,26 +225,29 @@ class ETLSourceTable(models.Model):
                             'last_sync_message': f'Sync job queued in {chunks} chunks',
                             'progress_percentage': 0
                         })
-                        
+
                         # Queue multiple jobs with ID ranges
                         for i in range(chunks):
                             # Calculate chunk boundaries
                             if isinstance(min_id, str) and isinstance(max_id, str):
                                 # For string IDs, divide the chunks evenly based on index
                                 chunk_min = min_id if i == 0 else f"{self.name}_chunk_{i}"
-                                chunk_max = max_id if i == chunks - 1 else f"{self.name}_chunk_{i+1}"
+                                chunk_max = max_id if i == chunks - \
+                                    1 else f"{self.name}_chunk_{i+1}"
                             else:
                                 # For numeric IDs, calculate range
-                                chunk_min = min_id + (i * (max_id - min_id) // chunks)
-                                chunk_max = min_id + ((i + 1) * (max_id - min_id) // chunks)
+                                chunk_min = min_id + \
+                                    (i * (max_id - min_id) // chunks)
+                                chunk_max = min_id + \
+                                    ((i + 1) * (max_id - min_id) // chunks)
                                 if i == chunks - 1:
                                     chunk_max = max_id  # Ensure we include the max value
-                            
+
                             # Queue this chunk's job
                             self.with_delay(
                                 description=f"Sync ETL table: {self.name} (chunk {i+1}/{chunks})"
                             ).sync_table_job_chunk(chunk_min, chunk_max, i+1, chunks)
-                        
+
                         return {
                             'type': 'ir.actions.client',
                             'tag': 'display_notification',
@@ -300,12 +258,12 @@ class ETLSourceTable(models.Model):
                                 'sticky': False,
                             }
                         }
-                    
+
                     # For medium-size tables, use a single job
                     job = self.with_delay(
                         description=f"Sync ETL table: {self.name}"
                     ).sync_table_job()
-                    
+
                     self.write({
                         'job_uuid': job.uuid,
                         'job_status': 'pending',
@@ -313,7 +271,7 @@ class ETLSourceTable(models.Model):
                         'last_sync_message': 'Sync job queued',
                         'progress_percentage': 0
                     })
-                    
+
                     return {
                         'type': 'ir.actions.client',
                         'tag': 'display_notification',
@@ -330,7 +288,7 @@ class ETLSourceTable(models.Model):
                 job = self.with_delay(
                     description=f"Sync ETL table: {self.name}"
                 ).sync_table_job()
-                
+
                 self.write({
                     'job_uuid': job.uuid,
                     'job_status': 'pending',
@@ -338,7 +296,7 @@ class ETLSourceTable(models.Model):
                     'last_sync_message': 'Sync job queued (fallback method)',
                     'progress_percentage': 0
                 })
-                
+
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
@@ -360,7 +318,7 @@ class ETLSourceTable(models.Model):
                     'sticky': True,
                 }
             }
-
+    
     def sync_table_job_main(self, total_chunks):
         """Main job that coordinates multiple chunk jobs"""
         try:

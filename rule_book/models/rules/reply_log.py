@@ -1069,8 +1069,8 @@ class ReplyLog(models.Model):
                 # Check if reminder_due_date is due today
 
                 if rulebook.reminder_due_date:
-                    _logger.critical(
-                        f" Checking reminder for rulebook {rulebook.id}: reminder_due_date {rulebook.reminder_due_date}, today {today}")
+                    # _logger.critical(
+                    #     f" Checking reminder for rulebook {rulebook.id}: reminder_due_date {rulebook.reminder_due_date}, today {today}")
 
                     comparison_date = rulebook.reg_due_date or rulebook.rulebook_compute_date
 
