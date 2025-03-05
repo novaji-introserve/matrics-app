@@ -7,6 +7,7 @@ from odoo.addons.queue_job.job import Job
 import math
 _logger = logging.getLogger(__name__)
 
+
 class ETLSourceTable(models.Model):
     _name = 'etl.source.table'
     _description = 'ETL Source Table Configuration'
