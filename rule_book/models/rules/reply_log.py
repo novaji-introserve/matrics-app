@@ -1027,12 +1027,20 @@ class ReplyLog(models.Model):
                                 'last_escalation_sent': today
                             })
 
-                            _logger.critical(
-                                f"Updated last_escalation_sent for rulebook log {rulebook.ids}")
-
                 # Check if reminder_due_date is due today
-                if rulebook.reminder_due_date and rulebook.reminder_due_date.date() == today.date():
-                    due_time_today = rulebook.reminder_due_date.time()
+
+                if rulebook.reminder_due_date:
+                    # _logger.critical(
+                    #     f" Checking reminder for rulebook {rulebook.id}: reminder_due_date {rulebook.reminder_due_date}, today {today}")
+
+                    comparison_date = rulebook.reg_due_date or rulebook.rulebook_compute_date
+
+                    # Check if we're between reminder_due_date and the due date
+                    if (rulebook.reminder_due_date.date() <= today.date() and
+                        comparison_date and
+                            today.date() <= comparison_date.date()):
+
+                        due_time_today = rulebook.reminder_due_date.time()
 
                     _logger.critical(
                         f" due time today  {due_time_today}")

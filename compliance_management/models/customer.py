@@ -57,7 +57,11 @@ class Customer(models.Model):
     region_id = fields.Many2one(
         comodel_name='res.partner.region', string='Region', tracking=True)
     sector_id = fields.Many2one(
+        
         comodel_name='res.partner.sector', string='Sector', index=True, tracking=True)
+    industry_id = fields.Many2one(
+        comodel_name='customer.industry', string='Industry', index=True, tracking=True)
+    
     sex_id = fields.Many2one(
         comodel_name='res.partner.gender', string='Sex', index=True)
     firstname = fields.Char(string='Firstname')
@@ -75,7 +79,7 @@ class Customer(models.Model):
     # account_officer_id = fields.Many2one(
     #     comodel_name='res.users', string='Account Officer', index=True, tracking=True)
     account_officer_id = fields.Many2one(
-        comodel_name='res.account.officer', string='Account Officer', index=True, tracking=True)
+        comodel_name='account.officers', string='Account Officer', index=True, tracking=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(
@@ -113,7 +117,9 @@ class Customer(models.Model):
     total_accounts = fields.Integer(
         string='Accounts', compute='_total_accounts', store=True)
     global_pep_id = fields.Many2one('res.pep', string='Related Global PEP',tracking=True)
+    # industry =
 
+    
     @api.model_create_multi
     def create(self, values):
         result = super(Customer, self).create(values)
@@ -322,6 +328,8 @@ class Customer(models.Model):
     def get_risk_level_name(self):
         return '%s risk' % (self.risk_level)
 
+   
+        
     def action_compute_risk_score_with_plan(self):
         self.ensure_one()
         score = self._get_risk_score_from_plan()
@@ -368,3 +376,5 @@ class Customer(models.Model):
                 self.env.cr.execute(f"select max(risk_score) from res_partner_risk_plan_line where partner_id={record_id}")
             records = self.env.cr.fetchone()
         return records[0] if records is not None else 0.00
+
+    
