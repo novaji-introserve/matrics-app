@@ -25,6 +25,7 @@ class CustomerAccount(models.Model):
     opening_date = fields.Date(
         string='Last Opening Date', required=False)
     
+    
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', required=False) #acct_officer
     
