@@ -34,6 +34,7 @@
         'security/security.xml',
         'data/schedules/adverse_media_cron.xml',
         'data/email_templates/adverse_media_alert_template.xml',
+        'data/schedules/update_statistic_cron.xml',
         # 'data/department.xml',
         'views/configuration.xml',
         'views/edd.xml',

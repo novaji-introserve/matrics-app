@@ -8,10 +8,10 @@
             <form >
                 
                 <header>
-                    <button name="compute_stat" class="oe_highlight" type="object"
+                    <!-- <button name="compute_stat" class="oe_highlight" type="object"
                         string="Compute Statistics"
-                        groups="compliance_management.group_compliance_branch_compliance_officer" />
-                    <button name="ViewInTableForm" string="View" class="btn btn-primary" type="object"/>
+                        groups="compliance_management.group_compliance_branch_compliance_officer" /> -->
+                    
                 </header>
                 <sheet string="Compliance Statistic">
                     <div class="oe_title" colspan="2">
