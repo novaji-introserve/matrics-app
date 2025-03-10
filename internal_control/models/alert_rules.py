@@ -131,15 +131,16 @@ class alert_rules(models.Model):
                 
         elif re.search(r"\w+\.\w+\s+AS\s+\w+", rule.sql_text.query, re.IGNORECASE): 
             query_lower = rule.sql_text.query.lower()
-            select_clause, from_clause = rule.sql_text.query.split("FROM", 1)
+        
+            select_clause, from_clause = query_lower.split("from", 1)
             select_clause = select_clause.strip()
 
             # Check if 'alias.branch_id' 
-            check_pattern = re.search(r"(\w+)\.branch_id\b", rule.sql_text.query)
+            check_pattern = re.search(r"(\w+)\.branch_id\b", rule.sql_text.query, re.IGNORECASE)
 
             if not check_pattern:
                 # Find the alias for res_branch
-                match = re.search(r"res_branch\s+(\w+)", from_clause.lower())
+                match = re.search(r"res_branch\s+(\w+)", from_clause.lower(), re.IGNORECASE)
                 if match:
                     branch_alias = match.group(1)
                     modified_select_clause = f"{select_clause}, {branch_alias}.id AS branch_id"
@@ -167,6 +168,8 @@ class alert_rules(models.Model):
             else:
                 
                 query = rule.sql_text.query
+
+                print(query)
         
 
         return query
@@ -371,6 +374,7 @@ class alert_rules(models.Model):
                         branch_officer = self.env['control.officer'].sudo().search([("branch_id", '=', int(branch))])
                         
                         if branch_officer and rule.alert_id.id == branch_officer.alert_id.id:
+                            print(f"branch officer exists {branch_officer.alert_id.email}")
 
                             # retrieve data for branch officer by branch 
                             self.env.cr.execute(f"{query} WHERE branch_id = '{branch_officer.branch_id.id}';")
@@ -400,6 +404,8 @@ class alert_rules(models.Model):
                             self.prepare_email(rule, table_html, encoded_content, [branch_officer.officer.email], "")
                             
                         else:
+
+                            print(f"officer do not exists")
 
                             mailto = set()
                             mailcc = set()
