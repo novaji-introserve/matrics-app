@@ -25,8 +25,8 @@ class SqlModel(models.Model):
             elif re.search(r"\w+\.\w+\s+AS\s+\w+", query, re.IGNORECASE):
                 if not re.search(r"\w+\.branch_id", query, re.IGNORECASE):
                     raise ValidationError(f'Record are partition by branch so please specify a branch from appropriate table in your statement')
-            else:
-                return {
+                else:
+                    return {
                     "type": "ir.actions.client",
                     "tag": "display_notification",
                     "params":{
@@ -34,6 +34,24 @@ class SqlModel(models.Model):
                         "type": "success"
                     }
                 }
+            else:
+                
+                try:
+                    self.env.cr.execute(query)
+
+                    return {
+                        "type": "ir.actions.client",
+                        "tag": "display_notification",
+                        "params":{
+                            "message": "Valid Sql",
+                            "type": "success"
+                        }
+                    }
+                except Exception as e:
+                    raise ValidationError(f'failed to execute query {str(e)}')
+
+
+
                 
                 
         except Exception as e:

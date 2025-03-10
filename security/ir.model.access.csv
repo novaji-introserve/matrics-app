@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_global_pep_list_web_scrapper_global_pep_list_web_scrapper,global_pep_list_web_scrapper.global_pep_list_web_scrapper,model_global_pep_list_web_scrapper_global_pep_list_web_scrapper,base.group_user,1,1,1,1
