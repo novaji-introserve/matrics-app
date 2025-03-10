@@ -11,8 +11,8 @@ class CustomerAccount(models.Model):
         ('uniq_account_name', 'unique(name)',
          "Account Name already exists. Value must be unique!"),
     ]
-
-    name = fields.Char(string="Account Number", required=True)
+    _order = "name" 
+    name = fields.Char(string="Account Number")
     account_name = fields.Char(string='Account Name', index=True)
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
@@ -26,16 +26,50 @@ class CustomerAccount(models.Model):
     balance = fields.Float(string='Balance', digits=(15,4))
     account_type_id = fields.Many2one(comodel_name='res.partner.account.type', string='Account Type',index=True)
     risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment',index=True)
-    num_tran_last6m = fields.Integer(string='Transactions - Last 6m')
-    avg_tran_last6m = fields.Float(string='Avg. Transaction Amount - Last 6m', digits=(10,2))
-    max_tran_last6m = fields.Float(string='Max. Transaction - Last 6m', digits=(10,2))
-    tot_tran_last6m = fields.Float(string='Total Transaction Amount - Last 6m', digits=(15,2))
-    num_tran_last1y = fields.Integer(string='Transactions - Last 1Y')
-    avg_tran_last1y = fields.Float(string='Avg. Transaction Amount - Last 1Y', digits=(10,2))
-    max_tran_last1y = fields.Float(string='Max. Transaction - Last 1Y', digits=(10,2))
-    tot_tran_last1y = fields.Float(string='Total Transaction Amount - Last 1Y', digits=(15,2))
+    # num_tran_last6m_credit = fields.Integer(string='Transactions - Last 6m')
+    # avg_tran_last6m_credit = fields.Float(string='Avg. Transaction Amount - Last 6m', digits=(10,2))
+    # max_tran_last6m_credit = fields.Float(string='Max. Transaction - Last 6m', digits=(10,2))
+    # tot_tran_last6m_credit = fields.Float(string='Total Transaction Amount - Last 6m', digits=(15,2))
+    # num_tran_last1y_credit = fields.Integer(string='Transactions - Last 1Y')
+    # avg_tran_last1y_credit = fields.Float(string='Avg. Transaction Amount - Last 1Y', digits=(10,2))
+    # max_tran_last1y_credit = fields.Float(string='Max. Transaction - Last 1Y', digits=(10,2))
+    # tot_tran_last1y_credit = fields.Float(string='Total Transaction Amount - Last 1Y', digits=(15,2))
+    # num_tran_last6m_debit = fields.Integer(string='Transactions - Last 6m')
+    # avg_tran_last6m_debit = fields.Float(string='Avg. Transaction Amount - Last 6m', digits=(10,2))
+    # max_tran_last6m_debit = fields.Float(string='Max. Transaction - Last 6m', digits=(10,2))
+    # tot_tran_last6m_debit = fields.Float(string='Total Transaction Amount - Last 6m', digits=(15,2))
+    # num_tran_last1y_debit = fields.Integer(string='Transactions - Last 1Y')
+    # avg_tran_last1y_debit = fields.Float(string='Avg. Transaction Amount - Last 1Y', digits=(10,2))
+    # max_tran_last1y_debit = fields.Float(string='Max. Transaction - Last 1Y', digits=(10,2))
+    # tot_tran_last1y_debit = fields.Float(string='Total Transaction Amount - Last 1Y', digits=(15,2))
+    # 6 months credit stats
+    num_credit_last6m = fields.Integer(string='Credit Transactions - Last 6m')
+    avg_credit_last6m = fields.Float(string='Avg. Credit Amount - Last 6m', digits=(10,2))
+    max_credit_last6m = fields.Float(string='Max. Credit - Last 6m', digits=(10,2))
+    tot_credit_last6m = fields.Float(string='Total Credit Amount - Last 6m', digits=(15,2))
+
+    # 6 months debit stats
+    num_debit_last6m = fields.Integer(string='Debit Transactions - Last 6m')
+    avg_debit_last6m = fields.Float(string='Avg. Debit Amount - Last 6m', digits=(10,2))
+    max_debit_last6m = fields.Float(string='Max. Debit - Last 6m', digits=(10,2))
+    tot_debit_last6m = fields.Float(string='Total Debit Amount - Last 6m', digits=(15,2))
+
+    # 1 year credit stats
+    num_credit_last1y = fields.Integer(string='Credit Transactions - Last 1Y')
+    avg_credit_last1y = fields.Float(string='Avg. Credit Amount - Last 1Y', digits=(10,2))
+    max_credit_last1y = fields.Float(string='Max. Credit - Last 1Y', digits=(10,2))
+    tot_credit_last1y = fields.Float(string='Total Credit Amount - Last 1Y', digits=(15,2))
+
+    # 1 year debit stats
+    num_debit_last1y = fields.Integer(string='Debit Transactions - Last 1Y')
+    avg_debit_last1y = fields.Float(string='Avg. Debit Amount - Last 1Y', digits=(10,2))
+    max_debit_last1y = fields.Float(string='Max. Debit - Last 1Y', digits=(10,2))
+    tot_debit_last1y = fields.Float(string='Total Debit Amount - Last 1Y', digits=(15,2))
+    risk_score = fields.Float(string='Risk Score', digits=(10,2),related="customer_id.risk_score")
+    risk_level = fields.Char(string='Risk Rating',related="customer_id.risk_level")
+    state = fields.Selection(string='Status', selection=[('active', 'Active'), ('dormant', 'Dormant'),('locked','Locked')],tracking=True,default='active')
     
-    
+     
     @api.model
     def open_accounts(self):
         return {
@@ -45,7 +79,13 @@ class CustomerAccount(models.Model):
             'view_mode': 'tree,form',
             'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
             'context': {'search_default_group_branch': 1}
-        }
+        } 
         
     def get_balance(self):
-        return self.balance
+        return  '{0:.2f}'.format(self.balance)
+    
+    def get_risk_score(self):
+        return self.risk_score
+
+    def get_risk_level(self):
+        return self.risk_level

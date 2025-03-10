@@ -21,6 +21,8 @@
             "/custom_backend_theme/static/src/js/chrome/sidebar_menu.js",
             "/custom_backend_theme/static/src/xml/systray.xml",
             "/custom_backend_theme/static/src/xml/top_bar.xml",
+            'custom_backend_theme/static/src/img/icons/*',
+           
         },
         "web.assets_frontend": {
             "/custom_backend_theme/static/src/scss/login.scss",
@@ -32,6 +34,6 @@
         "static/description/theme_screenshot.png",
     ],
     "installable": True,
-    "application": False,
+    "application": True,
     "auto_install": False,
 }

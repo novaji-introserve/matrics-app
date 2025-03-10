@@ -10,7 +10,7 @@ class CustomerRegion(models.Model):
         ('uniq_customer_region_code', 'unique(name)',
          "Customer region code already exists. Value must be unique!"),
     ]
-
+    _order = "name"
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string="Code", required=True)
     risk_assessment = fields.Many2one('res.risk.assessment', string='Risk Assessment')

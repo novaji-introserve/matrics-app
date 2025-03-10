@@ -1,7 +1,5 @@
 <odoo>
     <data>
-
-
         <!-- Action for PEP -->
         <record id="action_res_pep" model="ir.actions.act_window">
             <field name="name">PEP List</field>
@@ -40,6 +38,7 @@
             <field name="model">res.pep</field>
             <field name="arch" type="xml">
                 <tree string="Global PEP List">
+                    <field name="unique_identifier"/>
                     <field name="name"/>
                     <field name="surname"/>
                     <field name="first_name"/>
@@ -57,10 +56,22 @@
             <field name="model">res.pep</field>
             <field name="arch" type="xml">
                 <form string="Global PEP List">
+                    <header>
+                        <button name="action_find_person" class="oe_highlight" type="object"
+                        string="Find Biography"
+                        groups="compliance_management.group_compliance_compliance_risk_manager"/>
+                    </header>
                     <sheet>
                         <div class="oe_title">
+                            <label for="name" class="oe_edit_only" />
                             <h1>
                                 <field name="name" placeholder="Name" />
+                            </h1>
+                        </div>
+                        <div class="oe_title">
+                            <label for="unique_identifier" class="oe_edit_only" />
+                            <h1>
+                                <field name="unique_identifier" placeholder="Name" />
                             </h1>
                         </div>
                         <group>
@@ -75,10 +86,10 @@
                                 <field name="age" />
                                 <field name="email" />
                                 <field name="place_of_birth" />
-                                <field name="pob" />
                                 <field name="state_of_origin" />
                             </group>
-                            <group string="Professional Information">
+                            <group>
+                                <field name="citizenship" />
                                 <field name="present_position" />
                                 <field name="previous_position" />
                                 <field name="pep_classification" />
@@ -87,27 +98,39 @@
                                 <field name="business_interest" />
                             </group>
                         </group>
-                        <group>
-                            <group string="Contact Information">
-                                <field name="official_address" />
-                                <field name="residential_address" />
-                            </group>
-                            <group string="Family Information">
-                                <field name="spouse" />
-                                <field name="children" />
-                                <field name="sibling" />
-                                <field name="parents" />
-                                <field name="mothers_maden_name" />
-                            </group>
-                        </group>
+                        
                         <notebook>
-                            <page string="Additional Details">
+                            <page name="info" string="Biography">
+                                <field name="narration" />
+                            </page>
+                            <page name="family" string="Family and Contacts">
+                                <group>
+                                    <group string="Contact Information">
+                                        <field name="official_address" />
+                                        <field name="residential_address" />
+                                    </group>
+                                    <group string="Family Information">
+                                        <field name="spouse" />
+                                        <field name="children" />
+                                        <field name="sibling" />
+                                        <field name="parents" />
+                                        <field name="mothers_maden_name" />
+                                    </group>
+                                </group>
+                            </page>
+                            <page name="education" string="Education">
+                                <field name="education" />
+                            </page>
+                            <page name="career" string="Career">
+                                <field name="career_history" />
+                            </page>
+                            <page string="Associates">
                                 <group>
                                     <field name="associates__business_political_social_" />
                                     <field name="associate_business_politics" />
                                     <field name="bankers" />
                                     <field name="account_details" />
-                                    <field name="unique_identifier" />
+                                   
                                 </group>
                             </page>
                             <page string="Reports &amp; Remarks">
@@ -115,7 +138,6 @@
                                     <field name="press_report" />
                                     <field name="date_report" />
                                     <field name="remarks" />
-                                    <field name="narration" />
                                     <field name="additional_info" />
                                 </group>
                             </page>
@@ -131,7 +153,24 @@
                             </page>
                         </notebook>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
                 </form>
+            </field>
+        </record>
+
+        <record id="view_global_pep_search" model="ir.ui.view">
+            <field name="name">Global PEP Search</field>
+            <field name="model">res.pep</field>
+            <field name="priority" eval="10" />
+            <field name="arch" type="xml">
+                <search string="Search PEP">
+                    <field name="first_name" />
+                    <field name="surname" />
+                </search>
             </field>
         </record>
 
@@ -193,7 +232,8 @@
             name="Global PEP List"
             groups="group_compliance_compliance_officer"
             sequence="50" />
-
+        
+        
 
     </data>
 </odoo>

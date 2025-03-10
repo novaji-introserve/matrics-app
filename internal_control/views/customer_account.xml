@@ -1,0 +1,142 @@
+<odoo>
+    <!-- Action Window -->
+    <!-- <record id="action_customer_account" model="ir.actions.act_window">
+        <field name="name">Customer Account</field>
+        <field name="res_model">res.partner.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Customers account shows here
+            </p>
+        </field>
+    </record> -->
+
+    <!-- <record id="action_open_accounts" model="ir.actions.server">
+        <field name="name">Account</field>
+        <field name="model_id" ref="model_res_partner_account" />
+        <field name="state">code</field>
+        <field name="code">action = env['res.partner.account'].open_accounts()</field>
+    </record>  -->
+
+     <!-- Server Actions -->
+
+<record id="action_open_accounts_tier_1" model="ir.actions.server">
+    <field name="name">Tier 1 Accounts</field>
+    <field name="model_id" ref="model_res_partner_account" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = open_accounts_tier_1()</field>
+</record>
+
+   <!-- Server Actions -->
+    <record id="action_open_accounts_tier_1" model="ir.actions.server">
+        <field name="name">Tier 1 Accounts</field>
+        <field name="model_id" ref="model_res_partner_account"/>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_accounts_tier_1()</field>
+    </record>
+
+    <record id="action_open_accounts_tier_2" model="ir.actions.server">
+        <field name="name">Tier 2 Accounts</field>
+        <field name="model_id" ref="model_res_partner_account"/>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_accounts_tier_2()</field>
+    </record>
+
+    <record id="action_open_accounts_tier_3" model="ir.actions.server">
+        <field name="name">Tier 3 Accounts</field>
+        <field name="model_id" ref="model_res_partner_account"/>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_accounts_tier_3()</field>
+    </record>
+    
+       <!-- Add fields to the Tree View -->
+    <record id="internal_control_customer_account_tree_inherit" model="ir.ui.view">
+        <field name="name">res.customer.account.tree.inherit</field>
+        <field name="model">res.partner.account</field>
+        <field name="inherit_id" ref="compliance_management.compliance_customer_account_tree" />
+        <field name="arch" type="xml">
+            <field name="account_name" position="replace">
+                <field name="accounttitle" string="Account Title" optional="show" />
+                <field name="account_tier" string="Account Tier" optional="show" />
+            </field>
+            
+            <field name="risk_level" position="replace">
+            </field>
+            
+            <tree position="inside">
+                <field name="lnbalance" string="Ln Balance" optional="hide"/>
+                <field name="bkbalance" string="Bk Balance" optional="hide"/>
+                <field name="unclearedbal" string="Uncleared Balance" optional="hide"/>
+                <field name="holdbal" string="Hold Balance" optional="hide"/>
+                <field name="totdebit" string="Total Debit" optional="hide"/>
+                <field name="totcredit" string="Total Credit" optional="hide"/>
+                <field name="last_month_balance" string="Last Month Balance" optional="hide"/>
+                <field name="lien" string="Lien" optional="hide"/>
+                <field name="source_account_id" string="Source Account ID" optional="hide"/>
+                <field name="Status" widget="boolean" string="Status" optional="hide"/>
+            </tree>
+        </field>
+    </record> 
+
+    <!-- Add fields to the Form View -->
+    <record id="customer_account_view_form_inherit" model="ir.ui.view">
+        <field name="name">customer.account.view.form.inherit</field>
+        <field name="model">res.partner.account</field>
+        <field name="inherit_id" ref="compliance_management.customer_account_view_form" />
+
+        <field name="arch" type="xml">
+            <!-- Add "Update Statistics" button inside the header -->
+            <!-- <xpath expr="//header" position="inside">
+                <button name="update_account_statistics"
+                        string="Update Statistics"
+                        type="object"
+                        class="oe_highlight"/>
+            </xpath>  -->
+
+            <!-- Replace the original account_name label -->
+            <xpath expr="//label[@for='account_name']" position="replace">
+                <label for="accounttitle" string="Account Title" />
+            </xpath>
+
+            <!-- Replace the original account_name field -->
+            <xpath expr="//field[@name='account_name']" position="replace">
+                <field name="accounttitle" class="oe_inline" readonly="1" />
+            </xpath>
+            
+            <xpath expr="//field[@name='ledger_id']" position="replace" />
+            <xpath expr="//field[@name='customer_id']" position="replace" />
+            <xpath expr="//field[@name='risk_assessment']" position="replace" />
+            <xpath expr="//sheet//button[@name='get_risk_level']" position="replace" />
+            <xpath expr="//sheet//button[@name='get_risk_score']" position="replace" />
+            <!-- Add new fields inside the sheet -->
+            <xpath expr="//sheet" position="inside">
+                <group string="Additional Details">
+                    <group>
+                        <field name="officercode" string="Account Officer"/>
+                        <field name="sectorcode" string="Sector"/>
+                        <field name="lnbalance" string="Ln Balance"/>
+                        <field name="bkbalance" string="Bk Balance"/>
+                        <field name="unclearedbal" string="Uncleared Balance"/>
+                    </group>
+                    <group>
+                        <field name="holdbal" string="Hold Balance"/>
+                        <field name="totdebit" string="Total Debit"/>
+                        <field name="totcredit" string="Total Credit"/>
+                        <field name="last_month_balance" string="Last Month Balance"/>
+                        <field name="lien" string="Lien"/>
+                    </group>
+                </group>
+                <group string="Other Details">
+                    <field name="account_tier" string="Account Tier"/>
+                    <!-- Ensure the correct field name for status -->
+                    <!-- <field name="status" string="Status"/> -->
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

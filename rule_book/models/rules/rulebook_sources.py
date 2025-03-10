@@ -2,7 +2,7 @@ from odoo import models, fields
 
 class RulebookSources(models.Model):
     _name = 'rulebook.sources'
-    _description = 'Rulebook Sources'
+    _description = 'Regulatory Sources'
 
     name = fields.Char(string='Name', required=True)
     description = fields.Text(string='Description')

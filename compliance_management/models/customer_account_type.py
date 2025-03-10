@@ -12,11 +12,12 @@ class CustomerAccountType(models.Model):
         ('uniq_partner_account_type_name', 'unique(name)',
          "Account Type Name already exists. Value must be unique!")
     ]
+    _order = "name"
 
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string='Code', required=True)
     # risk_assessment = fields.Char(string="Risk Assessment")
-    risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment',index=True)
+    risk_assessment = fields.Many2one('res.risk.assessment', string='Risk Assessment',index=True)
 
     status = fields.Selection(string='Status', selection=[(
         'active', 'Active'), ('inactive', 'Inactive')], default='active',index=True)

@@ -5,27 +5,49 @@
         <field name="name">res_customer_account_tree</field>
         <field name="model">res.partner.account</field>
         <field name="arch" type="xml">
-            <tree string="Account">
+            <tree string="Account" create="false">
                 <field name="name" string="Account Number" />
-                <field name="account_name" />
-                <field name="branch_id" />
-                <field name="currency_id" />
-                <field name="account_type_id" />
-                <field name="product_id" />
-                <field name="date_created" />
+                <field name="account_name" optional="show"/>
+                <field name="branch_id" optional="show"/>
+                <field name="currency_id" optional="show"/>
+                <field name="account_type_id" optional="show"/>
+                <field name="product_id" optional="show"/>
+                <field name="risk_score" optional="show"/>
+                <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
+                decoration-warning="risk_level in ('medium')"
+                decoration-success="risk_level in ('lowel')" optional="show"/>
+                <field name="state" widget="badge" decoration-danger="state == 'locked'"
+                decoration-warning="state in ('dormant')"
+                decoration-success="state in ('active')" optional="show"/>
+                <field name="date_created" optional="show"/>
             </tree>
         </field>
     </record>
+    
     <record id="customer_account_view_form" model="ir.ui.view">
         <field name="name">customer.account.view.form</field>
         <field name="model">res.partner.account</field>
         <field name="arch" type="xml">
             <form readonly="1">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="active,dormant,locked" clickable="True" />
+                </header>
                 <sheet string="Account">
                     <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
+                            <span>Risk 
+                            <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
+                            decoration-warning="risk_level in ('medium')"
+                            decoration-success="risk_level in ('lowel')"/>
+                            </span>
+                           
+                        </button>
+                        <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
+                            <field string="Risk Score"  name="risk_score" widget="statinfo"/>
+                        </button>
                         <button class="oe_stat_button" type="object" name="get_balance"
                             icon="fa-money">
-                            <field string="Balance" name="balance" widget="statinfo" />
+                            <field string="Balance" name="balance" widget="monetary" readonly="True" />
                         </button>
                     </div>
                     <div class="oe_title">
@@ -37,11 +59,12 @@
                     <div class="row">
                         <div class="col col-md-auto">
                             <label for="account_name" string="Account Name" />
-                            <div>
+                             <div>
                                 <field name="account_name" class="oe_inline" readonly="1" />
                             </div>
                         </div>
                     </div>
+                    
                     <notebook>
                         <page name="details" string="Account Information">
                             <group>
@@ -65,17 +88,31 @@
                         </page>
                         <page name="transaction_profile" string="Transaction Profile">
                             <group>
-                                <group>
-                                    <field name="num_tran_last6m" readonly="1" />
-                                    <field name="avg_tran_last6m" readonly="1" />
-                                    <field name="max_tran_last6m" readonly="1" />
-                                    <field name="tot_tran_last6m" readonly="1" />
+                                <group string="Last 6 Months - Inflows (Credit)">
+                                    <field name="num_credit_last6m" readonly="1" />
+                                    <field name="avg_credit_last6m" readonly="1" />
+                                    <field name="max_credit_last6m" readonly="1" />
+                                    <field name="tot_credit_last6m" readonly="1" />
                                 </group>
-                                <group>
-                                    <field name="num_tran_last1y" readonly="1" />
-                                    <field name="avg_tran_last1y" readonly="1" />
-                                    <field name="max_tran_last1y" readonly="1" />
-                                    <field name="tot_tran_last1y" readonly="1" />
+                                <group string="Last 1 Year - Inflows (Credit)">
+                                    <field name="num_credit_last1y" readonly="1" />
+                                    <field name="avg_credit_last1y" readonly="1" />
+                                    <field name="max_credit_last1y" readonly="1" />
+                                    <field name="tot_credit_last1y" readonly="1" />
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Last 6 Months - Outflows (Debit)">
+                                    <field name="num_debit_last6m" readonly="1" />
+                                    <field name="avg_debit_last6m" readonly="1" />
+                                    <field name="max_debit_last6m" readonly="1" />
+                                    <field name="tot_debit_last6m" readonly="1" />
+                                </group>
+                                <group string="Last 1 Year - Outflows (Debit)">
+                                    <field name="num_debit_last1y" readonly="1" />
+                                    <field name="avg_debit_last1y" readonly="1" />
+                                    <field name="max_debit_last1y" readonly="1" />
+                                    <field name="tot_debit_last1y" readonly="1" />
                                 </group>
                             </group>
                             <group>
@@ -84,7 +121,7 @@
                         </page>
                     </notebook>
 
-                </sheet>
+                </sheet> 
                 <div class="oe_chatter">
                     <field name="message_follower_ids" />
                     <field name="activity_ids" />
@@ -111,9 +148,11 @@
                         context="{'group_by': 'product_id'}" />
                     <filter name="group_account_type" string="Account Type"
                         context="{'group_by': 'account_type_id'}" />
+                    <filter name="group_state" string="Status"
+                        context="{'group_by': 'state'}" />
                 </group>
             </search>
-        </field>
+        </field> 
     </record>
     <record id="open_accounts" model="ir.actions.server">
         <field name="name">Open Accounts</field>

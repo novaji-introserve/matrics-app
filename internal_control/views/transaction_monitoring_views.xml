@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_transaction_monitoring_form" model="ir.ui.view">
+        <field name="name">transaction.monitoring.form</field>
+        <field name="model">res.customer.transaction</field>
+        <field name="inherit_id" ref="compliance_management.compliance_transaction_form" />
+        <field name="arch" type="xml">
+        <!-- <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                        Transaction Records will be displayed here
+                </p>
+                <p>
+                    No Transaction Records Found
+                </p>
+        </field> -->
+            <!-- <xpath expr="//button[@name='action_create']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> -->
+           <xpath expr="//div[@class='oe_title']//label[@for='name']" position="replace">
+                    <label for="refno" class="oe_edit_only"/>
+                </xpath>
+                
+                <!-- Replace the 'name' field with 'refno' field -->
+                <xpath expr="//div[@class='oe_title']//field[@name='name']" position="replace">
+                    <field name="refno" readonly="1"/>
+                </xpath>
+             
+            <xpath expr="//page[@name='details']//group/group[last()]" position="after">
+                <!-- Transaction Details -->
+                <group string="Transaction Information">
+                    <group string="Transaction Details">
+                        <field name="accountmodule"/>
+                        <field name="tran_channel"/>
+                        <field name="tellerno"/>
+                        <field name="reversal"/>
+                    </group>
+                    <group string="Date Information">
+                        <field name="valuedate"/>
+                        <field name="actualdate"/>
+                        <field name="userid"/>
+                    </group>
+                </group>
+                
+                <!-- Processing Information -->
+                <group string="Processing Information">
+                    <group string="Status Details">
+                        <field name="status"/>
+                        <field name="deptcode"/>
+                    </group>
+                    <group string="Reference Information">
+                        <field name="request_id"/>
+                        <field name="trans_id"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Search View -->
+    <record id="view_transaction_monitoring_search" model="ir.ui.view">
+        <field name="name">transaction.monitoring.search</field>
+        <field name="model">res.customer.transaction</field>
+        <field name="inherit_id" ref="compliance_management.view_customer_trans_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='customer_id']" position="after">
+                <field name="valuedate"/>
+                <field name="userid"/>
+                <field name="refno"/>
+            </xpath>
+             
+            <xpath expr="//filter[@name='group_currency']" position="replace">
+                        <filter name="group_currency" string="" domain="[]"
+                        context="{'group_by': 'currency_id'}" />
+            </xpath>
+
+           
+            
+            <!-- <xpath expr="//filter[@name='group_state']" position="after">
+                <filter string="Value Date" name="group_date" context="{'group_by': 'valuedate:day'}"/>
+                <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+            </xpath> -->
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_transaction_monitoring_tree" model="ir.ui.view">
+        <field name="name">transaction.monitoring.tree</field>
+        <field name="inherit_id" ref="compliance_management.compliance_transaction_tree"/>
+        <field name="model">res.customer.transaction</field>
+        <field name="arch" type="xml">
+            <!-- <xpath expr="//button[@name='action_create']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> -->
+           
+
+            <xpath expr="//tree" position="attributes">
+                <attribute name="default_order">valuedate desc</attribute>
+                <!-- <attribute name="limit">80</attribute> -->
+            </xpath>
+
+            <xpath expr="//field[@name='name']" position="replace">
+             <field name="refno" />
+             </xpath>
+
+            <xpath expr="//field[@name='date_created']" position="after">
+                <field name="valuedate" string="Value Date" optional="show"/>
+                <field name="actualdate" string="Actual Date" optional="hide"/>
+                <field name="userid" optional="hide"/>
+                <field name="reversal" optional="hide"/>
+                <field name="accountmodule" optional="hide"/>
+                <field name="tellerno" optional="hide"/>
+                <field name="deptcode" optional="hide"/>
+                <field name="status" optional="hide"/>
+                <field name="tran_channel" optional="hide"/>
+                <field name="request_id" optional="hide"/>
+                <field name="trans_id" optional="hide"/>
+            </xpath>
+
+        </field>
+    </record> 
+
+		
+		<!-- Actions for All Transactions -->
+<!-- <record id="action_all_transactions_today" model="ir.actions.server">
+    <field name="name">Today - All Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="state">code</field>
+    <field name="type">ir.actions.server</field>
+    <field name="code">action = env['res.customer.transaction'].open_all_transactions_today()</field>
+</record>
+
+<record id="action_all_transactions_last_7_days" model="ir.actions.server">
+    <field name="name">Last 7 Days - All Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_all_transactions_last_7_days()</field>
+</record> -->
+
+<!-- Actions for Awaiting Review -->
+<!-- <record id="action_awaiting_review_today" model="ir.actions.server">
+    <field name="name">Today - Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_awaiting_review_today()</field>
+</record>
+
+<record id="action_awaiting_review_last_7_days" model="ir.actions.server">
+    <field name="name">Last 7 Days - Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_awaiting_review_last_7_days()</field>
+</record> -->
+
+<!-- Actions for Reviewed -->
+ <!-- <record id="action_reviewed_today" model="ir.actions.server">
+    <field name="name">Today - Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_reviewed_today()</field>
+</record>
+
+<record id="action_reviewed_last_7_days" model="ir.actions.server">
+    <field name="name">Last 7 Days - Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_reviewed_last_7_days()</field>
+</record> -->
+
+<!-- Actions for Customer Transactions - All Transactions -->
+<record id="action_customers_all_transactions_today_ngn" model="ir.actions.server">
+    <field name="name">Today NGN - All Customer Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="state">code</field>
+    <field name="type">ir.actions.server</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_all_transactions_today_ngn()</field>
+</record>
+
+<record id="action_customers_all_transactions_today_other" model="ir.actions.server">
+    <field name="name">Today Other Currencies - All Customer Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="state">code</field>
+    <field name="type">ir.actions.server</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_all_transactions_today_other()</field>
+</record>
+
+<record id="action_customers_all_transactions_7days_ngn" model="ir.actions.server">
+    <field name="name">Last 7 Days NGN - All Customer Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_all_transactions_7days_ngn()</field>
+</record>
+
+<record id="action_customers_all_transactions_7days_other" model="ir.actions.server">
+    <field name="name">Last 7 Days Other Currencies - All Customer Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_all_transactions_7days_other()</field>
+</record>
+
+<!-- Actions for Customer Transactions - Awaiting Review -->
+<record id="action_customers_awaiting_review_today_ngn" model="ir.actions.server">
+    <field name="name">Today NGN - Customer Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_awaiting_review_today_ngn()</field>
+</record>
+
+<record id="action_customers_awaiting_review_today_other" model="ir.actions.server">
+    <field name="name">Today Other Currencies - Customer Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_awaiting_review_today_other()</field>
+</record>
+
+<record id="action_customers_awaiting_review_7days_ngn" model="ir.actions.server">
+    <field name="name">Last 7 Days NGN - Customer Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_awaiting_review_7days_ngn()</field>
+</record>
+
+<record id="action_customers_awaiting_review_7days_other" model="ir.actions.server">
+    <field name="name">Last 7 Days Other Currencies - Customer Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_awaiting_review_7days_other()</field>
+</record>
+
+<!-- Actions for Customer Transactions - Reviewed -->
+<record id="action_customers_reviewed_today_ngn" model="ir.actions.server">
+    <field name="name">Today NGN - Customer Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_reviewed_today_ngn()</field>
+</record>
+
+<record id="action_customers_reviewed_today_other" model="ir.actions.server">
+    <field name="name">Today Other Currencies - Customer Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_reviewed_today_other()</field>
+</record>
+
+<record id="action_customers_reviewed_7days_ngn" model="ir.actions.server">
+    <field name="name">Last 7 Days NGN - Customer Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_reviewed_7days_ngn()</field>
+</record>
+
+<record id="action_customers_reviewed_7days_other" model="ir.actions.server">
+    <field name="name">Last 7 Days Other Currencies - Customer Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_customers_reviewed_7days_other()</field>
+</record>
+
+<!-- Actions for Internal Transactions - All Transactions -->
+<record id="action_internal_all_transactions_today_ngn" model="ir.actions.server">
+    <field name="name">Today NGN - All Internal Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="state">code</field>
+    <field name="type">ir.actions.server</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_all_transactions_today_ngn()</field>
+</record>
+
+<record id="action_internal_all_transactions_today_other" model="ir.actions.server">
+    <field name="name">Today Other Currencies - All Internal Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="state">code</field>
+    <field name="type">ir.actions.server</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_all_transactions_today_other()</field>
+</record>
+
+<record id="action_internal_all_transactions_7days_ngn" model="ir.actions.server">
+    <field name="name">Last 7 Days NGN - All Internal Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_all_transactions_7days_ngn()</field>
+</record>
+
+<record id="action_internal_all_transactions_7days_other" model="ir.actions.server">
+    <field name="name">Last 7 Days Other Currencies - All Internal Transactions</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_all_transactions_7days_other()</field>
+</record>
+
+<!-- Actions for Internal Transactions - Awaiting Review -->
+<record id="action_internal_awaiting_review_today_ngn" model="ir.actions.server">
+    <field name="name">Today NGN - Internal Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_awaiting_review_today_ngn()</field>
+</record>
+
+<record id="action_internal_awaiting_review_today_other" model="ir.actions.server">
+    <field name="name">Today Other Currencies - Internal Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_awaiting_review_today_other()</field>
+</record>
+
+<record id="action_internal_awaiting_review_7days_ngn" model="ir.actions.server">
+    <field name="name">Last 7 Days NGN - Internal Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_awaiting_review_7days_ngn()</field>
+</record>
+
+<record id="action_internal_awaiting_review_7days_other" model="ir.actions.server">
+    <field name="name">Last 7 Days Other Currencies - Internal Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_awaiting_review_7days_other()</field>
+</record>
+
+<!-- Actions for Internal Transactions - Reviewed -->
+<record id="action_internal_reviewed_today_ngn" model="ir.actions.server">
+    <field name="name">Today NGN - Internal Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_reviewed_today_ngn()</field>
+</record>
+
+<record id="action_internal_reviewed_today_other" model="ir.actions.server">
+    <field name="name">Today Other Currencies - Internal Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_reviewed_today_other()</field>
+</record>
+
+<record id="action_internal_reviewed_7days_ngn" model="ir.actions.server">
+    <field name="name">Last 7 Days NGN - Internal Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_reviewed_7days_ngn()</field>
+</record>
+
+<record id="action_internal_reviewed_7days_other" model="ir.actions.server">
+    <field name="name">Last 7 Days Other Currencies - Internal Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_internal_reviewed_7days_other()</field>
+</record>
+
+<!-- Continue with similar pattern for all other actions... -->
+
+</odoo>
+

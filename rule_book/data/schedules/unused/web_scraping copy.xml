@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <!-- Cron Job for checking rulebooks and updating due dates -->
+        <record id="cron_web_scraping" model="ir.cron">
+            <field name="name">Webscrapping For Regulatory document</field>
+            <field name="model_id" ref="model_rulebook_title" />
+            <field name="state">code</field>
+            <field name="code">model.run_webscrapping()</field>
+            <field name="active" eval="False" />
+            <field name="interval_type">days</field>
+            <field name="interval_number">1</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="True" />
+            <field name="nextcall"
+                eval="(datetime.now().replace(hour=21, minute=0, second=0, microsecond=0))" />
+        </record>
+        <!-- Cron Job for checking rulebooks and updating due dates -->
+        <record id="cron_web_nfiu" model="ir.cron">
+            <field name="name">Webscrapping For NFIU Scraper</field>
+            <field name="model_id" ref="model_rulebook_title" />
+            <field name="state">code</field>
+            <field name="code">model.NFIUScraper()</field>
+            <field name="active" eval="False" />
+            <field name="interval_type">days</field>
+            <field name="interval_number">1</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="True" />
+            <field name="nextcall"
+                eval="(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0))" />
+        </record>
+        <!-- Cron Job for checking rulebooks and updating due dates -->
+        <record id="cron_web_ndic" model="ir.cron">
+            <field name="name">Webscrapping For NDIC Scrapper</field>
+            <field name="model_id" ref="model_rulebook_title" />
+            <field name="state">code</field>
+            <field name="code">model.NDICScrapper()</field>
+            <field name="active" eval="True" />
+            <field name="interval_type">days</field>
+            <field name="interval_number">1</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+            <field name="nextcall"
+                eval="(datetime.now().replace(hour=23, minute=0, second=0, microsecond=0))" />
+        </record>
+
+        <record id="cron_web_sec" model="ir.cron">
+            <field name="name">Webscrapping For SEC Scrapper</field>
+            <field name="model_id" ref="model_rulebook_title" />
+            <field name="state">code</field>
+            <field name="code">model.secScrapper()</field>
+            <field name="active" eval="False" />
+            <field name="interval_type">days</field>
+            <field name="interval_number">1</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="True" />
+            <field name="nextcall"
+                eval="(datetime.now().replace(hour=22, minute=0, second=0, microsecond=0))" />
+        </record>
+
+        <record id="cron_web_cbn" model="ir.cron">
+            <field name="name">Webscrapping For CBN Scrapper</field>
+            <field name="model_id" ref="model_rulebook_title" />
+            <field name="state">code</field>
+            <field name="code">model.CBNScrapper()</field>
+            <field name="active" eval="False" />
+            <field name="interval_type">days</field>
+            <field name="interval_number">1</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="True" />
+            <field name="nextcall" eval="(datetime.now().replace(hour=22, minute=0, second=0, microsecond=0))" />
+        </record>
+    </data>
+</odoo>

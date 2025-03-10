@@ -11,6 +11,6 @@ class Branch(models.Model):
          "Branch code already exists. Code must be unique!"),
     ]
     
-    name = fields.Char(string="Branch", required=True)
-    code = fields.Char(string="Code", required=True)
+    name = fields.Char(string="Branch")
+    code = fields.Char(string="Code")
     users = fields.Many2many('res.users', 'res_branch_users_rel', 'branch_id', 'user_id')

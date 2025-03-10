@@ -12,7 +12,7 @@ class RiskUniverse(models.Model):
         ('uniq_risk_universe_name', 'unique(name)',
          "Risk Universe Name already exists. Value must be unique!")
     ]
-
+    _order = "name"
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string='Code', required=True)
     user_id = fields.Many2one(comodel_name='res.users', string='User',

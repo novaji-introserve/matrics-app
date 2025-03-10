@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View for the process model -->
+    <record id="view_alert_history_tree" model="ir.ui.view">
+        <field name="name">alert.history.tree</field>
+        <field name="model">alert.history</field>
+        <field name="arch" type="xml">
+            <tree string="Alert History List" create="false" >
+                <field name="alert_id" string="Alert Reference" />
+                <field name="process_id" />
+                <field name="risk_rating" />
+                <!-- <field name="narration" /> -->
+                <field name="email" />
+                <field name="last_checked" string="Date"   />
+                <field name="time" string="Time"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <!-- form View for the process model -->
+    <record id="view_alert_history_form" model="ir.ui.view">
+        <field name="name">alert.history.form</field>
+        <field name="model">alert.history</field>
+        <field name="arch" type="xml" >
+            <form string="Alert History List" edit="false" delete="false">
+                <header>
+                    <!-- Add the button to generate and download CSV -->
+                    <button name="generate_csv" type="object" string="Download CSV" style="background-color: #007046;" />
+                </header>
+               <sheet>
+                <div class="oe_title">
+                    <label for="alert_id" class="oe_edit_only" />
+                    <h1>
+                        <field name="alert_id" string="Alert Reference" />
+                    </h1>
+                </div>
+                <group>
+                    <group string="RISK RATING">
+                        <field name="risk_rating" string="Rating"/>
+                    </group>
+                </group>
+
+                <group string="DATE INFORMATION">
+                    <group>
+                        <field name="last_checked" string="Last Checked" />
+                    </group>
+                    <group>
+                        <field name="date_created" string="Date Created" />
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Record">
+                        <field name="html_body" widget="html" />
+                    </page>
+                </notebook>
+               </sheet>
+            </form>
+        </field>
+    </record>
+
+    
+
+    <!-- Action to open the tree view -->
+    <record id="action_alert_history_status" model="ir.actions.act_window">
+        <field name="name">Alert History </field>
+        <field name="res_model">alert.history</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('user_in_emails', '=', True)]</field>
+    </record>
+
+
+</odoo>

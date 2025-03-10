@@ -5,7 +5,7 @@
         <field name="name">res_cust_transaction_tree</field>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <tree string="Transactions">
+            <tree string="Transactions" create="false">
                 <header>
                     <button name="done" class="oe_highlight" type="object"
                         string="Mark Reviewed"
@@ -13,20 +13,21 @@
                         confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" />
                 </header>
                 <field name="name" string="Reference Number" />
-                <field name="customer_id" />
-                <field name="account_id" />
-                <field name="branch_id" />
-                <field name="currency_id" />
-                <field name="amount" />
-                <field name="tran_type" />
-                <field name="rule_id" />
+                <field name="customer_id" optional="show" />
+                <field name="account_id" optional="show"/>
+                <field name="branch_id" optional="show"/>
+                <field name="currency_id" optional="show" />
+                <field name="amount" optional="show"/>
+                <field name="tran_type" optional="show"/>
+                <field name="rule_id" optional="show"/>
+                <field name="likely_fraud" widget="boolean_toggle"  readonly="1" optional="show"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                     decoration-warning="risk_level in ('medium')"
                     decoration-success="risk_level in ('lowel')" />
                 <field name="state" widget="badge"
                     decoration-warning="state in ('new')"
                     decoration-success="state in ('done')" />
-                <field name="date_created" />
+                <field name="date_created" optional="show"/>
             </tree>
         </field>
     </record>
@@ -35,7 +36,7 @@
         <field name="name">Transaction Form</field>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <form>
+            <form create="false">
                 <header>
                     <button name="action_screen" class="oe_highlight" type="object"
                         string="Run Transaction Screening"
@@ -88,6 +89,7 @@
                                     <field name="currency_id" readonly="1" />
                                     <field name="branch_id" readonly="1" />
                                     <field name="rule_id" readonly="1" />
+                                    <field name="likely_fraud" widget="boolean_toggle"  readonly="1"/>
                                 </group>
                                 <group>
                                     <field name="tran_type" readonly="1" />
@@ -149,11 +151,25 @@
         </field>
     </record>
     <record id="open_transactions" model="ir.actions.server">
-        <field name="name">Open Transactions</field>
+        <field name="name">Open Transactions To Review</field>
         <field name="model_id" ref="model_res_customer_transaction" />
         <field name="type">ir.actions.server</field>
         <field name="state">code</field>
         <field name="code">action = model.open_transactions()</field>
+    </record>
+    <record id="open_transactions_done" model="ir.actions.server">
+        <field name="name">Open Transactions To Done</field>
+        <field name="model_id" ref="model_res_customer_transaction" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions_done()</field>
+    </record>
+    <record id="open_transactions_all" model="ir.actions.server">
+        <field name="name">Open All Transactions</field>
+        <field name="model_id" ref="model_res_customer_transaction" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions_all()</field>
     </record>
     <record model="ir.actions.server" id="action_done">
         <field name="name">Mark Done</field>
@@ -174,8 +190,22 @@
         id="menu_compliance_transactions"
         action="open_transactions"
         parent="menu_compliance_transaction_monitoring"
-        name="Transactions"
+        name="Transactions To Review"
         groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
         sequence="10" />
+    <menuitem
+        id="menu_compliance_transactions_done"
+        action="open_transactions_done"
+        parent="menu_compliance_transaction_monitoring"
+        name="Transactions Reviewed"
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+        sequence="20" />
+    <menuitem
+        id="menu_compliance_transactions_all"
+        action="open_transactions_all"
+        parent="menu_compliance_transaction_monitoring"
+        name="All Transactions"
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+        sequence="30" />
 
 </odoo>

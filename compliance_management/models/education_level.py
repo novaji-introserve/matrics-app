@@ -10,7 +10,7 @@ class EducationLevel(models.Model):
         ('uniq_edu_level_code', 'unique(code)',
          "Education level code already exists. Code must be unique!"),
     ]
-
+    _order = "name"
     name = fields.Char(string="Education Level", required=True)
     code = fields.Char(string="Code", required=True)
     risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment',index=True)

@@ -44,9 +44,9 @@
 
                 <div t-attf-class="clearfix oe_login_buttons text-center mb-1 {{'pt-2' if form_small else 'pt-3'}}">
                     <button type="submit" class="btn btn-primary btn-block">Log in</button>
-                    <t t-if="debug">
+                    <!-- <t t-if="debug">
                         <button type="submit" name="redirect" value="/web/become" class="btn btn-link btn-sm btn-block">Log in as superuser</button>
-                    </t>
+                    </t> -->
                     <div class="o_login_auth"/>
                 </div>
 
@@ -76,7 +76,8 @@
                                     <t t-if="not disable_database_manager">
                                         <a class="border-right pr-2 mr-1" href="/web/database/manager">Manage Databases</a>
                                     </t>
-                                    <a href="https://www.odoo.com?utm_source=db&amp;utm_medium=auth" target="_blank">
+                                    
+                                    <a href="https://www.novajii.com" target="_blank">
                                         Powered by <span>Novajii</span>
                                     </a>
                                 </div>
@@ -89,7 +90,3 @@
     </template>
 
 </odoo>
-
-
-
-

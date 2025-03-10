@@ -11,7 +11,7 @@ class RiskAssessment(models.Model):
         ('uniq_risk_assessment_name', 'unique(name)',
          "Risk Assessment Name already exists. Value must be unique!")
     ]
-
+    _order = "name"
     name = fields.Char(string="Name", required=True)
     user_id = fields.Many2one(comodel_name='res.users', string='User',
                               required=True, index=True, default=lambda self: self.env.user.id)
@@ -32,10 +32,13 @@ class RiskAssessment(models.Model):
     total_risk_lines = fields.Integer(
         string='Total Risk Lines', _compute='_compute_total_risk_lines', store=True)
     internal_category = fields.Selection(string='Internal Category', selection=[('inst', 'Institutional'), ('cp', 'Counter Party')],default='inst')
+    is_default = fields.Boolean(string='Is Default',tracking=True)
 
     @api.model
     def create(self, vals):
         record = super(RiskAssessment, self).create(vals)
+        for e in record:
+            e.action_update_risk_score()
         for e in record:
             e.action_update_risk_score()
         return record
@@ -44,6 +47,9 @@ class RiskAssessment(models.Model):
         self.total_risk_lines = len(self.line_ids)
 
     def write(self, vals):
+        for e in self:
+            score = e.compute_risk_score_from_lines()
+            vals['risk_rating'] = score
         for e in self:
             score = e.compute_risk_score_from_lines()
             vals['risk_rating'] = score
@@ -75,6 +81,8 @@ class RiskAssessment(models.Model):
     def _compute_risk_score(self):
         score = self.compute_risk_score_from_lines()
         for rec in self:
+             rec.write({"risk_rating": score}) 
+    
              rec.write({"risk_rating": score}) 
     
     @api.onchange('line_ids')

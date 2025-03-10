@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- security/report_rulebook_security.xml -->
+<odoo>
+    <data noupdate="1">
+        <!-- Department-based Access Rule -->
+        <record id="rule_report_department_access" model="ir.rule">
+            <field name="name">Department Report Access</field>
+            <field name="model_id" ref="model_report_rulebook"/>
+            <field name="groups" eval="[(4, ref('group_department_user'))]"/>
+            <field name="domain_force">[('department_id', '=', user.department.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Compliance Full Access Rule -->
+        <record id="rule_report_compliance_access" model="ir.rule">
+            <field name="name">Compliance Full Access</field>
+            <field name="model_id" ref="model_report_rulebook"/>
+            <field name="groups" eval="[(4, ref('group_compliance'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+    </data>
+</odoo>

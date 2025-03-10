@@ -28,32 +28,53 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
+        'data/res.country.state.csv',
+        'data/res.branch.csv',
+        'data/media_keywords.xml',
+        'security/security.xml',
+        'data/schedules/adverse_media_cron.xml',
+        'data/email_templates/adverse_media_alert_template.xml',
+        # 'data/department.xml',
         'views/configuration.xml',
+        'views/edd.xml',
         'views/kyc.xml',
+        'views/adverse_media.xml',
+        'views/adverse_media_logs.xml',
+        'views/adverse_media_keywords.xml',
+        # 'data/data.xml',
         'views/risk_assessment.xml',
         'views/res_users.xml',
         'views/sanction_screening.xml',
         'views/customer.xml',
-        'data/data.xml',
         'data/res.country.state.csv',
-        'data/res.branch.csv',
+        # 'data/res.branch.csv',
         'security/security.xml',
         'views/statistics.xml',
-        'data/email_templates.xml', 
         'views/dashboard.xml',
         'views/risk_assessment_plan.xml',
         'views/settings.xml',
-       'views/customer_accounts.xml',
+        'views/customer_accounts.xml',
         'views/transaction.xml',
-        'views/transaction_screening_rule.xml'
-
-            
-                ],
+        'views/transaction_screening_rule.xml',
+    ],
     # only loaded in demonstration mode
     'demo': [
-        'demo/demo.xml',
+        # 'demo/demo.xml',
     ],
+    
     "installable": True,
     "application": True,
     "auto_install": False,
+    'assets':{
+        'web.assets_backend': [
+            'compliance_management/static/src/scss/custom_status_bar.scss',
+            'compliance_management/static/src/css/style.css',
+            'compliance_management/static/src/components/**/*.js',
+            'compliance_management/static/src/components/**/*.xml',
+            'compliance_management/static/src/img/logov.png',
+            'compliance_management/static/img/alt_bank_logo.png',
+            'compliance_management/static/img/alt_bank_logo_.png',
+
+        ]
+    }
 }
