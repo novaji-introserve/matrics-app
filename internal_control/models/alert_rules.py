@@ -119,6 +119,18 @@ class alert_rules(models.Model):
             return last_checked + relativedelta(years=period)
         else:
             raise ValidationError("Unsupported Unit")
+    
+    def format_currency(self, cell):
+        if cell is not None and isinstance(cell, (int, float, str)):
+            try:
+                if re.match(r'[\$\d,.]+', str(cell)):
+                    return f"{float(cell):,.2f}" 
+                else:
+                    return cell
+            except (ValueError, TypeError):
+                return cell
+        else:
+            return cell
 
 
     def format_query(self,rule):
@@ -197,7 +209,7 @@ class alert_rules(models.Model):
         for row in rows:
             filtered_row = [cell for index, cell in enumerate(row) if index not in branch_id_indices]
             # Format currency values in the filtered row
-            formatted_row = [f"{float(re.sub(r'[^\d\.]', '', str(cell))):,.2f}" if cell is not None and re.match(r'[\$\d,.]+', str(cell)) else cell for cell in filtered_row]
+            formatted_row = [ self.format_currency(cell) for cell in filtered_row]
             csv_writer.writerow(formatted_row)
             
         
@@ -238,7 +250,7 @@ class alert_rules(models.Model):
             """
                     
         # Generate the table header
-        header_html = "".join([f"<th style='padding: 8px;'>{" ".join(header.split("_")).title()}</th>" for header in columns if header != 'branch_id'])
+        header_html = "".join([f"<th style='padding: 8px;'>{' '.join(header.split('_')).title()}</th>" for header in columns if header != 'branch_id'])
         # Create the HTML table for the email
         
         
@@ -250,7 +262,7 @@ class alert_rules(models.Model):
                  # Check currency
                 if bool(re.search(currency_pattern, str(cell))) and cell is not None:
                 # Format the currency value
-                    cell = f"{float(re.sub(r'[^\d\.]', '', str(cell))):,.2f}"  # Format with commas and two decimal places
+                    cell = f"{float(cell):,.2f}"  # Format with commas and two decimal places
                
                 if index not in branch_id_indices:
                     
