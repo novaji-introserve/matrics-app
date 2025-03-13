@@ -32,22 +32,22 @@
 
 
         <!-- Form Views for Global PEP -->
-          <!-- Views for Global PEP List-->
+        <!-- Views for Global PEP List-->
         <record id="view_res_global_pep_tree" model="ir.ui.view">
             <field name="name">res.pep.tree</field>
             <field name="model">res.pep</field>
             <field name="arch" type="xml">
                 <tree string="Global PEP List">
-                    <field name="unique_identifier"/>
-                    <field name="name"/>
-                    <field name="surname"/>
-                    <field name="first_name"/>
-                    <field name="title"/>
-                    <field name="status"/>
-                    <field name="pep_classification"/>
-                    <field name="present_position"/>
-                    <field name="createdon"/>
-                    <field name="lastmodifiedon"/>
+                    <field name="unique_identifier" />
+                    <field name="name" />
+                    <field name="surname" />
+                    <field name="first_name" />
+                    <field name="title" />
+                    <field name="status" />
+                    <field name="pep_classification" />
+                    <field name="present_position" />
+                    <field name="createdon" />
+                    <field name="lastmodifiedon" />
                 </tree>
             </field>
         </record>
@@ -57,9 +57,12 @@
             <field name="arch" type="xml">
                 <form string="Global PEP List">
                     <header>
+                        <button name="fetch_global_pep_list" class="oe_highlight" type="object"
+                            string="Test"
+                        />
                         <button name="action_find_person" class="oe_highlight" type="object"
-                        string="Find Biography"
-                        groups="compliance_management.group_compliance_compliance_risk_manager"/>
+                            string="Find Biography"
+                            groups="compliance_management.group_compliance_compliance_risk_manager" />
                     </header>
                     <sheet>
                         <div class="oe_title">
@@ -98,7 +101,7 @@
                                 <field name="business_interest" />
                             </group>
                         </group>
-                        
+
                         <notebook>
                             <page name="info" string="Biography">
                                 <field name="narration" />
@@ -130,7 +133,7 @@
                                     <field name="associate_business_politics" />
                                     <field name="bankers" />
                                     <field name="account_details" />
-                                   
+
                                 </group>
                             </page>
                             <page string="Reports &amp; Remarks">
@@ -154,9 +157,9 @@
                         </notebook>
                     </sheet>
                     <div class="oe_chatter">
-                        <field name="message_follower_ids"/>
-                        <field name="activity_ids"/>
-                        <field name="message_ids"/>
+                        <field name="message_follower_ids" />
+                        <field name="activity_ids" />
+                        <field name="message_ids" />
                     </div>
                 </form>
             </field>
@@ -232,8 +235,7 @@
             name="Global PEP List"
             groups="group_compliance_compliance_officer"
             sequence="50" />
-        
-        
+
 
     </data>
 </odoo>
