@@ -25,10 +25,15 @@ class Mydashboard(http.Controller):
    
         result = {
             "group": any(group.name.lower() == 'chief compliance officer' for group in user.groups_id),
-            "branch": [branch.id for branch in user.branches_id],
-            "alert_rules_domain": domain 
+            "branch": [],  # Initialize branch as an empty list
+            "alert_rules_domain": domain,
         }
+
+        if hasattr(user, 'branches_id') and user.branches_id:  # Check if branches_id exists and is not empty
+            result["branch"] = [branch.id for branch in user.branches_id]
+
         return result
+        
     
     
     @http.route('/dashboard/get_top_screening_rules', auth='public', type='json')

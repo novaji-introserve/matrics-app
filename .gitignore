@@ -5,6 +5,7 @@ __pycache__/
 *:Zone.Identifier
 node_modules
 .env
+media/
 internal_control/models/db_sync/db_config.json
 internal_control/models/db_sync/etl.log*
 internal_control/models/db_sync/etl_config.json
