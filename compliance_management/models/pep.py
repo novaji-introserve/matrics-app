@@ -7,6 +7,7 @@ from ..services.data_processor import DataProcessor
 from ..services.pep_importer import PepImporter
 
 from ..services.pep_service import PepService
+from ..services.sanction_list_data import sources
 
 _logger = logging.getLogger(__name__)
 
@@ -163,22 +164,23 @@ class Pep(models.Model):
         }
 
     def fetch_global_pep_list(self):
+
         """
         Start background jobs to fetch PEP data by source
         """
-        # Define sources
-        sources = ["eu_sanctions", "un_sanctions", "ofac_sanctions", "uk_sanctions"]
-        
+
         # Check if queue_job is installed
-        queue_job = self.env['ir.module.module'].sudo().search(
-            [('name', '=', 'queue_job'), ('state', '=', 'installed')]
+        queue_job = (
+            self.env["ir.module.module"]
+            .sudo()
+            .search([("name", "=", "queue_job"), ("state", "=", "installed")])
         )
-        
+
         if queue_job:
             # Queue separate jobs for each source
             for idx, source in enumerate(sources):
-                self.with_delay(priority=10+idx).fetch_source_pep_list(source)
-                
+                self.with_delay(priority=10 + idx).fetch_source_pep_list(source['url'], source['country'])
+
             return {
                 "type": "ir.actions.client",
                 "tag": "display_notification",
@@ -190,82 +192,89 @@ class Pep(models.Model):
                 },
             }
         else:
-            # Fallback to threading
-            thread = threading.Thread(target=self._fetch_global_pep_list_thread)
-            thread.daemon = True
-            thread.start()
-            
-            return {
-                "type": "ir.actions.client",
-                "tag": "display_notification",
-                "params": {
-                    "title": _("PEP Import Started"),
-                    "message": _("PEP data fetch has been started in a background thread."),
-                    "sticky": False,
-                    "type": "info",
-                },
-            }
+            pass
+        # Fallback to threading
+        # thread = threading.Thread(target=self._fetch_global_pep_list_thread)
+        # thread.daemon = True
+        # thread.start()
 
-    def fetch_source_pep_list(self, source_name):
+        # return {
+        #     "type": "ir.actions.client",
+        #     "tag": "display_notification",
+        #     "params": {
+        #         "title": _("PEP Import Started"),
+        #         "message": _(
+        #             "PEP data fetch has been started in a background thread."
+        #         ),
+        #         "sticky": False,
+        #         "type": "info",
+        #     },
+        # }
+
+    def fetch_source_pep_list(self, source_url, source_name):
         """
         Fetch PEP data for a specific source
         """
+
         service = PepService(self.env)
-        
+
         # Map source names to scraper methods
-        source_methods = {
-            "eu_sanctions": service.scraper.fetch_eu_sanctions,
-            "un_sanctions": service.scraper.fetch_un_sanctions,
-            "ofac_sanctions": service.scraper.fetch_ofac_sanctions,
-            "uk_sanctions": service.scraper.fetch_uk_sanctions
-        }
-        
-        if source_name not in source_methods:
-            _logger.error(f"Unknown source: {source_name}")
-            return
-            
+        # source_methods = {
+        #     "eu_sanctions": service.scraper.fetch_eu_sanctions,
+        #     "un_sanctions": service.scraper.fetch_un_sanctions,
+        #     "ofac_sanctions": service.scraper.fetch_ofac_sanctions,
+        #     "uk_sanctions": service.scraper.fetch_uk_sanctions,
+        # }
+
+        # if source_name not in source_methods:
+        #     _logger.error(f"Unknown source: {source_name}")
+        #     return
+
+        file_path, file_type = service.scraper.scrapeAndDownload(
+            source_url, source_name
+        )
+
         # Get files for this source
         _logger.info(f"Fetching files for {source_name}")
-        files = source_methods[source_name]()
-        
+        files = file_path
+
         if not files:
             _logger.warning(f"No files found for {source_name}")
             return
-            
+
         _logger.info(f"Found {len(files)} files for {source_name}")
-        
+
         # Process each file in a separate job
         processed_count = 0
         for file_info in files:
             # Queue the file processing as a separate job
             self.with_delay().process_pep_file(file_info)
             processed_count += 1
-            
-        _logger.info(f"Queued {processed_count} file processing jobs for {source_name}")
-        return processed_count
+
+        # _logger.info(f"Queued {processed_count} file processing jobs for {source_name}")
+        # return processed_count
 
     def process_pep_file(self, file_info):
         """
         Process a single PEP file
         """
         _logger.info(f"Processing file: {file_info['path']}")
-        
+
         service = PepService(self.env)
         importer = PepImporter(self.env)
         processor = DataProcessor(self.env)
-        
+
         try:
             # Process the file
             result = importer.process_file(file_info, processor)
-            
-            _logger.info(f"Processed file {file_info['path']}: created {result.get('records_created', 0)}, updated {result.get('records_updated', 0)}")
+
+            _logger.info(
+                f"Processed file {file_info['path']}: created {result.get('records_created', 0)}, updated {result.get('records_updated', 0)}"
+            )
             return result
         except Exception as e:
             _logger.error(f"Error processing file {file_info['path']}: {e}")
-            return {
-                "status": "error",
-                "message": str(e)
-            }
+            return {"status": "error", "message": str(e)}
 
     def fetch_global_pep_list_job(self):
         """
@@ -278,7 +287,7 @@ class Pep(models.Model):
 
             # Fetch and import data from all sources
             result = service.fetch_and_import_pep_data()
-            
+
             # Log the result
             if result["status"] == "success":
                 _logger.info(
@@ -288,16 +297,13 @@ class Pep(models.Model):
                 _logger.warning(f"PEP data import warning: {result['message']}")
             else:
                 _logger.error(f"PEP data import error: {result['message']}")
-                
+
             return result
-            
+
         except Exception as e:
             _logger.error(f"Error in background PEP import job: {str(e)}")
             _logger.error(traceback.format_exc())
-            return {
-                "status": "error",
-                "message": str(e)
-            }
+            return {"status": "error", "message": str(e)}
 
     def _fetch_global_pep_list_thread(self):
         """
@@ -309,13 +315,13 @@ class Pep(models.Model):
             with api.Environment.manage():
                 new_cr = self.pool.cursor()
                 env = api.Environment(new_cr, self.env.uid, self.env.context)
-                
+
                 # Create a PepService instance with the new env
                 service = PepService(env)
 
                 # Fetch and import data from all sources
                 result = service.fetch_and_import_pep_data()
-                
+
                 # Log the result
                 if result["status"] == "success":
                     _logger.info(
@@ -325,26 +331,23 @@ class Pep(models.Model):
                     _logger.warning(f"PEP data import warning: {result['message']}")
                 else:
                     _logger.error(f"PEP data import error: {result['message']}")
-                    
+
                 # Update status in config params
                 config = env["ir.config_parameter"].sudo()
                 config.set_param(
-                    "compliance_management.pep_import_thread_end", 
-                    fields.Datetime.now()
+                    "compliance_management.pep_import_thread_end", fields.Datetime.now()
                 )
                 config.set_param(
-                    "compliance_management.pep_import_thread_result", 
-                    result["status"]
+                    "compliance_management.pep_import_thread_result", result["status"]
                 )
                 config.set_param(
-                    "compliance_management.pep_import_thread_message", 
-                    result["message"]
+                    "compliance_management.pep_import_thread_message", result["message"]
                 )
-                
+
                 # Commit changes
                 new_cr.commit()
                 new_cr.close()
-                
+
         except Exception as e:
             _logger.error(f"Error in background PEP import thread: {str(e)}")
             _logger.error(traceback.format_exc())

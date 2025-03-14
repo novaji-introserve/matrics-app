@@ -9,6 +9,7 @@ from odoo import fields
 from .sanction_scraper import SanctionScraper
 from .data_processor import DataProcessor
 from .pep_importer import PepImporter
+# from ..models.sanction_list_data import sources
 
 _logger = logging.getLogger(__name__)
 
@@ -275,12 +276,14 @@ class PepService:
             self.importer.reset_counters()
             
             # Define sources with corresponding fetch methods
-            sources = [
-                ("uk_sanctions", self.scraper.fetch_uk_sanctions),  # Prioritize UK sanctions
-                ("eu_sanctions", self.scraper.fetch_eu_sanctions),
-                ("un_sanctions", self.scraper.fetch_un_sanctions),
-                ("ofac_sanctions", self.scraper.fetch_ofac_sanctions)
-            ]
+            # sources = [
+            #     ("uk_sanctions", self.scraper.fetch_uk_sanctions),  # Prioritize UK sanctions
+            #     ("eu_sanctions", self.scraper.fetch_eu_sanctions),
+            #     ("un_sanctions", self.scraper.fetch_un_sanctions),
+            #     ("ofac_sanctions", self.scraper.fetch_ofac_sanctions)
+            # ]
+
+            sources = []
             
             all_files = []
             source_results = {}
