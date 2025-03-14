@@ -418,7 +418,27 @@ class Customer(models.Model):
     #         'risk_score': score,
     #         'risk_level': risk_level,
     #     })
-        
+
+    # logic to commpute total risk sore of all users
+    @api.model
+    def compute_risk_score_for_all_users(self):
+        records = self.search([])
+        for record in records:
+            score = record._get_risk_score_from_plan()
+            risk_level = record.compute_risk_level()
+
+            # Use direct SQL update to avoid triggering write()
+            self.env.cr.execute(
+                """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+                WHERE id = %%s""" % self._table,
+                (score, risk_level, record.id)
+            )
+
+            # Invalidate cache for these fields
+            record.invalidate_cache(['risk_score', 'risk_level'])
+
+        return True
+    
     def action_compute_risk_score_with_plan(self):
         """Manual action to compute risk score"""
         for record in self:
