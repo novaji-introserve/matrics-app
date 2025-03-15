@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="compliance_management.TestAction" owl="1">
+        <div class="p-3">
+            <div class="alert alert-success">
+                <i class="fa fa-check-circle me-2"></i>
+                <span t-esc="state.message"></span>
+            </div>
+            <p>This is a test client action that loads correctly.</p>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Main Import Form Template -->
+    <t t-name="compliance_management.ImportForm" owl="1">
+    <div class="csv_import_container">
+            <!-- Upload Section -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">CSV Data Import</h4>
+            </div>
+            <!-- Error Message Banner -->
+                <div t-if="state.errorMessage" class="alert alert-danger mb-3">
+                    <i class="fa fa-exclamation-circle"></i>
+                    <span t-esc="state.errorMessage"></span>
+                    <button class="btn btn-sm btn-outline-danger float-end"
+                        t-on-click="() => state.errorMessage = null">
+                        Dismiss
+                    </button>
+                </div>
+            <div class="card-body">
+                <form class="o_form_view">
+                        <!-- Category/Model Selection -->
+                    <div class="mb-3">
+                        <label for="model-selector" class="form-label">Model</label>
+                        <div class="input-group mb-2">
+                            <input t-ref="modelSearch" t-on-input="onModelSearch" type="text" class="form-control" placeholder="Search models..." />
+                            <button class="btn btn-outline-secondary" type="button" t-on-click="searchModels">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                        <select t-ref="modelSelector" id="model-selector" class="form-select" t-on-change="onModelChanged">
+                            <option value="">Select a model...</option>
+                            <t t-foreach="state.filteredModels" t-as="model" t-key="model.id">
+                                <option t-att-value="model.id" t-att-selected="state.selectedModel and state.selectedModel.id === model.id">
+                                    <t t-esc="model.name"/> (<t t-esc="model.model_name"/>)
+                                </option>
+                            </t>
+                        </select>
+                        <small t-if="state.selectedModel and state.selectedModel.description" id="model-description" class="form-text text-muted mt-2">
+                            <t t-esc="state.selectedModel.description"/>
+                        </small>
+                    </div>
+
+                        <!-- File Upload -->
+                    <div class="mb-3">
+                        <label for="file" class="form-label">CSV File (max 2GB)</label>
+                        <div class="input-group">
+                            <input t-ref="fileInput" type="file" id="file" accept=".csv, .xlsx, .xls" class="form-control" t-on-change="onFileChanged" />
+                            <span id="file-name" t-ref="fileName" class="input-group-text text-muted">No file selected</span>
+                        </div>
+                        <small class="form-text text-muted">Supported formats: CSV, Excel (.xlsx, .xls) files up to 2GB</small>
+                    </div>
+
+                        <!-- Upload Progress -->
+                    <div t-if="state.isUploading" id="upload-progress" class="progress mb-3">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             t-att-style="'width: ' + state.uploadProgress + '%'" 
+                             role="progressbar" 
+                             t-att-aria-valuenow="state.uploadProgress" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            <t t-esc="state.uploadProgress"/>%
+                        </div>
+                    </div>
+                    <div t-if="state.isUploading" class="mb-3">
+                        <small id="progress-text" t-ref="progressText" class="text-muted">
+                            Uploading... <t t-esc="state.uploadProgress"/>% 
+                            (<t t-esc="state.uploadedSize"/> of <t t-esc="state.totalSize"/>) 
+                            at <t t-esc="state.uploadSpeed"/>
+                        </small>
+                    </div>
+
+                        <!-- Warning Banner -->
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-link text-warning p-0 toggle-warning-button" t-on-click="toggleWarning">
+                            <i class="fa fa-exclamation-triangle"/> 
+                            <t t-if="state.showWarning">Hide</t>
+                            <t t-else="">Show</t>
+                            Important Upload Guidance
+                        </button>
+                        <div t-if="state.showWarning" class="alert alert-warning mt-2" role="alert">
+                            <strong>Important Upload Guidance</strong>
+                            <p>⚠️ Please ensure your CSV/Excel file has headers that match the fields of the selected model. 
+                               The import will try to map columns automatically based on field names and labels, but exact matches work best.</p>
+                            <p>⚠️ Required fields must be included in your file. The import will fail if required fields are missing.</p>
+                        </div>
+                    </div>
+
+                        <!-- Template Downloads Section -->
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-link text-primary p-0 toggle-templates-button" t-on-click="toggleTemplates">
+                            <i class="fa fa-download"/> 
+                            <t t-if="state.showTemplates">Hide</t>
+                            <t t-else="">Show</t>
+                            Template Downloads
+                        </button>
+                        <div t-if="state.showTemplates" class="card border-primary mt-2">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">Download Templates</h5>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="select-all-templates" t-ref="selectAllTemplates" t-on-change="onSelectAllTemplates"/>
+                                        <label class="form-check-label" for="select-all-templates">Select All</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <t t-foreach="state.models" t-as="model" t-key="model.id">
+                                        <div class="col-md-6 col-lg-4 mb-2">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input template-checkbox" 
+                                                       t-att-id="'template-' + model.id" 
+                                                       t-att-data-model-id="model.id"
+                                                       t-att-data-model-name="model.name"
+                                                       t-att-checked="state.selectedTemplates.includes(model.id)"
+                                                       t-on-change="(ev) => this.onTemplateCheckboxChange(model.id, ev)"/>
+                                                <label class="form-check-label" t-att-for="'template-' + model.id">
+                                                    <t t-esc="model.name"/>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+
+                                <button id="download-templates" class="btn btn-primary mt-3" 
+                                        t-on-click="onDownloadTemplates" 
+                                        t-att-disabled="state.selectedTemplates.length === 0 || state.processingFiles">
+                                    <t t-if="state.processingFiles">
+                                        <i class="fa fa-spinner fa-spin"/> Processing...
+                                    </t>
+                                    <t t-elif="state.selectedTemplates.length === 0">
+                                        Select templates to download
+                                    </t>
+                                    <t t-elif="state.selectedTemplates.length === state.models.length">
+                                        Download All Templates
+                                    </t>
+                                    <t t-else="">
+                                        Download Selected Templates (<t t-esc="state.selectedTemplates.length"/>)
+                                    </t>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- Submit Button -->
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary upload-button" 
+                                t-on-click="onUpload" 
+                                t-att-disabled="!state.selectedFile || !state.selectedModel || state.isUploading">
+                            <t t-if="state.isUploading">
+                                <i class="fa fa-spinner fa-spin"/> Uploading...
+                            </t>
+                            <t t-else="">
+                                <i class="fa fa-upload"/> Upload
+                            </t>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+            <!-- Terminal Component -->
+        <div class="mt-4">
+            <TerminalComponent />
+        </div>
+
+            <!-- Upload Status Modal -->
+        <div t-if="state.showModal" id="upload-modal" class="modal" tabindex="-1" style="display: block;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><t t-esc="state.modalTitle"/></h5>
+                        <button type="button" class="btn-close" t-on-click="closeModal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div id="modal-icon" class="mb-3">
+                            <i t-if="state.modalType === 'success'" class="fa fa-check-circle text-success fa-4x"></i>
+                            <i t-else="" class="fa fa-times-circle text-danger fa-4x"></i>
+                        </div>
+                        <p id="modal-message"><t t-esc="state.modalMessage"/></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="modal-close" t-on-click="closeModal">Close</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-backdrop fade show"></div>
+        </div>
+    </div>
+</t>
+
+    <!-- Terminal Component Template -->
+    <t t-name="compliance_management.Terminal" owl="1">
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-title">
+                <i class="fa fa-terminal"/> Import Process Log
+                <span t-if="state.isProcessing" id="processingIndicator">
+                    <i class="fa fa-spinner fa-spin"/>
+                </span>
+            </div>
+            <div class="terminal-actions">
+                <button class="btn btn-sm btn-link" t-on-click="toggleFilterPanel">
+                    <i class="fa fa-filter"/>
+                </button>
+            </div>
+        </div>
+        
+        <div t-ref="terminalBody" class="terminal-body">
+            <t t-foreach="state.logs" t-as="log" t-key="log_index">
+                <div t-if="isLogVisible(log)" class="log-entry" t-att-data-type="log.type">
+                    <span class="log-timestamp"><t t-esc="log.timestamp"/></span>
+                    <span class="log-icon"><i t-att-class="getIconClass(log.type)"/></span>
+                    <span t-att-class="'log-message ' + getLogTypeClass(log.type)"><t t-esc="log.message"/></span>
+                </div>
+            </t>
+        </div>
+        
+        <div class="terminal-footer">
+            <span t-ref="logCount" class="log-count">
+                <t t-if="state.searchText || !Object.values(state.enabledSeverities).every(Boolean)">
+                    <t t-esc="visibleLogsCount"/> of <t t-esc="state.logs.length"/> messages
+                </t>
+                <t t-else="">
+                    <t t-esc="state.logs.length"/> messages
+                </t>
+            </span>
+            <button class="btn btn-sm btn-link clear-button" t-on-click="clearLogs">Clear</button>
+        </div>
+        
+        <div t-ref="filterPanel" t-att-class="'terminal-filter-panel ' + (state.showFilterPanel ? '' : 'hidden')">
+            <div class="filter-input-container">
+                <input t-ref="filterInput" type="text" class="form-control filter-input" 
+                       placeholder="Filter messages..." t-on-input="onFilterInput"/>
+            </div>
+            <div class="filter-severity">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="severity-info" 
+                           t-att-checked="state.enabledSeverities.info"
+                           t-on-change="() => this.toggleSeverity('info')"/>
+                    <label class="form-check-label" for="severity-info">
+                        <i class="fa fa-info-circle text-info"/> Info
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="severity-success" 
+                           t-att-checked="state.enabledSeverities.success"
+                           t-on-change="() => this.toggleSeverity('success')"/>
+                    <label class="form-check-label" for="severity-success">
+                        <i class="fa fa-check-circle text-success"/> Success
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="severity-warning" 
+                           t-att-checked="state.enabledSeverities.warning"
+                           t-on-change="() => this.toggleSeverity('warning')"/>
+                    <label class="form-check-label" for="severity-warning">
+                        <i class="fa fa-exclamation-triangle text-warning"/> Warning
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="severity-error" 
+                           t-att-checked="state.enabledSeverities.error"
+                           t-on-change="() => this.toggleSeverity('error')"/>
+                    <label class="form-check-label" for="severity-error">
+                        <i class="fa fa-times-circle text-danger"/> Error
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</t>
+
+</templates>

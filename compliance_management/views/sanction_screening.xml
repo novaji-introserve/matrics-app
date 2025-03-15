@@ -17,7 +17,7 @@
         </record>
         <!-- Actions for Blacklist-->
         <record id="action_res_partner_blacklist" model="ir.actions.act_window">
-            <field name="name">FEP List</field>
+            <field name="name">Black List</field>
             <field name="res_model">res.partner</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="domain">[('is_blacklist', '=', True)]</field>
@@ -30,9 +30,16 @@
             <field name="domain">[('is_watchlist', '=', True)]</field>
         </record>
 
+        <!-- Actions for Greylist-->
+        <record id="action_res_partner_greylist" model="ir.actions.act_window">
+            <field name="name">Grey List</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('is_greylist', '=', True)]</field>
+        </record>
 
         <!-- Form Views for Global PEP -->
-          <!-- Views for Global PEP List-->
+        <!-- Views for Global PEP List-->
         <record id="view_res_global_pep_tree" model="ir.ui.view">
             <field name="name">res.pep.tree</field>
             <field name="model">res.pep</field>
@@ -233,6 +240,13 @@
             groups="group_compliance_compliance_officer"
             sequence="50" />
         
+        <menuitem
+            id="menu_greylist"
+            action="action_res_partner_greylist"
+            parent="menu_sanction_screening_root"
+            name="Greylist"
+            groups="group_compliance_compliance_officer"
+            sequence="60" />
         
 
     </data>
