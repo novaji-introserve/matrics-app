@@ -219,7 +219,7 @@
         
         <div class="terminal-footer">
             <span t-ref="logCount" class="log-count">
-                <t t-if="state.searchText || !Object.values(state.enabledSeverities).every(Boolean)">
+                <t t-if="state.searchText || !areAllSeveritiesEnabled">
                     <t t-esc="visibleLogsCount"/> of <t t-esc="state.logs.length"/> messages
                 </t>
                 <t t-else="">

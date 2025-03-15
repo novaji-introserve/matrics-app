@@ -3,41 +3,56 @@
 // import { ImportFormComponent } from "./import_form_component";
 // import { TerminalComponent } from "./terminal_component";
 
-// // Register the client action with full properties
-// registry.category("actions").add("compliance_management.csv_import_form", async (env) => {
+// // Register the TerminalComponent
+// registry.category("components").add("TerminalComponent", TerminalComponent);
+
+// // Register the client action with the EXACT format expected by Odoo
+// registry.category("actions").add("compliance_management.csv_import_form", async function (env, action) {
+//     console.log("CSV import client action called with action:", action);
+
+//     // This exact structure is required by Odoo's ActionManager
 //     return {
-//         type: "ir.actions.client",  // This line is critical
-//         tag: "compliance_management.csv_import_form",
-//         Component: ImportFormComponent,
-//         target: "current",
+//         component: ImportFormComponent,  // Note the lowercase 'c' in component
+//         props: { action },
+//         target: action.target || 'current',
 //     };
 // });
 
-// // Register components if needed
-// registry.category("components").add("TerminalComponent", TerminalComponent);
+// export { ImportFormComponent, TerminalComponent };
 
 
 /** @odoo-module **/
-import { registry } from "@web/core/registry";
-import { ImportFormComponent } from "./import_form_component";
-import { TerminalComponent } from "./terminal_component";
 
-// Ensure action type is always defined
-registry.category("actions").add("compliance_management.csv_import_form",
-    function (env, action = {}) {  // Default empty object to prevent undefined
-        if (!action || !action.type) {
-            console.warn("Received action with no type:", action);
-            action = { ...action, type: "ir.actions.client" };  // Ensure default type
-        }
-        return {
-            Component: ImportFormComponent,
-            props: { action },
-        };
-    }
-);
+import { registry } from '@web/core/registry';
+import { ImportFormComponent } from './import_form_component';
 
-// Register additional components
-registry.category("components").add("TerminalComponent", TerminalComponent);
+// Debug logging to verify loading
+console.log("REGISTERING CSV IMPORT CLIENT ACTION");
+
+// Register the client action directly - this is the CRITICAL fix
+registry.category("actions").add("compliance_management.csv_import_form", ImportFormComponent);
+
+console.log("CSV IMPORT CLIENT ACTION REGISTERED SUCCESSFULLY");
+
+
+/** @odoo-module **/
+
+// import { registry } from '@web/core/registry';
+// import { ImportFormComponent } from './import_form_component';
+// import { TerminalComponent } from './terminal_component';
+// import { chunkedUploader } from './chunked_uploader';
+// import { terminalService } from './terminal';
+
+// // Register services first
+// const serviceRegistry = registry.category("services");
+// serviceRegistry.add("terminal", terminalService);
+// serviceRegistry.add("chunkedUploader", chunkedUploader);
+
+// // Then register the client action - make sure the tag exactly matches the XML
+// registry.category("actions").add("compliance_management.csv_import_form", ImportFormComponent);
+
+// // Register additional components
+// registry.category("components").add("TerminalComponent", TerminalComponent);
 
 // /** @odoo-module **/
 // import { registry } from "@web/core/registry";
@@ -55,7 +70,7 @@ registry.category("components").add("TerminalComponent", TerminalComponent);
 //     return {
 //         type: "ir.actions.client",
 //         tag: "csv_import_form",
-//         Component: ImportFormComponent,
+//         component: ImportFormComponent,
 //     };
 // });
 

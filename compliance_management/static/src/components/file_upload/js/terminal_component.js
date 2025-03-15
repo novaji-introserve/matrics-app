@@ -33,7 +33,7 @@ export class TerminalComponent extends Component {
             onMounted(() => {
                 try {
                     // Get existing logs
-                    this.state.logs = this.terminal.getLogs();
+                    this.state.logs = this.terminal.getLogs() || [];
 
                     // Register log listener
                     this.unsubscribe = this.terminal.onLog(this.handleNewLog.bind(this));
@@ -174,6 +174,16 @@ export class TerminalComponent extends Component {
      */
     get visibleLogsCount() {
         return this.state.logs.filter(log => this.isLogVisible(log)).length;
+    }
+
+    /**
+     * Check if all severities are enabled
+     * @returns {boolean} - Whether all severities are enabled
+     */
+    get areAllSeveritiesEnabled() {
+        // Safely check if all severities are enabled
+        if (!this.state.enabledSeverities) return true;
+        return Object.values(this.state.enabledSeverities).every(value => Boolean(value));
     }
 
     /**

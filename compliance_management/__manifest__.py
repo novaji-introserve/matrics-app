@@ -43,7 +43,6 @@
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
         "views/csv_import.xml",
-        "views/test_action.xml",
         "data/data.xml",
         "views/risk_assessment.xml",
         "views/res_users.xml",
@@ -68,31 +67,29 @@
     'assets':{
         'web.assets_backend': [
             'compliance_management/static/src/scss/custom_status_bar.scss',
-            'compliance_management/static/src/components/file_upload/js/test_action.js',
+
+            # Load templates first
+            'compliance_management/static/src/components/file_upload/xml/csv_import.xml',
+            
+            # Then load base files
+            'compliance_management/static/src/components/file_upload/js/terminal.js',
+            'compliance_management/static/src/components/file_upload/js/chunked_uploader.js',
+            'compliance_management/static/src/components/file_upload/js/terminal_component.js',
+            'compliance_management/static/src/components/file_upload/js/import_form_component.js',
+            
+            # Finally load action registrations
+            # 'compliance_management/static/src/components/file_upload/js/test_action.js',
+            'compliance_management/static/src/components/file_upload/js/main.js',
+            
+            # Styles
+            'compliance_management/static/src/components/file_upload/scss/csv_import.scss',
+        
+
             'compliance_management/static/src/css/style.css',
             'compliance_management/static/src/components/**/*.js',
             'compliance_management/static/src/components/**/*.xml',
             'compliance_management/static/src/components/**/*.css',
 
-            # 'compliance_management/static/src/components/file_upload/js/main.js',
-            # 'compliance_management/static/src/components/file_upload/js/chunked_uploader.js',
-            # 'compliance_management/static/src/components/file_upload/js/import_form_component.js',
-            # 'compliance_management/static/src/components/file_upload/js/terminal_component.js',
-            # 'compliance_management/static/src/components/file_upload/js/terminal.js',
-            # 'compliance_management/static/src/components/file_upload/js/terminal.js',
-            # 'compliance_management/static/src/components/file_upload/xml/csv_import.xml',
-            # 'compliance_management/static/src/components/file_upload/scss/csv_import.scss',
-            
-             # Specific file_upload component files
-            # 'compliance_management/static/src/components/file_upload/**/*.js',
-            # 'compliance_management/static/src/components/file_upload/**/*.xml',
-            # 'compliance_management/static/src/components/file_upload/**/*.css',
-            # 'compliance_management/static/src/components/file_upload/**/*.scss',
-            
-            # Include other components (if any)
-            # 'compliance_management/static/src/components/**/*/js/*.js',
-            # 'compliance_management/static/src/components/**/*/xml/*.xml',
-            # 'compliance_management/static/src/components/**/*/css/*.css',
 
             'compliance_management/static/src/img/logov.png',
             'compliance_management/static/img/alt_bank_logo.png',

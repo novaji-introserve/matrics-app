@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Clear existing action -->
+    <delete model="ir.actions.client"
+        search="[('tag', '=', 'compliance_management.csv_import_form')]" />
 
-    <!-- Action definition -->
     <record id="action_csv_import" model="ir.actions.client">
         <field name="name">CSV Import</field>
         <field name="tag">compliance_management.csv_import_form</field>
+        <field name="type">ir.actions.client</field>
     </record>
 
-    <!-- Menu item -->
     <menuitem id="menu_csv_import"
         name="CSV Import"
         parent="menu_pep_configurations"
