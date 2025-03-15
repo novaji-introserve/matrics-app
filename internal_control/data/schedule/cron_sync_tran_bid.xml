@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Cron Job for Sync Transaction -->
+        <record id="ir_cron_transaction_bid_sync" model="ir.cron">
+            <field name="name">Sync Transaction Branch ID</field>
+            <field name="model_id" ref="model_res_customer_transaction" />
+            <field name="state">code</field>
+            <field name="code">model.sync_transaction_branch_id()</field>
+            <field name="active" eval="True" />
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <!-- <field name="doall" eval="True" /> -->
+        </record>
+    </data>
+</odoo>
