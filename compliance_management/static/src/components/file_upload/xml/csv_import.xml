@@ -3,214 +3,225 @@
 
     <!-- Main Import Form Template -->
     <t t-name="compliance_management.ImportForm" owl="1">
-        <div class="csv-container">
-            <!-- Logo/Header Section -->
-            <div class="csv-header">
-                <div t-if="env.services.user">
-                    <h2 class="csv-title">Hi <span t-esc="env.services.user.name" /></h2>
-                </div>
-                <h2 class="csv-title">CSV Data Import</h2>
-            </div>
+        <div class="vh-100 overflow-auto bg-muted"
+                style="width: 100%; height: 100%; overflow: auto; border: 1px solid #ccc; background-color: #f9f9f9; margin-bottom: 15px;">
+            <div class="dashboard-container p-10 bg-gray-50" style="margin-bottom: 60px;">
+                <div
+                    class="d-flex bg-white rounded shadow p-4 justify-content-between align-items-center"
+                    style="position: sticky; top: 0; z-index: 100; background-color: white;">
 
-            <!-- Upload Section -->
-            <div class="csv-card">
-                <!-- Error Message Banner -->
-                <div t-if="state.errorMessage" style="background-color: #fee2e2; border-left: 4px solid #ef4444; color: #b91c1c; padding: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <i class="fa fa-exclamation-circle" style="margin-right: 0.5rem;"></i>
-                        <span t-esc="state.errorMessage"></span>
+                    <div class="lead fw-bold">
+                        <div t-if="env.services.user">
+                            <h2 class="mb-0">Hi, <span t-esc="env.services.user.name" /></h2>
+                        </div>
                     </div>
-                    <button style="padding: 0.25rem 0.5rem; border: 1px solid #ef4444; color: #ef4444; border-radius: 0.25rem; background: none; cursor: pointer;"
-                            t-on-click="() => state.errorMessage = null">
-                        Dismiss
-                    </button>
+
+                    <div class="text-end">
+                        <h2 class="mb-0 px-2 py-1 text-sm">CSV Data Import</h2>
+                    </div>
                 </div>
-                
-                <form>
-                    <!-- Category/Model Selection -->
-                    <div class="csv-form-group">
-                        <label class="csv-form-label" for="model-selector">Target Model</label>
-                        <div class="csv-search-container">
-                            <input t-ref="modelSearch"
-                                t-on-input="onModelSearch"
-                                type="text"
-                                class="csv-search-input"
-                                placeholder="Search models..." />
-                            <button class="csv-search-button" 
-                                    type="button" 
-                                    t-on-click="searchModels">
-                                <i class="fa fa-search"></i>
+                <div class=" csv-container">
+                    <!-- Upload Section -->
+                    <div class=" csv-card">
+                        <!-- Error Message Banner -->
+                        <div t-if=" state.errorMessage" style=" background-color: #fee2e2; border-left: 4px solid #ef4444; color: #b91c1c; padding: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <i class=" fa fa-exclamation-circle" style=" margin-right: 0.5rem;"></i>
+                                <span t-esc=" state.errorMessage"></span>
+                            </div>
+                            <button style=" padding: 0.25rem 0.5rem; border: 1px solid #ef4444; color: #ef4444; border-radius: 0.25rem; background: none; cursor: pointer;"
+                                    t-on-click=" ()=> state.errorMessage = null">
+                                Dismiss
                             </button>
                         </div>
-                        <select t-ref="modelSelector" 
-                                id="model-selector" 
-                                class="csv-select" 
-                                t-on-change="onModelChanged">
-                            <option value="">Select a model...</option>
-                            <t t-foreach="state.filteredModels" t-as="model" t-key="model.id">
-                                <option t-att-value="model.id" 
-                                        t-att-selected="state.selectedModel and state.selectedModel.id === model.id">
-                                    <t t-esc="model.name" /> (<t t-esc="model.model_name" />)
-                                </option>
-                            </t>
-                        </select>
-                        <small t-if="state.selectedModel and state.selectedModel.description" 
-                               class="csv-help-text">
-                            <t t-esc="state.selectedModel.description" />
-                        </small>
-                    </div>
+                        
+                        <form>
+                            <!-- Category/Model Selection -->
+                            <div class="csv-form-group">
+                                <label class="csv-form-label" for="model-selector">Target Model</label>
+                                <div class="csv-search-container">
+                                    <input t-ref="modelSearch"
+                                        t-on-input="onModelSearch"
+                                        type="text"
+                                        class="csv-search-input"
+                                        placeholder="Search models..." />
+                                    <button class="csv-search-button" 
+                                            type="button" 
+                                            t-on-click="searchModels">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                                <select t-ref="modelSelector" 
+                                        id="model-selector" 
+                                        class="csv-select" 
+                                        t-on-change="onModelChanged">
+                                    <option value="">Select a model...</option>
+                                    <t t-foreach="state.filteredModels" t-as="model" t-key="model.id">
+                                        <option t-att-value="model.id" 
+                                                t-att-selected="state.selectedModel and state.selectedModel.id === model.id">
+                                            <t t-esc="model.name" /> (<t t-esc="model.model_name" />)
+                                        </option>
+                                    </t>
+                                </select>
+                                <small t-if="state.selectedModel and state.selectedModel.description" 
+                                    class="csv-help-text">
+                                    <t t-esc="state.selectedModel.description" />
+                                </small>
+                            </div>
 
-                    <!-- File Upload -->
-                    <div class="csv-form-group">
-                        <label class="csv-form-label" for="file">CSV File (max 2GB)</label>
-                        <div class="csv-file-container">
-                            <input t-ref="fileInput"
-                                type="file"
-                                id="file"
-                                accept=".csv, .xlsx, .xls"
-                                class="csv-file-input"
-                                t-on-change="onFileChanged" />
-                            <span id="file-name" 
-                                  t-ref="fileName" 
-                                  class="csv-file-label">No file selected</span>
-                        </div>
-                        <p class="csv-help-text">Supported formats: CSV, Excel (.xlsx, .xls) files up to 2GB</p>
-                    </div>
+                            <!-- File Upload -->
+                            <div class="csv-form-group">
+                                <label class="csv-form-label" for="file">CSV File (max 2GB)</label>
+                                <div class="csv-file-container">
+                                    <input t-ref="fileInput"
+                                        type="file"
+                                        id="file"
+                                        accept=".csv, .xlsx, .xls"
+                                        class="csv-file-input"
+                                        t-on-change="onFileChanged" />
+                                    <span id="file-name" 
+                                        t-ref="fileName" 
+                                        class="csv-file-label">No file selected</span>
+                                </div>
+                                <p class="csv-help-text">Supported formats: CSV, Excel (.xlsx, .xls) files up to 2GB</p>
+                            </div>
 
-                    <!-- Upload Progress -->
-                    <div t-if="state.isUploading" class="csv-progress">
-                        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
-                            <div class="csv-spinner"></div>
-                            <p id="progress-text" t-ref="progressText" style="color: #6b7280; font-size: 0.875rem; margin: 0;">
-                                Uploading... <t t-esc="state.uploadProgress" />% 
-                                (<t t-esc="state.uploadedSize" /> of <t t-esc="state.totalSize" />) 
-                                at <t t-esc="state.uploadSpeed" />
-                            </p>
-                        </div>
-                        <div class="csv-progress-bar-container">
-                            <div class="csv-progress-bar" t-att-style="'width: ' + state.uploadProgress + '%'"></div>
-                        </div>
-                    </div>
-
-                    <!-- Warning Banner -->
-                    <div class="csv-form-group" style="max-width: 650px; margin-left: auto; margin-right: auto;">
-                        <button type="button" 
-                                class="csv-toggle-link" 
-                                t-on-click="toggleWarning">
-                            <i class="fa fa-exclamation-triangle" style="margin-right: 0.5rem;"></i> 
-                            <t t-if="state.showWarning">Hide</t>
-                            <t t-else="">Show</t>
-                            Important Upload Guidance
-                        </button>
-                        <div t-if="state.showWarning" class="csv-alert csv-alert-yellow">
-                            <p class="csv-alert-title">Important Upload Guidance</p>
-                            <p>⚠️ Please ensure your CSV/Excel file has headers that match the fields of the selected model. 
-                               The import will try to map columns automatically based on field names and labels, but exact matches work best.</p>
-                            <p>⚠️ Required fields must be included in your file. The import will fail if required fields are missing.</p>
-                        </div>
-                    </div>
-
-                    <!-- Template Downloads Section -->
-                    <div class="csv-form-group" style="max-width: 650px; margin-left: auto; margin-right: auto;">
-                        <button type="button" 
-                                class="csv-toggle-link blue" 
-                                t-on-click="toggleTemplates">
-                            <i class="fa fa-download" style="margin-right: 0.5rem;"></i> 
-                            <t t-if="state.showTemplates">Hide</t>
-                            <t t-else="">Show</t>
-                            Template Downloads
-                        </button>
-                        <div t-if="state.showTemplates" class="csv-alert csv-alert-blue">
-                            <div class="csv-checkbox-container">
-                                <p class="csv-alert-title">Download Templates</p>
-                                <div style="display: flex; align-items: center;">
-                                    <input type="checkbox"
-                                        class="csv-checkbox"
-                                        id="select-all-templates"
-                                        t-ref="selectAllTemplates"
-                                        t-on-change="onSelectAllTemplates" />
-                                    <label for="select-all-templates">Select All</label>
+                            <!-- Upload Progress -->
+                            <div t-if="state.isUploading" class="csv-progress">
+                                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                                    <div class="csv-spinner"></div>
+                                    <p id="progress-text" t-ref="progressText" style="color: #6b7280; font-size: 0.875rem; margin: 0;">
+                                        Uploading... <t t-esc="state.uploadProgress" />% 
+                                        (<t t-esc="state.uploadedSize" /> of <t t-esc="state.totalSize" />) 
+                                        at <t t-esc="state.uploadSpeed" />
+                                    </p>
+                                </div>
+                                <div class="csv-progress-bar-container">
+                                    <div class="csv-progress-bar" t-att-style="'width: ' + state.uploadProgress + '%'"></div>
                                 </div>
                             </div>
-                            
-                            <div class="csv-checkbox-group">
-                                <t t-foreach="state.models" t-as="model" t-key="model.id">
-                                    <div class="csv-checkbox-item">
-                                        <input type="checkbox"
-                                            class="csv-checkbox"
-                                            t-att-id="'template-' + model.id"
-                                            t-att-data-model-id="model.id"
-                                            t-att-data-model-name="model.name"
-                                            t-att-checked="state.selectedTemplates.includes(model.id)"
-                                            t-on-change="(ev) => this.onTemplateCheckboxChange(model.id, ev)" />
-                                        <label t-att-for="'template-' + model.id">
-                                            <t t-esc="model.name" />
-                                        </label>
-                                    </div>
-                                </t>
+
+                            <!-- Warning Banner -->
+                            <div class="csv-form-group" style="max-width: 650px; margin-left: auto; margin-right: auto;">
+                                <button type="button" 
+                                        class="csv-toggle-link" 
+                                        t-on-click="toggleWarning">
+                                    <i class="fa fa-exclamation-triangle" style="margin-right: 0.5rem;"></i> 
+                                    <t t-if="state.showWarning">Hide</t>
+                                    <t t-else="">Show</t>
+                                    Important Upload Guidance
+                                </button>
+                                <div t-if="state.showWarning" class="csv-alert csv-alert-yellow">
+                                    <p class="csv-alert-title">Important Upload Guidance</p>
+                                    <p>⚠️ Please ensure your CSV/Excel file has headers that match the fields of the selected model. 
+                                    The import will try to map columns automatically based on field names and labels, but exact matches work best.</p>
+                                    <p>⚠️ Required fields must be included in your file. The import will fail if required fields are missing.</p>
+                                </div>
                             </div>
 
-                            <button id="download-templates" 
-                                    class="csv-button" 
-                                    style="margin-top: 1rem;" 
-                                    t-on-click="onDownloadTemplates" 
-                                    t-att-disabled="state.selectedTemplates.length === 0 || state.processingFiles">
-                                <t t-if="state.processingFiles">
-                                    <i class="fa fa-spinner fa-spin" style="margin-right: 0.5rem;"></i> Processing...
-                                </t>
-                                <t t-elif="state.selectedTemplates.length === 0">
-                                    Select templates to download
-                                </t>
-                                <t t-elif="state.selectedTemplates.length === state.models.length">
-                                    Download All Templates
-                                </t>
-                                <t t-else="">
-                                    Download Selected Templates (<t t-esc="state.selectedTemplates.length" />)
-                                </t>
-                            </button>
-                        </div>
+                            <!-- Template Downloads Section -->
+                            <div class="csv-form-group" style="max-width: 650px; margin-left: auto; margin-right: auto;">
+                                <button type="button" 
+                                        class="csv-toggle-link blue" 
+                                        t-on-click="toggleTemplates">
+                                    <i class="fa fa-download" style="margin-right: 0.5rem;"></i> 
+                                    <t t-if="state.showTemplates">Hide</t>
+                                    <t t-else="">Show</t>
+                                    Template Downloads
+                                </button>
+                                <div t-if="state.showTemplates" class="csv-alert csv-alert-blue">
+                                    <div class="csv-checkbox-container">
+                                        <p class="csv-alert-title">Download Templates</p>
+                                        <div style="display: flex; align-items: center;">
+                                            <input type="checkbox"
+                                                class="csv-checkbox"
+                                                id="select-all-templates"
+                                                t-ref="selectAllTemplates"
+                                                t-on-change="onSelectAllTemplates" />
+                                            <label for="select-all-templates">Select All</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="csv-checkbox-group">
+                                        <t t-foreach="state.models" t-as="model" t-key="model.id">
+                                            <div class="csv-checkbox-item">
+                                                <input type="checkbox"
+                                                    class="csv-checkbox"
+                                                    t-att-id="'template-' + model.id"
+                                                    t-att-data-model-id="model.id"
+                                                    t-att-data-model-name="model.name"
+                                                    t-att-checked="state.selectedTemplates.includes(model.id)"
+                                                    t-on-change="(ev) => this.onTemplateCheckboxChange(model.id, ev)" />
+                                                <label t-att-for="'template-' + model.id">
+                                                    <t t-esc="model.name" />
+                                                </label>
+                                            </div>
+                                        </t>
+                                    </div>
+
+                                    <button id="download-templates" 
+                                            class="csv-button" 
+                                            style="margin-top: 1rem;" 
+                                            t-on-click="onDownloadTemplates" 
+                                            t-att-disabled="state.selectedTemplates.length === 0 || state.processingFiles">
+                                        <t t-if="state.processingFiles">
+                                            <i class="fa fa-spinner fa-spin" style="margin-right: 0.5rem;"></i> Processing...
+                                        </t>
+                                        <t t-elif="state.selectedTemplates.length === 0">
+                                            Select templates to download
+                                        </t>
+                                        <t t-elif="state.selectedTemplates.length === state.models.length">
+                                            Download All Templates
+                                        </t>
+                                        <t t-else="">
+                                            Download Selected Templates (<t t-esc="state.selectedTemplates.length" />)
+                                        </t>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="csv-form-group">
+                                <button type="button" 
+                                        class="csv-button csv-button-full" 
+                                        t-on-click="onUpload" 
+                                        t-att-disabled="!state.selectedFile || !state.selectedModel || state.isUploading">
+                                    <t t-if="state.isUploading">
+                                        <i class="fa fa-spinner fa-spin" style="margin-right: 0.5rem;"></i> Uploading...
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-upload" style="margin-right: 0.5rem;"></i> Upload
+                                    </t>
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="csv-form-group">
-                        <button type="button" 
-                                class="csv-button csv-button-full" 
-                                t-on-click="onUpload" 
-                                t-att-disabled="!state.selectedFile || !state.selectedModel || state.isUploading">
-                            <t t-if="state.isUploading">
-                                <i class="fa fa-spinner fa-spin" style="margin-right: 0.5rem;"></i> Uploading...
-                            </t>
-                            <t t-else="">
-                                <i class="fa fa-upload" style="margin-right: 0.5rem;"></i> Upload
-                            </t>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Upload Status Modal -->
-            <div t-if="state.showModal" class="csv-modal-backdrop">
-                <div class="csv-modal">
-                    <div style="text-align: center;">
-                        <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
-                            <t t-if="state.modalType === 'success'">
-                                <i class="fa fa-check-circle" style="font-size: 4rem; color: #10b981;"></i>
-                            </t>
-                            <t t-else="">
-                                <i class="fa fa-exclamation-triangle" style="font-size: 4rem; color: #ef4444;"></i>
-                            </t>
+                    <!-- Upload Status Modal -->
+                    <div t-if="state.showModal" class="csv-modal-backdrop">
+                        <div class="csv-modal">
+                            <div style="text-align: center;">
+                                <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+                                    <t t-if="state.modalType === 'success'">
+                                        <i class="fa fa-check-circle" style="font-size: 4rem; color: #10b981;"></i>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-exclamation-triangle" style="font-size: 4rem; color: #ef4444;"></i>
+                                    </t>
+                                </div>
+                                <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;" t-esc="state.modalTitle"></h2>
+                                <p style="color: #6b7280; margin-bottom: 1rem;" t-esc="state.modalMessage"></p>
+                                <button class="csv-button" 
+                                        t-on-click="closeModal">Close</button>
+                            </div>
                         </div>
-                        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;" t-esc="state.modalTitle"></h2>
-                        <p style="color: #6b7280; margin-bottom: 1rem;" t-esc="state.modalMessage"></p>
-                        <button class="csv-button" 
-                                t-on-click="closeModal">Close</button>
                     </div>
                 </div>
+                <!-- Terminal Component -->
+                <div class="terminal-log-container">
+                    <TerminalComponent />
+                </div>
             </div>
-        </div>
-        <!-- Terminal Component -->
-        <div class="terminal-log-container">
-            <TerminalComponent />
         </div>
     </t>
 

@@ -25,125 +25,6 @@ export const terminalService = {
         const MAX_RECONNECT_ATTEMPTS = 5;
         const RECONNECT_DELAY = 3000; // 3 seconds
 
-        // Initialize WebSocket if supported
-        async function connectWebSocket() {
-            if (typeof WebSocket === 'undefined') {
-                console.log('WebSockets not supported by your browser, using long-polling');
-                startBusListening();
-                return;
-            }
-
-            // Check if we already have a connection
-            if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
-                console.log('WebSocket already connected or connecting');
-                return;
-            }
-
-            try {
-                // First, get the WebSocket configuration from the server
-                const wsConfig = await rpc('/csv_import/ws_config');
-
-                // Construct the WebSocket URL using the configuration
-                const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-                const wsUrl = `${protocol}://${wsConfig.host}:${wsConfig.port}${wsConfig.path}`;
-
-                console.log(`Attempting to connect to WebSocket at ${wsUrl}`);
-
-                socket = new WebSocket(wsUrl);
-
-                socket.onopen = () => {
-                    connected = true;
-                    reconnectAttempts = 0;
-                    clearTimeout(reconnectTimer);
-                    notifyListeners('WebSocket connected', 'success');
-
-                    // Send authentication
-                    socket.send(JSON.stringify({
-                        type: 'auth',
-                        user_id: session.uid,
-                        session_id: session.session_id
-                    }));
-                };
-
-                socket.onmessage = (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        if (data.type === 'log_message') {
-                            addLog(data.message, data.message_type, data.timestamp);
-                        } else if (data.type === 'connected') {
-                            console.log('WebSocket authenticated:', data.message);
-                        } else if (data.type === 'error') {
-                            console.error('WebSocket error message:', data.message);
-                        }
-                    } catch (e) {
-                        console.error('Error parsing WebSocket message:', e);
-                    }
-                };
-
-                socket.onclose = (event) => {
-                    connected = false;
-                    if (event.wasClean) {
-                        notifyListeners(`WebSocket closed: ${event.reason}`, 'warning');
-                    } else {
-                        notifyListeners('WebSocket connection lost', 'warning');
-                    }
-
-                    // Try to reconnect after delay
-                    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                        reconnectAttempts++;
-                        const delay = RECONNECT_DELAY * reconnectAttempts;
-                        console.log(`Will try to reconnect WebSocket in ${delay / 1000}s (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
-
-                        clearTimeout(reconnectTimer);
-                        reconnectTimer = setTimeout(() => {
-                            if (!connected) {
-                                connectWebSocket();
-                            }
-                        }, delay);
-                    } else {
-                        console.log('Max WebSocket reconnection attempts reached, falling back to long-polling');
-                        startBusListening();
-                    }
-                };
-
-                socket.onerror = (error) => {
-                    console.error('WebSocket error:', error);
-                    notifyListeners('WebSocket error, will try to reconnect', 'error');
-                };
-            } catch (e) {
-                connected = false;
-                notifyListeners('Error setting up WebSocket, using long-polling', 'error');
-                console.error('WebSocket setup error:', e);
-                startBusListening();
-            }
-        }
-
-        // Rest of the code remains the same...
-        function startBusListening() {
-            try {
-                const channel = `csv_import_logs_${env.services.user.userId}`;
-                bus_service.addChannel(channel);
-
-                // Use addEventListener for notifications
-                bus_service.addEventListener('notification', (ev) => {
-                    const notifications = ev.detail;
-                    if (Array.isArray(notifications)) {
-                        notifications.forEach((notification) => {
-                            if (notification.type === 'log_message' && notification.payload) {
-                                addLog(notification.payload.message, notification.payload.message_type, notification.payload.timestamp);
-                            }
-                        });
-                    }
-                });
-
-                console.log('Bus service listening enabled as fallback');
-                addLog('Terminal connected via bus service (long-polling)', 'info');
-            } catch (e) {
-                console.warn('Error setting up bus service:', e);
-                addLog(`Error setting up bus service: ${e.message}`, 'error');
-            }
-        }
-
         // Add a log entry
         function addLog(message, type = 'info', timestamp = null) {
             if (!timestamp) {
@@ -160,6 +41,9 @@ export const terminalService = {
 
             // Notify listeners
             notifyListeners(message, type, timestamp);
+
+            // Log to console for debugging
+            console.log(`[Terminal ${type}] ${message}`);
         }
 
         // Notify all registered listeners
@@ -171,6 +55,162 @@ export const terminalService = {
                     console.error('Error in terminal listener:', e);
                 }
             });
+        }
+
+        // Initialize WebSocket if supported
+        async function connectWebSocket() {
+            // Log connection attempt immediately
+            addLog('Attempting to connect to WebSocket...', 'info');
+
+            if (typeof WebSocket === 'undefined') {
+                addLog('WebSockets not supported by your browser, using long-polling', 'warning');
+                startBusListening();
+                return;
+            }
+
+            // Check if we already have a connection
+            if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+                addLog('WebSocket already connected or connecting', 'info');
+                return;
+            }
+
+            try {
+                // First, get the WebSocket configuration from the server
+                addLog('Fetching WebSocket configuration...', 'info');
+                const wsConfig = await rpc('/csv_import/ws_config');
+
+                // Log the configuration
+                console.log('WebSocket configuration:', wsConfig);
+
+                // Construct the WebSocket URL
+                const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+                const wsUrl = `${protocol}://${wsConfig.host}:${wsConfig.port}${wsConfig.path}`;
+
+                addLog(`Connecting to WebSocket at ${wsUrl}`, 'info');
+                console.log(`Attempting to connect to WebSocket at ${wsUrl}`);
+
+                socket = new WebSocket(wsUrl);
+
+                socket.onopen = () => {
+                    connected = true;
+                    reconnectAttempts = 0;
+                    clearTimeout(reconnectTimer);
+                    addLog('WebSocket connected successfully!', 'success');
+
+                    // Send authentication
+                    const authMsg = {
+                        type: 'auth',
+                        user_id: session.uid,
+                        session_id: session.session_id
+                    };
+
+                    console.log('Sending authentication:', authMsg);
+                    socket.send(JSON.stringify(authMsg));
+                };
+
+                socket.onmessage = (event) => {
+                    try {
+                        console.log('WebSocket message received:', event.data);
+                        const data = JSON.parse(event.data);
+
+                        if (data.type === 'log_message') {
+                            addLog(data.message, data.message_type, data.timestamp);
+                        } else if (data.type === 'connected') {
+                            addLog(`WebSocket authenticated: ${data.message}`, 'success');
+                            console.log('WebSocket authenticated:', data.message);
+
+                            // Send a test message to confirm bidirectional communication
+                            socket.send(JSON.stringify({
+                                type: 'log_message',
+                                message: 'Terminal connected and authenticated',
+                                message_type: 'info'
+                            }));
+                        } else if (data.type === 'error') {
+                            addLog(`WebSocket error: ${data.message}`, 'error');
+                            console.error('WebSocket error message:', data.message);
+                        } else {
+                            // Log other message types
+                            console.log(`WebSocket message (${data.type}):`, data);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing WebSocket message:', e);
+                        console.error('Original message:', event.data);
+                    }
+                };
+
+                socket.onclose = (event) => {
+                    connected = false;
+                    if (event.wasClean) {
+                        addLog(`WebSocket closed: ${event.reason}`, 'warning');
+                    } else {
+                        addLog('WebSocket connection lost', 'warning');
+                    }
+
+                    // Try to reconnect after delay
+                    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                        reconnectAttempts++;
+                        const delay = RECONNECT_DELAY * reconnectAttempts;
+                        addLog(`Will try to reconnect WebSocket in ${delay / 1000}s (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`, 'info');
+
+                        clearTimeout(reconnectTimer);
+                        reconnectTimer = setTimeout(() => {
+                            if (!connected) {
+                                connectWebSocket();
+                            }
+                        }, delay);
+                    } else {
+                        addLog('Max WebSocket reconnection attempts reached, falling back to long-polling', 'warning');
+                        startBusListening();
+                    }
+                };
+
+                socket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    addLog('WebSocket error, will try to reconnect', 'error');
+                };
+
+                // Set a connection timeout
+                setTimeout(() => {
+                    if (socket && socket.readyState !== WebSocket.OPEN) {
+                        addLog('WebSocket connection timed out', 'error');
+                        if (socket.readyState !== WebSocket.CLOSED && socket.readyState !== WebSocket.CLOSING) {
+                            socket.close();
+                        }
+                        startBusListening();
+                    }
+                }, 10000); // 10 second timeout
+
+            } catch (e) {
+                connected = false;
+                addLog(`Error setting up WebSocket: ${e.message}`, 'error');
+                console.error('WebSocket setup error:', e);
+                startBusListening();
+            }
+        }
+
+        function startBusListening() {
+            try {
+                addLog('Setting up long-polling fallback...', 'info');
+                const channel = `csv_import_logs_${env.services.user.userId}`;
+                bus_service.addChannel(channel);
+
+                // Use addEventListener for notifications
+                bus_service.addEventListener('notification', (ev) => {
+                    const notifications = ev.detail;
+                    if (Array.isArray(notifications)) {
+                        notifications.forEach((notification) => {
+                            if (notification.type === 'log_message' && notification.payload) {
+                                addLog(notification.payload.message, notification.payload.message_type, notification.payload.timestamp);
+                            }
+                        });
+                    }
+                });
+
+                addLog('Terminal connected via bus service (long-polling)', 'success');
+            } catch (e) {
+                console.warn('Error setting up bus service:', e);
+                addLog(`Error setting up bus service: ${e.message}`, 'error');
+            }
         }
 
         // Send a log message to the server
@@ -207,15 +247,15 @@ export const terminalService = {
 
         // Initialize WebSocket and bus listening
         try {
+            // Add initial log
+            addLog('Terminal service initializing...', 'info');
+
             // Try WebSocket first
             connectWebSocket();
 
             // Also start bus listening as a parallel channel
             // The server will send to both to ensure delivery
             startBusListening();
-
-            // Add initial log
-            addLog('Terminal service initialized', 'info');
         } catch (e) {
             console.error('Error initializing terminal service:', e);
             // Add initial error log
