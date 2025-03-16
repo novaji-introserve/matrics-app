@@ -14,6 +14,7 @@ export const terminalService = {
     dependencies: ['bus_service', 'rpc'],
 
     start(env, { bus_service, rpc }) {
+        let socket = null;
         let connected = false;
         const logs = [];
         const listeners = new Set();
@@ -21,8 +22,62 @@ export const terminalService = {
 
         // Initialize WebSocket if supported
         function connectWebSocket() {
-            // Just log the status - don't attempt to connect in the simplified version
-            console.log('Terminal service initialized (WebSocket disabled)');
+            if (typeof WebSocket === 'undefined') {
+                console.log('WebSockets not supported by your browser, using long-polling');
+                return;
+            }
+
+            try {
+                const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+                const wsUrl = `${protocol}://${window.location.host}/csv_import/ws`;
+
+                socket = new WebSocket(wsUrl);
+
+                socket.onopen = () => {
+                    connected = true;
+                    notifyListeners('WebSocket connected', 'success');
+
+                    // Send authentication
+                    socket.send(JSON.stringify({
+                        type: 'auth',
+                        user_id: session.uid,
+                        session_id: session.session_id
+                    }));
+                };
+
+                socket.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'log_message') {
+                            addLog(data.message, data.message_type, data.timestamp);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing WebSocket message:', e);
+                    }
+                };
+
+                socket.onclose = () => {
+                    connected = false;
+                    notifyListeners('WebSocket disconnected', 'warning');
+
+                    // Try to reconnect after 5 seconds
+                    setTimeout(() => {
+                        if (!connected) {
+                            connectWebSocket();
+                        }
+                    }, 5000);
+                };
+
+                socket.onerror = (error) => {
+                    connected = false;
+                    notifyListeners('WebSocket error, falling back to long-polling', 'error');
+                    console.error('WebSocket error:', error);
+                };
+            } catch (e) {
+                connected = false;
+                notifyListeners('Error setting up WebSocket, using long-polling', 'error');
+                console.error('WebSocket setup error:', e);
+            }
         }
 
         // Start listening to bus messages
@@ -97,7 +152,7 @@ export const terminalService = {
         // Initialize bus listening (skip WebSocket for now)
         try {
             // Don't try WebSocket for now to avoid errors
-            // connectWebSocket();
+            connectWebSocket();
             startBusListening();
 
             // Add initial log

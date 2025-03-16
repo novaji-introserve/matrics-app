@@ -38,3 +38,4 @@ from . import transaction_type
 from . import pep_customer
 from . import adverse_media
 from . import pep_source
+from . import import_log

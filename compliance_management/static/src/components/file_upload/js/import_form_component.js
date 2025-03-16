@@ -127,6 +127,11 @@ export class ImportFormComponent extends Component {
             console.log("Loading models...");
             this.state.errorMessage = null;
 
+            // Show loading message
+            if (this.terminal) {
+                this.terminal.addLog("Loading available import models...", "info");
+            }
+
             // Add a timeout to prevent hanging
             const modelPromise = this.rpc("/csv_import/get_import_models", { limit: 100 });
             const timeoutPromise = new Promise((_, reject) =>
@@ -134,6 +139,11 @@ export class ImportFormComponent extends Component {
             );
 
             const result = await Promise.race([modelPromise, timeoutPromise]);
+
+            // Check if result contains error
+            if (result.error) {
+                throw new Error(result.error);
+            }
 
             this.state.models = result.models || [];
             this.state.filteredModels = [...this.state.models];
@@ -144,9 +154,13 @@ export class ImportFormComponent extends Component {
             }
         } catch (error) {
             console.error("Error loading models:", error);
-            this.state.errorMessage = `Failed to load models: ${error.message}`;
+
+            // More helpful error message
+            const errorMsg = `Failed to load models: ${error.message || 'Unknown error'}. Check server logs for details.`;
+            this.state.errorMessage = errorMsg;
+
             if (this.terminal) {
-                this.terminal.addLog(`Error loading models: ${error.message}`, "error");
+                this.terminal.addLog(errorMsg, "error");
             }
             if (this.notification) {
                 this.notification.add(_t("Failed to load import models"), {

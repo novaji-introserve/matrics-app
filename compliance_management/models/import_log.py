@@ -29,8 +29,8 @@ SQL Constraints:
     unique_model: Enforces a unique constraint on the `model_id` field, ensuring that the model is not already configured for import.
 
 Note: This code is written in Python and is part of a larger application or module. It utilizes the `models.Model` class from an external library or framework."""
-class ImportModel(models.Model):
-    _name = "import.model"
+class CsvImportModel(models.Model):
+    _name = "csv.import.model"
     _description = "Importable Model"
     _order = "name"
 
@@ -106,7 +106,7 @@ class ImportLog(models.Model):
     original_filename = fields.Char(string="Original Filename")
     content_type = fields.Char(string="Content Type")
     import_model_id = fields.Many2one(
-        "import.model", string="Import Model", required=True
+        "csv.import.model", string="Import Model", required=True
     )
     model_name = fields.Char(
         related="import_model_id.model_name", string="Model Name", store=True

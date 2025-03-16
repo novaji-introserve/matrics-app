@@ -66,6 +66,8 @@
     "auto_install": False,
     'assets':{
         'web.assets_backend': [
+            # Styles
+            'compliance_management/static/src/components/file_upload/scss/csv_import.scss',
             'compliance_management/static/src/scss/custom_status_bar.scss',
 
             # Load templates first
@@ -80,11 +82,7 @@
             # Finally load action registrations
             # 'compliance_management/static/src/components/file_upload/js/test_action.js',
             'compliance_management/static/src/components/file_upload/js/main.js',
-            
-            # Styles
-            'compliance_management/static/src/components/file_upload/scss/csv_import.scss',
         
-
             'compliance_management/static/src/css/style.css',
             'compliance_management/static/src/components/**/*.js',
             'compliance_management/static/src/components/**/*.xml',

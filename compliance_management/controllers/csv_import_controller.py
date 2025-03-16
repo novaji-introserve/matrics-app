@@ -66,11 +66,11 @@ class CSVImportController(http.Controller):
             ]
 
         # Get total count for pagination
-        total_count = request.env["import.model"].sudo().search_count(domain)
+        total_count = request.env["csv.import.model"].sudo().search_count(domain)
 
         # Get records with pagination
         models = (
-            request.env["import.model"]
+            request.env["csv.import.model"]
             .sudo()
             .search_read(
                 domain=domain,
@@ -86,7 +86,7 @@ class CSVImportController(http.Controller):
     @http.route("/csv_import/get_model_fields", type="json", auth="user")
     def get_model_fields(self, model_id):
         """Get fields for a specific model"""
-        import_model = request.env["import.model"].sudo().browse(int(model_id))
+        import_model = request.env["csv.import.model"].sudo().browse(int(model_id))
         if not import_model.exists():
             return {"error": "Model not found"}
 
@@ -145,7 +145,7 @@ class CSVImportController(http.Controller):
                 )
 
             # Validate model ID
-            import_model = request.env["import.model"].sudo().browse(model_id)
+            import_model = request.env["csv.import.model"].sudo().browse(model_id)
             if not import_model.exists():
                 return Response(
                     json.dumps({"error": f"Invalid model ID: {model_id}"}),
@@ -340,7 +340,7 @@ class CSVImportController(http.Controller):
     def download_template(self, model_id, **kw):
         """Download template file for a specific model"""
         try:
-            import_model = request.env["import.model"].sudo().browse(int(model_id))
+            import_model = request.env["csv.import.model"].sudo().browse(int(model_id))
             if not import_model.exists():
                 return Response(
                     json.dumps({"error": "Model not found"}),
@@ -618,11 +618,11 @@ class CSVImportController(http.Controller):
             ]
 
         # Get total count for pagination
-        total_count = request.env["import.model"].sudo().search_count(domain)
+        total_count = request.env["csv.import.model"].sudo().search_count(domain)
 
         # Get records with pagination
         models = (
-            request.env["import.model"]
+            request.env["csv.import.model"]
             .sudo()
             .search_read(
                 domain=domain,
@@ -638,7 +638,7 @@ class CSVImportController(http.Controller):
     @http.route("/csv_import/get_model_fields", type="json", auth="user")
     def get_model_fields(self, model_id):
         """Get fields for a specific model"""
-        import_model = request.env["import.model"].sudo().browse(int(model_id))
+        import_model = request.env["csv.import.model"].sudo().browse(int(model_id))
         if not import_model.exists():
             return {"error": "Model not found"}
 
@@ -697,7 +697,7 @@ class CSVImportController(http.Controller):
                 )
 
             # Validate model ID
-            import_model = request.env["import.model"].sudo().browse(model_id)
+            import_model = request.env["csv.import.model"].sudo().browse(model_id)
             if not import_model.exists():
                 return Response(
                     json.dumps({"error": f"Invalid model ID: {model_id}"}),
@@ -892,7 +892,7 @@ class CSVImportController(http.Controller):
     def download_template(self, model_id, **kw):
         """Download template file for a specific model"""
         try:
-            import_model = request.env["import.model"].sudo().browse(int(model_id))
+            import_model = request.env["csv.import.model"].sudo().browse(int(model_id))
             if not import_model.exists():
                 return Response(
                     json.dumps({"error": "Model not found"}),
