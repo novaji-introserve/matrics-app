@@ -37,7 +37,7 @@ class WebSocketManager:
         self.websocket_thread = None
         self.is_running = False
         self.host = config.get("websocket_host", "localhost")
-        self.port = int(config.get("websocket_port", 8069))
+        self.port = int(config.get("websocket_port", 8072))
         self.url_map = Map([
             Rule('/csv_import/ws', endpoint=self.handle_websocket)
         ])
@@ -47,56 +47,107 @@ class WebSocketManager:
         if not GEVENT_AVAILABLE:
             _logger.error("Cannot start WebSocket server: gevent and geventwebsocket packages are required.")
             return False
-            
+                
         if self.is_running:
             _logger.warning("WebSocket server is already running.")
             return True
-            
+                
         try:
-            # Define the WSGI application
+            # Define the WSGI application as before...
             def websocket_app(environ, start_response):
-                # Match the URL against our URL map
-                try:
-                    urls = self.url_map.bind_to_environ(environ)
-                    endpoint, args = urls.match()
-                    return endpoint(environ, start_response)
-                except NotFound:
-                    # Pass unmatched paths to a simple 404 response
-                    start_response('404 Not Found', [('Content-Type', 'text/plain')])
-                    return [b'Not Found']
-                except Exception as e:
-                    _logger.exception("WebSocket error: %s", e)
-                    start_response('500 Internal Server Error', [('Content-Type', 'text/plain')])
-                    return [b'Internal Server Error']
+                # same as your existing code
+                pass
             
-            # Create and start the server
+            # Create the server
             self.websocket_server = pywsgi.WSGIServer(
                 (self.host, self.port), 
                 websocket_app,
                 handler_class=WebSocketHandler
             )
             
-            # Start in a separate thread
-            self.websocket_thread = threading.Thread(target=self._run_server, daemon=True)
-            self.websocket_thread.start()
+            # Start the server without blocking (this is key)
+            self.websocket_server.start()
             
-            # Wait a moment to ensure the server starts
-            time.sleep(1)
+            # Set is_running flag
+            self.is_running = True
+            _logger.info("WebSocket server started on %s:%s", self.host, self.port)
+            return True
             
-            if self.websocket_server:
-                self.is_running = True
-                _logger.info("WebSocket server started on %s:%s", self.host, self.port)
-                return True
-            else:
-                _logger.error("Failed to start WebSocket server")
-                return False
         except Exception as e:
             _logger.exception("Failed to start WebSocket server: %s", e)
             return False
+
+    # def start(self):
+    #     """Start the WebSocket server in a separate thread"""
+    #     if not GEVENT_AVAILABLE:
+    #         _logger.error("Cannot start WebSocket server: gevent and geventwebsocket packages are required.")
+    #         return False
             
+    #     if self.is_running:
+    #         _logger.warning("WebSocket server is already running.")
+    #         return True
+            
+    #     try:
+    #         # Define the WSGI application
+    #         def websocket_app(environ, start_response):
+    #             # Match the URL against our URL map
+    #             try:
+    #                 urls = self.url_map.bind_to_environ(environ)
+    #                 endpoint, args = urls.match()
+    #                 return endpoint(environ, start_response)
+    #             except NotFound:
+    #                 # Pass unmatched paths to a simple 404 response
+    #                 start_response('404 Not Found', [('Content-Type', 'text/plain')])
+    #                 return [b'Not Found']
+    #             except Exception as e:
+    #                 _logger.exception("WebSocket error: %s", e)
+    #                 start_response('500 Internal Server Error', [('Content-Type', 'text/plain')])
+    #                 return [b'Internal Server Error']
+            
+    #         # Create and start the server
+    #         self.websocket_server = pywsgi.WSGIServer(
+    #             (self.host, self.port), 
+    #             websocket_app,
+    #             handler_class=WebSocketHandler
+    #         )
+            
+    #         # Start in a separate thread
+    #         self.websocket_thread = threading.Thread(target=self._run_server, daemon=True)
+    #         self.websocket_thread.start()
+            
+    #         # Wait a moment to ensure the server starts
+    #         time.sleep(1)
+            
+    #         if self.websocket_server:
+    #             self.is_running = True
+    #             _logger.info("WebSocket server started on %s:%s", self.host, self.port)
+    #             return True
+    #         else:
+    #             _logger.error("Failed to start WebSocket server")
+    #             return False
+    #     except Exception as e:
+    #         _logger.exception("Failed to start WebSocket server: %s", e)
+    #         return False
+            
+    # def _run_server(self):
+    #     """Run the WebSocket server (called in a thread)"""
+    #     try:
+    #         self.websocket_server.serve_forever()
+    #     except Exception as e:
+    #         _logger.exception("WebSocket server error: %s", e)
+    #         self.is_running = False
+
     def _run_server(self):
         """Run the WebSocket server (called in a thread)"""
         try:
+            # Import gevent modules here to ensure they're available
+            import gevent.monkey
+            # Patch only what's needed in this thread
+            gevent.monkey.patch_socket()
+            gevent.monkey.patch_ssl()
+            
+            # Now start the server
+            _logger.info("WebSocket server starting to serve...")
             self.websocket_server.serve_forever()
         except Exception as e:
             _logger.exception("WebSocket server error: %s", e)
