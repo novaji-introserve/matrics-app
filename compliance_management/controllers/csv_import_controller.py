@@ -10,7 +10,7 @@ import string
 from odoo import http, _
 from odoo.http import request, Response
 from werkzeug.exceptions import BadRequest
-# from ..services.websocket.websocket_helper import send_log_message
+# from ..services.websocket.websocket_helper import send_message
 from ..services.websocket.connection import send_message
 
 _logger = logging.getLogger(__name__)
@@ -20,62 +20,169 @@ class CSVImportController(http.Controller):
     @http.route("/csv_import/upload", type="http", auth="user")
     def csv_upload_page(self):
         """Render the CSV upload page"""
-        # No need to pass template_downloads - will be fetched dynamically via AJAX
         return request.render("csv_import.csv_import_upload_form", {})
 
     @http.route("/csv_import/get_import_models", type="json", auth="user")
-    def get_import_models(self, search_term=None, limit=10, offset=0):
-        """Get available import models"""
-        domain = [("active", "=", True)]
-
-        if search_term:
-            domain += [
-                "|",
-                ("name", "ilike", search_term),
-                ("model_id.model", "ilike", search_term),
+    def get_import_models(self, search_term=None, limit=50, offset=0):
+        """Get available models for import directly from ir.model"""
+        try:
+            self._send_message("Fetching available models from database...", "info")
+            
+            # Define domain for model filtering - exclude transient models and those that should not be imported
+            domain = [
+                ('transient', '=', False),  # Exclude transient models
+                ('model', 'not ilike', 'ir.%'),  # Exclude most system models
+                ('model', 'not ilike', 'base.%'),
+                ('model', 'not ilike', 'bus.%'),
+                ('model', 'not ilike', 'base_%'),
             ]
-
-        # Get total count for pagination
-        total_count = request.env["csv.import.model"].sudo().search_count(domain)
-
-        # Get records with pagination
-        models = (
-            request.env["csv.import.model"]
-            .sudo()
-            .search_read(
+            
+            # If there's a search term, add it to the domain
+            if search_term:
+                domain += [
+                    '|',
+                    ('name', 'ilike', search_term),
+                    ('model', 'ilike', search_term),
+                ]
+            
+            # Log the domain we're using for transparency
+            _logger.info(f"Searching ir.model with domain: {domain}")
+            
+            # Get count of all matching models
+            total_count = request.env['ir.model'].sudo().search_count(domain)
+            
+            # Get the model records - include description field if it exists
+            fields_to_fetch = ['id', 'name', 'model']
+            # Check if description field exists in ir.model
+            if 'description' in request.env['ir.model']._fields:
+                fields_to_fetch.append('description')
+            
+            ir_models = request.env['ir.model'].sudo().search_read(
                 domain=domain,
-                fields=["id", "name", "model_name", "description", "template_filename"],
+                fields=fields_to_fetch,
                 limit=limit,
                 offset=offset,
-                order="name",
+                order='name',
             )
-        )
-
-        return {"models": models, "total": total_count}
+            
+            # Convert to the expected format for the frontend
+            models = []
+            for ir_model in ir_models:
+                # Check if we can access the model (it's installed and accessible)
+                model_name = ir_model['model']
+                if model_name in request.env:
+                    try:
+                        # Safer approach to check if model is usable without causing SQL errors
+                        model_obj = request.env[model_name].sudo()
+                        
+                        # Check if model is a proper model with a database table
+                        if model_obj._abstract or not model_obj._table:
+                            continue
+                        
+                        # Try to safely check if we can access at least one record
+                        try:
+                            # Use a direct SQL query with a limit to avoid errors with non-existent tables
+                            request.env.cr.execute(f"""
+                                SELECT EXISTS (
+                                    SELECT 1 FROM information_schema.tables 
+                                    WHERE table_name = %s
+                                )
+                            """, (model_obj._table,))
+                            table_exists = request.env.cr.fetchone()[0]
+                            
+                            if not table_exists:
+                                continue
+                        except Exception as e:
+                            _logger.debug(f"Skipping model {model_name}, table check failed: {str(e)}")
+                            continue
+                        
+                        # Get description from ir_model if available, otherwise use default
+                        description = ir_model.get('description', False) or f"Import data into {ir_model['name']}"
+                        
+                        # Add to our list of available models
+                        models.append({
+                            'id': ir_model['id'],
+                            'name': ir_model['name'],
+                            'model_name': model_name,
+                            'description': description,
+                            'template_filename': f"{model_name.replace('.', '_')}_template.xlsx",
+                        })
+                    except Exception as e:
+                        _logger.debug(f"Skipping model {model_name}: {str(e)}")
+                        continue
+            
+            self._send_message(f"Loaded {len(models)} available models for import", "success")
+            
+            # Return the result
+            return {"models": models, "total": len(models)}
+            
+        except Exception as e:
+            error_msg = f"Error loading import models: {str(e)}"
+            _logger.exception(error_msg)
+            self._send_message(error_msg, "error")
+            return {"models": [], "total": 0, "error": error_msg}
 
     @http.route("/csv_import/get_model_fields", type="json", auth="user")
     def get_model_fields(self, model_id):
-        """Get fields for a specific model"""
-        import_model = request.env["csv.import.model"].sudo().browse(int(model_id))
-        if not import_model.exists():
-            return {"error": "Model not found"}
-
+        """Get importable fields for a specific model"""
         try:
-            fields = import_model.get_importable_fields()
+            # Get the ir.model record
+            ir_model = request.env['ir.model'].sudo().browse(int(model_id))
+            if not ir_model.exists():
+                self._send_message(f"Error: Model with ID {model_id} not found", "error")
+                return {"error": "Model not found"}
+                
+            model_name = ir_model.model
+            if model_name not in request.env:
+                return {"error": f"Model {model_name} is not accessible"}
+                
+            self._send_message(f"Getting fields for model: {ir_model.name}", "info")
+            
+            # Get the model object
+            model_obj = request.env[model_name]
+            importable_fields = []
+            required_fields = []
+            
+            # Get all fields for the model
+            for field_name, field in model_obj._fields.items():
+                # Skip non-storable fields, many2many fields, one2many fields and compute fields without inverse
+                if (not field.store or
+                    field.type in ["many2many", "one2many", "binary", "reference"] or
+                    (field.compute and not field.inverse)):
+                    continue
+                    
+                field_info = {
+                    "name": field_name,
+                    "string": field.string,
+                    "type": field.type,
+                    "required": field.required,
+                    "relation": field.comodel_name if field.type in ["many2one", "many2many"] else False,
+                }
+                importable_fields.append(field_info)
+                
+                # Track required fields
+                if field.required:
+                    required_fields.append(field_name)
+                    
+            self._send_message(f"Loaded {len(importable_fields)} fields for model {ir_model.name}", "success")
+            
             return {
-                "fields": fields,
-                "required_fields": import_model.field_ids.mapped("name"),
+                "fields": importable_fields,
+                "required_fields": required_fields,
             }
+            
         except Exception as e:
-            _logger.error(f"Error getting model fields: {str(e)}")
-            return {"error": str(e)}
-
+            error_msg = f"Error getting model fields: {str(e)}"
+            _logger.exception(error_msg)
+            self._send_message(error_msg, "error")
+            return {"error": error_msg}
+            
     @http.route(
         "/csv_import/upload_chunk",
         type="http",
         auth="user",
         methods=["POST"],
-        csrf=True,
+        csrf=False,
     )
     def upload_chunk(self, **post):
         """Handle chunked file uploads"""
@@ -114,18 +221,40 @@ class CSVImportController(http.Controller):
                     status=400,
                 )
 
-            # Validate model ID
-            import_model = request.env["csv.import.model"].sudo().browse(model_id)
-            if not import_model.exists():
+            # Validate model ID - use ir.model instead of csv.import.model
+            ir_model = request.env["ir.model"].sudo().browse(model_id)
+            if not ir_model.exists():
                 return Response(
                     json.dumps({"error": f"Invalid model ID: {model_id}"}),
                     content_type="application/json",
                     status=400,
                 )
 
-            # Get the chunk file
-            chunk_file = request.httprequest.files.get("chunk")
-            if not chunk_file:
+            # Get the chunk file - handle different possible formats
+            chunk_data = None
+            
+            # Try to get from files first (multipart form data)
+            if 'chunk' in request.httprequest.files:
+                chunk_file = request.httprequest.files['chunk']
+                chunk_data = chunk_file.read()
+                _logger.info(f"Got chunk from files, size: {len(chunk_data)} bytes")
+            # Try to get from form data
+            elif 'chunk' in request.httprequest.form:
+                chunk_data = request.httprequest.form['chunk']
+                # If it's a string, try to decode if it's base64
+                if isinstance(chunk_data, str):
+                    try:
+                        chunk_data = base64.b64decode(chunk_data)
+                        _logger.info(f"Decoded base64 chunk, size: {len(chunk_data)} bytes")
+                    except:
+                        _logger.warning("Failed to decode base64, treating as raw data")
+            # Try to get raw data
+            elif request.httprequest.data:
+                chunk_data = request.httprequest.data
+                _logger.info(f"Got chunk from raw data, size: {len(chunk_data)} bytes")
+                
+            if not chunk_data:
+                _logger.error("No chunk data found in request")
                 return Response(
                     json.dumps({"error": "No chunk file provided"}),
                     content_type="application/json",
@@ -137,23 +266,27 @@ class CSVImportController(http.Controller):
             chunk_dir = os.path.join(temp_dir, "odoo_csv_import", file_id)
             os.makedirs(chunk_dir, exist_ok=True)
 
-            # Save the chunk
+            # Save the chunk - write binary data directly
             chunk_path = os.path.join(chunk_dir, f"chunk_{chunk_number}")
-            chunk_file.save(chunk_path)
+            with open(chunk_path, 'wb') as f:
+                if isinstance(chunk_data, str):
+                    f.write(chunk_data.encode('utf-8'))
+                else:
+                    f.write(chunk_data)
 
             # Send log message
-            self._send_log_message(
+            self._send_message(
                 f"Successfully saved chunk {chunk_number + 1} of {total_chunks}",
                 "success",
             )
 
             # If this is the last chunk, process the complete file
             if chunk_number == total_chunks - 1:
-                self._send_log_message(
+                self._send_message(
                     "Final chunk received. Starting file reassembly...", "info"
                 )
                 return self._handle_final_chunk(
-                    file_id, total_chunks, original_filename, import_model, chunk_dir
+                    file_id, total_chunks, original_filename, ir_model, chunk_dir
                 )
 
             # Return success for intermediate chunks
@@ -170,7 +303,10 @@ class CSVImportController(http.Controller):
 
         except Exception as e:
             _logger.error(f"Unexpected error in upload_chunk: {str(e)}")
-            self._send_log_message(f"Error processing chunk: {str(e)}", "error")
+            # Log the full traceback for better debugging
+            import traceback
+            _logger.error(f"Traceback: {traceback.format_exc()}")
+            self._send_message(f"Error processing chunk: {str(e)}", "error")
             return Response(
                 json.dumps({"error": f"Server error: {str(e)}"}),
                 content_type="application/json",
@@ -178,7 +314,7 @@ class CSVImportController(http.Controller):
             )
 
     def _handle_final_chunk(
-        self, file_id, total_chunks, original_filename, import_model, chunk_dir
+        self, file_id, total_chunks, original_filename, ir_model, chunk_dir
     ):
         """Process the final chunk and initiate file processing"""
         final_path = None
@@ -197,7 +333,7 @@ class CSVImportController(http.Controller):
                 for i in range(total_chunks):
                     chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
                     if not os.path.exists(chunk_path):
-                        self._send_log_message(f"Missing chunk {i}", "error")
+                        self._send_message(f"Missing chunk {i}", "error")
                         return Response(
                             json.dumps({"error": f"Missing chunk {i}"}),
                             content_type="application/json",
@@ -212,7 +348,7 @@ class CSVImportController(http.Controller):
                 file_content = base64.b64encode(infile.read())
 
             # Create batch folder
-            batch_folder = f"batch_{import_model.model_name}_{timestamp}"
+            batch_folder = f"batch_{ir_model.model}_{timestamp}"
 
             # Create import log
             content_type = "text/csv"
@@ -230,7 +366,7 @@ class CSVImportController(http.Controller):
                         "file_name": unique_filename,
                         "original_filename": original_filename,
                         "content_type": content_type,
-                        "import_model_id": import_model.id,
+                        "ir_model_id": ir_model.id,  # Using ir_model_id field from our model
                         "file": file_content,
                         "status": "pending",
                         "batch_folder": batch_folder,
@@ -239,23 +375,25 @@ class CSVImportController(http.Controller):
                 )
             )
 
-            # Queue the processing task (using Odoo queue.job if installed, otherwise direct process)
+            # Process the file based on available queue job functionality
             if "queue.job" in request.env:
-                self._send_log_message("Queueing file for processing...", "info")
-                request.env["queue.job"].sudo().create(
-                    {
-                        "name": f"Process CSV Import {import_log.id}",
-                        "model_name": "import.log",
-                        "method_name": "process_file",
-                        "args": str([import_log.id]),
-                        "user_id": request.env.user.id,
-                    }
-                )
+                try:
+                    # Try using modern with_delay() method
+                    self._send_message("Queueing file for processing with with_delay()...", "info")
+                    import_log.sudo().with_delay().process_file()
+                    
+                except Exception as queue_error:
+                    _logger.warning(f"Error using with_delay(): {str(queue_error)}")
+                    
+                    # Try direct processing if queueing failed
+                    self._send_message("Queue job failed, processing file immediately...", "warning")
+                    import_log.sudo().with_context(async_mode=False).process_file()
             else:
-                self._send_log_message("Processing file immediately...", "info")
+                # No queue.job module, process directly
+                self._send_message("Processing file immediately...", "info")
                 import_log.sudo().with_context(async_mode=False).process_file()
 
-            self._send_log_message(
+            self._send_message(
                 "File successfully uploaded and queued for processing", "success"
             )
 
@@ -289,7 +427,11 @@ class CSVImportController(http.Controller):
 
         except Exception as e:
             _logger.error(f"Error handling final chunk: {str(e)}")
-            self._send_log_message(f"Error processing file: {str(e)}", "error")
+            # Log the full traceback for better debugging
+            import traceback
+            _logger.error(f"Traceback: {traceback.format_exc()}")
+            
+            self._send_message(f"Error processing file: {str(e)}", "error")
 
             # Clean up final file if it exists
             if final_path and os.path.exists(final_path):
@@ -304,47 +446,183 @@ class CSVImportController(http.Controller):
                 status=500,
             )
 
+    # def _handle_final_chunk(
+    #     self, file_id, total_chunks, original_filename, import_model, chunk_dir
+    # ):
+    #     """Process the final chunk and initiate file processing"""
+    #     final_path = None
+    #     try:
+    #         # Generate unique filename
+    #         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    #         random_suffix = "".join(
+    #             random.choices(string.ascii_letters + string.digits, k=6)
+    #         )
+    #         name, ext = os.path.splitext(original_filename)
+    #         unique_filename = f"{name}_{timestamp}_{random_suffix}{ext}"
+
+    #         # Combine all chunks into a single file
+    #         final_path = os.path.join(chunk_dir, unique_filename)
+    #         with open(final_path, "wb") as outfile:
+    #             for i in range(total_chunks):
+    #                 chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
+    #                 if not os.path.exists(chunk_path):
+    #                     self._send_message(f"Missing chunk {i}", "error")
+    #                     return Response(
+    #                         json.dumps({"error": f"Missing chunk {i}"}),
+    #                         content_type="application/json",
+    #                         status=500,
+    #                     )
+
+    #                 with open(chunk_path, "rb") as infile:
+    #                     outfile.write(infile.read())
+
+    #         # Read the file into memory
+    #         with open(final_path, "rb") as infile:
+    #             file_content = base64.b64encode(infile.read())
+
+    #         # Create batch folder
+    #         batch_folder = f"batch_{import_model.model_name}_{timestamp}"
+
+    #         # Create import log
+    #         content_type = "text/csv"
+    #         if original_filename.lower().endswith((".xlsx", ".xls")):
+    #             content_type = (
+    #                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    #             )
+
+    #         import_log = (
+    #             request.env["import.log"]
+    #             .sudo()
+    #             .create(
+    #                 {
+    #                     "name": f"Import {unique_filename}",
+    #                     "file_name": unique_filename,
+    #                     "original_filename": original_filename,
+    #                     "content_type": content_type,
+    #                     "import_model_id": import_model.id,
+    #                     "file": file_content,
+    #                     "status": "pending",
+    #                     "batch_folder": batch_folder,
+    #                     "uploaded_by": request.env.user.id,
+    #                 }
+    #             )
+    #         )
+
+    #         # Queue the processing task (using Odoo queue.job if installed, otherwise direct process)
+    #         if "queue.job" in request.env:
+    #             self._send_message("Queueing file for processing...", "info")
+    #             request.env["queue.job"].sudo().create(
+    #                 {
+    #                     "name": f"Process CSV Import {import_log.id}",
+    #                     "model_name": "import.log",
+    #                     "method_name": "process_file",
+    #                     "args": str([import_log.id]),
+    #                     "user_id": request.env.user.id,
+    #                 }
+    #             )
+    #         else:
+    #             self._send_message("Processing file immediately...", "info")
+    #             import_log.sudo().with_context(async_mode=False).process_file()
+
+    #         self._send_message(
+    #             "File successfully uploaded and queued for processing", "success"
+    #         )
+
+    #         # Clean up chunks
+    #         for i in range(total_chunks):
+    #             chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
+    #             if os.path.exists(chunk_path):
+    #                 os.unlink(chunk_path)
+
+    #         # Clean up temporary directory
+    #         try:
+    #             os.rmdir(chunk_dir)
+    #         except:
+    #             pass
+
+    #         # Clean up final file
+    #         if os.path.exists(final_path):
+    #             os.unlink(final_path)
+
+    #         return Response(
+    #             json.dumps(
+    #                 {
+    #                     "status": "success",
+    #                     "import_id": import_log.id,
+    #                     "message": "File upload complete, processing initiated",
+    #                     "filename": unique_filename,
+    #                 }
+    #             ),
+    #             content_type="application/json",
+    #         )
+
+    #     except Exception as e:
+    #         _logger.error(f"Error handling final chunk: {str(e)}")
+    #         self._send_message(f"Error processing file: {str(e)}", "error")
+
+    #         # Clean up final file if it exists
+    #         if final_path and os.path.exists(final_path):
+    #             try:
+    #                 os.unlink(final_path)
+    #             except:
+    #                 pass
+
+    #         return Response(
+    #             json.dumps({"error": f"Error handling final chunk: {str(e)}"}),
+    #             content_type="application/json",
+    #             status=500,
+    #         )
+
     @http.route(
-        "/csv_import/download_template/<int:model_id>", type="http", auth="user"
-    )
+            "/csv_import/download_template/<int:model_id>", type="http", auth="user"
+        )
     def download_template(self, model_id, **kw):
-        """Download template file for a specific model"""
+        """Download a template file for any model"""
         try:
-            import_model = request.env["csv.import.model"].sudo().browse(int(model_id))
-            if not import_model.exists():
+            # Get the model
+            ir_model = request.env['ir.model'].sudo().browse(int(model_id))
+            if not ir_model.exists():
                 return Response(
                     json.dumps({"error": "Model not found"}),
                     content_type="application/json",
                     status=404,
                 )
-
-            # Check if model has a template file
-            if not import_model.template_file:
-                # Generate a template if none exists
-                self._send_log_message(
-                    f"Generating template for {import_model.name}...", "info"
+                
+            model_name = ir_model.model
+            if model_name not in request.env:
+                return Response(
+                    json.dumps({"error": f"Model {model_name} is not accessible"}),
+                    content_type="application/json",
+                    status=400,
                 )
-                content = self._generate_template(import_model)
-
-                if not content:
-                    return Response(
-                        json.dumps({"error": "Could not generate template"}),
-                        content_type="application/json",
-                        status=500,
-                    )
-            else:
-                # Use the stored template
-                content = base64.b64decode(import_model.template_file)
-
-            filename = (
-                import_model.template_filename
-                or f"{import_model.model_name}_template.xlsx"
-            )
-
-            self._send_log_message(
-                f"Downloading template for {import_model.name}...", "info"
-            )
-
+                
+            # Generate a template
+            self._send_message(f"Generating template for {ir_model.name}...", "info")
+            
+            # Get fields for this model
+            fields_result = self.get_model_fields(model_id)
+            if "error" in fields_result:
+                return Response(
+                    json.dumps({"error": fields_result["error"]}),
+                    content_type="application/json",
+                    status=500,
+                )
+                
+            fields = fields_result["fields"]
+            
+            # Generate the template
+            content = self._generate_template(ir_model, fields)
+            if not content:
+                return Response(
+                    json.dumps({"error": "Could not generate template"}),
+                    content_type="application/json",
+                    status=500,
+                )
+                
+            filename = f"{model_name.replace('.', '_')}_template.xlsx"
+            
+            self._send_message(f"Downloading template for {ir_model.name}...", "info")
+            
             # Return the file
             return request.make_response(
                 content,
@@ -356,30 +634,28 @@ class CSVImportController(http.Controller):
                     ("Content-Disposition", f'attachment; filename="{filename}"'),
                 ],
             )
-
+            
         except Exception as e:
             _logger.error(f"Error downloading template: {str(e)}")
+            self._send_message(f"Error generating template: {str(e)}", "error")
             return Response(
                 json.dumps({"error": f"Error downloading template: {str(e)}"}),
                 content_type="application/json",
                 status=500,
             )
 
-    def _generate_template(self, import_model):
-        """Generate a template XLSX file for a model"""
+    def _generate_template(self, ir_model, fields):
+        """Generate a template XLSX file for any model"""
         try:
             import xlsxwriter
             from io import BytesIO
-
-            # Get importable fields
-            fields = import_model.get_importable_fields()
 
             # Create workbook
             output = BytesIO()
             workbook = xlsxwriter.Workbook(output)
             worksheet = workbook.add_worksheet(
-                import_model.name[:31]
-            )  # Excel limits worksheet names to 31 chars
+                ir_model.name[:31]  # Excel limits worksheet names to 31 chars
+            )
 
             # Add header row
             header_format = workbook.add_format({"bold": True, "bg_color": "#E6E6E6"})
@@ -472,7 +748,7 @@ class CSVImportController(http.Controller):
         else:
             return ""
 
-    def _send_log_message(self, message, message_type="info"):
+    def _send_message(self, message, message_type="info"):
         """Send log message to frontend and log to server"""
         # First, log to server
         log_level = {
@@ -486,7 +762,7 @@ class CSVImportController(http.Controller):
 
         # Then, try to use the websocket helper if available
         try:
-            send_log_message(request.env, message, message_type, request.env.user.id)
+            send_message(request.env, message, message_type, request.env.user.id)
         except ImportError:
             # Fallback to bus.bus
             try:
