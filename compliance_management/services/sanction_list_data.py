@@ -1,29 +1,29 @@
 sources = [
-    # {
-    #     "country": "Argentian",
-    #     "slug": "Argentian",
-    #     "url": "https://www.opensanctions.org/datasets/ar_parliament/",
-    # },
-    # {
-    #     "country": "Armenia",
-    #     "slug": "Armenia",
-    #     "url": "https://www.opensanctions.org/datasets/am_hetq_officials/",
-    # },
-    # {
-    #     "country": "Austria",
-    #     "slug": "Austria",
-    #     "url": "https://www.opensanctions.org/datasets/at_meine_abgeordneten/",
-    # },
-    # {
-    #     "country": "Brazil",
-    #     "slug": "Brazil",
-    #     "url": "https://www.opensanctions.org/datasets/br_pep/",
-    # },
-    # {
-    #     "country": "Caymans",
-    #     "slug": "Cayman_Island_Parliament",
-    #     "url": "https://www.opensanctions.org/datasets/ky_parliament/",
-    # },
+    {
+        "country": "Argentian",
+        "slug": "Argentian",
+        "url": "https://www.opensanctions.org/datasets/ar_parliament/",
+    },
+    {
+        "country": "Armenia",
+        "slug": "Armenia",
+        "url": "https://www.opensanctions.org/datasets/am_hetq_officials/",
+    },
+    {
+        "country": "Austria",
+        "slug": "Austria",
+        "url": "https://www.opensanctions.org/datasets/at_meine_abgeordneten/",
+    },
+    {
+        "country": "Brazil",
+        "slug": "Brazil",
+        "url": "https://www.opensanctions.org/datasets/br_pep/",
+    },
+    {
+        "country": "Caymans",
+        "slug": "Cayman_Island_Parliament",
+        "url": "https://www.opensanctions.org/datasets/ky_parliament/",
+    },
     # {
     #     "country": "Caymans",
     #     "slug": "Cayman_Island_Judiciary",

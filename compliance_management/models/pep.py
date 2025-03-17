@@ -230,20 +230,20 @@ class Pep(models.Model):
         #     _logger.error(f"Unknown source: {source_name}")
         #     return
 
-        file_path, file_type = service.scraper.scrapeAndDownload(
+        files = service.scraper.scrapeAndDownload(
             source_url, source_name
         )
 
+
         # Get files for this source
         _logger.info(f"Fetching files for {source_name}")
-        files = file_path
 
         if not files:
             _logger.warning(f"No files found for {source_name}")
             return
 
         _logger.info(f"Found {len(files)} files for {source_name}")
-
+        print(files)
         # Process each file in a separate job
         processed_count = 0
         for file_info in files:
@@ -267,7 +267,7 @@ class Pep(models.Model):
         try:
             # Process the file
             result = importer.process_file(file_info, processor)
-
+            
             _logger.info(
                 f"Processed file {file_info['path']}: created {result.get('records_created', 0)}, updated {result.get('records_updated', 0)}"
             )

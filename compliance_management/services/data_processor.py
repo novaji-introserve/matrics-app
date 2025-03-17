@@ -41,7 +41,7 @@ class DataProcessor:
 
         # Define field mappings for different sources
         self.field_mappings = {
-            "eu_sanctions": {
+            "Nigeria": {
                 "Name": "name",
                 "First Name": "first_name",
                 "Last Name": "surname",
@@ -62,79 +62,7 @@ class DataProcessor:
                 "Alias": "aka",
                 "Listed On": "createdon",
                 "Passport": "additional_info",
-            },
-            "un_sanctions": {
-                "DATAID": "unique_identifier",
-                "FIRST_NAME": "first_name",
-                "SECOND_NAME": "middle_name",
-                "THIRD_NAME": "surname",
-                "FOURTH_NAME": "additional_info",
-                "UN_LIST_TYPE": "pep_classification",
-                "REFERENCE_NUMBER": "unique_identifier",
-                "LISTED_ON": "createdon",
-                "NAME_ORIGINAL_SCRIPT": "additional_info",
-                "COMMENTS1": "remarks",
-                "NATIONALITY": "citizenship",
-                "DESIGNATION": "present_position",
-                "NATIONALITY2": "additional_info",
-                "TITLE": "title",
-                "GENDER": "sex",
-                "PLACE_OF_BIRTH": "place_of_birth",
-                "DATE_OF_BIRTH": "date_of_birth",
-                "ALIAS_NAME": "aka",
-                "CITY": "official_address",
-                "STREET": "residential_address",
-                "STATE_PROVINCE": "state_of_origin",
-                "COUNTRY": "citizenship",
-            },
-            "ofac_sanctions": {
-                "uid": "unique_identifier",
-                "firstName": "first_name",
-                "lastName": "surname",
-                "sdnType": "pep_classification",
-                "programList": "pep_classification",
-                "title": "title",
-                "dateOfBirth": "date_of_birth",
-                "placeOfBirth": "place_of_birth",
-                "nationality": "citizenship",
-                "citizenships": "citizenship",
-                "address": "official_address",
-                "remarks": "remarks",
-                "sourceDescription": "source",
-                "sourceListURL": "source",
-                "callSign": "additional_info",
-                "vesselType": "additional_info",
-                "vesselFlag": "additional_info",
-                "vesselOwner": "additional_info",
-                "publishedDate": "createdon",
-                "gender": "sex",
-            },
-            "uk_sanctions": {
-                "Group ID": "unique_identifier",
-                "Name 6": "name",
-                "Name 1": "first_name",
-                "Name 2": "middle_name",
-                "Name 3": "surname",
-                "Title": "title",
-                "DOB": "date_of_birth",
-                "Town of Birth": "place_of_birth",
-                "Country of Birth": "place_of_birth",
-                "Nationality": "citizenship",
-                "Position": "present_position",
-                "Address 1": "official_address",
-                "Address 2": "residential_address",
-                "Address 3": "additional_info",
-                "Address 4": "additional_info",
-                "Address 5": "additional_info",
-                "Address 6": "additional_info",
-                "Post/Zip Code": "additional_info",
-                "Country": "citizenship",
-                "Other Information": "remarks",
-                "Regime": "pep_classification",
-                "Listed On": "createdon",
-                "Last Updated": "lastmodifiedon",
-                "Group Type": "pep_classification",
-            },
+            }
         }
 
         # Fallback generic mapping (used when source-specific mapping isn't available)
@@ -282,7 +210,7 @@ class DataProcessor:
         Get field mapping for a specific source
 
         Args:
-            source: Source name (e.g., 'eu_sanctions')
+            source: Source name (e.g., 'Nigeria')
             columns: List of column names in the data
 
         Returns:
@@ -454,15 +382,15 @@ class DataProcessor:
             dict: Record ready for insertion
         """
         record = {}
-        
+
         # Debugging: Log the raw row data
         _logger.debug(f"Raw row data from {source}: {row}")
-        
+
         # Map each column to its corresponding field
         for col, field in column_map.items():
             if col in row and row[col] is not None:
                 value = self._clean_value(row[col])
-                
+
                 # Special handling for certain fields
                 if field == "date_of_birth":
                     value = self._format_date(value)
@@ -473,30 +401,29 @@ class DataProcessor:
                         value = "Male"
                     elif value in ["F", "FEMALE"]:
                         value = "Female"
-                
+
                 # Verify that value is not None before adding to record
                 if value is not None:
                     record[field] = value
-        
+
         # Add source information
         record["source"] = source
-        
+
         # Debugging: Log mapped fields
         _logger.debug(f"Mapped fields from {source}: {record.keys()}")
-        
+
         # Ensure we have a unique identifier
         if "unique_identifier" not in record or not record["unique_identifier"]:
             record["unique_identifier"] = self._make_unique_identifier(row, column_map)
             _logger.debug(f"Generated unique identifier: {record['unique_identifier']}")
-        
+
         # Ensure we have first_name and surname fields
         self._ensure_name_fields(record)
-        
+
         # Debugging: Log final record
         _logger.debug(f"Final prepared record: {record}")
-        
-        return record
 
+        return record
 
     # def _prepare_record(self, row, column_map, source):
     #     """
@@ -545,7 +472,7 @@ class DataProcessor:
     #     # if "name" in record and ("first_name" not in record or "surname" not in record):
     #     #     name_parts = record["name"].split()
     #     # If we have name but no first_name/surname, try to extract them
-    #     if ("name" in record 
+    #     if ("name" in record
     #         and isinstance(record["name"], str)  # Make sure it's actually a string
     #         and ("first_name" not in record or "surname" not in record)):
     #         name_parts = record["name"].split()
@@ -581,21 +508,21 @@ class DataProcessor:
         # Generate name if we have first_name and surname but no name
         if "name" not in record and "first_name" in record and "surname" in record:
             record["name"] = f"{record['first_name']} {record['surname']}"
-        
+
         # If we have name but no first_name/surname, try to extract them
         if "name" in record and isinstance(record["name"], str):
             name_parts = record["name"].split()
             if len(name_parts) >= 1:
                 if "first_name" not in record or not record["first_name"]:
                     record["first_name"] = name_parts[0]
-                
+
                 if len(name_parts) >= 2:
                     if "surname" not in record or not record["surname"]:
                         record["surname"] = name_parts[-1]
-                    
+
                     if "middle_name" not in record and len(name_parts) > 2:
                         record["middle_name"] = " ".join(name_parts[1:-1])
-        
+
         # Make sure first_name and surname are not empty
         if "first_name" not in record or not record["first_name"]:
             if "name" in record and isinstance(record["name"], str):
@@ -606,7 +533,7 @@ class DataProcessor:
                     record["first_name"] = "Unknown"
             else:
                 record["first_name"] = "Unknown"
-        
+
         if "surname" not in record or not record["surname"]:
             if "name" in record and isinstance(record["name"], str):
                 parts = record["name"].split()
@@ -652,23 +579,23 @@ class DataProcessor:
         # Check required fields
         if not record.get("unique_identifier"):
             return False, "Missing unique identifier"
-        
+
         # Require at least a first_name and surname
         if not record.get("first_name"):
             return False, "Missing first name"
-        
+
         if not record.get("surname"):
             return False, "Missing surname"
-        
+
         # Check string length for key fields to avoid database errors
         max_length = 255  # Typical varchar length in database
-        
+
         for field in ["unique_identifier", "first_name", "middle_name", "surname", "name"]:
             if field in record and isinstance(record[field], str) and len(record[field]) > max_length:
                 # Truncate overly long strings
                 record[field] = record[field][:max_length]
                 _logger.warning(f"Truncated {field} to {max_length} characters")
-        
+
         return True, ""
 
     def process_csv(self, file_path, source_name, callback=None):
@@ -685,10 +612,10 @@ class DataProcessor:
         """
         try:
             _logger.info(f"Processing CSV file: {file_path}")
-            
+
             # Initialize df as None
             df = None
-            
+
             # Try first with pandas using default settings
             try:
                 _logger.info("Attempting pandas parse with default settings")
@@ -704,12 +631,12 @@ class DataProcessor:
             except Exception as e:
                 _logger.warning(f"Pandas parse with default settings failed: {str(e)}")
                 df = None
-            
+
             # If the first attempt didn't work, try different encodings and delimiters
             if df is None:
                 encodings = ["utf-8", "latin-1", "iso-8859-1", "cp1252"]
                 delimiters = [',', ';', '\t', '|']
-                
+
                 for encoding in encodings:
                     for delimiter in delimiters:
                         try:
@@ -731,11 +658,11 @@ class DataProcessor:
                         except Exception as e:
                             df = None
                             continue
-                    
+
                     # Break outer loop if we succeeded
                     if df is not None and not df.empty:
                         break
-            
+
             # If still failed, try with Python's CSV module
             if df is None:
                 try:
@@ -744,7 +671,7 @@ class DataProcessor:
                     with open(file_path, 'rb') as f:
                         # Read a sample to detect encoding
                         sample = f.read(4096)
-                        
+
                         # Try to detect encoding
                         try:
                             encoding = 'utf-8'
@@ -755,21 +682,21 @@ class DataProcessor:
                                 sample.decode('latin-1')
                             except UnicodeDecodeError:
                                 encoding = 'cp1252'  # Fallback
-                    
+
                     rows = []
                     with open(file_path, 'r', encoding=encoding, errors='replace') as f:
                         # Try to detect delimiter
                         dialect = csv.Sniffer().sniff(f.read(4096))
                         f.seek(0)
-                        
+
                         reader = csv.reader(f, dialect)
                         headers = next(reader)
-                        
+
                         for row in reader:
                             if len(row) == len(headers):
                                 rows.append(dict(zip(headers, row)))
-                                
-                    # Create DataFrame from rows            
+
+                    # Create DataFrame from rows
                     if rows:
                         df = pd.DataFrame(rows)
                         _logger.info(f"CSV module parsing succeeded with {len(rows)} rows")
@@ -779,7 +706,7 @@ class DataProcessor:
                 except Exception as e:
                     _logger.error(f"CSV module parsing failed: {str(e)}")
                     df = None
-            
+
             # If all parsing methods failed, create an empty DataFrame with error info
             if df is None:
                 _logger.error("All parsing methods failed, creating empty DataFrame")
@@ -788,7 +715,7 @@ class DataProcessor:
                     "file_path": [file_path],
                     "source": [source_name]
                 })
-            
+
             # Check if the DataFrame has any rows
             if df.empty:
                 _logger.warning(f"Parsed DataFrame is empty for file: {file_path}")
@@ -799,20 +726,20 @@ class DataProcessor:
                     "records_valid": 0,
                     "records_invalid": 0,
                 }
-            
+
             # Clean column names
             df.columns = self._clean_column_names(df.columns)
-            
+
             # Get mapping for this source
             column_map = self._get_mapping(source_name, df.columns)
-            
+
             if not column_map:
                 _logger.warning(f"No field mappings found for CSV file: {file_path}")
-            
+
             # Process in batches
             records_valid = 0
             records_invalid = 0
-            
+
             # Calculate batch size based on dataframe size
             # Use smaller batches for larger files to avoid memory issues
             rows_count = len(df)
@@ -822,44 +749,44 @@ class DataProcessor:
                 batch_size = 500
             else:
                 batch_size = self.batch_size
-                
+
             _logger.info(f"Processing {rows_count} rows with batch size {batch_size}")
-            
+
             for i in range(0, len(df), batch_size):
                 batch = df.iloc[i : i + batch_size]
-                
+
                 # Convert to dictionaries
                 batch_dicts = batch.to_dict("records")
-                
+
                 # Prepare records
                 batch_records = []
                 invalid_records = []
-                
+
                 for row in batch_dicts:
                     record = self._prepare_record(row, column_map, source_name)
-                    
+
                     # Validate record
                     is_valid, error = self._validate_record(record)
-                    
+
                     if is_valid:
                         batch_records.append(record)
                     else:
                         invalid_records.append((record, error))
-                
+
                 # Update counters
                 records_valid += len(batch_records)
                 records_invalid += len(invalid_records)
-                
+
                 # Process batch via callback
                 if callback and batch_records:
                     callback(batch_records)
-                
+
                 # Log progress
                 _logger.info(f"Processed batch of {len(batch)} records from CSV file ({i+1}-{i+len(batch)} of {rows_count})")
-            
+
             _logger.info(f"Completed processing CSV file: {file_path}")
             _logger.info(f"Valid records: {records_valid}, Invalid records: {records_invalid}")
-            
+
             return {
                 "status": "success",
                 "message": f"Processed CSV file: {records_valid} valid records, {records_invalid} invalid",
@@ -867,12 +794,12 @@ class DataProcessor:
                 "records_valid": records_valid,
                 "records_invalid": records_invalid,
             }
-            
+
         except Exception as e:
             _logger.error(f"Error processing CSV file: {file_path}")
             _logger.error(f"Error: {str(e)}")
             _logger.error(traceback.format_exc())
-            
+
             return {
                 "status": "error",
                 "message": f"Error processing CSV file: {str(e)}",
@@ -893,72 +820,72 @@ class DataProcessor:
         """
         try:
             _logger.info(f"Preprocessing CSV file: {file_path}")
-            
+
             # Check if cleaning is needed
             needs_cleaning = False
             issues_found = []
-            
+
             # Open in binary mode to check for issues
             with open(file_path, 'rb') as f:
                 content = f.read()
-                
+
                 # Check for NULL bytes
                 if b'\x00' in content:
                     needs_cleaning = True
                     issues_found.append("NULL bytes")
-                
+
                 # Check for BOM (Byte Order Mark)
                 if content.startswith(b'\xef\xbb\xbf'):
                     needs_cleaning = True
                     issues_found.append("BOM marker")
-                
+
                 # Check for non-standard line endings
                 if b'\r\r\n' in content:
                     needs_cleaning = True
                     issues_found.append("non-standard line endings")
-                
+
                 # Check for control characters
                 control_chars = [bytes([i]) for i in range(1, 32) if i not in [9, 10, 13]]  # Exclude tab, LF, CR
                 if any(char in content for char in control_chars):
                     needs_cleaning = True
                     issues_found.append("control characters")
-            
+
             if not needs_cleaning:
                 _logger.info("File doesn't need preprocessing")
                 return None
-                
+
             _logger.info(f"File needs preprocessing. Issues found: {', '.join(issues_found)}")
-            
+
             # Create a cleaned version of the file
             cleaned_path = f"{file_path}.cleaned"
-            
+
             with open(file_path, 'rb') as in_file, open(cleaned_path, 'wb') as out_file:
                 # Skip BOM if present
                 content = in_file.read()
                 if content.startswith(b'\xef\xbb\xbf'):
                     content = content[3:]
-                
+
                 # Replace NULL bytes with spaces
                 content = content.replace(b'\x00', b' ')
-                
+
                 # Normalize line endings to LF
                 content = content.replace(b'\r\r\n', b'\n').replace(b'\r\n', b'\n').replace(b'\r', b'\n')
-                
+
                 # Replace control characters with spaces
                 for i in range(1, 32):
                     if i not in [9, 10, 13]:  # tab, LF, CR
                         content = content.replace(bytes([i]), b' ')
-                
+
                 # Remove leading/trailing whitespace from lines
                 lines = content.split(b'\n')
                 cleaned_lines = [line.strip() for line in lines]
-                
+
                 # Write cleaned content
                 out_file.write(b'\n'.join(cleaned_lines))
-            
+
             _logger.info(f"Created cleaned file: {cleaned_path}")
             return cleaned_path
-            
+
         except Exception as e:
             _logger.error(f"Error preprocessing CSV file: {str(e)}")
             _logger.error(traceback.format_exc())
@@ -978,32 +905,32 @@ class DataProcessor:
         """
         try:
             _logger.info(f"Processing Excel file: {file_path}")
-            
+
             # Determine file type
             _, file_extension = os.path.splitext(file_path)
             file_extension = file_extension.lower()
-            
+
             # Special handling for ODS files to prevent server crashes
             if file_extension == ".ods":
                 _logger.info("ODS file detected, using memory-safe approach")
                 return self._safe_process_ods_file(file_path, source_name, callback)
-            
+
             # For other Excel files, use standard approach with safeguards
             file_size = os.path.getsize(file_path)
             file_size_mb = file_size / (1024 * 1024)
-            
+
             _logger.info(f"Excel file size: {file_size_mb:.2f} MB")
-            
+
             # For large files, use extra caution
             if file_size_mb > 5:
                 _logger.info("Large Excel file detected, using limited row processing")
                 return self._safe_process_excel_large(file_path, source_name, file_extension, callback)
-            
+
             # Regular processing for small Excel files
             try:
                 engine = "openpyxl" if file_extension == ".xlsx" else "xlrd"
                 _logger.info(f"Reading Excel with {engine} engine (max 1000 rows)")
-                
+
                 # Read with row limit to prevent memory issues
                 df = pd.read_excel(
                     file_path, 
@@ -1011,61 +938,61 @@ class DataProcessor:
                     nrows=1000,  # Limit to 1000 rows max
                     dtype=str
                 )
-                
+
                 _logger.info(f"Successfully read Excel with {len(df)} rows")
-                
+
                 # Clean column names
                 df.columns = self._clean_column_names(df.columns)
-                
+
                 # Get mapping for this source
                 column_map = self._get_mapping(source_name, df.columns)
-                
+
                 if not column_map:
                     _logger.warning(f"No field mappings found for Excel file: {file_path}")
-                
+
                 # Process in small batches
                 records_valid = 0
                 records_invalid = 0
                 batch_size = 50  # Very small batches
-                
+
                 for i in range(0, len(df), batch_size):
                     batch = df.iloc[i : i + batch_size]
-                    
+
                     # Convert to dictionaries
                     batch_dicts = batch.to_dict("records")
-                    
+
                     # Prepare records
                     batch_records = []
                     invalid_records = []
-                    
+
                     for row in batch_dicts:
                         record = self._prepare_record(row, column_map, source_name)
-                        
+
                         # Validate record
                         is_valid, error = self._validate_record(record)
-                        
+
                         if is_valid:
                             batch_records.append(record)
                         else:
                             invalid_records.append((record, error))
-                    
+
                     # Update counters
                     records_valid += len(batch_records)
                     records_invalid += len(invalid_records)
-                    
+
                     # Process batch via callback
                     if callback and batch_records:
                         callback(batch_records)
-                    
+
                     # Log progress
                     _logger.info(f"Processed batch {i//batch_size + 1}/{(len(df)//batch_size)+1}")
-                    
+
                     # Force garbage collection
                     gc.collect()
-                
+
                 _logger.info(f"Completed processing Excel file: {file_path}")
                 _logger.info(f"Valid records: {records_valid}, Invalid records: {records_invalid}")
-                
+
                 return {
                     "status": "success",
                     "message": f"Processed Excel file: {records_valid} valid records, {records_invalid} invalid",
@@ -1073,7 +1000,7 @@ class DataProcessor:
                     "records_valid": records_valid,
                     "records_invalid": records_invalid,
                 }
-                
+
             except Exception as e:
                 _logger.error(f"Error processing Excel file: {str(e)}")
                 return {
@@ -1083,11 +1010,11 @@ class DataProcessor:
                     "records_valid": 0,
                     "records_invalid": 0,
                 }
-                
+
         except Exception as e:
             _logger.error(f"Error in Excel processing: {str(e)}")
             _logger.error(traceback.format_exc())
-            
+
             return {
                 "status": "error",
                 "message": f"Error processing Excel file: {str(e)}",
@@ -1109,22 +1036,22 @@ class DataProcessor:
             dict: Processing results
         """
         _logger.info(f"Using memory-safe ODS processing for: {file_path}")
-        
+
         # Strategy 1: Try to convert to CSV first (if possible)
         csv_path = self._convert_ods_to_csv(file_path)
         if csv_path:
             _logger.info(f"Successfully converted ODS to CSV, processing the CSV instead")
             return self.process_csv(csv_path, source_name, callback)
-        
+
         # Strategy 2: Extract a sample of data directly from the ODS without pandas
         try:
             _logger.info("Extracting a limited sample from ODS file")
-            
+
             # ODS files are ZIP files with XML content
             # Create a dictionary for sample data
             sample_data = []
             headers = []
-            
+
             # Open the ODS file as a ZIP archive
             with zipfile.ZipFile(file_path, 'r') as z:
                 # Check if content.xml exists
@@ -1137,43 +1064,43 @@ class DataProcessor:
                         "records_valid": 0,
                         "records_invalid": 0,
                     }
-                
+
                 # Extract just the content.xml file
                 content_data = z.read('content.xml')
-            
+
             # Parse only the beginning of content.xml to extract headers and a few rows
             _logger.info("Parsing ODS header and sample rows")
-            
+
             # Define ODS namespaces
             namespaces = {
                 'office': 'urn:oasis:names:tc:opendocument:xmlns:office:1.0',
                 'table': 'urn:oasis:names:tc:opendocument:xmlns:table:1.0',
                 'text': 'urn:oasis:names:tc:opendocument:xmlns:text:1.0'
             }
-            
+
             # Use iterparse to process the file with minimal memory
             context = ET.iterparse(BytesIO(content_data), events=('end',))
-            
+
             # Extract only the first few rows
             max_rows = 100  # Only process this many rows
             row_count = 0
             in_first_table = False
             current_row = []
-            
+
             # Process XML in streaming mode
             for event, elem in context:
                 if row_count >= max_rows:
                     break
-                    
+
                 # Find the first table
                 if elem.tag == '{' + namespaces['table'] + '}table' and not in_first_table:
                     in_first_table = True
                     continue
-                    
+
                 # Exit if we've moved to another table
                 if elem.tag == '{' + namespaces['table'] + '}table' and in_first_table:
                     break
-                    
+
                 # Process rows from the first table
                 if in_first_table and elem.tag == '{' + namespaces['table'] + '}table-row':
                     # Extract cell values
@@ -1184,9 +1111,9 @@ class DataProcessor:
                         for text_elem in cell.findall('.//{' + namespaces['text'] + '}p'):
                             if text_elem.text:
                                 value += text_elem.text
-                        
+
                         current_row.append(value)
-                    
+
                     # Process based on row position
                     if row_count == 0:
                         # Header row
@@ -1199,20 +1126,20 @@ class DataProcessor:
                                 current_row.extend([''] * (len(headers) - len(current_row)))
                             elif len(current_row) > len(headers):
                                 current_row = current_row[:len(headers)]
-                                
+
                             # Add to sample data
                             row_dict = dict(zip(headers, current_row))
                             sample_data.append(row_dict)
-                    
+
                     # Increment row counter
                     row_count += 1
-                    
+
                     # Clear element to free memory
                     elem.clear()
-            
+
             # Clean up
             del context
-            
+
             # Check if we got any valid data
             if not headers or not sample_data:
                 _logger.warning("No valid data extracted from ODS file")
@@ -1223,50 +1150,50 @@ class DataProcessor:
                     "records_valid": 0,
                     "records_invalid": 0,
                 }
-            
+
             # Clean header names
             headers = self._clean_column_names(headers)
-            
+
             # Get mapping for this source
             column_map = self._get_mapping(source_name, headers)
-            
+
             if not column_map:
                 _logger.warning(f"No field mappings found for ODS file")
-            
+
             # Process the sample data
             records_valid = 0
             records_invalid = 0
-            
+
             # Process all rows at once (small sample)
             batch_records = []
             invalid_records = []
-            
+
             for row in sample_data:
                 record = self._prepare_record(row, column_map, source_name)
-                
+
                 # Validate record
                 is_valid, error = self._validate_record(record)
-                
+
                 if is_valid:
                     batch_records.append(record)
                 else:
                     invalid_records.append((record, error))
-            
+
             # Process via callback
             if callback and batch_records:
                 callback(batch_records)
-            
+
             # Update counters
             records_valid = len(batch_records)
             records_invalid = len(invalid_records)
-            
+
             _logger.info(f"Processed sample of {len(sample_data)} rows from ODS file")
             _logger.info(f"Valid records: {records_valid}, Invalid records: {records_invalid}")
             _logger.warning(f"Note: Only processed first {max_rows} rows of ODS file to prevent memory issues")
-            
+
             # Force garbage collection
             gc.collect()
-            
+
             return {
                 "status": "success",
                 "message": f"Processed ODS sample: {records_valid} valid records, {records_invalid} invalid (limited to {max_rows} rows)",
@@ -1274,14 +1201,14 @@ class DataProcessor:
                 "records_valid": records_valid,
                 "records_invalid": records_invalid,
             }
-            
+
         except Exception as e:
             _logger.error(f"Error in safe ODS processing: {str(e)}")
             _logger.error(traceback.format_exc())
-            
+
             # Strategy 3: Complete fallback - skip file with informative message
             _logger.warning("All ODS processing methods failed, skipping file to prevent server crash")
-            
+
             # Create a single placeholder record for this source
             if callback:
                 placeholder_record = {
@@ -1293,7 +1220,7 @@ class DataProcessor:
                     "source": source_name
                 }
                 callback([placeholder_record])
-            
+
             return {
                 "status": "warning",
                 "message": f"ODS file skipped to prevent memory issues: {str(e)}",
@@ -1315,13 +1242,13 @@ class DataProcessor:
         try:
             _logger.info(f"Attempting to convert ODS to CSV: {ods_path}")
             csv_path = f"{ods_path}.csv"
-            
+
             # Method 1: Try using LibreOffice if available
             try:                
                 # Check if LibreOffice is installed
                 lo_paths = ["libreoffice", "soffice", "/Applications/LibreOffice.app/Contents/MacOS/soffice"]
                 lo_cmd = None
-                
+
                 for path in lo_paths:
                     try:
                         subprocess.run([path, "--version"], capture_output=True, timeout=5)
@@ -1329,32 +1256,32 @@ class DataProcessor:
                         break
                     except:
                         pass
-                
+
                 if lo_cmd:
                     _logger.info(f"Found LibreOffice at {lo_cmd}, using for conversion")
                     # Convert using LibreOffice headless mode
                     out_dir = os.path.dirname(ods_path)
                     cmd = [lo_cmd, "--headless", "--convert-to", "csv", ods_path, "--outdir", out_dir]
-                    
+
                     # Run with timeout
                     process = subprocess.run(cmd, capture_output=True, timeout=120)
-                    
+
                     # Check if file was created
                     base_name = os.path.basename(ods_path)
                     expected_csv = os.path.join(out_dir, os.path.splitext(base_name)[0] + ".csv")
-                    
+
                     if os.path.exists(expected_csv):
                         _logger.info(f"Successfully converted ODS to CSV: {expected_csv}")
                         return expected_csv
             except Exception as e:
                 _logger.warning(f"LibreOffice conversion failed: {str(e)}")
-            
+
             # Method 2: Try using pyexcel if available
             try:                
                 _logger.info("Attempting conversion with pyexcel")
                 # Use pyexcel for conversion
                 pyexcel.save_as(file_name=ods_path, dest_file_name=csv_path)
-                
+
                 if os.path.exists(csv_path):
                     _logger.info(f"Successfully converted ODS to CSV with pyexcel: {csv_path}")
                     return csv_path
@@ -1362,11 +1289,11 @@ class DataProcessor:
                 _logger.warning("pyexcel not installed, skipping this conversion method")
             except Exception as e:
                 _logger.warning(f"pyexcel conversion failed: {str(e)}")
-            
+
             # If all conversion methods fail
             _logger.warning("All ODS to CSV conversion methods failed")
             return None
-            
+
         except Exception as e:
             _logger.error(f"Error in ODS to CSV conversion: {str(e)}")
             return None
@@ -1386,96 +1313,96 @@ class DataProcessor:
         """
         try:
             _logger.info(f"Using memory-safe approach for large Excel file: {file_path}")
-            
+
             # For XLSX files, we can use openpyxl in read-only mode
             if file_extension == ".xlsx":
                 _logger.info("Processing XLSX with openpyxl in read-only mode")
-                
+
                 # Use read-only mode to minimize memory usage
                 wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
-                
+
                 # Only process the first sheet
                 if wb.sheetnames:
                     sheet = wb[wb.sheetnames[0]]
                     _logger.info(f"Processing first sheet: {wb.sheetnames[0]}")
-                    
+
                     # Read headers
                     headers = []
                     for cell in next(sheet.iter_rows()):
                         headers.append(str(cell.value) if cell.value is not None else "")
-                    
+
                     # Clean headers
                     headers = self._clean_column_names(headers)
-                    
+
                     # Get mapping
                     column_map = self._get_mapping(source_name, headers)
-                    
+
                     if not column_map:
                         _logger.warning(f"No field mappings found for Excel file")
-                    
+
                     # Process rows in small batches
                     records_valid = 0
                     records_invalid = 0
                     rows_processed = 0
                     max_rows = 500  # Limit to 500 rows to prevent memory issues
-                    
+
                     # Process rows in batches
                     current_batch = []
-                    
+
                     # Skip the header row
                     rows = sheet.iter_rows(min_row=2)
-                    
+
                     for row in rows:
                         # Stop if we've reached the maximum row limit
                         if rows_processed >= max_rows:
                             break
-                        
+
                         # Create a dictionary for the row
                         row_dict = {}
                         for i, cell in enumerate(row):
                             if i < len(headers):
                                 row_dict[headers[i]] = str(cell.value) if cell.value is not None else ""
-                        
+
                         current_batch.append(row_dict)
                         rows_processed += 1
-                        
+
                         # Process batch when it reaches size or at the end
                         if len(current_batch) >= 50 or rows_processed >= max_rows:
                             # Process this batch
                             batch_records = []
                             invalid_records = []
-                            
+
                             for row_data in current_batch:
                                 record = self._prepare_record(row_data, column_map, source_name)
-                                
+
                                 # Validate record
                                 is_valid, error = self._validate_record(record)
-                                
+
                                 if is_valid:
                                     batch_records.append(record)
                                 else:
                                     invalid_records.append((record, error))
-                            
+
                             # Update counters
                             records_valid += len(batch_records)
                             records_invalid += len(invalid_records)
-                            
+
                             # Process batch via callback
                             if callback and batch_records:
                                 callback(batch_records)
-                            
+
                             # Clear batch
                             current_batch = []
-                            
+
                             # Force garbage collection
                             gc.collect()
-                    
+
                     # Close workbook to free memory
                     wb.close()
-                    
+
                     _logger.info(f"Completed processing {rows_processed} rows from Excel file")
                     _logger.info(f"Valid records: {records_valid}, Invalid records: {records_invalid}")
-                    
+
                     return {
                         "status": "success",
                         "message": f"Processed Excel file: {records_valid} valid records, {records_invalid} invalid (limited to {rows_processed} rows)",
@@ -1483,46 +1410,46 @@ class DataProcessor:
                         "records_valid": records_valid,
                         "records_invalid": records_invalid,
                     }
-            
+
             # For XLS files, use xlrd with limits
             elif file_extension == ".xls":                
                 _logger.info("Processing XLS with xlrd with row limits")
-                
+
                 # Open the workbook
                 wb = xlrd.open_workbook(file_path, on_demand=True)
-                
+
                 # Only process the first sheet
                 if wb.sheet_names():
                     sheet = wb.sheet_by_index(0)
                     _logger.info(f"Processing first sheet: {wb.sheet_names()[0]}")
-                    
+
                     # Get row and column counts
                     num_rows = min(500, sheet.nrows)  # Limit to 500 rows
                     num_cols = sheet.ncols
-                    
+
                     # Read headers from first row
                     headers = [str(sheet.cell_value(0, i)) for i in range(num_cols)]
-                    
+
                     # Clean headers
                     headers = self._clean_column_names(headers)
-                    
+
                     # Get mapping
                     column_map = self._get_mapping(source_name, headers)
-                    
+
                     if not column_map:
                         _logger.warning(f"No field mappings found for Excel file")
-                    
+
                     # Process rows in small batches
                     records_valid = 0
                     records_invalid = 0
-                    
+
                     # Process in batches of 50 rows
                     for start_row in range(1, num_rows, 50):
                         end_row = min(start_row + 50, num_rows)
-                        
+
                         batch_records = []
                         invalid_records = []
-                        
+
                         # Process this batch of rows
                         for row_idx in range(start_row, end_row):
                             # Create a dictionary for the row
@@ -1530,33 +1457,33 @@ class DataProcessor:
                             for col_idx in range(num_cols):
                                 if col_idx < len(headers):
                                     row_dict[headers[col_idx]] = str(sheet.cell_value(row_idx, col_idx))
-                            
+
                             # Prepare and validate record
                             record = self._prepare_record(row_dict, column_map, source_name)
                             is_valid, error = self._validate_record(record)
-                            
+
                             if is_valid:
                                 batch_records.append(record)
                             else:
                                 invalid_records.append((record, error))
-                        
+
                         # Update counters
                         records_valid += len(batch_records)
                         records_invalid += len(invalid_records)
-                        
+
                         # Process batch via callback
                         if callback and batch_records:
                             callback(batch_records)
-                        
+
                         # Force garbage collection
                         gc.collect()
-                    
+
                     # Close workbook to free memory
                     wb.release_resources()
-                    
+
                     _logger.info(f"Completed processing {num_rows-1} rows from Excel file")
                     _logger.info(f"Valid records: {records_valid}, Invalid records: {records_invalid}")
-                    
+
                     return {
                         "status": "success",
                         "message": f"Processed Excel file: {records_valid} valid records, {records_invalid} invalid (limited to {num_rows-1} rows)",
@@ -1564,48 +1491,48 @@ class DataProcessor:
                         "records_valid": records_valid,
                         "records_invalid": records_invalid,
                     }
-            
+
             # Fallback to pandas with strict limits
             _logger.info("Falling back to pandas with strict row limits")
-            
+
             # Use pandas with strict row limit
             df = pd.read_excel(
                 file_path,
                 nrows=100,  # Very strict limit
                 dtype=str
             )
-            
+
             # Clean column names
             df.columns = self._clean_column_names(df.columns)
-            
+
             # Get mapping
             column_map = self._get_mapping(source_name, df.columns)
-            
+
             # Process all rows at once (small number)
             batch_records = []
             invalid_records = []
-            
+
             for _, row in df.iterrows():
                 record = self._prepare_record(row.to_dict(), column_map, source_name)
-                
+
                 # Validate record
                 is_valid, error = self._validate_record(record)
-                
+
                 if is_valid:
                     batch_records.append(record)
                 else:
                     invalid_records.append((record, error))
-            
+
             # Process via callback
             if callback and batch_records:
                 callback(batch_records)
-            
+
             records_valid = len(batch_records)
             records_invalid = len(invalid_records)
-            
+
             _logger.info(f"Processed {len(df)} rows using pandas fallback")
             _logger.info(f"Valid records: {records_valid}, Invalid records: {records_invalid}")
-            
+
             return {
                 "status": "success",
                 "message": f"Processed Excel file: {records_valid} valid records, {records_invalid} invalid (limited to {len(df)} rows)",
@@ -1613,11 +1540,11 @@ class DataProcessor:
                 "records_valid": records_valid,
                 "records_invalid": records_invalid,
             }
-            
+
         except Exception as e:
             _logger.error(f"Error in safe Excel processing: {str(e)}")
             _logger.error(traceback.format_exc())
-            
+
             # Create a placeholder record
             if callback:
                 placeholder_record = {
@@ -1629,7 +1556,7 @@ class DataProcessor:
                     "source": source_name
                 }
                 callback([placeholder_record])
-            
+
             return {
                 "status": "warning",
                 "message": f"Excel file processing limited to prevent memory issues: {str(e)}",

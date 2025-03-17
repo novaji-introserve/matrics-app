@@ -296,7 +296,6 @@ class PepImporter:
         try:
             # Process the file
             results = processor.process_file(file_info, self.import_records)
-
             # Return combined results
             return {
                 "status": results["status"],
