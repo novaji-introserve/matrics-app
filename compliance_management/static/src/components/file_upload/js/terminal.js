@@ -28,7 +28,8 @@ export const terminalService = {
         // Add a log entry
         function addLog(message, type = 'info', timestamp = null) {
             if (!timestamp) {
-                timestamp = new Date().toLocaleTimeString();
+                // timestamp = new Date().toLocaleTimeString();
+                timestamp = formatFullTimestamp(new Date());
             }
 
             // Add to logs array
@@ -119,11 +120,16 @@ export const terminalService = {
                             addLog(`WebSocket authenticated: ${data.message}`, 'success');
                             console.log('WebSocket authenticated:', data.message);
 
+                            // Generate full timestamp to match Python format
+                            const now = new Date();
+                            const timestamp = formatFullTimestamp(now);
+                            
                             // Send a test message to confirm bidirectional communication
                             socket.send(JSON.stringify({
                                 type: 'log_message',
                                 message: 'Terminal connected and authenticated',
-                                message_type: 'info'
+                                message_type: 'info',
+                                timestamp: timestamp  // Include timestamp in the same format as Python
                             }));
                         } else if (data.type === 'error') {
                             addLog(`WebSocket error: ${data.message}`, 'error');
@@ -137,6 +143,36 @@ export const terminalService = {
                         console.error('Original message:', event.data);
                     }
                 };
+                
+                // socket.onmessage = (event) => {
+                //     try {
+                //         console.log('WebSocket message received:', event.data);
+                //         const data = JSON.parse(event.data);
+
+                //         if (data.type === 'log_message') {
+                //             addLog(data.message, data.message_type, data.timestamp);
+                //         } else if (data.type === 'connected') {
+                //             addLog(`WebSocket authenticated: ${data.message}`, 'success');
+                //             console.log('WebSocket authenticated:', data.message);
+
+                //             // Send a test message to confirm bidirectional communication
+                //             socket.send(JSON.stringify({
+                //                 type: 'log_message',
+                //                 message: 'Terminal connected and authenticated',
+                //                 message_type: 'info'
+                //             }));
+                //         } else if (data.type === 'error') {
+                //             addLog(`WebSocket error: ${data.message}`, 'error');
+                //             console.error('WebSocket error message:', data.message);
+                //         } else {
+                //             // Log other message types
+                //             console.log(`WebSocket message (${data.type}):`, data);
+                //         }
+                //     } catch (e) {
+                //         console.error('Error parsing WebSocket message:', e);
+                //         console.error('Original message:', event.data);
+                //     }
+                // };
 
                 socket.onclose = (event) => {
                     connected = false;
@@ -215,8 +251,11 @@ export const terminalService = {
 
         // Send a log message to the server
         async function sendLog(message, type = 'info') {
+            // Generate timestamp in the same format as Python
+            const timestamp = formatFullTimestamp(new Date());
+
             // Display locally immediately
-            addLog(message, type);
+            addLog(message, type, timestamp);
 
             // Try WebSocket first if connected
             if (connected && socket && socket.readyState === WebSocket.OPEN) {
@@ -224,7 +263,8 @@ export const terminalService = {
                     socket.send(JSON.stringify({
                         type: 'log_message',
                         message: message,
-                        message_type: type
+                        message_type: type,
+                        timestamp: timestamp  // Include timestamp
                     }));
                     return;
                 } catch (error) {
@@ -236,14 +276,57 @@ export const terminalService = {
             try {
                 await rpc('/csv_import/send_log', {
                     message,
-                    message_type: type
+                    message_type: type,
+                    timestamp: timestamp  // Include timestamp here too
                 });
             } catch (error) {
                 console.error('Error sending log via RPC:', error);
                 // Still add the log locally even if server send fails
-                addLog(`Failed to send log to server: ${error.message}`, 'warning');
+                addLog(`Failed to send log to server: ${error.message}`, 'warning', timestamp);
             }
         }
+
+        // Helper function to format timestamps consistently with Python
+        function formatFullTimestamp(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        // async function sendLog(message, type = 'info') {
+        //     // Display locally immediately
+        //     addLog(message, type);
+
+        //     // Try WebSocket first if connected
+        //     if (connected && socket && socket.readyState === WebSocket.OPEN) {
+        //         try {
+        //             socket.send(JSON.stringify({
+        //                 type: 'log_message',
+        //                 message: message,
+        //                 message_type: type
+        //             }));
+        //             return;
+        //         } catch (error) {
+        //             console.warn('Error sending log via WebSocket, falling back to RPC:', error);
+        //         }
+        //     }
+
+        //     // Fallback to RPC
+        //     try {
+        //         await rpc('/csv_import/send_log', {
+        //             message,
+        //             message_type: type
+        //         });
+        //     } catch (error) {
+        //         console.error('Error sending log via RPC:', error);
+        //         // Still add the log locally even if server send fails
+        //         addLog(`Failed to send log to server: ${error.message}`, 'warning');
+        //     }
+        // }
 
         // Initialize WebSocket and bus listening
         try {
