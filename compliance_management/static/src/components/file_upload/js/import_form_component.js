@@ -502,6 +502,3 @@ export class ImportFormComponent extends Component {
 ImportFormComponent.template = "compliance_management.ImportForm";
 ImportFormComponent.components = { TerminalComponent }; 
 ImportFormComponent.props = {};
-// ImportFormComponent.template = "compliance_management.ImportForm";
-// ImportFormComponent.components = { TerminalComponent: owl.Component };
-// ImportFormComponent.props = {};

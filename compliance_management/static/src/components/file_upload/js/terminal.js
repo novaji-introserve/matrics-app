@@ -143,36 +143,6 @@ export const terminalService = {
                         console.error('Original message:', event.data);
                     }
                 };
-                
-                // socket.onmessage = (event) => {
-                //     try {
-                //         console.log('WebSocket message received:', event.data);
-                //         const data = JSON.parse(event.data);
-
-                //         if (data.type === 'log_message') {
-                //             addLog(data.message, data.message_type, data.timestamp);
-                //         } else if (data.type === 'connected') {
-                //             addLog(`WebSocket authenticated: ${data.message}`, 'success');
-                //             console.log('WebSocket authenticated:', data.message);
-
-                //             // Send a test message to confirm bidirectional communication
-                //             socket.send(JSON.stringify({
-                //                 type: 'log_message',
-                //                 message: 'Terminal connected and authenticated',
-                //                 message_type: 'info'
-                //             }));
-                //         } else if (data.type === 'error') {
-                //             addLog(`WebSocket error: ${data.message}`, 'error');
-                //             console.error('WebSocket error message:', data.message);
-                //         } else {
-                //             // Log other message types
-                //             console.log(`WebSocket message (${data.type}):`, data);
-                //         }
-                //     } catch (e) {
-                //         console.error('Error parsing WebSocket message:', e);
-                //         console.error('Original message:', event.data);
-                //     }
-                // };
 
                 socket.onclose = (event) => {
                     connected = false;
@@ -297,37 +267,7 @@ export const terminalService = {
 
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         }
-        // async function sendLog(message, type = 'info') {
-        //     // Display locally immediately
-        //     addLog(message, type);
-
-        //     // Try WebSocket first if connected
-        //     if (connected && socket && socket.readyState === WebSocket.OPEN) {
-        //         try {
-        //             socket.send(JSON.stringify({
-        //                 type: 'log_message',
-        //                 message: message,
-        //                 message_type: type
-        //             }));
-        //             return;
-        //         } catch (error) {
-        //             console.warn('Error sending log via WebSocket, falling back to RPC:', error);
-        //         }
-        //     }
-
-        //     // Fallback to RPC
-        //     try {
-        //         await rpc('/csv_import/send_log', {
-        //             message,
-        //             message_type: type
-        //         });
-        //     } catch (error) {
-        //         console.error('Error sending log via RPC:', error);
-        //         // Still add the log locally even if server send fails
-        //         addLog(`Failed to send log to server: ${error.message}`, 'warning');
-        //     }
-        // }
-
+        
         // Initialize WebSocket and bus listening
         try {
             // Add initial log
