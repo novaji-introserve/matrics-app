@@ -28,8 +28,8 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
-        'data/res.country.state.csv',
-        'data/res.branch.csv',
+        # 'data/res.country.state.csv',
+        # 'data/res.branch.csv',
         'data/media_keywords.xml',
         'security/security.xml',
         'data/schedules/adverse_media_cron.xml',

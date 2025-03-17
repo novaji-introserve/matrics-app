@@ -43,7 +43,7 @@ class Customer(models.Model):
     ]
 
     customer_id = fields.Char(string="Customer ID", index=True, tracking=True)
-    bvn = fields.Char(string='BVN', tracking=True)
+    bvn = fields.Char(string='BVN', tracking=True, readonly=True)
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True, tracking=True)
     education_level_id = fields.Many2one(
@@ -59,37 +59,40 @@ class Customer(models.Model):
     identification_expiry_date = fields.Date(
         string='Identification Expiry Date', index=True, tracking=True)
     dob = fields.Date(
-        string='Date of Birth', tracking=True)
+        string='Date of Birth', tracking=True, readonly=True)
     vat = fields.Char(string='Tax ID/TIN', index=True,
-                      help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.")
+                      help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.", readonly=True)
     region_id = fields.Many2one(
         comodel_name='res.partner.region', string='Region', tracking=True)
     sector_id = fields.Many2one(
         
-        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True)
+        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True, readonly=True)
     industry_id = fields.Many2one(
-        comodel_name='customer.industry', string='Industry', index=True, tracking=True)
+        comodel_name='customer.industry', string='Industry', index=True, tracking=True, readonly=True)
     
     sex_id = fields.Many2one(
-        comodel_name='res.partner.gender', string='Sex', index=True)
-    firstname = fields.Char(string='Firstname')
-    lastname = fields.Char(string='Lastname')
+        comodel_name='res.partner.gender', string='Sex', index=True, readonly=True)
+    firstname = fields.Char(string='Firstname', readonly=True)
+    # fullname = fields.Char(string='Fullname')
+    short_name = fields.Char(string='Short name', readonly=True)
+    lastname = fields.Char(string='Lastname', readonly=True)
     middlename = fields.Char(string='Middle Name')
     othername = fields.Char(string='Other Name')
-    town = fields.Char(string='Town')
-    registration_date = fields.Date(string='Registration Date', tracking=True)
+    town = fields.Char(string='Town', readonly=True)
+    registration_date = fields.Date(
+        string='Registration Date', tracking=True, required=False, readonly=True)
     company_reg_date = fields.Date(
         string='Company Registration Date', tracking=True)
     risk_score = fields.Float(
         string='Risk Score', digits=(10, 2), tracking=True)
     risk_level = fields.Char(
-        string='Risk Level', index=True, default='low', tracking=True)
+        string='Risk Level', index=True, default='low', tracking=True, readonly=True)
     account_officer_id = fields.Many2one(
-        comodel_name='account.officers', string='Account Officer', index=True, tracking=True)
+        comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(
-        comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts')
+        comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts', readonly=True)
     edd_ids = fields.One2many(
         comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
@@ -107,7 +110,7 @@ class Customer(models.Model):
     current_branch_id = fields.Integer(
         string='Current Branch', compute='_get_current_branch')
     internal_category = fields.Selection(string='Internal Category', selection=[('customer', 'Customer'), (
-        'vendor', 'Vendor'), ('partner', 'Partner'), ('correspondent', 'Correspondent'), ('respondent', 'Respondent')], default='customer', index=True)
+        'vendor', 'Vendor'), ('partner', 'Partner'), ('correspondent', 'Correspondent'), ('respondent', 'Respondent')], default='customer', index=True, readonly=True)
     anti_bribery = fields.Binary(string='Anti-Bribery & Corruption Docs')
     anti_bribery_file_name = fields.Char(
         string='Anti-Bribery & Corruption Docs')
@@ -123,8 +126,116 @@ class Customer(models.Model):
     total_accounts = fields.Integer(
         string='Accounts', compute='_total_accounts', store=True)
     global_pep_id = fields.Many2one('res.pep', string='Related Global PEP',tracking=True)
+    
+    address = fields.Char(string="Address", required=False, readonly=True)
+    customer_title = fields.Char(string="Title", required=False, readonly=True)
+    gender = fields.Char(string="Gender", required=False, readonly=True)
+    marital_status = fields.Char(
+        string="Marital Status", required=False, readonly=True)
+    employment_status = fields.Char(string="Employment Status", required=False,readonly=True)
+    state_residence = fields.Char(string="Region", required=False, readonly=True)
+    nin = fields.Char(
+        string="National Identification Number (NIN)", required=False, readonly=True)
+    customer_rating = fields.Char(
+        string="Customer Rating", required=False, readonly=True)
+    active = fields.Boolean(default=True, readonly=True)
+
+    
+    
+     
     # industry =
 
+
+    def init(self):
+        # Drop the trigger if it exists
+        self.env.cr.execute(
+            "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
+        self.env.cr.execute(
+            "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
+
+
+        # Create the trigger
+        self.env.cr.execute("""
+            CREATE OR REPLACE FUNCTION set_partner_defaults_func()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                IF NEW.active IS NULL THEN
+                    NEW.active = TRUE;
+                END IF;
+                
+                IF NEW.type IS NULL THEN
+                    NEW.type = 'contact';
+                END IF;
+                
+                IF NEW.lang IS NULL THEN
+                    NEW.lang = 'en_US';
+                END IF;
+                
+                IF NEW.create_uid IS NULL THEN
+                    NEW.create_uid = 1;
+                END IF;
+                
+                IF NEW.write_uid IS NULL THEN
+                    NEW.write_uid = 1;
+                END IF;
+                    
+                IF NEW.color IS NULL THEN
+                    NEW.color = 0;
+                END IF;
+                
+                IF NEW.create_date IS NULL THEN
+                    NEW.create_date = NOW();
+                END IF;
+                
+                IF NEW.tz IS NULL THEN
+                    NEW.tz = 'Africa/Lagos';
+                END IF;
+                
+                IF NEW.write_date IS NULL THEN
+                    NEW.write_date = NOW();
+                END IF;
+                
+                IF NEW.internal_category IS NULL THEN
+                    NEW.internal_category = 'customer';
+                END IF;
+                
+                -- Set commercial_partner_id to the record's ID after insert
+                -- This requires a BEFORE INSERT trigger to work properly
+                IF NEW.commercial_partner_id IS NULL THEN
+                    -- Using NEW.id directly in a BEFORE INSERT trigger
+                    -- This will work since the record already has an ID before the trigger
+                    NEW.commercial_partner_id = NEW.id;
+                END IF;
+                
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            
+            CREATE TRIGGER set_partner_defaults
+            BEFORE INSERT ON res_partner
+            FOR EACH ROW
+            EXECUTE FUNCTION set_partner_defaults_func();
+        """)
+        
+        # Create AFTER INSERT trigger for commercial_partner_id
+        self.env.cr.execute("""
+            CREATE OR REPLACE FUNCTION set_partner_defaults_after_func()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                IF NEW.commercial_partner_id IS NULL THEN
+                    UPDATE res_partner SET commercial_partner_id = NEW.id WHERE id = NEW.id;
+                END IF;
+                
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            
+            CREATE TRIGGER set_partner_defaults_after
+            AFTER INSERT ON res_partner
+            FOR EACH ROW
+            EXECUTE FUNCTION set_partner_defaults_after_func();
+        """)
+    
     
     @api.model_create_multi
     def create(self, vals_list):

@@ -7,8 +7,8 @@ class Branch(models.Model):
     _name = 'res.branch'
     _description = 'Branch'
     _sql_constraints = [
-        ('uniq_branch_code', 'unique(code)',
-         "Branch code already exists. Code must be unique!"),
+        ('uniq_branch_name', 'unique(name)',
+         "Branch Name already exists. Name must be unique!"),
     ]
     
     name = fields.Char(string="Branch")

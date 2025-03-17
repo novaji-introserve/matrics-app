@@ -4,6 +4,8 @@ from odoo.exceptions import ValidationError
 import json
 import logging
 from odoo.addons.queue.queue_job.job import Job
+# from odoo.addons.queue.queue_job.job import identity_exact
+
 import math
 import psycopg2
 
@@ -194,7 +196,7 @@ class ETLSourceTable(models.Model):
 
                     # For very large tables (> 500,000 rows), split into chunks
                     if total_count > 500000:
-                        chunk_size = 150000  # Process 150k records per job
+                        chunk_size = 100000  # Process 150k records per job
                         chunks = math.ceil(total_count / chunk_size)
 
                         # Get range of primary key values

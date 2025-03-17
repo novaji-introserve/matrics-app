@@ -15,10 +15,14 @@ from threading import Lock
 import time
 from dotenv import load_dotenv
 import os
+# from odoo.addons.queue.queue_job.job import Job
+# from odoo.addons.queue.queue_job.job import identity_exact
+
 
 load_dotenv()
 
 _logger = logging.getLogger(__name__)
+
 
 class ETLManager(models.AbstractModel):
     _name = 'etl.manager'
@@ -30,8 +34,6 @@ class ETLManager(models.AbstractModel):
     _processed_tables = set()
     _processed_tables_lock = Lock()
 
-    
-    
     @api.model
     def get_db_connections(self):
         """Get database connections based on system parameters"""
@@ -61,7 +63,6 @@ class ETLManager(models.AbstractModel):
 
         return source_conn_string, pg_conn_string, source_type
 
-    
     @contextmanager
     def get_connections(self):
         """Context manager for database connections with retry logic"""
@@ -93,7 +94,8 @@ class ETLManager(models.AbstractModel):
 
         except Exception as e:
             _logger.error(f"Connection error: {str(e)}")
-            raise UserError(f"Failed to establish database connection: {str(e)}")
+            raise UserError(
+                f"Failed to establish database connection: {str(e)}")
 
         finally:
             # Clean up connections
@@ -156,7 +158,6 @@ class ETLManager(models.AbstractModel):
         row_str = json.dumps(processed_row, sort_keys=True)
         return hashlib.sha256(row_str.encode()).hexdigest()
 
-
     @backoff.on_exception(
         backoff.expo,
         (psycopg2.Error, ValueError),
@@ -166,8 +167,9 @@ class ETLManager(models.AbstractModel):
         """Look up a value in the PostgreSQL database with caching and retry"""
         if key_value is None or (isinstance(key_value, str) and not key_value.strip()):
             return None
-                
-        cached_value = self.get_from_lookup_cache(table, key_value, key_column, value_column)
+
+        cached_value = self.get_from_lookup_cache(
+            table, key_value, key_column, value_column)
         if cached_value is not None:
             return cached_value
 
@@ -175,26 +177,28 @@ class ETLManager(models.AbstractModel):
             query = f"SELECT {value_column} FROM {table} WHERE {key_column} = %s"
             pg_cursor.execute(query, (key_value,))
             result = pg_cursor.fetchone()
-            
+
             if result:
-                self.set_in_lookup_cache(table, key_value, key_column, value_column, result[0])
+                self.set_in_lookup_cache(
+                    table, key_value, key_column, value_column, result[0])
                 return result[0]
 
-            _logger.debug(f"No matching record found in {table} for {key_column}={key_value}")
+            _logger.debug(
+                f"No matching record found in {table} for {key_column}={key_value}")
             return None
         except psycopg2.Error as e:
             # Get the connection object from the cursor
             connection = pg_cursor.connection
-            
+
             # Roll back the transaction to clear the error state
             connection.rollback()
-            
+
             # Log the error
-            _logger.warning(f"Lookup error for {table}.{key_column}={key_value}: {str(e)}")
-            
+            _logger.warning(
+                f"Lookup error for {table}.{key_column}={key_value}: {str(e)}")
+
             # Return None for the lookup value
             return None
-
 
     def transform_value(self, mapping: dict, value: Any, pg_cursor) -> Any:
         """Transform a value based on mapping configuration"""
@@ -202,10 +206,10 @@ class ETLManager(models.AbstractModel):
             if mapping['type'] == 'lookup':
                 return None
             return value
-                    
+
         if isinstance(value, str):
             value = value.strip()
-        
+
         if mapping['type'] == 'direct':
             return value
         elif mapping['type'] == 'lookup':
@@ -235,13 +239,14 @@ class ETLManager(models.AbstractModel):
             ('table_id', '=', table_id),
             ('status', '=', 'success')
         ], order='create_date desc', limit=1)
-        
+
         if sync_log:
             try:
                 row_hashes = json.loads(sync_log.row_hashes or '{}')
                 return sync_log.start_time, row_hashes
             except json.JSONDecodeError:
-                _logger.error(f"Failed to decode row hashes for table {table_id}")
+                _logger.error(
+                    f"Failed to decode row hashes for table {table_id}")
                 return sync_log.start_time, {}
         return fields.Datetime.now(), {}
 
@@ -257,40 +262,45 @@ class ETLManager(models.AbstractModel):
                 FROM information_schema.columns 
                 WHERE table_name = %s
             """, (config['target_table'],))
-            
-            table_columns = {row[0].lower(): row[1] for row in pg_cursor.fetchall()}
-            
+
+            table_columns = {row[0].lower(): row[1]
+                             for row in pg_cursor.fetchall()}
+
             # Debug logging
             _logger.debug(f"First row to update: {rows[0]}")
-            _logger.debug(f"Available columns in target table: {table_columns}")
+            _logger.debug(
+                f"Available columns in target table: {table_columns}")
 
             # Get columns from first row
             columns = list(rows[0].keys())
-            
+
             # Validate columns
             for col in columns:
                 if col.lower() not in table_columns:
-                    raise ValueError(f"Column {col} not found in table {config['target_table']}")
+                    raise ValueError(
+                        f"Column {col} not found in table {config['target_table']}")
 
             # Prepare SQL
             column_names = ', '.join(f'"{col.lower()}"' for col in columns)
             placeholders = ', '.join(['%s'] * len(columns))
-            
+
             # Get primary key mapping
             primary_key_target = None
             for source_col, mapping in config['mappings'].items():
                 if source_col.lower() == config['primary_key'].lower():
                     primary_key_target = mapping['target'].lower()
                     break
-            
+
             if not primary_key_target:
-                raise ValueError(f"Primary key mapping not found for {config['primary_key']}")
+                raise ValueError(
+                    f"Primary key mapping not found for {config['primary_key']}")
 
             # Prepare update clause
             update_sets = []
             for col in columns:
                 if col.lower() != primary_key_target:
-                    update_sets.append(f'"{col.lower()}" = EXCLUDED."{col.lower()}"')
+                    update_sets.append(
+                        f'"{col.lower()}" = EXCLUDED."{col.lower()}"')
             update_clause = ', '.join(update_sets)
 
             # Final query
@@ -304,14 +314,14 @@ class ETLManager(models.AbstractModel):
             _logger.debug(f"Executing query: {insert_query}")
 
             # Execute in batches
-            batch_size = 1000
+            batch_size = 4000
             for i in range(0, len(rows), batch_size):
                 batch = rows[i:i + batch_size]
                 values = []
                 for row in batch:
                     row_values = [row.get(col) for col in columns]
                     values.append(row_values)
-                
+
                 pg_cursor.executemany(insert_query, values)
 
         except Exception as e:
@@ -319,7 +329,6 @@ class ETLManager(models.AbstractModel):
             _logger.error(f"Target table: {config['target_table']}")
             _logger.error(f"Columns being updated: {columns}")
             raise
-
 
     def process_table(self, table_config):
         """Process a single table with pagination for large datasets"""
@@ -358,7 +367,7 @@ class ETLManager(models.AbstractModel):
                 query = f"SELECT TOP 0 * FROM {table_delimiter}{config['source_table']}{table_delimiter_end}" if not is_postgres_source else f'SELECT * FROM "{config["source_table"]}" LIMIT 0'
                 source_cursor.execute(query)
                 source_columns = {col[0].lower(): col[0]
-                                for col in source_cursor.description}
+                                  for col in source_cursor.description}
 
                 # Prepare query columns
                 query_columns = []
@@ -385,14 +394,16 @@ class ETLManager(models.AbstractModel):
                     count_query = f"SELECT COUNT(*) FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
                     source_cursor.execute(count_query)
                     total_count = source_cursor.fetchone()[0]
-                    _logger.info(f"Total records in source table: {total_count}")
+                    _logger.info(
+                        f"Total records in source table: {total_count}")
                 except Exception as e:
                     _logger.warning(
                         f"Could not get count, using standard processing: {str(e)}")
                     total_count = None
 
                 # Process in smaller batches
-                batch_size = min(config['batch_size'], 5000)  # Use smaller batches
+                # Use smaller batches
+                batch_size = min(config['batch_size'], 5000)
 
                 # For tables with a manageable number of rows, process all at once
                 if total_count and total_count < 20000:
@@ -446,7 +457,8 @@ class ETLManager(models.AbstractModel):
 
                     # Final batch update
                     if rows_to_update:
-                        self.batch_update_rows(pg_cursor, config, rows_to_update)
+                        self.batch_update_rows(
+                            pg_cursor, config, rows_to_update)
                         pg_conn.commit()
 
                 else:
@@ -531,7 +543,8 @@ class ETLManager(models.AbstractModel):
                                     )] = transformed_value
 
                             if transformed_row:  # Only process if we have values
-                                row_hash = self.calculate_row_hash(transformed_row)
+                                row_hash = self.calculate_row_hash(
+                                    transformed_row)
                                 pk_value = str(row_dict[config['primary_key']])
                                 current_hashes[pk_value] = row_hash
 
@@ -554,7 +567,8 @@ class ETLManager(models.AbstractModel):
                         # Update progress
                         processed += batch_count
                         if total_count:
-                            progress = round(100.0 * processed / total_count, 2)
+                            progress = round(
+                                100.0 * processed / total_count, 2)
                             _logger.info(
                                 f"Progress: {progress}% - Processed {processed} of {total_count} rows")
                         else:
@@ -610,7 +624,6 @@ class ETLManager(models.AbstractModel):
             })
 
             raise
-    
 
     def process_table_chunk(self, table_config, min_id, max_id):
         """Process a specific chunk of a table with ID range"""
@@ -654,7 +667,7 @@ class ETLManager(models.AbstractModel):
                 )
                 source_cursor.execute(query)
                 source_columns = {col[0].lower(): col[0]
-                                for col in source_cursor.description}
+                                  for col in source_cursor.description}
 
                 # Prepare query columns
                 query_columns = []
@@ -692,14 +705,16 @@ class ETLManager(models.AbstractModel):
                     else:
                         source_cursor.execute(count_query)
                     chunk_total_count = source_cursor.fetchone()[0]
-                    _logger.info(f"Total records in chunk: {chunk_total_count}")
+                    _logger.info(
+                        f"Total records in chunk: {chunk_total_count}")
                 except Exception as e:
                     _logger.warning(
                         f"Could not get chunk count, using standard processing: {str(e)}")
                     chunk_total_count = None
 
                 # Process in smaller batches
-                batch_size = min(config['batch_size'], 5000)  # Use smaller batches
+                # Use smaller batches
+                batch_size = min(config['batch_size'], 5000)
                 processed = 0
                 last_pk_value = min_id  # Start from min_id
 
@@ -716,7 +731,8 @@ class ETLManager(models.AbstractModel):
                             ORDER BY {table_delimiter}{primary_key_original}{table_delimiter_end}
                             LIMIT {batch_size}
                         """
-                        source_cursor.execute(batch_query, (last_pk_value, max_id))
+                        source_cursor.execute(
+                            batch_query, (last_pk_value, max_id))
                     else:
                         batch_query = f"""
                             SELECT TOP {batch_size} {cols} 
@@ -775,17 +791,20 @@ class ETLManager(models.AbstractModel):
 
                     # Update in smaller batches
                     if rows_to_update:
-                        self.batch_update_rows(pg_cursor, config, rows_to_update)
+                        self.batch_update_rows(
+                            pg_cursor, config, rows_to_update)
                         pg_conn.commit()  # Commit each batch
 
                     # Update progress
                     processed += batch_count
                     if chunk_total_count:
-                        progress = round(100.0 * processed / chunk_total_count, 2)
+                        progress = round(100.0 * processed /
+                                         chunk_total_count, 2)
                         _logger.info(
                             f"Chunk progress: {progress}% - Processed {processed} of {chunk_total_count} rows")
                     else:
-                        _logger.info(f"Processed {processed} rows in chunk so far")
+                        _logger.info(
+                            f"Processed {processed} rows in chunk so far")
 
                     # If we got fewer rows than the batch size or reached the max_id, we're done
                     if batch_count < batch_size or str(last_pk_value) >= str(max_id):
@@ -843,31 +862,30 @@ class ETLManager(models.AbstractModel):
         """Run scheduled synchronization for tables"""
         self.clear_lookup_cache()
         self.clear_processed_tables()
-        
-        frequency = self.env['etl.frequency'].search([('code', '=', frequency_code)], limit=1)
+
+        frequency = self.env['etl.frequency'].search(
+            [('code', '=', frequency_code)], limit=1)
         if not frequency:
             _logger.error(f"Frequency '{frequency_code}' not found")
             return
-        
+
         tables = self.env['etl.source.table'].search([
             ('frequency_id', '=', frequency.id),
             ('active', '=', True)
         ])
-        
+
         for table in tables:
             try:
                 # Queue the sync as a job
                 table.with_delay(
                     description=f"Scheduled sync for table: {table.name}"
                 ).sync_table_job()
-                
+
                 table.write({
                     'job_status': 'pending'
                 })
-                
+
                 _logger.info(f"Sync job queued for table {table.name}")
             except Exception as e:
-                _logger.error(f"Failed to queue sync job for table {table.name}: {str(e)}")
-                
-                
-                
+                _logger.error(
+                    f"Failed to queue sync job for table {table.name}: {str(e)}")
