@@ -5,11 +5,13 @@
         <field name="name">Compliance Statistic</field>
         <field name="model">res.compliance.stat</field>
         <field name="arch" type="xml">
-            <form>
+            <form >
+                
                 <header>
-                    <button name="compute_stat" class="oe_highlight" type="object"
+                    <!-- <button name="compute_stat" class="oe_highlight" type="object"
                         string="Compute Statistics"
-                        groups="compliance_management.group_compliance_branch_compliance_officer" />
+                        groups="compliance_management.group_compliance_branch_compliance_officer" /> -->
+                    
                 </header>
                 <sheet string="Compliance Statistic">
                     <div class="oe_title" colspan="2">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="compliance_dashboard_view_kanban" model="ir.ui.view">
+    <!-- <record id="compliance_dashboard_view_kanban" model="ir.ui.view">
         <field name="name">rec.compliance.stat.view.kanban</field>
         <field name="model">res.compliance.stat</field>
         <field name="arch" type="xml">
@@ -9,17 +9,31 @@
                 <field name="name" />
                 <field name="val" />
                 <field name="write_date" />
+                <field name="scope_color" />
                 <field name="scope" />
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="kanban-box"> -->
+
+                     
+
+                        <!-- <div t-att-class="oe_kanban_global_click" t-attf-style="justify-content: space-between; min-height: 20vh; margin-bottom: 0.4rem;"> -->
+                        <!-- <div t-att-class="oe_kanban_global_click"
+                            t-att-style="justify-content: space-between; min-height: 20vh; margin-bottom: 0.4rem;"> -->
+                            
                         
-                        <div t-att-class="oe_kanban_global_click" style="justify-content: space-between;">
-                          <!--  <div class="o_kanban_image">
+                            <!--  <div class="o_kanban_image">
                                 <img alt="Stat Image" src="compliance_management/static/description/icons-compliance.png" class="o_kanban_image"/>
                             </div>-->
-                            <div class="oe_kanban_details">
-                                <h5><field name="name"/></h5>
-                                <div><h1><field name="val" decoration-info="1"/></h1></div>
+                            <!-- <div class="">
+                                <p class="text-muted display-6">
+                                    <field name="name" />
+                                    
+                                </p>
+                                <div>
+                                    <h1 style="line-height: 1rem; font-size: 3rem;">
+                                        <field name="val" decoration-info="1" />
+                                    </h1>
+                                </div> -->
                                 <!--<div t-if="record.function.raw_value"><field name="function"/></div>
                                 <div t-if="record.email.raw_value"><field name="email" widget="email"/></div>
                                 <div t-if="record.type.raw_value != 'contact'">
@@ -32,10 +46,10 @@
                                 </div>
                                 <div t-if="record.phone.raw_value">Phone: <t t-esc="record.phone.value"/></div>
                                 <div t-if="record.mobile.raw_value">Mobile: <t t-esc="record.mobile.value"/></div>-->
-                            </div>
-                          <!--  <field name="name" class="fw-bolder fs-5" /><br/>
+                            <!-- </div> -->
+                            <!--  <field name="name" class="fw-bolder fs-5" /><br/>
                             <field name="val" widget="badge" decoration-info="1"/> -->
-                        </div>
+                        <!-- </div>
                     </t>
                 </templates>
             </kanban>
@@ -56,7 +70,15 @@
             </p>
         </field>
     </record>
-    <menuitem id="menu_compliance_dashboard" name="Dashboard" action="action_dashboard_compliance"
+ -->
+
+    <!-- client to load the owl action created -->
+    <record id="action_compliance_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard</field>
+        <field name="tag">owl.compliance_dashboard</field>
+    </record>
+
+    <menuitem id="menu_compliance_dashboard" name="Dashboard" action="action_compliance_dashboard"
         parent="compliance_management.menu_compliance_root" sequence="-1" />
 
 </odoo>

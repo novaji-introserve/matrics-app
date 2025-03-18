@@ -21,6 +21,7 @@
             <field name="model_id" ref="model_reply_log" />
             <field name="state">code</field>
             <field name="code">model.check_rulebook_and_update_due_date()</field>
+            <!-- <field name="active" eval="False" /> -->
             <field name="active" eval="True" />
             <field name="interval_type">minutes</field>
             <field name="interval_number">4</field>
@@ -28,6 +29,24 @@
             </record>
     </data>
 
+        <!-- Cron Job for checking rulebook and updating due dates -->
+   <data>
+        <record id="cron_check_rulebook_and_update_due_date_for_rulebook" model="ir.cron">
+            <field name="name">Open Rulebook and Update Due Dates</field>
+            <field name="model_id" ref="model_rulebook" />
+            <field name="state">code</field>
+            <field name="code">model.check_and_update_overdue_dates()</field>
+            <field name="active" eval="True" />
+            <field name="interval_type">days</field>
+            <field name="interval_number">1</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="DateTime.now().replace(hour=16, minute=30)" />
+            <field name="doall" eval="False"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <!-- Run as admin -->
+
+        </record>
+    </data>
 
     <data>
         <!-- Cron Job for checking rulebook logs and sending out emails that are due -->
@@ -51,9 +70,9 @@
             <field name="model_id" ref="model_rulebook" />
             <field name="state">code</field>
             <field name="code">model._create_rulebook_logs_entry()</field>
-            <field name="active" eval="True" />
+            <field name="active" eval="False" />
             <field name="interval_type">days</field>
-            <field name="interval_number">30</field>
+            <field name="interval_number">1</field>
             <field name="numbercall">-1</field>
         </record>
     </data>
@@ -115,6 +134,19 @@
         </record>
     </data>
 
+    <data>
+        <!-- cron job to clear last internal due date alert -->
+        <record id="clear_last_internal_due_date_sent_" model="ir.cron">
+            <field name="name">Clear last internal due date </field>
+            <field name="model_id" ref="model_reply_log"/>
+            <field name="state">code</field>
+            <field name="code">model.clear_last_internal_due_date_sent()</field>
+            <field name="active" eval="False" />
+            <field name="interval_type">days</field>
+            <field name="interval_number">1</field>
+            <field name="numbercall">-1</field>
+        </record>
+    </data>
 
 
 </odoo>

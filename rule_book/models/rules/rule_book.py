@@ -37,6 +37,7 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Rulebook Source document.",
+        index= True
         # default=""
     )
 
@@ -45,14 +46,18 @@ class Rulebook(models.Model):
 
     formatted_rulebook_date = fields.Char(
         string="Formatted Rulebook Date",
-        compute="_compute_formatted_rulebook_date",        # store=True
+        compute="_compute_formatted_rulebook_date",   
+        index=True,
+        # store=True
 
     )
 
     formatted_regulatory_date = fields.Char(
         string="Formatted Regulatory Date",
         compute="_compute_formatted_regulatory_date",
-        # store=True
+        # store=True,
+        index=True,
+
     )
 
     formatted_reminder_date = fields.Char(
@@ -109,6 +114,7 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Type of return for this rulebook.",
+        index= True,
     )
 
     regulatory_agency_id = fields.Many2one(
@@ -134,6 +140,7 @@ class Rulebook(models.Model):
         required=True,
         tracking=True,
         help="Primary person responsible for this rulebook.",
+        index= True,
         # default=''
     )
 
@@ -144,6 +151,8 @@ class Rulebook(models.Model):
         string="Officers To Copy",
         tracking=True,
         help="Select the person(s) to copy for this rulebook.",
+        # index= True,
+        # store= True
     )
 
     description = fields.Text(
@@ -303,6 +312,7 @@ class Rulebook(models.Model):
         string="Frequency Type",
         required=True,
         help="Select the frequency type for the regulatory action.",
+        index= True,
     )
 
     is_recurring = fields.Boolean(
@@ -386,39 +396,7 @@ class Rulebook(models.Model):
 
     # to send the data in the global variable to the template
 
-    def your_method(self):
-
-        africa_timezone = pytz.timezone("Africa/Lagos")
-        # Get the current date and time in the Africa/Lagos timezone
-        africa_now = datetime.now(africa_timezone)
-
-        # Get today's start and end times (naive) and localize them
-        today_start = africa_timezone.localize(africa_now.replace(
-            hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None))
-        today_end = africa_timezone.localize(africa_now.replace(
-            hour=23, minute=59, second=59, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None))
-
-        # Format the date and time to the desired output
-        formatted_today_start = today_start.strftime('%Y-%m-%d %H:%M:%S')
-        formatted_today_end = today_end.strftime('%Y-%m-%d %H:%M:%S')
-
-        # Logging the results with the formatted datetime
-        _logger.critical("today start %s", formatted_today_start)
-        _logger.critical("today end %s", formatted_today_end)
-
-        # Get current date and time (without timezone info for today_now)
-        current_date = fields.Datetime.now()  # Current date and time
-        today_now = fields.Datetime.now().astimezone(
-            pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-
-        formatted_today_now = today_now.strftime('%Y-%m-%d %H:%M:%S')
-
-        _logger.critical("Current Date and Time: %s", formatted_today_now)
-        utc_now = datetime.now(pytz.UTC)
-        _logger.critical("utc %s", utc_now.strftime('%Y-%m-%d %H:%M:%S'))
-        _logger.critical("todays date odoo  %s",
-                         current_date.strftime('%Y-%m-%d %H:%M:%S'))
-
+  
     @api.model
     def open_rulebooks(self):
         # Check if user belongs to compliance or COO groups
@@ -496,7 +474,7 @@ class Rulebook(models.Model):
         base_url = self.env["ir.config_parameter"].sudo(
         ).get_param("web.base.url")
         appendedValue = encrypt_id(id)
-        _logger.critical(f"{base_url}/report_submission/{appendedValue}")
+        # _logger.critical(f"{base_url}/report_submission/{appendedValue}")
         return f"{base_url}/report_submission/{appendedValue}"
 
     def _record_link(self, record_id, model_name=None):
@@ -578,8 +556,8 @@ class Rulebook(models.Model):
 
                 record.is_recurring = record.is_recurring or False
 
-                _logger.critical("is reoccuring got here ",
-                                 record.is_recurring)
+                # _logger.critical("is reoccuring got here ",
+                #                  record.is_recurring)
                 # Missing boolean assignment for is_recurring
 
             elif record.frequency_type == "day_of_month":
@@ -587,8 +565,8 @@ class Rulebook(models.Model):
                     try:
                         day_value = int(record.day_value)
                         month_value = int(record.month_value)
-                        _logger.critical(
-                            f"Day Value {day_value} , month value {month_value}")
+                        # _logger.critical(
+                        #     f"Day Value {day_value} , month value {month_value}")
 
                         # Calculate correct year
                         target_year = today.year
@@ -799,8 +777,8 @@ class Rulebook(models.Model):
 
                 # Validate month value
                 if not (1 <= month_value <= 12):
-                    _logger.warning(
-                        f"Invalid month value: {month_value}. Setting to default month 12.")
+                    # _logger.warning(
+                    #     f"Invalid month value: {month_value}. Setting to default month 12.")
                     month_value = 12
 
                 # Get the maximum days for the selected month
@@ -823,8 +801,8 @@ class Rulebook(models.Model):
                     record.is_recurring = record.is_recurring or False
 
                 except ValueError as e:
-                    _logger.error(
-                        f"Error creating date: year={year}, month={month_value}, day={day}. Error: {e}")
+                    # _logger.error(
+                    #     f"Error creating date: year={year}, month={month_value}, day={day}. Error: {e}")
                     continue
 
             elif record.frequency_type == "three_yearly":
@@ -859,7 +837,7 @@ class Rulebook(models.Model):
                         record.is_recurring = record.is_recurring or False
 
                     except ValueError as e:
-                        _logger.error(f"Error creating three-yearly date: {e}")
+                        # _logger.error(f"Error creating three-yearly date: {e}")
                         record.computed_date = default_time
 
             elif record.frequency_type == "immediate":
@@ -996,8 +974,8 @@ class Rulebook(models.Model):
                     record.reg_due_date = record.computed_date + relativedelta(
                         **delta_args
                     )
-                    _logger.critical(
-                        f"writing escalation date {record.reg_due_date}")
+                    # _logger.critical(
+                    #     f"writing escalation date {record.reg_due_date}")
                     record.sudo().write({
                         'reg_due_date': record.reg_due_date,
                     })
@@ -1080,6 +1058,34 @@ class Rulebook(models.Model):
                 # If computed_date is not available, set reg_due_date to False or handle accordingly
                 record.reminder_due_date = None
 
+    def _compute_reminder_due_date_for_cron_job(self):
+        for record in self:
+            if record.computed_date and record.reminder_due_date_unit in [
+                "days",
+                "hours",
+                "minutes",
+                "seconds",
+                "weeks",
+                "months",
+                "years",
+            ]:
+                if record.reminder_due_date_value:
+                    delta_args = {
+                        record.reminder_due_date_unit: -record.reminder_due_date_value
+                    }
+                    record.reminder_due_date = record.computed_date + relativedelta(
+                        **delta_args
+                    )
+                    _logger.critical(
+                        f"writing NEW Reminder Due date for rulebook ..{record.reminder_due_date}")
+                    record.sudo().write({
+                        'reminder_due_date': record.reminder_due_date,
+                    })
+
+            else:
+                # If computed_date is not available, set reg_due_date to False or handle accordingly
+                record.reminder_due_date = None
+    
     @api.depends("computed_date")
     def _compute_formatted_rulebook_date(self):
         for record in self:
@@ -1407,16 +1413,16 @@ class Rulebook(models.Model):
         self._update_risk_rating(vals)
         # self.your_method()
 
-        _logger.critical(f"Write values for rulebook email data: {vals}")
+        # _logger.critical(f"Write values for rulebook email data: {vals}")
 
         updating_computed_date = "computed_date" in vals or "frequency_type" in vals
 
         # If 'computed_date' exists and is being updated, subtract one hour
         if updating_computed_date and "computed_date" in vals:
-            _logger.critical(f"computed date was herrere")
+            # _logger.critical(f"computed date was herrere")
             # Ensure computed_date is not None before performing arithmetic
             if vals["computed_date"]:
-                _logger.critical(f"computed date got updated")
+                # _logger.critical(f"computed date got updated")
 
                 vals["computed_date"] = vals["computed_date"] - \
                     timedelta(hours=1)
@@ -1431,9 +1437,9 @@ class Rulebook(models.Model):
                 email_data = self._prepare_email_data()
 
                 # Enhanced logging
-                _logger.info(
-                    f"Frequency type set to immediate for record {self.id}")
-                _logger.info(f"Prepared email data: {email_data}")
+                # _logger.info(
+                #     f"Frequency type set to immediate for record {self.id}")
+                # _logger.info(f"Prepared email data: {email_data}")
 
                 # Send immediate notification
                 if email_data:
@@ -1470,13 +1476,13 @@ class Rulebook(models.Model):
 
         reply_log_vals['rulebook_id'] = self.id
 
-        _logger.critical(
-            f"Reply log vals {reply_log_vals} rulebook_id {self.id}")
+        # _logger.critical(
+        #     f"Reply log vals {reply_log_vals} rulebook_id {self.id}")
 
         # If no reply log exists and frequency type is "immediate", create a new reply log
         if not reply_logs and self.frequency_type == "immediate":
-            _logger.critical(
-                f"frequency is immediate and reply_logs is {reply_logs} logsid {reply_logs.id}  self id{self.id}")
+            # _logger.critical(
+            #     f"frequency is immediate and reply_logs is {reply_logs} logsid {reply_logs.id}  self id{self.id}")
             try:
                 reply_log = self.env['reply.log'].create(reply_log_vals)
             except Exception as e:
@@ -1485,8 +1491,8 @@ class Rulebook(models.Model):
             if reply_log:
                 _logger.critical(
                     f"Inserted Success fully {reply_logs}  ID {self.id} , Valuses {reply_log_vals}")
-            _logger.critical(
-                f"Inserted record is {reply_log}")
+            # _logger.critical(
+            #     f"Inserted record is {reply_log}")
         else:
             # If reply log exists or frequency type is not "immediate", use the existing reply log
             reply_log = reply_logs[0] if reply_logs else None
@@ -1590,7 +1596,7 @@ class Rulebook(models.Model):
                 if category and category.risk_priority:
                     vals["risk_rating"] = category.risk_priority
 
-                _logger.info(f"Risk category updated: {category}")
+                # _logger.info(f"Risk category updated: {category}")
 
         except Exception as e:
             _logger.error(f"Error updating risk rating: {e}")
@@ -1709,56 +1715,39 @@ class Rulebook(models.Model):
             raise ValueError(
                 f"Error extracting rulebook ID from event: {event.name}. Error: {str(e)}")
 
+    
+                
     @api.model
-    def check_rulebook_and_update_due_date(self):
-        """Check rulebooks with today's regulatory date and update next due date."""
+    def check_and_update_overdue_dates(self):
+        """Check and update rulebooks where computed_date or regulatory_date has passed"""
+        today = datetime.now().replace(microsecond=0)
+        self = self.sudo()
 
-        today = datetime.now().date()
+        # Search for rulebooks where either date has passed
+        rulebooks = self.env["rulebook"].search([
+            ("is_recurring", "=", True),
+            "|",  # OR condition
+            "&",
+            ("computed_date", "!=", False),
+            ("computed_date", "<=", today),
+            "&",
+            ("reg_due_date", "!=", False),
+            ("reg_due_date", "<=", today)
+        ])
 
-        _logger.critical(
-            f"rulebooks with today's regulatory date  {today}, plus one day {today + timedelta(days=1)}")
+        # _logger.info(f"Found {len(rulebooks)} overdue rulebooks to update")
 
-        today = fields.Datetime.now()
-        # .astimezone(
-        #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
-
-        # Adjust to local midnight without timezone conversion
-        day_start = today.replace(hour=0, minute=0, second=0)
-        day_end = today.replace(hour=23, minute=59, second=59)
-        time_in_15_minutes = today + timedelta(minutes=15)
-
-        day_start = day_start.replace(
-            tzinfo=None, microsecond=0)  # Remove timezone info
-        day_end = day_end.replace(tzinfo=None, microsecond=0)
-
-        time_in_15_minutes = time_in_15_minutes.replace(
-            tzinfo=None, microsecond=0)
-
-        # Perform the search
-        rulebooks = self.env["rulebook"].search(
-            [
-                ("computed_date", ">=", day_start),
-                ("computed_date", "<", day_end),
-                ("is_recurring", "=", True),
-            ]
-        )
-
+        # Update each rulebook
         for record in rulebooks:
             try:
-                _logger.critical(
-                    f"To Update rulebook {record.id}:,  type of return : {re.sub(r'<[^>]+>', '', record.type_of_return)} frequency : {record.frequency_type}")
-
-                computed_date = (record.computed_date)
-                time_in_5_minutes = computed_date - timedelta(minutes=5)
-
-                if today >= time_in_5_minutes and computed_date:
-                    record._compute_next_due_date()
-
+                record.sudo()._compute_next_due_date()
+                # _logger.info(f"Updated rulebook: {record.id}")
             except Exception as e:
-                _logger.critical(f"Failed to update rulebook {record.id}: {e}")
+                _logger.error(f"Failed to update rulebook {record.id}: {e}")
+                
 
     def _compute_next_due_date(self):
-        _logger.critical("Updating next due date...")
+        # _logger.critical("Updating next due date...")
 
         """Compute the next internal due date for the rulebook when the status is 'completed'."""
 
@@ -1857,9 +1846,10 @@ class Rulebook(models.Model):
 
                 record._compute_escalation_date_for_cron_job()
                 record._compute_reg_due_date_for_cron_job()
+                record._compute_reminder_due_date_for_cron_job()
 
-                _logger.critical(
-                    f"Record {record.id}: Computed next due date as {next_compute_date}.")
+                # _logger.critical(
+                #     f"Record {record.id}: Computed next due date as {next_compute_date}.")
 
             except Exception as e:
                 _logger.error(
@@ -1873,13 +1863,13 @@ class Rulebook(models.Model):
         # today = fields.Datetime.now().astimezone(
         #     pytz.timezone('Africa/Lagos')).replace(tzinfo=None)
 
-        _logger.critical(
-            f"create rulebook logs entry for rulebook cron job has started ")
+        # _logger.critical(
+        #     f"create rulebook logs entry for rulebook cron job has started ")
 
         # Get all rulebook IDs in the current recordset
         rulebook_ = self.env["rulebook"].search([])
         rulebook_ids = rulebook_.ids
-        _logger.critical(f"Rulebook ids {rulebook_ids}")
+        # _logger.critical(f"Rulebook ids {rulebook_ids}")
 
         rulebooks_with_no_reply_log = self.env['rulebook'].search([
             ('id', 'not in', self.env['reply.log'].search([]).mapped(
@@ -1890,8 +1880,8 @@ class Rulebook(models.Model):
             ('computed_date', '!=', False)  # is_reoccuring should be True
         ])
 
-        _logger.critical(
-            f" Rulebooks IDS NOT IN Rulebook LOGS{rulebooks_with_no_reply_log}")
+        # _logger.critical(
+        #     f" Rulebooks IDS NOT IN Rulebook LOGS{rulebooks_with_no_reply_log}")
 
         for rulebook in rulebooks_with_no_reply_log:
             reply_log_vals = rulebook._prepare_reply_log_vals(
@@ -1899,8 +1889,8 @@ class Rulebook(models.Model):
                 submission_time='pending'
 
             )
-            _logger.critical(
-                f"REPLY LOGS VALUES FOR INSERT {reply_log_vals} ")
+            # _logger.critical(
+            #     f"REPLY LOGS VALUES FOR INSERT {reply_log_vals} ")
             try:
 
                 reply_log_vals = rulebook._prepare_reply_log_vals(
@@ -1915,15 +1905,15 @@ class Rulebook(models.Model):
                 else:
                     adjusted_computed_date = rulebook.computed_date
 
-                _logger.critical(
-                    f" adjusted_computed_date {adjusted_computed_date},.... computed_date { rulebook.computed_date}")
+                # _logger.critical(
+                #     f" adjusted_computed_date {adjusted_computed_date},.... computed_date { rulebook.computed_date}")
 
                 reply_log_vals['rulebook_compute_date'] = adjusted_computed_date
 
                 reply = self.env['reply.log'].create(reply_log_vals)
 
-                _logger.critical(
-                    f"Created reply.log for Rulebook ID {rulebook.id}  Reply Log ID {reply.id}")
+                # _logger.critical(
+                #     f"Created reply.log for Rulebook ID {rulebook.id}  Reply Log ID {reply.id}")
 
             except Exception as e:
                 _logger.critical(
@@ -1953,8 +1943,7 @@ class Rulebook(models.Model):
         time_in_15_minutes = today + timedelta(minutes=10)
         time_in_15_minutes = time_in_15_minutes.strftime('%Y-%m-%d %H:%M:%S')
 
-        _logger.critical("today start : ", today_start,
-                         " today end", today_end)
+       
 
         # Search for rulebooks where computed_date is today and is_recurring is True
         rulebooks = self.search(
@@ -2018,15 +2007,15 @@ class Rulebook(models.Model):
             # Update the record with the cleaned and capitalized value
             if clean_value != rulebook.type_of_return:
                 rulebook.sudo().write({'type_of_return': clean_value})
-                _logger.critical(
-                    f"Updated rulebook {rulebook.id}: Cleaned and capitalized type_of_return field.")
+                # _logger.critical(
+                #     f"Updated rulebook {rulebook.id}: Cleaned and capitalized type_of_return field.")
 
     def update_time_zone_for_all_users(self):
         users = self.env['res.users'].search([])  # Get all users
         for user in users:
             user.sudo().write({'tz': 'Africa/Lagos'})
-            _logger.critical(
-                F"timezone update successfull {user}  users found ..{users}")
+            # _logger.critical(
+            #     F"timezone update successfull {user}  users found ..{users}")
         return True
 
     @api.model
@@ -2051,3 +2040,4 @@ class Rulebook(models.Model):
         if user.id not in compliance_group.users.ids and user.id not in cco_group.users.ids:
             raise AccessError(
                 "Action Unauthorized. You do not have access right.")
+    

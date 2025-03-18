@@ -96,6 +96,8 @@
                 <field name="name" />
                 <field name="status" />
                 <field name="source_id" />
+                <field name="external_resource_url" />
+                <field name="created_on" />
                 <group expand="1" string="Group By">
                     <filter string="Created By" name="created_by" />
                     <filter string="Source" name="source_id" />

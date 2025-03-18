@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.card" owl="1">
+        <div t-on-click="() => props.onClick" class="p-4 box position-relative" t-attf-style="background-color: {{ props.bgcolor }};">
+
+            <img t-if="props.scope === 'bank'" t-att-src="'/compliance_management/static/src/img/link.png'" alt="Bank"
+                class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+            <img t-if="props.scope === 'regulatory'" t-att-src="'/compliance_management/static/src/img/regulatory.svg'"
+                alt="Regulatory" class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+            <img t-if="props.scope === 'risk'" t-att-src="'/compliance_management/static/src/img/risk.svg'" alt="Risk"
+                class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+            <img t-if="props.scope === 'compliance'" t-att-src="'/compliance_management/static/src/img/compliance.svg'" alt="Risk"
+                class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+            <img t-if="props.scope === 'branch'" t-att-src="'/compliance_management/static/src/img/bank.svg'" alt="Risk"
+                class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+
+
+            <h2 class="my-3 fs-1">
+                <t t-out="props.total" />
+            </h2>
+
+            <p class="text-muted text-capitalize fs-4">
+                <t t-out="props.title" />
+            </p>
+
+            <div class="text-uppercase fw-bold text-center bg-dark text-white fs-6 position-absolute catbox">
+                <p ><t t-out="props.scope.slice(0,2)" /></p>
+            </div>
+
+
+        </div>
+    </t>
+</templates>

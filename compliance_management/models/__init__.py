@@ -33,4 +33,6 @@ from . import risk_assessment_plan
 from . import settings
 from . import transaction
 from . import transaction_screening_rule
+from . import transaction_type
 from . import pep_customer
+from . import adverse_media

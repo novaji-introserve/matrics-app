@@ -8,14 +8,18 @@
             <tree string="Rulebook Log" create="false">
             <!-- <tree string="Rulebook Log" create="false" delete="false"> -->
                 <field name="rulebook_id" string="Source"/>
-                <field name="rulebook_name" string="Rulebook Returns"/>
+                <field name="rulebook_name" string="Return"/>
                 <field name="formatted_rulebook_date" string="Internal Due Date"/>
-                <field name="formatted_reply_date" string="Reply date"/>
+                <field name="formatted_reply_date" string="Reply date" optional="hide"/>
                 <field name="submission_timing" widget="badge" decoration-muted="submission_timing == 'pending'" decoration-success="submission_timing == 'early'" decoration-warning="submission_timing == 'after_internal'" decoration-danger="submission_timing in ['not_responded','late']"/>
-                <field name="rulebook_status" widget="badge" decoration-muted="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'"/>
+                <field name="rulebook_status" string="Status" widget="badge" decoration-muted="rulebook_status == 'pending'" decoration-info="rulebook_status == 'submitted'" decoration-warning="rulebook_status == 'reviewed'" decoration-success="rulebook_status == 'completed'"/>
                 <field name="reporter" string="Officer Responsible"/>
-                <field name="reg_due_date" optional="hide" string="Regulatory Due Date"/>
-                <field name="active" invisible="1"/>
+                <field name="frequency_type" string="frequency"/>
+                <field name="formatted_regulatory_date" optional="hide" string="Regulatory Due Date"/>
+                <!-- <field name="active" invisible="1"/> -->
+                <field name="active" invisible="1" groups="rule_book.group_chief_compliance_officer_"/>
+                <!-- <button name="toggle_active" type="object" icon="fa-archive" groups="rule_book.group_chief_compliance_officer_"/> -->
+
             </tree>
         </field>
     </record>
@@ -29,12 +33,23 @@
                 <field name="rulebook_id"/>
                 <field name="submission_timing"/>
                 <field name="reply_content" string="Reply Note"/>
+                <field name="rulebook_name" string="Type of return"/>
+                <field name="frequency_type" string="frequency"/>
+                <field name="reporter" string="Officer Responsible"/>
+                <field name="department_id" string="Department Responsible"/>
+                <field name="officer_cc" string="Officers in Copy" filter_domain="[('officer_cc', 'ilike', self)]"/>
+
                 <searchpanel>
-                    <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1"/>
+                    <!-- <field name="rulebook_id" icon="fa-book" string="Rulebook" enable_counters="1"/> -->
+                    <field name="frequency_type" icon="fa-clock" string="frequency" enable_counters="1"/>
                     <field name="submission_timing" icon="fa-clock" string="Submission Timing" enable_counters="1"/>
+                    <field name="department_id" icon="fa-clock" string="Department Responsible" enable_counters="1"/>
                 </searchpanel>
                 <group expand="1" string="Group By" groups="rule_book.group_compliance_manager_">
                     <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                    <filter string="Internal Due Date" name="group_computed_date" context="{'group_by': 'rulebook_compute_date:day'}"/>
+                    <filter string="Regulatory Due Date" name="group_reg_due_date" context="{'group_by': 'reg_due_date:day'}"/>
+
                 </group>
             </search>
         </field>
@@ -61,17 +76,20 @@
                             <field name="formatted_reply_date" readonly="1" string="Reply date"/>
                             <field name="reply_content"/>
                             <field name="submission_timing" string="Submission Timing"/>
-                            <!-- <field name="reminder_due_date" readonly="0" />
-                            <field name="formatted_reminder_date" readonly="0" />
+
+                            <!-- <field name="rulebook_compute_date" readonly="0"/>
+                            <field name="reminder_due_date" readonly="0" />
                             <field name="escalation_date" readonly="0" />
-                            <field name="formatted_escalation_date" readonly="0" /> -->
+                            <field name="reg_due_date" readonly="0" /> -->
                         </group>
                         <group>
                             <field name="reporter" readonly="1" string="Officer Responsible"/>
                             <field name="officer_cc" widget="many2many_tags" readonly="1" string="Officer(s) Included in This Return" attrs="{'invisible': [('officer_cc', '=', [])]}"/>
                             <field name="department_id" readonly="1" string="Department Responsible"/>
                             <field name="formatted_rulebook_date" readonly="1" string="Internal Due Date"/>
+                            <!-- <field name="rulebook_compute_date" readonly="0" string="Internal Due Date1"/> -->
                             <field name="formatted_regulatory_date" readonly="1" string="Regulatory Due Date"/>
+                            <!-- <field name="formatted_reminder_date" readonly="1" string="Reminder Date"/> -->
                             <field name="frequency_type" readonly="1"/>
                         </group>
                     </group>

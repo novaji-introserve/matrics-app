@@ -43,13 +43,18 @@
         'views/process_category_view.xml',        
         # 'views/department.xml',
         'views/control_officer.xml',
-        'data/cron_job.xml',
         'views/sql_view.xml', 
         'views/sql_panel.xml', 
         'views/menus.xml',       
         'security/groups.xml',
         
-        
+     
+        # cron job
+        'data/schedule/cron_job.xml',
+        'data/schedule/cron_trans_screening.xml',
+        'data/schedule/cron_branch_sync.xml',
+        'data/schedule/account_trans_metrics.xml',
+        'data/schedule/cron_sync_tran_bid.xml'
     ],
 
     'images': [

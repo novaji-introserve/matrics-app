@@ -19,7 +19,7 @@ from . import customer_account
 from . import customer
 from . import customer_tier
 from . import customer_type
-from . import transaction_type
+# from . import transaction_type
 from . import users_status
 from . import gender
 from . import marital_status
@@ -33,5 +33,14 @@ from . import title
 from . import account_officer
 from . import account_product
 from . import currency
+from . import res_subbranch
+from . import branch_type
+from . import res_module
+from . import res_audit_trail
+from . import res_glclasslv2
+from . import res_glclasslv3
+from . import res_mandatepicts
+from . import res_reactivation
+from . import bankgl
 # from .legacy import sync_script 
 

@@ -10,13 +10,15 @@
         <field name="description">Send Alert for new Report Submitted</field>
 
 
-        <field name="subject">New Report Submitted:{{object.data()['rulebook_source']}}</field>
+        <field name="subject">New Report Submitted: {{object.data()['rulebook_source']}}</field>
         <field name="body_html" type="html">
             <div class="email-container" style="font-family: Arial, sans-serif; background-color: #f0f8ff; color: #333333; margin: 0; padding: 0;">
                 <div class="email-content" style="background-color: #ffffff; margin: 20px auto; padding: 20px; max-width: 600px; border: 1px solid #E0E0E0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); background: linear-gradient(135deg, #f6f8f9 30%, #ffffff);">
                     <div class="header" style="text-align: center; padding: 10px 0;">
+                       <img src="https://www.boi.ng/wp-content/uploads/2024/10/boi-logo.svg" alt="Bank of Industry logo" style="max-width: 100px;" />
+                       <!-- <img src="https://www.boi.ng//wp-content/uploads/2022/06/BOI-logo.png" alt="Bank of Industry logo" style="max-width: 100px;" /> -->
                         <!-- <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg" alt="Bank of Industry" style="max-width: 150px;" /> -->
-                        <img src="rule_book/static/src/img/boi.jpeg" alt="Bank of Industry" style="max-width: 150px;" />
+                        <!-- <img src="rule_book/static/src/img/boi.jpeg" alt="Bank of Industry" style="max-width: 150px;" /> -->
                     </div>
                     <div class="content" style="padding: 20px;">
                         <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear<strong style="color: #006400;">

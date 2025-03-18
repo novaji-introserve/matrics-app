@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_media_keyword_tree" model="ir.ui.view">
+        <field name="name">media.keyword.tree</field>
+        <field name="model">media.keyword</field>
+        <field name="arch" type="xml">
+            <tree string="Media Keywords" >
+                <field name="name"/>
+                <field name="code"/>
+                <!-- <field name="risk_score"/> -->
+                <field name="risk_score_decoration" invisible="1"/>
+                <field name="risk_score" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'"/>
+                <field name="media_risk_level" widget="badge" decoration-danger="media_risk_level=='high'" decoration-warning="media_risk_level=='medium'" decoration-success="media_risk_level=='low'"/>
+                <field name="adverse_media_officers" widget="many2many_tags" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_media_keyword_form" model="ir.ui.view">
+        <field name="name">media.keyword.form</field>
+        <field name="model">media.keyword</field>
+        <field name="arch" type="xml">
+            <form string="Media Keyword">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Keyword Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <!-- <field name="risk_score" widget="percentage"/> -->
+                            <field name="risk_score" widget="slider" step="0.5" min="0.5" max="25" />
+                            <field name="media_risk_level"/>
+                        </group>
+                        <group>
+                            <field name="adverse_media_officers" widget="many2many_tags" help="Officer(s) to get alerted if media keyword is found"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_media_keyword_search" model="ir.ui.view">
+        <field name="name">media.keyword.search</field>
+        <field name="model">media.keyword</field>
+        <field name="arch" type="xml">
+            <search string="Search Media Keywords">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="adverse_media_officers"/>
+                <!-- <filter string="Critical Risk" name="critical_risk" domain="[('media_risk_level', '=', 'critical')]"/> -->
+                <filter string="High Risk" name="high_risk" domain="[('media_risk_level', '=', 'high')]"/>
+                <filter string="Medium Risk" name="medium_risk" domain="[('media_risk_level', '=', 'medium')]"/>
+                <filter string="Low Risk" name="low_risk" domain="[('media_risk_level', '=', 'low')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Risk Level" name="group_by_risk" context="{'group_by': 'media_risk_level'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_media_keyword" model="ir.actions.act_window">
+        <field name="name">Media Keywords</field>
+        <field name="res_model">media.keyword</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first media keyword
+            </p>
+            <p>
+                Define keywords for adverse media screening with associated risk levels.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_compliance_adverse_media_config" name="Adverse Media" parent="menu_compliance_configuration" sequence="501" />
+
+    <menuitem id="menu_media_keyword" name="Media Configurations" parent="menu_compliance_adverse_media_config" action="action_media_keyword" sequence="12"/>
+    
+    </odoo>
+    

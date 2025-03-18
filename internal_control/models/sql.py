@@ -2,7 +2,7 @@ from odoo import models, fields, api
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import ValidationError
-
+import re
 
 class SqlModel(models.Model):
     _name = 'process.sql'
@@ -12,17 +12,47 @@ class SqlModel(models.Model):
     query = fields.Char(string="Query", required=True)
     name = fields.Char(string="Name",required=True)
     
-    is_valid = fields.Boolean(default=False)
 
     def Validate(self):
         try:
-            chk = self.query.strip().startswith('select')
+           
+
+            query = self.query.strip().lower()
             
-            if chk:
-                self.env.cr.execute(self.query)
-                self.write({'is_valid': True})
-            else:
+            if not query.startswith('select') :
                 raise ValidationError(f'query not supported.\n Hint: start with select')
+            
+            elif re.search(r"\w+\.\w+\s+AS\s+\w+", query, re.IGNORECASE):
+                if not re.search(r"\w+\.branch_id", query, re.IGNORECASE):
+                    raise ValidationError(f'Record are partition by branch so please specify a branch from appropriate table in your statement')
+                else:
+                    return {
+                    "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params":{
+                        "message": "Valid Sql",
+                        "type": "success"
+                    }
+                }
+            else:
+                
+                try:
+                    self.env.cr.execute(query)
+
+                    return {
+                        "type": "ir.actions.client",
+                        "tag": "display_notification",
+                        "params":{
+                            "message": "Valid Sql",
+                            "type": "success"
+                        }
+                    }
+                except Exception as e:
+                    raise ValidationError(f'failed to execute query {str(e)}')
+
+
+
+                
                 
         except Exception as e:
             raise ValidationError(f'failed to execute query {str(e)}')
