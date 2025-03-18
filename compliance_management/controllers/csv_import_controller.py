@@ -429,7 +429,23 @@ class CSVImportController(http.Controller):
                 pass
 
             # Check if we should use the job queue for processing
-            use_queue = "queue.job" in request.env
+            use_queue = False  # Default to not using queue
+            
+            # First check if the queue_job module is installed
+            try:
+                queue_job_installed = request.env['ir.module.module'].sudo().search([
+                    ('name', '=', 'queue_job'),
+                    ('state', '=', 'installed')
+                ], limit=1)
+                
+                use_queue = bool(queue_job_installed)
+            except Exception as e:
+                _logger.warning(f"Error checking for queue_job module: {str(e)}")
+            
+            # Also check if the model has the required method
+            if use_queue and not hasattr(import_log, 'with_delay'):
+                use_queue = False
+                _logger.warning("ImportLog model doesn't have with_delay method")
 
             if use_queue:
                 self._send_message("Queueing file for batch processing...", "info")
@@ -442,11 +458,10 @@ class CSVImportController(http.Controller):
                     batch_size = 10000
                 
                 try:
-                    # Use the correct way to create a job with with_delay()
-                    # This automatically handles the job creation in queue.job
+                    # FIXED: Use the new process_file method instead of process_file_batch
                     import_log.sudo().with_delay(
-                        description=f"Process CSV Import {import_log.id} (Batch 1)"
-                    ).process_file_batch(0, batch_size)
+                        description=f"Process CSV Import {import_log.id}"
+                    ).process_file()
                     
                     cr.commit()
                     
@@ -472,20 +487,41 @@ class CSVImportController(http.Controller):
                     # Fallback to direct processing
                     use_queue = False
             
-            # If queue.job not available or failed, return success
-            # The user can manually trigger processing
-            return Response(
-                json.dumps(
-                    {
-                        "status": "success",
-                        "import_id": import_log.id,
-                        "message": "File upload complete. Please start processing.",
-                        "filename": unique_filename,
-                        "file_path": final_path,
-                    }
-                ),
-                content_type="application/json",
-            )
+            # If queue.job not available or failed, start processing directly
+            if not use_queue:
+                try:
+                    # Direct processing - no queue job
+                    self._send_message("Starting direct processing (no job queue)...", "info")
+                    # Call process_file directly
+                    result = import_log.sudo().process_file()
+                    
+                    return Response(
+                        json.dumps(
+                            {
+                                "status": "success" if result.get('success', False) else "warning",
+                                "import_id": import_log.id,
+                                "message": result.get('message', "Processing started"),
+                                "filename": unique_filename,
+                                "file_path": final_path,
+                            }
+                        ),
+                        content_type="application/json",
+                    )
+                except Exception as e:
+                    _logger.error(f"Error starting direct processing: {str(e)}")
+                    return Response(
+                        json.dumps(
+                            {
+                                "status": "warning",
+                                "import_id": import_log.id,
+                                "message": "File upload complete. Please start processing manually.",
+                                "error": str(e),
+                                "filename": unique_filename,
+                                "file_path": final_path,
+                            }
+                        ),
+                        content_type="application/json",
+                    )
 
         except Exception as e:
             _logger.error(f"Error handling final chunk: {str(e)}")
@@ -699,7 +735,6 @@ class CSVImportController(http.Controller):
 
     def _send_message(self, message, message_type="info"):
         """Send log message to frontend and log to server with safe error handling"""
-        # First, log to server
         log_level = {
             "info": _logger.info,
             "error": _logger.error,
@@ -709,7 +744,6 @@ class CSVImportController(http.Controller):
 
         log_level(f"[{message_type.upper()}] {message}")
 
-        # Then, try to use the websocket helper if available
         try:
             send_message(request.env, message, message_type, request.env.user.id)
         except Exception as e:
