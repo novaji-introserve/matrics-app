@@ -32,72 +32,72 @@ class Mydashboard(http.Controller):
 
         return result
 
-    # @http.route('/dashboard/get_top_screening_rules', auth='public', type='json')
-    # def get_top_screening(self, cco, branches_id, datepicked, **kw):
+    @http.route('/dashboard/get_top_screening_rules', auth='public', type='json')
+    def get_top_screening(self, cco, branches_id, datepicked, **kw):
         
-    #     today = datetime.now().date()  # Get today's date
-    #     prev_date = today - timedelta(days=datepicked)  # Get previous date
+        today = datetime.now().date()  # Get today's date
+        prev_date = today - timedelta(days=datepicked)  # Get previous date
 
-    #     def _execute_query(sql, params=None):
-    #         request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
-    #         results = request.env.cr.fetchall()
-    #         return [{
-    #             "id": row[0],
-    #             'name': row[1],
-    #             'count': row[2]
-    #         } for row in results]
+        def _execute_query(sql, params=None):
+            request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
+            results = request.env.cr.fetchall()
+            return [{
+                "id": row[0],
+                'name': row[1],
+                'count': row[2]
+            } for row in results]
 
-    #     if cco:
-    #         if datepicked > 0:
-    #             sql = """
-    #                 SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-    #                 FROM res_transaction_screening_rule rtsr
-    #                 JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-    #                 WHERE rct.date_created BETWEEN %s AND %s
-    #                 GROUP BY rtsr.id, rtsr.name
-    #                 ORDER BY hit_count DESC
-    #                 LIMIT 10;
-    #             """
-    #             return _execute_query(sql, (prev_date, today))
-    #         else:  # datepicked == 0
+        if cco:
+            if datepicked > 0:
+                sql = """
+                    SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+                    FROM res_transaction_screening_rule rtsr
+                    JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+                    WHERE rct.date_created BETWEEN %s AND %s
+                    GROUP BY rtsr.id, rtsr.name
+                    ORDER BY hit_count DESC
+                    LIMIT 10;
+                """
+                return _execute_query(sql, (prev_date, today))
+            else:  # datepicked == 0
 
-    #             sql = """
-    #                 SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-    #                 FROM res_transaction_screening_rule rtsr
-    #                 JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-    #                 GROUP BY rtsr.id, rtsr.name
-    #                 ORDER BY hit_count DESC
-    #                 LIMIT 10;
-    #             """
-    #             return _execute_query(sql)
+                sql = """
+                    SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+                    FROM res_transaction_screening_rule rtsr
+                    JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+                    GROUP BY rtsr.id, rtsr.name
+                    ORDER BY hit_count DESC
+                    LIMIT 10;
+                """
+                return _execute_query(sql)
 
-    #     else: # cco == False
-    #         if not branches_id:
-    #             return []
+        else: # cco == False
+            if not branches_id:
+                return []
 
-    #         if datepicked > 0:
-    #             sql = """
-    #             SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-    #             FROM res_transaction_screening_rule rtsr
-    #             JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-    #             WHERE rct.date_created BETWEEN %s AND %s AND rct.branch_id IN %s
-    #             GROUP BY rtsr.id, rtsr.name
-    #             ORDER BY hit_count DESC
-    #             LIMIT 10;
-    #             """
-    #             return _execute_query(sql, (prev_date, today, tuple(branches_id))) 
-    #         else:
-    #             sql = """
-    #             SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-    #             FROM res_transaction_screening_rule rtsr
-    #             JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-    #             WHERE rct.branch_id IN %s
-    #             GROUP BY rtsr.id, rtsr.name
-    #             ORDER BY hit_count DESC
-    #             LIMIT 10;
+            if datepicked > 0:
+                sql = """
+                SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+                FROM res_transaction_screening_rule rtsr
+                JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+                WHERE rct.date_created BETWEEN %s AND %s AND rct.branch_id IN %s
+                GROUP BY rtsr.id, rtsr.name
+                ORDER BY hit_count DESC
+                LIMIT 10;
+                """
+                return _execute_query(sql, (prev_date, today, tuple(branches_id))) 
+            else:
+                sql = """
+                SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+                FROM res_transaction_screening_rule rtsr
+                JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+                WHERE rct.branch_id IN %s
+                GROUP BY rtsr.id, rtsr.name
+                ORDER BY hit_count DESC
+                LIMIT 10;
 
-    #             """
-    #             return _execute_query(sql, (tuple(branches_id)))
+                """
+                return _execute_query(sql, (tuple(branches_id)))
 
     @http.route('/dashboard/get_high_risk_customer_by_branch', auth='public', type='json')
     def get_high_risk(self, cco, branches_id, datepicked, **kw):
