@@ -130,6 +130,8 @@ export class ComplianceDashboard extends Component {
   }
   async getcurrentuser() {
     let result = await this.rpc("/dashboard/user");
+    console.log(result);
+    
     this.state.branches_id = result.branch;
     this.state.cco = result.group;
   }
@@ -139,6 +141,9 @@ export class ComplianceDashboard extends Component {
       branches_id: this.state.branches_id,
       datepicked: Number(this.state.datepicked),
     });
+
+   
+    
 
     this.state.stats = result.data;
     this.state.totalstat = result.total;

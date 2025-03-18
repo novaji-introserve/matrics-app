@@ -95,11 +95,14 @@ class Statistic(models.Model):
 
 
 
-    def ViewInTableForm(self):
+    def update_stat(self):
        
         try:
                 
-            raise ValidationError(f'Failed to execute query:\n{str(e)}')
+          statistic = self.env['res.compliance.stat'].search([])
+
+          for stat in statistic:
+              self.env.cr.execute(stat.sql_query)
         finally:
             self.env.cr.rollback() #Rollback the cursor to prevent any unintended changes
 

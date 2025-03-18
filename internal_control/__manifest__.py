@@ -54,6 +54,7 @@
         'data/schedule/cron_trans_screening.xml',
         'data/schedule/cron_branch_sync.xml',
         'data/schedule/account_trans_metrics.xml',
+        'data/schedule/cron_sync_tran_bid.xml'
     ],
 
     'images': [
