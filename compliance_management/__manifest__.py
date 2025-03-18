@@ -38,7 +38,6 @@
         "security/ir.model.access.csv",
         "data/res.country.state.csv",
         "data/department.xml",
-        "data/res.branch.csv",
         "data/media_keywords.xml",
         "security/security.xml",
         "data/schedules/adverse_media_cron.xml",

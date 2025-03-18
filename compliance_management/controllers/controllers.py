@@ -21,6 +21,14 @@ class Compliance(http.Controller):
             "branch": branch,
         }
         return result
+    
+    def check_branches_id(self, branches_id):
+        # Ensure branches_id is a list
+        if not isinstance(branches_id, list):
+            branches_id = [branches_id]  # Convert to list if it's a single integer
+            return branches_id
+        else:
+            return branches_id
 
     @http.route('/dashboard/stats', auth='public', type='json')
     def getAllstats(self, cco, branches_id, datepicked, **kw):
@@ -60,8 +68,9 @@ class Compliance(http.Controller):
                   WHERE rbur.branch_id = ANY(%s::integer[])
               );
             """
+            branches_id = self.check_branches_id(branches_id)
 
-            request.env.cr.execute(query, (start_of_prev_day, end_of_today, tuple(branches_id)))
+            request.env.cr.execute(query, (start_of_prev_day, end_of_today, branches_id))
 
             # Fetch results
             # Get column names
@@ -118,8 +127,9 @@ class Compliance(http.Controller):
                   WHERE rbur.branch_id = ANY(%s::integer[])
               );
             """
+            branches_id = self.check_branches_id(branches_id)
 
-            request.env.cr.execute(query, (start_of_prev_day, end_of_today, tuple(branches_id)))
+            request.env.cr.execute(query, (start_of_prev_day, end_of_today, branches_id))
 
             # Fetch results
             # Get column names
