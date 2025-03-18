@@ -69,6 +69,7 @@ class Pep(models.Model):
     citizenship = fields.Char(string='Citizenship')
     education = fields.Text(string='Education')
     career_history = fields.Text(string='Career History')
+    source = fields.Char(string="Source", help="Source of the PEP information")
 
     # Internal tracking fields
     last_fetch_date = fields.Datetime(string="Last Fetch Date", readonly=True)
