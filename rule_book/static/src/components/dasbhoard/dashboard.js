@@ -55,25 +55,6 @@ export class Dashboard extends Component {
     });
   }
 
-  // Load action IDs dynamically for each model
-  async loadActionIds() {
-    try {
-      // Fetch action IDs for each model's tree view
-      this.actionIds["rulebook"] = await this.getActionId("rulebook");
-
-      this.actionIds["rulebook.title"] = await this.getActionId(
-        "rulebook.title"
-      );
-      this.actionIds["reply.log"] = await this.getActionId("reply.log");
-
-      this.actionIds["rulebook.sources"] = await this.getActionId(
-        "rulebook.sources"
-      );
-      this.actionIds["pdf.chat"] = await this.getActionId("pdf.chat");
-    } catch (error) {
-      console.error("Failed to load action IDs:", error);
-    }
-  }
 
   async getActionId(model) {
     // Search for an action tied to the model with a tree view
@@ -89,11 +70,57 @@ export class Dashboard extends Component {
     return actions.length > 0 ? actions[0].id : null;
   }
 
+  
+  async loadActionIds() {
+    try {
+      // Fetch action IDs for each model's tree view
+      this.actionIds["rulebook"] = await this.getActionId("rulebook");
+
+      // If the standard approach didn't work for rulebook, try finding the server action
+      if (!this.actionIds["rulebook"]) {
+        const serverActions = await this.orm.searchRead(
+          "ir.actions.server",
+          [
+            ["model_id.model", "=", "rulebook"],
+            ["name", "=", "Open RuleBooks"],
+          ],
+          ["id"],
+          { limit: 1 }
+        );
+
+        if (serverActions.length > 0) {
+          this.actionIds["rulebook.server"] = serverActions[0].id;
+        }
+      }
+
+      // Continue with your existing code for other models
+       this.actionIds["rulebook.title"] = await this.getActionId(
+         "rulebook.title"
+       );
+       this.actionIds["reply.log"] = await this.getActionId("reply.log");
+
+       this.actionIds["rulebook.sources"] = await this.getActionId(
+         "rulebook.sources"
+       );
+       this.actionIds["pdf.chat"] = await this.getActionId("pdf.chat");
+      // etc...
+    } catch (error) {
+      console.error("Failed to load action IDs:", error);
+    }
+  }
+
   // Dynamic tree view link methods
   getRulebookTreeLink() {
-    return this.actionIds["rulebook"]
-      ? `/web#action=${this.actionIds["rulebook"]}`
-      : "/web"; // Fallback if no action found
+    // First try with the standard action
+    if (this.actionIds["rulebook"]) {
+      return `/web#action=${this.actionIds["rulebook"]}`;
+    }
+    // Then try with the server action if available
+    else if (this.actionIds["rulebook.server"]) {
+      return `/web#action=${this.actionIds["rulebook.server"]}&model=rulebook`;
+    }
+    // Fallback if no action found
+    return "/web";
   }
 
   getRulebookTitleTreeLink() {
@@ -123,19 +150,19 @@ export class Dashboard extends Component {
   async fetchAwaitingReplies() {
     try {
       // Using the ORM to fetch awaiting replies
-      console.log("Using the ORM to fetch awaiting replies");
+      // console.log("Using the ORM to fetch awaiting replies");
       const replies = await this.orm.call(
         "reply.log",
         "get_awaiting_replies",
         []
       );
       this.state.awaitingReplies = replies;
-      console.log(replies); // Print the replies
+      // console.log(replies); // Print the replies
     } catch (error) {
       console.error("Failed to fetch awaiting replies:", error);
     }
   }
-  
+
   async fetchNewlyUploadedTitle() {
     try {
       // Using the ORM to fetch awaiting replies
@@ -145,7 +172,7 @@ export class Dashboard extends Component {
         []
       );
       this.state.newlyUploadedTitle = newlyUploadedTitle;
-      console.log(newlyUploadedTitle); // Print the replies
+      // console.log(newlyUploadedTitle); // Print the replies
     } catch (error) {
       console.error("Failed to fetch newly uploaded title:", error);
     }
@@ -159,7 +186,7 @@ export class Dashboard extends Component {
         []
       );
       this.state.mostAskedQuestion = mostAskedQuestion;
-      console.log(mostAskedQuestion); // Print the replies
+      // console.log(mostAskedQuestion); // Print the replies
     } catch (error) {
       console.error("Failed to fetch newly uploaded title:", error);
     }
@@ -399,7 +426,6 @@ export class Dashboard extends Component {
     // Constructs a URL to the rulebook's form view
     return `/web#id=${id}&model=reply.log&view_type=form`;
   }
- 
 }
 
 // Dashboard.template = "rule_book.Dashboard";
