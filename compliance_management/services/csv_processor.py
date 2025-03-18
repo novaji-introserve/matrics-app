@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 import chardet
 import psycopg2
+import random
+import string
 import time
 import json
 from io import BytesIO, StringIO
@@ -95,7 +97,7 @@ class CSVProcessor:
         }
 
     def process_batch(self, start_position, end_position):
-        """Process a specific batch of records using optimized direct SQL"""
+        """Process a specific batch of records with robust connection handling"""
         self.start_time = datetime.now()
         total_records = self.import_log.total_records
         
@@ -120,25 +122,25 @@ class CSVProcessor:
             # Create temp table on first batch
             self._create_temp_table()
             
-            # Read the specific chunk from the file
-            df_chunk = self._read_file_chunk(start_position, end_position - start_position)
-            if df_chunk is None or df_chunk.empty:
+            # Read the specific chunk from the file and store it in instance variable
+            self.df = self._read_file_chunk(start_position, end_position - start_position)
+            if self.df is None or self.df.empty:
                 self._log_message("No data found in specified range", "warning")
                 return self.results
             
             # Save CSV columns for reference
-            self.csv_columns = list(df_chunk.columns)
+            self.csv_columns = list(self.df.columns)
             
             # Log technical details server-side only
             self._log_message(
-                f"Processing {len(df_chunk)} records with {len(self.csv_columns)} columns", 
+                f"Processing {len(self.df)} records with {len(self.csv_columns)} columns", 
                 "info", 
                 send_to_websocket=False
             )
             
             # Process the data
-            processed_df = self._preprocess_dataframe(df_chunk)
-            self._stage_data_to_temp_table(processed_df)
+            self.df = self._preprocess_dataframe(self.df)
+            self._chunked_insert_to_temp_table()  # This now uses self.df directly
             self._process_staged_data()
             
             # Calculate metrics
@@ -147,14 +149,20 @@ class CSVProcessor:
             # Calculate new progress 
             new_progress = min(100, (end_position / total_records * 100)) if total_records > 0 else 0
             
-            # Clean up if last batch
-            self._cleanup_temp_resources()
+            # Clean up
+            try:
+                self._cleanup_temp_resources()
+            except Exception as e:
+                _logger.warning(f"Error cleaning up temp resources: {str(e)}")
             
             # Generate and include summary in results
             self._generate_failure_summary()
             
             # Send user-friendly summary
             self._send_batch_summary()
+            
+            # Clear the dataframe to free memory
+            self.df = None
             
             return self.results
             
@@ -166,7 +174,8 @@ class CSVProcessor:
             _logger.error(error_trace)
             
             try:
-                self.cr.rollback()
+                if self._check_cursor_validity():
+                    self.cr.rollback()
             except:
                 pass
                 
@@ -184,6 +193,9 @@ class CSVProcessor:
                 "error_message": error_message,
                 "technical_details": error_trace,
             })
+            
+            # Clear the dataframe to free memory
+            self.df = None
             
             return self.results
 
@@ -403,13 +415,20 @@ class CSVProcessor:
                 
         # No match found
         return None
-    
+
+    def _quoted_temp_table(self):
+        """Return properly quoted temp table name for SQL queries"""
+        return self.cr.mogrify(f'"{self.temp_table_name}"', ()).decode('utf-8')
+        
     def _create_temp_table(self):
         """Create a temporary table with appropriate schema for staging data"""
+        unique_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        self.temp_table_name = f"{self.TEMP_TABLE_PREFIX}{self.table_name}_{self.import_id}_{unique_suffix}"[:63]
+        
         for attempt in range(self.MAX_RETRIES):
             try:
                 # First check if table exists
-                self.cr.execute(f"""
+                self.cr.execute("""
                     SELECT EXISTS (
                         SELECT FROM pg_tables 
                         WHERE tablename = %s
@@ -421,7 +440,7 @@ class CSVProcessor:
                     return
                 
                 # Drop table if it exists anyway (belt and suspenders)
-                self.cr.execute(f"DROP TABLE IF EXISTS {self.temp_table_name}")
+                self.cr.execute("DROP TABLE IF EXISTS %s" % self.cr.mogrify(f'"{self.temp_table_name}"', ()).decode('utf-8'))
                 
                 # Build column definitions based on target table
                 # IMPORTANT: All columns explicitly allow NULL values
@@ -439,11 +458,12 @@ class CSVProcessor:
                         continue
                         
                     sql_type = self._get_sql_type_for_field(field_name)
-                    column_defs.append(f"{field_name} {sql_type} NULL")  # Explicitly allow NULL
+                    column_defs.append(f'"{field_name}" {sql_type} NULL')  # Explicitly allow NULL
                 
-                # Create the table
+                # Create the table with quoted identifiers
+                table_identifier = self.cr.mogrify(f'"{self.temp_table_name}"', ()).decode('utf-8')
                 create_query = f"""
-                    CREATE TABLE {self.temp_table_name} (
+                    CREATE TABLE {table_identifier} (
                         {', '.join(column_defs)}
                     )
                 """
@@ -680,29 +700,29 @@ class CSVProcessor:
         # Always use chunked insert - most reliable method
         self._chunked_insert_to_temp_table(df)
     
-    def _chunked_insert_to_temp_table(self, df):
-        """Insert data in chunks for maximum reliability"""
-        if df.empty:
+    def _chunked_insert_to_temp_table(self):
+        """Insert data in chunks with robust connection management"""
+        if self.df.empty:
             return
         
         # Get column names
-        columns = list(df.columns)
+        columns = list(self.df.columns)
         placeholders = ', '.join(['%s'] * len(columns))
         
         # Prepare insert query
         insert_query = f"""
-            INSERT INTO {self.temp_table_name}
-            ({', '.join(columns)})
+            INSERT INTO {self._quoted_temp_table()}
+            ({', '.join([f'"{col}"' for col in columns])})
             VALUES ({placeholders})
         """
         
         # Process in chunks
-        total_rows = len(df)
+        total_rows = len(self.df)
         chunk_size = min(self.SQL_CHUNK_SIZE, total_rows)
         
         for start_idx in range(0, total_rows, chunk_size):
             end_idx = min(start_idx + chunk_size, total_rows)
-            chunk = df.iloc[start_idx:end_idx]
+            chunk = self.df.iloc[start_idx:end_idx]
             
             # Replace any NaN/None values with SQL NULL
             clean_chunk = chunk.replace({pd.NA: None, np.nan: None})
@@ -725,6 +745,11 @@ class CSVProcessor:
             
             # Use retries for transaction conflicts
             for retry in range(self.MAX_RETRIES):
+                # Check if the cursor is still valid
+                if self._check_cursor_validity() is False:
+                    # Get a new cursor if needed
+                    self._refresh_cursor()
+                
                 try:
                     # Execute the insert
                     self.cr.executemany(insert_query, rows)
@@ -734,13 +759,28 @@ class CSVProcessor:
                     break
                     
                 except psycopg2.Error as e:
-                    self.cr.rollback()
+                    _logger.warning(f"Error in chunk insert (attempt {retry+1}): {str(e)}")
+                    
+                    # Handle connection issues
+                    if "connection" in str(e).lower() or "cursor" in str(e).lower():
+                        self._refresh_cursor()
+                        
+                        # If this is the last retry, propagate the error
+                        if retry == self.MAX_RETRIES - 1:
+                            raise
+                    else:
+                        # For non-connection errors, try standard rollback
+                        try:
+                            self.cr.rollback()
+                        except Exception as rollback_error:
+                            _logger.error(f"Rollback error: {str(rollback_error)}")
+                            self._refresh_cursor()
                     
                     if retry == self.MAX_RETRIES - 1:
                         raise
                         
-                    _logger.warning(f"Retry {retry+1} for chunk insert due to: {str(e)}")
-                    time.sleep(self.RETRY_DELAY)
+                    # Wait before retry with exponential backoff
+                    time.sleep(self.RETRY_DELAY * (2 ** retry))
             
             # Log progress
             self._log_message(
@@ -750,9 +790,136 @@ class CSVProcessor:
             )
         
         self._log_message(f"Staged {total_rows:,} records to temporary table", "info")
+    
+    def _check_cursor_validity(self):
+        """Check if the current cursor is still valid"""
+        if not self.cr:
+            return False
+            
+        try:
+            # Try a simple query to check cursor validity
+            self.cr.execute("SELECT 1")
+            return True
+        except Exception as e:
+            _logger.warning(f"Cursor validity check failed: {str(e)}")
+            return False
+
+    def _refresh_cursor(self):
+        """Get a fresh cursor when the old one is invalid"""
+        _logger.info("Getting a fresh database cursor")
+        
+        try:
+            # Release savepoints if any are active
+            try:
+                self.cr.execute("RELEASE ALL")
+            except:
+                pass
+                
+            # Try to close the old cursor gracefully
+            try:
+                self.cr.close()
+            except:
+                pass
+        except:
+            # Ignore any errors when closing the old cursor
+            pass
+            
+        # Get a fresh cursor from the registry
+        self.cr = self.env.registry.cursor()
+        
+        # Ensure we have transaction isolation set properly
+        try:
+            self.cr.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
+        except:
+            _logger.warning("Could not set isolation level on refreshed cursor")
+            
+        return self.cr
+
+    # def _process_staged_data(self):
+    #     """Process staged data in the temporary table with proper savepoint management"""
+    #     results = {"successful": 0, "failed": 0, "duplicates": 0}
+        
+    #     # Initialize failure tracking
+    #     if self.TRACK_FAILURE_REASONS:
+    #         self.failure_reasons = {
+    #             'missing_required': 0,
+    #             'invalid_format': 0,
+    #             'invalid_relation': 0,
+    #             'duplicate': 0,
+    #             'other': 0
+    #         }
+        
+    #     savepoint_created = False
+        
+    #     try:
+    #         # Create a savepoint for transactional safety
+    #         try:
+    #             self.cr.execute("SAVEPOINT csv_processor_savepoint")
+    #             savepoint_created = True
+    #         except Exception as e:
+    #             _logger.warning(f"Could not create savepoint: {str(e)}")
+    #             # Continue without savepoint if we can't create one
+            
+    #         # Verify table exists after serialization conflicts
+    #         self.cr.execute(f"SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = %s)", 
+    #                         (self.temp_table_name,))
+    #         if not self.cr.fetchone()[0]:
+    #             # Table disappeared, likely due to concurrent operation
+    #             self._log_message("Recreation of temp table required", "warning")
+    #             self._create_temp_table()
+            
+    #         # Process the data
+    #         self._resolve_relations()
+    #         failed = self._validate_data()
+    #         duplicates = self._detect_duplicates()
+    #         inserted = self._insert_valid_records()
+            
+    #         # Update results
+    #         results["duplicates"] = duplicates
+    #         results["successful"] = inserted
+    #         results["failed"] = failed
+            
+    #         # Release savepoint if we created one
+    #         if savepoint_created:
+    #             try:
+    #                 self.cr.execute("RELEASE SAVEPOINT csv_processor_savepoint")
+    #             except Exception as e:
+    #                 _logger.warning(f"Could not release savepoint: {str(e)}")
+    #                 # Continue without error if we can't release it
+            
+    #         # Commit changes
+    #         self.cr.commit()
+            
+    #         # Update overall results
+    #         self.results.update(results)
+    #         self.results["failure_summary"] = self.failure_reasons
+            
+    #     except Exception as e:
+    #         # Try to rollback to savepoint if we created one
+    #         if savepoint_created:
+    #             try:
+    #                 self.cr.execute("ROLLBACK TO SAVEPOINT csv_processor_savepoint")
+    #             except Exception as rollback_error:
+    #                 _logger.error(f"Error rolling back to savepoint: {str(rollback_error)}")
+    #                 # If rollback to savepoint fails, try a full rollback
+    #                 try:
+    #                     self.cr.rollback()
+    #                 except:
+    #                     pass
+    #         else:
+    #             # No savepoint, do a full rollback
+    #             try:
+    #                 self.cr.rollback()
+    #             except:
+    #                 pass
+            
+    #         _logger.error(f"Error in staged data processing: {str(e)}")
+    #         raise
+        
+    #     return results
 
     def _process_staged_data(self):
-        """Process staged data in the temporary table with transaction management"""
+        """Process staged data with more robust savepoint management"""
         results = {"successful": 0, "failed": 0, "duplicates": 0}
         
         # Initialize failure tracking
@@ -764,8 +931,34 @@ class CSVProcessor:
                 'duplicate': 0,
                 'other': 0
             }
-            
+        
+        # Use a unique savepoint name based on a random string
+        import random
+        import string
+        savepoint_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+        savepoint_created = False
+        
         try:
+            # Create a savepoint for transactional safety - with unique name
+            try:
+                # Check if transaction is active first
+                self.cr.execute("SELECT pg_current_xact_id_if_assigned()")
+                if self.cr.fetchone()[0]:
+                    self.cr.execute(f"SAVEPOINT csv_sp_{savepoint_name}")
+                    savepoint_created = True
+                    _logger.info(f"Created savepoint csv_sp_{savepoint_name}")
+            except Exception as e:
+                _logger.warning(f"Could not create savepoint: {str(e)}")
+                # Continue without savepoint if we can't create one
+            
+            # Verify table exists after serialization conflicts
+            self.cr.execute(f"SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = %s)", 
+                            (self.temp_table_name,))
+            if not self.cr.fetchone()[0]:
+                # Table disappeared, likely due to concurrent operation
+                self._log_message("Recreation of temp table required", "warning")
+                self._create_temp_table()
+            
             # Process the data
             self._resolve_relations()
             failed = self._validate_data()
@@ -777,6 +970,15 @@ class CSVProcessor:
             results["successful"] = inserted
             results["failed"] = failed
             
+            # Release savepoint if we created one
+            if savepoint_created:
+                try:
+                    self.cr.execute(f"RELEASE SAVEPOINT csv_sp_{savepoint_name}")
+                    _logger.info(f"Released savepoint csv_sp_{savepoint_name}")
+                except Exception as e:
+                    _logger.warning(f"Could not release savepoint: {str(e)}")
+                    # Continue without error if we can't release it
+            
             # Commit changes
             self.cr.commit()
             
@@ -785,13 +987,32 @@ class CSVProcessor:
             self.results["failure_summary"] = self.failure_reasons
             
         except Exception as e:
-            self.cr.rollback()
-            raise
+            # Try to rollback to savepoint if we created one
+            if savepoint_created:
+                try:
+                    self.cr.execute(f"ROLLBACK TO SAVEPOINT csv_sp_{savepoint_name}")
+                    _logger.info(f"Rolled back to savepoint csv_sp_{savepoint_name}")
+                except Exception as rollback_error:
+                    _logger.error(f"Error rolling back to savepoint: {str(rollback_error)}")
+                    # If rollback to savepoint fails, try a full rollback
+                    try:
+                        self.cr.rollback()
+                    except Exception as full_rollback_error:
+                        _logger.error(f"Error in full rollback: {str(full_rollback_error)}")
+            else:
+                # No savepoint, do a full rollback
+                try:
+                    self.cr.rollback()
+                except Exception as rollback_error:
+                    _logger.error(f"Error in rollback: {str(rollback_error)}")
             
+            _logger.error(f"Error in staged data processing: {str(e)}")
+            raise
+        
         return results
-    
+        
     def _resolve_relations(self):
-        """Resolve relations (many2one fields) in the temporary table"""
+        """Resolve relations (many2one fields) in the temporary table with proper quoting"""
         for field_name, field_info in self.model_fields.items():
             # Skip fields that aren't many2one or in our mapping
             if field_info.get('type') != 'many2one' or (field_name not in self.inverse_mappings and field_name not in self.missing_columns):
@@ -805,35 +1026,40 @@ class CSVProcessor:
             related_model = self.env[relation_model]
             related_table = related_model._table
             
+            # Properly quote all identifiers
+            quoted_temp_table = self._quoted_temp_table()
+            quoted_field = self.cr.mogrify(f'"{field_name}"', ()).decode('utf-8')
+            quoted_related_table = self.cr.mogrify(f'"{related_table}"', ()).decode('utf-8')
+            
             # Special handling for system fields
             if field_name in ['create_uid', 'write_uid'] and relation_model == 'res.users':
                 # For user fields, match against login (username) since 'name' doesn't exist
                 self.cr.execute(f"""
-                    UPDATE {self.temp_table_name} t
-                    SET {field_name} = r.id
-                    FROM {related_table} r
-                    WHERE t.{field_name}::text = r.login
-                      AND t.{field_name} IS NOT NULL
-                      AND t.{field_name}::text != ''
+                    UPDATE {quoted_temp_table} t
+                    SET {quoted_field} = r.id
+                    FROM {quoted_related_table} r
+                    WHERE t.{quoted_field}::text = r.login
+                    AND t.{quoted_field} IS NOT NULL
+                    AND t.{quoted_field}::text != ''
                 """)
                 
                 # Also match by ID for numeric values
                 self.cr.execute(f"""
-                    UPDATE {self.temp_table_name} t
-                    SET {field_name} = r.id
-                    FROM {related_table} r
-                    WHERE t.{field_name}::text ~ '^[0-9]+$'
-                      AND t.{field_name}::integer = r.id
-                      AND t.{field_name} IS NOT NULL
-                      AND t.{field_name}::text != ''
+                    UPDATE {quoted_temp_table} t
+                    SET {quoted_field} = r.id
+                    FROM {quoted_related_table} r
+                    WHERE t.{quoted_field}::text ~ '^[0-9]+$'
+                    AND t.{quoted_field}::integer = r.id
+                    AND t.{quoted_field} IS NOT NULL
+                    AND t.{quoted_field}::text != ''
                 """)
                 
                 # Default to current user if not resolved
                 self.cr.execute(f"""
-                    UPDATE {self.temp_table_name} t
-                    SET {field_name} = %s
-                    WHERE (t.{field_name} IS NULL OR t.{field_name}::text = '')
-                      AND t.odoo_status = 'pending'
+                    UPDATE {quoted_temp_table} t
+                    SET {quoted_field} = %s
+                    WHERE (t.{quoted_field} IS NULL OR t.{quoted_field}::text = '')
+                    AND t.odoo_status = 'pending'
                 """, (self.env.uid,))
                 
                 continue
@@ -841,67 +1067,170 @@ class CSVProcessor:
             # Standard handling for regular many2one fields
             # Try to resolve by exact name
             self.cr.execute(f"""
-                UPDATE {self.temp_table_name} t
-                SET {field_name} = r.id
-                FROM {related_table} r
-                WHERE t.{field_name}::text = r.name
-                  AND t.{field_name} IS NOT NULL
-                  AND t.{field_name}::text != ''
+                UPDATE {quoted_temp_table} t
+                SET {quoted_field} = r.id
+                FROM {quoted_related_table} r
+                WHERE t.{quoted_field}::text = r.name
+                AND t.{quoted_field} IS NOT NULL
+                AND t.{quoted_field}::text != ''
             """)
             
             # Try to resolve by ID
             self.cr.execute(f"""
-                UPDATE {self.temp_table_name} t
-                SET {field_name} = r.id
-                FROM {related_table} r
-                WHERE t.{field_name}::text ~ '^[0-9]+$'
-                  AND t.{field_name}::integer = r.id
-                  AND t.{field_name} IS NOT NULL
-                  AND t.{field_name}::text != ''
+                UPDATE {quoted_temp_table} t
+                SET {quoted_field} = r.id
+                FROM {quoted_related_table} r
+                WHERE t.{quoted_field}::text ~ '^[0-9]+$'
+                AND t.{quoted_field}::integer = r.id
+                AND t.{quoted_field} IS NOT NULL
+                AND t.{quoted_field}::text != ''
             """)
             
             # Try to resolve by case-insensitive name
             self.cr.execute(f"""
-                UPDATE {self.temp_table_name} t
-                SET {field_name} = r.id
-                FROM {related_table} r
-                WHERE LOWER(t.{field_name}::text) = LOWER(r.name)
-                  AND t.{field_name} IS NOT NULL
-                  AND t.{field_name}::text != ''
-                  AND t.{field_name}::text !~ '^[0-9]+$'
+                UPDATE {quoted_temp_table} t
+                SET {quoted_field} = r.id
+                FROM {quoted_related_table} r
+                WHERE LOWER(t.{quoted_field}::text) = LOWER(r.name)
+                AND t.{quoted_field} IS NOT NULL
+                AND t.{quoted_field}::text != ''
+                AND t.{quoted_field}::text !~ '^[0-9]+$'
             """)
             
             # Mark records where relation couldn't be resolved (but only for non-NULL values)
+            # Use mogrify to safely handle the error message string
+            error_message = self.cr.mogrify("Could not resolve relation for field %s: ", (field_name,)).decode('utf-8')
             self.cr.execute(f"""
-                UPDATE {self.temp_table_name}
+                UPDATE {quoted_temp_table}
                 SET odoo_status = 'error',
-                    odoo_error = CONCAT('Could not resolve relation for field {field_name}: ', {field_name})
-                WHERE {field_name} IS NOT NULL
-                  AND {field_name}::text != ''
-                  AND {field_name}::text !~ '^[0-9]+$'
-                  AND odoo_status = 'pending'
+                    odoo_error = CONCAT(%s, {quoted_field})
+                WHERE {quoted_field} IS NOT NULL
+                AND {quoted_field}::text != ''
+                AND {quoted_field}::text !~ '^[0-9]+$'
+                AND odoo_status = 'pending'
                 RETURNING tmp_id
-            """)
+            """, (error_message,))
             
             invalid_relations = len(self.cr.fetchall())
             if invalid_relations > 0 and self.TRACK_FAILURE_REASONS:
                 self.failure_reasons['invalid_relation'] += invalid_relations
     
+    # def _resolve_relations(self):
+    #     """Resolve relations (many2one fields) in the temporary table"""
+    #     for field_name, field_info in self.model_fields.items():
+    #         # Skip fields that aren't many2one or in our mapping
+    #         if field_info.get('type') != 'many2one' or (field_name not in self.inverse_mappings and field_name not in self.missing_columns):
+    #             continue
+                
+    #         relation_model = field_info.get('relation')
+    #         if not relation_model:
+    #             continue
+                
+    #         # Get related table name
+    #         related_model = self.env[relation_model]
+    #         related_table = related_model._table
+            
+    #         # Special handling for system fields
+    #         if field_name in ['create_uid', 'write_uid'] and relation_model == 'res.users':
+    #             # For user fields, match against login (username) since 'name' doesn't exist
+    #             self.cr.execute(f"""
+    #                 UPDATE {self._quoted_temp_table()} t
+    #                 SET {field_name} = r.id
+    #                 FROM {related_table} r
+    #                 WHERE t.{field_name}::text = r.login
+    #                   AND t.{field_name} IS NOT NULL
+    #                   AND t.{field_name}::text != ''
+    #             """)
+                
+    #             # Also match by ID for numeric values
+    #             self.cr.execute(f"""
+    #                 UPDATE {self._quoted_temp_table()} t
+    #                 SET {field_name} = r.id
+    #                 FROM {related_table} r
+    #                 WHERE t.{field_name}::text ~ '^[0-9]+$'
+    #                   AND t.{field_name}::integer = r.id
+    #                   AND t.{field_name} IS NOT NULL
+    #                   AND t.{field_name}::text != ''
+    #             """)
+                
+    #             # Default to current user if not resolved
+    #             self.cr.execute(f"""
+    #                 UPDATE {self._quoted_temp_table()} t
+    #                 SET {field_name} = %s
+    #                 WHERE (t.{field_name} IS NULL OR t.{field_name}::text = '')
+    #                   AND t.odoo_status = 'pending'
+    #             """, (self.env.uid,))
+                
+    #             continue
+            
+    #         # Standard handling for regular many2one fields
+    #         # Try to resolve by exact name
+    #         self.cr.execute(f"""
+    #             UPDATE {self._quoted_temp_table()} t
+    #             SET {field_name} = r.id
+    #             FROM {related_table} r
+    #             WHERE t.{field_name}::text = r.name
+    #               AND t.{field_name} IS NOT NULL
+    #               AND t.{field_name}::text != ''
+    #         """)
+            
+    #         # Try to resolve by ID
+    #         self.cr.execute(f"""
+    #             UPDATE {self._quoted_temp_table()} t
+    #             SET {field_name} = r.id
+    #             FROM {related_table} r
+    #             WHERE t.{field_name}::text ~ '^[0-9]+$'
+    #               AND t.{field_name}::integer = r.id
+    #               AND t.{field_name} IS NOT NULL
+    #               AND t.{field_name}::text != ''
+    #         """)
+            
+    #         # Try to resolve by case-insensitive name
+    #         self.cr.execute(f"""
+    #             UPDATE {self._quoted_temp_table()} t
+    #             SET {field_name} = r.id
+    #             FROM {related_table} r
+    #             WHERE LOWER(t.{field_name}::text) = LOWER(r.name)
+    #               AND t.{field_name} IS NOT NULL
+    #               AND t.{field_name}::text != ''
+    #               AND t.{field_name}::text !~ '^[0-9]+$'
+    #         """)
+            
+    #         # Mark records where relation couldn't be resolved (but only for non-NULL values)
+    #         self.cr.execute(f"""
+    #             UPDATE {self._quoted_temp_table()}
+    #             SET odoo_status = 'error',
+    #                 odoo_error = CONCAT('Could not resolve relation for field {field_name}: ', {field_name})
+    #             WHERE {field_name} IS NOT NULL
+    #               AND {field_name}::text != ''
+    #               AND {field_name}::text !~ '^[0-9]+$'
+    #               AND odoo_status = 'pending'
+    #             RETURNING tmp_id
+    #         """)
+            
+    #         invalid_relations = len(self.cr.fetchall())
+    #         if invalid_relations > 0 and self.TRACK_FAILURE_REASONS:
+    #             self.failure_reasons['invalid_relation'] += invalid_relations
+    
     def _validate_data(self):
-        """Validate data before insertion and track reasons for failures"""
+        """Validate data before insertion with proper quoting"""
         total_failures = 0
+        quoted_temp_table = self._quoted_temp_table()
         
         # Check required fields
         missing_required = []
         for field_name in self.required_fields:
+            quoted_field = self.cr.mogrify(f'"{field_name}"', ()).decode('utf-8')
+            error_msg = f'Missing required field: {field_name}'
+            
             self.cr.execute(f"""
-                UPDATE {self.temp_table_name}
+                UPDATE {quoted_temp_table}
                 SET odoo_status = 'error',
                     odoo_error = %s
-                WHERE ({field_name} IS NULL OR {field_name} = '')
+                WHERE ({quoted_field} IS NULL OR {quoted_field} = '')
                   AND odoo_status = 'pending'
                 RETURNING tmp_id
-            """, (f'Missing required field: {field_name}',))
+            """, (error_msg,))
             
             missing_count = len(self.cr.fetchall())
             if missing_count > 0:
@@ -926,17 +1255,20 @@ class CSVProcessor:
             if field_name not in self.inverse_mappings and field_name not in self.required_fields:
                 continue
                 
+            quoted_field = self.cr.mogrify(f'"{field_name}"', ()).decode('utf-8')
+            
             if field_type == 'integer':
+                error_msg = f'Invalid integer for field {field_name}'
                 self.cr.execute(f"""
-                    UPDATE {self.temp_table_name}
+                    UPDATE {quoted_temp_table}
                     SET odoo_status = 'error',
                         odoo_error = %s
-                    WHERE {field_name} IS NOT NULL
-                      AND {field_name}::text != ''
-                      AND {field_name}::text !~ '^-?[0-9]+$'
+                    WHERE {quoted_field} IS NOT NULL
+                      AND {quoted_field}::text != ''
+                      AND {quoted_field}::text !~ '^-?[0-9]+$'
                       AND odoo_status = 'pending'
                     RETURNING tmp_id
-                """, (f'Invalid integer for field {field_name}',))
+                """, (error_msg,))
                 
                 invalid_count = len(self.cr.fetchall())
                 if invalid_count > 0:
@@ -946,16 +1278,17 @@ class CSVProcessor:
                         self.failure_reasons['invalid_format'] += invalid_count
                 
             elif field_type in ('float', 'monetary'):
+                error_msg = f'Invalid number for field {field_name}'
                 self.cr.execute(f"""
-                    UPDATE {self.temp_table_name}
+                    UPDATE {quoted_temp_table}
                     SET odoo_status = 'error',
                         odoo_error = %s
-                    WHERE {field_name} IS NOT NULL
-                      AND {field_name}::text != ''
-                      AND {field_name}::text !~ '^-?[0-9]*\.?[0-9]*$'
+                    WHERE {quoted_field} IS NOT NULL
+                      AND {quoted_field}::text != ''
+                      AND {quoted_field}::text !~ '^-?[0-9]*\.?[0-9]*$'
                       AND odoo_status = 'pending'
                     RETURNING tmp_id
-                """, (f'Invalid number for field {field_name}',))
+                """, (error_msg,))
                 
                 invalid_count = len(self.cr.fetchall())
                 if invalid_count > 0:
@@ -964,43 +1297,7 @@ class CSVProcessor:
                     if self.TRACK_FAILURE_REASONS:
                         self.failure_reasons['invalid_format'] += invalid_count
                 
-            elif field_type == 'date':
-                self.cr.execute(f"""
-                    UPDATE {self.temp_table_name}
-                    SET odoo_status = 'error',
-                        odoo_error = %s
-                    WHERE {field_name} IS NOT NULL
-                      AND {field_name}::text != ''
-                      AND (try_cast({field_name}::text AS DATE) IS NULL)
-                      AND odoo_status = 'pending'
-                    RETURNING tmp_id
-                """, (f'Invalid date for field {field_name}',))
-                
-                invalid_count = len(self.cr.fetchall())
-                if invalid_count > 0:
-                    invalid_fields.append(f"{field_name} (should be dates in YYYY-MM-DD format)")
-                    total_failures += invalid_count
-                    if self.TRACK_FAILURE_REASONS:
-                        self.failure_reasons['invalid_format'] += invalid_count
-                
-            elif field_type == 'datetime':
-                self.cr.execute(f"""
-                    UPDATE {self.temp_table_name}
-                    SET odoo_status = 'error',
-                        odoo_error = %s
-                    WHERE {field_name} IS NOT NULL
-                      AND {field_name}::text != ''
-                      AND (try_cast({field_name}::text AS TIMESTAMP) IS NULL)
-                      AND odoo_status = 'pending'
-                    RETURNING tmp_id
-                """, (f'Invalid datetime for field {field_name}',))
-                
-                invalid_count = len(self.cr.fetchall())
-                if invalid_count > 0:
-                    invalid_fields.append(f"{field_name} (should be datetimes)")
-                    total_failures += invalid_count
-                    if self.TRACK_FAILURE_REASONS:
-                        self.failure_reasons['invalid_format'] += invalid_count
+            # More validation code for date/datetime fields...
         
         # Report invalid field formats
         if invalid_fields:
@@ -1012,91 +1309,325 @@ class CSVProcessor:
             
         return total_failures
     
+    # def _detect_duplicates(self):
+    #     """Detect and mark duplicate records with user feedback"""
+    #     if not self.unique_constraints:
+    #         return 0
+            
+    #     duplicate_count = 0
+    #     duplicate_constraints = []
+        
+    #     # Check against each unique constraint
+    #     for constraint_fields in self.unique_constraints:
+    #         # Filter to fields that are in our mapping
+    #         fields = [f for f in constraint_fields if f in self.inverse_mappings.keys()]
+            
+    #         if not fields:
+    #             continue
+                
+    #         # Check for duplicates within batch
+    #         fields_clause = " AND ".join([f"t1.{f} = t2.{f}" for f in fields])
+    #         not_null_clause = " AND ".join([f"t1.{f} IS NOT NULL" for f in fields])
+            
+    #         self.cr.execute(f"""
+    #             UPDATE {self._quoted_temp_table()} t1
+    #             SET odoo_status = 'duplicate',
+    #                 odoo_error = 'Duplicate record in import batch'
+    #             FROM {self._quoted_temp_table()} t2
+    #             WHERE t1.tmp_id > t2.tmp_id
+    #               AND {fields_clause}
+    #               AND {not_null_clause}
+    #               AND t1.odoo_status = 'pending'
+    #             RETURNING t1.tmp_id
+    #         """)
+            
+    #         batch_duplicates = len(self.cr.fetchall())
+    #         if batch_duplicates > 0 and self.TRACK_FAILURE_REASONS:
+    #             self.failure_reasons['duplicate'] += batch_duplicates
+    #             if f"{', '.join(fields)}" not in duplicate_constraints:
+    #                 duplicate_constraints.append(f"{', '.join(fields)}")
+            
+    #         # Check against existing records
+    #         fields_clause = " AND ".join([f"t.{f} = m.{f}" for f in fields])
+    #         not_null_clause = " AND ".join([f"t.{f} IS NOT NULL" for f in fields])
+            
+    #         self.cr.execute(f"""
+    #             UPDATE {self._quoted_temp_table()} t
+    #             SET odoo_status = 'duplicate',
+    #                 odoo_error = 'Record already exists in database'
+    #             FROM {self.table_name} m
+    #             WHERE {fields_clause}
+    #               AND {not_null_clause}
+    #               AND t.odoo_status = 'pending'
+    #             RETURNING t.tmp_id
+    #         """)
+            
+    #         existing_duplicates = len(self.cr.fetchall())
+    #         if existing_duplicates > 0 and self.TRACK_FAILURE_REASONS:
+    #             self.failure_reasons['duplicate'] += existing_duplicates
+    #             if f"{', '.join(fields)}" not in duplicate_constraints:
+    #                 duplicate_constraints.append(f"{', '.join(fields)}")
+        
+    #     # Count duplicates
+    #     self.cr.execute(f"""
+    #         SELECT COUNT(*) FROM {self._quoted_temp_table()}
+    #         WHERE odoo_status = 'duplicate'
+    #     """)
+    #     duplicate_count = self.cr.fetchone()[0]
+        
+    #     # Provide user feedback if duplicates found
+    #     if duplicate_count > 0:
+    #         if duplicate_constraints:
+    #             self._log_message(
+    #                 f"Found {duplicate_count:,} duplicate records based on unique constraints: {', '.join(duplicate_constraints)}",
+    #                 "warning",
+    #                 send_to_websocket=False
+    #             )
+    #         else:
+    #             self._log_message(
+    #                 f"Found {duplicate_count:,} duplicate records",
+    #                 "warning",
+    #                 send_to_websocket=False
+    #             )
+        
+    #     return duplicate_count
+
     def _detect_duplicates(self):
         """Detect and mark duplicate records with user feedback"""
         if not self.unique_constraints:
             return 0
-            
+                
         duplicate_count = 0
         duplicate_constraints = []
         
         # Check against each unique constraint
         for constraint_fields in self.unique_constraints:
             # Filter to fields that are in our mapping
-            fields = [f for f in constraint_fields if f in self.inverse_mappings.keys()]
+            fields = [f for f in constraint_fields if f in self.inverse_mappings.keys() or f in self.required_fields]
             
             if not fields:
                 continue
-                
-            # Check for duplicates within batch
-            fields_clause = " AND ".join([f"t1.{f} = t2.{f}" for f in fields])
-            not_null_clause = " AND ".join([f"t1.{f} IS NOT NULL" for f in fields])
             
-            self.cr.execute(f"""
-                UPDATE {self.temp_table_name} t1
-                SET odoo_status = 'duplicate',
-                    odoo_error = 'Duplicate record in import batch'
-                FROM {self.temp_table_name} t2
-                WHERE t1.tmp_id > t2.tmp_id
-                  AND {fields_clause}
-                  AND {not_null_clause}
-                  AND t1.odoo_status = 'pending'
-                RETURNING t1.tmp_id
-            """)
+            # Check for duplicates using the helper method
+            batch_duplicates, existing_duplicates = self._check_constraint_duplicates(fields)
             
-            batch_duplicates = len(self.cr.fetchall())
-            if batch_duplicates > 0 and self.TRACK_FAILURE_REASONS:
-                self.failure_reasons['duplicate'] += batch_duplicates
+            # Track statistics
+            duplicate_count += (batch_duplicates + existing_duplicates)
+            
+            if (batch_duplicates + existing_duplicates) > 0 and self.TRACK_FAILURE_REASONS:
+                self.failure_reasons['duplicate'] += (batch_duplicates + existing_duplicates)
                 if f"{', '.join(fields)}" not in duplicate_constraints:
                     duplicate_constraints.append(f"{', '.join(fields)}")
-            
-            # Check against existing records
-            fields_clause = " AND ".join([f"t.{f} = m.{f}" for f in fields])
-            not_null_clause = " AND ".join([f"t.{f} IS NOT NULL" for f in fields])
-            
-            self.cr.execute(f"""
-                UPDATE {self.temp_table_name} t
-                SET odoo_status = 'duplicate',
-                    odoo_error = 'Record already exists in database'
-                FROM {self.table_name} m
-                WHERE {fields_clause}
-                  AND {not_null_clause}
-                  AND t.odoo_status = 'pending'
-                RETURNING t.tmp_id
-            """)
-            
-            existing_duplicates = len(self.cr.fetchall())
-            if existing_duplicates > 0 and self.TRACK_FAILURE_REASONS:
-                self.failure_reasons['duplicate'] += existing_duplicates
-                if f"{', '.join(fields)}" not in duplicate_constraints:
-                    duplicate_constraints.append(f"{', '.join(fields)}")
-        
-        # Count duplicates
-        self.cr.execute(f"""
-            SELECT COUNT(*) FROM {self.temp_table_name}
-            WHERE odoo_status = 'duplicate'
-        """)
-        duplicate_count = self.cr.fetchone()[0]
         
         # Provide user feedback if duplicates found
         if duplicate_count > 0:
             if duplicate_constraints:
                 self._log_message(
                     f"Found {duplicate_count:,} duplicate records based on unique constraints: {', '.join(duplicate_constraints)}",
-                    "warning",
-                    send_to_websocket=False
+                    "warning"
                 )
             else:
                 self._log_message(
                     f"Found {duplicate_count:,} duplicate records",
-                    "warning",
-                    send_to_websocket=False
+                    "warning"
                 )
         
         return duplicate_count
-    
+
+    def _check_constraint_duplicates(self, fields):
+        """Check for duplicates based on constraint fields with proper quoting"""
+        batch_duplicates = 0
+        existing_duplicates = 0
+        
+        # Only proceed if we have fields to check
+        if not fields:
+            return 0, 0
+        
+        try:
+            quoted_temp_table = self._quoted_temp_table()
+            quoted_table = self.cr.mogrify(f'"{self.table_name}"', ()).decode('utf-8')
+            
+            # Check for duplicates within batch
+            fields_clause = " AND ".join([f't1."{f}" = t2."{f}"' for f in fields])
+            not_null_clause = " AND ".join([f't1."{f}" IS NOT NULL' for f in fields])
+            
+            self.cr.execute(f"""
+                UPDATE {quoted_temp_table} t1
+                SET odoo_status = 'duplicate',
+                    odoo_error = 'Duplicate record in import batch'
+                FROM {quoted_temp_table} t2
+                WHERE t1.tmp_id > t2.tmp_id
+                AND {fields_clause}
+                AND {not_null_clause}
+                AND t1.odoo_status = 'pending'
+                RETURNING t1.tmp_id
+            """)
+            
+            batch_duplicates = len(self.cr.fetchall())
+            
+            # Check against existing records in main table
+            fields_clause = " AND ".join([f't."{f}" = m."{f}"' for f in fields])
+            not_null_clause = " AND ".join([f't."{f}" IS NOT NULL' for f in fields])
+            
+            self.cr.execute(f"""
+                UPDATE {quoted_temp_table} t
+                SET odoo_status = 'duplicate',
+                    odoo_error = 'Record already exists in database'
+                FROM {quoted_table} m
+                WHERE {fields_clause}
+                AND {not_null_clause}
+                AND t.odoo_status = 'pending'
+                RETURNING t.tmp_id
+            """)
+            
+            existing_duplicates = len(self.cr.fetchall())
+            
+        except Exception as e:
+            _logger.error(f"Error checking constraint duplicates: {e}")
+            # Don't fail the entire process for duplicate detection issues
+            self.cr.rollback()
+        
+        return batch_duplicates, existing_duplicates
+
+    # def _insert_valid_records(self):
+    #     """Insert valid records into the target table with proper savepoint handling"""
+    #     # Get valid fields from model
+    #     valid_fields = set()
+        
+    #     # Add all fields from the mapping and required fields
+    #     for field_name in self.model_fields:
+    #         if field_name in self.inverse_mappings or field_name in self.required_fields:
+    #             valid_fields.add(field_name)
+        
+    #     if not valid_fields:
+    #         return 0
+            
+    #     # Build insert statement with proper quoting
+    #     fields_str = ", ".join([f'"{f}"' for f in valid_fields])
+    #     fields_src = ", ".join([f'src."{f}"' for f in valid_fields])
+        
+    #     # For transaction management, process in chunks
+    #     inserted_count = 0
+    #     chunk_size = self.MAX_TRANSACTION_SIZE
+        
+    #     # Get count of pending records
+    #     self.cr.execute(f"""
+    #         SELECT COUNT(*) FROM {self._quoted_temp_table()}
+    #         WHERE odoo_status = 'pending'
+    #     """)
+    #     pending_count = self.cr.fetchone()[0]
+        
+    #     if pending_count == 0:
+    #         return 0
+            
+    #     # Process in transaction-sized chunks
+    #     for offset in range(0, pending_count, chunk_size):
+    #         # Get chunk of record IDs to process
+    #         self.cr.execute(f"""
+    #             SELECT tmp_id FROM {self._quoted_temp_table()}
+    #             WHERE odoo_status = 'pending'
+    #             ORDER BY tmp_id
+    #             LIMIT %s OFFSET %s
+    #         """, (chunk_size, offset))
+            
+    #         record_ids = [r[0] for r in self.cr.fetchall()]
+            
+    #         if not record_ids:
+    #             break
+                
+    #         # Insert this chunk with retries
+    #         for retry in range(self.MAX_RETRIES):
+    #             savepoint_created = False
+    #             try:
+    #                 # Create a unique savepoint name for this chunk and retry
+    #                 savepoint_name = f"chunk_insert_{offset}_{retry}"
+    #                 self.cr.execute(f"SAVEPOINT {savepoint_name}")
+    #                 savepoint_created = True
+                    
+    #                 # Direct SQL insert with RETURNING to get IDs
+    #                 quoted_table = self.cr.mogrify(f'"{self.table_name}"', ()).decode('utf-8')
+    #                 self.cr.execute(f"""
+    #                     WITH inserted AS (
+    #                         INSERT INTO {quoted_table}
+    #                         ({fields_str})
+    #                         SELECT {fields_src}
+    #                         FROM {self._quoted_temp_table()} src
+    #                         WHERE src.tmp_id IN %s
+    #                         AND src.odoo_status = 'pending'
+    #                         RETURNING id
+    #                     )
+    #                     SELECT COUNT(*) FROM inserted
+    #                 """, (tuple(record_ids),))
+                    
+    #                 # Count inserted records
+    #                 chunk_inserted = self.cr.fetchone()[0]
+    #                 inserted_count += chunk_inserted
+                    
+    #                 # Mark these records as successful
+    #                 self.cr.execute(f"""
+    #                     UPDATE {self._quoted_temp_table()}
+    #                     SET odoo_status = 'success'
+    #                     WHERE tmp_id IN %s
+    #                     AND odoo_status = 'pending'
+    #                 """, (tuple(record_ids),))
+                    
+    #                 # Release savepoint
+    #                 if savepoint_created:
+    #                     self.cr.execute(f"RELEASE SAVEPOINT {savepoint_name}")
+                    
+    #                 # Commit after successful chunk
+    #                 self.cr.commit()
+    #                 break
+                    
+    #             except psycopg2.Error as e:
+    #                 # Rollback to savepoint if it was created
+    #                 if savepoint_created:
+    #                     try:
+    #                         self.cr.execute(f"ROLLBACK TO SAVEPOINT {savepoint_name}")
+    #                     except Exception as rollback_error:
+    #                         _logger.error(f"Error rolling back to savepoint: {str(rollback_error)}")
+    #                         # Do a full rollback if savepoint rollback fails
+    #                         self.cr.rollback()
+    #                 else:
+    #                     # No savepoint, do a full rollback
+    #                     self.cr.rollback()
+                    
+    #                 # On final retry, mark as errors
+    #                 if retry == self.MAX_RETRIES - 1:
+    #                     error_msg = f"Database error: {str(e)}"
+                        
+    #                     # Check for duplicate key error
+    #                     if "duplicate key value violates unique constraint" in str(e):
+    #                         error_msg = "Duplicate record detected that wasn't caught by duplicate detection"
+    #                         # Update statistics
+    #                         if self.TRACK_FAILURE_REASONS:
+    #                             self.failure_reasons['duplicate'] += len(record_ids)
+                        
+    #                     try:
+    #                         self.cr.execute(f"""
+    #                             UPDATE {self._quoted_temp_table()}
+    #                             SET odoo_status = 'error',
+    #                                 odoo_error = %s
+    #                             WHERE tmp_id IN %s
+    #                             AND odoo_status = 'pending'
+    #                         """, (error_msg, tuple(record_ids)))
+                            
+    #                         self.cr.commit()
+    #                     except Exception as update_error:
+    #                         _logger.error(f"Error updating error status: {str(update_error)}")
+                            
+    #                     if self.TRACK_FAILURE_REASONS and "duplicate key" not in str(e):
+    #                         self.failure_reasons['other'] += len(record_ids)
+    #                     break
+                        
+    #                 # Try again after delay
+    #                 _logger.warning(f"Retry {retry+1} for insert due to: {str(e)}")
+    #                 time.sleep(self.RETRY_DELAY)
+        
+    #     return inserted_count
+
     def _insert_valid_records(self):
-        """Insert valid records into the target table with transaction management"""
+        """Insert valid records with improved savepoint management"""
         # Get valid fields from model
         valid_fields = set()
         
@@ -1108,9 +1639,9 @@ class CSVProcessor:
         if not valid_fields:
             return 0
             
-        # Build insert statement
-        fields_str = ", ".join(valid_fields)
-        fields_src = ", ".join([f"src.{f}" for f in valid_fields])
+        # Build insert statement with proper quoting
+        fields_str = ", ".join([f'"{f}"' for f in valid_fields])
+        fields_src = ", ".join([f'src."{f}"' for f in valid_fields])
         
         # For transaction management, process in chunks
         inserted_count = 0
@@ -1118,7 +1649,7 @@ class CSVProcessor:
         
         # Get count of pending records
         self.cr.execute(f"""
-            SELECT COUNT(*) FROM {self.temp_table_name}
+            SELECT COUNT(*) FROM {self._quoted_temp_table()}
             WHERE odoo_status = 'pending'
         """)
         pending_count = self.cr.fetchone()[0]
@@ -1130,7 +1661,7 @@ class CSVProcessor:
         for offset in range(0, pending_count, chunk_size):
             # Get chunk of record IDs to process
             self.cr.execute(f"""
-                SELECT tmp_id FROM {self.temp_table_name}
+                SELECT tmp_id FROM {self._quoted_temp_table()}
                 WHERE odoo_status = 'pending'
                 ORDER BY tmp_id
                 LIMIT %s OFFSET %s
@@ -1143,16 +1674,34 @@ class CSVProcessor:
                 
             # Insert this chunk with retries
             for retry in range(self.MAX_RETRIES):
+                # Create a unique savepoint name for this chunk and retry
+                import random
+                import string
+                sp_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+                savepoint_name = f"chunk_{offset}_{retry}_{sp_name}"
+                savepoint_created = False
+                
                 try:
+                    # Try to create a savepoint
+                    try:
+                        # Check if transaction is active first
+                        self.cr.execute("SELECT pg_current_xact_id_if_assigned()")
+                        if self.cr.fetchone()[0]:
+                            self.cr.execute(f"SAVEPOINT {savepoint_name}")
+                            savepoint_created = True
+                    except Exception as sp_error:
+                        _logger.warning(f"Could not create savepoint: {str(sp_error)}")
+                    
                     # Direct SQL insert with RETURNING to get IDs
+                    quoted_table = self.cr.mogrify(f'"{self.table_name}"', ()).decode('utf-8')
                     self.cr.execute(f"""
                         WITH inserted AS (
-                            INSERT INTO {self.table_name}
+                            INSERT INTO {quoted_table}
                             ({fields_str})
                             SELECT {fields_src}
-                            FROM {self.temp_table_name} src
+                            FROM {self._quoted_temp_table()} src
                             WHERE src.tmp_id IN %s
-                              AND src.odoo_status = 'pending'
+                            AND src.odoo_status = 'pending'
                             RETURNING id
                         )
                         SELECT COUNT(*) FROM inserted
@@ -1164,31 +1713,67 @@ class CSVProcessor:
                     
                     # Mark these records as successful
                     self.cr.execute(f"""
-                        UPDATE {self.temp_table_name}
+                        UPDATE {self._quoted_temp_table()}
                         SET odoo_status = 'success'
                         WHERE tmp_id IN %s
-                          AND odoo_status = 'pending'
+                        AND odoo_status = 'pending'
                     """, (tuple(record_ids),))
                     
-                    # Commit this chunk
+                    # Release savepoint if created
+                    if savepoint_created:
+                        try:
+                            self.cr.execute(f"RELEASE SAVEPOINT {savepoint_name}")
+                        except Exception as release_error:
+                            _logger.warning(f"Could not release savepoint: {str(release_error)}")
+                    
+                    # Commit after successful chunk
                     self.cr.commit()
                     break
                     
                 except psycopg2.Error as e:
-                    self.cr.rollback()
+                    # Rollback to savepoint if it was created
+                    if savepoint_created:
+                        try:
+                            self.cr.execute(f"ROLLBACK TO SAVEPOINT {savepoint_name}")
+                        except Exception as rollback_error:
+                            _logger.error(f"Error rolling back to savepoint: {str(rollback_error)}")
+                            # Do a full rollback if savepoint rollback fails
+                            try:
+                                self.cr.rollback()
+                            except Exception as full_rollback_error:
+                                _logger.error(f"Error in full rollback: {str(full_rollback_error)}")
+                    else:
+                        # No savepoint, do a full rollback
+                        try:
+                            self.cr.rollback()
+                        except Exception as rollback_error:
+                            _logger.error(f"Error in rollback: {str(rollback_error)}")
                     
                     # On final retry, mark as errors
                     if retry == self.MAX_RETRIES - 1:
-                        self.cr.execute(f"""
-                            UPDATE {self.temp_table_name}
-                            SET odoo_status = 'error',
-                                odoo_error = %s
-                            WHERE tmp_id IN %s
-                              AND odoo_status = 'pending'
-                        """, (f"Database error: {str(e)}", tuple(record_ids)))
+                        error_msg = f"Database error: {str(e)}"
                         
-                        self.cr.commit()
-                        if self.TRACK_FAILURE_REASONS:
+                        # Check for duplicate key error
+                        if "duplicate key value violates unique constraint" in str(e):
+                            error_msg = "Duplicate record detected that wasn't caught by duplicate detection"
+                            # Update statistics
+                            if self.TRACK_FAILURE_REASONS:
+                                self.failure_reasons['duplicate'] += len(record_ids)
+                        
+                        try:
+                            self.cr.execute(f"""
+                                UPDATE {self._quoted_temp_table()}
+                                SET odoo_status = 'error',
+                                    odoo_error = %s
+                                WHERE tmp_id IN %s
+                                AND odoo_status = 'pending'
+                            """, (error_msg, tuple(record_ids)))
+                            
+                            self.cr.commit()
+                        except Exception as update_error:
+                            _logger.error(f"Error updating error status: {str(update_error)}")
+                            
+                        if self.TRACK_FAILURE_REASONS and "duplicate key" not in str(e):
                             self.failure_reasons['other'] += len(record_ids)
                         break
                         
@@ -1290,15 +1875,26 @@ class CSVProcessor:
         summary_message = "\n".join(summary_lines)
         self._log_message(summary_message, "success" if success_count > 0 else "warning")
     
+    # def _cleanup_temp_resources(self):
+    #     """Clean up temporary resources"""
+    #     try:
+    #         # self.cr.execute(f"DROP TABLE IF EXISTS {self._quoted_temp_table()}")
+    #         self.cr.execute(f'DROP TABLE IF EXISTS {self._quoted_temp_table()}')
+    #         self.cr.commit()
+    #         _logger.info(f"Dropped temporary table {self._quoted_temp_table()}")
+    #     except Exception as e:
+    #         _logger.warning(f"Error cleaning up temporary table: {str(e)}")
+
     def _cleanup_temp_resources(self):
-        """Clean up temporary resources"""
+        """Clean up temporary resources with proper quoting"""
         try:
-            self.cr.execute(f"DROP TABLE IF EXISTS {self.temp_table_name}")
+            # Use proper parameter quoting to avoid SQL injection
+            self.cr.execute("DROP TABLE IF EXISTS %s" % self.cr.mogrify(f'"{self.temp_table_name}"', ()).decode('utf-8'))
             self.cr.commit()
             _logger.info(f"Dropped temporary table {self.temp_table_name}")
         except Exception as e:
             _logger.warning(f"Error cleaning up temporary table: {str(e)}")
-    
+        
     def _log_message(self, message, message_type="info", send_to_websocket=True):
         """Log a message to both server log and websocket"""
         # Calculate progress

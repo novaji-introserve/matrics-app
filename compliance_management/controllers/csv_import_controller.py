@@ -8,7 +8,7 @@ import random
 import string
 import shutil
 
-from odoo import http, _
+from odoo import http, _, api
 from odoo.http import request, Response
 from werkzeug.exceptions import BadRequest
 from ..services.websocket.connection import send_message
@@ -325,19 +325,14 @@ class CSVImportController(http.Controller):
                 content_type="application/json",
                 status=500,
             )
-
+    
     def _handle_final_chunk(
         self, file_id, total_chunks, original_filename, ir_model, chunk_dir
     ):
         """
-        Process the final chunk:
-        1. Reassemble the complete file
-        2. Save it to the upload directory
-        3. Create an import log
-        4. Queue a job for processing
+        Process the final chunk with improved transaction management
         """
         final_path = None
-        cr = request.env.cr
         
         try:
             # Generate unique filename
@@ -378,10 +373,6 @@ class CSVImportController(http.Controller):
                 "success",
             )
 
-            # Read the file into memory for attachment
-            with open(final_path, "rb") as infile:
-                file_content = base64.b64encode(infile.read())
-
             # Determine content type
             content_type = "text/csv"
             if original_filename.lower().endswith((".xlsx", ".xls")):
@@ -389,34 +380,50 @@ class CSVImportController(http.Controller):
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
-            # Important! Start a new transaction for import_log creation
-            cr.commit()
-
-            # Create import log
-            import_log = (
-                request.env["import.log"]
-                .sudo()
-                .create(
-                    {
-                        "name": f"Import {unique_filename}",
-                        "file_name": unique_filename,
-                        "original_filename": original_filename,
-                        "content_type": content_type,
-                        "ir_model_id": ir_model.id,
-                        "file": file_content,
-                        "status": "pending",  # Always start in pending status
-                        "batch_folder": batch_folder,
-                        "file_path": final_path,  # Store physical file path
-                        "uploaded_by": request.env.user.id,
-                    }
-                )
-            )
+            # Important! Create import log using a dedicated cursor to avoid transaction conflicts
+            import_log_id = None
+            import_log = None
             
-            # Commit the import log creation immediately to avoid losing it
-            cr.commit()
-            self._send_message("File successfully uploaded and saved", "success")
+            # Use a dedicated cursor for creating the import log
+            with request.env.registry.cursor() as new_cr:
+                try:
+                    # Create environment with new cursor
+                    env = api.Environment(new_cr, request.env.uid, request.env.context)
+                    
+                    # Read file into memory for attachment
+                    with open(final_path, "rb") as infile:
+                        file_content = base64.b64encode(infile.read())
+                    
+                    # Create import log with transaction
+                    import_log = (
+                        env["import.log"]
+                        .sudo()
+                        .create(
+                            {
+                                "name": f"Import {unique_filename}",
+                                "file_name": unique_filename,
+                                "original_filename": original_filename,
+                                "content_type": content_type,
+                                "ir_model_id": ir_model.id,
+                                "file": file_content,
+                                "status": "pending",  # Always start in pending status
+                                "batch_folder": batch_folder,
+                                "file_path": final_path,  # Store physical file path
+                                "uploaded_by": request.env.user.id,
+                            }
+                        )
+                    )
+                    
+                    import_log_id = import_log.id
+                    
+                    # Commit the import log creation to make it available to other processes
+                    new_cr.commit()
+                    self._send_message("File successfully uploaded and saved", "success")
+                except Exception as e:
+                    new_cr.rollback()
+                    raise e
 
-            # Clean up chunks
+            # Clean up chunks to save space
             for i in range(total_chunks):
                 chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
                 if os.path.exists(chunk_path):
@@ -442,86 +449,88 @@ class CSVImportController(http.Controller):
             except Exception as e:
                 _logger.warning(f"Error checking for queue_job module: {str(e)}")
             
-            # Also check if the model has the required method
-            if use_queue and not hasattr(import_log, 'with_delay'):
-                use_queue = False
-                _logger.warning("ImportLog model doesn't have with_delay method")
-
-            if use_queue:
-                self._send_message("Queueing file for batch processing...", "info")
+            # Get the import log from the registry using a new cursor
+            with request.env.registry.cursor() as proc_cr:
+                env = api.Environment(proc_cr, request.env.uid, request.env.context)
+                process_import_log = env['import.log'].sudo().browse(import_log_id)
                 
-                # Calculate a reasonable batch size based on file size
-                # For very large files, use smaller batches
-                if file_size > 1024 * 1024 * 100:  # > 100MB
-                    batch_size = 5000
-                else:
-                    batch_size = 10000
-                
-                try:
-                    # FIXED: Use the new process_file method instead of process_file_batch
-                    import_log.sudo().with_delay(
-                        description=f"Process CSV Import {import_log.id}"
-                    ).process_file()
-                    
-                    cr.commit()
-                    
-                    # Log that job was created
-                    self._send_message(
-                        f"Job queued for processing", "success"
-                    )
-                    
-                    return Response(
-                        json.dumps(
-                            {
-                                "status": "success",
-                                "import_id": import_log.id,
-                                "message": "File upload complete, processing queued",
-                                "filename": unique_filename,
-                                "file_path": final_path,
-                            }
-                        ),
-                        content_type="application/json",
-                    )
-                except Exception as e:
-                    _logger.error(f"Error creating queue job: {str(e)}")
-                    # Fallback to direct processing
+                # Also check if the model has the required method
+                if use_queue and not hasattr(process_import_log, 'with_delay'):
                     use_queue = False
-            
-            # If queue.job not available or failed, start processing directly
-            if not use_queue:
-                try:
-                    # Direct processing - no queue job
-                    self._send_message("Starting direct processing (no job queue)...", "info")
-                    # Call process_file directly
-                    result = import_log.sudo().process_file()
+                    _logger.warning("ImportLog model doesn't have with_delay method")
+
+                if use_queue:
+                    self._send_message("Queueing file for batch processing...", "info")
                     
-                    return Response(
-                        json.dumps(
-                            {
-                                "status": "success" if result.get('success', False) else "warning",
-                                "import_id": import_log.id,
-                                "message": result.get('message', "Processing started"),
-                                "filename": unique_filename,
-                                "file_path": final_path,
-                            }
-                        ),
-                        content_type="application/json",
-                    )
-                except Exception as e:
-                    _logger.error(f"Error starting direct processing: {str(e)}")
-                    return Response(
-                        json.dumps(
-                            {
-                                "status": "warning",
-                                "import_id": import_log.id,
-                                "message": "File upload complete. Please start processing manually.",
-                                "error": str(e),
-                                "filename": unique_filename,
-                                "file_path": final_path,
-                            }
-                        ),
-                        content_type="application/json",
-                    )
+                    try:
+                        # FIXED: Use the new process_file method instead of process_file_batch
+                        job = process_import_log.sudo().with_delay(
+                            description=f"Process CSV Import {import_log_id}",
+                            channel="csv_import"
+                        ).process_file()
+                        
+                        proc_cr.commit()
+                        
+                        # Log that job was created
+                        self._send_message(
+                            f"Job queued for processing", "success"
+                        )
+                        
+                        return Response(
+                            json.dumps(
+                                {
+                                    "status": "success",
+                                    "import_id": import_log_id,
+                                    "message": "File upload complete, processing queued",
+                                    "filename": unique_filename,
+                                    "file_path": final_path,
+                                }
+                            ),
+                            content_type="application/json",
+                        )
+                    except Exception as e:
+                        proc_cr.rollback()
+                        _logger.error(f"Error creating queue job: {str(e)}")
+                        # Fallback to direct processing
+                        use_queue = False
+                
+                # If queue.job not available or failed, start processing directly
+                if not use_queue:
+                    try:
+                        # Direct processing - no queue job
+                        self._send_message("Starting direct processing (no job queue)...", "info")
+                        # Call process_file directly
+                        result = process_import_log.sudo().process_file()
+                        proc_cr.commit()
+                        
+                        return Response(
+                            json.dumps(
+                                {
+                                    "status": "success" if result.get('success', False) else "warning",
+                                    "import_id": import_log_id,
+                                    "message": result.get('message', "Processing started"),
+                                    "filename": unique_filename,
+                                    "file_path": final_path,
+                                }
+                            ),
+                            content_type="application/json",
+                        )
+                    except Exception as e:
+                        proc_cr.rollback()
+                        _logger.error(f"Error starting direct processing: {str(e)}")
+                        return Response(
+                            json.dumps(
+                                {
+                                    "status": "warning",
+                                    "import_id": import_log_id,
+                                    "message": "File upload complete. Please start processing manually.",
+                                    "error": str(e),
+                                    "filename": unique_filename,
+                                    "file_path": final_path,
+                                }
+                            ),
+                            content_type="application/json",
+                        )
 
         except Exception as e:
             _logger.error(f"Error handling final chunk: {str(e)}")
@@ -529,12 +538,6 @@ class CSVImportController(http.Controller):
             import traceback
             _logger.error(f"Traceback: {traceback.format_exc()}")
             
-            # Try to rollback the transaction
-            try:
-                cr.rollback()
-            except:
-                pass
-                
             self._send_message(f"Error processing file: {str(e)}", "error")
 
             # Clean up final file if it exists
@@ -549,6 +552,257 @@ class CSVImportController(http.Controller):
                 content_type="application/json",
                 status=500,
             )
+
+    @http.route('/csv_import/start_import', type='json', auth='user')
+    def start_import(self, import_id):
+        """Start the import process with proper transaction management"""
+        import_id = int(import_id)
+        
+        # Use a dedicated cursor for this operation to prevent transaction conflicts
+        with request.env.registry.cursor() as cr:
+            try:
+                # Create an environment with the new cursor
+                env = api.Environment(cr, request.env.uid, request.env.context)
+                
+                # Get the import log record
+                import_log = env['import.log'].sudo().browse(import_id)
+                if not import_log.exists():
+                    return {'success': False, 'error': 'Import not found'}
+                    
+                # Process the file (with transaction management inside method)
+                result = import_log.process_file()
+                
+                cr.commit()
+                return result
+                
+            except Exception as e:
+                cr.rollback()
+                _logger.error(f"Error starting import: {str(e)}")
+                return {'success': False, 'error': str(e)}
+
+    # def _handle_final_chunk(
+    #     self, file_id, total_chunks, original_filename, ir_model, chunk_dir
+    # ):
+    #     """
+    #     Process the final chunk:
+    #     1. Reassemble the complete file
+    #     2. Save it to the upload directory
+    #     3. Create an import log
+    #     4. Queue a job for processing
+    #     """
+    #     final_path = None
+    #     cr = request.env.cr
+        
+    #     try:
+    #         # Generate unique filename
+    #         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    #         random_suffix = "".join(
+    #             random.choices(string.ascii_letters + string.digits, k=6)
+    #         )
+    #         name, ext = os.path.splitext(original_filename)
+    #         unique_filename = f"{name}_{timestamp}_{random_suffix}{ext}"
+
+    #         # Create batch folder in upload directory
+    #         batch_folder = f"batch_{ir_model.model}_{timestamp}"
+    #         batch_dir = os.path.join(self.UPLOAD_DIR, batch_folder)
+    #         os.makedirs(batch_dir, exist_ok=True)
+
+    #         # Define path for the reassembled file
+    #         final_path = os.path.join(batch_dir, unique_filename)
+            
+    #         # Combine all chunks into a single file
+    #         with open(final_path, "wb") as outfile:
+    #             for i in range(total_chunks):
+    #                 chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
+    #                 if not os.path.exists(chunk_path):
+    #                     self._send_message(f"Missing chunk {i}", "error")
+    #                     return Response(
+    #                         json.dumps({"error": f"Missing chunk {i}"}),
+    #                         content_type="application/json",
+    #                         status=500,
+    #                     )
+
+    #                 with open(chunk_path, "rb") as infile:
+    #                     outfile.write(infile.read())
+
+    #         # Get file size
+    #         file_size = os.path.getsize(final_path)
+    #         self._send_message(
+    #             f"File successfully reassembled: {self._format_bytes(file_size)}",
+    #             "success",
+    #         )
+
+    #         # Read the file into memory for attachment
+    #         with open(final_path, "rb") as infile:
+    #             file_content = base64.b64encode(infile.read())
+
+    #         # Determine content type
+    #         content_type = "text/csv"
+    #         if original_filename.lower().endswith((".xlsx", ".xls")):
+    #             content_type = (
+    #                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    #             )
+
+    #         # Important! Start a new transaction for import_log creation
+    #         cr.commit()
+
+    #         # Create import log
+    #         import_log = (
+    #             request.env["import.log"]
+    #             .sudo()
+    #             .create(
+    #                 {
+    #                     "name": f"Import {unique_filename}",
+    #                     "file_name": unique_filename,
+    #                     "original_filename": original_filename,
+    #                     "content_type": content_type,
+    #                     "ir_model_id": ir_model.id,
+    #                     "file": file_content,
+    #                     "status": "pending",  # Always start in pending status
+    #                     "batch_folder": batch_folder,
+    #                     "file_path": final_path,  # Store physical file path
+    #                     "uploaded_by": request.env.user.id,
+    #                 }
+    #             )
+    #         )
+            
+    #         # Commit the import log creation immediately to avoid losing it
+    #         cr.commit()
+    #         self._send_message("File successfully uploaded and saved", "success")
+
+    #         # Clean up chunks
+    #         for i in range(total_chunks):
+    #             chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
+    #             if os.path.exists(chunk_path):
+    #                 os.unlink(chunk_path)
+
+    #         # Clean up temporary directory
+    #         try:
+    #             os.rmdir(chunk_dir)
+    #         except:
+    #             pass
+
+    #         # Check if we should use the job queue for processing
+    #         use_queue = False  # Default to not using queue
+            
+    #         # First check if the queue_job module is installed
+    #         try:
+    #             queue_job_installed = request.env['ir.module.module'].sudo().search([
+    #                 ('name', '=', 'queue_job'),
+    #                 ('state', '=', 'installed')
+    #             ], limit=1)
+                
+    #             use_queue = bool(queue_job_installed)
+    #         except Exception as e:
+    #             _logger.warning(f"Error checking for queue_job module: {str(e)}")
+            
+    #         # Also check if the model has the required method
+    #         if use_queue and not hasattr(import_log, 'with_delay'):
+    #             use_queue = False
+    #             _logger.warning("ImportLog model doesn't have with_delay method")
+
+    #         if use_queue:
+    #             self._send_message("Queueing file for batch processing...", "info")
+                
+    #             # Calculate a reasonable batch size based on file size
+    #             # For very large files, use smaller batches
+    #             if file_size > 1024 * 1024 * 100:  # > 100MB
+    #                 batch_size = 5000
+    #             else:
+    #                 batch_size = 10000
+                
+    #             try:
+    #                 # FIXED: Use the new process_file method instead of process_file_batch
+    #                 import_log.sudo().with_delay(
+    #                     description=f"Process CSV Import {import_log.id}"
+    #                 ).process_file()
+                    
+    #                 cr.commit()
+                    
+    #                 # Log that job was created
+    #                 self._send_message(
+    #                     f"Job queued for processing", "success"
+    #                 )
+                    
+    #                 return Response(
+    #                     json.dumps(
+    #                         {
+    #                             "status": "success",
+    #                             "import_id": import_log.id,
+    #                             "message": "File upload complete, processing queued",
+    #                             "filename": unique_filename,
+    #                             "file_path": final_path,
+    #                         }
+    #                     ),
+    #                     content_type="application/json",
+    #                 )
+    #             except Exception as e:
+    #                 _logger.error(f"Error creating queue job: {str(e)}")
+    #                 # Fallback to direct processing
+    #                 use_queue = False
+            
+    #         # If queue.job not available or failed, start processing directly
+    #         if not use_queue:
+    #             try:
+    #                 # Direct processing - no queue job
+    #                 self._send_message("Starting direct processing (no job queue)...", "info")
+    #                 # Call process_file directly
+    #                 result = import_log.sudo().process_file()
+                    
+    #                 return Response(
+    #                     json.dumps(
+    #                         {
+    #                             "status": "success" if result.get('success', False) else "warning",
+    #                             "import_id": import_log.id,
+    #                             "message": result.get('message', "Processing started"),
+    #                             "filename": unique_filename,
+    #                             "file_path": final_path,
+    #                         }
+    #                     ),
+    #                     content_type="application/json",
+    #                 )
+    #             except Exception as e:
+    #                 _logger.error(f"Error starting direct processing: {str(e)}")
+    #                 return Response(
+    #                     json.dumps(
+    #                         {
+    #                             "status": "warning",
+    #                             "import_id": import_log.id,
+    #                             "message": "File upload complete. Please start processing manually.",
+    #                             "error": str(e),
+    #                             "filename": unique_filename,
+    #                             "file_path": final_path,
+    #                         }
+    #                     ),
+    #                     content_type="application/json",
+    #                 )
+
+    #     except Exception as e:
+    #         _logger.error(f"Error handling final chunk: {str(e)}")
+    #         # Log the full traceback for better debugging
+    #         import traceback
+    #         _logger.error(f"Traceback: {traceback.format_exc()}")
+            
+    #         # Try to rollback the transaction
+    #         try:
+    #             cr.rollback()
+    #         except:
+    #             pass
+                
+    #         self._send_message(f"Error processing file: {str(e)}", "error")
+
+    #         # Clean up final file if it exists
+    #         if final_path and os.path.exists(final_path):
+    #             try:
+    #                 os.unlink(final_path)
+    #             except:
+    #                 pass
+
+    #         return Response(
+    #             json.dumps({"error": f"Error handling final chunk: {str(e)}"}),
+    #             content_type="application/json",
+    #             status=500,
+    #         )
 
     @http.route(
             "/csv_import/download_template/<int:model_id>", type="http", auth="user"
@@ -697,6 +951,108 @@ class CSVImportController(http.Controller):
         except Exception as e:
             _logger.error(f"Error generating template: {str(e)}")
             return None
+
+    # @http.route('/csv_import/start_import', type='json', auth='user')
+    # def start_import(self, import_id):
+    #     """Start the import process with SQL-only updates to avoid concurrency issues"""
+    #     # Get the import record ID
+    #     import_id = int(import_id)
+        
+    #     # Establish a new cursor
+    #     with request.env.registry.cursor() as cr:
+    #         # Create an environment with the new cursor
+    #         env = api.Environment(cr, request.env.uid, request.env.context)
+            
+    #         # First check if import exists and get file path
+    #         cr.execute("""
+    #             SELECT file_path, status 
+    #             FROM import_log 
+    #             WHERE id = %s
+    #         """, (import_id,))
+    #         result = cr.fetchone()
+            
+    #         if not result:
+    #             return {'success': False, 'error': 'Import not found'}
+                
+    #         file_path, status = result
+            
+    #         # Check status
+    #         if status == 'completed':
+    #             return {'success': True, 'message': 'Import already completed'}
+                
+    #         # Check file existence
+    #         if not file_path or not os.path.exists(file_path):
+    #             cr.execute("""
+    #                 UPDATE import_log
+    #                 SET status = 'failed',
+    #                     error_message = 'Import file not found at specified path'
+    #                 WHERE id = %s
+    #             """, (import_id,))
+    #             cr.commit()
+    #             return {'success': False, 'error': 'File not found'}
+                
+    #         # Get file size
+    #         file_size = os.path.getsize(file_path)
+                
+    #         # Calculate optimal parameters
+    #         try:
+    #             batch_size = int(env['ir.config_parameter'].sudo().get_param('csv_import.batch_size', '10000'))
+    #             parallel_jobs = int(env['ir.config_parameter'].sudo().get_param('csv_import.parallel_jobs', '4'))
+    #         except:
+    #             batch_size = 10000
+    #             parallel_jobs = 4
+                
+    #         # Adjust based on file size
+    #         if file_size > 1024 * 1024 * 500:  # > 500MB
+    #             batch_size = 50000
+    #         elif file_size > 1024 * 1024 * 100:  # > 100MB
+    #             batch_size = 20000
+                
+    #         # Adjust parallelism based on available CPU cores
+    #         available_cores = multiprocessing.cpu_count()
+    #         if available_cores > 4:
+    #             parallel_jobs = min(available_cores - 2, 8)
+                
+    #         # Count records (simplified for example)
+    #         total_records = 0
+    #         # ... implement record counting here ...
+            
+    #         # Calculate batches
+    #         total_batches = math.ceil(total_records / batch_size) if total_records > 0 else 1
+            
+    #         # UPDATE ALL FIELDS IN ONE TRANSACTION
+    #         start_time = fields.Datetime.now()
+            
+    #         cr.execute("""
+    #             UPDATE import_log
+    #             SET status = 'processing',
+    #                 started_at = %s,
+    #                 batch_size = %s,
+    #                 parallel_jobs = %s, 
+    #                 total_records = %s,
+    #                 total_batches = %s,
+    #                 retry_count = retry_count + 1,
+    #                 execution_time = 0,
+    #                 error_message = NULL,
+    #                 technical_details = NULL
+    #             WHERE id = %s
+    #         """, (
+    #             start_time, 
+    #             batch_size,
+    #             parallel_jobs,
+    #             total_records,
+    #             total_batches,
+    #             import_id
+    #         ))
+            
+    #         # Commit all changes at once
+    #         cr.commit()
+            
+    #         # Now create the queue jobs for processing
+    #         import_log = env['import.log'].browse(import_id)
+    #         result = import_log._launch_parallel_jobs(start_time)
+            
+    #         return result
 
     def _get_sample_value(self, field):
         """Get a sample value for a field based on its type"""
