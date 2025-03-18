@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Get or reference the root channel -->
+        <record id="csv_import_queue_channel" model="queue.job.channel">
+            <field name="name">csv_import</field>
+            <field name="parent_id" ref="queue_job.channel_root" />
+        </record>
+
+        <!-- Create a function for the import process -->
+        <record id="csv_import_process_function" model="queue.job.function">
+            <field name="model_id" ref="model_import_log" />
+            <field name="method">process_file</field>
+            <field name="channel_id" ref="csv_import_queue_channel" />
+        </record>
+
+        <!-- Configuration parameters - using standard system parameters -->
+        <record id="ir_config_csv_import_timeout" model="ir.config_parameter">
+            <field name="key">queue_job.timeout.csv_import</field>
+            <field name="value">7200</field>  <!-- 2 hours timeout for import jobs -->
+        </record>
+    </data>
+</odoo>
