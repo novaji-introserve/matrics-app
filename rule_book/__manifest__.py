@@ -63,6 +63,9 @@
         "views/alert_dashboard.xml",
       
         'views/user_setting.xml',
+        'views/keyword_tracking.xml',
+        'data/sequence/keyword.xml',
+        'views/keyword_logs.xml',
 
 
     ],
