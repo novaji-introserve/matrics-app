@@ -97,7 +97,7 @@ class CSVProcessor:
         }
 
     def process_batch(self, start_position, end_position):
-        """Process a specific batch of records with robust connection handling"""
+        """Process a specific batch of records with robust connection handling and visual indicators"""
         self.start_time = datetime.now()
         total_records = self.import_log.total_records
         
@@ -133,21 +133,25 @@ class CSVProcessor:
             
             # Log technical details server-side only
             self._log_message(
-                f"Processing {len(self.df)} records with {len(self.csv_columns)} columns", 
+                f"Processing {len(self.df):,} records with {len(self.csv_columns)} columns", 
                 "info", 
                 send_to_websocket=False
             )
             
-            # Process the data
+            # Process the data - update with animation and improved progress
             self.df = self._preprocess_dataframe(self.df)
+            
+            # Show a processing indicator before starting the chunked insert
+            self._log_message_no_progress(
+                f"⏳ Processing records {start_position:,} to {end_position:,} ({self._get_processing_indicator()})...", 
+                "info"
+            )
+            
             self._chunked_insert_to_temp_table()  # This now uses self.df directly
             self._process_staged_data()
             
             # Calculate metrics
             self.process_time = (datetime.now() - self.start_time).total_seconds()
-            
-            # Calculate new progress 
-            new_progress = min(100, (end_position / total_records * 100)) if total_records > 0 else 0
             
             # Clean up
             try:
@@ -198,6 +202,109 @@ class CSVProcessor:
             self.df = None
             
             return self.results
+
+    # def process_batch(self, start_position, end_position):
+    #     """Process a specific batch of records with robust connection handling"""
+    #     self.start_time = datetime.now()
+    #     total_records = self.import_log.total_records
+        
+    #     try:
+    #         # Validate inputs
+    #         if start_position < 0 or end_position <= start_position:
+    #             raise ValueError(f"Invalid positions: start={start_position}, end={end_position}")
+                
+    #         if not os.path.exists(self.file_path):
+    #             raise FileNotFoundError(f"Import file not found at {self.file_path}")
+            
+    #         # Calculate progress percentage
+    #         progress = min(100, (start_position / total_records * 100)) if total_records > 0 else 0
+    #         self._log_message(
+    #             f"Processing records {start_position:,} to {end_position:,}", 
+    #             "info"
+    #         )
+            
+    #         # Initialize dynamic schema for mapping
+    #         self._initialize_dynamic_schema()
+            
+    #         # Create temp table on first batch
+    #         self._create_temp_table()
+            
+    #         # Read the specific chunk from the file and store it in instance variable
+    #         self.df = self._read_file_chunk(start_position, end_position - start_position)
+    #         if self.df is None or self.df.empty:
+    #             self._log_message("No data found in specified range", "warning")
+    #             return self.results
+            
+    #         # Save CSV columns for reference
+    #         self.csv_columns = list(self.df.columns)
+            
+    #         # Log technical details server-side only
+    #         self._log_message(
+    #             f"Processing {len(self.df)} records with {len(self.csv_columns)} columns", 
+    #             "info", 
+    #             send_to_websocket=False
+    #         )
+            
+    #         # Process the data
+    #         self.df = self._preprocess_dataframe(self.df)
+    #         self._chunked_insert_to_temp_table()  # This now uses self.df directly
+    #         self._process_staged_data()
+            
+    #         # Calculate metrics
+    #         self.process_time = (datetime.now() - self.start_time).total_seconds()
+            
+    #         # Calculate new progress 
+    #         new_progress = min(100, (end_position / total_records * 100)) if total_records > 0 else 0
+            
+    #         # Clean up
+    #         try:
+    #             self._cleanup_temp_resources()
+    #         except Exception as e:
+    #             _logger.warning(f"Error cleaning up temp resources: {str(e)}")
+            
+    #         # Generate and include summary in results
+    #         self._generate_failure_summary()
+            
+    #         # Send user-friendly summary
+    #         self._send_batch_summary()
+            
+    #         # Clear the dataframe to free memory
+    #         self.df = None
+            
+    #         return self.results
+            
+    #     except Exception as e:
+    #         import traceback
+    #         error_trace = traceback.format_exc()
+    #         error_message = f"Error processing batch: {str(e)}"
+    #         _logger.error(error_message)
+    #         _logger.error(error_trace)
+            
+    #         try:
+    #             if self._check_cursor_validity():
+    #                 self.cr.rollback()
+    #         except:
+    #             pass
+                
+    #         try:
+    #             self._cleanup_temp_resources()
+    #         except:
+    #             pass
+            
+    #         # Send user-friendly error message
+    #         user_friendly_error = self._create_user_friendly_error(str(e))
+    #         self._log_message(user_friendly_error, "error")
+            
+    #         self.results.update({
+    #             "success": False,
+    #             "error_message": error_message,
+    #             "technical_details": error_trace,
+    #         })
+            
+    #         # Clear the dataframe to free memory
+    #         self.df = None
+            
+    #         return self.results
 
     def _initialize_dynamic_schema(self):
         """Initialize dynamic schema information by introspecting the database and model"""
@@ -507,10 +614,14 @@ class CSVProcessor:
         return type_map.get(field_type, 'TEXT')
     
     def _read_file_chunk(self, start_row, num_rows):
-        """Read a specific chunk from the file with optimized settings"""
+        """Read a specific chunk from the file with progress indicators"""
         try:
             # Determine file type
             file_ext = os.path.splitext(self.file_path)[1].lower()
+            
+            # Get total records for progress
+            total_records = self.import_log.total_records
+            current_position = self.import_log.current_position
             
             # For Excel files
             if file_ext in ('.xlsx', '.xls'):
@@ -537,7 +648,11 @@ class CSVProcessor:
                         nrows=num_rows
                     )
                     
-                self._log_message(f"Read {df.shape[0]} rows from file", "success")
+                # Log with accurate progress and record count
+                self._log_message_no_progress(
+                    f"Read {df.shape[0]:,} rows from file ({start_row + df.shape[0]:,}/{total_records:,} - {((start_row + df.shape[0])/total_records*100):.1f}% complete). Processing...", 
+                    "success"
+                )
                 return df
                 
             # For CSV files
@@ -566,7 +681,11 @@ class CSVProcessor:
                         
                         # Check if we have a valid dataframe
                         if df.shape[1] > 1:
-                            self._log_message(f"Read {df.shape[0]} rows from file", "success")
+                            # Log with accurate progress and record count
+                            self._log_message_no_progress(
+                                f"Read {df.shape[0]:,} rows from file ({start_row + df.shape[0]:,}/{total_records:,} - {((start_row + df.shape[0])/total_records*100):.1f}% complete). Processing...", 
+                                "success"
+                            )
                             return df
                     except Exception as e:
                         _logger.debug(f"Failed to read CSV with separator '{sep}': {e}")
@@ -577,6 +696,78 @@ class CSVProcessor:
         except Exception as e:
             self._log_message(f"Error reading file chunk: {str(e)}", "error")
             raise
+
+    # def _read_file_chunk(self, start_row, num_rows):
+    #     """Read a specific chunk from the file with optimized settings"""
+    #     try:
+    #         # Determine file type
+    #         file_ext = os.path.splitext(self.file_path)[1].lower()
+            
+    #         # For Excel files
+    #         if file_ext in ('.xlsx', '.xls'):
+    #             engine = "openpyxl" if file_ext == '.xlsx' else "xlrd"
+                
+    #             # Need to add 1 to start_row to account for header row in Excel
+    #             df = pd.read_excel(
+    #                 self.file_path,
+    #                 dtype=str,
+    #                 engine=engine,
+    #                 keep_default_na=False,
+    #                 skiprows=start_row+1,  # +1 for header
+    #                 nrows=num_rows
+    #             )
+                
+    #             # If this is the first chunk, check if we have at least one valid row
+    #             if start_row == 0 and (df.empty or df.shape[0] == 0):
+    #                 # Try without skipping rows in case the file has no header
+    #                 df = pd.read_excel(
+    #                     self.file_path,
+    #                     dtype=str,
+    #                     engine=engine,
+    #                     keep_default_na=False,
+    #                     nrows=num_rows
+    #                 )
+                    
+    #             self._log_message(f"Read {df.shape[0]} rows from file", "success")
+    #             return df
+                
+    #         # For CSV files
+    #         else:
+    #             # Detect encoding first
+    #             with open(self.file_path, 'rb') as f:
+    #                 sample = f.read(min(10000, os.path.getsize(self.file_path)))
+    #                 detection = chardet.detect(sample)
+    #                 encoding = detection["encoding"] or "utf-8"
+                
+    #             # Try different separators if needed
+    #             for sep in [',', ';', '\t', '|']:
+    #                 try:
+    #                     # Skip to the start_row (add 1 for header)
+    #                     df = pd.read_csv(
+    #                         self.file_path,
+    #                         dtype=str,
+    #                         encoding=encoding,
+    #                         sep=sep,
+    #                         keep_default_na=False,
+    #                         skiprows=range(1, start_row+1),  # Skip header and rows up to start_row
+    #                         nrows=num_rows,
+    #                         low_memory=True,
+    #                         on_bad_lines='skip'
+    #                     )
+                        
+    #                     # Check if we have a valid dataframe
+    #                     if df.shape[1] > 1:
+    #                         self._log_message(f"Read {df.shape[0]} rows from file", "success")
+    #                         return df
+    #                 except Exception as e:
+    #                     _logger.debug(f"Failed to read CSV with separator '{sep}': {e}")
+    #                     continue
+                
+    #             raise ValueError("Failed to read CSV file with any separator")
+                
+    #     except Exception as e:
+    #         self._log_message(f"Error reading file chunk: {str(e)}", "error")
+    #         raise
     
     def _preprocess_dataframe(self, df):
         """Preprocess the dataframe for database insertion"""
@@ -701,7 +892,7 @@ class CSVProcessor:
         self._chunked_insert_to_temp_table(df)
     
     def _chunked_insert_to_temp_table(self):
-        """Insert data in chunks with robust connection management"""
+        """Insert data in chunks with robust connection management and progress updates"""
         if self.df.empty:
             return
         
@@ -782,14 +973,115 @@ class CSVProcessor:
                     # Wait before retry with exponential backoff
                     time.sleep(self.RETRY_DELAY * (2 ** retry))
             
-            # Log progress
-            self._log_message(
-                f"Processed chunk {start_idx+1:,}-{end_idx:,} of {total_rows:,} records", 
-                "info", 
-                send_to_websocket=False
+            # Log progress more frequently with processed rows
+            total_records = self.import_log.total_records if self.import_log else 0
+            current_position = self.import_log.current_position if self.import_log else 0
+            
+            # Only update on intervals to reduce log spam (every 5% or 10,000 records)
+            is_log_interval = (
+                end_idx % 10000 < chunk_size or  # Every 10,000 records
+                int((end_idx / total_rows) * 20) > int((start_idx / total_rows) * 20)  # Every 5%
             )
+            
+            if is_log_interval:
+                self._log_message(
+                    f"Read {end_idx:,} rows from file ({(end_idx/total_rows*100):.1f}% complete). Currently at {current_position+end_idx:,}/{total_records:,} records.", 
+                    "info", 
+                    send_to_websocket=True
+                )
         
         self._log_message(f"Staged {total_rows:,} records to temporary table", "info")
+
+    # def _chunked_insert_to_temp_table(self):
+    #     """Insert data in chunks with robust connection management"""
+    #     if self.df.empty:
+    #         return
+        
+    #     # Get column names
+    #     columns = list(self.df.columns)
+    #     placeholders = ', '.join(['%s'] * len(columns))
+        
+    #     # Prepare insert query
+    #     insert_query = f"""
+    #         INSERT INTO {self._quoted_temp_table()}
+    #         ({', '.join([f'"{col}"' for col in columns])})
+    #         VALUES ({placeholders})
+    #     """
+        
+    #     # Process in chunks
+    #     total_rows = len(self.df)
+    #     chunk_size = min(self.SQL_CHUNK_SIZE, total_rows)
+        
+    #     for start_idx in range(0, total_rows, chunk_size):
+    #         end_idx = min(start_idx + chunk_size, total_rows)
+    #         chunk = self.df.iloc[start_idx:end_idx]
+            
+    #         # Replace any NaN/None values with SQL NULL
+    #         clean_chunk = chunk.replace({pd.NA: None, np.nan: None})
+            
+    #         # Handle callable objects and None values
+    #         rows = []
+    #         for _, row in clean_chunk.iterrows():
+    #             # Process each value in the row
+    #             processed_row = []
+    #             for val in row:
+    #                 if callable(val):
+    #                     try:
+    #                         processed_row.append(val())  # Execute function
+    #                     except:
+    #                         processed_row.append(None)  # Use NULL if function fails
+    #                 else:
+    #                     processed_row.append(val)
+                        
+    #             rows.append(tuple(processed_row))
+            
+    #         # Use retries for transaction conflicts
+    #         for retry in range(self.MAX_RETRIES):
+    #             # Check if the cursor is still valid
+    #             if self._check_cursor_validity() is False:
+    #                 # Get a new cursor if needed
+    #                 self._refresh_cursor()
+                
+    #             try:
+    #                 # Execute the insert
+    #                 self.cr.executemany(insert_query, rows)
+                    
+    #                 # Commit chunk
+    #                 self.cr.commit()
+    #                 break
+                    
+    #             except psycopg2.Error as e:
+    #                 _logger.warning(f"Error in chunk insert (attempt {retry+1}): {str(e)}")
+                    
+    #                 # Handle connection issues
+    #                 if "connection" in str(e).lower() or "cursor" in str(e).lower():
+    #                     self._refresh_cursor()
+                        
+    #                     # If this is the last retry, propagate the error
+    #                     if retry == self.MAX_RETRIES - 1:
+    #                         raise
+    #                 else:
+    #                     # For non-connection errors, try standard rollback
+    #                     try:
+    #                         self.cr.rollback()
+    #                     except Exception as rollback_error:
+    #                         _logger.error(f"Rollback error: {str(rollback_error)}")
+    #                         self._refresh_cursor()
+                    
+    #                 if retry == self.MAX_RETRIES - 1:
+    #                     raise
+                        
+    #                 # Wait before retry with exponential backoff
+    #                 time.sleep(self.RETRY_DELAY * (2 ** retry))
+            
+    #         # Log progress
+    #         self._log_message(
+    #             f"Processed chunk {start_idx+1:,}-{end_idx:,} of {total_rows:,} records", 
+    #             "info", 
+    #             send_to_websocket=False
+    #         )
+        
+    #     self._log_message(f"Staged {total_rows:,} records to temporary table", "info")
     
     def _check_cursor_validity(self):
         """Check if the current cursor is still valid"""
@@ -835,8 +1127,87 @@ class CSVProcessor:
             
         return self.cr
 
+    def _process_staged_data(self):
+        """Process staged data without using savepoints to avoid transaction issues"""
+        results = {"successful": 0, "failed": 0, "duplicates": 0}
+        
+        # Initialize failure tracking
+        if self.TRACK_FAILURE_REASONS:
+            self.failure_reasons = {
+                'missing_required': 0,
+                'invalid_format': 0,
+                'invalid_relation': 0,
+                'duplicate': 0,
+                'other': 0
+            }
+        
+        try:
+            # Check if the temporary table exists
+            self.cr.execute(f"SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = %s)", 
+                            (self.temp_table_name,))
+            if not self.cr.fetchone()[0]:
+                # Table disappeared, likely due to concurrent operation
+                self._log_message("Recreation of temp table required", "warning")
+                self._create_temp_table()
+            
+            # Process the data in smaller transaction units
+            # 1. Resolve relations
+            try:
+                self._resolve_relations()
+                self.cr.commit()
+                _logger.info("Successfully resolved relations")
+            except Exception as e:
+                self.cr.rollback()
+                _logger.error(f"Error resolving relations: {str(e)}")
+                raise
+                
+            # 2. Validate data
+            try:
+                failed = self._validate_data()
+                self.cr.commit()
+                _logger.info(f"Data validation completed with {failed} failures")
+            except Exception as e:
+                self.cr.rollback()
+                _logger.error(f"Error validating data: {str(e)}")
+                raise
+                
+            # 3. Detect duplicates
+            try:
+                duplicates = self._detect_duplicates()
+                self.cr.commit()
+                _logger.info(f"Duplicate detection completed with {duplicates} duplicates")
+            except Exception as e:
+                self.cr.rollback()
+                _logger.error(f"Error detecting duplicates: {str(e)}")
+                raise
+                
+            # 4. Insert valid records
+            try:
+                inserted = self._insert_valid_records()
+                self.cr.commit()
+                _logger.info(f"Successfully inserted {inserted} records")
+            except Exception as e:
+                self.cr.rollback()
+                _logger.error(f"Error inserting records: {str(e)}")
+                raise
+            
+            # Update results
+            results["duplicates"] = duplicates
+            results["successful"] = inserted
+            results["failed"] = failed
+            
+            # Update overall results
+            self.results.update(results)
+            self.results["failure_summary"] = self.failure_reasons
+            
+        except Exception as e:
+            _logger.error(f"Error in staged data processing: {str(e)}")
+            raise
+        
+        return results
+
     # def _process_staged_data(self):
-    #     """Process staged data in the temporary table with proper savepoint management"""
+    #     """Process staged data with robust savepoint management"""
     #     results = {"successful": 0, "failed": 0, "duplicates": 0}
         
     #     # Initialize failure tracking
@@ -849,16 +1220,19 @@ class CSVProcessor:
     #             'other': 0
     #         }
         
+    #     # Generate a unique savepoint name but track it in the instance
+    #     self.current_savepoint = f"csv_sp_{self._generate_random_id(10)}"
     #     savepoint_created = False
         
     #     try:
-    #         # Create a savepoint for transactional safety
-    #         try:
-    #             self.cr.execute("SAVEPOINT csv_processor_savepoint")
+    #         # Check if transaction is active before creating savepoint
+    #         self.cr.execute("SELECT pg_current_xact_id_if_assigned()")
+    #         if self.cr.fetchone()[0]:
+    #             self.cr.execute(f"SAVEPOINT {self.current_savepoint}")
     #             savepoint_created = True
-    #         except Exception as e:
-    #             _logger.warning(f"Could not create savepoint: {str(e)}")
-    #             # Continue without savepoint if we can't create one
+    #             _logger.info(f"Created savepoint {self.current_savepoint}")
+    #         else:
+    #             _logger.warning("No active transaction, skipping savepoint creation")
             
     #         # Verify table exists after serialization conflicts
     #         self.cr.execute(f"SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = %s)", 
@@ -879,13 +1253,15 @@ class CSVProcessor:
     #         results["successful"] = inserted
     #         results["failed"] = failed
             
-    #         # Release savepoint if we created one
-    #         if savepoint_created:
+    #         # Release savepoint if we created one - using the instance variable
+    #         if savepoint_created and self.current_savepoint:
     #             try:
-    #                 self.cr.execute("RELEASE SAVEPOINT csv_processor_savepoint")
+    #                 self.cr.execute(f"RELEASE SAVEPOINT {self.current_savepoint}")
+    #                 _logger.info(f"Released savepoint {self.current_savepoint}")
+    #                 # Clear the savepoint name after successful release
+    #                 self.current_savepoint = None
     #             except Exception as e:
     #                 _logger.warning(f"Could not release savepoint: {str(e)}")
-    #                 # Continue without error if we can't release it
             
     #         # Commit changes
     #         self.cr.commit()
@@ -896,9 +1272,10 @@ class CSVProcessor:
             
     #     except Exception as e:
     #         # Try to rollback to savepoint if we created one
-    #         if savepoint_created:
+    #         if savepoint_created and self.current_savepoint:
     #             try:
-    #                 self.cr.execute("ROLLBACK TO SAVEPOINT csv_processor_savepoint")
+    #                 self.cr.execute(f"ROLLBACK TO SAVEPOINT {self.current_savepoint}")
+    #                 _logger.info(f"Rolled back to savepoint {self.current_savepoint}")
     #             except Exception as rollback_error:
     #                 _logger.error(f"Error rolling back to savepoint: {str(rollback_error)}")
     #                 # If rollback to savepoint fails, try a full rollback
@@ -910,106 +1287,19 @@ class CSVProcessor:
     #             # No savepoint, do a full rollback
     #             try:
     #                 self.cr.rollback()
-    #             except:
-    #                 pass
+    #             except Exception as rollback_error:
+    #                 _logger.error(f"Error in rollback: {str(rollback_error)}")
             
     #         _logger.error(f"Error in staged data processing: {str(e)}")
     #         raise
         
     #     return results
 
-    def _process_staged_data(self):
-        """Process staged data with more robust savepoint management"""
-        results = {"successful": 0, "failed": 0, "duplicates": 0}
-        
-        # Initialize failure tracking
-        if self.TRACK_FAILURE_REASONS:
-            self.failure_reasons = {
-                'missing_required': 0,
-                'invalid_format': 0,
-                'invalid_relation': 0,
-                'duplicate': 0,
-                'other': 0
-            }
-        
-        # Use a unique savepoint name based on a random string
+    def _generate_random_id(self, length=10):
+        """Generate a random identifier for savepoints"""
         import random
         import string
-        savepoint_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
-        savepoint_created = False
-        
-        try:
-            # Create a savepoint for transactional safety - with unique name
-            try:
-                # Check if transaction is active first
-                self.cr.execute("SELECT pg_current_xact_id_if_assigned()")
-                if self.cr.fetchone()[0]:
-                    self.cr.execute(f"SAVEPOINT csv_sp_{savepoint_name}")
-                    savepoint_created = True
-                    _logger.info(f"Created savepoint csv_sp_{savepoint_name}")
-            except Exception as e:
-                _logger.warning(f"Could not create savepoint: {str(e)}")
-                # Continue without savepoint if we can't create one
-            
-            # Verify table exists after serialization conflicts
-            self.cr.execute(f"SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = %s)", 
-                            (self.temp_table_name,))
-            if not self.cr.fetchone()[0]:
-                # Table disappeared, likely due to concurrent operation
-                self._log_message("Recreation of temp table required", "warning")
-                self._create_temp_table()
-            
-            # Process the data
-            self._resolve_relations()
-            failed = self._validate_data()
-            duplicates = self._detect_duplicates()
-            inserted = self._insert_valid_records()
-            
-            # Update results
-            results["duplicates"] = duplicates
-            results["successful"] = inserted
-            results["failed"] = failed
-            
-            # Release savepoint if we created one
-            if savepoint_created:
-                try:
-                    self.cr.execute(f"RELEASE SAVEPOINT csv_sp_{savepoint_name}")
-                    _logger.info(f"Released savepoint csv_sp_{savepoint_name}")
-                except Exception as e:
-                    _logger.warning(f"Could not release savepoint: {str(e)}")
-                    # Continue without error if we can't release it
-            
-            # Commit changes
-            self.cr.commit()
-            
-            # Update overall results
-            self.results.update(results)
-            self.results["failure_summary"] = self.failure_reasons
-            
-        except Exception as e:
-            # Try to rollback to savepoint if we created one
-            if savepoint_created:
-                try:
-                    self.cr.execute(f"ROLLBACK TO SAVEPOINT csv_sp_{savepoint_name}")
-                    _logger.info(f"Rolled back to savepoint csv_sp_{savepoint_name}")
-                except Exception as rollback_error:
-                    _logger.error(f"Error rolling back to savepoint: {str(rollback_error)}")
-                    # If rollback to savepoint fails, try a full rollback
-                    try:
-                        self.cr.rollback()
-                    except Exception as full_rollback_error:
-                        _logger.error(f"Error in full rollback: {str(full_rollback_error)}")
-            else:
-                # No savepoint, do a full rollback
-                try:
-                    self.cr.rollback()
-                except Exception as rollback_error:
-                    _logger.error(f"Error in rollback: {str(rollback_error)}")
-            
-            _logger.error(f"Error in staged data processing: {str(e)}")
-            raise
-        
-        return results
+        return ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
         
     def _resolve_relations(self):
         """Resolve relations (many2one fields) in the temporary table with proper quoting"""
@@ -1817,8 +2107,66 @@ class CSVProcessor:
                 'failure_details': failure_details
             }
     
+    # def _send_batch_summary(self):
+    #     """Send a user-friendly summary of the batch processing results"""
+    #     # Get key metrics
+    #     success_count = self.results.get('successful', 0)
+    #     duplicate_count = self.results.get('duplicates', 0)
+    #     failed_count = self.results.get('failed', 0)
+    #     total_count = success_count + duplicate_count + failed_count
+    #     process_time = self.process_time
+        
+    #     # Calculate records per second
+    #     if process_time > 0:
+    #         records_per_second = total_count / process_time
+    #     else:
+    #         records_per_second = 0
+            
+    #     # Prepare summary message
+    #     summary_lines = []
+        
+    #     # Success information
+    #     if success_count > 0:
+    #         summary_lines.append(f"✅ Successfully imported {success_count:,} records")
+        
+    #     # Duplicate information if any
+    #     if duplicate_count > 0:
+    #         summary_lines.append(f"⚠️ Skipped {duplicate_count:,} duplicate records")
+            
+    #     # Failed information if any
+    #     if failed_count > 0:
+    #         summary_lines.append(f"❌ Failed to import {failed_count:,} records")
+            
+    #         # Add failure reasons if available
+    #         if self.TRACK_FAILURE_REASONS and self.failure_reasons:
+    #             failure_details = []
+    #             for reason, count in self.failure_reasons.items():
+    #                 if count > 0:
+    #                     # Make the reason more readable
+    #                     readable_reason = reason.replace('_', ' ').title()
+    #                     failure_details.append(f"  • {readable_reason}: {count:,}")
+                        
+    #             if failure_details:
+    #                 summary_lines.append("Failure reasons:")
+    #                 summary_lines.extend(failure_details)
+        
+    #     # Performance metrics
+    #     if total_count > 0:
+    #         summary_lines.append(f"⏱️ Processed in {process_time:.1f} seconds ({records_per_second:.1f} records/sec)")
+            
+    #     # Progress information
+    #     total_records = self.import_log.total_records
+    #     if total_records > 0:
+    #         current_position = self.import_log.current_position + total_count
+    #         progress = min(100, (current_position / total_records * 100))
+    #         summary_lines.append(f"📊 Overall progress: {progress:.1f}% complete")
+            
+    #     # Send the summary
+    #     summary_message = "\n".join(summary_lines)
+    #     self._log_message(summary_message, "success" if success_count > 0 else "warning")
+
     def _send_batch_summary(self):
-        """Send a user-friendly summary of the batch processing results"""
+        """Send a user-friendly summary of the batch processing results with consistent progress calculation"""
         # Get key metrics
         success_count = self.results.get('successful', 0)
         duplicate_count = self.results.get('duplicates', 0)
@@ -1831,7 +2179,20 @@ class CSVProcessor:
             records_per_second = total_count / process_time
         else:
             records_per_second = 0
-            
+        
+        # Get overall import progress from import log
+        current_position = self.import_log.current_position
+        total_records = self.import_log.total_records
+        
+        # Calculate accurate progress percentage
+        if total_records > 0:
+            # Adjust current position to include all processed records in this batch
+            adjusted_position = current_position + total_count
+            # Ensure we don't exceed 100%
+            overall_progress = min(100, (adjusted_position / total_records * 100))
+        else:
+            overall_progress = 0
+        
         # Prepare summary message
         summary_lines = []
         
@@ -1864,16 +2225,32 @@ class CSVProcessor:
         if total_count > 0:
             summary_lines.append(f"⏱️ Processed in {process_time:.1f} seconds ({records_per_second:.1f} records/sec)")
             
-        # Progress information
-        total_records = self.import_log.total_records
-        if total_records > 0:
-            current_position = self.import_log.current_position + total_count
-            progress = min(100, (current_position / total_records * 100))
-            summary_lines.append(f"📊 Overall progress: {progress:.1f}% complete")
+        # Progress information - ensuring NO PERCENTAGE is added to the end of the message
+        # by marking this as a special message
+        summary_lines.append(f"📊 Overall progress: {overall_progress:.1f}% complete")
             
-        # Send the summary
+        # Send the summary as a special type that won't get the percentage appended
         summary_message = "\n".join(summary_lines)
-        self._log_message(summary_message, "success" if success_count > 0 else "warning")
+        self._log_message_no_progress(summary_message, "success")
+
+    def _log_message_no_progress(self, message, message_type="info"):
+        """Log a message without appending progress percentage"""
+        # Log to server
+        log_level = {
+            "info": _logger.info,
+            "error": _logger.error,
+            "success": _logger.info,
+            "warning": _logger.warning,
+        }.get(message_type, _logger.info)
+        
+        log_message = f"{self.model_name} import (job {self.job_id}): {message}"
+        log_level(log_message)
+        
+        # Send to websocket without appending progress
+        try:
+            send_message(self.env, message, message_type, self.user_id)
+        except Exception as e:
+            _logger.warning(f"Failed to send websocket message: {e}")
     
     # def _cleanup_temp_resources(self):
     #     """Clean up temporary resources"""
@@ -1895,13 +2272,54 @@ class CSVProcessor:
         except Exception as e:
             _logger.warning(f"Error cleaning up temporary table: {str(e)}")
         
+    # def _log_message(self, message, message_type="info", send_to_websocket=True):
+    #     """Log a message to both server log and websocket"""
+    #     # Calculate progress
+    #     current_position = self.import_log.current_position
+    #     total_records = self.import_log.total_records
+        
+    #     if total_records > 0:
+    #         progress = min(100, (current_position / total_records * 100))
+    #         progress_str = f" ({progress:.1f}% complete)"
+    #     else:
+    #         progress_str = ""
+            
+    #     # Create server log message
+    #     log_message = f"{self.model_name} import (job {self.job_id}): {message}"
+        
+    #     # Add progress to websocket message if configured
+    #     if send_to_websocket:
+    #         full_message = f"{message}{progress_str}"
+    #     else:
+    #         full_message = log_message
+        
+    #     # Always log to server
+    #     log_level = {
+    #         "info": _logger.info,
+    #         "error": _logger.error,
+    #         "success": _logger.info,
+    #         "warning": _logger.warning,
+    #     }.get(message_type, _logger.info)
+        
+    #     log_level(log_message)
+        
+    #     # Only send user-friendly messages to websocket
+    #     if send_to_websocket:
+    #         try:
+    #             send_message(self.env, full_message, message_type, self.user_id)
+    #         except Exception as e:
+    #             _logger.warning(f"Failed to send websocket message: {e}")
+
     def _log_message(self, message, message_type="info", send_to_websocket=True):
-        """Log a message to both server log and websocket"""
+        """Log a message to both server log and websocket with improved progress information"""
         # Calculate progress
         current_position = self.import_log.current_position
         total_records = self.import_log.total_records
         
-        if total_records > 0:
+        # DON'T add progress info if the message already contains progress information
+        has_progress_info = "% complete" in message or "Overall progress" in message
+        
+        if total_records > 0 and not has_progress_info:
             progress = min(100, (current_position / total_records * 100))
             progress_str = f" ({progress:.1f}% complete)"
         else:
@@ -1910,11 +2328,11 @@ class CSVProcessor:
         # Create server log message
         log_message = f"{self.model_name} import (job {self.job_id}): {message}"
         
-        # Add progress to websocket message if configured
-        if send_to_websocket:
+        # Add progress to websocket message if configured and message doesn't have progress
+        if send_to_websocket and not has_progress_info:
             full_message = f"{message}{progress_str}"
         else:
-            full_message = log_message
+            full_message = message if send_to_websocket else log_message
         
         # Always log to server
         log_level = {
@@ -1932,6 +2350,15 @@ class CSVProcessor:
                 send_message(self.env, full_message, message_type, self.user_id)
             except Exception as e:
                 _logger.warning(f"Failed to send websocket message: {e}")
+
+    def _get_processing_indicator(self):
+        """Return a visual indicator for ongoing processing"""
+        # Simple spinner frames for visual feedback
+        spinner_frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+        
+        # Use the current time to pick a frame (changes every 100ms)
+        frame_index = int((time.time() * 10) % len(spinner_frames))
+        return spinner_frames[frame_index]
     
     def _create_user_friendly_error(self, error_message):
         """Convert technical error messages to user-friendly ones"""

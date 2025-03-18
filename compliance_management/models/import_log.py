@@ -1147,7 +1147,8 @@ class ImportLog(models.Model):
             _logger.warning(f"Failed to send websocket message: {e}")
     
     def _generate_import_summary(self):
-        """Generate a comprehensive summary of the import results with retry logic"""
+        """Generate a comprehensive summary of the import results with retry logic and enhanced details"""
+        import json 
         max_retries = 5
         
         for attempt in range(max_retries):
@@ -1185,6 +1186,18 @@ class ImportLog(models.Model):
                     else:
                         success_pct = failed_pct = duplicate_pct = 0
                         
+                    # Get detailed failure reasons from logs if possible
+                    failure_details = {}
+                    try:
+                        # Parse JSON data from technical details if available
+                        if current_import.summary and isinstance(current_import.summary, str):
+                            import json
+                            summary_data = json.loads(current_import.summary)
+                            if "failure_details" in summary_data:
+                                failure_details = summary_data["failure_details"]
+                    except Exception as e:
+                        _logger.warning(f"Could not parse failure details: {e}")
+                    
                     # Format summary
                     summary = {
                         'import_id': self.id,
@@ -1201,7 +1214,8 @@ class ImportLog(models.Model):
                             'duplicate_percentage': round(duplicate_pct, 1),
                             'execution_time': round(execution_time, 1),
                             'records_per_second': round(successful / execution_time, 1) if execution_time > 0 else 0
-                        }
+                        },
+                        'failure_details': failure_details
                     }
                     
                     # Store summary as JSON
@@ -1211,17 +1225,23 @@ class ImportLog(models.Model):
                         WHERE id = %s
                     """, (json.dumps(summary), self.id))
                     
-                    # Generate user-friendly message
+                    # Generate user-friendly message with enhanced details
+                    failure_messages = []
+                    if failure_details:
+                        failure_messages.append("Failure reasons:")
+                        for reason, count in failure_details.items():
+                            readable_reason = reason.replace('_', ' ').title()
+                            failure_messages.append(f"  • {readable_reason}: {count:,}")
+                    
+                    processing_rate = successful / execution_time if execution_time > 0 else 0
+                    
                     msg = f"""
-            Import Summary for '{current_import.original_filename}':
-
-            📊 Records Processed: {total:,}
-            ✅ Successfully Imported: {successful:,} ({success_pct:.1f}%)
-            ❌ Failed Records: {failed:,} ({failed_pct:.1f}%)
-            ⚠️ Duplicate Records: {duplicates:,} ({duplicate_pct:.1f}%)
-
-            ⏱️ Total Execution Time: {execution_time:.1f} seconds
-            ⚡ Import Speed: {successful/execution_time:.1f} records/second if execution_time > 0 else 0
+    ✅ Successfully imported {successful:,} records
+    {'⚠️ Skipped ' + str(duplicates) + ' duplicate records' if duplicates > 0 else ''}
+    {'❌ Failed to import ' + str(failed) + ' records' if failed > 0 else ''}
+    {chr(10).join(failure_messages) if failure_messages else ''}
+    ⏱️ Processed in {execution_time:.1f} seconds ({processing_rate:.1f} records/sec)
+    📊 Overall progress: {success_pct:.1f}% complete
                     """
                     
                     # Post message using the new cursor
@@ -1244,6 +1264,105 @@ class ImportLog(models.Model):
         
         _logger.error(f"Failed to generate import summary after {max_retries} attempts")
         return None
+
+    # def _generate_import_summary(self):
+    #     """Generate a comprehensive summary of the import results with retry logic"""
+    #     max_retries = 5
+        
+    #     for attempt in range(max_retries):
+    #         try:
+    #             # Use a separate cursor for summary generation
+    #             with self.env.registry.cursor() as summary_cr:
+    #                 # Create environment with new cursor
+    #                 env = api.Environment(summary_cr, self.env.uid, self.env.context)
+    #                 current_import = env['import.log'].browse(self.id)
+                    
+    #                 # Lock the record to prevent concurrent updates
+    #                 summary_cr.execute("""
+    #                     SELECT id FROM import_log 
+    #                     WHERE id = %s
+    #                     FOR UPDATE NOWAIT
+    #                 """, (self.id,))
+                    
+    #                 if not summary_cr.fetchone():
+    #                     _logger.warning(f"Could not lock import record {self.id} for summary generation")
+    #                     time.sleep(1)
+    #                     continue
+                    
+    #                 # Get current statistics
+    #                 successful = current_import.successful_records
+    #                 failed = current_import.failed_records
+    #                 duplicates = current_import.duplicate_records
+    #                 total = current_import.total_records
+    #                 execution_time = current_import.execution_time
+                    
+    #                 # Calculate percentages
+    #                 if total > 0:
+    #                     success_pct = (successful / total) * 100
+    #                     failed_pct = (failed / total) * 100
+    #                     duplicate_pct = (duplicates / total) * 100
+    #                 else:
+    #                     success_pct = failed_pct = duplicate_pct = 0
+                        
+    #                 # Format summary
+    #                 summary = {
+    #                     'import_id': self.id,
+    #                     'model': current_import.model_name,
+    #                     'file_name': current_import.original_filename,
+    #                     'date': fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    #                     'statistics': {
+    #                         'total_records': total,
+    #                         'successful': successful,
+    #                         'success_percentage': round(success_pct, 1),
+    #                         'failed': failed,
+    #                         'failed_percentage': round(failed_pct, 1),
+    #                         'duplicates': duplicates,
+    #                         'duplicate_percentage': round(duplicate_pct, 1),
+    #                         'execution_time': round(execution_time, 1),
+    #                         'records_per_second': round(successful / execution_time, 1) if execution_time > 0 else 0
+    #                     }
+    #                 }
+                    
+    #                 # Store summary as JSON
+    #                 summary_cr.execute("""
+    #                     UPDATE import_log
+    #                     SET summary = %s
+    #                     WHERE id = %s
+    #                 """, (json.dumps(summary), self.id))
+                    
+    #                 # Generate user-friendly message
+    #                 msg = f"""
+    #         Import Summary for '{current_import.original_filename}':
+
+    #         📊 Records Processed: {total:,}
+    #         ✅ Successfully Imported: {successful:,} ({success_pct:.1f}%)
+    #         ❌ Failed Records: {failed:,} ({failed_pct:.1f}%)
+    #         ⚠️ Duplicate Records: {duplicates:,} ({duplicate_pct:.1f}%)
+
+    #         ⏱️ Total Execution Time: {execution_time:.1f} seconds
+    #         ⚡ Import Speed: {successful/execution_time:.1f} records/second if execution_time > 0 else 0
+    #                 """
+                    
+    #                 # Post message using the new cursor
+    #                 env['mail.message'].create({
+    #                     'body': msg,
+    #                     'model': 'import.log',
+    #                     'res_id': self.id,
+    #                     'message_type': 'comment',
+    #                 })
+                    
+    #                 # Commit changes
+    #                 summary_cr.commit()
+                    
+    #                 # Return summary
+    #                 return summary
+                    
+    #         except Exception as e:
+    #             _logger.error(f"Error generating import summary (attempt {attempt+1}): {str(e)}")
+    #             time.sleep(2 ** attempt)  # Exponential backoff
+        
+    #     _logger.error(f"Failed to generate import summary after {max_retries} attempts")
+    #     return None
             
     # ---------- Action Methods ----------
             
