@@ -57,9 +57,7 @@
             <field name="arch" type="xml">
                 <form string="Global PEP List">
                     <header>
-                        <button name="fetch_global_pep_list" class="oe_highlight" type="object"
-                            string="Test"
-                        />
+                    
                         <button name="action_find_person" class="oe_highlight" type="object"
                             string="Find Biography"
                             groups="compliance_management.group_compliance_compliance_risk_manager" />
