@@ -60,9 +60,9 @@
         # "security/group_action.xml",
         "views/pdf_chat.xml",
         "views/alert_report_rulebook.xml",
-        # "views/alert_dashboard.xml,"
+        "views/alert_dashboard.xml",
       
-        # 'views/user_setting.xml',
+        'views/user_setting.xml',
 
 
     ],
