@@ -135,6 +135,7 @@ export class Dashboard extends Component {
       console.error("Failed to fetch awaiting replies:", error);
     }
   }
+  
   async fetchNewlyUploadedTitle() {
     try {
       // Using the ORM to fetch awaiting replies
