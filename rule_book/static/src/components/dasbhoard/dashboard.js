@@ -399,9 +399,7 @@ export class Dashboard extends Component {
     // Constructs a URL to the rulebook's form view
     return `/web#id=${id}&model=reply.log&view_type=form`;
   }
-  getRulebookTreeLink() {
-    return "/web#menu_id=221&action=337";
-  }
+ 
 }
 
 // Dashboard.template = "rule_book.Dashboard";
