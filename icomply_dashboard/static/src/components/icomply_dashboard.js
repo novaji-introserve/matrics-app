@@ -121,7 +121,7 @@ export class IcomplyDashboard extends Component {
           : [];
 
       const branchFilter =
-        ids.length > 0 && this.state.cc == false
+        ids?.length > 0 && this?.state?.cc == false
           ? [["branch_id", "in", Array.from(ids)]]
           : [];
       const domain = [...dateFilter, ...branchFilter];
@@ -174,7 +174,7 @@ export class IcomplyDashboard extends Component {
 
   loadInitialData = async () => {
     await this.TopBranches();
-    await this.TopTransactionRules();
+    // await this.TopTransactionRules();
     await this.highriskcustomer();
     
   };
@@ -189,8 +189,8 @@ export class IcomplyDashboard extends Component {
          : [];
 
      const branchFilter =
-       this.state.branches_id.length > 0 && this.state.cc == false
-         ? [["branch_id", "in", Array.from(this.state.branches_id)]]
+       this?.state?.branches_id?.length > 0 && this.state?.cc == false
+         ? [["branch_id", "in", Array.from(this.state?.branches_id)]]
          : [];
 
       const domain = [
