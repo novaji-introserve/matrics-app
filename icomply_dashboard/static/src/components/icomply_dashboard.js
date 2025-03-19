@@ -174,7 +174,7 @@ export class IcomplyDashboard extends Component {
 
   loadInitialData = async () => {
     await this.TopBranches();
-    // await this.TopTransactionRules();
+    await this.TopTransactionRules();
     await this.highriskcustomer();
     
   };

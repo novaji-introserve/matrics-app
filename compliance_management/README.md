@@ -277,12 +277,8 @@ http {
         text/plain
         text/x-component;
 
-    # For MacOS:
-    include /usr/local/etc/nginx/sites-enabled/*.conf;
-    
-    # For Linux (uncomment the appropriate line):
-    # include /etc/nginx/sites-enabled/*.conf;  # Debian/Ubuntu
-    # include /etc/nginx/conf.d/*.conf;         # CentOS/RHEL
+    include /etc/nginx/sites-enabled/*.conf;  # Debian/Ubuntu
+    include /etc/nginx/conf.d/*.conf;         # CentOS/RHEL
 }
 ```
 
