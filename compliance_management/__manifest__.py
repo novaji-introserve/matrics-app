@@ -77,7 +77,6 @@
             'compliance_management/static/src/components/file_upload/js/import_form_component.js',
             
             # Finally load action registrations
-            # 'compliance_management/static/src/components/file_upload/js/test_action.js',
             'compliance_management/static/src/components/file_upload/js/main.js',
         
             'compliance_management/static/src/css/style.css',
