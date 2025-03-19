@@ -60,7 +60,7 @@
         <!-- Number of parallel workers for parallel segments -->
         <record id="ir_config_csv_import_parallel_workers" model="ir.config_parameter">
             <field name="key">queue_job.channels.csv_import_parallel.workers</field>
-            <field name="value">6</field>
+            <field name="value">24</field>
         </record>
 
         <!-- Maximum number of parallel import jobs -->
