@@ -7,7 +7,7 @@
         <field name="subject">${ctx.get('document_name')}</field>
         <field name="email_from">${ctx.get('email_from')}</field>
         <field name="body_html" type="html">
-            <div style="margin: 10px 12px; padding: 0px; font-family: Arial, sans-serif; max-width: 600px;">
+            <div style="margin: 10px 12px; padding: 0px; font-family: Arial, sans-serif;">
                 <p style="margin: 8px 0;">Dear  
                     <i>
                         <t t-out="ctx.get('officer_name', 'Officer')"/>
@@ -33,10 +33,10 @@
             <span t-out="ctx.get('risk_level', object.risk_level)"/>
         </p>
 
-        <p style="margin: 12px 0 12px 0;">
+        <p style="margin: 12px 0 1px 0;">
             <strong>AI Analysis:</strong>
         </p>
-        <p style="margin: 12px 0 12px 0;" t-out="ctx.get('ai_analysis', 'No analysis available')"/>
+        <p style="margin: 1px 0 12px 0;" t-out="ctx.get('ai_analysis', 'No analysis available')"/>
 
         <p style="margin: 17px 0 17px 0;">Please review the document and take appropriate action.</p>
 

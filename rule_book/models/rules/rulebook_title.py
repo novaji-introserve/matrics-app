@@ -39,7 +39,7 @@ load_dotenv()
 class RulebookTitle(models.Model):
     _name = 'rulebook.title'
     _description = 'Rulebook Sources'
-    _rec_name = 'create_date'
+    _rec_name = 'name'
     _order = "id desc"
 
     _inherit = ['mail.thread', 'mail.activity.mixin']
