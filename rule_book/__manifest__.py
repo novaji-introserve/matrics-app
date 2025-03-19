@@ -43,6 +43,7 @@
         "data/email_templates/rulebook_log_notification.xml",
         "data/email_templates/first_line_escalation.xml",
         "data/email_templates/share_document_template.xml",
+        "data/email_templates/keyword_alert.xml",
 
         "data/schedules/rule_book.xml",
         # "views/dashboard.xml",

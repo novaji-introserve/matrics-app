@@ -19,9 +19,16 @@ from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urljoin
 import hashlib
 import psycopg2
-# from odoo.addons.queue.queue_job import delay  # Import the job decorator
-# from odoo.addons.queue.queue_job import job, with_delay
-# from odoo.addons.queue.queue_job.exception import RetryableJobError
+
+import io
+from collections import Counter
+import binascii  # Make sure this import is added
+import PyPDF2
+from odoo.exceptions import ValidationError, UserError
+from PIL import Image
+import pytesseract
+from pdf2image import convert_from_bytes
+
 
 _logger = logging.getLogger(__name__)
 
@@ -32,19 +39,24 @@ load_dotenv()
 class RulebookTitle(models.Model):
     _name = 'rulebook.title'
     _description = 'Rulebook Sources'
-    _rec_name = 'name'
+    _rec_name = 'create_date'
+    _order = "id desc"
+
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
    
     name = fields.Char(string='Title', required=True, index=True)
     file = fields.Binary(string='File', attachment=True,
-                         required=False, index=True)
-    file_name = fields.Char(string='File Name', index=True) 
+                         required=False, index=True, tracking=True,)
+    file_name = fields.Char(string='File Name', index=True, tracking=True,)
     ref_number = fields.Char(string='Reference Number', required=False)
-    released_date = fields.Date(string='Released Date', required=False)
+    released_date = fields.Date(
+        string='Released Date', required=False, tracking=True,)
     status = fields.Selection([
         ('active', 'Active'),
         ('inactive', 'Inactive'),
         ('deleted', 'Deleted')
-    ], string='Status', default='active', required=True)
+    ], string='Status', default='active', required=True, tracking=True,)
     source_id = fields.Many2one(
         'rulebook.sources', string='Source', required=True, index=True)
     created_on = fields.Datetime(
@@ -55,7 +67,7 @@ class RulebookTitle(models.Model):
         [('manual', 'Manual Input'), ('ai', 'AI Generated')],
         string='Source',
         default='manual',
-        tracking=True
+        tracking=True,
     )
     active = fields.Boolean(string='Active', default=True)
 
@@ -221,8 +233,8 @@ class RulebookTitle(models.Model):
                 'form_link': form_url,  # HTML escaped link to form view
             })
 
-        _logger.info(
-            f"Retrieved {len(results)} AI titles from the last 7 days: {results}")
+        # _logger.info(
+        #     f"Retrieved {len(results)} AI titles from the last 7 days: {results}")
         return results
 
     def action_ndic_scrapper(self):
@@ -999,3 +1011,505 @@ class RulebookTitle(models.Model):
         # If none of the formats work, raise an error
         # raise ValueError(f"Date format for '{date_string}' is not supported")
         return ""
+    
+    def action_scan_keywords(self):
+        """Button action to scan the document for keywords and alert officers if found."""
+        self.ensure_one()
+        if not self.file:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': ('Warning'),
+                    'message': ('No file attached to scan.'),
+                    'type': 'warning',
+                    'sticky': False,
+                }
+            }
+
+        # Get the PDF content
+        pdf_content = self._get_pdf_content(self)
+
+        if not pdf_content:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': ('Error'),
+                    'message': ('Could not retrieve PDF content.'),
+                    'type': 'danger',
+                    'sticky': False,
+                }
+            }
+
+        # Extract text from the PDF
+        extracted_text = self._extract_text_from_pdf(pdf_content)
+
+        if not extracted_text or extracted_text.startswith("Error:"):
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': ('Error'),
+                    'message': ('Failed to extract text from PDF: %s') % extracted_text,
+                    'type': 'danger',
+                    'sticky': False,
+                }
+            }
+
+        # Get all active keywords
+        keywords = self.env['keyword.tracking'].search([('active', '=', True)])
+
+        if not keywords:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': ('Information'),
+                    'message': ('No active keywords to scan for.'),
+                    'type': 'info',
+                    'sticky': False,
+                }
+            }
+
+        # Search for keywords in the text
+        found_keywords = []
+
+        for keyword in keywords:
+            # Use regex to find the keyword with word boundaries
+            pattern = r'\b' + re.escape(keyword.name) + r'\b'
+            matches = re.finditer(pattern, extracted_text, re.IGNORECASE)
+
+            for match in matches:
+                # Get surrounding text (100 characters before and after)
+                start = max(0, match.start() - 100)
+                end = min(len(extracted_text), match.end() + 100)
+                surrounding_text = extracted_text[start:end]
+
+                # Format the text to highlight the keyword
+                matched_word = extracted_text[match.start():match.end()]
+                highlighted_text = surrounding_text.replace(
+                    matched_word,
+                    f"**{matched_word}**"  # Using markdown for highlighting
+                )
+
+                found_keywords.append({
+                    'keyword': keyword,
+                    'matched_text': highlighted_text,
+                    'risk_level': keyword.risk_level,
+                })
+
+                # Only process the first occurrence of each keyword
+                break
+
+        if not found_keywords:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': ('Information'),
+                    'message': ('No keywords found in the document.'),
+                    'type': 'info',
+                    'sticky': False,
+                }
+            }
+
+        # Process the found keywords
+        self._process_found_keywords(found_keywords)
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': ('Success'),
+                'message': ('%s keywords found and alerts sent.') % len(found_keywords),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    def _process_found_keywords(self, found_keywords):
+        """Process the found keywords and consolidate into a single alert."""
+        # Initialize variables for consolidated alert
+        keyword_ids = []
+        matched_texts = []
+        risk_levels = []
+        all_keywords = []
+
+        # Collect data from all found keywords
+        for found in found_keywords:
+            keyword = found['keyword']
+            matched_text = found['matched_text']
+            risk_level = found['risk_level']
+
+            keyword_ids.append(keyword.id)
+            matched_texts.append(
+                f"Keyword '{keyword.name}':\n{matched_text}\n")
+            risk_levels.append(risk_level)
+            all_keywords.append(keyword.name)
+
+        # Determine the highest risk level
+        highest_risk = 'low'
+        if 'high' in risk_levels:
+            highest_risk = 'high'
+        elif 'medium' in risk_levels:
+            highest_risk = 'medium'
+
+        # Combine all matched texts
+        combined_text = "\n---\n".join(matched_texts)
+
+        # Create a single keyword alert log
+        alert_log = self.env['keyword.alert.log'].create({
+            'name': self.env['ir.sequence'].next_by_code('keyword.alert.log') or 'New',
+            # Replace with all found keyword IDs
+            'keyword_id': [(6, 0, keyword_ids)],
+            'document_id': self.id,
+            'risk_level': highest_risk,
+            'match_text': combined_text,
+        })
+
+        # Send AI analysis to add context for all keywords
+        ai_analysis = self._analyze_keyword_context(
+            ", ".join(all_keywords), combined_text)
+        
+        alert_log.sudo().write({
+            'ai_analysis': ai_analysis,
+        })
+
+        # Send a single consolidated email to all assigned officers
+        self._send_consolidated_alert_email(alert_log, ai_analysis)
+
+    def _analyze_keyword_context(self, keywords, context_text):
+        """Send the matched text to AI for analysis."""
+        prompt = f"""
+        Analyze the following text where these keywords were found: {keywords}
+        
+        {context_text}
+        
+        Please provide a brief analysis of:
+        1. The context in which each keyword appears
+        2. Potential implications or concerns
+        3. Recommended actions if any
+        
+        Keep your response concise and focused on the regulatory or compliance implications.
+        """
+
+        return self.query_gemini_api(prompt)
+
+    
+    def _send_consolidated_alert_email(self, alert_log, ai_analysis):
+        """Send a consolidated alert email to all assigned officers."""
+        try:
+            # Load template
+            template = self.env.ref(
+                'rule_book.email_template_keyword_alert', raise_if_not_found=False)
+            if not template:
+                _logger.error("Email template for keyword alerts not found!")
+                return
+
+            # Get officers with valid emails
+            officers = alert_log.officers_alerted.filtered('email')
+            if not officers:
+                _logger.warning("No officers with valid email addresses found!")
+                return
+
+            # Generate document URL
+            base_url = self.env['ir.config_parameter'].sudo(
+            ).get_param('web.base.url')
+            document_url = f"{base_url}/web#id={self.id}&model=rulebook.title&view_type=form"
+
+            # Prepare context with all required data
+            ctx = {
+                'ai_analysis': ai_analysis,
+                'document_name': self.name,
+                'document_id': self.id,
+                'document_url': document_url,
+                'keywords': ", ".join(alert_log.keyword_id.mapped('name')),
+                'risk_level': alert_log.risk_level,
+                # 'officer_name': officers[0].name if len(officers) == 1 else "Officer",
+                'officer_name': ", ".join(officers.mapped('name')),
+                'email_from': os.getenv("EMAIL_FROM"),
+            }
+
+            # Prepare email values
+            email_values = {
+                'email_to': ", ".join(officers.mapped('email')),
+                'email_from': os.getenv("EMAIL_FROM"),
+                'subject': f"ALERT: Keywords Found in Document '{self.name}'",
+            }
+
+            # Send email using template
+            try:
+                template_id = template.with_context(**ctx)
+                template_id.send_mail(
+                    alert_log.id,
+                    force_send=True,
+                    email_values=email_values
+                )
+                # template.with_context(**ctx).send_mail(
+                #     alert_log.id,
+                #     force_send=True,
+                #     email_values=email_values
+                # )
+                _logger.info(
+                    f"Consolidated alert email sent to {email_values['email_to']} for keywords: {ctx['keywords']}")
+            except Exception as e:
+                _logger.error(f"Failed to send consolidated alert email: {str(e)}")
+                raise
+
+        except Exception as e:
+            _logger.error(
+                f"Error in sending consolidated alert email: {str(e)}", exc_info=True)
+            return
+    
+    def _get_pdf_content(self, rulebook):
+        """Retrieve the actual PDF content from the rulebook."""
+        if not rulebook.file:
+            return None
+
+        # Try to get the attachment directly
+        attachment = self.env['ir.attachment'].search([
+            ('res_model', '=', 'rulebook.title'),
+            ('res_id', '=', rulebook.id),
+            ('res_field', '=', 'file')
+        ], limit=1)
+
+        if attachment:
+            _logger.info(
+                f"Found attachment: {attachment.name}, size: {attachment.file_size}")
+
+            # Try a direct approach to get the file contents
+            try:
+                # For Odoo v14+ with attachment store
+                if hasattr(attachment, '_full_path'):
+                    store_fname = attachment.store_fname
+                    if store_fname:
+                        full_path = attachment._full_path(store_fname)
+                        _logger.info(
+                            f"Reading file directly from: {full_path}")
+                        with open(full_path, 'rb') as f:
+                            file_content = f.read()
+                            return file_content
+
+                # Another approach for getting the binary data
+                if hasattr(attachment, 'raw'):
+                    _logger.info("Using attachment.raw to get data")
+                    return attachment.raw
+
+                # For database storage
+                _logger.info("Using standard datas field")
+                raw_datas = attachment.datas
+
+                # If it's a string (base64), decode it
+                if isinstance(raw_datas, str):
+                    # Remove any padding issues
+                    padding = len(raw_datas) % 4
+                    if padding:
+                        raw_datas += '=' * (4 - padding)
+
+                    try:
+                        return base64.b64decode(raw_datas)
+                    except Exception as e:
+                        _logger.error(
+                            f"Failed to decode attachment.datas: {e}")
+
+                return raw_datas
+            except Exception as e:
+                _logger.error(f"Error accessing attachment data: {e}")
+
+        # If all else fails, try the original file
+        try:
+            return base64.b64decode(rulebook.file)
+        except Exception as e:
+            _logger.error(f"Failed to decode rulebook.file: {e}")
+            return None
+
+    def _extract_text_from_pdf(self, pdf_file):
+        """Extract text from the provided binary PDF file."""
+        if not pdf_file:
+            _logger.error("No PDF file provided")
+            return "No PDF content available"
+
+        # Make sure we're working with binary data
+        if isinstance(pdf_file, str):
+            try:
+                pdf_file = base64.b64decode(pdf_file)
+            except Exception as e:
+                _logger.error(f"Failed to decode base64 string: {e}")
+                return "Error: Could not decode PDF data"
+
+        # Safety check - is this actually a PDF?
+        if not pdf_file.startswith(b'%PDF'):
+            _logger.error(
+                "Data does not appear to be a valid PDF (missing PDF header)")
+            # Log a sample of the data for debugging
+            sample = pdf_file[:100].hex()
+            # _logger.info(f"First 100 bytes (hex): {sample}")
+            return "Error: File does not appear to be a valid PDF"
+
+        # Get a file-like object
+        pdf_stream = io.BytesIO(pdf_file)
+
+        try:
+            # Try PyPDF2
+            reader = PyPDF2.PdfReader(pdf_stream, strict=False)
+            text = ""
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+
+            if text.strip():
+                return text
+
+            # If no text extracted, fallback to OCR
+            return self._extract_text_from_image_pdf(pdf_file)
+        except Exception as e:
+            _logger.error(f"PyPDF2 error: {e}")
+            # Fallback to OCR
+            return self._extract_text_from_image_pdf(pdf_file)
+
+    def _extract_text_from_image_pdf(self, pdf_data):
+        """Convert PDF pages to images and use OCR."""
+        try:
+            _logger.info("Attempting OCR conversion of PDF")
+            pages = convert_from_bytes(pdf_data)
+            text = ""
+
+            for i, page in enumerate(pages):
+                _logger.info(f"Processing page {i+1} with OCR")
+                page_text = pytesseract.image_to_string(page)
+                text += page_text + "\n"
+
+            if not text.strip():
+                return "OCR processing did not extract any text"
+
+            return text
+        except Exception as e:
+            _logger.error(f"OCR processing error: {e}")
+            return f"Error during OCR processing: {str(e)}"
+
+    def query_gemini_api(self, prompt):
+        apikey = os.getenv("GEMINI_API")
+        """Function to send the prompt to the Gemini API and return the response."""
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={apikey}"
+        headers = {
+            'Content-Type': 'application/json',
+        }
+
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ]
+        }
+
+        try:
+            response = requests.post(api_url, headers=headers, json=payload)
+            response.raise_for_status()  # Raise an error for bad responses
+
+            # Extract the text from the response
+            candidates = response.json().get('candidates', [])
+            if candidates:
+                # Assuming you want the text from the first candidate
+                text_parts = candidates[0].get('content', {}).get('parts', [])
+                if text_parts:
+                    return ''.join(part['text'] for part in text_parts)
+
+        except requests.exceptions.HTTPError as http_err:
+            # Handle HTTP errors
+            _logger.info(f"HTTP error occurred: {http_err}")
+        except requests.exceptions.ConnectionError as conn_err:
+            # Handle connection errors
+            _logger.info(f"Connection error occurred: {conn_err}")
+        except requests.exceptions.Timeout as timeout_err:
+            # Handle timeout errors
+            _logger.info(f"Timeout error occurred: {timeout_err}")
+        except requests.exceptions.RequestException as req_err:
+            # Handle any other request errors
+            _logger.info(f"An error occurred: {req_err}")
+        except Exception as e:
+            # Handle unexpected errors
+            _logger.info(f"An unexpected error occurred: {e}")
+
+        return "An error occurred while analyzing the keyword context"
+    
+    def open_keyword_log(self):
+        # Define your action here
+        action = self.env.ref(
+            "rule_book.action_keyword_alert_log").sudo().read()[0]
+
+        # Set the default domain to show tickets with matching issue
+        id = self.id
+        action["domain"] = [("document_id", "=", id)]
+
+        return action
+        
+    def action_view_rulebooks(self):
+        self.ensure_one()
+        return {
+            'name': 'Rulebooks',
+            'type': 'ir.actions.act_window',
+            'res_model': 'rulebook',
+            'view_mode': 'form',
+            'domain': [('name', '=', self.id)],
+            'context': {'default_name': self.id},  # Pre-fill the title when creating new rulebook
+        }
+        
+    def copy_email_to_alert_log(self, alert_log_id=None):
+        """Copy email messages from rulebook.title to keyword.alert.log"""
+        self.ensure_one()
+        
+        # Find alert logs to copy to
+        if not alert_log_id:
+            alert_logs = self.env['keyword.alert.log'].search([('document_id', '=', self.id)])
+        else:
+            alert_logs = self.env['keyword.alert.log'].browse([alert_log_id])
+            
+        if not alert_logs:
+            return False
+        
+        # Get email messages
+        messages = self.env['mail.message'].search([
+            ('res_id', '=', self.id),
+            ('model', '=', 'rulebook.title'),
+            ('message_type', 'in', ['email', 'notification'])
+        ], order='create_date asc')
+        
+        if not messages:
+            return False
+            
+        # Copy messages to each alert log
+        for alert_log in alert_logs:
+            for message in messages:
+                # Skip if already copied
+                existing = self.env['mail.message'].search([
+                    ('res_id', '=', alert_log.id),
+                    ('model', '=', 'keyword.alert.log'),
+                    ('parent_id', '=', message.id)
+                ], limit=1)
+                
+                if not existing:
+                    # Copy message
+                    message.copy({
+                        'model': 'keyword.alert.log',
+                        'res_id': alert_log.id,
+                        'parent_id': message.id
+                    })
+        
+        return alert_logs
+    
+    # Override message_post for this specific model only
+    @api.returns('mail.message', lambda value: value.id)
+    def message_post(self, *args, **kwargs):
+        """Copy emails to alert logs when posted from rulebook.title"""
+        message = super(RulebookTitle, self).message_post(*args, **kwargs)
+        
+        # Only process email/notification messages
+        if message.message_type in ['email', 'notification']:
+            self.copy_email_to_alert_log()
+        
+        return message
