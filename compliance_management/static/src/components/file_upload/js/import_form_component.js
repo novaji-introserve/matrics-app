@@ -502,7 +502,8 @@ export class ImportFormComponent extends Component {
 ImportFormComponent.template = "compliance_management.ImportForm";
 ImportFormComponent.components = { TerminalComponent }; 
 ImportFormComponent.props = {
-    action: { type: String, optional: true },
+    // action: { type: String, optional: true },
+    action: { type: [String, Object], optional: true },
     actionId: { type: Number, optional: true },
     className: { type: String, optional: true }
 };
