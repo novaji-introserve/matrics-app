@@ -39,3 +39,6 @@ from . import pep_customer
 from . import adverse_media
 from . import pep_source
 from . import import_log
+from . import open_sanctions_extension
+from . import job_queue_handler
+from . import web_scraping
