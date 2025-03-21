@@ -1,6 +1,7 @@
 from odoo import _, api, fields, models
 import threading
 import logging
+import traceback
 import json
 from datetime import datetime, timedelta
 import uuid

@@ -318,7 +318,7 @@
     </record>
 
     <!-- Scheduled Action for Processing OpenSanctions Jobs -->
-    <record id="ir_cron_process_opensanctions_jobs" model="ir.cron">
+    <!-- <record id="ir_cron_process_opensanctions_jobs" model="ir.cron">
         <field name="name">Process Scheduled OpenSanctions Jobs</field>
         <field name="model_id" ref="model_opensanctions_job_queue" />
         <field name="state">code</field>
@@ -329,5 +329,5 @@
         <field name="numbercall">-1</field>
         <field name="doall" eval="False" />
         <field name="active" eval="True" />
-    </record>
+    </record> -->
 </odoo>

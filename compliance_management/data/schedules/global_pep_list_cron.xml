@@ -29,6 +29,20 @@
             <field name="active" eval="True" />
         </record>
 
+        <!-- Scheduled Action for Job Cleanup -->
+        <record id="ir_cron_cleanup_opensanctions_jobs" model="ir.cron">
+            <field name="name">Clean up Old OpenSanctions Jobs</field>
+            <field name="model_id" ref="model_opensanctions_job_queue" />
+            <field name="state">code</field>
+            <field name="code">model.clean_old_jobs(days=7)</field>
+            <field name="user_id" ref="base.user_root" />
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+            <field name="active" eval="True" />
+        </record>
+
         <!-- Scheduler for Automatic PEP List Update -->
         <!-- <record id="ir_cron_fetch_pep_data" model="ir.cron">
             <field name="name">Fetch Global PEP List and Sanctions Data</field>

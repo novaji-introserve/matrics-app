@@ -258,7 +258,7 @@ class OpenSanctions:
             
         # Fallback to system parameter
         return self.env['ir.config_parameter'].sudo().get_param(
-            'compliance_management.opensanctions_api_key', False)
+            'opensanctions_api_key', False)
     
     def fetch_csv_file(self, source_record=None):
         """
