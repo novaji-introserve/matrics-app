@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# # -*- coding: utf-8 -*-
 from odoo import http
 from odoo.http import request
 from datetime import datetime, timedelta
@@ -314,21 +314,4 @@ class Compliance(http.Controller):
             
             return customer_counts
 
-
-
-
-
-
-
-        
-
-     
-   
-
-
-
-       
-
-
-     
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# # -*- coding: utf-8 -*-
 from odoo import http
 from odoo.http import request
 from datetime import datetime, timedelta
@@ -242,5 +242,3 @@ class Mydashboard(http.Controller):
                     ORDER BY customer_count DESC;
                 """
                 return _execute_query(sql, (tuple(branches_id), start_of_prev_day, end_of_today))
-        
-        
