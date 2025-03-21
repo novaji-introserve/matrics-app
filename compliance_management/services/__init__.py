@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
+"""
+Services Package
+==============
+This package contains service layers that connect Odoo models with 
+external functionality like csv_processor, data_processor, pep_importer, pep_service , sanction_scraper and  WebSockets.
+"""
 
-from . import sanction_scraper
+from . import csv_processor
 from . import data_processor
 from . import pep_importer
 from . import pep_service
-from . import sanction_list_data
+from . import sanction_scraper
+from . import websocket
