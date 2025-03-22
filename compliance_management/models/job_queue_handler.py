@@ -869,6 +869,8 @@ class OpenSanctionsJobQueue(models.Model):
                                     help="The user whose permissions will be used to run this job")
     api_limit = fields.Integer('API Result Limit', default=500,
                               help="Maximum number of results to fetch from API")
+    offset = fields.Integer(string="API Offset", default=0,
+                           help="Starting offset for API pagination")
     file_path = fields.Char('CSV File Path', readonly=True,
                            help="Path to the downloaded CSV file")
     batch_size = fields.Integer('Batch Size', default=500,
@@ -1458,8 +1460,12 @@ class OpenSanctionsJobQueue(models.Model):
         if not api_key:
             self._append_log("API key not configured, skipping")
             return
-            
-        self._append_log("Querying API...")
+        
+        # # Get offset from job data or use 0 for first batch
+        # offset = self.offset if hasattr(self, 'offset') else 0
+        self._append_log(f"Querying API (offset: {self.offset})...")
+
+        # self._append_log("Querying API...")
         entity_type = None
         if hasattr(source, 'default_entity_type') and source.default_entity_type:
             # Capitalize the first letter as the API might expect proper casing
@@ -1471,14 +1477,30 @@ class OpenSanctionsJobQueue(models.Model):
         api_result = service.query_api(
             entity_type=entity_type,
             limit=self.api_limit,
+            offset=self.offset,
             source_record=source
         )
         
         if api_result.get('status') == 'success':
-            self._append_log("API data received, processing...")
+            data = api_result.get('data', {})
+            current_count = 0
             
-            # Process API results
+            # Count results from this batch
+            if 'results' in data and isinstance(data['results'], list):
+                current_count = len(data['results'])
+                self._append_log(f"Found {current_count} results in this batch")
+            elif 'entities' in data and isinstance(data['entities'], list):
+                current_count = len(data['entities'])
+                self._append_log(f"Found {current_count} entities in this batch")
+            
+            # Process current batch
             api_process_result = importer.process_api_results(api_result, source)
+        
+        # if api_result.get('status') == 'success':
+        #     self._append_log("API data received, processing...")
+            
+        #     # Process API results
+        #     api_process_result = importer.process_api_results(api_result, source)
             
             if api_process_result.get('status') == 'success':
                 self._append_log(f"API processing completed: {api_process_result.get('records_created', 0)} created, "
@@ -1490,6 +1512,31 @@ class OpenSanctionsJobQueue(models.Model):
                     'records_updated': self.records_updated + api_process_result.get('records_updated', 0),
                     'records_failed': self.records_failed + api_process_result.get('records_errored', 0)
                 })
+
+                # Check if we need to create a follow-up job
+                # If we received the maximum number of results, there might be more
+                new_offset = self.offset + current_count
+                
+                # Only create a follow-up job if we got the maximum number of results (suggesting there might be more)
+                if current_count >= self.api_limit:
+                    # Create a follow-up job to fetch the next batch
+                    self._append_log(f"Creating follow-up job for next batch (offset: {new_offset})")
+                    
+                    # Create a new job for the next batch
+                    next_job = self.env['opensanctions.job.queue'].create({
+                        'name': f"{self.name} (continued, offset: {new_offset})",
+                        'source_id': source.id,
+                        'job_type': 'api',
+                        'state': 'pending',
+                        'offset': new_offset,
+                        'api_limit': self.api_limit,
+                        'run_as_user_id': self.run_as_user_id.id if self.run_as_user_id else False,
+                        'debug_mode': self.debug_mode
+                    })
+                    
+                    # Schedule job to run immediately
+                    next_job.process_job()
+
             else:
                 self._append_log(f"API processing failed: {api_process_result.get('message')}")
         else:

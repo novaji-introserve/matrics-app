@@ -409,7 +409,7 @@ class OpenSanctions:
                 'message': f"Error fetching CSV file: {str(e)}"
             }
     
-    def query_api(self, query=None, entity_type=None, limit=100, source_record=None):
+    def query_api(self, query=None, entity_type=None, limit=100, offset=0, source_record=None):
         """
         Query a sanctions API based on the source configuration
         
@@ -417,6 +417,7 @@ class OpenSanctions:
             query: Optional search query
             entity_type: Entity type to search for (override from source config)
             limit: Maximum number of results (default: 100)
+            offset: Offset for pagination (default: 0)
             source_record: PEP source record, required for this function
             
         Returns:
@@ -452,7 +453,8 @@ class OpenSanctions:
                 
             # Prepare request parameters
             params = {
-                'limit': limit
+                'limit': limit,
+                'offset': offset
             }
             
             # Add schema parameter if entity_type is provided
