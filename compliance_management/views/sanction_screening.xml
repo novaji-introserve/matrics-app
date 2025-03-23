@@ -38,6 +38,13 @@
             <field name="domain">[('is_greylist', '=', True)]</field>
         </record>
 
+        <!-- Actions for CSV Import -->
+        <record id="action_csv_import" model="ir.actions.client">
+            <field name="name">CSV Import</field>
+            <field name="tag">compliance_management.csv_import_form</field>
+            <field name="type">ir.actions.client</field>
+        </record>
+
         <!-- Form Views for Global PEP -->
         <!-- Views for Global PEP List-->
         <record id="view_res_global_pep_tree" model="ir.ui.view">
@@ -248,7 +255,14 @@
             name="Greylist"
             groups="group_compliance_compliance_officer"
             sequence="60" />
-        
+
+        <menuitem 
+            id="menu_csv_import"
+            name="List Upload"
+            parent="menu_sanction_screening_root"
+            action="compliance_management.action_csv_import"
+            groups="group_compliance_compliance_officer"
+            sequence="70" />
 
     </data>
 </odoo>

@@ -38,7 +38,6 @@
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
-        "views/csv_import.xml",
         "data/schedules/queue_job_config.xml",
         "data/data.xml",
         "views/risk_assessment.xml",
