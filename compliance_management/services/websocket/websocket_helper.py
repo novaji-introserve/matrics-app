@@ -55,7 +55,7 @@ def send_log_message(env, message, message_type="info", user_id=None, group=None
 def _has_websocket_support():
     """Check if WebSocket support is available"""
     try:
-        from odoo.addons.bus.websocket import WebsocketConnectionHandler
+        from addons.bus.websocket import WebsocketConnectionHandler
 
         return True
     except ImportError:

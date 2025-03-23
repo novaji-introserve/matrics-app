@@ -18,17 +18,19 @@ export const terminalService = {
         let socket = null;
         let connected = false;
         let reconnectTimer = null;
+        let connectionTimeoutTimer = null;
         let reconnectAttempts = 0;
+        let usingLongPolling = false;
+        let stoppedWebSocketAttempts = false;
         const logs = [];
         const listeners = new Set();
         const MAX_LOGS = 1000;
-        const MAX_RECONNECT_ATTEMPTS = 5;
-        const RECONNECT_DELAY = 3000; // 3 seconds
+        const MAX_RECONNECT_ATTEMPTS = 1;
+        const RECONNECT_DELAY = 3000; 
 
         // Add a log entry
         function addLog(message, type = 'info', timestamp = null) {
             if (!timestamp) {
-                // timestamp = new Date().toLocaleTimeString();
                 timestamp = formatFullTimestamp(new Date());
             }
 
@@ -60,6 +62,11 @@ export const terminalService = {
 
         // Initialize WebSocket if supported
         async function connectWebSocket() {
+            // Don't attempt connection if we've already committed to long-polling
+            if (stoppedWebSocketAttempts) {
+                return;
+            }
+            
             // Log connection attempt immediately
             addLog('Attempting to connect to WebSocket...', 'info');
 
@@ -107,6 +114,12 @@ export const terminalService = {
 
                     console.log('Sending authentication:', authMsg);
                     socket.send(JSON.stringify(authMsg));
+                    
+                    // If we were using long-polling, we can log that we're now using WebSocket
+                    if (usingLongPolling) {
+                        addLog('Switched from long-polling to WebSocket connection', 'info');
+                        usingLongPolling = false;
+                    }
                 };
 
                 socket.onmessage = (event) => {
@@ -125,12 +138,15 @@ export const terminalService = {
                             const timestamp = formatFullTimestamp(now);
                             
                             // Send a test message to confirm bidirectional communication
-                            socket.send(JSON.stringify({
-                                type: 'log_message',
-                                message: 'Terminal connected and authenticated',
-                                message_type: 'info',
-                                timestamp: timestamp  // Include timestamp in the same format as Python
-                            }));
+                            // Only send one authentication message to avoid duplicates
+                            if (!connected) {
+                                socket.send(JSON.stringify({
+                                    type: 'log_message',
+                                    message: 'Terminal connected and authenticated',
+                                    message_type: 'info',
+                                    timestamp: timestamp  // Include timestamp in the same format as Python
+                                }));
+                            }
                         } else if (data.type === 'error') {
                             addLog(`WebSocket error: ${data.message}`, 'error');
                             console.error('WebSocket error message:', data.message);
@@ -146,6 +162,12 @@ export const terminalService = {
 
                 socket.onclose = (event) => {
                     connected = false;
+                    
+                    // Don't log or attempt reconnection if we've committed to long-polling
+                    if (stoppedWebSocketAttempts) {
+                        return;
+                    }
+                    
                     if (event.wasClean) {
                         addLog(`WebSocket closed: ${event.reason}`, 'warning');
                     } else {
@@ -160,13 +182,16 @@ export const terminalService = {
 
                         clearTimeout(reconnectTimer);
                         reconnectTimer = setTimeout(() => {
-                            if (!connected) {
+                            if (!connected && !stoppedWebSocketAttempts) {
                                 connectWebSocket();
                             }
                         }, delay);
                     } else {
                         addLog('Max WebSocket reconnection attempts reached, falling back to long-polling', 'warning');
-                        startBusListening();
+                        // Only start long-polling if it's not already active
+                        if (!usingLongPolling) {
+                            startBusListening();
+                        }
                     }
                 };
 
@@ -176,25 +201,68 @@ export const terminalService = {
                 };
 
                 // Set a connection timeout
-                setTimeout(() => {
-                    if (socket && socket.readyState !== WebSocket.OPEN) {
+                if (connectionTimeoutTimer) {
+                    clearTimeout(connectionTimeoutTimer);
+                }
+                
+                connectionTimeoutTimer = setTimeout(() => {
+                    // Only proceed if we haven't already stopped WebSocket attempts
+                    if (!stoppedWebSocketAttempts && socket && socket.readyState !== WebSocket.OPEN) {
                         addLog('WebSocket connection timed out', 'error');
                         if (socket.readyState !== WebSocket.CLOSED && socket.readyState !== WebSocket.CLOSING) {
                             socket.close();
                         }
-                        startBusListening();
+                        
+                        // Only start long-polling if it's not already active
+                        if (!usingLongPolling) {
+                            startBusListening();
+                        }
                     }
+                    connectionTimeoutTimer = null;
                 }, 10000); // 10 second timeout
 
             } catch (e) {
                 connected = false;
                 addLog(`Error setting up WebSocket: ${e.message}`, 'error');
                 console.error('WebSocket setup error:', e);
-                startBusListening();
+                
+                // Only start long-polling if it's not already active
+                if (!usingLongPolling) {
+                    startBusListening();
+                }
             }
         }
 
         function startBusListening() {
+            // Mark that we're using long-polling
+            usingLongPolling = true;
+            
+            // Stop any further WebSocket attempts
+            stoppedWebSocketAttempts = true;
+            
+            // Clear any pending timers
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+                reconnectTimer = null;
+            }
+            
+            if (connectionTimeoutTimer) {
+                clearTimeout(connectionTimeoutTimer);
+                connectionTimeoutTimer = null;
+            }
+            
+            // Close WebSocket if it exists
+            if (socket) {
+                try {
+                    if (socket.readyState !== WebSocket.CLOSED && socket.readyState !== WebSocket.CLOSING) {
+                        socket.close();
+                    }
+                } catch (e) {
+                    console.warn('Error closing WebSocket:', e);
+                }
+                socket = null;
+            }
+            
             try {
                 addLog('Setting up long-polling fallback...', 'info');
                 const channel = `csv_import_logs_${env.services.user.userId}`;
@@ -268,21 +336,26 @@ export const terminalService = {
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         }
         
-        // Initialize WebSocket and bus listening
+        // Initialize communication - try WebSocket first, fallback to long-polling
         try {
             // Add initial log
             addLog('Terminal service initializing...', 'info');
 
             // Try WebSocket first
             connectWebSocket();
-
-            // Also start bus listening as a parallel channel
-            // The server will send to both to ensure delivery
-            startBusListening();
+            
+            // No longer start bus listening in parallel
+            // startBusListening() will be called automatically if WebSocket fails
+            
         } catch (e) {
             console.error('Error initializing terminal service:', e);
             // Add initial error log
             addLog(`Error initializing terminal service: ${e.message}`, 'error');
+            
+            // If initialization failed completely, try long-polling as last resort
+            if (!usingLongPolling) {
+                startBusListening();
+            }
         }
 
         // Return public interface
@@ -342,13 +415,35 @@ export const terminalService = {
             isWebSocketConnected() {
                 return connected;
             },
+            
+            /**
+             * Check if using long-polling fallback
+             * 
+             * @returns {boolean} - True if using long-polling
+             */
+            isUsingLongPolling() {
+                return usingLongPolling;
+            },
 
             /**
              * Manually reconnect WebSocket
              */
             reconnectWebSocket() {
+                // Reset state variables
                 reconnectAttempts = 0;
+                stoppedWebSocketAttempts = false;
+                
+                // Try to connect
                 connectWebSocket();
+            },
+            
+            /**
+             * Switch to long-polling mode
+             */
+            switchToLongPolling() {
+                if (!usingLongPolling) {
+                    startBusListening();
+                }
             }
         };
     }

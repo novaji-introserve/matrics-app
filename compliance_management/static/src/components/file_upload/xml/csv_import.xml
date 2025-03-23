@@ -38,13 +38,13 @@
                         <form>
                             <!-- Category/Model Selection -->
                             <div class="csv-form-group">
-                                <label class="csv-form-label" for="model-selector">Target Model</label>
+                                <label class="csv-form-label" for="model-selector">Target Table</label>
                                 <div class="csv-search-container">
                                     <input t-ref="modelSearch"
                                         t-on-input="onModelSearch"
                                         type="text"
                                         class="csv-search-input"
-                                        placeholder="Search models..." />
+                                        placeholder="Search tables..." />
                                     <button class="csv-search-button" 
                                             type="button" 
                                             t-on-click="searchModels">
@@ -55,7 +55,7 @@
                                         id="model-selector" 
                                         class="csv-select" 
                                         t-on-change="onModelChanged">
-                                    <option value="">Select a model...</option>
+                                    <option value="">Select a table...</option>
                                     <t t-foreach="state.filteredModels" t-as="model" t-key="model.id">
                                         <option t-att-value="model.id" 
                                                 t-att-selected="state.selectedModel and state.selectedModel.id === model.id">
@@ -63,9 +63,15 @@
                                         </option>
                                     </t>
                                 </select>
-                                <small t-if="state.selectedModel and state.selectedModel.description" 
-                                    class="csv-help-text">
-                                    <t t-esc="state.selectedModel.description" />
+                                <small t-if="state.selectedModel" 
+                                    class="csv-help-text" 
+                                    style="display: block; margin-top: 8px; padding: 8px; background-color: #fff; border-left: 3px solid #3b82f6; font-weight: 500;">
+                                    <t t-if="state.selectedModel.description">
+                                        <t t-esc="state.selectedModel.description" />
+                                    </t>
+                                    <t t-else="">
+                                        Import data into <strong t-esc="state.selectedModel.name" />. Please make sure your file has the required fields.
+                                    </t>
                                 </small>
                             </div>
 

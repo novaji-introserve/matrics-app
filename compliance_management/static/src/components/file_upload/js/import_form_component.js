@@ -133,7 +133,7 @@ export class ImportFormComponent extends Component {
             }
 
             // Add a timeout to prevent hanging
-            const modelPromise = this.rpc("/csv_import/get_import_models", { limit: 100 });
+            const modelPromise = this.rpc("/csv_import/get_import_models", { limit: 200 });
             const timeoutPromise = new Promise((_, reject) =>
                 setTimeout(() => reject(new Error("Request timeout")), 10000)
             );
@@ -308,12 +308,47 @@ export class ImportFormComponent extends Component {
      */
     onModelChanged(ev) {
         const modelId = parseInt(ev.target.value, 10);
-        const model = this.state.models.find(m => m.id === modelId);
-
-        this.state.selectedModel = model || null;
-
-        if (model && this.terminal) {
-            this.terminal.addLog(`Selected model: ${model.name}`, "info");
+        
+        if (isNaN(modelId) || modelId <= 0) {
+            console.log("No valid model selected");
+            this.state.selectedModel = null;
+            return;
+        }
+        
+        // First check in filteredModels (what's currently in the dropdown)
+        let model = this.state.filteredModels.find(m => m.id === modelId);
+        
+        // If not found in filtered models, check in the full models array
+        if (!model) {
+            console.log(`Model ${modelId} not found in filtered models, checking full list`);
+            model = this.state.models.find(m => m.id === modelId);
+        }
+        
+        if (model) {
+            console.log("Selected model:", model);
+            
+            // Add a description if missing
+            if (!model.description) {
+                console.log("Adding default description for model");
+                model = { 
+                    ...model, 
+                    description: `Import data into ${model.name} (${model.model_name}). Please ensure your file has the required fields.` 
+                };
+            }
+            
+            // Update selected model in state - create a new object to ensure reactivity
+            this.state.selectedModel = { ...model };
+            
+            // Log the selection
+            if (this.terminal) {
+                this.terminal.addLog(`Selected model: ${model.name}`, "info");
+            }
+            
+            // Force UI update by setting a key property
+            this.state.selectedModelKey = Date.now();
+        } else {
+            console.error(`Model with ID ${modelId} not found in any model list`);
+            this.state.selectedModel = null;
         }
     }
 
