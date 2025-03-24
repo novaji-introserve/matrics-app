@@ -1179,6 +1179,7 @@ class RulebookTitle(models.Model):
         # Send a single consolidated email to all assigned officers
         self._send_consolidated_alert_email(alert_log, ai_analysis)
 
+    
     def _analyze_keyword_context(self, keywords, context_text):
         """Send the matched text to AI for analysis."""
         prompt = f"""
@@ -1190,6 +1191,12 @@ class RulebookTitle(models.Model):
         1. The context in which each keyword appears
         2. Potential implications or concerns
         3. Recommended actions if any
+        
+        IMPORTANT FORMATTING INSTRUCTIONS:
+        - Format your response with clean section headers (do NOT use asterisks for emphasis)
+        - Use "Section 1: Context" format for main sections
+        - For bullet points, use simple dash (-) without asterisks
+        - If you need to emphasize text, use standard formatting without special characters
         
         Keep your response concise and focused on the regulatory or compliance implications.
         """
@@ -1217,10 +1224,14 @@ class RulebookTitle(models.Model):
             base_url = self.env['ir.config_parameter'].sudo(
             ).get_param('web.base.url')
             document_url = f"{base_url}/web#id={self.id}&model=rulebook.title&view_type=form"
+            
+            formatted_analysis = self._format_email_analysis(ai_analysis)
+
 
             # Prepare context with all required data
             ctx = {
-                'ai_analysis': ai_analysis,
+                # 'ai_analysis': ai_analysis,
+                'ai_analysis': formatted_analysis,
                 'document_name': self.name,
                 'document_id': self.id,
                 'document_url': document_url,
@@ -1246,11 +1257,7 @@ class RulebookTitle(models.Model):
                     force_send=True,
                     email_values=email_values
                 )
-                # template.with_context(**ctx).send_mail(
-                #     alert_log.id,
-                #     force_send=True,
-                #     email_values=email_values
-                # )
+                
                 _logger.info(
                     f"Consolidated alert email sent to {email_values['email_to']} for keywords: {ctx['keywords']}")
             except Exception as e:
@@ -1513,3 +1520,72 @@ class RulebookTitle(models.Model):
             self.copy_email_to_alert_log()
         
         return message
+
+    # def _format_email_analysis(self, analysis_text):
+    #     """Format AI analysis text for proper display in email."""
+    #     # Convert plain text newlines to HTML paragraphs
+    #     paragraphs = analysis_text.split('\n\n')
+
+    #     # Process each paragraph
+    #     formatted_paragraphs = []
+    #     for para in paragraphs:
+    #         if para.strip():
+    #             # Check if it's a list item
+    #             if para.strip().startswith('-'):
+    #                 # Format list items
+    #                 list_items = para.split('\n-')
+    #                 list_html = '<ul style="margin-left: 20px; padding-left: 15px;">'
+    #                 for i, item in enumerate(list_items):
+    #                     if i == 0:  # First item may not start with dash
+    #                         item = item.lstrip('- ')
+    #                     list_html += f'<li style="margin-bottom: 8px;list-style-type: none;"> - {item.strip()}</li>'
+    #                 list_html += '</ul>'
+    #                 formatted_paragraphs.append(list_html)
+    #             # Check if it's a section header
+    #             elif any(section in para for section in ["Section", "Context:", "Implications:", "Actions:"]):
+    #                 # Format as a heading
+    #                 formatted_paragraphs.append(
+    #                     f'<h4 style="margin-top: 16px; margin-bottom: 8px; font-weight: normal;">{para}</h4>')
+    #                 # formatted_paragraphs.append(
+    #                 #     f'<h6 style="margin-top: 16px; margin-bottom: 8px;">{para}</h6>')
+    #             else:
+    #                 # Regular paragraph
+    #                 formatted_paragraphs.append(
+    #                     f'<p style="margin-bottom: 12px;">{para}</p>')
+
+    #     # Join all formatted paragraphs
+    #     return ''.join(formatted_paragraphs)
+    def _format_email_analysis(self, analysis_text):
+        """Format AI analysis text for proper display in email."""
+        # Convert plain text newlines to HTML paragraphs
+        paragraphs = analysis_text.split('\n\n')
+
+        # Process each paragraph
+        formatted_paragraphs = []
+        for para in paragraphs:
+            if para.strip():
+                # Check if it's a list item
+                if para.strip().startswith('-'):
+                    # Format list items
+                    list_items = para.split('\n-')
+                    # Use div instead of ul/li for better control
+                    list_html = '<div style="margin-left: 20px;">'
+                    for i, item in enumerate(list_items):
+                        if i == 0:  # First item may not start with dash
+                            item = item.lstrip('- ')
+                        # Using div with dash prefix instead of li
+                        list_html += f'<div style="margin-bottom: 8px; text-indent: -12px; padding-left: 12px;">- {item.strip()}</div>'
+                    list_html += '</div>'
+                    formatted_paragraphs.append(list_html)
+                # Check if it's a section header
+                elif any(section in para for section in ["Section", "Context:", "Implications:", "Actions:"]):
+                    # Format as a heading
+                    formatted_paragraphs.append(
+                        f'<h4 style="margin-top: 16px; margin-bottom: 8px; font-weight: normal;">{para}</h4>')
+                else:
+                    # Regular paragraph
+                    formatted_paragraphs.append(
+                        f'<p style="margin-bottom: 12px;">{para}</p>')
+
+        # Join all formatted paragraphs
+        return ''.join(formatted_paragraphs)

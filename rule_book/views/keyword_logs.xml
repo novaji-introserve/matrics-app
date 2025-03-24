@@ -57,7 +57,8 @@
                             <field name="match_text" string="Matched Context"/>
                     </group> -->
                     <group>
-                            <field name="ai_analysis" readonly="1"/>
+                            <field name="ai_analysis" readonly="1" />
+                            
                     </group>
                    
                 </sheet>

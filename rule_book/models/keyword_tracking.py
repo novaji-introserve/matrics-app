@@ -23,9 +23,10 @@ _logger = logging.getLogger(__name__)
 class KeywordTracking(models.Model):
     _name = 'keyword.tracking'  # Model name, customize as needed
     _description = 'Keyword'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Name', required=True)
-    code = fields.Char(string='Code', required=True)
+    name = fields.Char(string='Name', required=True,tracking=True)
+    code = fields.Char(string='Code', required=True, tracking=True)
     risk_level = fields.Selection([
         ('low', 'Low'),
         ('medium', 'Medium'),
@@ -34,10 +35,10 @@ class KeywordTracking(models.Model):
     assigned_officers = fields.Many2many(
         'res.users',  # Assuming you are linking to the res.users model
         'keyword_tracking_officers',
-        string="Officer(s) To Alert",
+        string="Officer(s) Responsible",
         tracking=True,
     )
-    active = fields.Boolean(default=True)
+    active = fields.Boolean(default=True, tracking=True)
     _sql_constraints = [
         ('name_uniq', 'unique (name)',
          "Keyword Name must be unique!"),
@@ -66,7 +67,7 @@ class KeywordAlertLog(models.Model):
     alert_date = fields.Datetime(string='Alert Date', readonly=True,        default=datetime.now().replace(microsecond=0), tracking=True,
                                   )
 
-    officers_alerted = fields.Many2many('res.users', string='Officers Alerted',
+    officers_alerted = fields.Many2many('res.users', string='Officers Responsible',
                                         compute='_compute_officers_alerted', store=True, ondelete='cascade', readonly=True)
 
     keyword_id = fields.Many2many(

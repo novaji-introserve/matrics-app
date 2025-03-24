@@ -72,7 +72,7 @@
     ],
     # only loaded in demonstration mode
     "demo": [
-        # "demo/demo.xml",
+        "data/demo/demo.xml",
         # "demo/demo_department.xml"
     ],
     "installable": True,
