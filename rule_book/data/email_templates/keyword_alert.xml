@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="email_template_keyword_alert" model="mail.template">
+        <field name="name">Keyword Alert</field>
+        <field name="model_id" ref="model_keyword_alert_log"/>
+        <field name="subject">${ctx.get('document_name')}</field>
+        <field name="email_from">${ctx.get('email_from')}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 10px 12px; padding: 0px; font-family: Arial, sans-serif;">
+                <p style="margin: 8px 0;">Dear  
+                    <i>
+                        <t t-out="ctx.get('officer_name', 'Officer')"/>
+                    </i> 
+,
+                </p>
+
+                <p style="margin: 12px 0 12px 0;">
+                The following keywords have been detected in document :
+                <br/>
+                <strong t-out="ctx.get('keywords', ', '.join([k.name for k in object.keyword_id]))"/>
+            </p>
+
+            <p style="margin: 12px 0 12px 0;">
+                <strong> Document Name:</strong>
+            <br/>
+            <span t-out="ctx.get('document_name', object.document_id.name)"/>
+            <!-- <span t-out="ctx.get('risk_level', object.risk_level)"/> -->
+        </p>
+
+        <p style="margin: 12px 0 12px 0;">
+            <strong>Risk Level:</strong>
+            <span t-out="ctx.get('risk_level', object.risk_level)"/>
+        </p>
+
+        <p style="margin: 12px 0 1px 0;">
+            <strong>AI Analysis:</strong>
+        </p>
+        <!-- <p style="margin: 1px 0 12px 0;" t-out="ctx.get('ai_analysis', 'No analysis available')"/> -->
+        <!-- <div style="margin: 1px 0 12px 0; line-height: 1.5;" t-out="ctx.get('ai_analysis', 'No analysis available')"/> -->
+        <div style="margin: 1px 0 12px 0; line-height: 1.5;" t-raw="ctx.get('ai_analysis', 'No analysis available')"/>
+
+
+        <p style="margin: 17px 0 17px 0;">Please review the document and take appropriate action.</p>
+
+        <p style="margin: 10px 0;">
+                You can access the full document 
+            <a t-att-href="ctx.get('document_url', '#')">here</a>.
+        </p>
+
+        <p style="margin: 20px 0 20px 0; color: #666; font-size: 0.9em;">Warm Regards.</p>
+    </div>
+</field>
+<field name="auto_delete" eval="False" />
+</record>
+
+
+</odoo>

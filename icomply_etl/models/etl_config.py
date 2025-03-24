@@ -3,8 +3,10 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import json
 import logging
-from odoo.addons.queue_job.job import Job
+from odoo.addons.queue.queue_job.job import Job
 import math
+import psycopg2
+
 _logger = logging.getLogger(__name__)
 
 
@@ -39,6 +41,7 @@ class ETLSourceTable(models.Model):
         ('failed', 'Failed'),
         ('canceled', 'Canceled'),
     ], string='Job Status', readonly=True, copy=False)
+
 
     # category = fields.Selection([
     #     ('master', 'Master Data'),
@@ -114,6 +117,7 @@ class ETLSourceTable(models.Model):
             'mappings': normalized_mappings
         }
 
+
     # def action_test_connection(self):
     #     """Test database connections"""
     #     self.ensure_one()
@@ -150,8 +154,8 @@ class ETLSourceTable(models.Model):
         self.ensure_one()
         try:
             etl_manager = self.env['etl.manager']
-            with etl_manager.get_connections() as (mssql_conn, pg_conn):
-                mssql_cursor = mssql_conn.cursor()
+            with etl_manager.get_connections() as (source_conn, pg_conn):
+                source_cursor = source_conn.cursor()
                 pg_cursor = pg_conn.cursor()
 
                 return {
@@ -159,7 +163,7 @@ class ETLSourceTable(models.Model):
                     'tag': 'display_notification',
                     'params': {
                         'title': _('Success'),
-                        'message': _('Successfully connected to both databases!'),
+                        'message': _('Successfully connected to both source and target databases!'),
                         'type': 'success',
                         'sticky': False,
                     }
@@ -175,6 +179,7 @@ class ETLSourceTable(models.Model):
                     'sticky': True,
                 }
             }
+
 
     # def action_sync_table(self):
     #     """Manual sync action"""
@@ -213,8 +218,9 @@ class ETLSourceTable(models.Model):
             # Check if table is large to determine if queue_job should be used
             try:
                 etl_manager = self.env['etl.manager']
-                with etl_manager.get_connections() as (mssql_conn, pg_conn):
+                with etl_manager.get_connections() as (source_conn, pg_conn):
                     config = self.get_config_json()
+
                     mssql_cursor = mssql_conn.cursor()
                     count_query = f"SELECT COUNT(*) FROM [{config['source_table']}]"
                     mssql_cursor.execute(count_query)
@@ -239,9 +245,13 @@ class ETLSourceTable(models.Model):
                     primary_key_original = None
 
                     # Get original column name with proper case
-                    query = f"SELECT TOP 1 * FROM [{config['source_table']}]"
-                    mssql_cursor.execute(query)
-                    for col in mssql_cursor.description:
+                    query = (
+                        f"SELECT TOP 1 * FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
+                        if not is_postgres_source
+                        else f'SELECT * FROM "{config["source_table"]}" LIMIT 1'
+                    )
+                    source_cursor.execute(query)
+                    for col in source_cursor.description:
                         if col[0].lower() == primary_key.lower():
                             primary_key_original = col[0]
                             break
@@ -256,6 +266,7 @@ class ETLSourceTable(models.Model):
                         chunks = math.ceil(total_count / chunk_size)
 
                         # Get range of primary key values
+
                         min_query = f"SELECT MIN([{primary_key_original}]) FROM [{config['source_table']}]"
                         max_query = f"SELECT MAX([{primary_key_original}]) FROM [{config['source_table']}]"
                         mssql_cursor.execute(min_query)
@@ -372,7 +383,7 @@ class ETLSourceTable(models.Model):
                     'sticky': True,
                 }
             }
-
+    
     def sync_table_job_main(self, total_chunks):
         """Main job that coordinates multiple chunk jobs"""
         try:
