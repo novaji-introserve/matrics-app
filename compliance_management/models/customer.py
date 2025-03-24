@@ -66,9 +66,10 @@ class Customer(models.Model):
         comodel_name='res.partner.region', string='Region', tracking=True)
     sector_id = fields.Many2one(
         
-        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True, readonly=True)
+        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True)
     industry_id = fields.Many2one(
-        comodel_name='customer.industry', string='Industry', index=True, tracking=True, readonly=True)
+        comodel_name='customer.industry', string='Industry', index=True, tracking=True)
+
     
     sex_id = fields.Many2one(
         comodel_name='res.partner.gender', string='Sex', index=True, readonly=True)

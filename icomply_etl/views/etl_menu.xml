@@ -14,6 +14,7 @@
 
     <menuitem id="menu_etl_category" name="Categories" parent="menu_etl_configuration" action="action_etl_category" sequence="20"/>
 
+
     <menuitem id="menu_etl_frequency" name="Frequencies" parent="menu_etl_configuration" action="action_etl_frequency" sequence="30"/>
    
     <!-- Logs Menu -->

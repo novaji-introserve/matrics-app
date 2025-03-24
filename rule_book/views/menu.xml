@@ -11,7 +11,7 @@
       <field name="res_model">rulebook.theme</field>
       <field name="view_mode">tree,form</field>
     </record> -->
-    
+
     <!-- rule book source -->
     <record id="action_rulebook_sources" model="ir.actions.act_window">
       <field name="name">Rulebook Sources</field>
@@ -62,17 +62,6 @@
       <field name="state">code</field>
       <field name="code">action = model.open_rulebooks()</field>
     </record>
-    <!-- <record id="action_rulebook" model="ir.actions.act_window">
-      <field name="name">RuleBook</field>
-      <field name="res_model">rulebook</field>
-      <field name="view_mode">tree,form,kanban</field>
-      <field name="context">{"search_default_not_deleted":1}</field>
-      <field name="help" type="html">
-        <p class="oe_view_nocontent_create">
-          Create your rule book
-        </p>
-      </field>
-    </record> -->
 
 
 
@@ -116,11 +105,9 @@
     <menuitem id="menu_pdf_chat" name="AI Assistance" parent="menu_rulebook_details" action="action_pdf_chat" sequence="3" groups="rule_book.group_compliance_manager_"/>
 
     <!-- Alerts -->
-    <!-- <menuitem id="menu_report_rulebook" name="Reports" parent="menu_rulebook_alert" action="action_report_rulebook" sequence="4"/> -->
     <menuitem id="menu_owl_alert_dashboard" name="Alert" parent="menu_rulebook_alert" action="action_owl_alert_dashboard" sequence="1" />
 
 
-    <!-- <menuitem id="menu_rulebook_theme" name="Themes" parent="menu_rulebook_details" action="action_rulebook_theme" sequence="4" /> -->
     <!-- Reply Logs -->
     <menuitem id="menu_reply_log" name="Rulebook Logs" parent="menu_rulebook_details" action="open_reply_log" sequence="5" />
 
@@ -129,13 +116,10 @@
     <!-- Submenu for Configuration (with Exception Management) -->
     <menuitem id="menu_rulebook_configuration" name="Configuration" parent="menu_rulebook_theme_root" sequence="4" groups="rule_book.group_compliance_manager_" />
 
-    <!-- <menuitem id="menu_rulebook_responsible" name="Email Group" parent="menu_rulebook_configuration" action="action_rulebook_responsible" sequence="4" /> -->
-    <!-- <menuitem id="menu_rulebook_department" name="Departments" parent="menu_rulebook_configuration" action="action_rulebook_department" sequence="8" /> -->
-    <!-- branch -->
-    <!-- <menuitem id="menu_rulebook_branch" name="Branches" parent="menu_rulebook_configuration" action="action_rulebook_branch" sequence="8" /> -->
-
     <!-- Risk Categories -->
     <menuitem id="menu_rulebook_risk_category" name="Risk Categories" parent="menu_rulebook_configuration" action="action_rulebook_risk_category" sequence="7" />
+    
+    <!-- Tracking Keywords -->
 
     <!--Regulatory Sources  -->
     <menuitem id="menu_regulatory_sources" name="Regulatory Sources" parent="menu_rulebook_configuration" action="action_rulebook_sources" />
@@ -146,14 +130,6 @@
     <menuitem id="helpdesk_rule_book_dashbaord" name="Dashboard" parent="menu_rulebook_theme_root" action="action_cusotomer_details_js" sequence="-1" />
 
 
-    <!-- <record id="action_custom_tree" model="ir.actions.act_window">
-      <field name="name">Custom Tree View</field>
-      <field name="res_model">custom.tree.model</field>
-      <field name="view_mode">tree,form</field>
-      <field name="target">current</field>
-    </record> -->
-
-    <!-- <menuitem id="menu_custom_tree" name="Custom Tree" action="action_custom_tree" parent="menu_rulebook_theme_root" /> -->
 
   </data>
 

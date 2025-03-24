@@ -47,6 +47,8 @@ access_res_users_employee_cco,hr employees cco user,hr.model_hr_employee,rule_bo
 access_rulebook_rulebook_manager,report.rulebook.compliance.manager,model_rulebook,rule_book.group_compliance_manager_,1,1,1,1
 rulebook_reply_log_manager,report.rulebook.compliance.manager,model_reply_log,rule_book.group_compliance_manager_,1,1,0,0
 rulebook_title_manager,title manager user,model_rulebook_title,rule_book.group_compliance_manager_,1,1,1,1
+keywords_tracking,keywords_tracking_rulebook,model_keyword_tracking,base.group_user,1,1,1,1
+keywords_alert_logs,keywords_alert_logs,model_keyword_alert_log,base.group_user,1,1,1,1
 
 
 

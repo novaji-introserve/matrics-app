@@ -24,17 +24,7 @@
         # department/reports
         # Load security groups first
         "security/security_groups.xml",
-        'views/user_setting.xml',
 
-        # "security/security.xml",
-
-        # "views/report_rulebook.xml",
-        # 'views/alert_report.xml',
-
-        # Then load security rules
-        # "security/report_rulebook_security.xml",
-
-        # Then load access rights
         "security/ir.model.access.csv",
 
         # "data/preloaded_data/rule_book_branch.xml",
@@ -45,7 +35,6 @@
         # "security/ir.model.access.csv",
         "views/risk/risk_category.xml",
         "views/rules/rule_book.xml",
-        #    "data/preloaded_data/rule_book_department.xml",
         #
         # "views/responsible.xml",
         "data/email_templates/reminder_due_date_email.xml",
@@ -54,6 +43,7 @@
         "data/email_templates/rulebook_log_notification.xml",
         "data/email_templates/first_line_escalation.xml",
         "data/email_templates/share_document_template.xml",
+        "data/email_templates/keyword_alert.xml",
 
         "data/schedules/rule_book.xml",
         # "views/dashboard.xml",
@@ -71,18 +61,18 @@
         # "security/group_action.xml",
         "views/pdf_chat.xml",
         "views/alert_report_rulebook.xml",
-        # "views/alert_dashboard.xml,"
-        "views/alert_dashboard.xml"
-        # "views/branch.xml",
-        # 'security/security.csv',
-        # "views/department_.xml",
-        #  "views/department.xml",
+        "views/alert_dashboard.xml",
+      
+        'views/user_setting.xml',
+        'views/keyword_tracking.xml',
+        'data/sequence/keyword.xml',
+        'views/keyword_logs.xml',
 
 
     ],
     # only loaded in demonstration mode
     "demo": [
-        # "demo/demo.xml",
+        "data/demo/demo.xml",
         # "demo/demo_department.xml"
     ],
     "installable": True,
