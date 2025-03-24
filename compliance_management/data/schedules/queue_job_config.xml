@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- Configure CSV import job functions with appropriate channels -->
         <!-- Define a dedicated CSV import channel -->
         <record id="csv_import_queue_channel" model="queue.job.channel">
             <field name="name">csv_import</field>
@@ -19,7 +20,6 @@
             <field name="parent_id" ref="csv_import_queue_channel" />
         </record>
 
-        <!-- Configure CSV import job functions with appropriate channels -->
         <record id="csv_import_process_function" model="queue.job.function">
             <field name="model_id" ref="model_import_log" />
             <field name="method">process_file</field>
@@ -38,7 +38,6 @@
             <field name="channel_id" ref="csv_import_queue_channel" />
         </record>
 
-        <!-- Configuration parameters - using standard system parameters -->
         <!-- Extended timeout for large imports (4 hours) -->
         <record id="ir_config_csv_import_timeout" model="ir.config_parameter">
             <field name="key">queue_job.timeout.csv_import</field>
@@ -73,6 +72,32 @@
         <record id="ir_config_csv_batch_size" model="ir.config_parameter">
             <field name="key">csv_import.batch_size</field>
             <field name="value">10000</field>
+        </record>
+
+
+        <!-- Web-scraping or fetch through api parms config -->
+        <!-- Chunking parameters -->
+        <record id="param_max_records_per_job" model="ir.config_parameter">
+            <field name="key">compliance_management.max_records_per_job</field>
+            <field name="value">20000</field>
+        </record>
+
+        <!-- Batch size for processing -->
+        <record id="param_import_batch_size" model="ir.config_parameter">
+            <field name="key">compliance_management.import_batch_size</field>
+            <field name="value">500</field>
+        </record>
+
+        <!-- Storage directory -->
+        <!-- <record id="param_pep_storage_dir" model="ir.config_parameter">
+            <field name="key">compliance_management.pep_storage_dir</field>
+            <field name="value">/media/pep_list_data</field>
+        </record> -->
+
+        <!-- API timeout -->
+        <record id="param_opensanctions_timeout" model="ir.config_parameter">
+            <field name="key">compliance_management.opensanctions_timeout</field>
+            <field name="value">60</field>
         </record>
     </data>
 </odoo>

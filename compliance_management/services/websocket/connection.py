@@ -11,6 +11,7 @@ import json
 import logging
 import requests
 from datetime import datetime
+import pytz
 from odoo import api, models
 from odoo.tools import config
 
@@ -33,7 +34,11 @@ def send_message(env, message, message_type="info", user_id=None, group=None, ch
     """
     try:
         # Create message data with full date-time format to match JavaScript
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        nigeria_tz = pytz.timezone('Africa/Lagos')
+        local_time = datetime.now(nigeria_tz)
+        timestamp = local_time.strftime("%Y-%m-%d %H:%M:%S")
+        # timestamp = datetime.now(pytz.UTC).strftime("%Y-%m-%d %H:%M:%S")
         message_data = {
             "type": "log_message",
             "message": message,
