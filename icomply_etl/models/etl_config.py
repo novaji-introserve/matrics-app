@@ -3,12 +3,8 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import json
 import logging
-from odoo.addons.queue.queue_job.job import Job
-# from odoo.addons.queue.queue_job.job import identity_exact
-
+from odoo.addons.queue_job.job import Job
 import math
-import psycopg2
-
 _logger = logging.getLogger(__name__)
 
 
@@ -18,18 +14,22 @@ class ETLSourceTable(models.Model):
     _order = 'sequence, name'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char('Table Name', required=True, help="Source table name (e.g., tbl_customer)")
+    name = fields.Char('Table Name', required=True,
+                       help="Source table name (e.g., tbl_customer)")
     sequence = fields.Integer('Sequence', default=10)
-    target_table = fields.Char('Target Table', required=True, help="Target table name (e.g., res_partner)")
+    target_table = fields.Char(
+        'Target Table', required=True, help="Target table name (e.g., res_partner)")
     primary_key = fields.Char('Primary Key', required=True)
     batch_size = fields.Integer('Batch Size', default=2000)
-    is_base_table = fields.Boolean('Is Base Table', help="Tables with no dependencies")
+    is_base_table = fields.Boolean(
+        'Is Base Table', help="Tables with no dependencies")
     active = fields.Boolean(default=True)
     progress_percentage = fields.Float('Progress', readonly=True, default=0)
 
-    category_id = fields.Many2one('etl.category', string='Category', required=True)
-    frequency_id = fields.Many2one('etl.frequency', string='Frequency', required=True)
-
+    category_id = fields.Many2one(
+        'etl.category', string='Category', required=True)
+    frequency_id = fields.Many2one(
+        'etl.frequency', string='Frequency', required=True)
 
     job_uuid = fields.Char('Job UUID', readonly=True, copy=False)
     job_status = fields.Selection([
@@ -39,19 +39,33 @@ class ETLSourceTable(models.Model):
         ('failed', 'Failed'),
         ('canceled', 'Canceled'),
     ], string='Job Status', readonly=True, copy=False)
-    
-    
+
+    # category = fields.Selection([
+    #     ('master', 'Master Data'),
+    #     ('customer', 'Customer Data'),
+    #     ('account', 'Account Data'),
+    #     ('transaction', 'Transaction Data')
+    # ], required=True, default='master')
+
+    # frequency = fields.Selection([
+    #     ('hourly', 'Hourly'),
+    #     ('daily', 'Daily'),
+    #     ('weekly', 'Weekly')
+    # ], required=True, default='daily')
+
     dependency_ids = fields.Many2many(
-        'etl.source.table', 
-        'etl_table_dependencies', 
-        'table_id', 
-        'dependency_id', 
+        'etl.source.table',
+        'etl_table_dependencies',
+        'table_id',
+        'dependency_id',
         string='Dependencies'
     )
-    
-    mapping_ids = fields.One2many('etl.column.mapping', 'table_id', string='Column Mappings')
-    sync_log_ids = fields.One2many('etl.sync.log', 'table_id', string='Sync Logs')
-    
+
+    mapping_ids = fields.One2many(
+        'etl.column.mapping', 'table_id', string='Column Mappings')
+    sync_log_ids = fields.One2many(
+        'etl.sync.log', 'table_id', string='Sync Logs')
+
     last_sync_time = fields.Datetime('Last Sync Time', readonly=True)
     last_sync_status = fields.Selection([
         ('success', 'Success'),
@@ -59,19 +73,20 @@ class ETLSourceTable(models.Model):
         ('running', 'Running'),
     ], string='Last Sync Status', readonly=True)
     last_sync_message = fields.Text('Last Sync Message', readonly=True)
-    
-    total_records_synced = fields.Integer('Total Records Synced', readonly=True)
-    
+
+    total_records_synced = fields.Integer(
+        'Total Records Synced', readonly=True)
+
     @api.constrains('dependency_ids')
     def _check_dependencies(self):
         for table in self:
             if table in table.dependency_ids:
                 raise ValidationError(_("A table cannot depend on itself!"))
-    
+
     def get_config_json(self):
         """Generate JSON configuration for ETL process"""
         self.ensure_one()
-        
+
         # Normalize all mappings to lowercase
         normalized_mappings = {}
         for mapping in self.mapping_ids:
@@ -79,17 +94,17 @@ class ETLSourceTable(models.Model):
                 'target': mapping.target_column.lower(),
                 'type': mapping.mapping_type,
             }
-            
+
             if mapping.mapping_type == 'lookup':
                 mapping_dict.update({
                     'lookup_table': mapping.lookup_table.lower(),
                     'lookup_key': mapping.lookup_key.lower(),
                     'lookup_value': mapping.lookup_value.lower()
                 })
-            
+
             # Store with lowercase source column as key
             normalized_mappings[mapping.source_column.lower()] = mapping_dict
-            
+
         return {
             'source_table': self.name.lower(),
             'target_table': self.target_table.lower(),
@@ -98,29 +113,53 @@ class ETLSourceTable(models.Model):
             'dependencies': [dep.name.lower() for dep in self.dependency_ids],
             'mappings': normalized_mappings
         }
-    
+
+    # def action_test_connection(self):
+    #     """Test database connections"""
+    #     self.ensure_one()
+    #     try:
+    #         etl_manager = self.env['etl.manager']
+    #         with etl_manager.get_connections() as (mssql_conn, pg_conn):
+    #             mssql_cursor = mssql_conn.cursor()
+    #             pg_cursor = pg_conn.cursor()
+
+    #             return {
+    #                 'type': 'ir.actions.client',
+    #                 'tag': 'display_notification',
+    #                 'params': {
+    #                     'title': _('Success'),
+    #                     'message': _('Successfully connected to both databases!'),
+    #                     'type': 'success',
+    #                     'sticky': False,
+    #                 }
+    #             }
+    #     except Exception as e:
+    #         return {
+    #             'type': 'ir.actions.client',
+    #             'tag': 'display_notification',
+    #             'params': {
+    #                 'title': _('Error'),
+    #                 'message': str(e),
+    #                 'type': 'danger',
+    #                 'sticky': True,
+    #             }
+    #         }
+
     def action_test_connection(self):
         """Test database connections"""
         self.ensure_one()
         try:
             etl_manager = self.env['etl.manager']
-            with etl_manager.get_connections() as (source_conn, pg_conn):
-                source_cursor = source_conn.cursor()
+            with etl_manager.get_connections() as (mssql_conn, pg_conn):
+                mssql_cursor = mssql_conn.cursor()
                 pg_cursor = pg_conn.cursor()
-
-                # Optional: Test a simple query on both connections
-                is_postgres_source = isinstance(
-                    source_conn, psycopg2.extensions.connection)
-                test_query = "SELECT 1" if is_postgres_source else "SELECT 1 AS test"
-                source_cursor.execute(test_query)
-                pg_cursor.execute("SELECT 1")
 
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
                         'title': _('Success'),
-                        'message': _('Successfully connected to both source and target databases!'),
+                        'message': _('Successfully connected to both databases!'),
                         'type': 'success',
                         'sticky': False,
                     }
@@ -137,6 +176,35 @@ class ETLSourceTable(models.Model):
                 }
             }
 
+    # def action_sync_table(self):
+    #     """Manual sync action"""
+    #     self.ensure_one()
+    #     try:
+    #         etl_manager = self.env['etl.manager']
+    #         etl_manager.process_table(self)
+
+    #         return {
+    #             'type': 'ir.actions.client',
+    #             'tag': 'display_notification',
+    #             'params': {
+    #                 'title': _('Success'),
+    #                 'message': _('Table synchronization started successfully'),
+    #                 'type': 'success',
+    #                 'sticky': False,
+    #             }
+    #         }
+    #     except Exception as e:
+    #         return {
+    #             'type': 'ir.actions.client',
+    #             'tag': 'display_notification',
+    #             'params': {
+    #                 'title': _('Error'),
+    #                 'message': str(e),
+    #                 'type': 'danger',
+    #                 'sticky': True,
+    #             }
+    #         }
+
     def action_sync_table(self):
         """Queue a sync job with chunking for very large tables"""
         self.ensure_one()
@@ -145,20 +213,12 @@ class ETLSourceTable(models.Model):
             # Check if table is large to determine if queue_job should be used
             try:
                 etl_manager = self.env['etl.manager']
-                with etl_manager.get_connections() as (source_conn, pg_conn):
+                with etl_manager.get_connections() as (mssql_conn, pg_conn):
                     config = self.get_config_json()
-                    source_cursor = source_conn.cursor()
-
-                    # Determine source DB type for query syntax
-                    is_postgres_source = isinstance(
-                        source_conn, psycopg2.extensions.connection)
-                    table_delimiter = '"' if is_postgres_source else '['
-                    table_delimiter_end = '"' if is_postgres_source else ']'
-
-                    # Count total records
-                    count_query = f"SELECT COUNT(*) FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
-                    source_cursor.execute(count_query)
-                    total_count = source_cursor.fetchone()[0]
+                    mssql_cursor = mssql_conn.cursor()
+                    count_query = f"SELECT COUNT(*) FROM [{config['source_table']}]"
+                    mssql_cursor.execute(count_query)
+                    total_count = mssql_cursor.fetchone()[0]
 
                     # For small tables (< 20,000 rows), run synchronously
                     if total_count < 20000:
@@ -179,13 +239,9 @@ class ETLSourceTable(models.Model):
                     primary_key_original = None
 
                     # Get original column name with proper case
-                    query = (
-                        f"SELECT TOP 1 * FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
-                        if not is_postgres_source
-                        else f'SELECT * FROM "{config["source_table"]}" LIMIT 1'
-                    )
-                    source_cursor.execute(query)
-                    for col in source_cursor.description:
+                    query = f"SELECT TOP 1 * FROM [{config['source_table']}]"
+                    mssql_cursor.execute(query)
+                    for col in mssql_cursor.description:
                         if col[0].lower() == primary_key.lower():
                             primary_key_original = col[0]
                             break
@@ -196,20 +252,16 @@ class ETLSourceTable(models.Model):
 
                     # For very large tables (> 500,000 rows), split into chunks
                     if total_count > 500000:
-                        chunk_size = 100000  # Process 150k records per job
+                        chunk_size = 150000  # Process 150k records per job
                         chunks = math.ceil(total_count / chunk_size)
 
                         # Get range of primary key values
-                        min_query = (
-                            f"SELECT MIN({table_delimiter}{primary_key_original}{table_delimiter_end}) FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
-                        )
-                        max_query = (
-                            f"SELECT MAX({table_delimiter}{primary_key_original}{table_delimiter_end}) FROM {table_delimiter}{config['source_table']}{table_delimiter_end}"
-                        )
-                        source_cursor.execute(min_query)
-                        min_id = source_cursor.fetchone()[0]
-                        source_cursor.execute(max_query)
-                        max_id = source_cursor.fetchone()[0]
+                        min_query = f"SELECT MIN([{primary_key_original}]) FROM [{config['source_table']}]"
+                        max_query = f"SELECT MAX([{primary_key_original}]) FROM [{config['source_table']}]"
+                        mssql_cursor.execute(min_query)
+                        min_id = mssql_cursor.fetchone()[0]
+                        mssql_cursor.execute(max_query)
+                        max_id = mssql_cursor.fetchone()[0]
 
                         _logger.info(
                             f"Splitting table {self.name} into {chunks} chunks (min_id={min_id}, max_id={max_id})")
@@ -320,7 +372,7 @@ class ETLSourceTable(models.Model):
                     'sticky': True,
                 }
             }
-    
+
     def sync_table_job_main(self, total_chunks):
         """Main job that coordinates multiple chunk jobs"""
         try:
@@ -328,12 +380,13 @@ class ETLSourceTable(models.Model):
                 'job_status': 'started',
                 'progress_percentage': 0
             })
-            
+
             # This job doesn't do processing itself - it just waits for all chunks
             # to complete and then updates the final status
-            
-            _logger.info(f"Main sync job started for table {self.name} with {total_chunks} chunks")
-            
+
+            _logger.info(
+                f"Main sync job started for table {self.name} with {total_chunks} chunks")
+
             return {
                 'table': self.name,
                 'status': 'started',
@@ -341,14 +394,15 @@ class ETLSourceTable(models.Model):
             }
         except Exception as e:
             error_message = str(e)
-            _logger.error(f"Error in main sync job for table {self.name}: {error_message}")
-            
+            _logger.error(
+                f"Error in main sync job for table {self.name}: {error_message}")
+
             self.write({
                 'job_status': 'failed',
                 'last_sync_status': 'failed',
                 'last_sync_message': f'Main job error: {error_message}'
             })
-            
+
             return {
                 'table': self.name,
                 'status': 'failed',
@@ -359,18 +413,19 @@ class ETLSourceTable(models.Model):
         """Process a chunk of a large table"""
         try:
             # We don't update the main job status since this is just a chunk
-            _logger.info(f"Starting chunk {chunk_num}/{total_chunks} for table {self.name}")
-            
+            _logger.info(
+                f"Starting chunk {chunk_num}/{total_chunks} for table {self.name}")
+
             etl_manager = self.env['etl.manager']
             stats = etl_manager.process_table_chunk(self, min_id, max_id)
-            
+
             # Update progress in main job
             current_progress = (chunk_num / total_chunks) * 100
             self.write({
                 'progress_percentage': current_progress,
                 'last_sync_message': f'Processed chunk {chunk_num}/{total_chunks} ({current_progress:.1f}%)'
             })
-            
+
             # If this is the last chunk, mark the main job as complete
             if chunk_num == total_chunks:
                 self.write({
@@ -378,7 +433,7 @@ class ETLSourceTable(models.Model):
                     'progress_percentage': 100,
                     'last_sync_message': f'All {total_chunks} chunks completed successfully'
                 })
-            
+
             return {
                 'table': self.name,
                 'status': 'success',
@@ -389,13 +444,14 @@ class ETLSourceTable(models.Model):
             }
         except Exception as e:
             error_message = str(e)
-            _logger.error(f"Sync job failed for table {self.name} chunk {chunk_num}: {error_message}")
-            
+            _logger.error(
+                f"Sync job failed for table {self.name} chunk {chunk_num}: {error_message}")
+
             # Don't mark the main job as failed, just update the message
             self.write({
                 'last_sync_message': f'Error in chunk {chunk_num}/{total_chunks}: {error_message}'
             })
-            
+
             return {
                 'table': self.name,
                 'status': 'failed',
@@ -413,19 +469,20 @@ class ETLSourceTable(models.Model):
                 'job_status': 'started',
                 'progress_percentage': 0  # Initialize progress to 0%
             })
-            
+
             # Wrap process_table in a custom handler to update progress
             original_logger_info = _logger.info
-            
+
             def custom_logger_info(message):
                 # Intercept progress log messages to update the progress bar
                 original_logger_info(message)
                 if "Progress:" in message:
                     try:
                         # Extract progress percentage from the log message
-                        progress_str = message.split("Progress:")[1].split("%")[0].strip()
+                        progress_str = message.split("Progress:")[
+                            1].split("%")[0].strip()
                         progress = float(progress_str)
-                        
+
                         # Update progress on the record
                         self.write({
                             'progress_percentage': progress,
@@ -433,25 +490,25 @@ class ETLSourceTable(models.Model):
                         })
                     except Exception:
                         pass  # If parsing fails, just continue
-            
+
             # Replace logger temporarily
             _logger.info = custom_logger_info
-            
+
             try:
                 # Use your existing process_table method
                 etl_manager = self.env['etl.manager']
                 etl_manager.process_table(self)
-                
+
                 # Restore original logger
                 _logger.info = original_logger_info
-                
+
                 # Update final status
                 self.write({
                     'job_status': 'done',
                     'progress_percentage': 100,  # Set to 100% when complete
                     'last_sync_message': f'Sync completed successfully at {fields.Datetime.now()}'
                 })
-                
+
                 return {
                     'table': self.name,
                     'status': 'success',
@@ -460,17 +517,18 @@ class ETLSourceTable(models.Model):
             finally:
                 # Ensure logger is restored even if there's an exception
                 _logger.info = original_logger_info
-            
+
         except Exception as e:
             error_message = str(e)
-            _logger.error(f"Sync job failed for table {self.name}: {error_message}")
-            
+            _logger.error(
+                f"Sync job failed for table {self.name}: {error_message}")
+
             self.write({
                 'job_status': 'failed',
                 'last_sync_status': 'failed',
                 'last_sync_message': error_message
             })
-            
+
             return {
                 'table': self.name,
                 'status': 'failed',
@@ -489,28 +547,31 @@ class ETLSourceTable(models.Model):
             'context': self.env.context,
         }
 
+
 class ETLCategory(models.Model):
     _name = 'etl.category'
     _description = 'ETL Table Category'
     _order = 'sequence, name'
-    
+
     name = fields.Char('Category Name', required=True)
     code = fields.Char('Category Code', required=True)
     sequence = fields.Integer('Sequence', default=10)
     active = fields.Boolean(default=True)
-    
+
     _sql_constraints = [
         ('code_uniq', 'unique (code)', 'Category code must be unique!')
     ]
+
 
 class ETLFrequency(models.Model):
     _name = 'etl.frequency'
     _description = 'ETL Sync Frequency'
     _order = 'sequence, name'
-    
+
     name = fields.Char('Frequency Name', required=True)
     code = fields.Char('Frequency Code', required=True)
-    interval_number = fields.Integer('Interval Number', default=1, required=True)
+    interval_number = fields.Integer(
+        'Interval Number', default=1, required=True)
     interval_type = fields.Selection([
         ('minutes', 'Minutes'),
         ('hours', 'Hours'),
@@ -520,10 +581,11 @@ class ETLFrequency(models.Model):
     ], string='Interval Type', required=True)
     sequence = fields.Integer('Sequence', default=10)
     active = fields.Boolean(default=True)
-    
+
     _sql_constraints = [
         ('code_uniq', 'unique (code)', 'Frequency code must be unique!')
     ]
+
 
 class ETLColumnMapping(models.Model):
     _name = 'etl.column.mapping'
@@ -531,19 +593,20 @@ class ETLColumnMapping(models.Model):
     _order = 'sequence, id'
 
     sequence = fields.Integer('Sequence', default=10)
-    table_id = fields.Many2one('etl.source.table', required=True, ondelete='cascade')
+    table_id = fields.Many2one(
+        'etl.source.table', required=True, ondelete='cascade')
     source_column = fields.Char('Source Column', required=True)
     target_column = fields.Char('Target Column', required=True)
     mapping_type = fields.Selection([
         ('direct', 'Direct'),
         ('lookup', 'Lookup')
     ], required=True, default='direct')
-    
+
     # For lookup mappings
     lookup_table = fields.Char('Lookup Table')
     lookup_key = fields.Char('Lookup Key')
     lookup_value = fields.Char('Lookup Value')
-    
+
     active = fields.Boolean(default=True)
 
     @api.model
@@ -570,20 +633,23 @@ class ETLColumnMapping(models.Model):
         if vals.get('lookup_value'):
             vals['lookup_value'] = vals['lookup_value'].lower()
         return super().write(vals)
-    
+
     @api.constrains('mapping_type', 'lookup_table', 'lookup_key', 'lookup_value')
     def _check_lookup_fields(self):
         for mapping in self:
             if mapping.mapping_type == 'lookup':
                 if not (mapping.lookup_table and mapping.lookup_key and mapping.lookup_value):
-                    raise ValidationError(_("Lookup mappings require lookup table, key, and value!"))
+                    raise ValidationError(
+                        _("Lookup mappings require lookup table, key, and value!"))
+
 
 class ETLSyncLog(models.Model):
     _name = 'etl.sync.log'
     _description = 'ETL Synchronization Log'
     _order = 'create_date desc'
 
-    table_id = fields.Many2one('etl.source.table', string='Table', required=True)
+    table_id = fields.Many2one(
+        'etl.source.table', string='Table', required=True)
     start_time = fields.Datetime('Start Time', required=True)
     end_time = fields.Datetime('End Time')
     status = fields.Selection([
@@ -595,8 +661,9 @@ class ETLSyncLog(models.Model):
     new_records = fields.Integer('New Records')
     updated_records = fields.Integer('Updated Records')
     error_message = fields.Text('Error Message')
-    row_hashes = fields.Text('Row Hashes', help="JSON string storing the row hashes for change detection")
-    
+    row_hashes = fields.Text(
+        'Row Hashes', help="JSON string storing the row hashes for change detection")
+
     def name_get(self):
         return [(log.id, f"{log.table_id.name} - {log.start_time}") for log in self]
 

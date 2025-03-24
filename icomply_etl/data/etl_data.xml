@@ -7,16 +7,10 @@
             <field name="value">Driver={ODBC Driver 18 for SQL Server};Server=server_name;Database=database_name;UID=username;PWD=password;TrustServerCertificate=yes;</field>
         </record>
 
-        <!-- Source PostgreSQL Connection String -->
-        <record id="etl_source_postgres" model="ir.config_parameter">
-            <field name="key">etl.source_postgres</field>
-            <field name="value">dbname=icomply user=IComplyDueDiligence password=IcomPlyc@23b41 host=172.20.160.111 port=5432</field>
-        </record>
-
         <!-- PostgreSQL Connection String -->
         <record id="etl_postgres_connection_string" model="ir.config_parameter">
             <field name="key">etl.postgres_connection_string</field>
-            <field name="value">dbname=due_d user=odoo password=odoo host=localhost port=5432</field>
+            <field name="value">dbname=dbname user=user password=password host=localhost port=5432</field>
         </record>
 
         <!-- Default Batch Size -->
