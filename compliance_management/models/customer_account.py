@@ -8,8 +8,10 @@ class CustomerAccount(models.Model):
     _description = 'Account'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _sql_constraints = [
-        ('uniq_account_name', 'unique(name)',
-         "Account Name already exists. Value must be unique!"),
+        # ('uniq_account_name', 'unique(name)',
+        #  "Account Name already exists. Value must be unique!"),
+        ('uniq_account_id', 'unique(customer_id)',
+         "Customer ID already exists. Value must be unique!"),
     ]
     _order = "name" 
     name = fields.Char(string="Account Number")
@@ -25,6 +27,7 @@ class CustomerAccount(models.Model):
     opening_date = fields.Date(
         string='Last Opening Date', required=False)
     
+
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', required=False) #acct_officer
     
@@ -39,16 +42,24 @@ class CustomerAccount(models.Model):
     
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
+
     product_id = fields.Many2one(
         comodel_name='res.partner.account.product', string='Product',index=True)
-    date_created = fields.Date(string='Date Created', index=True)
+    date_created = fields.Date(string='Date Created', index=True) #date_created
     ledger_id = fields.Many2one(comodel_name='res.partner.account.ledger', string='Ledger',index=True)
     closure_status = fields.Selection(string='Closure Status', selection=[('N', 'No'), ('Y', 'Yes')])
     customer_id = fields.Many2one(comodel_name='res.partner', string='Customer',index=True) #customer
     branch_id = fields.Many2one(comodel_name='res.branch', string='Branch',index=True)
     balance = fields.Float(string='Balance', digits=(15,4)) #working_balance
     account_type_id = fields.Many2one(comodel_name='res.partner.account.type', string='Account Type',index=True)
+
     risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment',index=True)
+    risk_score = fields.Float(string='Risk Score', digits=(10,2),related="customer_id.risk_score")
+    risk_level = fields.Char(string='Risk Rating',related="customer_id.risk_level")
+    account_type_id = fields.Many2one(comodel_name='res.partner.account.type', string='Account Type',index=True)
+    currency_id = fields.Many2one(
+        comodel_name='res.currency', string='Currency', index=True)
+    
     # num_tran_last6m_credit = fields.Integer(string='Transactions - Last 6m')
     # avg_tran_last6m_credit = fields.Float(string='Avg. Transaction Amount - Last 6m', digits=(10,2))
     # max_tran_last6m_credit = fields.Float(string='Max. Transaction - Last 6m', digits=(10,2))
@@ -130,6 +141,7 @@ class CustomerAccount(models.Model):
     avg_debit_last1y = fields.Float(string='Avg. Debit Amount - Last 1Y', digits=(10,2))
     max_debit_last1y = fields.Float(string='Max. Debit - Last 1Y', digits=(10,2))
     tot_debit_last1y = fields.Float(string='Total Debit Amount - Last 1Y', digits=(15,2))
+
     state = fields.Selection(string='Status', selection=[('active', 'Active'), ('dormant', 'Dormant'),('locked','Locked')],tracking=True,default='active',required=False) #sta_code
     
      
