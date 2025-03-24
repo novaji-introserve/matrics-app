@@ -22,7 +22,7 @@ export const terminalService = {
         const logs = [];
         const listeners = new Set();
         const MAX_LOGS = 1000;
-        const MAX_RECONNECT_ATTEMPTS = 1;
+        const MAX_RECONNECT_ATTEMPTS = 3;
         const RECONNECT_DELAY = 3000; // 3 seconds
 
         // Add a log entry
@@ -355,6 +355,8 @@ export const terminalService = {
 };
 
 registry.category("services").add("terminal", terminalService);
+
+
 
 
 // /** @odoo-module **/

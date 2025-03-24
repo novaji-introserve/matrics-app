@@ -132,7 +132,8 @@ class ChunkedUploader {
                 if (csrf_token) {
                     xhr.setRequestHeader('X-CSRFToken', csrf_token);
                 } else {
-                    console.warn('CSRF token not found - request may fail');
+                    // console.warn('CSRF token not found - request may fail');
+                    console.debug('CSRF token not found, but route has csrf=False so this is ok');
                 }
 
                 // Track progress

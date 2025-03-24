@@ -188,7 +188,7 @@ export class ImportFormComponent extends Component {
         try {
             const result = await this.rpc("/csv_import/get_import_models", {
                 search_term: term,
-                limit: 100
+                limit: 200
             });
 
             this.state.filteredModels = result.models || [];
