@@ -42,8 +42,8 @@
 }
 
 .box:hover{
-    transform: scale(1.2);
-    transition: all 5s ease-in-out;
+    transform: scale(1.1);
+    transition: all 3s ease-in-out;
 }
 
 .catbox{
@@ -75,9 +75,7 @@
 .chart{
     min-height: 45vh;
 }
-.doughnut{
-    min-height: 45vh;
-}
+
 
 @media (max-width: 768px) {
     .rightside{

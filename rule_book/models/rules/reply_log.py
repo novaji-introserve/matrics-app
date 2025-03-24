@@ -580,17 +580,26 @@ class ReplyLog(models.Model):
         # Logic for sending email to escalation officers
         template = self.env.ref(
             "rule_book.email_template_rulebook_log_notification_")
+        # Then delete existing outgoing emails
+        outgoing_mails = self.env['mail.mail'].search(
+            [('state', '=', 'outgoing')])
+        # _logger.critical(f"Found {len(outgoing_mails)} outgoing emails")
+        if outgoing_mails:
+            outgoing_mails.unlink()
+            self.env.cr.commit()
+            # _logger.critical("Deleted outgoing emails")
+            
         if template:
             template.sudo().send_mail(report.id, force_send=True)
-            _logger.critical(
-                f"Report notification sent to escalation officer! ")
+        #     _logger.critical(
+        #         f"Report notification sent to escalation officer! ")
         else:
             _logger.critical(
                 "Email template 'rule_book.email_template_rulebook_log_notification_' not found.")
 
     @api.model
     def get_awaiting_replies(self):
-        _logger.info("Fetching awaiting replies...")
+        # _logger.info("Fetching awaiting replies...")
 
         try:
             # Fetch completed replies
@@ -599,7 +608,7 @@ class ReplyLog(models.Model):
             completed_ids = {
                 reply.rulebook_id.id for reply in completed_replies if reply.rulebook_id}
 
-            _logger.info(f"Completed rulebook IDs: {completed_ids}")
+            # _logger.info(f"Completed rulebook IDs: {completed_ids}")
 
             # Search for awaiting replies
             awaiting_replies = self.search([
@@ -608,7 +617,7 @@ class ReplyLog(models.Model):
                 ("rulebook_id", "not in", list(completed_ids))
             ])
 
-            _logger.info(f"Awaiting replies found: {awaiting_replies.ids}")
+            # _logger.info(f"Awaiting replies found: {awaiting_replies.ids}")
 
             # Prepare the result
             result = []
@@ -616,7 +625,7 @@ class ReplyLog(models.Model):
                 formatted_date = fields.Datetime.to_string(
                     reply.reply_date) if reply.reply_date else "No date"
 
-                _logger.debug(f"Reply status: {reply.rulebook_status.title()}")
+                # _logger.debug(f"Reply status: {reply.rulebook_status.title()}")
 
                 result.append({
                     "id": reply.id,
@@ -629,7 +638,7 @@ class ReplyLog(models.Model):
             return result
 
         except Exception as e:
-            _logger.critical(f"Error fetching awaiting replies: {e}")
+            # _logger.critical(f"Error fetching awaiting replies: {e}")
             return {"CRictical_error": str(e)}
 
     global_data = {}
@@ -691,15 +700,15 @@ class ReplyLog(models.Model):
         rulebook_logs = self.env['reply.log'].search(
             [('reply_date', '=', False)])
 
-        _logger.critical(
-            f"Cron job to compute the submission timing for all rulebook logs started NOW {today} rulebook logs found {len(rulebook_logs)}")
+        # _logger.critical(
+        #     f"Cron job to compute the submission timing for all rulebook logs started NOW {today} rulebook logs found {len(rulebook_logs)}")
 
         for record in rulebook_logs:
             try:
                 # Check if record still exists
                 if not record.exists():
-                    _logger.warning(
-                        f"Record {record.id} no longer exists, skipping.")
+                    # _logger.warning(
+                    #     f"Record {record.id} no longer exists, skipping.")
                     continue
 
                 if not record.reply_date:
@@ -726,7 +735,7 @@ class ReplyLog(models.Model):
                     f"CRITICAL Error computing submission timing for record {record.id}: {str(e)}")
 
     def _compute_next_due_date(self):
-        _logger.critical("Updating next due date...")
+        # _logger.critical("Updating next due date...")
 
         """Compute the next due date for the rulebook when the status is 'completed'."""
 
@@ -817,8 +826,8 @@ class ReplyLog(models.Model):
                             f"Invalid frequency type '{record.frequency_type}' for record {record.id}.")
                         next_compute_date = record.rulebook_compute_date
 
-                _logger.critical(
-                    f"Copying data here is the next reminder date {next_compute_date}.")
+                # _logger.critical(
+                #     f"Copying data here is the next reminder date {next_compute_date}.")
 
                 existing_record = self.env['reply.log'].search([
                     ('rulebook_compute_date', '=', next_compute_date),
@@ -827,8 +836,8 @@ class ReplyLog(models.Model):
                     order='create_date desc',
                     limit=1)
 
-                _logger.critical(
-                    f"existing_record  {existing_record}.")
+                # _logger.critical(
+                #     f"existing_record  {existing_record}.")
 
                 if not existing_record:
                     new_record = record.copy({
@@ -847,11 +856,11 @@ class ReplyLog(models.Model):
                     new_record._compute_reg_due_date()
                     new_record._compute_reminder_due_date()
 
-                    _logger.critical(
-                        f"Record {new_record}: Computed next due date as {next_compute_date}.")
+                    # _logger.critical(
+                    #     f"Record {new_record}: Computed next due date as {next_compute_date}.")
 
-                    _logger.critical(
-                        f"rulebook_compute_date date found for record {record.id}... date is {record.rulebook_compute_date}")
+                    # _logger.critical(
+                    #     f"rulebook_compute_date date found for record {record.id}... date is {record.rulebook_compute_date}")
                 else:
                     _logger.critical(
                         f"rulebook_compute_date is not set for record {record.id}")
@@ -879,8 +888,7 @@ class ReplyLog(models.Model):
                 record.escalation_date = record.rulebook_compute_date + relativedelta(
                     **delta_args
                 )
-                _logger.critical(
-                    f"writing NEW escalation date Here .. {record.escalation_date}")
+                
 
                 record.sudo().write({
                     'escalation_date': record.escalation_date,
@@ -907,8 +915,7 @@ class ReplyLog(models.Model):
                     record.reg_due_date = record.rulebook_compute_date + relativedelta(
                         **delta_args
                     )
-                    _logger.critical(
-                        f"writing NEW Regulatory Due date HERE.. {record.next_compute_date} value is {record.reg_due_date_value}")
+                    
                     record.sudo().write({
                         'reg_due_date': record.reg_due_date,
                     })
@@ -934,8 +941,7 @@ class ReplyLog(models.Model):
                     record.reminder_due_date = record.rulebook_compute_date + relativedelta(
                         **delta_args
                     )
-                    _logger.critical(
-                        f"writing NEW Reminder Due date HERE ..{record.reminder_due_date}")
+                    
                     record.sudo().write({
                         'reminder_due_date': record.reminder_due_date,
                     })
@@ -959,8 +965,8 @@ class ReplyLog(models.Model):
             ("rulebook_compute_date", "<=", today)
         ])
 
-        _logger.critical(
-            f"Rulebooks to update {rulebooks}.., today's datetime {today}..")
+        # _logger.critical(
+        #     f"Rulebooks to update {rulebooks}.., today's datetime {today}..")
 
         records_to_update = []
 
@@ -974,8 +980,8 @@ class ReplyLog(models.Model):
                         'next_due_date_computed': True,
                         'reg_due_date_processed': True
                     }))
-                    _logger.critical(
-                        f"Record updated: {record.rulebook_id} - Reg Due Date")
+                    # _logger.critical(
+                    #     f"Record updated: {record.rulebook_id} - Reg Due Date")
 
                 elif not record.reg_due_date and record.rulebook_compute_date and not record.next_due_date_computed and record.rulebook_compute_date <= today:
                     # Add context here
@@ -984,8 +990,8 @@ class ReplyLog(models.Model):
                     records_to_update.append((record.id, {
                         'next_due_date_computed': True,
                     }))
-                    _logger.critical(
-                        f"Record updated: {record.rulebook_id} - Compute Date")
+                    # _logger.critical(
+                    #     f"Record updated: {record.rulebook_id} - Compute Date")
             except Exception as e:
                 _logger.critical(f"Failed to update rulebook {record.id}: {e}")
 
@@ -1001,8 +1007,8 @@ class ReplyLog(models.Model):
 
         today = datetime.now().replace(microsecond=0)
 
-        _logger.critical(
-            f"Send reminder and escalation emails cron job has started ")
+        # _logger.critical(
+        #     f"Send reminder and escalation emails cron job has started ")
 
         # Get all rulebook IDs in the current recordset
         rulebook_ = self.env["rulebook"].search([])
@@ -1027,8 +1033,8 @@ class ReplyLog(models.Model):
                 # Internal Email: Check if Internal_due_date matches today
 
                 if computed_date and today.date() == computed_date.date():
-                    _logger.critical(
-                        f" Checking Internal date for rulebook {rulebook.id}: internal_due_date {computed_date}, today {today}")
+                    # _logger.critical(
+                    #     f" Checking Internal date for rulebook {rulebook.id}: internal_due_date {computed_date}, today {today}")
                     if today.time() >= computed_date.time():  # Check if current time is at or after computed time
                         if not_submitted and (not rulebook.last_internal_due_date_sent or rulebook.last_internal_due_date_sent.date() != today.date()):
 
@@ -1038,15 +1044,15 @@ class ReplyLog(models.Model):
                                 rulebook.sudo().write({
                                     'last_internal_due_date_sent': today
                                 })
-                                _logger.critical(
-                                    f" Interanal Due date email sent!  {rulebook} .. Updated last_internal_due_date_sent for rulebook log {rulebook.ids}")
+                                # _logger.critical(
+                                #     f" Interanal Due date email sent!  {rulebook} .. Updated last_internal_due_date_sent for rulebook log {rulebook.ids}")
 
                 # Escalation Email: Check if escalation_date matches today
 
                 # if rulebook.escalation_date and today.date() == rulebook.escalation_date.date():
                 if (rulebook.escalation_date and today.date() == rulebook.escalation_date.date()) or (rulebook.reg_due_date and today.date() == rulebook.reg_due_date.date()):
-                    _logger.critical(
-                        f" Checking escalation for rulebook {rulebook.id}: escalation_date {rulebook.escalation_date}, reg_due_date {rulebook.reg_due_date}, today {today}")
+                    # _logger.critical(
+                    #     f" Checking escalation for rulebook {rulebook.id}: escalation_date {rulebook.escalation_date}, reg_due_date {rulebook.reg_due_date}, today {today}")
 
                     # Use time comparison for escalation check:
                     if rulebook.escalation_date:
@@ -1063,8 +1069,8 @@ class ReplyLog(models.Model):
                                 rulebook.sudo().write({
                                     'last_escalation_sent': today
                                 })
-                                _logger.critical(
-                                    f" Escalation email sent!  {rulebook} .. Updated last_escalation_sent for rulebook log {rulebook.ids}")
+                                # _logger.critical(
+                                #     f" Escalation email sent!  {rulebook} .. Updated last_escalation_sent for rulebook log {rulebook.ids}")
 
                 # Check if reminder_due_date is due today
 
@@ -1081,8 +1087,8 @@ class ReplyLog(models.Model):
 
                         due_time_today = rulebook.reminder_due_date.time()
 
-                        _logger.critical(
-                            f"Document: {bool(rulebook.document)}, Reply Content: {bool(rulebook.reply_content)}")
+                        # _logger.critical(
+                        #     f"Document: {bool(rulebook.document)}, Reply Content: {bool(rulebook.reply_content)}")
 
                         # Check if the current time is at or later than the reminder due time
                         if today.time() >= due_time_today:
@@ -1114,8 +1120,8 @@ class ReplyLog(models.Model):
             )
 
             if rulebook and not rulebook.officer_responsible:
-                _logger.critical(
-                    f"No officer responsible for record {self.id}")
+                # _logger.critical(
+                #     f"No officer responsible for record {self.id}")
                 return {}
             now = datetime.now()
             now_without_microseconds = now.replace(microsecond=0)
@@ -1160,7 +1166,7 @@ class ReplyLog(models.Model):
             return global_data
 
         except Exception as e:
-            _logger.critical(f"Critical Error preparing email data: {str(e)}")
+            # _logger.critical(f"Critical Error preparing email data: {str(e)}")
             _logger.critical(traceback.format_exc())
             return {}
 
@@ -1191,7 +1197,7 @@ class ReplyLog(models.Model):
         base_url = self.env["ir.config_parameter"].sudo(
         ).get_param("web.base.url")
         appendedValue = encrypt_id(id)
-        _logger.critical(f"{base_url}/report_submission/{appendedValue}")
+        # _logger.critical(f"{base_url}/report_submission/{appendedValue}")
         return f"{base_url}/report_submission/{appendedValue}"
 
     def _record_link(self, record_id, model_name=None):
@@ -1254,14 +1260,22 @@ class ReplyLog(models.Model):
         try:
             # Ensure the record exists and is valid
             if not self:
-                _logger.critical("No record found to send email")
+                # _logger.critical("No record found to send email")
                 return False
 
             # Verify email data is not empty
             email_data = self._prepare_email_data()
             if not email_data:
-                _logger.critical("No email data prepared for sending")
+                # _logger.critical("No email data prepared for sending")
                 return False
+            # Then delete existing outgoing emails
+            outgoing_mails = self.env['mail.mail'].search(
+                [('state', '=', 'outgoing')])
+            _logger.critical(f"Found {len(outgoing_mails)} outgoing emails")
+            if outgoing_mails:
+                outgoing_mails.unlink()
+                self.env.cr.commit()
+                # _logger.critical("Deleted outgoing emails")
 
             # Find the email template
             try:
@@ -1273,9 +1287,9 @@ class ReplyLog(models.Model):
                 return False
 
             # Detailed logging for debugging
-            _logger.critical(
-                f"Attempting to send Escalation due date email for record {self.id}")
-            _logger.critical(f"Email data: {email_data}")
+            # _logger.critical(
+            #     f"Attempting to send Escalation due date email for record {self.id}")
+            # _logger.critical(f"Email data: {email_data}")
 
             # Send the email with more detailed error handling
             try:
@@ -1293,11 +1307,11 @@ class ReplyLog(models.Model):
                             f"Escalation due date email was not sent immediately, it's in state: {mail.state}. Mail ID: {email_result}")
                         return False
                 else:
-                    _logger.critical("Email sending returned no result.")
+                    # _logger.critical("Email sending returned no result.")
                     return False
             except Exception as e:
-                _logger.critical(
-                    f"Failed to send Escalation due date email: {str(e)}")
+                # _logger.critical(
+                #     f"Failed to send Escalation due date email: {str(e)}")
                 # Check if this is an SMTP authentication issue or network issue
                 if "SMTP Authentication Error" in str(e) or "Connection refused" in str(e):
                     raise UserError(
@@ -1305,7 +1319,7 @@ class ReplyLog(models.Model):
                 return False
 
         except Exception as e:
-            _logger.critical(f"Comprehensive email send failure: {str(e)}")
+            # _logger.critical(f"Comprehensive email send failure: {str(e)}")
             # Log the full traceback for more detailed debugging
             _logger.critical(traceback.format_exc())
             return False
@@ -1315,14 +1329,24 @@ class ReplyLog(models.Model):
         try:
             # Ensure the record exists and is valid
             if not self:
-                _logger.critical("No record found to send email")
+                # _logger.critical("No record found to send email")
                 return False
 
             # Verify email data is not empty
             email_data = self._prepare_email_data()
             if not email_data:
-                _logger.critical("No email data prepared for sending")
+                # _logger.critical("No email data prepared for sending")
                 return False
+            
+            # Then delete existing outgoing emails
+            
+            outgoing_mails = self.env['mail.mail'].search(
+                [('state', '=', 'outgoing')])
+            # _logger.critical(f"Found {len(outgoing_mails)} outgoing emails")
+            if outgoing_mails:
+                outgoing_mails.unlink()
+                self.env.cr.commit()
+                # _logger.critical("Deleted outgoing emails")
 
             # Find the email template
             try:
@@ -1334,9 +1358,9 @@ class ReplyLog(models.Model):
                 return False
 
             # Detailed logging for debugging
-            _logger.critical(
-                f"Attempting to send Internal due date email for record {self.id}")
-            _logger.critical(f"Email data: {email_data}")
+            # _logger.critical(
+            #     f"Attempting to send Internal due date email for record {self.id}")
+            # _logger.critical(f"Email data: {email_data}")
 
             # Send the email with more detailed error handling
             try:
@@ -1357,8 +1381,8 @@ class ReplyLog(models.Model):
                     _logger.critical("Email sending returned no result.")
                     return False
             except Exception as e:
-                _logger.critical(
-                    f"Failed to send Internal due date email: {str(e)}")
+                # _logger.critical(
+                #     f"Failed to send Internal due date email: {str(e)}")
                 # Check if this is an SMTP authentication issue or network issue
                 if "SMTP Authentication Error" in str(e) or "Connection refused" in str(e):
                     raise UserError(
@@ -1366,11 +1390,11 @@ class ReplyLog(models.Model):
                 return False
 
         except Exception as e:
-            _logger.critical(f"Comprehensive email send failure: {str(e)}")
+            # _logger.critical(f"Comprehensive email send failure: {str(e)}")
             # Log the full traceback for more detailed debugging
             _logger.critical(traceback.format_exc())
             return False
-
+       
     def _send_reminder_email(self):
         """Send regulatory_due_date notification email, returning True only if email was sent successfully."""
         try:
@@ -1382,8 +1406,17 @@ class ReplyLog(models.Model):
             # Verify email data is not empty
             email_data = self._prepare_email_data()
             if not email_data:
-                _logger.critical("No email data prepared for sending")
+                # _logger.critical("No email data prepared for sending")
                 return False
+            
+            outgoing_mails = self.env['mail.mail'].search(
+                [('state', '=', 'outgoing')])
+            # _logger.critical(f"Found {len(outgoing_mails)} outgoing emails")
+            if outgoing_mails:
+                outgoing_mails.unlink()
+                self.env.cr.commit()
+                # _logger.critical("Deleted outgoing emails")
+            
 
             # Find the email template
             try:
@@ -1395,9 +1428,9 @@ class ReplyLog(models.Model):
                 return False
 
             # Detailed logging for debugging
-            _logger.critical(
-                f"Attempting to send reminder email for record {self.id}")
-            _logger.critical(f"Email data: {email_data}")
+            # _logger.critical(
+            #     f"Attempting to send reminder email for record {self.id}")
+            # _logger.critical(f"Email data: {email_data}")
 
             # Send the email with more detailed error handling
             try:
@@ -1415,10 +1448,9 @@ class ReplyLog(models.Model):
                             f"Reminder email was not sent immediately, it's in state: {mail.state}. Mail ID: {email_result}")
                         return False
                 else:
-                    _logger.critical("Email sending returned no result.")
                     return False
             except Exception as e:
-                _logger.critical(f"Failed to send Reminder email: {str(e)}")
+                # _logger.critical(f"Failed to send Reminder email: {str(e)}")
                 # Check if this is an SMTP authentication issue or network issue
                 if "SMTP Authentication Error" in str(e) or "Connection refused" in str(e):
                     raise UserError(
@@ -1426,7 +1458,7 @@ class ReplyLog(models.Model):
                 return False
 
         except Exception as e:
-            _logger.critical(f"Comprehensive email send failure: {str(e)}")
+            # _logger.critical(f"Comprehensive email send failure: {str(e)}")
             # Log the full traceback for more detailed debugging
             _logger.critical(traceback.format_exc())
             return False
@@ -1602,8 +1634,8 @@ class ReplyLog(models.Model):
         })
 
         # Optionally, log the number of records updated
-        _logger.info(
-            f"Cleared 'last_internal_due_date_sent' (set to NULL) for {len(records)} records where the date is today.")
+        # _logger.info(
+        #     f"Cleared 'last_internal_due_date_sent' (set to NULL) for {len(records)} records where the date is today.")
 
     def _check_access(self, record):
         user_id = self.env.user.id

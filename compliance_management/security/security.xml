@@ -5,7 +5,8 @@
     <record id="User_see_branch_customeers" model="ir.rule">
         <field name="name">User see only branch customers</field>
         <field name="model_id" ref="model_res_partner" />
-        <field name="domain_force">['|', '&amp;',('type', '!=', 'private'), ('type', '=', False),('branch_id', 'in', [e.id for e in user.branches_id])]</field>
+        <field name="domain_force">['|', '&amp;',('type', '!=', 'private'), ('type', '=', False),('branch_id', 'in', user.branches_id.ids)]</field>
+        <!-- <field name="domain_force">['|', '&amp;',('type', '!=', 'private'), ('type', '=', False),('branch_id', 'in', [e.id for e in user.branches_id])]</field> -->
         <field name="groups" eval="[(4, ref('base.group_user'))]" />
         <field name="perm_create" eval="0" />
         <field name="perm_write" eval="0" />

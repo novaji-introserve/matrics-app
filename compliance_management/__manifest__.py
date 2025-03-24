@@ -39,10 +39,7 @@
         'views/configuration.xml',
         'views/edd.xml',
         'views/kyc.xml',
-        'views/adverse_media.xml',
-        'views/adverse_media_logs.xml',
-        'views/adverse_media_keywords.xml',
-        # 'data/data.xml',
+        'data/data.xml',
         'views/risk_assessment.xml',
         'views/res_users.xml',
         'views/sanction_screening.xml',
@@ -55,25 +52,12 @@
         'views/customer_accounts.xml',
         'views/transaction.xml',
         'views/transaction_screening_rule.xml',
-    ],
+                ],
     # only loaded in demonstration mode
     'demo': [
-        # 'demo/demo.xml',
+        'demo/demo.xml',
     ],
-    
     "installable": True,
     "application": True,
     "auto_install": False,
-    'assets':{
-        'web.assets_backend': [
-            'compliance_management/static/src/scss/custom_status_bar.scss',
-            'compliance_management/static/src/css/style.css',
-            'compliance_management/static/src/components/**/*.js',
-            'compliance_management/static/src/components/**/*.xml',
-            'compliance_management/static/src/img/logov.png',
-            'compliance_management/static/img/alt_bank_logo.png',
-            'compliance_management/static/img/alt_bank_logo_.png',
-
-        ]
-    }
 }

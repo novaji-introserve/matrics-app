@@ -208,15 +208,14 @@ export class ChartRenderer extends Component {
           const clickedIndex = elements[0].index;
           const filter = rules_ids[clickedIndex];
 
-          alert(filter)
-
+  
            let domain = [
-             ["rule_id", "=", filter]
+              ["rule_id", "=", filter]
            ];
 
            if (this.props.date > 0) {
-             domain.push(["create_date", ">=", prevDate]);
-             domain.push(["create_date", "<=", currentDate]);
+             domain.push(["date_created", ">=", prevDate]);
+             domain.push(["date_created", "<=", currentDate]);
            }
 
            // Admin Check and Branch Filtering
@@ -224,18 +223,21 @@ export class ChartRenderer extends Component {
              domain.push(["branch_id", "in", this.props.branches_id]);
            }
 
-          // let action = {
-          //   type: "ir.actions.act_window",
-          //   name: "Top 10 Screened Transaction By Rules", // Use constant for action name
-          //   res_model: "res.customer.transaction", // Use constant for model name
-          //   domain: domain,
-          //   views: [
-          //     [false, "tree"], // Use constants for view types
-          //     [false, "form"],
-          //   ],
-          // };
+  
+           
 
-          // this.navigate.doAction(action);
+          let action = {
+            type: "ir.actions.act_window",
+            name: "Top 10 Screened Transaction By Rules", // Use constant for action name
+            res_model: "res.customer.transaction", // Use constant for model name
+            domain: domain,
+            views: [
+              [false, "tree"], // Use constants for view types
+              [false, "form"],
+            ],
+          };
+
+          this.navigate.doAction(action);
         },
         scales: {
           y: {
@@ -345,7 +347,7 @@ export class ChartRenderer extends Component {
             text: this.props.title,
           },
           legend: {
-            position: "right",
+            position: "top",
             align: "center",
           },
         },
