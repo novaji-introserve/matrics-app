@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Define a dedicated CSV import channel -->
+        <record id="csv_import_queue_channel" model="queue.job.channel">
+            <field name="name">csv_import</field>
+            <field name="parent_id" ref="queue_job.channel_root" />
+        </record>
+
+        <!-- Dedicated sub-channel for heavy imports -->
+        <record id="csv_import_heavy_channel" model="queue.job.channel">
+            <field name="name">csv_import_heavy</field>
+            <field name="parent_id" ref="csv_import_queue_channel" />
+        </record>
+
+        <!-- Dedicated sub-channel for parallel segments -->
+        <record id="csv_import_parallel_channel" model="queue.job.channel">
+            <field name="name">csv_import_parallel</field>
+            <field name="parent_id" ref="csv_import_queue_channel" />
+        </record>
+
+        <!-- Configure CSV import job functions with appropriate channels -->
+        <record id="csv_import_process_function" model="queue.job.function">
+            <field name="model_id" ref="model_import_log" />
+            <field name="method">process_file</field>
+            <field name="channel_id" ref="csv_import_queue_channel" />
+        </record>
+
+        <record id="csv_import_segment_function" model="queue.job.function">
+            <field name="model_id" ref="model_import_log" />
+            <field name="method">process_file_segment</field>
+            <field name="channel_id" ref="csv_import_parallel_channel" />
+        </record>
+
+        <record id="csv_import_retry_function" model="queue.job.function">
+            <field name="model_id" ref="model_import_log" />
+            <field name="method">retry_import</field>
+            <field name="channel_id" ref="csv_import_queue_channel" />
+        </record>
+
+        <!-- Configuration parameters - using standard system parameters -->
+        <!-- Extended timeout for large imports (4 hours) -->
+        <record id="ir_config_csv_import_timeout" model="ir.config_parameter">
+            <field name="key">queue_job.timeout.csv_import</field>
+            <field name="value">14400</field>
+        </record>
+
+        <!-- Number of parallel workers for the CSV import channel -->
+        <record id="ir_config_csv_import_workers" model="ir.config_parameter">
+            <field name="key">queue_job.channels.csv_import.workers</field>
+            <field name="value">4</field>
+        </record>
+
+        <!-- Number of parallel workers for heavy imports -->
+        <record id="ir_config_csv_import_heavy_workers" model="ir.config_parameter">
+            <field name="key">queue_job.channels.csv_import_heavy.workers</field>
+            <field name="value">2</field>
+        </record>
+
+        <!-- Number of parallel workers for parallel segments -->
+        <record id="ir_config_csv_import_parallel_workers" model="ir.config_parameter">
+            <field name="key">queue_job.channels.csv_import_parallel.workers</field>
+            <field name="value">24</field>
+        </record>
+
+        <!-- Maximum number of parallel import jobs -->
+        <record id="ir_config_csv_parallel_jobs" model="ir.config_parameter">
+            <field name="key">csv_import.parallel_jobs</field>
+            <field name="value">4</field>
+        </record>
+
+        <!-- Default batch size for imports -->
+        <record id="ir_config_csv_batch_size" model="ir.config_parameter">
+            <field name="key">csv_import.batch_size</field>
+            <field name="value">10000</field>
+        </record>
+    </data>
+</odoo>

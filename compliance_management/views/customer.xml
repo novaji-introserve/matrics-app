@@ -63,7 +63,7 @@
                     <button name="action_unmark_pep" class="oe_highlight" type="object"
                         string="Delist from Global PEP"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Unlink this customer from Global PEP list. Are you sure?" 
+                        confirm="Unlink this customer from Global PEP list. Are you sure?"
                         attrs="{'invisible': [('global_pep', '=',False)]}" />
                     <button name="action_remove_pep" type="object"
                         string="Remove From PEP List"
@@ -96,10 +96,20 @@
                         confirm="Add Customer to Watchlist. Are you sure?"
                         attrs="{'invisible': [('is_watchlist', '=',True)]}" />
                     <button name="action_remove_watchlist" type="object"
-                        string="From from Watchlist"
+                        string="Remove from Watchlist"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Remove from Watchlist. Are you sure?"
                         attrs="{'invisible': [('is_watchlist', '!=',True)]}" />
+                    <button name="action_greylist" class="oe_highlight" type="object"
+                        string="Add to Greylist"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Add Customer to Greylist. Are you sure?"
+                        attrs="{'invisible': [('is_greylist', '=',True)]}" />
+                    <button name="action_remove_greylist" type="object"
+                        string="Remove from Greylist"
+                        groups="compliance_management.group_compliance_branch_compliance_officer"
+                        confirm="Remove from Greylist. Are you sure?"
+                        attrs="{'invisible': [('is_greylist', '!=',True)]}" />
                     <button name="action_conduct_risk_assessment" class="oe_highlight" type="object"
                         string="Conduct Risk Assessment"
                         groups="compliance_management.group_compliance_branch_compliance_officer"

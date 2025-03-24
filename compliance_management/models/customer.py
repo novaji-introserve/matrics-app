@@ -103,6 +103,8 @@ class Customer(models.Model):
     is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
     is_blacklist = fields.Boolean(
         string="Is Blacklist", default=False, tracking=True)
+    is_greylist = fields.Boolean(
+        string="Is Greylist", default=False, tracking=True)
     global_pep = fields.Boolean(string="Global PEP", default=False)
     current_branch_id = fields.Integer(
         string='Current Branch', compute='_get_current_branch')
@@ -320,6 +322,16 @@ class Customer(models.Model):
     def action_remove_watchlist(self):
         for e in self:
             e.write({'is_watchlist': False})
+            e.action_compute_risk_score_with_plan()
+
+    def action_greylist(self):
+        for e in self:
+            e.write({'is_greylist': True})
+            e.action_compute_risk_score_with_plan()
+
+    def action_remove_greylist(self):
+        for e in self:
+            e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
 
     def action_conduct_risk_assessment(self):

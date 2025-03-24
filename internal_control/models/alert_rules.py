@@ -95,14 +95,27 @@ class alert_rules(models.Model):
         unit = rule.frequency_id.name
         period = rule.frequency_id.period
         next_check = self.calculate_next_check(last_checked, unit, period)
-
-       
         current_time_lagos = fields.Datetime.now()
-        if current_time_lagos.year == next_check.year and current_time_lagos.month == next_check.month and  current_time_lagos.day == next_check.day and current_time_lagos.hour == next_check.hour and current_time_lagos.minute == next_check.minute:
 
+        if last_checked and current_time_lagos.year == next_check.year and current_time_lagos.month == next_check.month and current_time_lagos.day == next_check.day and current_time_lagos.hour == next_check.hour and current_time_lagos.minute == next_check.minute:
             rule.write({'last_checked': fields.Datetime.now()})
-    
             self.send_alert(rule)
+            return
+
+        # Check if scheduled time has elapsed, handling potential misses
+        calculated_time = next_check
+        if calculated_time < current_time_lagos:
+            rule.write({'last_checked': fields.Datetime.now()})
+            self.send_alert(rule)
+            return
+        else:
+            # Handle the case where last_checked is None
+            calculated_time = self.calculate_next_check(current_time_lagos - timedelta(minutes=1), unit, period) #uses current time - 1 minute as the base.
+            if calculated_time <= current_time_lagos:
+                self.send_alert(rule)
+                rule.write({'last_checked': fields.Datetime.now()})
+                return
+
     
     def calculate_next_check(self, last_checked, unit, period):
         if unit == 'minutes':
