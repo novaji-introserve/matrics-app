@@ -1,35 +1,5 @@
 <odoo noupdate="0">
 
-<!-- <record id="alert_type_money_laundering" model="media.keyword">
-    <field name="name">Money Laundering</field>
-    <field name="code">money_laundering</field>
-</record>
-
-<record id="alert_type_fraud" model="media.keyword">
-    <field name="name">Fraud</field>
-    <field name="code">fraud</field>
-</record>
-
-<record id="alert_type_corruption" model="media.keyword">
-    <field name="name">Corruption</field>
-    <field name="code">corruption</field>
-</record>
-
-<record id="alert_type_sanctions" model="media.keyword">
-    <field name="name">Sanctions</field>
-    <field name="code">sanctions</field>
-</record>
-
-<record id="alert_type_terrorism" model="media.keyword">
-    <field name="name">Terrorism Financing</field>
-    <field name="code">terrorism</field>
-</record>
-
-<record id="alert_type_other" model="media.keyword">
-    <field name="name">Other Financial Crime</field>
-    <field name="code">other</field>
-</record> -->
-
 <record id="alert_type_money_laundering" model="media.keyword">
     <field name="name">Money Laundering</field>
     <field name="code">money_laundering</field>
