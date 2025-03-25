@@ -37,12 +37,14 @@
     "data": [
         "security/groups.xml",
         "security/ir.model.access.csv",
-        "data/res.country.state.csv",
-        "data/department.xml",
+        # "data/res.country.state.csv",
+        # "data/department.xml",
+        # "data/res.branch.csv",
         "data/media_keywords.xml",
         "security/security.xml",
         "data/schedules/adverse_media_cron.xml",
         "data/email_templates/adverse_media_alert_template.xml",
+        "data/schedules/global_pep_list_cron.xml",
         "views/configuration.xml",
         "views/edd.xml",
         "views/kyc.xml",
@@ -50,10 +52,10 @@
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
-        "views/csv_import.xml",
-        # "data/schedules/queue_job_config.xml",
-        "data/data.xml",
+        "data/schedules/queue_job_config.xml",
+        # "data/data.xml",
         "views/risk_assessment.xml",
+        "views/open_sanctions.xml",
         "views/res_users.xml",
         "views/sanction_screening.xml",
         "views/customer.xml",
@@ -88,15 +90,18 @@
             "compliance_management/static/src/components/file_upload/js/terminal_component.js",
             "compliance_management/static/src/components/file_upload/js/import_form_component.js",
             # Finally load action registrations
-            # 'compliance_management/static/src/components/file_upload/js/test_action.js',
-            "compliance_management/static/src/components/file_upload/js/main.js",
-            "compliance_management/static/src/css/style.css",
-            "compliance_management/static/src/components/**/*.js",
-            "compliance_management/static/src/components/**/*.xml",
-            "compliance_management/static/src/components/**/*.css",
-            "compliance_management/static/src/img/logov.png",
-            "compliance_management/static/img/alt_bank_logo.png",
-            "compliance_management/static/img/alt_bank_logo_.png",
+            'compliance_management/static/src/components/file_upload/js/main.js',
+        
+            'compliance_management/static/src/css/style.css',
+            'compliance_management/static/src/components/**/*.js',
+            'compliance_management/static/src/components/**/*.xml',
+            'compliance_management/static/src/components/**/*.css',
+
+
+            'compliance_management/static/src/img/logov.png',
+            'compliance_management/static/img/alt_bank_logo.png',
+            'compliance_management/static/img/alt_bank_logo_.png',
+
         ]
     },
 }

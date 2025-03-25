@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend PEP Source Form View -->
+    <record id="view_pep_source_form_extended" model="ir.ui.view">
+        <field name="name">pep.source.form.extended</field>
+        <field name="model">pep.source</field>
+        <field name="inherit_id" ref="view_pep_source_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='is_free']" position="after">
+                <field name="source_format" />
+                <field name="is_opensanctions" />
+            </xpath>
+
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_fetch_csv"
+                        string="Download &amp; Import CSV"
+                        type="object" class="oe_highlight"
+                        attrs="{'invisible': [('source_format', '=', 'api')]}" />
+                    <button name="action_test_csv_fetch"
+                        string="Test CSV Fetch"
+                        type="object"
+                        attrs="{'invisible': [('source_format', '=', 'api')]}" />
+                    <button name="action_fetch_api"
+                        string="Import from API"
+                        type="object" class="oe_highlight"
+                        attrs="{'invisible': ['|', ('source_format', '=', 'csv'), ('use_api', '=', False), ('api_key', '=', False)]}" />
+                    <button name="action_test_api"
+                        string="Test API"
+                        type="object"
+                        attrs="{'invisible': ['|', ('source_format', '=', 'csv'), ('use_api', '=', False), ('api_key', '=', False)]}" />
+                    <button name="action_create_import_job"
+                        string="Create Import Job"
+                        type="object"
+                        class="btn-primary" />
+                    <button name="action_view_jobs"
+                        string="View Jobs"
+                        type="object"
+                        class="btn-secondary" />
+                </header>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="CSV Configuration"
+                    attrs="{'invisible': [('source_format', '=', 'api')]}">
+                    <group>
+                        <group>
+                            <field name="base_url" placeholder="https://example.com" />
+                            <field name="csv_path" placeholder="/datasets/peps.csv" />
+                            <field name="csv_delimiter" />
+                        </group>
+                        <group>
+                            <field name="request_headers"
+                                placeholder="{'User-Agent': 'My User Agent'}" />
+                        </group>
+                    </group>
+                </page>
+                <page string="API Configuration"
+                    attrs="{'invisible': [('source_format', '=', 'csv')]}">
+                    <group>
+                        <field name="use_api" />
+                    </group>
+                    <group attrs="{'invisible': [('use_api', '=', False)]}">
+                        <group>
+                            <field name="api_url" placeholder="https://api.example.com" />
+                            <field name="api_endpoint" placeholder="/search" />
+                            <field name="api_auth_format" />
+                            <field name="default_entity_type" />
+                        </group>
+                        <group>
+                            <field name="api_results_path" placeholder="data.results" />
+                            <field name="api_entity_filter" placeholder="schema:Person" />
+                            <field name="api_headers"
+                                placeholder="{'Content-Type': 'application/json'}" />
+                            <field name="api_params" placeholder="{'limit': 100}" />
+                        </group>
+                    </group>
+                </page>
+                <page string="Field Mapping">
+                    <group>
+                        <field name="field_mapping"
+                            placeholder="{
+  'unique_identifier': 'id',
+  'first_name': 'given_name',
+  'surname': 'family_name',
+  'date_of_birth': 'birth_date'
+}"
+                            widget="ace" options="{'mode': 'json'}" />
+                    </group>
+                </page>
+                <page string="Job Status">
+                    <group>
+                        <field name="job_id" readonly="1" />
+                        <field name="job_status" readonly="1" />
+                        <field name="job_started" readonly="1" />
+                        <field name="job_completed" readonly="1" />
+                        <field name="import_message" readonly="1" />
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OpenSanctions Job Queue Form View -->
+    <record id="view_opensanctions_job_queue_form" model="ir.ui.view">
+        <field name="name">opensanctions.job.queue.form</field>
+        <field name="model">opensanctions.job.queue</field>
+        <field name="arch" type="xml">
+            <form string="OpenSanctions Job">
+                <header>
+                    <button name="action_run_job" string="Run Now"
+                        type="object" class="oe_highlight"
+                        attrs="{'invisible': [('state', 'not in', ['pending', 'failed', 'cancelled'])]}" />
+                    <button name="action_cancel_job" string="Cancel"
+                        type="object"
+                        attrs="{'invisible': [('state', '!=', 'pending')]}" />
+                    <button name="action_reset_job" string="Reset"
+                        type="object"
+                        attrs="{'invisible': [('state', 'not in', ['failed', 'cancelled', 'done'])]}" />
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="pending,running,done" />
+                </header>
+                <sheet>
+                    <div class="alert alert-info" role="alert"
+                        attrs="{'invisible': [('is_opensanctions', '=', False)]}">
+                        <p><strong>OpenSanctions Source</strong> - Configuration will be
+                            automatically applied from the data source.</p>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Job Name" />
+                        </h1>
+                    </div>
+
+                    <!-- Main Job Configuration -->
+                    <group>
+                        <group>
+                            <field name="source_id" options="{'no_create': True, 'no_open': False}" />
+                            <field name="is_opensanctions" invisible="1" />
+                            <field name="job_type" />
+                            <field name="priority" />
+                            <field name="next_run" />
+                            <field name="debug_mode" />
+                        </group>
+                        <group>
+                            <field name="create_date" readonly="1" />
+                            <field name="start_date" readonly="1" />
+                            <field name="end_date" readonly="1" />
+                            <field name="duration" readonly="1" widget="float_time" />
+                            <field name="user_id" readonly="1" />
+                            <field name="run_as_user_id" />
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- Job Configuration Tab -->
+                        <page string="Configuration">
+                            <group>
+                                <group string="CSV Configuration"
+                                    attrs="{'invisible': [('job_type', '=', 'api')]}">
+                                    <field name="batch_size" />
+                                    <field name="base_url" readonly="1" />
+                                    <field name="csv_path" readonly="1" />
+                                    <field name="csv_delimiter" readonly="1" />
+                                    <field name="file_path" readonly="1"
+                                        attrs="{'invisible': [('file_path', '=', False)]}" />
+                                </group>
+                                <group string="API Configuration"
+                                    attrs="{'invisible': [('job_type', '=', 'csv')]}">
+                                    <field name="api_limit" />
+                                    <field name="use_api" readonly="1" />
+                                    <field name="api_url" readonly="1"
+                                        attrs="{'invisible': [('use_api', '=', False)]}" />
+                                    <field name="api_endpoint" readonly="1"
+                                        attrs="{'invisible': [('use_api', '=', False)]}" />
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Chunking Tab (for advanced users) -->
+                        <page string="Chunking" groups="base.group_system">
+                            <group>
+                                <group>
+                                    <field name="is_chunk" />
+                                    <field name="parent_job_id"
+                                        attrs="{'invisible': [('is_chunk', '=', False)], 'required': [('is_chunk', '=', True)]}"
+                                        options="{'no_create': True}" />
+                                    <field name="chunk_index"
+                                        attrs="{'invisible': [('is_chunk', '=', False)]}" />
+                                    <field name="chunk_size"
+                                        attrs="{'invisible': [('is_chunk', '=', False)]}" />
+                                </group>
+                                <group>
+                                    <field name="total_chunks"
+                                        attrs="{'invisible': ['|', ('is_chunk', '=', True), ('total_chunks', '=', 0)]}" />
+                                    <field name="chunks_completed"
+                                        attrs="{'invisible': ['|', ('is_chunk', '=', True), ('total_chunks', '=', 0)]}" />
+                                    <field name="total_records"
+                                        attrs="{'invisible': [('total_records', '=', 0)]}" />
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Results Tab -->
+                        <page string="Results">
+                            <group>
+                                <field name="records_created" readonly="1" />
+                                <field name="records_updated" readonly="1" />
+                                <field name="records_failed" readonly="1" />
+                            </group>
+                            <field name="result" readonly="1" />
+                        </page>
+
+                        <!-- Log Tab -->
+                        <page string="Log">
+                            <field name="log" readonly="1" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- OpenSanctions Job Queue Tree View -->
+    <record id="view_opensanctions_job_queue_tree" model="ir.ui.view">
+        <field name="name">opensanctions.job.queue.tree</field>
+        <field name="model">opensanctions.job.queue</field>
+        <field name="arch" type="xml">
+            <tree string="OpenSanctions Jobs" decoration-info="state=='pending'"
+                decoration-danger="state=='failed'" decoration-success="state=='done'"
+                decoration-warning="state=='running'" default_order="create_date desc">
+                <field name="name" />
+                <field name="source_id" />
+                <field name="job_type" />
+                <field name="is_chunk" invisible="1" />
+                <field name="state" />
+                <field name="priority" />
+                <field name="create_date" />
+                <field name="start_date" />
+                <field name="duration" widget="float_time" />
+                <!-- <field name="records_created" sum="Total Created" />
+                <field name="records_updated" sum="Total Updated" />
+                <field name="records_failed" sum="Total Failed" /> -->
+                <field name="next_run" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- OpenSanctions Job Queue Search View -->
+    <record id="view_opensanctions_job_queue_search" model="ir.ui.view">
+        <field name="name">opensanctions.job.queue.search</field>
+        <field name="model">opensanctions.job.queue</field>
+        <field name="arch" type="xml">
+            <search string="Search OpenSanctions Jobs">
+                <field name="name" />
+                <field name="source_id" />
+                <field name="job_type" />
+                <separator />
+                <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]" />
+                <filter string="Running" name="running" domain="[('state', '=', 'running')]" />
+                <filter string="Completed" name="done" domain="[('state', '=', 'done')]" />
+                <filter string="Failed" name="failed" domain="[('state', '=', 'failed')]" />
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancelled')]" />
+                <separator />
+                <filter string="Main Jobs" name="main_jobs" domain="[('is_chunk', '=', False)]" />
+                <filter string="Chunk Jobs" name="chunk_jobs" domain="[('is_chunk', '=', True)]" />
+                <filter string="Scheduled" name="scheduled" domain="[('next_run', '!=', False)]" />
+                <filter string="My Jobs" name="my_jobs" domain="[('user_id', '=', uid)]" />
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="groupby_state" context="{'group_by': 'state'}" />
+                    <filter string="Source" name="groupby_source"
+                        context="{'group_by': 'source_id'}" />
+                    <filter string="Job Type" name="groupby_type" context="{'group_by': 'job_type'}" />
+                    <filter string="Created By" name="groupby_user"
+                        context="{'group_by': 'user_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- OpenSanctions Job Queue Action -->
+    <record id="action_opensanctions_job_queue" model="ir.actions.act_window">
+        <field name="name">OpenSanctions Jobs</field>
+        <field name="res_model">opensanctions.job.queue</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_main_jobs': 1, 'search_default_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first OpenSanctions import job
+            </p>
+            <p>
+                Select a PEP source and job type to get started.
+                The system will automatically configure the job based on the selected source.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_opensanctions_jobs"
+        name="OpenSanctions Jobs"
+        parent="menu_pep_configurations"
+        action="action_opensanctions_job_queue"
+        sequence="20" />
+
+    <!-- Add OpenSanctions button to PEP list view -->
+    <record id="view_pep_tree_opensanctions" model="ir.ui.view">
+        <field name="name">res.pep.tree.opensanctions</field>
+        <field name="model">res.pep</field>
+        <field name="inherit_id" ref="view_res_global_pep_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <header>
+                    <button name="fetch_opensanctions_data" string="Import from OpenSanctions"
+                        type="object" class="btn-primary" />
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Scheduled Action for Processing OpenSanctions Jobs -->
+    <!-- <record id="ir_cron_process_opensanctions_jobs" model="ir.cron">
+        <field name="name">Process Scheduled OpenSanctions Jobs</field>
+        <field name="model_id" ref="model_opensanctions_job_queue" />
+        <field name="state">code</field>
+        <field name="code">model._process_scheduled_jobs()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False" />
+        <field name="active" eval="True" />
+    </record> -->
+</odoo>

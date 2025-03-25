@@ -36,6 +36,9 @@
             <xpath expr="//field[@name='user_id']" position="replace">
                 <field name="user_id" optional="show" invisible="1" widget="many2one_avatar_user" domain="[('share', '=', False)]" />
             </xpath>
+
+           
+
         </field>
     </record>
 
@@ -130,7 +133,7 @@
                     <span>Risk 
                     <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                     decoration-warning="risk_level in ('medium')"
-                    decoration-success="risk_level in ('lowel')"/>
+                    decoration-success="risk_level in ('low')"/>
                     </span>
                    
                 </button>
@@ -138,6 +141,34 @@
                     <field string="Risk Score"  name="risk_score" widget="statinfo"/>
                 </button>
             </xpath>
+            <xpath expr="//field[@name='website']" position="replace">
+                <field name="industry_id" invisible="0" />
+                <!-- <attribute name="invisible">1</attribute> -->
+            </xpath>
+
+            <xpath expr="//field[@name='region_id']" position="replace">
+                <field name="state_residence" invisible="0" />
+
+            </xpath>
+
+            <xpath expr="//field[@name='function']" position="replace">
+                <field name="employment_status" invisible="0" />
+
+            </xpath>
+            <xpath expr="//field[@name='function']" position="replace">
+                <field name="employment_status" invisible="0" />
+            </xpath>
+
+            <xpath expr="//field[@name='mobile']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='company_reg_date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
         </field>
     </record>
     <record id="view_customer_search" model="ir.ui.view">

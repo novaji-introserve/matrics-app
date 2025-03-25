@@ -61,9 +61,9 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-            <xpath expr="//header//button[@name='149']" position="attributes">
+            <!-- <xpath expr="//header//button[@name='149']" position="attributes">
                 <attribute name="invisible">1</attribute>
-            </xpath>
+            </xpath> -->
 
 
         </field>

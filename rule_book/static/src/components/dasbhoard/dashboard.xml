@@ -106,7 +106,7 @@
 											<!-- <div class="avatar flex-shrink-0">
 												<img src="rule_book/static/assets/img/icons/object/rule_book.png" alt="chart success" class="rounded" />
 											</div> -->
-											<a href="/web#menu_id=146&action=207" class="d-flex align-items-center">
+											<a t-att-href="getRulebookTreeLink()" class="d-flex align-items-center">
 												<div class="avatar flex-shrink-0">
 													<img src="/rule_book/static/assets/img/icons/object/rule_book.png" alt="Rule Book" class="rounded" />
 												</div>
@@ -132,7 +132,7 @@
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
 
-											<a href="/web#menu_id=147&action=187" class="d-flex align-items-center">
+											<a t-att-href="getRulebookTitleTreeLink()" class="d-flex align-items-center">
 												<div class="avatar flex-shrink-0">
 													<img src="/rule_book/static/assets/img/icons/object/rulebook_title.png" alt="RuleBook Source" class="rounded" />
 												</div>
@@ -159,7 +159,7 @@ RuleBook Source
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
 
-											<a href="/web#menu_id=149&action=208" class="d-flex align-items-center">
+											<a t-att-href="getReplyLogTreeLink()" class="d-flex align-items-center">
 												<div class="avatar flex-shrink-0">
 													<img src="/rule_book/static/assets/img/icons/object/reply.png" alt="RuleBook Logs" class="rounded" />
 												</div>
@@ -185,7 +185,7 @@ RuleBook Source
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
 
-											<a href="/web#menu_id=148&action=192" class="d-flex align-items-center">
+											<a t-att-href="getPdfChatTreeLink()" class="d-flex align-items-center">
 												<div class="avatar flex-shrink-0">
 													<img src="/rule_book/static/assets/img/icons/object/ai.png" alt="Ai Chat" class="rounded" />
 												</div>
@@ -211,7 +211,7 @@ RuleBook Source
 									<div class="card-body">
 										<div class="card-title d-flex align-items-start justify-content-between mb-4">
 
-											<a href="/web#menu_id=154&action=186" class="d-flex align-items-center">
+											<a t-att-href="getRulebookSourcesTreeLink()" class="d-flex align-items-center">
 												<div class="avatar flex-shrink-0">
 													<img src="/rule_book/static/assets/img/icons/object/regulatory.png" alt="Regulatory Source" class="rounded" />
 												</div>

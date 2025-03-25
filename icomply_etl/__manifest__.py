@@ -13,6 +13,7 @@
         'views/etl_sync_log_views.xml',
         'views/etl_config_views.xml',
         'views/etl_dashboard.xml',
+        # 'views/etl_database_con.xml',
         'views/etl_menu.xml',
         'data/etl_cron.xml',
         'data/etl_data.xml',

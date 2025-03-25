@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<odoo >
 
     <!-- User Access -->
     <record id="User_see_branch_customeers" model="ir.rule">

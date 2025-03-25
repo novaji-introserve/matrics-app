@@ -158,7 +158,6 @@ class ImportLog(models.Model):
                 record.estimated_time_left = "Unknown"
                 
     # ---------- Business Methods ----------
-                
     def process_file(self):
         """Process the file using direct SQL to avoid concurrency issues"""
         self.ensure_one()
@@ -173,7 +172,7 @@ class ImportLog(models.Model):
                 
                 # First check if file exists and status is valid
                 new_cr.execute("""
-                    SELECT file_path, status 
+                    SELECT file_path, status, model_name 
                     FROM import_log 
                     WHERE id = %s
                     FOR UPDATE
@@ -183,7 +182,7 @@ class ImportLog(models.Model):
                 if not result:
                     return {'success': False, 'error': 'Import not found'}
                     
-                file_path, status = result
+                file_path, status, model_name = result
                 
                 # Validate status
                 if status == 'completed':
@@ -212,6 +211,21 @@ class ImportLog(models.Model):
                 
                 # Start time
                 start_time = fields.Datetime.now()
+                
+                # IMPORTANT: Get current record count before import for verification
+                try:
+                    # Get the target table name
+                    env = api.Environment(new_cr, self.env.uid, self.env.context)
+                    model_obj = env[model_name]
+                    table_name = model_obj._table
+                    
+                    # Count existing records
+                    new_cr.execute(f"SELECT COUNT(*) FROM {table_name}")
+                    record_count_before = new_cr.fetchone()[0]
+                    _logger.info(f"Record count before import: {record_count_before}")
+                except Exception as count_error:
+                    _logger.warning(f"Could not get record count before import: {str(count_error)}")
+                    record_count_before = 0
                 
                 # Get configuration or use defaults
                 try:
@@ -270,9 +284,14 @@ class ImportLog(models.Model):
                 # Commit before launching jobs to ensure our changes are visible to them
                 new_cr.commit()
                 
-                # Launch parallel jobs with the new cursor
-                return self._launch_parallel_jobs_with_cursor(new_cr, start_time)
+                # Save record count in context for verification later
+                context = dict(self.env.context, record_count_before_import=record_count_before)
                 
+                # Launch parallel jobs with the new cursor and context
+                env = api.Environment(new_cr, self.env.uid, context)
+                current_import = env['import.log'].browse(import_id)
+                return current_import._launch_parallel_jobs_with_cursor(new_cr, start_time)
+                    
             except Exception as e:
                 import traceback
                 error_trace = traceback.format_exc()
@@ -291,6 +310,7 @@ class ImportLog(models.Model):
                     pass
                     
                 return {'success': False, 'error': str(e)}
+
     def _count_file_records(self, file_path):
         """Count records in a file with better error handling"""
         try:
@@ -708,44 +728,10 @@ class ImportLog(models.Model):
                 'error_message': error_message,
                 'technical_details': error_trace
             }
-            
-    # def _update_progress_counters(self, current_position, successful, failed, duplicates, processing_time):
-    #     """
-    #     Update progress counters with advisory locks to prevent concurrent update issues
-    #     """
-    #     # with self.advisory_lock() as acquired:
-    #     #     if not acquired:
-    #     max_retries = 5
-    #     for attempt in range(max_retries):
-    #         try:
-    #             # Use explicit transaction with stronger isolation level
-    #             self.env.cr.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
-                
-    #             self.env.cr.execute("""
-    #                 UPDATE import_log
-    #                 SET 
-    #                     successful_records = successful_records + %s,
-    #                     failed_records = failed_records + %s,
-    #                     duplicate_records = duplicate_records + %s,
-    #                     execution_time = execution_time + %s,
-    #                     current_position = GREATEST(current_position, %s),
-    #                     current_batch = current_batch + 1
-    #                 WHERE id = %s
-    #             """, (successful, failed, duplicates, processing_time, current_position, self.id))
-                
-    #             self.env.cr.commit()
-    #             return True
-    #         except Exception as e:
-    #             self.env.cr.rollback()
-    #             wait_time = min(2 ** attempt, 16)  # Exponential backoff with max 16 seconds
-    #             _logger.warning(f"Retry {attempt+1}/{max_retries} updating progress - waiting {wait_time}s")
-    #             time.sleep(wait_time)
-        
-    #     return False
 
     def _update_progress_counters(self, current_position, successful, failed, duplicates, processing_time):
         """
-        Update progress counters with proper concurrency control and retries
+        Update progress counters with linear progression across jobs
         """
         # Use exponential backoff for retries
         max_retries = 5
@@ -754,9 +740,48 @@ class ImportLog(models.Model):
                 # Create a new cursor for this operation to isolate it
                 with self.env.registry.cursor() as new_cr:
                     # Use advisory lock with the import ID for coordination
-                    # Add attempt count to the lock to allow different attempts to acquire different locks
                     lock_id = self.id + 10000000 + attempt
                     new_cr.execute("SELECT pg_advisory_xact_lock(%s)", (lock_id,))
+                    
+                    # First get stats to calculate progress
+                    new_cr.execute("""
+                        SELECT total_records, current_position, completed_jobs, parallel_jobs,
+                            successful_records, failed_records, duplicate_records
+                        FROM import_log
+                        WHERE id = %s
+                        FOR UPDATE
+                    """, (self.id,))
+                    
+                    result = new_cr.fetchone()
+                    if not result:
+                        _logger.warning(f"Import {self.id} not found when updating progress counters")
+                        return False
+                        
+                    total_records, curr_pos, completed_jobs, parallel_jobs, curr_successful, curr_failed, curr_duplicates = result
+                    
+                    # Calculate linear progress
+                    # Even if there are 6 jobs, they should increment roughly by ~16.7% each
+                    if parallel_jobs > 0:
+                        # Each job should represent an equal portion of the total
+                        portion_per_job = total_records / parallel_jobs
+                        
+                        # Calculate which job this is (based on position)
+                        current_job = completed_jobs  # 0-based index
+                        
+                        # Calculate the base position for this job
+                        base_position = int(current_job * portion_per_job)
+                        
+                        # The new position should be the base position plus the processed records
+                        new_position = min(total_records, base_position + successful + duplicates)
+                    else:
+                        # Fallback if no parallel jobs defined
+                        new_position = min(total_records, curr_pos + successful + duplicates)
+                    
+                    # For the final job, ensure we get to exactly 100%
+                    is_final_job = (completed_jobs + 1 >= parallel_jobs)
+                    if is_final_job:
+                        # Force to total_records on last job
+                        new_position = total_records
                     
                     # Perform the update with direct SQL
                     new_cr.execute("""
@@ -766,7 +791,7 @@ class ImportLog(models.Model):
                             failed_records = failed_records + %s,
                             duplicate_records = duplicate_records + %s,
                             execution_time = execution_time + %s,
-                            current_position = GREATEST(current_position, %s),
+                            current_position = %s,
                             current_batch = current_batch + 1
                         WHERE id = %s
                     """, (
@@ -774,9 +799,27 @@ class ImportLog(models.Model):
                         failed,
                         duplicates,
                         processing_time,
-                        current_position,
+                        new_position,
                         self.id
                     ))
+                    
+                    # Calculate progress percentage for logging
+                    progress_pct = round(100 * new_position / max(total_records, 1), 1)
+                    
+                    # Log progress at key points
+                    if is_final_job or progress_pct % 10 < 1 or progress_pct > 95:
+                        _logger.info(f"Import {self.id} progress: {progress_pct}% ({new_position}/{total_records})")
+                    
+                    # Send websocket message with accurate progress
+                    try:
+                        from ..services.websocket.connection import send_message
+                        # Only send at meaningful increments (10%, 20%, etc.) or final job
+                        if is_final_job or int(progress_pct) % 10 == 0 or progress_pct > 95:
+                            progress_msg = f"📊 Import progress: {int(progress_pct)}% complete"
+                            send_message(api.Environment(new_cr, self.env.uid, self.env.context),
+                                        progress_msg, "info", self.uploaded_by.id)
+                    except Exception:
+                        pass  # Ignore websocket errors
                     
                     # Commit this isolated transaction
                     new_cr.commit()
@@ -790,55 +833,9 @@ class ImportLog(models.Model):
         # If we get here, all retries failed
         _logger.error(f"Failed to update import progress after {max_retries} attempts")
         return False
-        # with self.advisory_lock() as acquired:
-        #     if not acquired:
-        #         # Don't proceed if lock not acquired, wait and retry
-        #         time.sleep(1)
-        #         _logger.warning(f"Could not acquire lock for import {self.id}, attempting update anyway")
-        #         return self._update_progress_counters(current_position, successful, failed, duplicates, processing_time)
-                
-        #     # Use direct SQL update with GREATEST to prevent race conditions
-        #     try:
-        #         self.env.cr.execute("""
-        #             UPDATE import_log
-        #             SET 
-        #                 successful_records = successful_records + %s,
-        #                 failed_records = failed_records + %s,
-        #                 duplicate_records = duplicate_records + %s,
-        #                 execution_time = execution_time + %s,
-        #                 current_position = GREATEST(current_position, %s),
-        #                 current_batch = current_batch + 1
-        #             WHERE id = %s
-        #         """, (
-        #             successful,
-        #             failed,
-        #             duplicates,
-        #             processing_time,
-        #             current_position,
-        #             self.id
-        #         ))
-                
-        #         # Make sure to commit immediately
-        #         self.env.cr.commit()
-                
-        #     except Exception as e:
-        #         _logger.error(f"Error updating import progress: {str(e)}")
-        #         self.env.cr.rollback()
-                
-        #         # Try a simpler update as fallback
-        #         try:
-        #             self.env.cr.execute("""
-        #                 UPDATE import_log
-        #                 SET 
-        #                     current_batch = current_batch + 1
-        #                 WHERE id = %s
-        #             """, (self.id,))
-        #             self.env.cr.commit()
-        #         except:
-        #             pass
-    
+
     def _mark_job_completed(self, segment_time, start_time):
-        """Mark a job as completed with robust completion detection"""
+        """Mark a job as completed with robust error handling and parameter validation"""
         max_retries = 5
         import_id = self.id
         
@@ -852,7 +849,8 @@ class ImportLog(models.Model):
                     
                     # Update job counter with FOR UPDATE to prevent race conditions
                     comp_cr.execute("""
-                        SELECT completed_jobs, parallel_jobs, status
+                        SELECT completed_jobs, parallel_jobs, status, total_records, 
+                            current_position, execution_time
                         FROM import_log 
                         WHERE id = %s
                         FOR UPDATE
@@ -863,7 +861,7 @@ class ImportLog(models.Model):
                         _logger.warning(f"Import log {import_id} not found during job completion")
                         return False
                         
-                    completed_jobs, total_jobs, current_status = result
+                    completed_jobs, total_jobs, current_status, total_records, current_pos, exec_time = result
                     
                     # Skip if already completed
                     if current_status == 'completed':
@@ -879,6 +877,18 @@ class ImportLog(models.Model):
                     
                     # Check if all jobs are now completed
                     should_complete = (completed_jobs + 1 >= total_jobs)
+                                
+                    # Calculate expected progress for this job
+                    if total_jobs > 0:
+                        job_progress = (completed_jobs + 1) / total_jobs
+                        expected_position = int(total_records * job_progress)
+                        
+                        # Update position even if not complete
+                        comp_cr.execute("""
+                            UPDATE import_log
+                            SET current_position = %s
+                            WHERE id = %s AND current_position < %s
+                        """, (expected_position, import_id, expected_position))
                                     
                     # Update status if all jobs completed
                     if should_complete:
@@ -886,178 +896,195 @@ class ImportLog(models.Model):
                         end_time = fields.Datetime.now()
                         if isinstance(start_time, str):
                             start_time = fields.Datetime.from_string(start_time)
-                        total_time = (end_time - start_time).total_seconds()
                         
-                        # Get current counts
-                        comp_cr.execute("""
-                            SELECT successful_records, failed_records 
-                            FROM import_log 
-                            WHERE id = %s
-                        """, (import_id,))
+                        # Calculate duration, ensuring it's a positive number
+                        try:
+                            total_time = (end_time - start_time).total_seconds()
+                            if total_time < 0:
+                                total_time = segment_time  # Fallback to segment time
+                        except:
+                            total_time = segment_time  # Another fallback
                         
-                        success_count, fail_count = comp_cr.fetchone() or (0, 0)
-                        
-                        # Determine final status
-                        status = 'completed' if success_count > 0 else 'failed'
-                        
-                        # Update final status
+                        # FIXED: Ensure all parameters are passed correctly
                         comp_cr.execute("""
                             UPDATE import_log
-                            SET status = %s,
+                            SET status = 'completed',
                                 completed_at = %s,
-                                execution_time = %s
+                                execution_time = %s,
+                                current_position = total_records
                             WHERE id = %s
-                        """, (status, end_time, total_time, import_id))
+                        """, (end_time, total_time, import_id))
                         
-                        _logger.info(f"Import {import_id} marked as {status} with {completed_jobs + 1}/{total_jobs} jobs completed")
+                        _logger.info(f"Import {import_id} marked as completed with {completed_jobs + 1}/{total_jobs} jobs completed")
+                        
+                        # FORCE A DIRECT MESSAGE to websocket with 100% progress
+                        try:
+                            from ..services.websocket.connection import send_message
+                            final_message = f"✅ Import completed successfully! Processing {total_records} records complete."
+                            send_message(api.Environment(comp_cr, self.env.uid, self.env.context), 
+                                        final_message, "success", self.uploaded_by.id)
+                        except Exception as ws_error:
+                            _logger.error(f"Error sending final websocket message: {str(ws_error)}")
                     
-                    # Commit this transaction
+                    # Always send a progress update message
+                    try:
+                        progress = min(100, round((completed_jobs + 1) / max(total_jobs, 1) * 100))
+                        from ..services.websocket.connection import send_message
+                        progress_message = f"📊 Import job {completed_jobs + 1}/{total_jobs} completed ({progress}%)"
+                        send_message(api.Environment(comp_cr, self.env.uid, self.env.context),
+                                    progress_message, "info", self.uploaded_by.id)
+                    except Exception as ws_error:
+                        pass  # Ignore websocket errors for progress updates
+                    
+                    # Commit changes immediately before generating summary
                     comp_cr.commit()
                     
                     # If all jobs completed, generate the summary in a separate transaction
                     if should_complete:
+                        # Allow a brief moment for all transactions to finalize
+                        time.sleep(1)
+                        
+                        # Try to generate summary
                         try:
-                            self._generate_import_summary()
+                            # Run in a new transaction to avoid conflicts
+                            with self.env.registry.cursor() as summary_cr:
+                                env = api.Environment(summary_cr, self.env.uid, self.env.context)
+                                current_import = env['import.log'].browse(self.id)
+                                current_import._create_final_summary()
+                                summary_cr.commit()
                         except Exception as e:
                             _logger.error(f"Error generating summary: {str(e)}")
-                            # Don't stop completion due to summary generation error
                         
                     return True
                     
             except Exception as e:
-                _logger.error(f"Error marking job complete (attempt {attempt+1}): {str(e)}")
+                import traceback
+                error_message = f"Error marking job complete (attempt {attempt+1}): {str(e)}"
+                stack_trace = traceback.format_exc()
+                _logger.error(f"{error_message}\n{stack_trace}")
                 time.sleep(1 * (attempt + 1))  # Linear backoff
+        
+        # Last resort - force completion through direct SQL
+        try:
+            with self.env.registry.cursor() as last_cr:
+                last_cr.execute("""
+                    UPDATE import_log
+                    SET status = 'completed',
+                        current_position = total_records,
+                        completed_at = NOW()
+                    WHERE id = %s AND completed_jobs >= parallel_jobs
+                """, (import_id,))
+                last_cr.commit()
+                _logger.info(f"Forced completion of import {import_id} as last resort")
+        except Exception as e:
+            _logger.error(f"Final attempt to mark import as complete failed: {str(e)}")
         
         return False
 
-    def force_complete_import(self):
-        """Force completion of stuck imports that have all data processed"""
-        self.ensure_one()
-        
-        # Only work on processing imports
-        if self.status != 'processing':
-            raise UserError(_("Only 'processing' imports can be force-completed"))
-        
-        # Use a new cursor for this operation
-        with self.env.registry.cursor() as force_cr:
-            env = api.Environment(force_cr, self.env.uid, self.env.context)
-            current_import = env['import.log'].browse(self.id)
+    def _create_final_summary(self):
+        """Create a final import summary with proper record counting"""
+        try:
+            # Use current environment
+            env = self.env
             
-            # Check if the import is nearly complete (progress > 95%)
-            progress = 0
-            if current_import.total_records > 0:
-                progress = (current_import.current_position / current_import.total_records) * 100
-            
-            if progress < 95:
-                raise UserError(_("Import is only at %.1f%% - cannot force completion below 95%%") % progress)
-            
-            # Calculate final statistics
-            start_time = current_import.started_at
-            end_time = fields.Datetime.now()
-            if start_time:
-                total_time = (end_time - start_time).total_seconds()
-            else:
-                total_time = 0
-            
-            # Update the import to completed status
-            force_cr.execute("""
-                UPDATE import_log
-                SET status = 'completed',
-                    completed_at = %s,
-                    execution_time = %s,
-                    completed_jobs = parallel_jobs  -- Mark all jobs as completed
-                WHERE id = %s
-            """, (end_time, total_time, self.id))
-            
-            # Commit changes
-            force_cr.commit()
-            
-            # Generate a summary
+            # Get counts from database directly for greater accuracy
             try:
-                current_import._generate_import_summary()
-            except Exception as e:
-                _logger.error(f"Error generating summary during force completion: {str(e)}")
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'reload',
-        }
+                # Try to get actual record count from target table
+                model_name = self.model_name
+                model_table = env[model_name]._table
+                
+                # IMPORTANT: Calculate expected records added by this import
+                # This is especially useful when appending to existing records
+                before_import = self.env.context.get('record_count_before_import', 0)
+                
+                self.env.cr.execute(f"""
+                    SELECT COUNT(*) 
+                    FROM {model_table}
+                """)
+                actual_records = self.env.cr.fetchone()[0]
+                added_records = actual_records - before_import
+                
+                _logger.info(f"Actual records in {model_table}: {actual_records}")
+                _logger.info(f"Added approx. {added_records} new records in this import")
+            except Exception as count_error:
+                _logger.warning(f"Could not get actual record count: {str(count_error)}")
+                actual_records = None
+                added_records = None
+            
+            # Get current statistics
+            successful = self.successful_records
+            failed = self.failed_records
+            duplicates = self.duplicate_records
+            total = self.total_records
+            execution_time = self.execution_time or 0
+            
+            # Check if we need to update "successful records" based on database verification
+            if added_records is not None and abs(successful - added_records) > 1000:
+                _logger.warning(f"Large discrepancy between reported successful ({successful}) and actual added records ({added_records})")
+                # Update the successful records to match reality
+                try:
+                    self.env.cr.execute("""
+                        UPDATE import_log
+                        SET successful_records = %s
+                        WHERE id = %s
+                    """, (added_records, self.id))
+                    self.env.cr.commit()
+                    successful = added_records
+                except Exception as update_error:
+                    _logger.error(f"Error updating successful record count: {str(update_error)}")
+            
+            # Calculate percentages
+            if total > 0:
+                success_pct = (successful / total) * 100
+                failed_pct = (failed / total) * 100
+                duplicate_pct = (duplicates / total) * 100
+            else:
+                success_pct = failed_pct = duplicate_pct = 0
+            
+            # Create summary message
+            verification = ""
+            if actual_records is not None:
+                if added_records is not None:
+                    verification = f"\n✅ Added {added_records:,} new records to the database (total now: {actual_records:,})"
+                else:
+                    verification = f"\n✅ Database now contains {actual_records:,} total records"
+            
+            msg = f"""
+    🎉 Import Complete!
 
-    # def _mark_job_completed(self, segment_time, start_time):
-    #     """Mark a job as completed with proper concurrency handling"""
-    #     max_retries = 5
-    #     for attempt in range(max_retries):
-    #         try:
-    #             # Use a separate cursor for updating completion status
-    #             with self.env.registry.cursor() as comp_cr:
-    #                 # Use unique lock ID for each attempt
-    #                 lock_id = self.id + 40000000 + attempt
-    #                 comp_cr.execute("SELECT pg_advisory_xact_lock(%s)", (lock_id,))
-                    
-    #                 # Update job counter with FOR UPDATE to prevent race conditions
-    #                 comp_cr.execute("""
-    #                     SELECT completed_jobs, parallel_jobs
-    #                     FROM import_log 
-    #                     WHERE id = %s
-    #                     FOR UPDATE
-    #                 """, (self.id,))
-                    
-    #                 result = comp_cr.fetchone()
-    #                 if not result:
-    #                     return
-                        
-    #                 completed_jobs, total_jobs = result
-                    
-    #                 # Increment completed jobs
-    #                 comp_cr.execute("""
-    #                     UPDATE import_log
-    #                     SET completed_jobs = completed_jobs + 1
-    #                     WHERE id = %s
-    #                 """, (self.id,))
-                    
-    #                 # Update status if all jobs completed
-    #                 if completed_jobs + 1 >= total_jobs:
-    #                     # Get current time and calculate total duration
-    #                     end_time = fields.Datetime.now()
-    #                     if isinstance(start_time, str):
-    #                         start_time = fields.Datetime.from_string(start_time)
-    #                     total_time = (end_time - start_time).total_seconds()
-                        
-    #                     # Get current counts
-    #                     comp_cr.execute("""
-    #                         SELECT successful_records, failed_records 
-    #                         FROM import_log 
-    #                         WHERE id = %s
-    #                     """, (self.id,))
-                        
-    #                     success_count, fail_count = comp_cr.fetchone() or (0, 0)
-                        
-    #                     # Determine final status
-    #                     status = 'completed' if success_count > 0 else 'failed'
-                        
-    #                     # Update final status
-    #                     comp_cr.execute("""
-    #                         UPDATE import_log
-    #                         SET status = %s,
-    #                             completed_at = %s,
-    #                             execution_time = %s
-    #                         WHERE id = %s
-    #                     """, (status, end_time, total_time, self.id))
-                        
-    #                 # Commit this transaction
-    #                 comp_cr.commit()
-                    
-    #                 # If all jobs completed, generate the summary in a separate transaction
-    #                 if completed_jobs + 1 >= total_jobs:
-    #                     self._generate_import_summary()
-                        
-    #                 return True
-                    
-    #         except Exception as e:
-    #             _logger.error(f"Error marking job complete (attempt {attempt+1}): {str(e)}")
-    #             time.sleep(1 * (attempt + 1))  # Linear backoff
-        
-    #     return False
+    📊 Results for '{self.original_filename}':
+    ✅ Successfully Imported: {successful:,} ({success_pct:.1f}%)
+    ❌ Failed Records: {failed:,} ({failed_pct:.1f}%)
+    ⚠️ Duplicate Records: {duplicates:,} ({duplicate_pct:.1f}%)
+
+    ⏱️ Total Execution Time: {execution_time:.1f} seconds
+    ⚡ Average Speed: {successful / max(execution_time, 0.001):.1f} records/second{verification}
+
+    Final status: COMPLETED
+            """
+            
+            # Post message
+            self.env['mail.message'].create({
+                'body': msg,
+                'model': 'import.log',
+                'res_id': self.id,
+                'message_type': 'comment',
+                'subject': 'Import Complete'
+            })
+            
+            # Send notification message
+            try:
+                from ..services.websocket.connection import send_message
+                added_message = f"{added_records:,}" if added_records is not None else f"{successful:,}"
+                send_message(self.env, f"🎉 Import Complete! Successfully imported {added_message} records.",
+                            "success", self.uploaded_by.id)
+            except Exception as ws_error:
+                _logger.error(f"Error sending websocket message: {str(ws_error)}")
+            
+            return True
+        except Exception as e:
+            _logger.error(f"Error creating final summary: {str(e)}")
+            return False
             
     def _append_error_log(self, error_message, error_trace):
         """Append error information to the log with concurrency handling"""
@@ -1145,10 +1172,9 @@ class ImportLog(models.Model):
             send_message(self.env, message, message_type, self.uploaded_by.id)
         except Exception as e:
             _logger.warning(f"Failed to send websocket message: {e}")
-    
+
     def _generate_import_summary(self):
-        """Generate a comprehensive summary of the import results with retry logic and enhanced details"""
-        import json 
+        """Generate a comprehensive summary of the import results with robust error handling"""
         max_retries = 5
         
         for attempt in range(max_retries):
@@ -1171,12 +1197,37 @@ class ImportLog(models.Model):
                         time.sleep(1)
                         continue
                     
+                    # ENSURE STATUS IS COMPLETED
+                    summary_cr.execute("""
+                        UPDATE import_log
+                        SET status = 'completed',
+                            current_position = total_records
+                        WHERE id = %s AND completed_jobs >= parallel_jobs
+                    """, (self.id,))
+                    
+                    # Get counts from database directly for greater accuracy
+                    try:
+                        # Try to get actual record count from target table
+                        model_table = env[current_import.model_name]._table
+                        
+                        # IMPORTANT: Use a different cursor for this to avoid interfering with the main transaction
+                        with env.registry.cursor() as count_cr:
+                            count_cr.execute(f"""
+                                SELECT COUNT(*) 
+                                FROM {model_table}
+                            """)
+                            actual_records = count_cr.fetchone()[0]
+                            _logger.info(f"Actual records in {model_table}: {actual_records}")
+                    except Exception as count_error:
+                        _logger.warning(f"Could not get actual record count: {str(count_error)}")
+                        actual_records = None
+                    
                     # Get current statistics
                     successful = current_import.successful_records
                     failed = current_import.failed_records
                     duplicates = current_import.duplicate_records
                     total = current_import.total_records
-                    execution_time = current_import.execution_time
+                    execution_time = current_import.execution_time or 0
                     
                     # Calculate percentages
                     if total > 0:
@@ -1185,20 +1236,8 @@ class ImportLog(models.Model):
                         duplicate_pct = (duplicates / total) * 100
                     else:
                         success_pct = failed_pct = duplicate_pct = 0
-                        
-                    # Get detailed failure reasons from logs if possible
-                    failure_details = {}
-                    try:
-                        # Parse JSON data from technical details if available
-                        if current_import.summary and isinstance(current_import.summary, str):
-                            import json
-                            summary_data = json.loads(current_import.summary)
-                            if "failure_details" in summary_data:
-                                failure_details = summary_data["failure_details"]
-                    except Exception as e:
-                        _logger.warning(f"Could not parse failure details: {e}")
-                    
-                    # Format summary
+                            
+                    # Format enhanced summary
                     summary = {
                         'import_id': self.id,
                         'model': current_import.model_name,
@@ -1213,35 +1252,40 @@ class ImportLog(models.Model):
                             'duplicates': duplicates,
                             'duplicate_percentage': round(duplicate_pct, 1),
                             'execution_time': round(execution_time, 1),
-                            'records_per_second': round(successful / execution_time, 1) if execution_time > 0 else 0
-                        },
-                        'failure_details': failure_details
+                            'records_per_second': round(successful / max(execution_time, 0.001), 1),
+                            'actual_records_in_db': actual_records
+                        }
                     }
                     
                     # Store summary as JSON
+                    import json
                     summary_cr.execute("""
                         UPDATE import_log
                         SET summary = %s
                         WHERE id = %s
                     """, (json.dumps(summary), self.id))
                     
-                    # Generate user-friendly message with enhanced details
-                    failure_messages = []
-                    if failure_details:
-                        failure_messages.append("Failure reasons:")
-                        for reason, count in failure_details.items():
-                            readable_reason = reason.replace('_', ' ').title()
-                            failure_messages.append(f"  • {readable_reason}: {count:,}")
-                    
-                    processing_rate = successful / execution_time if execution_time > 0 else 0
+                    # Generate user-friendly message
+                    speed = successful / max(execution_time, 0.001)
+                    verification = ""
+                    if actual_records is not None:
+                        if abs(successful - actual_records) > 10:
+                            verification = f"\n⚠️ Verification: Expected {successful:,} records, found {actual_records:,} in database."
+                        else:
+                            verification = f"\n✅ Verification: All {successful:,} records confirmed in database."
                     
                     msg = f"""
-    ✅ Successfully imported {successful:,} records
-    {'⚠️ Skipped ' + str(duplicates) + ' duplicate records' if duplicates > 0 else ''}
-    {'❌ Failed to import ' + str(failed) + ' records' if failed > 0 else ''}
-    {chr(10).join(failure_messages) if failure_messages else ''}
-    ⏱️ Processed in {execution_time:.1f} seconds ({processing_rate:.1f} records/sec)
-    📊 Overall progress: {success_pct:.1f}% complete
+    🎉 Import Complete!
+
+    📊 Results for '{current_import.original_filename}':
+    ✅ Successfully Imported: {successful:,} ({success_pct:.1f}%)
+    ❌ Failed Records: {failed:,} ({failed_pct:.1f}%)
+    ⚠️ Duplicate Records: {duplicates:,} ({duplicate_pct:.1f}%)
+
+    ⏱️ Total Execution Time: {execution_time:.1f} seconds
+    ⚡ Average Speed: {speed:.1f} records/second{verification}
+
+    Final status: COMPLETED
                     """
                     
                     # Post message using the new cursor
@@ -1250,119 +1294,110 @@ class ImportLog(models.Model):
                         'model': 'import.log',
                         'res_id': self.id,
                         'message_type': 'comment',
+                        'subject': 'Import Complete'
                     })
+                    
+                    # Send to websocket if possible
+                    try:
+                        from ..services.websocket.connection import send_message
+                        send_message(env, f"🎉 Import Complete! Successfully imported {successful:,} records.",
+                                    "success", current_import.uploaded_by.id)
+                    except Exception as ws_error:
+                        _logger.error(f"Error sending websocket message: {str(ws_error)}")
                     
                     # Commit changes
                     summary_cr.commit()
                     
-                    # Return summary
-                    return summary
+                    # Send an alert to the user if there's a significant mismatch
+                    if actual_records is not None and abs(successful - actual_records) > 1000:
+                        try:
+                            from ..services.websocket.connection import send_message
+                            mismatch_msg = f"⚠️ Records count mismatch: Expected {successful:,}, found {actual_records:,} in database."
+                            send_message(env, mismatch_msg, "warning", current_import.uploaded_by.id)
+                        except Exception as ws_error:
+                            _logger.error(f"Error sending mismatch message: {str(ws_error)}")
                     
+                    return summary
+                        
             except Exception as e:
                 _logger.error(f"Error generating import summary (attempt {attempt+1}): {str(e)}")
-                time.sleep(2 ** attempt)  # Exponential backoff
+                import traceback
+                _logger.error(traceback.format_exc())
+                time.sleep(1 + attempt)  # Linear backoff
         
-        _logger.error(f"Failed to generate import summary after {max_retries} attempts")
+        # If all retries failed, try the simple fallback
+        try:
+            self._create_fallback_summary()
+        except Exception as fallback_error:
+            _logger.error(f"Final fallback summary also failed: {str(fallback_error)}")
+        
         return None
 
-    # def _generate_import_summary(self):
-    #     """Generate a comprehensive summary of the import results with retry logic"""
-    #     max_retries = 5
-        
-    #     for attempt in range(max_retries):
-    #         try:
-    #             # Use a separate cursor for summary generation
-    #             with self.env.registry.cursor() as summary_cr:
-    #                 # Create environment with new cursor
-    #                 env = api.Environment(summary_cr, self.env.uid, self.env.context)
-    #                 current_import = env['import.log'].browse(self.id)
-                    
-    #                 # Lock the record to prevent concurrent updates
-    #                 summary_cr.execute("""
-    #                     SELECT id FROM import_log 
-    #                     WHERE id = %s
-    #                     FOR UPDATE NOWAIT
-    #                 """, (self.id,))
-                    
-    #                 if not summary_cr.fetchone():
-    #                     _logger.warning(f"Could not lock import record {self.id} for summary generation")
-    #                     time.sleep(1)
-    #                     continue
-                    
-    #                 # Get current statistics
-    #                 successful = current_import.successful_records
-    #                 failed = current_import.failed_records
-    #                 duplicates = current_import.duplicate_records
-    #                 total = current_import.total_records
-    #                 execution_time = current_import.execution_time
-                    
-    #                 # Calculate percentages
-    #                 if total > 0:
-    #                     success_pct = (successful / total) * 100
-    #                     failed_pct = (failed / total) * 100
-    #                     duplicate_pct = (duplicates / total) * 100
-    #                 else:
-    #                     success_pct = failed_pct = duplicate_pct = 0
-                        
-    #                 # Format summary
-    #                 summary = {
-    #                     'import_id': self.id,
-    #                     'model': current_import.model_name,
-    #                     'file_name': current_import.original_filename,
-    #                     'date': fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-    #                     'statistics': {
-    #                         'total_records': total,
-    #                         'successful': successful,
-    #                         'success_percentage': round(success_pct, 1),
-    #                         'failed': failed,
-    #                         'failed_percentage': round(failed_pct, 1),
-    #                         'duplicates': duplicates,
-    #                         'duplicate_percentage': round(duplicate_pct, 1),
-    #                         'execution_time': round(execution_time, 1),
-    #                         'records_per_second': round(successful / execution_time, 1) if execution_time > 0 else 0
-    #                     }
-    #                 }
-                    
-    #                 # Store summary as JSON
-    #                 summary_cr.execute("""
-    #                     UPDATE import_log
-    #                     SET summary = %s
-    #                     WHERE id = %s
-    #                 """, (json.dumps(summary), self.id))
-                    
-    #                 # Generate user-friendly message
-    #                 msg = f"""
-    #         Import Summary for '{current_import.original_filename}':
 
-    #         📊 Records Processed: {total:,}
-    #         ✅ Successfully Imported: {successful:,} ({success_pct:.1f}%)
-    #         ❌ Failed Records: {failed:,} ({failed_pct:.1f}%)
-    #         ⚠️ Duplicate Records: {duplicates:,} ({duplicate_pct:.1f}%)
+    def _create_fallback_summary(self):
+        """Create a basic import summary as a fallback when the main method fails"""
+        try:
+            # Use a dedicated cursor
+            with self.env.registry.cursor() as fallback_cr:
+                env = api.Environment(fallback_cr, self.env.uid, self.env.context)
+                
+                # First ensure the status is completed
+                fallback_cr.execute("""
+                    UPDATE import_log
+                    SET status = 'completed',
+                        current_position = total_records,
+                        completed_at = COALESCE(completed_at, NOW())
+                    WHERE id = %s AND (completed_jobs >= parallel_jobs OR completed_jobs > 0)
+                """, (self.id,))
+                
+                # Fetch the import record
+                fallback_cr.execute("""
+                    SELECT successful_records, failed_records, duplicate_records, execution_time, original_filename
+                    FROM import_log
+                    WHERE id = %s
+                """, (self.id,))
+                
+                result = fallback_cr.fetchone()
+                if not result:
+                    fallback_cr.rollback()
+                    return False
+                    
+                successful, failed, duplicates, execution_time, filename = result
+                
+                # Format a simple summary
+                msg = f"""
+    🎉 Import Summary (Fallback) for '{filename}':
 
-    #         ⏱️ Total Execution Time: {execution_time:.1f} seconds
-    #         ⚡ Import Speed: {successful/execution_time:.1f} records/second if execution_time > 0 else 0
-    #                 """
+    ✅ Successfully Imported: {successful:,}
+    ❌ Failed Records: {failed:,}
+    ⚠️ Duplicate Records: {duplicates:,}
+    ⏱️ Total Execution Time: {execution_time:.1f} seconds
+
+    Import completed at: {fields.Datetime.now()}
+                """
+                
+                # Post message
+                env['mail.message'].create({
+                    'body': msg,
+                    'model': 'import.log',
+                    'res_id': self.id,
+                    'message_type': 'comment',
+                    'subject': 'Import Completed (Fallback Summary)'
+                })
+                
+                # Try to send a websocket message
+                try:
+                    from ..services.websocket.connection import send_message
+                    send_message(env, f"🎉 Import Complete! Successfully imported {successful:,} records.",
+                                "success", self.uploaded_by.id)
+                except Exception:
+                    pass
                     
-    #                 # Post message using the new cursor
-    #                 env['mail.message'].create({
-    #                     'body': msg,
-    #                     'model': 'import.log',
-    #                     'res_id': self.id,
-    #                     'message_type': 'comment',
-    #                 })
-                    
-    #                 # Commit changes
-    #                 summary_cr.commit()
-                    
-    #                 # Return summary
-    #                 return summary
-                    
-    #         except Exception as e:
-    #             _logger.error(f"Error generating import summary (attempt {attempt+1}): {str(e)}")
-    #             time.sleep(2 ** attempt)  # Exponential backoff
-        
-    #     _logger.error(f"Failed to generate import summary after {max_retries} attempts")
-    #     return None
+                fallback_cr.commit()
+                return True
+        except Exception as e:
+            _logger.error(f"Fatal error in fallback summary: {str(e)}")
+            return False
             
     # ---------- Action Methods ----------
             

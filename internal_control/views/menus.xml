@@ -293,12 +293,12 @@
         sequence="3"/>
     
 
-    <menuitem id="menu_internal_control_cron_tree_parent" 
+    <!-- <menuitem id="menu_internal_control_cron_tree_parent" 
         name="Schedule Action"
         parent="menu_internal_control_configurations"
         groups="internal_control.group_internal_control_tech_support"
         action="action_ir_cron"
-        sequence="80" />
+        sequence="80" /> -->
 
     
 
