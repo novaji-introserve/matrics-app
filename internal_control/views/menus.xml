@@ -167,6 +167,7 @@
     <!-- Configurations -->
     <menuitem id="menu_internal_control_configurations"
               name="Configurations"
+              groups="compliance_management.group_compliance_chief_compliance_officer"
               parent="menu_internal_control_main"
               sequence="40"/>
 

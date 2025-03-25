@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- High Risk Jurisdiction Views -->
+    <record id="view_high_risk_jurisdiction_tree" model="ir.ui.view">
+        <field name="name">res.high.risk.jurisdiction.tree</field>
+        <field name="model">res.high.risk.jurisdiction</field>
+        <field name="arch" type="xml">
+            <tree string="High Risk Jurisdictions" decoration-danger="risk_level=='extreme'" decoration-warning="risk_level=='high'" decoration-info="risk_level=='medium'" decoration-success="risk_level=='low'">
+                <field name="name"/>
+                <field name="country_code"/>
+                <field name="risk_score"/>
+                <field name="risk_level"/>
+                <field name="last_updated"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_high_risk_jurisdiction_form" model="ir.ui.view">
+        <field name="name">res.high.risk.jurisdiction.form</field>
+        <field name="model">res.high.risk.jurisdiction</field>
+        <field name="arch" type="xml">
+            <form string="High Risk Jurisdiction">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Country/Region Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="country_code"/>
+                            <field name="risk_score" widget="percentage"/>
+                            <field name="risk_level"/>
+                        </group>
+                        <group>
+                            <field name="last_updated"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Risk Factors">
+                            <field name="factors" widget="html"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_high_risk_jurisdiction_search" model="ir.ui.view">
+        <field name="name">res.high.risk.jurisdiction.search</field>
+        <field name="model">res.high.risk.jurisdiction</field>
+        <field name="arch" type="xml">
+            <search string="Search High Risk Jurisdictions">
+                <field name="name"/>
+                <field name="country_code"/>
+                <filter string="High Risk" name="high_risk" domain="[('risk_level', 'in', ['high', 'extreme'])]"/>
+                <filter string="Medium Risk" name="medium_risk" domain="[('risk_level', '=', 'medium')]"/>
+                <filter string="Low Risk" name="low_risk" domain="[('risk_level', '=', 'low')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Risk Level" name="group_by_risk_level" context="{'group_by': 'risk_level'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+ 
+
+   
+    
+
+    <!-- Risk Profile Update Views -->
+    <!-- <record id="view_risk_profile_update_tree" model="ir.ui.view">
+        <field name="name">icomply.risk.profile.update.tree</field>
+        <field name="model">icomply.risk.profile.update</field>
+        <field name="arch" type="xml">
+            <tree string="Risk Profile Updates" decoration-danger="status=='failed'" decoration-success="status=='completed'" decoration-info="status=='in_progress'" decoration-muted="status=='pending'">
+                <field name="date"/>
+                <field name="user_id"/>
+                <field name="update_type"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_risk_profile_update_form" model="ir.ui.view">
+        <field name="name">icomply.risk.profile.update.form</field>
+        <field name="model">icomply.risk.profile.update</field>
+        <field name="arch" type="xml">
+            <form string="Risk Profile Update">
+                <header>
+                    <button name="update_risk_profiles" string="Run Update" type="object" class="oe_highlight" attrs="{'invisible': [('status', 'in', ['in_progress', 'completed'])]}"/>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,in_progress,completed,failed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="update_type"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Result">
+                            <field name="result"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record> -->
+
+    <!-- Partner Form Inheritance -->
+    <!-- <record id="view_partner_form_inherit_risk" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.risk</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Risk Assessment" groups="account.group_account_manager,account.group_account_user">
+                    <group>
+                        <group>
+                            <field name="jurisdiction_id" options="{'no_create': True}"/>
+                            <field name="risk_score" widget="percentage"/>
+                            <field name="risk_level"/>
+                        </group>
+                        <group>
+                            <field name="requires_enhanced_due_diligence"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record> -->
+
+    <!-- Account Move Form Inheritance -->
+    <!-- <record id="view_move_form_inherit_risk" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.risk</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="partner_risk_level" invisible="1"/>
+                <field name="requires_risk_review" invisible="1"/>
+                <field name="risk_review_state" attrs="{'invisible': [('requires_risk_review', '=', False)]}"/>
+            </field>
+            <div name="button_box" position="inside">
+                <button 
+                    type="object" 
+                    name="action_approve_risk_review" 
+                    class="oe_stat_button" 
+                    icon="fa-check-circle" 
+                    string="Approve Risk Review" 
+                    attrs="{'invisible': ['|', ('requires_risk_review', '=', False), ('risk_review_state', '!=', 'pending')]}"
+                    groups="account.group_account_manager"/>
+                <button 
+                    type="object" 
+                    name="action_reject_risk_review" 
+                    class="oe_stat_button" 
+                    icon="fa-times-circle" 
+                    string="Reject Transaction" 
+                    attrs="{'invisible': ['|', ('requires_risk_review', '=', False), ('risk_review_state', '!=', 'pending')]}"
+                    groups="account.group_account_manager"/>
+            </div>
+        </field>
+    </record>  -->
+
+    
+    
+    <!-- <record id="action_risk_profile_update" model="ir.actions.act_window">
+        <field name="name">Risk Profile Updates</field>
+        <field name="res_model">icomply.risk.profile.update</field>
+        <field name="view_mode">tree,form</field>
+    </record> -->
+
+    <!-- Risk Profiling  -->
+        <record id="action_high_risk_jurisdiction" model="ir.actions.act_window">
+            <field name="name">High Risk Jurisdictions</field>
+            <field name="res_model">res.high.risk.jurisdiction</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_high_risk': 1}</field>
+        </record>
+        
+
+
+   
+    <menuitem id="menu_high_risk_jurisdiction" name="High Risk Jurisdiction" parent="menu_fcra_risk" action="action_high_risk_jurisdiction" sequence="40"/>
+    
+</odoo>
