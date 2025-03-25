@@ -4,10 +4,7 @@ import io
 from collections import Counter
 import os
 import binascii  # Make sure this import is added
-
-
 import requests
-
 from odoo import models, fields, api
 import PyPDF2
 # import ollama
@@ -16,7 +13,6 @@ from PIL import Image
 import pytesseract
 from pdf2image import convert_from_bytes
 from odoo.exceptions import UserError
-
 from dotenv import load_dotenv
 import logging
 
@@ -41,21 +37,6 @@ class PdfChat(models.Model):
         'pdf.chat.log', 'pdf_chat_id', string='Chat Logs', ondelete='cascade', index=True)
     # Temporary field for user input
     user_question = fields.Text(string='User Question')
-    # extracted_text_search = fields.Char(
-    #     string='Extracted Text Search', index=True,
-    #     compute='_compute_extracted_text_search', store=True)
-
-
-    
-    
-    # @api.depends('extracted_text')
-    # def _compute_extracted_text_search(self):
-    #     for record in self:
-    #         if record.extracted_text:
-    #             # Store only the first 1000 characters for search purposes
-    #             record.extracted_text_search = record.extracted_text[:1000]
-    #         else:
-    #             record.extracted_text_search = False
 
     
     def _get_pdf_content(self, rulebook):
@@ -187,7 +168,7 @@ class PdfChat(models.Model):
                 "Data does not appear to be a valid PDF (missing PDF header)")
             # Log a sample of the data for debugging
             sample = pdf_file[:100].hex()
-            _logger.info(f"First 100 bytes (hex): {sample}")
+            # _logger.info(f"First 100 bytes (hex): {sample}")
             return "Error: File does not appear to be a valid PDF"
 
         # Get a file-like object
@@ -364,7 +345,7 @@ class PdfChatLog(models.Model):
             })
 
         # For debugging or logging
-        _logger.info(f"results {result}")
+        # _logger.info(f"results {result}")
 
         return result
 

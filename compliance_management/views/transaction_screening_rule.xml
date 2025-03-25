@@ -10,7 +10,7 @@
                 <field name="priority" />
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                 decoration-warning="risk_level in ('medium')"
-                decoration-success="risk_level in ('lowel')"/>
+                decoration-success="risk_level in ('low')"/>
                 <field name="likely_fraud" widget="boolean_toggle"/>
                 <field name="create_uid" />
                 <field name="create_date" />

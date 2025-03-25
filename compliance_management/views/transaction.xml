@@ -23,7 +23,7 @@
                 <field name="likely_fraud" widget="boolean_toggle"  readonly="1" optional="show"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
                     decoration-warning="risk_level in ('medium')"
-                    decoration-success="risk_level in ('lowel')" />
+                    decoration-success="risk_level in ('low')" />
                 <field name="state" widget="badge"
                     decoration-warning="state in ('new')"
                     decoration-success="state in ('done')" />
@@ -60,7 +60,7 @@
                             <span>Risk <field string="Risk Level" name="risk_level" widget="badge"
                                     decoration-danger="risk_level == 'high'"
                                     decoration-warning="risk_level in ('medium')"
-                                    decoration-success="risk_level in ('lowel')" />
+                                    decoration-success="risk_level in ('low')" />
                             </span>
                         </button>
                     </div>

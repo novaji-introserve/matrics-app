@@ -44,6 +44,8 @@
         # 'views/department.xml',
         'views/control_officer.xml',
         'views/sql_view.xml', 
+        'views/user_profile.xml',
+        'views/emplpyee.xml',
         'views/sql_panel.xml', 
         'views/menus.xml',       
         'security/groups.xml',
