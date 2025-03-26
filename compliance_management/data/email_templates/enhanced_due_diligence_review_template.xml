@@ -4,7 +4,7 @@
             <field name="name">EDD Review Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">EEnhanced Due Diligence (EDD) Review Required</field>
-            <field name="email_from">odoabuchivictor7@gmail.com</field>
+            <field name="email_from"></field>
             <field name="email_to">{{ object.approving_officer_id.email_formatted }}</field>
             <field name="email_cc">${ctx.get('email_cc')}</field> 
             <field name="mail_server_id">1</field>
