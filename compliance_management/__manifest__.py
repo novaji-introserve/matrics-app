@@ -52,7 +52,6 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-    'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
         'data/department.xml',
