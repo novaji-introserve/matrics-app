@@ -44,6 +44,8 @@
         # 'views/department.xml',
         'views/control_officer.xml',
         'views/sql_view.xml', 
+        'views/user_profile.xml',
+        'views/emplpyee.xml',
         'views/sql_panel.xml', 
         'views/menus.xml',       
         'security/groups.xml',
@@ -54,6 +56,7 @@
         'data/schedule/cron_trans_screening.xml',
         'data/schedule/cron_branch_sync.xml',
         'data/schedule/account_trans_metrics.xml',
+        'data/schedule/cron_sync_tran_bid.xml'
     ],
 
     'images': [

@@ -95,14 +95,27 @@ class alert_rules(models.Model):
         unit = rule.frequency_id.name
         period = rule.frequency_id.period
         next_check = self.calculate_next_check(last_checked, unit, period)
-
-       
         current_time_lagos = fields.Datetime.now()
-        if current_time_lagos.year == next_check.year and current_time_lagos.month == next_check.month and  current_time_lagos.day == next_check.day and current_time_lagos.hour == next_check.hour and current_time_lagos.minute == next_check.minute:
 
+        if last_checked and current_time_lagos.year == next_check.year and current_time_lagos.month == next_check.month and current_time_lagos.day == next_check.day and current_time_lagos.hour == next_check.hour and current_time_lagos.minute == next_check.minute:
             rule.write({'last_checked': fields.Datetime.now()})
-    
             self.send_alert(rule)
+            return
+
+        # Check if scheduled time has elapsed, handling potential misses
+        calculated_time = next_check
+        if calculated_time < current_time_lagos:
+            rule.write({'last_checked': fields.Datetime.now()})
+            self.send_alert(rule)
+            return
+        else:
+            # Handle the case where last_checked is None
+            calculated_time = self.calculate_next_check(current_time_lagos - timedelta(minutes=1), unit, period) #uses current time - 1 minute as the base.
+            if calculated_time <= current_time_lagos:
+                self.send_alert(rule)
+                rule.write({'last_checked': fields.Datetime.now()})
+                return
+
     
     def calculate_next_check(self, last_checked, unit, period):
         if unit == 'minutes':
@@ -119,6 +132,18 @@ class alert_rules(models.Model):
             return last_checked + relativedelta(years=period)
         else:
             raise ValidationError("Unsupported Unit")
+    
+    def format_currency(self, cell):
+        if cell is not None and isinstance(cell, (int, float, str)):
+            try:
+                if re.match(r'[\$\d,.]+', str(cell)):
+                    return f"{float(cell):,.2f}" 
+                else:
+                    return cell
+            except (ValueError, TypeError):
+                return cell
+        else:
+            return cell
 
 
     def format_query(self,rule):
@@ -131,15 +156,16 @@ class alert_rules(models.Model):
                 
         elif re.search(r"\w+\.\w+\s+AS\s+\w+", rule.sql_text.query, re.IGNORECASE): 
             query_lower = rule.sql_text.query.lower()
-            select_clause, from_clause = rule.sql_text.query.split("FROM", 1)
+        
+            select_clause, from_clause = query_lower.split("from", 1)
             select_clause = select_clause.strip()
 
             # Check if 'alias.branch_id' 
-            check_pattern = re.search(r"(\w+)\.branch_id\b", rule.sql_text.query)
+            check_pattern = re.search(r"(\w+)\.branch_id\b", rule.sql_text.query, re.IGNORECASE)
 
             if not check_pattern:
                 # Find the alias for res_branch
-                match = re.search(r"res_branch\s+(\w+)", from_clause.lower())
+                match = re.search(r"res_branch\s+(\w+)", from_clause.lower(), re.IGNORECASE)
                 if match:
                     branch_alias = match.group(1)
                     modified_select_clause = f"{select_clause}, {branch_alias}.id AS branch_id"
@@ -167,6 +193,8 @@ class alert_rules(models.Model):
             else:
                 
                 query = rule.sql_text.query
+
+                print(query)
         
 
         return query
@@ -194,7 +222,7 @@ class alert_rules(models.Model):
         for row in rows:
             filtered_row = [cell for index, cell in enumerate(row) if index not in branch_id_indices]
             # Format currency values in the filtered row
-            formatted_row = [f"{float(re.sub(r'[^\d\.]', '', str(cell))):,.2f}" if cell is not None and re.match(r'[\$\d,.]+', str(cell)) else cell for cell in filtered_row]
+            formatted_row = [ self.format_currency(cell) for cell in filtered_row]
             csv_writer.writerow(formatted_row)
             
         
@@ -235,7 +263,7 @@ class alert_rules(models.Model):
             """
                     
         # Generate the table header
-        header_html = "".join([f"<th style='padding: 8px;'>{" ".join(header.split("_")).title()}</th>" for header in columns if header != 'branch_id'])
+        header_html = "".join([f"<th style='padding: 8px;'>{' '.join(header.split('_')).title()}</th>" for header in columns if header != 'branch_id'])
         # Create the HTML table for the email
         
         
@@ -247,7 +275,7 @@ class alert_rules(models.Model):
                  # Check currency
                 if bool(re.search(currency_pattern, str(cell))) and cell is not None:
                 # Format the currency value
-                    cell = f"{float(re.sub(r'[^\d\.]', '', str(cell))):,.2f}"  # Format with commas and two decimal places
+                    cell = f"{float(cell):,.2f}"  # Format with commas and two decimal places
                
                 if index not in branch_id_indices:
                     
@@ -371,6 +399,7 @@ class alert_rules(models.Model):
                         branch_officer = self.env['control.officer'].sudo().search([("branch_id", '=', int(branch))])
                         
                         if branch_officer and rule.alert_id.id == branch_officer.alert_id.id:
+                            print(f"branch officer exists {branch_officer.alert_id.email}")
 
                             # retrieve data for branch officer by branch 
                             self.env.cr.execute(f"{query} WHERE branch_id = '{branch_officer.branch_id.id}';")
@@ -400,6 +429,8 @@ class alert_rules(models.Model):
                             self.prepare_email(rule, table_html, encoded_content, [branch_officer.officer.email], "")
                             
                         else:
+
+                            print(f"officer do not exists")
 
                             mailto = set()
                             mailcc = set()

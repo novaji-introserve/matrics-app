@@ -5,7 +5,6 @@ const { Component, useState, onWillStart, useRef } = owl;
 import { useService } from "@web/core/utils/hooks";
 import { session } from "@web/session";
 
-
 export class Dashboard extends Component {
   setup() {
     this.state = useState({
@@ -36,8 +35,12 @@ export class Dashboard extends Component {
     // Initialize the orm service
     this.orm = useService("orm");
     this.user = useService("user");
+    this.action = useService("action"); // Add action service
+    this.actionIds = {};
 
     onWillStart(async () => {
+      await this.loadActionIds(); // Load action IDs before rendering
+
       this.state.hasPermission = await this.user.hasGroup(
         "rule_book.group_compliance_manager_"
       );
@@ -52,21 +55,114 @@ export class Dashboard extends Component {
     });
   }
 
+
+  async getActionId(model) {
+    // Search for an action tied to the model with a tree view
+    const actions = await this.orm.searchRead(
+      "ir.actions.act_window",
+      [
+        ["res_model", "=", model],
+        ["view_mode", "ilike", "tree"], // Look for actions with tree view
+      ],
+      ["id"],
+      { limit: 1 } // Get the first matching action
+    );
+    return actions.length > 0 ? actions[0].id : null;
+  }
+
+  
+  async loadActionIds() {
+    try {
+      // Fetch action IDs for each model's tree view
+      this.actionIds["rulebook"] = await this.getActionId("rulebook");
+
+      // If the standard approach didn't work for rulebook, try finding the server action
+      if (!this.actionIds["rulebook"]) {
+        const serverActions = await this.orm.searchRead(
+          "ir.actions.server",
+          [
+            ["model_id.model", "=", "rulebook"],
+            ["name", "=", "Open RuleBooks"],
+          ],
+          ["id"],
+          { limit: 1 }
+        );
+
+        if (serverActions.length > 0) {
+          this.actionIds["rulebook.server"] = serverActions[0].id;
+        }
+      }
+
+      // Continue with your existing code for other models
+       this.actionIds["rulebook.title"] = await this.getActionId(
+         "rulebook.title"
+       );
+       this.actionIds["reply.log"] = await this.getActionId("reply.log");
+
+       this.actionIds["rulebook.sources"] = await this.getActionId(
+         "rulebook.sources"
+       );
+       this.actionIds["pdf.chat"] = await this.getActionId("pdf.chat");
+      // etc...
+    } catch (error) {
+      console.error("Failed to load action IDs:", error);
+    }
+  }
+
+  // Dynamic tree view link methods
+  getRulebookTreeLink() {
+    // First try with the standard action
+    if (this.actionIds["rulebook"]) {
+      return `/web#action=${this.actionIds["rulebook"]}`;
+    }
+    // Then try with the server action if available
+    else if (this.actionIds["rulebook.server"]) {
+      return `/web#action=${this.actionIds["rulebook.server"]}&model=rulebook`;
+    }
+    // Fallback if no action found
+    return "/web";
+  }
+
+  getRulebookTitleTreeLink() {
+    return this.actionIds["rulebook.title"]
+      ? `/web#action=${this.actionIds["rulebook.title"]}`
+      : "/web";
+  }
+
+  getReplyLogTreeLink() {
+    return this.actionIds["reply.log"]
+      ? `/web#action=${this.actionIds["reply.log"]}`
+      : "/web";
+  }
+
+  getRulebookSourcesTreeLink() {
+    return this.actionIds["rulebook.sources"]
+      ? `/web#action=${this.actionIds["rulebook.sources"]}`
+      : "/web";
+  }
+
+  getPdfChatTreeLink() {
+    return this.actionIds["pdf.chat"]
+      ? `/web#action=${this.actionIds["pdf.chat"]}`
+      : "/web";
+  }
+
   async fetchAwaitingReplies() {
     try {
       // Using the ORM to fetch awaiting replies
-      console.log("Using the ORM to fetch awaiting replies");
+      // console.log("Using the ORM to fetch awaiting replies");
       const replies = await this.orm.call(
         "reply.log",
         "get_awaiting_replies",
         []
       );
       this.state.awaitingReplies = replies;
-      console.log(replies); // Print the replies
+      // console.log(replies); // Print the replies
     } catch (error) {
       console.error("Failed to fetch awaiting replies:", error);
     }
   }
+
   async fetchNewlyUploadedTitle() {
     try {
       // Using the ORM to fetch awaiting replies
@@ -76,7 +172,7 @@ export class Dashboard extends Component {
         []
       );
       this.state.newlyUploadedTitle = newlyUploadedTitle;
-      console.log(newlyUploadedTitle); // Print the replies
+      // console.log(newlyUploadedTitle); // Print the replies
     } catch (error) {
       console.error("Failed to fetch newly uploaded title:", error);
     }
@@ -90,7 +186,7 @@ export class Dashboard extends Component {
         []
       );
       this.state.mostAskedQuestion = mostAskedQuestion;
-      console.log(mostAskedQuestion); // Print the replies
+      // console.log(mostAskedQuestion); // Print the replies
     } catch (error) {
       console.error("Failed to fetch newly uploaded title:", error);
     }
@@ -177,14 +273,12 @@ export class Dashboard extends Component {
       const today = new Date(); // Get the current date
       today.setHours(0, 0, 0, 0); // Set to the start of the day
 
-
       const userIsComplianceManager = await this.env.services.user.hasGroup(
         "rule_book.group_compliance_manager_"
       );
-     
+
       const userId = session.uid;
-      
-  
+
       const userDepartmentId = await this.orm.searchRead(
         "hr.employee",
         [["user_id", "=", userId]],
@@ -197,14 +291,14 @@ export class Dashboard extends Component {
 
       console.log(`user department id `, departmentId);
       console.log(`user userIsComplianceManager `, userIsComplianceManager);
-      console.log("User ID " , session.uid);
+      console.log("User ID ", session.uid);
 
       // Base domain for active records
       const baseDomain = [["status", "=", "active"]];
 
       // If the user is not a compliance manager, restrict by department
       if (!userIsComplianceManager) {
-         baseDomain.push(["department_id", "=", departmentId]); // Filter by department for non-compliance managers
+        baseDomain.push(["department_id", "=", departmentId]); // Filter by department for non-compliance managers
       }
 
       // Fetch Escalation Due Dates
@@ -267,57 +361,6 @@ export class Dashboard extends Component {
         }
       );
 
-      // const escalationDueDates = await this.orm.searchRead(
-      //   "reply.log",
-      //   [
-      //     ["escalation_date", "!=", false],
-      //     ["status", "=", "active"],
-      //     ["escalation_date", ">=", today.toISOString()],
-      //   ],
-      //   ["id", "rulebook_name", "escalation_date", "department_id"],
-      //   { limit: 5, order: "escalation_date asc" }
-      // );
-
-      // // Fetch first 10 Internal Due Dates
-      // const regulatoryDueDates = await this.orm.searchRead(
-      //   "reply.log",
-      //   [
-      //     ["reg_due_date", "!=", false],
-      //     ["status", "=", "active"],
-      //     ["reg_due_date", ">=", today.toISOString()],
-      //   ],
-      //   ["id", "rulebook_name", "reg_due_date", "department_id"],
-      //   { limit: 5, order: "reg_due_date asc" }
-      // );
-
-      // // Fetch first 10 Reminder Due Dates
-      // const reminderDueDates = await this.orm.searchRead(
-      //   "reply.log",
-      //   [
-      //     ["reminder_due_date", "!=", false],
-      //     ["status", "=", "active"],
-      //     ["reminder_due_date", ">=", today.toISOString()],
-      //   ],
-      //   ["id", "rulebook_name", "reminder_due_date", "department_id"],
-      //   { limit: 5, order: "reminder_due_date asc" }
-      // );
-
-      // // Fetch first 10 Regulatory Due Dates (computed_date)
-
-      // const internalDueDates = await this.orm.searchRead(
-      //   // regulatoryDueDates
-      //   "reply.log",
-      //   [
-      //     ["rulebook_compute_date", "!=", false],
-      //     ["rulebook_compute_date", ">=", today.toISOString()], // Filter for dates greater than or equal to today
-      //     ["status", "=", "active"],
-      //   ],
-      //   ["id", "rulebook_name", "rulebook_compute_date", "department_id"],
-      //   {
-      //     limit: 5,
-      //     order: "rulebook_compute_date asc",
-      //   }
-      // );
       console.log("date time for today ", today.toISOString(), "");
 
       this.state.escalationDueDates = escalationDueDates.map((date) => ({

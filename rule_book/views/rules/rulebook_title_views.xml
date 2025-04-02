@@ -24,7 +24,12 @@
         <field name="model">rulebook.title</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="action_scan_keywords" string="Scan for Keywords" icon="fa-search"  type="object" class="oe_highlight" attrs="{'invisible': [('file', '=', False)]}"/>
+                    <button type="object" class="oe_highlight oe_left " name="open_keyword_log" icon="fa-history"  string="View Keyword Logs" attrs="{'invisible': [('file', '=', False)]}" />
+                    <button name="action_view_rulebooks" type="object" class="oe_highlight oe_left" icon="fa-book" string="Create Rulebook"/>
 
+                </header>
 
                 <sheet>
 
@@ -56,11 +61,11 @@
 
                             </group>
 
-                                <div class="mb-4">
-                                    <button name="action_send_email" class="btn btn-primary" type="object" icon="fa-envelope" string=" Send Email" attrs="{'invisible': [('file', '=', False)]}"/>
-                                </div>
+                            <div class="mb-4">
+                                <button name="action_send_email" class="btn btn-primary" type="object" icon="fa-envelope" string=" Send Email" attrs="{'invisible': [('file', '=', False)]}"/>
+                            </div>
 
-                            
+
                             <div class="alert alert-info" role="alert">
                                 <i class="fa fa-info-circle"/>
  The current file will be automatically attached to the email.
@@ -84,6 +89,11 @@
                     </notebook>
 
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+               
             </form>
         </field>
     </record>
