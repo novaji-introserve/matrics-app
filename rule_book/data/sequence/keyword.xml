@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<record id="sequence_keyword_alert_log" model="ir.sequence">
+    <field name="name">Keyword Alert Log Sequence</field>
+    <field name="code">keyword.alert.log</field>
+    <field name="prefix">ALERT-</field>
+    <field name="padding">7</field>    <!-- e.g., ALERT/0001, ALERT/0002 -->
+    <!-- Multi-company support, optional -->
+</record>
+    
+
+</odoo>

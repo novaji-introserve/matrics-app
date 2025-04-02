@@ -17,7 +17,7 @@
         </record>
         <!-- Actions for Blacklist-->
         <record id="action_res_partner_blacklist" model="ir.actions.act_window">
-            <field name="name">FEP List</field>
+            <field name="name">Black List</field>
             <field name="res_model">res.partner</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="domain">[('is_blacklist', '=', True)]</field>
@@ -30,24 +30,38 @@
             <field name="domain">[('is_watchlist', '=', True)]</field>
         </record>
 
+        <!-- Actions for Greylist-->
+        <record id="action_res_partner_greylist" model="ir.actions.act_window">
+            <field name="name">Grey List</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('is_greylist', '=', True)]</field>
+        </record>
+
+        <!-- Actions for CSV Import -->
+        <record id="action_csv_import" model="ir.actions.client">
+            <field name="name">CSV Import</field>
+            <field name="tag">compliance_management.csv_import_form</field>
+            <field name="type">ir.actions.client</field>
+        </record>
 
         <!-- Form Views for Global PEP -->
-          <!-- Views for Global PEP List-->
+        <!-- Views for Global PEP List-->
         <record id="view_res_global_pep_tree" model="ir.ui.view">
             <field name="name">res.pep.tree</field>
             <field name="model">res.pep</field>
             <field name="arch" type="xml">
                 <tree string="Global PEP List">
-                    <field name="unique_identifier"/>
-                    <field name="name"/>
-                    <field name="surname"/>
-                    <field name="first_name"/>
-                    <field name="title"/>
-                    <field name="status"/>
-                    <field name="pep_classification"/>
-                    <field name="present_position"/>
-                    <field name="createdon"/>
-                    <field name="lastmodifiedon"/>
+                    <field name="unique_identifier" />
+                    <field name="name" />
+                    <field name="surname" />
+                    <field name="first_name" />
+                    <field name="title" />
+                    <field name="status" />
+                    <field name="pep_classification" />
+                    <field name="present_position" />
+                    <field name="createdon" />
+                    <field name="lastmodifiedon" />
                 </tree>
             </field>
         </record>
@@ -57,9 +71,10 @@
             <field name="arch" type="xml">
                 <form string="Global PEP List">
                     <header>
+                    
                         <button name="action_find_person" class="oe_highlight" type="object"
-                        string="Find Biography"
-                        groups="compliance_management.group_compliance_compliance_risk_manager"/>
+                            string="Find Biography"
+                            groups="compliance_management.group_compliance_compliance_risk_manager" />
                     </header>
                     <sheet>
                         <div class="oe_title">
@@ -98,7 +113,7 @@
                                 <field name="business_interest" />
                             </group>
                         </group>
-                        
+
                         <notebook>
                             <page name="info" string="Biography">
                                 <field name="narration" />
@@ -130,7 +145,7 @@
                                     <field name="associate_business_politics" />
                                     <field name="bankers" />
                                     <field name="account_details" />
-                                   
+
                                 </group>
                             </page>
                             <page string="Reports &amp; Remarks">
@@ -154,9 +169,9 @@
                         </notebook>
                     </sheet>
                     <div class="oe_chatter">
-                        <field name="message_follower_ids"/>
-                        <field name="activity_ids"/>
-                        <field name="message_ids"/>
+                        <field name="message_follower_ids" />
+                        <field name="activity_ids" />
+                        <field name="message_ids" />
                     </div>
                 </form>
             </field>
@@ -233,7 +248,21 @@
             groups="group_compliance_compliance_officer"
             sequence="50" />
         
-        
+        <menuitem
+            id="menu_greylist"
+            action="action_res_partner_greylist"
+            parent="menu_sanction_screening_root"
+            name="Greylist"
+            groups="group_compliance_compliance_officer"
+            sequence="60" />
+
+        <menuitem 
+            id="menu_csv_import"
+            name="List Upload"
+            parent="menu_sanction_screening_root"
+            action="compliance_management.action_csv_import"
+            groups="group_compliance_compliance_officer"
+            sequence="70" />
 
     </data>
 </odoo>

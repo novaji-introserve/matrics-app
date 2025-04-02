@@ -118,6 +118,7 @@
                             <field name="is_fep" attrs="{'readonly': True}" />
                             <field name="is_blacklist" attrs="{'readonly': True}" />
                             <field name="is_watchlist" attrs="{'readonly': True}" />
+                            <field name="is_greylist" attrs="{'readonly': True}" />
                         </group>
                     </group>
                 </page>

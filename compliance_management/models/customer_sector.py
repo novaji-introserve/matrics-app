@@ -17,3 +17,19 @@ class CustomerSector(models.Model):
     risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment',index=True)
     status = fields.Selection(string='Status', selection=[(
         'active', 'Active'), ('inactive', 'Inactive')], default='active',index=True)
+
+class CustomerIndustry(models.Model):
+    _name = 'customer.industry'
+    _description = 'Customer Industry'
+    _sql_constraints = [
+        ('uniq_industry_code', 'unique(code)',
+         "Customer industry already exists. Code must be unique!"),
+    ]
+    _order = "name"
+    name = fields.Char(string="Name", required=True)
+    code = fields.Char(string="Code", required=True)
+    
+
+
+
+   
