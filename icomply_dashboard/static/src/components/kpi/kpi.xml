@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates>
     <t t-name="owl.kpicard" owl="1">
-        <div class="col-md-3 col-sm-6 mb-3 cursor-pointer" t-on-click="() => props.onClick">
+        <div class="col-md-3 col-sm-6  mb-3 cursor-pointer" t-on-click="() => props.onClick">
             <div class="col m-0 p-0 ">
-                <div class="bg-white  rounded shadow p-1 py-2 shadow-1 text-center">
+                <div class="bg-white  shadow p-1 py-1 shadow-1 text-center">
                     <h2 class="h1 fw-bold text-dark">
                         <span>
                             <t t-esc="props.value"/>

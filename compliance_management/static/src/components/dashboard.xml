@@ -14,11 +14,12 @@
 
                         <div class="ms-3">
                             <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
-                                <option value="0" selected="selected">Today</option>
+                                <option value="0">Today</option>
                                 <option value="7">Last 7 Days</option>
                                 <option value="14">Last 14 Days</option>
                                 <option value="30">Last Month</option>
                                 <option value="60">2 Months</option>
+                                <option selected="selected" value="20000">ALL</option>
                             </select>
                         </div>
                     </div>
@@ -27,7 +28,7 @@
 
             <!-- second section -->
 
-            <div class="container-fluid ">
+            <div class="container-fluid" style="margin-bottom:7rem;">
 
                 <div class="row">
 
@@ -105,32 +106,32 @@
                                 <div t-on-click="() => displaybycategory('bank')"
                                     class="d-flex gap-2 mb-2 cursor-pointer  align-items-center justify-content-between">
                                     <h5>Bank</h5>
-                                    <div style="background-color: #FFD700; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('risk')"
                                     class="d-flex gap-2 mb-2 cursor-pointer  align-items-center justify-content-between">
                                     <h5>Risk</h5>
-                                    <div style="background-color: #999999; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('compliance')"
                                     class="d-flex  gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Compliance</h5>
-                                    <div style="background-color: #C8102E; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('branch')"
                                     class="d-flex gap-2  mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Branch</h5>
-                                    <div style="background-color: #66B2FF; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('regulatory')"
                                     class="d-flex gap-2  mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Regulatory</h5>
-                                    <div style="background-color: #4CAF50; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('all')"
                                     class="d-flex gap-2  mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>All</h5>
-                                    <div style="background-color: rgb(0, 0, 0); min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
 
                             </div>

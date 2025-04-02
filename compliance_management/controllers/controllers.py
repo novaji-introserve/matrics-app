@@ -215,6 +215,12 @@ class Compliance(http.Controller):
         today = datetime.now().date()  # Get today's date
         prev_date = today - timedelta(days=datepicked)  # Get previous date
 
+
+        print(today)
+        print(prev_date)
+
+        
+
         def _execute_query(sql, params=None):
             request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
             results = request.env.cr.fetchall()

@@ -19,7 +19,7 @@ export class ComplianceDashboard extends Component {
       branches_id: [],
       stats: [],
       totalstat: 0,
-      datepicked: 0,
+      datepicked: 20000,
       chartData: [],
       scrollLeft: sessionStorage.getItem("user_scroll_left")
         ? sessionStorage.getItem("user_scroll_left")
