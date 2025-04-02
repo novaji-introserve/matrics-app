@@ -29,6 +29,7 @@
         "data/media_keywords.xml",
         "security/security.xml",
         "data/schedules/adverse_media_cron.xml",
+        "data/schedules/run_risk_assessment_corn.xml",
         "data/email_templates/adverse_media_alert_template.xml",
         "data/schedules/global_pep_list_cron.xml",
         "views/configuration.xml",
@@ -52,7 +53,6 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-    'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
         'data/department.xml',
@@ -61,7 +61,6 @@
         'data/media_keywords.xml',
         'security/security.xml',
         'data/schedules/adverse_media_cron.xml',
-        'data/schedules/compute_risk_score_cron.xml',
         'data/email_templates/adverse_media_alert_template.xml',
         'views/configuration.xml',
         'views/edd.xml',

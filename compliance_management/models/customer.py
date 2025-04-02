@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 from psycopg2 import ProgrammingError
 import logging
 from dotenv import load_dotenv
+import psycopg2, os
 
 
 load_dotenv()
@@ -143,8 +144,48 @@ class Customer(models.Model):
     is_greylist = fields.Boolean(
         string="Is Greylist", default=False, tracking=True)    
      
-    # industry =
 
+
+    def cron_run_risk_assessment(self):
+        self.update_global_pep_status()
+        self.compute_risk_score_for_all_users()
+
+
+    def update_global_pep_status(self):
+        _logger.info("Starting PEP status check using SQL query.")
+
+        # Fetch first and last names from res_partner
+        query_fetch = """
+            SELECT id, firstname, lastname 
+            FROM res_partner
+            WHERE firstname IS NOT NULL AND lastname IS NOT NULL
+        """
+        self.env.cr.execute(query_fetch)
+        partners = self.env.cr.fetchall()
+
+        if not partners:
+            _logger.info("No customers found in res_partner.")
+            return
+
+        # Prepare a set of unique full names
+        full_names = list(set(f"{first} {last}" for _, first, last in partners))
+        _logger.info(f"Unique customer full names: {full_names}")
+
+        # Step 3: Update res_partner if name exists in res_pep
+        query_update = """
+            UPDATE res_partner
+            SET global_pep = True
+            FROM res_pep
+            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = LOWER(TRIM(res_pep.name))
+        """
+
+        self.env.cr.execute(query_update)
+        self.env.cr.commit()
+
+        _logger.info("PEP status check completed. Unique customers updated.")
+
+
+    # industry =
 
     def init(self):
         # Drop the trigger if it exists
