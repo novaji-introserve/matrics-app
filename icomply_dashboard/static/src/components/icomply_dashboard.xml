@@ -27,6 +27,9 @@
                     </div>
                 </div>
 
+               <div class="content">
+               
+
                 <div class="row mt-2 mt-md-4 m-auto">
                     <KpiCard t-on-click="() => displayTransactionsByRisk('high')" name="'High Risk Tran.'"
                         value="state.kpi.highrisk" percentage="state.kpi.highriskbypercent" />
@@ -110,6 +113,9 @@
                     </div>
 
                 </div>
+
+
+               </div>
 
 
             </div>
