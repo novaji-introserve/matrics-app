@@ -427,34 +427,65 @@
         <field name="type_id" ref="compliance_inst_risk_type_3" />
         <field name="is_default">True</field>
     </record>
-    <record id="res_risk_assessment_line_1" model="res.risk.assessment.line">
-        <field name="name">Money Laundering</field>
-        <field name="implication">Regulatory Fine</field>
-        <field name="existing_controls">Put Accounts on PND</field>
-        <field name="planned_mitigation">Customers will be charged accordingly</field>
-        <field name="category_id" ref="compliance_inst_fc_risk_category_1" />
-        <field name="department_id" ref="hr_department_compliance" />
-        <field name="risk_assessment_id" ref="res_risk_assessment_1" />
-        <field name="inherent_risk_score">24</field>
-        <field name="control_effectiveness_score">9</field>
-        <field name="residual_risk_impact">24.00</field>
-        <field name="residual_risk_score">15.36</field>
-        <field name="residual_risk_probability">60</field>
-    </record>
-    <record id="res_risk_assessment_line_onboarding" model="res.risk.assessment.line">
-        <field name="name">Customer Onboarding</field>
-        <field name="implication">To be deteremined</field>
-        <field name="existing_controls">KYC Completed</field>
-        <field name="planned_mitigation">Account put on hold</field>
-        <field name="category_id" ref="compliance_inst_fc_risk_category_52" />
-        <field name="department_id" ref="hr_department_compliance" />
-        <field name="risk_assessment_id" ref="res_risk_assessment_onboarding" />
-        <field name="inherent_risk_score">10</field>
-        <field name="control_effectiveness_score">12</field>
-        <field name="residual_risk_impact">12.00</field>
-        <field name="residual_risk_score">6.24</field>
-        <field name="residual_risk_probability">52</field>
-    </record>
+<!-- <record id="res_risk_assessment_line_1" model="res.risk.assessment.line">
+    <field name="name">Money Laundering</field>
+    <field name="implication">Regulatory Fine</field>
+    <field name="existing_controls" eval="[(6, 0, [ref('risk_control_fcra_permissible_purpose').id])]"/>
+    <field name="planned_mitigation" eval="[(6, 0, [ref('mitigation_1_demo').id])]"/>
+    <field name="category_id" ref="compliance_inst_fc_risk_category_1"/>
+    <field name="department_id" ref="hr_department_compliance"/>
+    <field name="risk_assessment_id" ref="res_risk_assessment_1"/>
+    <field name="inherent_risk_score">24</field>
+    <field name="control_effectiveness_score">9</field>
+    <field name="residual_risk_impact">24.00</field>
+    <field name="residual_risk_score">15.36</field>
+    <field name="residual_risk_probability">60</field>
+</record>
+    
+<record id="res_risk_assessment_line_onboarding" model="res.risk.assessment.line">
+    <field name="name">Customer Onboarding</field>
+    <field name="implication">To be deteremined</field>
+    <field name="existing_controls" eval="[(6, 0, [ref('risk_control_fcra_adverse_action').id])]"/>
+    <field name="planned_mitigation" eval="[(6,0, [ref('mitigation_2_demo').id])]"/>
+    <field name="category_id" ref="compliance_inst_fc_risk_category_52" />
+    <field name="department_id" ref="hr_department_compliance" />
+    <field name="risk_assessment_id" ref="res_risk_assessment_onboarding" />
+    <field name="inherent_risk_score">10</field>
+    <field name="control_effectiveness_score">12</field>
+    <field name="residual_risk_impact">12.00</field>
+    <field name="residual_risk_score">6.24</field>
+    <field name="residual_risk_probability">52</field>
+</record> -->
+
+<record id="res_risk_assessment_line_1" model="res.risk.assessment.line">
+    <field name="name">Money Laundering</field>
+    <field name="implication">Regulatory Fine</field>
+    <field name="existing_controls" eval="[(6, 0, [ref('risk_control_fcra_permissible_purpose')])]"/>
+    <field name="planned_mitigation" eval="[(6, 0, [ref('mitigation_1_demo')])]"/>
+    <field name="category_id" ref="compliance_inst_fc_risk_category_1"/>
+    <field name="department_id" ref="hr_department_compliance"/>
+    <field name="risk_assessment_id" ref="res_risk_assessment_1"/>
+    <field name="inherent_risk_score">24</field>
+    <field name="control_effectiveness_score">9</field>
+    <field name="residual_risk_impact">24.00</field>
+    <field name="residual_risk_score">15.36</field>
+    <field name="residual_risk_probability">60</field>
+</record>
+
+<record id="res_risk_assessment_line_onboarding" model="res.risk.assessment.line">
+    <field name="name">Customer Onboarding</field>
+    <field name="implication">To be deteremined</field>
+    <field name="existing_controls" eval="[(6, 0, [ref('risk_control_fcra_adverse_action')])]"/>
+    <field name="planned_mitigation" eval="[(6, 0, [ref('mitigation_2_demo')])]"/>
+    <field name="category_id" ref="compliance_inst_fc_risk_category_52"/>
+    <field name="department_id" ref="hr_department_compliance"/>
+    <field name="risk_assessment_id" ref="res_risk_assessment_onboarding"/>
+    <field name="inherent_risk_score">10</field>
+    <field name="control_effectiveness_score">12</field>
+    <field name="residual_risk_impact">12.00</field>
+    <field name="residual_risk_score">6.24</field>
+    <field name="residual_risk_probability">52</field>
+</record>
 
 
     <!-- Account Types -->

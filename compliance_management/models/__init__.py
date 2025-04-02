@@ -42,3 +42,5 @@ from . import import_log
 from . import open_sanctions_extension
 from . import job_queue_handler
 from . import web_scraping
+from . import risk_assessment_control
+from . import risk_assesment_mitigation

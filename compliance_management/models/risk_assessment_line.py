@@ -20,15 +20,15 @@ class RiskAssessmentLine(models.Model):
     implication = fields.Text(string='Implication', required=True)
     inherent_risk_score = fields.Float(
         string='Inherent Risk Score', required=True, tracking=True)
-    existing_controls = fields.Text(string='Existing Controls', required=True)
+    # existing_controls = fields.Text(string='Existing Controls', required=True)
+    existing_controls = fields.Many2many("risk.assessment.control", "res_risk_assessment_line_risk_assessment_control_rel", tracking=True)
     control_effectiveness_score = fields.Float(
         string='Control Effectiveness Score', tracking=True)
     residual_risk_probability = fields.Float(
         string='Residual Risk Probability', compute='_compute_risk_probability', store=True)
     residual_risk_impact = fields.Float(
         string='Residual Risk Impact', required=True, tracking=True)
-    planned_mitigation = fields.Text(
-        string='Planned Mitigation', required=True)
+    planned_mitigation = fields.Many2many("risk.assessment.mitigation", "res_risk_assessment_line_risk_assessment_mitigation_rel", tracking=True)
     department_id = fields.Many2one(
         comodel_name='hr.department', string='Department', required=True, help="Department Responsible")
     implementation_date = fields.Date(

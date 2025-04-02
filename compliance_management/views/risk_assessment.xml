@@ -36,7 +36,7 @@
                     </group>
                     <group>
                         <group colspan="2">
-                            <field name="existing_controls"/>
+                            <field name="existing_controls" widget="many2many_tags"/>
                         </group>
                     </group>
                     <group>
@@ -49,7 +49,7 @@
                     </group>
                     <group>
                         <group colspan="2">
-                            <field name="planned_mitigation" />
+                            <field name="planned_mitigation" widget="many2many_tags" />
                         </group>
                     </group>
                     <group>
