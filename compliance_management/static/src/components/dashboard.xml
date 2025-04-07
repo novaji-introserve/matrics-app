@@ -40,7 +40,7 @@
                             
                                <t t-if="state.stats and state.stats.length > 0">
                                 <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
-                                    <Card t-on-click="() => displayOdooView(stat.scope)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
+                                    <Card t-on-click="() => displayOdooView(stat.scope, stat.query)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
                                 </t>
                                </t>
                                <t t-else="">
@@ -149,7 +149,7 @@
                             <t t-if="state.highriskchart.length > 0">
                                 <div class="chart mt-4 ml-1 shadow shadow-1 bg-white p1">
                                 <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="'Top 10 High-Risk Customer By Branch'"
-                                    data="state.highriskchart" />
+                                    data="state.highriskchart" dynamic="false"  />
                                 </div>
                             </t>
 
@@ -159,6 +159,20 @@
 
 
 
+                    </div>
+
+                    <div class="dynamic_chart">
+                    
+                    <t t-if="state.dynamic_chart.length > 0">
+                        <t t-foreach="state.dynamic_chart" t-as="chart" t-key="chart.id">
+
+                        <div class="chart col-md-4 mt-4 ml-1 shadow shadow-1 bg-white p1">
+                            <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="'chart.title'"
+                                data="chart" dynamic="true" />
+                        </div>
+                        
+                        </t>
+                    </t>
                     </div>
                    
 

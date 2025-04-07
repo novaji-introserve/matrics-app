@@ -2,7 +2,7 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-
+import re
 
 class Statistic(models.Model):
     _name = 'res.compliance.stat'
@@ -29,6 +29,30 @@ class Statistic(models.Model):
     
     scope_color = fields.Char()
 
+    # @api.depends('sql_query')
+    # def _compute_val(self):
+    #     for record in self:
+    #         if record.sql_query:
+    #             try:
+    #                 query = record.sql_query.strip().lower()
+    #                 if not query.startswith('select'):
+    #                     raise ValidationError('Query not supported.\nHint: Start with SELECT')
+    #                 record.env.cr.execute(query)
+    #                 aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
+    #                 pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\("
+    #                 match = re.search(pattern, query, re.IGNORECASE)
+    #                 if match:
+    #                     record.val = record.env.cr.fetchone()[0]
+    #                 else:
+    #                     records = record.env.cr.fetchall()
+    #                     record.val = str(len(records)) # convert to string, because val is a Char.
+    #             except Exception as e:
+    #                 record.val = 'Error'
+    #                 raise ValidationError(f'Invalid SQL query:\n{str(e)}')
+    #         else:
+    #             record.val = '0'
+
+
     @api.model
     def create(self, vals):
         sql_query = vals.get('sql_query')  # Get the sql_query from the values
@@ -43,15 +67,19 @@ class Statistic(models.Model):
                 
                 self.env.cr.execute(query)
 
-                if "count('*')" in sql_query or 'count(*)' in sql_query:
+                aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
+                pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\(" 
+                match = re.search(pattern, query, re.IGNORECASE)
+
+                if match:
                     count = self.env.cr.fetchone()[0]
-                    vals['val'] = count  # Store the count of records
+                    self.val = count  # Store the count of records
                 else:
                     records = self.env.cr.fetchall()
                     if records:
-                            vals['val'] = len(records)  # Store the length of the records
+                        self.val = len(records)  # Store the length of the records
                     else:
-                        vals['val'] = 0  # Store 0 if no records
+                        self.val = 0  # Store 0 if no records
 
 
                 # assign the color
@@ -77,6 +105,41 @@ class Statistic(models.Model):
                 raise ValidationError(f'Invalid SQL query:\n{str(e)}')
         
         return super(Statistic, self).create(vals)
+
+    @api.onchange('sql_query')
+    def _onchange_sql_query(self):
+        
+        try:
+            if self.sql_query:
+
+                print(self.val)
+                print(self.sql_query)
+               
+                query = self.sql_query
+                self.env.cr.execute(query)
+
+                aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
+                pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\(" 
+                match = re.search(pattern, query, re.IGNORECASE)
+
+                if match:
+                    count = self.env.cr.fetchone()[0]
+                    print(count)
+                    self.write({'val': count}) # save the value to the database.
+                else:
+                    records = self.env.cr.fetchall()
+                    if records:
+                        self.write({'val': len(records)}) # save the value to the database.
+                    else:
+                       
+                        self.write({'val': 0}) # save the value to the database.
+                
+               
+
+
+        except Exception as e:
+            raise ValidationError(str(e))
+
 
 
     def compute_stat(self):

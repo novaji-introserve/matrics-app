@@ -30,6 +30,7 @@ export class ComplianceDashboard extends Component {
       screenedchart: [],
       highriskchart: [],
       topbranch: [],
+      dynamic_chart: []
     });
 
 
@@ -90,43 +91,53 @@ export class ComplianceDashboard extends Component {
     }
   };
 
-  async displayOdooView(category) {
-    const formatDate = (date) => date.toISOString().slice(0, 10);
+  async displayOdooView(category, query) {
+    // const formatDate = (date) => date.toISOString().slice(0, 10);
 
-    let prevDate, currentDate;
+    // let prevDate, currentDate;
 
-    if (this.state.datepicked > 0) {
-      prevDate = moment()
-        .subtract(this.state.datepicked, "days")
-        .format("YYYY-MM-DD");
-      currentDate = formatDate(new Date()); // Today's date
-    } else {
-      currentDate = formatDate(new Date()); // Today's date
-      prevDate = currentDate; // Same as today if datepicked is 0
+    // if (this.state.datepicked > 0) {
+    //   prevDate = moment()
+    //     .subtract(this.state.datepicked, "days")
+    //     .format("YYYY-MM-DD");
+    //   currentDate = formatDate(new Date()); // Today's date
+    // } else {
+    //   currentDate = formatDate(new Date()); // Today's date
+    //   prevDate = currentDate; // Same as today if datepicked is 0
+    // }
+
+    // const odooPrevDate = `${prevDate} 00:00:00`; // For Odoo's datetime field
+    // const odooCurrentDate = `${currentDate} 23:59:59`; // For Odoo's datetime field
+
+    // this.state.prevDate = odooPrevDate; // Update the state
+    // this.state.currentDate = odooCurrentDate; // Update the state
+
+    // let domain = [
+    //   ["create_date", ">=", odooPrevDate], // Use the formatted dates
+    //   ["create_date", "<=", odooCurrentDate], // Use <= for inclusive end date
+    //   ["scope", "=", category],
+    // ];
+
+    const response = await this.rpc("/dashboard/dynamic_sql", { sql_query: query });      
+        
+    if(response.error){
+      alert(response.error)
+    }else{
+      
+      
+      this.navigate.doAction({
+        type: "ir.actions.act_window",
+        res_model: response.replace(/_/g, "."),
+        name: category,
+        domain: [],
+        views: [
+          [false, "tree"],
+          [false, "form"],
+        ],
+      });
     }
 
-    const odooPrevDate = `${prevDate} 00:00:00`; // For Odoo's datetime field
-    const odooCurrentDate = `${currentDate} 23:59:59`; // For Odoo's datetime field
-
-    this.state.prevDate = odooPrevDate; // Update the state
-    this.state.currentDate = odooCurrentDate; // Update the state
-
-    let domain = [
-      ["create_date", ">=", odooPrevDate], // Use the formatted dates
-      ["create_date", "<=", odooCurrentDate], // Use <= for inclusive end date
-      ["scope", "=", category],
-    ];
-
-    this.navigate.doAction({
-      type: "ir.actions.act_window",
-      res_model: "res.compliance.stat",
-      name: category,
-      domain: domain,
-      views: [
-        [false, "tree"],
-        [false, "form"],
-      ],
-    });
+    
   }
   async getcurrentuser() {
     let result = await this.rpc("/dashboard/user");
@@ -177,6 +188,7 @@ export class ComplianceDashboard extends Component {
     await this.fetchScreenedChart();
     await this.TopBranches();
     await this.highRiskBranches();
+    await this.fetchDashboardCharts()
   };
 
 
@@ -213,10 +225,33 @@ export class ComplianceDashboard extends Component {
         datepicked: Number(this.state.datepicked),
       }
     );  
-
-
+    
+    
     this.state.highriskchart = response
+    
+  }
+  
+  async fetchDashboardCharts(){
 
+    let charts = await this.api.searchRead("res.dashboard.charts", [])
+  
+    for(let chart of charts){
+    
+      const response = await this.rpc(`/dashboard/dynamic_charts/${chart.id}`,
+      {
+        cco: this.state.cco,
+        branches_id: this.state.branches_id,
+        datepicked: Number(this.state.datepicked),
+      }
+    );  
+
+    this.state.dynamic_chart = [...this.state.dynamic_chart, response]
+    
+  
+    
+      
+    }
+    
   }
 }
 
