@@ -73,7 +73,10 @@
 }
 
 .chart{
+    max-height: 45vh;
     min-height: 45vh;
+    overflow: auto;
+    margin: auto;
 }
 
 

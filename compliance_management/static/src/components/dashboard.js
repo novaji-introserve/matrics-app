@@ -141,7 +141,6 @@ export class ComplianceDashboard extends Component {
   }
   async getcurrentuser() {
     let result = await this.rpc("/dashboard/user");
-    console.log(result);
     
     this.state.branches_id = result.branch;
     this.state.cco = result.group;
@@ -185,9 +184,9 @@ export class ComplianceDashboard extends Component {
 
   filterByDate = async () => {
     await this.getAllStats();
-    await this.fetchScreenedChart();
-    await this.TopBranches();
-    await this.highRiskBranches();
+    // await this.fetchScreenedChart();
+    // await this.TopBranches();
+    // await this.highRiskBranches();
     await this.fetchDashboardCharts()
   };
 
@@ -232,12 +231,8 @@ export class ComplianceDashboard extends Component {
   }
   
   async fetchDashboardCharts(){
-
-    let charts = await this.api.searchRead("res.dashboard.charts", [])
-  
-    for(let chart of charts){
     
-      const response = await this.rpc(`/dashboard/dynamic_charts/${chart.id}`,
+    const response = await this.rpc(`/dashboard/dynamic_charts/`,
       {
         cco: this.state.cco,
         branches_id: this.state.branches_id,
@@ -245,15 +240,22 @@ export class ComplianceDashboard extends Component {
       }
     );  
 
-    this.state.dynamic_chart = [...this.state.dynamic_chart, response]
+    console.log(response);
     
-  
+
+    if(response.error){
+      alert(response.error)
+
+    }else{
+      this.state.dynamic_chart = response
+
+    }
     
       
     }
     
   }
-}
+
 
 ComplianceDashboard.template = "owl.ComplianceDashboard";
 ComplianceDashboard.components = { Card, ChartRenderer };

@@ -34,11 +34,12 @@ class ResCharts(models.Model):
         ('rainbow', 'Rainbow'),
     ], string="Color Scheme", default='default')
     
-    x_axis_field = fields.Char('X-Axis Field', help="Column name to use for X-axis labels")
-    y_axis_field = fields.Char('Y-Axis Field', help="Column name to use for Y-axis values")
+    x_axis_field = fields.Char('X-Axis Field', help="Column name to use for X-axis labels", required=True)
+    y_axis_field = fields.Char('Y-Axis Field', help="Column name to use for Y-axis values",required=True)
     
-    date_filter = fields.Boolean('Enable Date Filter', default=True)
-    date_field = fields.Char('Date Field Name', help="Name of date field in query to filter by")
+    branch_filter = fields.Boolean('Enable Branch Filter', default=True)
+    date_field = fields.Char('Date Field Name', help="Name of date field in query to filter by",required=True)
+    branch_field = fields.Char('Branch Field Name', help="Name of branch field in query to filter by")
     
     state = fields.Selection(
     [("active", "Active"), ("inactive", "inactive" )],

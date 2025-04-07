@@ -387,37 +387,47 @@ export class ChartRenderer extends Component {
         datasets: this.props.data.datasets
       },
       options: {
-        ...this.getDefaultChartOptions(), // Start with default options
-        onClick: (event, elements) => {
-          if (!elements || elements.length === 0) return;
+        // ...this.getDefaultChartOptions(), // Start with default options
+        // onClick: (event, elements) => {
+        //   if (!elements || elements.length === 0) return;
 
-          const clickedIndex = elements[0].index;
-          const filter = branch_ids[clickedIndex];
+        //   const clickedIndex = elements[0].index;
+        //   const filter = branch_ids[clickedIndex];
 
-           let domain = [["branch_id", "=", filter]];
+        //    let domain = [["branch_id", "=", filter]];
 
-           if (this.props.date > 0) {
-             domain.push(["create_date", ">=", prevDate]);
-             domain.push(["create_date", "<=", currentDate]);
-           }
+        //    if (this.props.date > 0) {
+        //      domain.push(["create_date", ">=", prevDate]);
+        //      domain.push(["create_date", "<=", currentDate]);
+        //    }
 
-           // Admin Check and Branch Filtering
-           if (!this.props.admin) {
-             domain.push(["branch_id", "in", this.props.branches_id]);
-           }
+        //    // Admin Check and Branch Filtering
+        //    if (!this.props.admin) {
+        //      domain.push(["branch_id", "in", this.props.branches_id]);
+        //    }
 
-          let action = {
-            type: "ir.actions.act_window",
-            name: "Top 10 Branches", // Use constant for action name
-            res_model: "res.partner", // Use constant for model name
-            domain: domain,
-            views: [
-              [false, "tree"], // Use constants for view types
-              [false, "form"],
-            ],
-          };
+        //   let action = {
+        //     type: "ir.actions.act_window",
+        //     name: "Top 10 Branches", // Use constant for action name
+        //     res_model: "res.partner", // Use constant for model name
+        //     domain: domain,
+        //     views: [
+        //       [false, "tree"], // Use constants for view types
+        //       [false, "form"],
+        //     ],
+        //   };
 
-          this.navigate.doAction(action);
+        //   this.navigate.doAction(action);
+        // },
+        responsive: true,
+        maintainAspectRatio: true,
+        layout: {
+            padding: {
+                top: 2,
+                bottom: 2,
+                left: 2,
+                right: 2
+            }
         },
         scales: {
           y: {
@@ -431,7 +441,7 @@ export class ChartRenderer extends Component {
         },
         plugins: {
           title: {
-            text: this.props.title,
+            text: this.props.data.title,
           },
         },
       },

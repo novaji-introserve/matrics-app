@@ -245,11 +245,6 @@ class Compliance(http.Controller):
 
         today = datetime.now().date()  # Get today's date
         prev_date = today - timedelta(days=datepicked)  # Get previous date
-
-
-        print(today)
-        print(prev_date)
-
         
 
         def _execute_query(sql, params=None):

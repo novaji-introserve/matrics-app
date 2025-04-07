@@ -4,88 +4,131 @@ import json
 from datetime import datetime, timedelta
 
 class DynamicChartController(http.Controller):
-    
-    @http.route('/dashboard/dynamic_charts', type='json', auth='user')
-    def dynamic_charts_dashboard(self, cco, branches_id, datepicked, **kw):
-        """Render the dynamic charts dashboard"""
-        if not request.env.user.has_group('dynamic_charts.group_dynamic_chart_user'):
-            return request.render('web.login', {})
+ 
+
+    def _add_where_to_query(self, query, where_clause):
         
-        charts = request.env['dynamic.chart'].search([('active', '=', True)])
-        return request.render('dynamic_charts.dashboard_template', {
-            'charts': charts
-        })
-    
-    @http.route('/dashboard/dynamic_charts/<int:chart_id>', type='json', auth='user')
-    def get_chart_data(self, chart_id, cco, branches_id, datepicked, **kw):
-        """Get chart data in JSON format"""
-        # if not request.env.user.has_group('dynamic_charts.group_dynamic_chart_user'):
-        #     return {'error': 'Access denied'}
+        if 'WHERE' in query.upper():
+            # Find the position of WHERE
+            where_pos = query.upper().find('WHERE')
+            # Get everything after WHERE (the original conditions)
+            where_content = query[where_pos + 5:].strip()
+            
+            # Determine whether we need to add an AND
+            if where_content:
+                # There are existing conditions, so add AND
+                new_where = f"WHERE {where_clause} AND {where_content}"
+            else:
+                # No existing conditions after WHERE
+                new_where = f"WHERE {where_clause}"
+                
+            return query[:where_pos] + new_where
+        
+        # If no WHERE clause exists, add it before GROUP BY, ORDER BY, etc.
+        for clause in ['GROUP BY', 'ORDER BY', 'LIMIT']:
+            if clause in query.upper():
+                position = query.upper().find(clause)
+                return query[:position] + f" WHERE {where_clause} " + query[position:]
+        
+        # If no clauses found, add WHERE at the end
+        return query + f" WHERE {where_clause}"
+        
+    def _process_query_results(self, chart, query):
 
        
-        today = datetime.now().date()  # Get today's date
-        prevDate = today - timedelta(days=datepicked)  # Get previous date
-        
-        chart = request.env['res.dashboard.charts'].browse(chart_id)
-        if not chart.exists():
-            return {'error': 'Chart not found'}
-        
         try:
-            params = {}
-            query = chart.query
-            
-            
-            if 'WHERE' in query.upper():
-                query = query.replace('WHERE', f"WHERE {chart.date_field} BETWEEN %(start_date)s AND %(end_date)s AND ", 1)
-                params = {'start_date': prevDate, 'end_date': today}
-            else:
-                # Add WHERE clause before GROUP BY, ORDER BY, or at the end
-                for clause in ['GROUP BY', 'ORDER BY', 'LIMIT']: 
-                    if clause in query.upper():
-                        position = query.upper().find(clause)
-                        query = query[:position] + f" WHERE {chart.date_field} BETWEEN %(start_date)s AND %(end_date)s " + query[position:]
-                        params = {'start_date': prevDate, 'end_date': today}
-                        break
-                    else:
-                        query += f" WHERE {chart.date_field} BETWEEN %(start_date)s AND %(end_date)s"
-                        params = {'start_date': prevDate, 'end_date': today}
-            
-           
-            request.env.cr.execute(query, params)
+            request.env.cr.execute(query)
             results = request.env.cr.dictfetchall()
+        except Exception as e:
+            print(e)
 
-            if not results:
-                return {'labels': [], 'datasets': [{'data': [], 'backgroundColor': []}]}
-            
-            # Extract labels and values
-            x_field = chart.x_axis_field or next(iter(results[0]))
-            y_field = chart.y_axis_field or next((k for k in results[0].keys() if k != x_field), None)
-
-            
-            if not y_field:
-                return {'error': 'Cannot determine Y-axis field from query results'}
-            
-            labels = [str(r[x_field]) for r in results]
-            values = [float(r[y_field]) if r[y_field] is not None else 0 for r in results]
-
-            # Generate colors based on selected scheme
-            colors = self._generate_colors(chart.color_scheme, len(results))
-
+        if len(results) == 0:
+            print(len(results))
             return {
-                'id': chart.id,
-                'title': chart.name,
-                'type': chart.chart_type,
-                'labels': labels,
-                'datasets': [{
-                    'data': values,
-                    'backgroundColor': colors,
-                    'borderColor': colors if chart.chart_type in ['line', 'radar'] else [],
-                    'borderWidth': 1
-                }]
+                'title': '',
+                'type': '',
+                'labels': [],
+                'datasets': [{'data': [], 'backgroundColor': []}]
             }
         
-        except Exception as e:
-            return {'error': str(e)}
+        # Extract labels and values
+        x_field = chart.x_axis_field or next(iter(results[0]))
+        y_field = chart.y_axis_field or next((k for k in results[0].keys() if k != x_field), None)
+        
+        if not y_field:
+            return {'error': 'Cannot determine Y-axis field from query results'}
+        
+        labels = [str(r[x_field]) for r in results]
+        values = [float(r[y_field]) if r[y_field] is not None else 0 for r in results]
+        
+        # Generate colors based on selected scheme
+        colors = self._generate_colors(chart.color_scheme, len(results))
+        
+        return {
+            'id': chart.id,
+            'title': chart.name,
+            'type': chart.chart_type,
+            'labels': labels,
+            'datasets': [{
+                'data': values,
+                'backgroundColor': colors,
+                'borderColor': colors if chart.chart_type in ['line', 'radar'] else [],
+                'borderWidth': 1
+            }]
+        }
+
+    
+    @http.route('/dashboard/dynamic_charts/', type='json', auth='user')
+    def get_chart_data(self, cco, branches_id, datepicked, **kw):
+        """Get chart data in JSON format"""
+        
+        charts = request.env['res.dashboard.charts'].search([('state', '=', 'active')])
+
+        today = datetime.now().date()  # Get today's date
+        prevDate = today - timedelta(days=datepicked)  # Get previous date
+
+        chartsData = []
+        
+        for chart in charts:
+
+            
+            
+            chart = request.env['res.dashboard.charts'].browse(chart.id)
+            if not chart.exists():
+                return {'error': 'Chart not found'}
+            
+            try:
+
+                # Build where clause based on conditions
+                where_clause = f"{chart.date_field} BETWEEN '{prevDate}' AND '{today}'"
+                
+                # Add branch filtering if needed
+                if not cco and chart.branch_filter and branches_id and len(branches_id) > 0:
+                    where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
+                
+                
+                elif not cco and chart.branch_filter and branches_id:
+                    where_clause += f" AND {chart.branch_field} IN {tuple()}"
+                
+
+                # Modify query to include WHERE clause
+                query = self._add_where_to_query(chart.query, where_clause)
+                
+                # Execute query and process results
+                result = self._process_query_results(chart, query)
+
+                if result['title'] == '' and result['type'] == '' and result['labels'] == []:
+                    pass
+                    
+                else:
+                    chartsData.append(result)
+
+            except Exception as e:
+                return {'error': str(e)}
+        
+        return chartsData
+
+              
     
     def _generate_colors(self, color_scheme, count):
         """Generate colors based on the selected color scheme"""
