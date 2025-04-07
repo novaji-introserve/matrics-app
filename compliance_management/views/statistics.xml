@@ -23,7 +23,7 @@
                     <div class="oe_title" colspan="2">
                         <label for="val" class="oe_edit_only" />
                         <h1>
-                            <field name="val" />
+                            <field name="val" readonly="True" />
                         </h1>
                     </div>
                     <group>
