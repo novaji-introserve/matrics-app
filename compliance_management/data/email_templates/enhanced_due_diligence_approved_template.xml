@@ -4,7 +4,7 @@
             <field name="name">EDD Approved Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Approved</field>
-            <field name="email_from">odoabuchivitor7@gmail.com</field>
+            <field name="email_from"></field>  
             <field name="email_to">${ctx.get('email_to')}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[

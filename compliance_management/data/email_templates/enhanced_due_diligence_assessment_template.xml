@@ -4,7 +4,7 @@
             <field name="name">EDD Assessment Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Assessment Required</field>
-            <field name="email_from">odoabuchivitor7@gmail.com</field>
+            <field name="email_from"></field>
             <field name="email_to">{{ object.responsible_id.email_formatted }}</field>
             <field name="email_cc">${ctx.get('email_cc')}</field> 
             <field name="auto_delete" eval="True"/>
