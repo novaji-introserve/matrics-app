@@ -240,6 +240,14 @@ class Customer(models.Model):
                     NEW.internal_category = 'customer';
                 END IF;
                 
+                IF NEW.commercial_partner_id IS NULL THEN
+                    NEW.commercial_partner_id = NEW.id;
+                END IF;
+
+                IF (NEW.display_name IS NULL OR TRIM(NEW.display_name) = '') AND NEW.name IS NOT NULL THEN
+                    NEW.display_name = NEW.name;
+                END IF;
+                
                 -- Set commercial_partner_id to the record's ID after insert
                 -- This requires a BEFORE INSERT trigger to work properly
                 IF NEW.commercial_partner_id IS NULL THEN
