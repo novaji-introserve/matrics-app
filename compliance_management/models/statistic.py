@@ -23,7 +23,8 @@ class Statistic(models.Model):
         ('regulatory', 'Regulatory'),('risk','Risk Assessment')], default='bank')
     state = fields.Selection(string='State', selection=[(
         'active', 'Active'), ('inactive', 'Inactive')], default='active')
-    val = fields.Char(string='Value')
+    # val = fields.Char(string='Value')
+    val = fields.Char(string='Value', compute='_compute_val', store=True, readonly=True)
     narration = fields.Text(string='Narration')
   
     
@@ -73,7 +74,8 @@ class Statistic(models.Model):
 
                 if match:
                     count = self.env.cr.fetchone()[0]
-                    self.val = count  # Store the count of records
+                    self.val = count if count is not None else '0'
+                    
                 else:
                     records = self.env.cr.fetchall()
                     if records:
@@ -106,41 +108,42 @@ class Statistic(models.Model):
         
         return super(Statistic, self).create(vals)
 
+    @api.depends('sql_query')
+    def _compute_val(self):
+        for record in self:
+            if not record.sql_query:
+                record.val = '0'
+                continue
+                
+            try:
+                query = record.sql_query.strip().lower()
+                
+                if not query.startswith('select'):
+                    raise ValidationError('Query not supported.\nHint: Start with SELECT')
+                    
+                record.env.cr.execute(query)
+                
+                aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
+                pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\("
+                match = re.search(pattern, query, re.IGNORECASE)
+                
+                if match:
+                    result = record.env.cr.fetchone()
+                    record.val = str(result[0]) if result and result[0] is not None else '0'
+                else:
+                    records = record.env.cr.fetchall()
+                    record.val = str(len(records)) if records else '0'
+                    
+            except Exception as e:
+                record.val = 'Error'
+                # Logging the error might be better than raising here
+                # since this is a computed field
+                record.env.cr.rollback()
+    
     @api.onchange('sql_query')
     def _onchange_sql_query(self):
-        
-        try:
-            if self.sql_query:
-
-                print(self.val)
-                print(self.sql_query)
-               
-                query = self.sql_query
-                self.env.cr.execute(query)
-
-                aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
-                pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\(" 
-                match = re.search(pattern, query, re.IGNORECASE)
-
-                if match:
-                    count = self.env.cr.fetchone()[0]
-                    print(count)
-                    self.write({'val': count}) # save the value to the database.
-                else:
-                    records = self.env.cr.fetchall()
-                    if records:
-                        self.write({'val': len(records)}) # save the value to the database.
-                    else:
-                       
-                        self.write({'val': 0}) # save the value to the database.
-                
-               
-
-
-        except Exception as e:
-            raise ValidationError(str(e))
-
-
+        # This will update the field in the UI before saving
+        self._compute_val()
 
     def compute_stat(self):
         query = self.sql_query.lower()
