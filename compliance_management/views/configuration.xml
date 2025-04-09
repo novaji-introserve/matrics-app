@@ -661,7 +661,7 @@
         <menuitem
             id="menu_compliance_configuration"
             name="Configuration"
-            groups="group_compliance_compliance_officer,base.group_system"
+            groups="compliance_management.group_compliance_chief_compliance_officer"
             parent="menu_compliance_root"
             sequence="1500" />
 
