@@ -100,7 +100,7 @@ class Compliance(http.Controller):
               );
             """
             branches_id = self.check_branches_id(branches_id)
-
+           
             request.env.cr.execute(query, (start_of_prev_day, end_of_today, branches_id))
 
             # Fetch results
@@ -123,6 +123,7 @@ class Compliance(http.Controller):
     @http.route('/dashboard/statsbycategory', auth='public', type='json')
     def getAllstatsByCategory(self, cco, branches_id, category, datepicked, **kw):
 
+    
         today = datetime.now().date()  # Get today's date
         prevDate = today - timedelta(days=datepicked)  # Get previous date
 
@@ -152,6 +153,7 @@ class Compliance(http.Controller):
             FROM res_compliance_stat rcs
             WHERE rcs.create_date >= %s
               AND rcs.create_date < %s
+              AND rcs.scope = %s
               AND rcs.create_uid IN (
                   SELECT rbur.user_id
                   FROM res_branch_users_rel rbur
@@ -160,7 +162,7 @@ class Compliance(http.Controller):
             """
             branches_id = self.check_branches_id(branches_id)
 
-            request.env.cr.execute(query, (start_of_prev_day, end_of_today, branches_id))
+            request.env.cr.execute(query, (start_of_prev_day, end_of_today, category, branches_id))
 
             # Fetch results
             # Get column names

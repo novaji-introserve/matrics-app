@@ -47,6 +47,33 @@ class ResCharts(models.Model):
     string="State",
     tracking=True
     )
+    target_model_id = fields.Many2one(
+    'ir.model',
+    string='Target Model for Action',
+    required=True,
+    ondelete='cascade', 
+    help="Select the model to use for this chart's action",
+    # The domain will be defined here (as discussed previously)
+    )
+    target_model = fields.Char(
+        related='target_model_id.model',
+        string='Model Technical Name',
+        store=True
+    )
+    # Add this field to your ResCharts model
+    domain_field_id = fields.Many2one(
+        'ir.model.fields',
+        string='Domain Fields',
+        help="Select fields from the target model to use as domain filters",
+        domain="[('model_id', '=', target_model_id)]"
+    )
+    domain_field = fields.Char(
+    related='domain_field_id.name',
+    string='Domain Field Name',
+    store=True
+    )
+
+   
 
     @api.constrains('query')
     def _check_query_safety(self):
@@ -86,79 +113,3 @@ class ResCharts(models.Model):
                 raise exceptions.ValidationError(f"Database error: {e}")
 
     
-    # def get_chart_data(self, start_date=None, end_date=None):
-    #     self.ensure_one()
-        
-    #     try:
-    #         params = []
-    #         query = self.query
-            
-    #         # Apply date filter if enabled and dates provided
-    #         if self.date_filter and start_date and end_date and self.date_field:
-    #             if '%s' in query:
-    #                 params = [start_date, end_date]
-    #             else:
-    #                 # If no parameters in query, add WHERE clause
-    #                 if 'WHERE' in query.upper():
-    #                     query = query.replace('WHERE', f"WHERE {self.date_field} BETWEEN %s AND %s AND ", 1)
-    #                     params = [start_date, end_date]
-    #                 else:
-    #                     # Add WHERE clause before GROUP BY, ORDER BY, or at the end
-    #                     for clause in ['GROUP BY', 'ORDER BY', 'LIMIT']:
-    #                         if clause in query.upper():
-    #                             position = query.upper().find(clause)
-    #                             query = query[:position] + f" WHERE {self.date_field} BETWEEN %s AND %s " + query[position:]
-    #                             params = [start_date, end_date]
-    #                             break
-    #                     else:
-    #                         query += f" WHERE {self.date_field} BETWEEN %s AND %s"
-    #                         params = [start_date, end_date]
-            
-    #         self.env.cr.execute(query, params)
-    #         results = self.env.cr.dictfetchall()
-            
-    #         if not results:
-    #             return {'labels': [], 'datasets': [{'data': [], 'backgroundColor': []}]}
-            
-    #         # Extract labels and values
-    #         x_field = self.x_axis_field or next(iter(results[0]))
-    #         y_field = self.y_axis_field or next((k for k in results[0].keys() if k != x_field), None)
-            
-    #         if not y_field:
-    #             return {'error': 'Cannot determine Y-axis field from query results'}
-            
-    #         labels = [str(r[x_field]) for r in results]
-    #         values = [float(r[y_field]) if r[y_field] is not None else 0 for r in results]
-            
-    #         # Generate colors based on selected scheme
-    #         colors = self._generate_colors(len(results))
-            
-    #         return {
-    #             'labels': labels,
-    #             'datasets': [{
-    #                 'data': values,
-    #                 'backgroundColor': colors,
-    #                 'borderColor': colors if self.chart_type in ['line', 'radar'] else [],
-    #                 'borderWidth': 1
-    #             }]
-    #         }
-        
-    #     except Exception as e:
-    #         return {'error': str(e)}
-    
-    # def _generate_colors(self, count):
-    #     """Generate colors based on the selected color scheme"""
-    #     if self.color_scheme == 'cool':
-    #         base_colors = ['#3366cc', '#66ccff', '#6666ff', '#3333cc', '#000099']
-    #     elif self.color_scheme == 'warm':
-    #         base_colors = ['#ff6600', '#ff9933', '#ffcc66', '#ff0000', '#cc0000']
-    #     elif self.color_scheme == 'rainbow':
-    #         base_colors = ['#ff0000', '#ff9900', '#ffff00', '#00ff00', '#0099ff', '#6633ff']
-    #     else:  # default
-    #         base_colors = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099', '#0099c6']
-        
-    #     colors = []
-    #     for i in range(count):
-    #         colors.append(base_colors[i % len(base_colors)])
-    #     return colors
-

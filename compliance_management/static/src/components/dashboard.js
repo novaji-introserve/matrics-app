@@ -165,12 +165,14 @@ export class ComplianceDashboard extends Component {
       category: name,
       datepicked: Number(this.state.datepicked),
     });
+    
 
     this.state.stats = result.data;
     this.state.totalstat = result.total;
   }
 
   displaybycategory = async (name) => {
+
     this.state.isCategorySortingEnabled = false;
 
     if (name == "all") {
@@ -191,44 +193,44 @@ export class ComplianceDashboard extends Component {
   };
 
 
-  async fetchScreenedChart() {
-    const response = await this.rpc("/dashboard/get_top_screened_rules", {
-      cco: this.state.cco,
-      branches_id: this.state.branches_id,
-      datepicked: Number(this.state.datepicked),
-    });  
+  // async fetchScreenedChart() {
+  //   const response = await this.rpc("/dashboard/get_top_screened_rules", {
+  //     cco: this.state.cco,
+  //     branches_id: this.state.branches_id,
+  //     datepicked: Number(this.state.datepicked),
+  //   });  
 
    
-    this.state.screenedchart = response
+  //   this.state.screenedchart = response
     
 
-  }
-  async TopBranches() {
-    const response = await this.rpc("/dashboard/get_branch_by_customer", {
-      cco: this.state.cco,
-      branches_id: this.state.branches_id,
-      datepicked: Number(this.state.datepicked),
-    });  
+  // }
+  // async TopBranches() {
+  //   const response = await this.rpc("/dashboard/get_branch_by_customer", {
+  //     cco: this.state.cco,
+  //     branches_id: this.state.branches_id,
+  //     datepicked: Number(this.state.datepicked),
+  //   });  
 
 
     
 
-    this.state.topbranch = response
+  //   this.state.topbranch = response
 
-  }
-  async highRiskBranches() {
-    const response = await this.rpc("/dashboard/get_high_risk_customer_by_branch",
-      {
-        cco: this.state.cco,
-        branches_id: this.state.branches_id,
-        datepicked: Number(this.state.datepicked),
-      }
-    );  
+  // }
+  // async highRiskBranches() {
+  //   const response = await this.rpc("/dashboard/get_high_risk_customer_by_branch",
+  //     {
+  //       cco: this.state.cco,
+  //       branches_id: this.state.branches_id,
+  //       datepicked: Number(this.state.datepicked),
+  //     }
+  //   );  
     
     
-    this.state.highriskchart = response
+  //   this.state.highriskchart = response
     
-  }
+  // }
   
   async fetchDashboardCharts(){
     
@@ -239,16 +241,16 @@ export class ComplianceDashboard extends Component {
         datepicked: Number(this.state.datepicked),
       }
     );  
-
-    console.log(response);
     
 
-    if(response.error){
-      alert(response.error)
-
-    }else{
-      this.state.dynamic_chart = response
-
+    if (response && response.error) {
+      alert(`Error fetching dashboard charts: ${response.error}`);
+      this.state.dynamic_chart = []; // Or some other appropriate error state
+    } else if (response) {
+      this.state.dynamic_chart = response;
+    } else {
+      alert("Error: Empty response received while fetching dashboard charts.");
+      this.state.dynamic_chart = [];
     }
     
       

@@ -38,6 +38,8 @@
                                 <field name="x_axis_field"/>
                                 <field name="y_axis_field"/>
                                 <field name="date_field"/>
+                                <field name="target_model_id" options="{'no_create': True}"/>
+                                <field name="domain_field_id" options="{'no_create': True}" context="{'ir_model_id': target_model_id}"/>
                             </group>
                         </group>
                         <notebook>

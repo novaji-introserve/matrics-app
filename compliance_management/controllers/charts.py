@@ -32,8 +32,57 @@ class DynamicChartController(http.Controller):
         
         # If no clauses found, add WHERE at the end
         return query + f" WHERE {where_clause}"
+
+    # def _add_where_to_query(self, query, where_clause):
+    #     # Initialize variable to store conditions with values (as a list)
+    #     conditions_with_values = []
         
+    #     if 'WHERE' in query.upper():
+    #         # Find the position of WHERE
+    #         where_pos = query.upper().find('WHERE')
+            
+    #         # Find the end of the WHERE clause
+    #         end_pos = len(query)
+    #         for clause in ['GROUP BY', 'ORDER BY', 'LIMIT']:
+    #             clause_pos = query.upper().find(clause, where_pos)
+    #             if clause_pos != -1:
+    #                 end_pos = min(end_pos, clause_pos)
+            
+    #         # Get everything after WHERE up to the next clause (the original conditions)
+    #         where_content = query[where_pos + 5:end_pos].strip()
+            
+    #         # Store conditions with values
+    #         if where_content:
+    #             # Split by AND to handle multiple conditions
+    #             conditions = where_content.split(' AND ')
+    #             for condition in conditions:
+    #                 condition = condition.strip()
+    #                 if '=' in condition:
+    #                     conditions_with_values.append(condition)
+            
+    #         # Determine whether we need to add an AND
+    #         if where_content:
+    #             # There are existing conditions, so add AND
+    #             new_where = f"WHERE {where_clause} AND {where_content}"
+    #         else:
+    #             # No existing conditions after WHERE
+    #             new_where = f"WHERE {where_clause}"
+                
+    #         return query[:where_pos] + new_where
+        
+    #     # If no WHERE clause exists, add it before GROUP BY, ORDER BY, etc.
+    #     for clause in ['GROUP BY', 'ORDER BY', 'LIMIT']:
+    #         if clause in query.upper():
+    #             position = query.upper().find(clause)
+    #             return query[:position] + f" WHERE {where_clause} " + query[position:]
+        
+    #     # If no clauses found, add WHERE at the end
+    #     return query + f" WHERE {where_clause}"
+    
+
     def _process_query_results(self, chart, query):
+
+        print(query)
 
        
         try:
@@ -43,7 +92,6 @@ class DynamicChartController(http.Controller):
             print(e)
 
         if len(results) == 0:
-            print(len(results))
             return {
                 'title': '',
                 'type': '',
@@ -54,6 +102,17 @@ class DynamicChartController(http.Controller):
         # Extract labels and values
         x_field = chart.x_axis_field or next(iter(results[0]))
         y_field = chart.y_axis_field or next((k for k in results[0].keys() if k != x_field), None)
+        # Try to find an ID field - common patterns might be 'id', '{table}_id', etc.
+        id_field = next((k for k in results[0].keys() if k.endswith('_id') or k == 'id'), None)
+
+        # If no obvious ID field is found, use the first field that's not x_field or y_field
+        if not id_field:
+            id_field = next((k for k in results[0].keys() if k != x_field and k != y_field), None)
+
+        # Extract the IDs if we found a suitable field
+        ids = [r[id_field] if id_field else None for r in results]
+
+    
         
         if not y_field:
             return {'error': 'Cannot determine Y-axis field from query results'}
@@ -68,7 +127,11 @@ class DynamicChartController(http.Controller):
             'id': chart.id,
             'title': chart.name,
             'type': chart.chart_type,
+            'model_name': chart.target_model,
+            'filter': chart.domain_field,
             'labels': labels,
+            'ids': ids,
+            'datefield': chart.date_field,
             'datasets': [{
                 'data': values,
                 'backgroundColor': colors,
@@ -99,20 +162,28 @@ class DynamicChartController(http.Controller):
             
             try:
 
+
                 # Build where clause based on conditions
                 where_clause = f"{chart.date_field} BETWEEN '{prevDate}' AND '{today}'"
                 
                 # Add branch filtering if needed
                 if not cco and chart.branch_filter and branches_id and len(branches_id) > 0:
-                    where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
+            
+                    # where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
+                    if len(branches_id) == 1:
+                        where_clause += f" AND {chart.branch_field} = {branches_id[0]}"
+                       
+                    else:
+                        where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
                 
                 
-                elif not cco and chart.branch_filter and branches_id:
-                    where_clause += f" AND {chart.branch_field} IN {tuple()}"
+                elif not cco and chart.branch_filter and len(branches_id) == 0:
+                    where_clause += " AND 1 = 0"
                 
 
                 # Modify query to include WHERE clause
                 query = self._add_where_to_query(chart.query, where_clause)
+
                 
                 # Execute query and process results
                 result = self._process_query_results(chart, query)
@@ -122,6 +193,7 @@ class DynamicChartController(http.Controller):
                     
                 else:
                     chartsData.append(result)
+                    
 
             except Exception as e:
                 return {'error': str(e)}

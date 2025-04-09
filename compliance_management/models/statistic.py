@@ -74,6 +74,7 @@ class Statistic(models.Model):
                 if match:
                     count = self.env.cr.fetchone()[0]
                     self.val = count  # Store the count of records
+                    
                 else:
                     records = self.env.cr.fetchall()
                     if records:

@@ -387,48 +387,57 @@ export class ChartRenderer extends Component {
         datasets: this.props.data.datasets
       },
       options: {
-        // ...this.getDefaultChartOptions(), // Start with default options
-        // onClick: (event, elements) => {
-        //   if (!elements || elements.length === 0) return;
+        onClick: (event, elements) => {
+          if (!elements || elements.length === 0) return;
 
-        //   const clickedIndex = elements[0].index;
-        //   const filter = branch_ids[clickedIndex];
+          let dateField = ""
+          const clickedIndex = elements[0].index;
+          const modelName = this.props.data.model_name
+          const filterColumn = this.props.data.filter
+          const filterID = this.props.data.ids[clickedIndex];
+          
+          let splitDateField = this.props.data.datefield.split(".") 
 
-        //    let domain = [["branch_id", "=", filter]];
+          if(splitDateField.length > 1){
+            dateField = splitDateField[1]
+          }else{
+            dateField = this.props.data.datefield
+          }
+          
+          let domain = []
+          
+           if (this.props.date > 0) {
+             domain.push([dateField, ">=", prevDate]);
+             domain.push([dateField, "<=", currentDate]);
+           }
 
-        //    if (this.props.date > 0) {
-        //      domain.push(["create_date", ">=", prevDate]);
-        //      domain.push(["create_date", "<=", currentDate]);
-        //    }
+           // Admin Check and Branch Filtering
+           if (!this.props.admin) {
+             domain.push([filterColumn, "=", filterID]);
+           }
 
-        //    // Admin Check and Branch Filtering
-        //    if (!this.props.admin) {
-        //      domain.push(["branch_id", "in", this.props.branches_id]);
-        //    }
+           console.log(domain);
 
-        //   let action = {
-        //     type: "ir.actions.act_window",
-        //     name: "Top 10 Branches", // Use constant for action name
-        //     res_model: "res.partner", // Use constant for model name
-        //     domain: domain,
-        //     views: [
-        //       [false, "tree"], // Use constants for view types
-        //       [false, "form"],
-        //     ],
-        //   };
+           const replacedString = modelName.replaceAll(".", "_");
+           const firstChar = replacedString.charAt(0).toUpperCase();
+           const restOfString = replacedString.slice(1);
+           
+           
+          let action = {
+            type: "ir.actions.act_window",
+            name: firstChar + restOfString, // Use constant for action name
+            res_model: modelName, // Use constant for .model name
+            domain: domain,
+            views: [
+              [false, "tree"], // Use constants for view types
+              [false, "form"],
+            ],
+          };
 
-        //   this.navigate.doAction(action);
-        // },
+          this.navigate.doAction(action);
+        },
         responsive: true,
         maintainAspectRatio: true,
-        layout: {
-            padding: {
-                top: 2,
-                bottom: 2,
-                left: 2,
-                right: 2
-            }
-        },
         scales: {
           y: {
             ticks: {
