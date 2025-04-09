@@ -1,4 +1,4 @@
-# # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from odoo import http
 from odoo.http import request
 from datetime import datetime, timedelta
@@ -225,7 +225,7 @@ class Compliance(http.Controller):
             GROUP BY rtsr.id, rtsr.name
             ORDER BY hit_count DESC
             LIMIT 10;
-            # """
+            """
             request.env.cr.execute(sql,(prevDate, today, tuple(branches_id)))
             results = request.env.cr.fetchall()
 

@@ -267,7 +267,7 @@
     <menuitem id="contacts.res_partner_menu_contacts"
         name="Customers"
         action="contacts.action_contacts"
-        groups="base.group_system"
+        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
         parent="contacts.menu_contacts"
         sequence="2" />
     <menuitem
