@@ -43,31 +43,31 @@ class Customer(models.Model):
          "Customer ID already exists. Value must be unique!"),
     ]
 
-    customer_id = fields.Char(string="Customer ID", index=True, tracking=True)
+    customer_id = fields.Char(string="Customer ID", index=True, tracking=True, readonly=True)
     bvn = fields.Char(string='BVN', tracking=True, readonly=True)
     branch_id = fields.Many2one(
-        comodel_name='res.branch', string='Branch', index=True, tracking=True)
+        comodel_name='res.branch', string='Branch', index=True, tracking=True, readonly=True)
     education_level_id = fields.Many2one(
-        comodel_name='res.education.level', string='Education Level', index=True, tracking=True)
+        comodel_name='res.education.level', string='Education Level', index=True, tracking=True, readonly=True)
     kyc_limit_id = fields.Many2one(
         comodel_name='res.partner.kyc.limit', string='KYC Limit')
     tier_id = fields.Many2one(
         comodel_name='res.partner.tier', string='Customer Tier', index=True)
     identification_type_id = fields.Many2one(
-        comodel_name='res.identification.type', string='Identification Type', index=True, tracking=True)
+        comodel_name='res.identification.type', string='Identification Type', index=True, tracking=True, readonly=True)
     identification_number = fields.Char(
-        string='Identification Number', tracking=True)
+        string='Identification Number', tracking=True, readonly=True)
     identification_expiry_date = fields.Date(
-        string='Identification Expiry Date', index=True, tracking=True)
+        string='Identification Expiry Date', index=True, tracking=True, readonly=True)
     dob = fields.Date(
         string='Date of Birth', tracking=True, readonly=True)
     vat = fields.Char(string='Tax ID/TIN', index=True,
                       help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.", readonly=True)
     region_id = fields.Many2one(
-        comodel_name='res.partner.region', string='Region', tracking=True)
+        comodel_name='res.partner.region', string='Region', tracking=True, readonly=True)
     sector_id = fields.Many2one(
         
-        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True)
+        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True, readonly=True)
     industry_id = fields.Many2one(
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
@@ -78,8 +78,8 @@ class Customer(models.Model):
     # fullname = fields.Char(string='Fullname')
     short_name = fields.Char(string='Short name', readonly=True)
     lastname = fields.Char(string='Lastname', readonly=True)
-    middlename = fields.Char(string='Middle Name')
-    othername = fields.Char(string='Other Name')
+    middlename = fields.Char(string='Middle Name', readonly=True)
+    othername = fields.Char(string='Other Name', readonly=True)
     town = fields.Char(string='Town', readonly=True)
     registration_date = fields.Date(
         string='Registration Date', tracking=True, required=False, readonly=True)
