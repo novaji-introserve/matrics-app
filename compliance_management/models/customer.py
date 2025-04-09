@@ -202,8 +202,8 @@ class Customer(models.Model):
                 IF NEW.commercial_partner_id IS NULL THEN
                     NEW.commercial_partner_id = NEW.id;
                 END IF;
-                
-                IF NEW.display_name IS NULL AND NEW.name IS NOT NULL THEN
+
+                IF (NEW.display_name IS NULL OR TRIM(NEW.display_name) = '') AND NEW.name IS NOT NULL THEN
                     NEW.display_name = NEW.name;
                 END IF;
                 
