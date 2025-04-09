@@ -3,6 +3,7 @@ from odoo import http
 from odoo.http import request
 from datetime import datetime, timedelta
 from odoo import fields
+import re
 
 
 class Compliance(http.Controller):
@@ -30,6 +31,36 @@ class Compliance(http.Controller):
         else:
             return branches_id
 
+    @http.route('/dashboard/dynamic_sql', auth='public', type='json')
+    def execute_sql_query_limited_columns(self, sql_query:str, max_columns=7):
+        """Executes SQL and returns a limited number of columns."""
+        try:
+            lower_query = sql_query.lower()
+
+            # Regular expressions to match table names in common SQL clauses
+            from_match = re.search(r'\bfrom\s+([\w.]+)', lower_query)
+            join_match = re.search(r'\bjoin\s+([\w.]+)', lower_query)
+            update_match = re.search(r'\bupdate\s+([\w.]+)', lower_query)
+            into_match = re.search(r'\binto\s+([\w.]+)', lower_query)
+            delete_match = re.search(r'\bdelete\s+from\s+([\w.]+)', lower_query)
+
+            if from_match:
+                return from_match.group(1)
+            elif join_match:
+                return join_match.group(1)
+            elif update_match:
+                return {'error': "Not Allowed"}
+            elif into_match:
+                return {'error': "Not Allowed"}
+            elif delete_match:
+               return {'error': "Not Allowed"}
+            else:
+                return None
+
+
+        except Exception as e:
+            return {'error': str(e)}
+
     @http.route('/dashboard/stats', auth='public', type='json')
     def getAllstats(self, cco, branches_id, datepicked, **kw):
 
@@ -48,7 +79,7 @@ class Compliance(http.Controller):
             computed_results = []
 
             for result in results:
-                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"]})
+                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
 
             return {
                     "data": computed_results,
@@ -82,7 +113,7 @@ class Compliance(http.Controller):
             computed_results = []
 
             for result in results:
-                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"]})
+                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
 
             return {
                     "data": computed_results,
@@ -107,7 +138,7 @@ class Compliance(http.Controller):
             computed_results = []
 
             for result in results:
-                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"]})
+                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
 
             return {
                     "data": computed_results,
@@ -141,7 +172,7 @@ class Compliance(http.Controller):
             computed_results = []
 
             for result in results:
-                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"]})
+                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
 
             return {
                     "data": computed_results,
@@ -214,6 +245,7 @@ class Compliance(http.Controller):
 
         today = datetime.now().date()  # Get today's date
         prev_date = today - timedelta(days=datepicked)  # Get previous date
+        
 
         def _execute_query(sql, params=None):
             request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)

@@ -14,11 +14,12 @@
 
                         <div class="ms-3">
                             <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
-                                <option value="0" selected="selected">Today</option>
+                                <option value="0">Today</option>
                                 <option value="7">Last 7 Days</option>
                                 <option value="14">Last 14 Days</option>
                                 <option value="30">Last Month</option>
                                 <option value="60">2 Months</option>
+                                <option selected="selected" value="20000">ALL</option>
                             </select>
                         </div>
                     </div>
@@ -27,19 +28,19 @@
 
             <!-- second section -->
 
-            <div class="container-fluid ">
+            <div class="container-fluid" style="margin-bottom:7rem;">
 
                 <div class="row">
 
 
-                    <div class="col-lg-9 position-relative">
+                    <div class="col-lg-8 position-relative">
 
                      
                             <div  class="d-flex position-relative card-container gap-3 py-4">
                             
                                <t t-if="state.stats and state.stats.length > 0">
                                 <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
-                                    <Card t-on-click="() => displayOdooView(stat.scope)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
+                                    <Card t-on-click="() => displayOdooView(stat.scope, stat.query)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
                                 </t>
                                </t>
                                <t t-else="">
@@ -59,7 +60,30 @@
 
                        
                         <div class="row g-md-2 mt-md-3 mt-5 ">
-                            <div class="col-md-6">
+
+                            <t t-if="state.dynamic_chart.length > 0">
+                                <t t-set="firstTwoCharts" t-value="state.dynamic_chart.slice(0, 2)"/>
+                                <t t-foreach="firstTwoCharts" t-as="chart" t-key="chart.id">
+
+                                    <div class="col-md-6">
+                                        <div class="d-flex bg-white shadow shadow-1  rounded justify-content-between p-2 align-items-center">
+                                            <h6 class=" fw-bold text-dark">
+                                                <t t-out="chart.title"/>
+                                            </h6>
+                                            <button class="btn btn-dark">
+                                                <i class="fa fa-angle-right"></i>
+                                            </button>
+                                        </div>
+                                        <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
+                                            <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="chart.title"
+                                                data="chart" dynamic="true" 
+                                            />
+                                        </div>
+                                    </div>
+                            
+                                </t>
+                            </t>
+                            <!-- <div class="col-md-6">
                                
                                 <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
                                     <h3 class="lead fw-bold text-dark">Top 10 Screened Transaction By Rules</h3>
@@ -67,13 +91,13 @@
                                         <i class="fa fa-angle-right"></i>
                                     </button>
                                 </div>
-                            <t t-if="state.screenedchart.length > 0">
-                                <div class="chart mt-4 ml-1 bg-white shadow shadow-1">
-                                    <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'bar'" title="'Top 10 Screened Transaction By Rules'" data="state.screenedchart" />
-                                </div>
-                            </t>
-                            </div>
-                            <div class="col-md-6">
+                                <t t-if="state.screenedchart.length > 0">
+                                    <div class="chart mt-4 ml-1 bg-white shadow shadow-1">
+                                        <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'bar'" title="'Top 10 Screened Transaction By Rules'" data="state.screenedchart" />
+                                    </div>
+                                </t>
+                            </div> -->
+                            <!-- <div class="col-md-6">
                                 <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
                                     <h3 class="lead fw-bold text-dark">Top 10 Branches By Customer</h3>
                                     <button class="btn btn-dark">
@@ -86,12 +110,12 @@
                                             data="state.topbranch" />
                                     </div>
                                 </t>
-                            </div>
+                            </div> -->
                         </div>
 
                     </div>
 
-                    <div class="col-lg-3 rightside p-4 ">
+                    <div class="col-lg-4 rightside p-4 ">
 
 
                         <div class="shadow bg-white shadow-lg p-4 d-flex justify-content-between gap-md-2">
@@ -100,37 +124,37 @@
                                 <t t-out="state.totalstat" />
                             </div>
 
-                            <div>
+                            <div class="">
 
                                 <div t-on-click="() => displaybycategory('bank')"
                                     class="d-flex gap-2 mb-2 cursor-pointer  align-items-center justify-content-between">
                                     <h5>Bank</h5>
-                                    <div style="background-color: #FFD700; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('risk')"
                                     class="d-flex gap-2 mb-2 cursor-pointer  align-items-center justify-content-between">
                                     <h5>Risk</h5>
-                                    <div style="background-color: #999999; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('compliance')"
                                     class="d-flex  gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Compliance</h5>
-                                    <div style="background-color: #C8102E; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('branch')"
                                     class="d-flex gap-2  mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Branch</h5>
-                                    <div style="background-color: #66B2FF; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('regulatory')"
                                     class="d-flex gap-2  mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>Regulatory</h5>
-                                    <div style="background-color: #4CAF50; min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
                                 <div t-on-click="() => displaybycategory('all')"
                                     class="d-flex gap-2  mb-2 cursor-pointer align-items-center justify-content-between">
                                     <h5>All</h5>
-                                    <div style="background-color: rgb(0, 0, 0); min-height: 1rem; min-width:2rem"></div>
+                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
                                 </div>
 
                             </div>
@@ -139,7 +163,7 @@
 
                         <div class="shadow shadow-lg mt-3 bg-white doughnut">
 
-                            <div class="d-flex bg-white shadow shadow-1  rounded justify-content-between p-2 align-items-center">
+                            <!-- <div class="d-flex bg-white shadow shadow-1  rounded justify-content-between p-2 align-items-center">
                                 <h6 class=" fw-bold text-dark">Top 10 High-Risk Customer By Branch</h6>
                                 <button class="btn btn-dark">
                                     <i class="fa fa-angle-right"></i>
@@ -148,8 +172,27 @@
                             <t t-if="state.highriskchart.length > 0">
                                 <div class="chart mt-4 ml-1 shadow shadow-1 bg-white p1">
                                 <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="'Top 10 High-Risk Customer By Branch'"
-                                    data="state.highriskchart" />
+                                    data="state.highriskchart" dynamic="false"  />
                                 </div>
+                            </t> -->
+
+                             <t t-if="state.dynamic_chart.length > 0">
+                                <t t-set="ThirdChart" t-value="state.dynamic_chart.slice(2, 3)"/>
+                                <t t-foreach="ThirdChart" t-as="chart" t-key="chart.id">
+
+                                    <div class="d-flex bg-white shadow shadow-1  rounded justify-content-between p-2 align-items-center">
+                                        <h6 class=" fw-bold text-dark"> <t t-out="chart.title"/> </h6>
+                                        <button class="btn btn-dark">
+                                            <i class="fa fa-angle-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="chart mt-4 ml-1 shadow shadow-1 bg-white p1">
+                                         <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="chart.title"
+                                                data="chart" dynamic="true" 
+                                            />
+                                    </div>
+                                   
+                                </t>
                             </t>
 
                             
@@ -158,6 +201,30 @@
 
 
 
+                    </div>
+
+                    <div class="dynamic_chart">
+                    
+                        <!-- <t t-if="state.dynamic_chart.length > 0">
+                            <t t-foreach="state.dynamic_chart" t-as="chart" t-key="chart.id">
+
+                            
+
+                            <div class="chart col-md-4 mt-4 ml-1 shadow shadow-1 bg-white p1">
+                                <div class="d-flex bg-white shadow shadow-1  rounded justify-content-between p-2 align-items-center">
+                                        <h6 class=" fw-bold text-dark">
+                                        <t t-out="chart.title"/>
+                                        </h6>
+                                        <button class="btn btn-dark">
+                                            <i class="fa fa-angle-right"></i>
+                                        </button>
+                                </div>
+                                <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="chart.title"
+                                    data="chart" dynamic="true" />
+                            </div>
+                            
+                            </t>
+                        </t> -->
                     </div>
                    
 

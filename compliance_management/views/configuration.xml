@@ -757,6 +757,17 @@
         <menuitem id="menu_compliance_risk_settings" name="Configuration"
             parent="menu_compliance_configuration" sequence="500" />
        
+        <menuitem id="menu_compliance_dashboard_charts" name="Dashboard Charts"
+            parent="menu_compliance_configuration" sequence="100" />
+
+        <menuitem
+            id="menu_dashboard_chart"
+            action="res_charts_action"
+            parent="menu_compliance_dashboard_charts"
+            name="Charts"
+            sequence="10" 
+            groups="group_compliance_compliance_officer"
+        />
       
 
     </data>
