@@ -293,6 +293,8 @@ sudo ln -s /usr/local/etc/nginx/sites-available/compliance_websocket.conf /usr/l
 # Test Nginx configuration
 sudo nginx -t
 
+
+
 # Reload Nginx
 sudo nginx -s reload
 ```
@@ -305,6 +307,14 @@ sudo ln -s /etc/nginx/sites-available/compliance_websocket.conf /etc/nginx/sites
 
 # Test Nginx configuration
 sudo nginx -t
+
+sudo mkdir -p /usr/local/var/log/nginx/
+
+sudo touch /usr/local/var/log/nginx/websocket_error.log
+
+sudo chown www-data:www-data /usr/local/var/log/nginx/websocket_error.log
+
+sudo systemctl start nginx
 
 # Reload Nginx
 sudo systemctl reload nginx

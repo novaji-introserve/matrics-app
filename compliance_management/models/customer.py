@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 from psycopg2 import ProgrammingError
 import logging
 from dotenv import load_dotenv
+import psycopg2, os
 
 
 load_dotenv()
@@ -42,31 +43,31 @@ class Customer(models.Model):
          "Customer ID already exists. Value must be unique!"),
     ]
 
-    customer_id = fields.Char(string="Customer ID", index=True, tracking=True)
+    customer_id = fields.Char(string="Customer ID", index=True, tracking=True, readonly=True)
     bvn = fields.Char(string='BVN', tracking=True, readonly=True)
     branch_id = fields.Many2one(
-        comodel_name='res.branch', string='Branch', index=True, tracking=True)
+        comodel_name='res.branch', string='Branch', index=True, tracking=True, readonly=True)
     education_level_id = fields.Many2one(
-        comodel_name='res.education.level', string='Education Level', index=True, tracking=True)
+        comodel_name='res.education.level', string='Education Level', index=True, tracking=True, readonly=True)
     kyc_limit_id = fields.Many2one(
         comodel_name='res.partner.kyc.limit', string='KYC Limit')
     tier_id = fields.Many2one(
         comodel_name='res.partner.tier', string='Customer Tier', index=True)
     identification_type_id = fields.Many2one(
-        comodel_name='res.identification.type', string='Identification Type', index=True, tracking=True)
+        comodel_name='res.identification.type', string='Identification Type', index=True, tracking=True, readonly=True)
     identification_number = fields.Char(
-        string='Identification Number', tracking=True)
+        string='Identification Number', tracking=True, readonly=True)
     identification_expiry_date = fields.Date(
-        string='Identification Expiry Date', index=True, tracking=True)
+        string='Identification Expiry Date', index=True, tracking=True, readonly=True)
     dob = fields.Date(
         string='Date of Birth', tracking=True, readonly=True)
     vat = fields.Char(string='Tax ID/TIN', index=True,
                       help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.", readonly=True)
     region_id = fields.Many2one(
-        comodel_name='res.partner.region', string='Region', tracking=True)
+        comodel_name='res.partner.region', string='Region', tracking=True, readonly=True)
     sector_id = fields.Many2one(
         
-        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True)
+        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True, readonly=True)
     industry_id = fields.Many2one(
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
@@ -77,8 +78,8 @@ class Customer(models.Model):
     # fullname = fields.Char(string='Fullname')
     short_name = fields.Char(string='Short name', readonly=True)
     lastname = fields.Char(string='Lastname', readonly=True)
-    middlename = fields.Char(string='Middle Name')
-    othername = fields.Char(string='Other Name')
+    middlename = fields.Char(string='Middle Name', readonly=True)
+    othername = fields.Char(string='Other Name', readonly=True)
     town = fields.Char(string='Town', readonly=True)
     registration_date = fields.Date(
         string='Registration Date', tracking=True, required=False, readonly=True)
@@ -143,8 +144,48 @@ class Customer(models.Model):
     is_greylist = fields.Boolean(
         string="Is Greylist", default=False, tracking=True)    
      
-    # industry =
 
+
+    def cron_run_risk_assessment(self):
+        self.update_global_pep_status()
+        self.compute_risk_score_for_all_users()
+
+
+    def update_global_pep_status(self):
+        _logger.info("Starting PEP status check using SQL query.")
+
+        # Fetch first and last names from res_partner
+        query_fetch = """
+            SELECT id, firstname, lastname 
+            FROM res_partner
+            WHERE firstname IS NOT NULL AND lastname IS NOT NULL
+        """
+        self.env.cr.execute(query_fetch)
+        partners = self.env.cr.fetchall()
+
+        if not partners:
+            _logger.info("No customers found in res_partner.")
+            return
+
+        # Prepare a set of unique full names
+        full_names = list(set(f"{first} {last}" for _, first, last in partners))
+        _logger.info(f"Unique customer full names: {full_names}")
+
+        # Step 3: Update res_partner if name exists in res_pep
+        query_update = """
+            UPDATE res_partner
+            SET global_pep = True
+            FROM res_pep
+            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = LOWER(TRIM(res_pep.name))
+        """
+
+        self.env.cr.execute(query_update)
+        self.env.cr.commit()
+
+        _logger.info("PEP status check completed. Unique customers updated.")
+
+
+    # industry =
 
     def init(self):
         # Drop the trigger if it exists
