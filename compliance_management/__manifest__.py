@@ -29,6 +29,7 @@
         'data/media_keywords.xml',
         'security/security.xml',
         'data/schedules/adverse_media_cron.xml',
+        'data/schedules/run_risk_assessment_cron.xml',
         'data/email_templates/adverse_media_alert_template.xml',
         'views/configuration.xml',
         'views/edd.xml',
