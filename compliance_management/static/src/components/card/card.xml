@@ -4,15 +4,15 @@
         <div t-on-click="() => props.onClick" class="p-4 box shadow bg-white position-relative" t-attf-style="">
 
             <img t-if="props.scope === 'bank'" t-att-src="'/compliance_management/static/src/img/link.png'" alt="Bank"
-                class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+                class="img-fluid" style="cursor:pointer; width: 20px; max-height: 20px; object-fit: contain;" />
             <img t-if="props.scope === 'regulatory'" t-att-src="'/compliance_management/static/src/img/regulatory.svg'"
-                alt="Regulatory" class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+                alt="Regulatory" class="img-fluid" style="cursor:pointer; width: 20px; max-height: 20px; object-fit: contain;" />
             <img t-if="props.scope === 'risk'" t-att-src="'/compliance_management/static/src/img/risk.svg'" alt="Risk"
-                class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+                class="img-fluid" style="cursor:pointer; width: 20px; max-height: 20px; object-fit: contain;" />
             <img t-if="props.scope === 'compliance'" t-att-src="'/compliance_management/static/src/img/compliance.svg'" alt="Risk"
-                class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+                class="img-fluid" style="cursor:pointer; width: 20px; max-height: 20px; object-fit: contain;" />
             <img t-if="props.scope === 'branch'" t-att-src="'/compliance_management/static/src/img/bank.svg'" alt="Risk"
-                class="img-fluid" style="width: 20px; max-height: 20px; object-fit: contain;" />
+                class="img-fluid" style="cursor:pointer; width: 20px; max-height: 20px; object-fit: contain;" />
 
 
             <h2 class="my-3 fs-1">

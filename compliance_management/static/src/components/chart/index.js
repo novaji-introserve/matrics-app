@@ -404,20 +404,14 @@ export class ChartRenderer extends Component {
             dateField = this.props.data.datefield
           }
           
-          let domain = []
+          let domain = [[filterColumn, "=", filterID]]
           
            if (this.props.date > 0) {
              domain.push([dateField, ">=", prevDate]);
              domain.push([dateField, "<=", currentDate]);
            }
 
-           // Admin Check and Branch Filtering
-           if (!this.props.admin) {
-             domain.push([filterColumn, "=", filterID]);
-           }
-
-           console.log(domain);
-
+      
            const replacedString = modelName.replaceAll(".", "_");
            const firstChar = replacedString.charAt(0).toUpperCase();
            const restOfString = replacedString.slice(1);

@@ -40,6 +40,20 @@ class ResCharts(models.Model):
     branch_filter = fields.Boolean('Enable Branch Filter', default=True)
     date_field = fields.Char('Date Field Name', help="Name of date field in query to filter by",required=True)
     branch_field = fields.Char('Branch Field Name', help="Name of branch field in query to filter by")
+    column = fields.Selection([
+        ('1', 'One'),
+        ('2', 'Two'),
+        ('3', 'Three'),
+        ('4', 'Four'),
+        ('5', 'Five'),
+        ('6', 'Six'),
+        ('7', 'Seven'),
+        ('8', 'Eight'),
+        ('9', 'Nine'),
+        ('10', 'Ten'),
+        ('11', 'Eleven'),
+        ('12', 'Twelve'),
+    ], string="Columns", default='4')
     
     state = fields.Selection(
     [("active", "Active"), ("inactive", "inactive" )],

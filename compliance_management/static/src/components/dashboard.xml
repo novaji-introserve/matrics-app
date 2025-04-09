@@ -45,7 +45,7 @@
                                         </t>
                                     </t>
                                     <t t-else="">
-                                        <h4 class="" style="padding: 5rem;">No Data!! Please click on the configuration menu then statistic and start creating</h4>
+                                        <h4 class="" style="padding: 5rem; cursor:pointer;">No Data!! Please click on the configuration menu then statistic and start creating</h4>
                                     </t>
                                         
                             </div>
@@ -93,7 +93,7 @@
                             <t t-if="state.dynamic_chart.length > 0">
                                 <t t-foreach="state.dynamic_chart" t-as="chart" t-key="chart.id">
 
-                                    <div class="col-md-4">
+                                    <div t-attf-class="col-md-{{ chart.column }}">
                                         <div class="d-flex bg-white shadow shadow-1  rounded justify-content-between p-2 align-items-center">
                                             <h6 class=" fw-bold text-capitalize text-dark">
                                                 <t t-out="chart.title"/>

@@ -82,8 +82,7 @@ class DynamicChartController(http.Controller):
 
     def _process_query_results(self, chart, query):
 
-        print(query)
-
+      
        
         try:
             request.env.cr.execute(query)
@@ -129,6 +128,7 @@ class DynamicChartController(http.Controller):
             'type': chart.chart_type,
             'model_name': chart.target_model,
             'filter': chart.domain_field,
+            'column': chart.column,
             'labels': labels,
             'ids': ids,
             'datefield': chart.date_field,
