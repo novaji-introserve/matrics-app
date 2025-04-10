@@ -31,7 +31,15 @@
         "data/schedules/adverse_media_cron.xml",
         "data/schedules/send_assessment_notification_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
+        "data/schedules/send_assessment_notification_cron.xml",
+        'data/schedules/run_risk_assessment_cron.xml',
         "data/email_templates/adverse_media_alert_template.xml",
+        'data/email_templates/enhanced_due_diligence_assessment_template.xml',
+        'data/email_templates/enhanced_due_diligence_approved_template.xml',
+        'data/email_templates/enhanced_due_diligence_review_template.xml',
+        'data/email_templates/enhanced_due_diligence_cancellation_template.xml',
+        'data/email_templates/enhanced_due_diligence_sent_back_template.xml',
+        'data/email_templates/enhanced_due_diligence_archived_template.xml',
         'data/email_templates/enhanced_due_diligence_assessment_template.xml',
         'data/email_templates/enhanced_due_diligence_approved_template.xml',
         'data/email_templates/enhanced_due_diligence_review_template.xml',
@@ -61,10 +69,7 @@
         "views/settings.xml",
         "views/customer_accounts.xml",
         "views/transaction.xml",
-        "views/transaction_screening_rule.xml",
-        # "data/charts.xml",
-        
-        
+        "views/transaction_screening_rule.xml"
     ],
     # only loaded in demonstration mode
     "demo": [
