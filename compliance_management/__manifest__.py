@@ -24,6 +24,7 @@
         "security/groups.xml",
         "security/ir.model.access.csv",
         "data/res.country.state.csv",
+        "data/settings/email_smtp.xml",
         "data/department.xml",
         "data/res.branch.csv",
         "data/media_keywords.xml",
@@ -60,7 +61,7 @@
         # "data/schedules/queue_job_config.xml",
         "data/data.xml",
         "views/risk_assessment.xml",
-        "views/open_sanctions.xml",
+        # "views/open_sanctions.xml",
         "views/res_users.xml",
         "views/sanction_screening.xml",
         "views/customer.xml",
@@ -71,7 +72,11 @@
         "views/settings.xml",
         "views/customer_accounts.xml",
         "views/transaction.xml",
-        "views/transaction_screening_rule.xml"
+        "views/transaction_screening_rule.xml",
+        "data/charts.xml",
+        "data/res_partner.xml",
+        
+        
     ],
     # only loaded in demonstration mode
     "demo": [

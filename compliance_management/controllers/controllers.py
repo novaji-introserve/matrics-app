@@ -69,8 +69,10 @@ class Compliance(http.Controller):
             update_match = re.search(r'\bupdate\s+([\w.]+)', lower_query)
             into_match = re.search(r'\binto\s+([\w.]+)', lower_query)
             delete_match = re.search(r'\bdelete\s+from\s+([\w.]+)', lower_query)
+            conditions = []
 
             if from_match:
+                
                 return from_match.group(1)
             elif join_match:
                 return join_match.group(1)
