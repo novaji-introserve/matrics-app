@@ -31,6 +31,9 @@
         "data/schedules/adverse_media_cron.xml",
         "data/schedules/send_assessment_notification_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
+        "data/schedules/send_assessment_notification_cron.xml",
+        'data/schedules/run_risk_assessment_cron.xml',
+
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/enhanced_due_diligence_assessment_template.xml',
         'data/email_templates/enhanced_due_diligence_approved_template.xml',
@@ -38,6 +41,13 @@
         'data/email_templates/enhanced_due_diligence_cancellation_template.xml',
         'data/email_templates/enhanced_due_diligence_sent_back_template.xml',
         'data/email_templates/enhanced_due_diligence_archived_template.xml',
+        'data/email_templates/enhanced_due_diligence_assessment_template.xml',
+        'data/email_templates/enhanced_due_diligence_approved_template.xml',
+        'data/email_templates/enhanced_due_diligence_review_template.xml',
+        'data/email_templates/enhanced_due_diligence_cancellation_template.xml',
+        'data/email_templates/enhanced_due_diligence_sent_back_template.xml',
+        'data/email_templates/enhanced_due_diligence_archived_template.xml',
+
         "data/schedules/global_pep_list_cron.xml",
         "views/dynamic_charts.xml",
         "views/configuration.xml",
@@ -99,6 +109,7 @@
             'compliance_management/static/src/img/logov.png',
             'compliance_management/static/img/alt_bank_logo.png',
             'compliance_management/static/img/alt_bank_logo_.png',
+            
 
         ]
     },
