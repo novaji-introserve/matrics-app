@@ -1657,44 +1657,43 @@
         <field name="name">Customers without BVN</field>
         <field name="risk_score">25</field>
         <field name="code">cust_no_bvn</field>
-        <field name="sql_query">select 25 from res_partner where id=%s and bvn is null</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and bvn is null</field>
         <field name="priority">1</field>
         <field name="state">active</field>
-        <field name="compute_score_from">dynamic</field>
+        <field name="compute_score_from">static</field>
         <field name="narration">Customers without BVN are high risk</field>
     </record>
     <record id="risk_plan_2" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers without Phone</field>
         <field name="risk_score">17</field>
         <field name="code">cust_no_phone</field>
-        <field name="sql_query">select 17 from res_partner where id=%s and mobile is null and phone
-            is null</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and mobile is null and phone is null</field>
         <field name="priority">2</field>
         <field name="state">active</field>
-        <field name="compute_score_from">dynamic</field>
+        <field name="compute_score_from">static</field>
         <field name="narration">Customers without mobile phone are medium risk</field>
     </record>
     <record id="risk_plan_3" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on Blacklist</field>
         <field name="risk_score">25</field>
         <field name="code">cust_blacklist</field>
-        <field name="sql_query">select 25 from res_partner where id=%s and is_blacklist=true</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and is_blacklist=true</field>
         <field name="priority">3</field>
         <field name="state">active</field>
-        <field name="compute_score_from">dynamic</field>
+        <field name="compute_score_from">static</field>
         <field name="narration">Customers on blacklist are significantly high risk</field>
     </record>
     <record id="risk_plan_pep" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on PEPlist</field>
         <field name="risk_score">20</field>
         <field name="code">cust_pep</field>
-        <field name="sql_query">select 20 from res_partner where id=%s and is_pep=true</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and is_pep=true</field>
         <field name="priority">4</field>
         <field name="state">active</field>
-        <field name="compute_score_from">dynamic</field>
+        <field name="compute_score_from">static</field>
         <field name="narration">Customers on PEPlist are significantly high risk</field>
     </record>
-    <record id="risk_plan_fep" model="res.compliance.risk.assessment.plan">
+    <!-- <record id="risk_plan_fep" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on FEPlist</field>
         <field name="risk_score">20</field>
         <field name="code">cust_fep</field>
@@ -1703,12 +1702,12 @@
         <field name="state">active</field>
         <field name="compute_score_from">dynamic</field>
         <field name="narration">Customers on FEPlist are significantly high risk</field>
-    </record>
+    </record> -->
     <record id="risk_plan_watchlist" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on Watchlist</field>
         <field name="risk_score">20</field>
         <field name="code">cust_watchlist</field>
-        <field name="sql_query">select 20 from res_partner where id=%s and is_watchlist=true</field>
+        <field name="sql_query">select select risk_score from res_partner where id=%s and is_watchlist=true</field>
         <field name="priority">6</field>
         <field name="state">active</field>
         <field name="compute_score_from">dynamic</field>
