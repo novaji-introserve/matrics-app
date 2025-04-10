@@ -1720,7 +1720,7 @@
         <field name="sql_query">select risk_rating from res_risk_assessment where is_default=true limit 1</field>
         <field name="priority">1</field>
         <field name="state">active</field>
-        <field name="compute_score_from">dynamic</field>
+        <field name="compute_score_from">static</field>
         <field name="narration">Default Plan for risk rating</field>
     </record>
 </odoo>
