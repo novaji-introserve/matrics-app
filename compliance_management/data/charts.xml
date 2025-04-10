@@ -19,10 +19,8 @@
             <field name="date_field">rp.create_date</field>
             <field name="branch_field">rb.id</field>
             <field name="state">active</field>
-            <field name="target_model_id">compliance_management.model_res_customer_transaction</field>
-            <field name="domain_field_id"
-            eval="[(6, 0, [ref('compliance_management.field_res_customer_transaction__branch_id'), ])]"
-            />
+            <field name="target_model_id" ref="compliance_management.model_res_partner" />
+            <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
         </record>
         
         
@@ -46,13 +44,9 @@
             <field name="date_field">rp.create_date</field>
             <field name="branch_field">rb.id</field>
             <field name="state">active</field>
-             <field name="target_model_id">compliance_management.model_res_partner</field>
-            <field name="domain_field_id"
-            eval="[(6, 0, [
-            ref('compliance_management.field_res_partner__branch_id'), 
-            ref('compliance_management.field_res_partner__risk_level')
-            ])]"
-            />
+            <field name="target_model_id" ref="compliance_management.model_res_partner"/>
+            <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
+
         </record>
         
         
@@ -75,11 +69,8 @@
             <field name="date_field">rct.date_created</field>
             <field name="branch_field">rct.branch_id</field>
             <field name="state">active</field>
-             <field name="target_model_id">compliance_management.model_res_customer_transaction</field>
-            <field name="domain_field_id"
-            eval="[(6, 0, [
-            ref('compliance_management.field_res_partner__rule_id')
-            ])]"/>
+             <field name="target_model_id" ref="compliance_management.model_res_customer_transaction" />
+           <field name="domain_field_id" ref="compliance_management.field_res_customer_transaction__rule_id"/>
         </record>
         
     </data>

@@ -159,6 +159,35 @@ class Customer(models.Model):
             CREATE OR REPLACE FUNCTION set_partner_defaults_func()
             RETURNS TRIGGER AS $$
             BEGIN
+
+                -- Check if this is demo data (active = FALSE)
+                IF NEW.active IS NOT NULL AND NEW.active = FALSE THEN
+                    -- For demo data: Set defaults but preserve certain fields like risk_level
+                    -- Save the original risk_level value if it exists
+                    DECLARE original_risk_level VARCHAR;
+                    BEGIN
+                        original_risk_level := NEW.risk_level;
+                        
+                        -- Set basic defaults
+                        NEW.create_uid = 1;
+                        NEW.write_uid = 1;
+                        NEW.type = 'contact';
+                        NEW.lang = 'en_US';
+                        NEW.color = 0;
+                        NEW.tz = 'Africa/Lagos';
+                        NEW.internal_category = 'customer';
+                        
+                        NEW.active = TRUE;
+                        
+                        -- Restore the original risk_level if it was set
+                        IF original_risk_level IS NOT NULL THEN
+                            NEW.risk_level := original_risk_level;
+                        END IF;
+                        
+                        RETURN NEW;
+                    END;
+                END IF;
+
                 IF NEW.active IS NULL THEN
                     NEW.active = TRUE;
                 END IF;
