@@ -336,7 +336,8 @@ class Customer(models.Model):
                 )
 
                 # Invalidate cache for these fields
-                record.invalidate_cache(['risk_score', 'risk_level'])
+                record.invalidate_recordset(['risk_score', 'risk_level'])
+                # record.invalidate_cache(['risk_score', 'risk_level'])
 
         return result
         

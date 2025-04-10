@@ -54,7 +54,7 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-        "data/charts.xml",
+        # "data/charts.xml",
         
         
     ],
