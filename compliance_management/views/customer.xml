@@ -141,6 +141,7 @@
                     <field string="Risk Score"  name="risk_score" widget="statinfo"/>
                 </button>
             </xpath>
+         
             <xpath expr="//field[@name='website']" position="replace">
                 <field name="industry_id" invisible="0" />
                 <!-- <attribute name="invisible">1</attribute> -->
@@ -155,18 +156,121 @@
                 <field name="employment_status" invisible="0" />
 
             </xpath>
-            <xpath expr="//field[@name='function']" position="replace">
-                <field name="employment_status" invisible="0" />
-            </xpath>
+          
 
             <xpath expr="//field[@name='mobile']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+
+            <xpath expr="//field[@name='type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
             <xpath expr="//field[@name='category_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+
             <xpath expr="//field[@name='company_reg_date']" position="attributes">
                 <attribute name="invisible">1</attribute>
+            </xpath>
+           
+
+            <xpath expr="//form//field[@name='street2']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//form//field[@name='company_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//form//field[@name='company_type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//div[@class='o_row']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <xpath expr="//span[@class='o_form_label o_td_label']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//div[@class='o_address_format']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//div[@class='o_address_format']" position="after">
+                <field name="street" invisible="0" readonly="1"/>
+
+            </xpath>
+           
+
+            <xpath expr="//field[@name='education_level_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Hide identification_type_id -->
+            <xpath expr="//field[@name='identification_type_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Hide identification_number -->
+            <xpath expr="//field[@name='identification_number']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Hide identification_expiry_date -->
+            <xpath expr="//field[@name='identification_expiry_date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+
+            <!-- Readonly fields -->
+
+            <xpath expr="//field[@name='middlename']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='othername']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='customer_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='branch_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <!--  -->
+
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+
+            <xpath expr="//field[@name='sector_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='email']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='industry_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='title']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@id='individual']" position="attributes">
+                <attribute name="readonly">1</attribute>
             </xpath>
 
         </field>
