@@ -1707,10 +1707,10 @@
         <field name="name">Customers on Watchlist</field>
         <field name="risk_score">20</field>
         <field name="code">cust_watchlist</field>
-        <field name="sql_query">select select risk_score from res_partner where id=%s and is_watchlist=true</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and is_watchlist=true</field>
         <field name="priority">6</field>
         <field name="state">active</field>
-        <field name="compute_score_from">dynamic</field>
+        <field name="compute_score_from">static</field>
         <field name="narration">Customers on Watchlist are significantly high risk</field>
     </record>
     <record id="risk_plan_default" model="res.compliance.risk.assessment.plan">
