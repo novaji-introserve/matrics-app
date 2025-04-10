@@ -130,28 +130,30 @@ class Pep(models.Model):
     @api.depends("first_name", "surname")
     def action_find_person(self):
         """
-        Find information about a person using external services
+        Find information about a person using OpenSanctions Entity API
         """
         self.ensure_one()
 
         # Create a PepService instance
         service = PepService(self.env)
 
-        # Find biography using Gemini
+        # Find biography using Gemini (keep this for narrative description)
         narration_html = service.find_person_biography(self.first_name, self.surname)
         if narration_html:
             self.write({"narration": narration_html})
 
-        # Query sanctions service
+        # Query OpenSanctions API with enhanced entity lookup
         result = service.query_sanctions_service(self.first_name, self.surname)
+        
         if result:
-            # Format the data
+            # Format the data with relationship information
             person_data = service.format_person_data(result)
-
+            _logger.info(f"Formatted person data from OpenSanctions: {json.dumps(person_data, indent=2)}")
+            
             # Update the record
             if person_data:
                 self.write(person_data)
-
+        
         # Log the action
         _logger.info(f"Person information lookup completed for {self.name}")
 
@@ -165,6 +167,46 @@ class Pep(models.Model):
                 "type": "success",
             },
         }
+    
+    # @api.depends("first_name", "surname")
+    # def action_find_person(self):
+    #     """
+    #     Find information about a person using external services
+    #     """
+    #     self.ensure_one()
+
+    #     # Create a PepService instance
+    #     service = PepService(self.env)
+
+    #     # Find biography using Gemini
+    #     narration_html = service.find_person_biography(self.first_name, self.surname)
+    #     if narration_html:
+    #         self.write({"narration": narration_html})
+
+    #     # Query sanctions service
+    #     result = service.query_sanctions_service(self.first_name, self.surname)
+    #     if result:
+    #         # Format the data
+    #         person_data = service.format_person_data(result)
+    #         _logger.info(f"Formatted person data: {json.dumps(person_data, indent=2)}")
+
+    #         # Update the record
+    #         if person_data:
+    #             self.write(person_data)
+
+    #     # Log the action
+    #     _logger.info(f"Person information lookup completed for {self.name}")
+
+    #     return {
+    #         "type": "ir.actions.client",
+    #         "tag": "display_notification",
+    #         "params": {
+    #             "title": _("Information Lookup"),
+    #             "message": _("Person information lookup completed."),
+    #             "sticky": False,
+    #             "type": "success",
+    #         },
+    #     }
 
     def _is_job_running(self):
         """
