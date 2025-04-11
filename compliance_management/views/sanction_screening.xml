@@ -230,13 +230,13 @@
             groups="group_compliance_compliance_officer"
             sequence="10" />
 
-        <menuitem
+        <!-- <menuitem
             id="menu_is_fep"
             action="action_res_partner_fep"
             parent="menu_sanction_screening_root"
             name="FEP List"
             groups="group_compliance_compliance_officer"
-            sequence="20" />
+            sequence="20" /> -->
 
         <menuitem
             id="menu_watchlist"

@@ -70,16 +70,22 @@
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Remove Customer from PEP List. Are you sure?"
                         attrs="{'invisible': [('is_pep', '!=',True)]}" />
-                    <button name="action_add_fep" class="oe_highlight" type="object"
+
+                    <!-- <button name="action_add_fep" class="oe_highlight" type="object"
                         string="Add to FEP List"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Add Customer to FEP List. Are you sure?"
-                        attrs="{'invisible': [('is_fep', '=',True)]}" />
-                    <button name="action_remove_fep" type="object"
+                        attrs="{'invisible': [('is_fep', '=',True)]}" 
+                        style="display: none;"
+                        /> -->
+
+                    <!-- <button name="action_remove_fep" type="object"
                         string="Remove from FEP List"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Remove from FEP List. Are you sure?"
-                        attrs="{'invisible': [('is_fep', '!=',True)]}" />
+                        attrs="{'invisible': [('is_fep', '!=',True)]}" 
+                        /> -->
+
                     <button name="action_blacklist" class="oe_highlight" type="object"
                         string="Add to Blacklist"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
@@ -129,14 +135,25 @@
                 <button class="oe_stat_button" type="object" name="action_total_accounts" icon="fa-star">
                     <field name="total_accounts" widget="statinfo"/>
                 </button>
-                <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
+
+                <!-- <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
                     <span>Risk 
-                    <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
+                    <field string="Risk Level" name="risk_level" widget="badge" 
+                    decoration-danger="risk_level in ('high')"
                     decoration-warning="risk_level in ('medium')"
                     decoration-success="risk_level in ('low')"/>
+                    </span>                   
+                </button> -->
+
+                <button class="oe_stat_button"  icon="fa-thermometer-0">
+                    <span>Risk
+                        <field string="Risk Level" name="risk_level" widget="badge" 
+                        decoration-danger="risk_level == 'high'" 
+                        decoration-warning="risk_level == 'medium'" 
+                        decoration-success="risk_level == 'low'"/>
                     </span>
-                   
                 </button>
+
                 <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
                     <field string="Risk Score"  name="risk_score" widget="statinfo"/>
                 </button>
