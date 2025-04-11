@@ -71,12 +71,24 @@
             <field name="arch" type="xml">
                 <form string="Global PEP List">
                     <header>
-                    
                         <button name="action_find_person" class="oe_highlight" type="object"
                             string="Find Biography"
-                            groups="compliance_management.group_compliance_compliance_risk_manager" />
+                            groups="compliance_management.group_compliance_compliance_risk_manager"
+                            attrs="{'invisible': [('job_status', '=', 'running')]}" />
+                        <field name="job_status" widget="statusbar" statusbar_visible="pending,running,completed,failed"/>
                     </header>
                     <sheet>
+                        <!-- Status messages for job -->
+                        <div class="alert alert-info" role="alert" attrs="{'invisible': [('job_status', '!=', 'running')]}">
+                            <p><i class="fa fa-spinner fa-spin"/> Biography lookup in progress...</p>
+                        </div>
+                        <div class="alert alert-success" role="alert" attrs="{'invisible': [('job_status', '!=', 'completed')]}">
+                            <p><i class="fa fa-check"/> Biography lookup completed successfully.</p>
+                        </div>
+                        <div class="alert alert-danger" role="alert" attrs="{'invisible': [('job_status', '!=', 'failed')]}">
+                            <p><i class="fa fa-exclamation-triangle"/> Error: <field name="import_message" readonly="1" class="oe_inline"/></p>
+                        </div>
+                        
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only" />
                             <h1>
@@ -111,6 +123,7 @@
                                 <field name="profession" />
                                 <field name="status" />
                                 <field name="business_interest" />
+                                <field name="last_fetch_date" />
                             </group>
                         </group>
 
@@ -145,7 +158,6 @@
                                     <field name="associate_business_politics" />
                                     <field name="bankers" />
                                     <field name="account_details" />
-
                                 </group>
                             </page>
                             <page string="Reports &amp; Remarks">
@@ -164,6 +176,8 @@
                                     <field name="lastmodifiedby" />
                                     <field name="lastmodifiedon" />
                                     <field name="lastmodifiedbyemail" />
+                                    <field name="source" />
+                                    <!-- <field name="import_status" /> -->
                                 </group>
                             </page>
                         </notebook>
