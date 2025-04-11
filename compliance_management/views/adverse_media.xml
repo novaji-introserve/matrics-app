@@ -30,7 +30,7 @@
             <form string="Media Watchlist">
 
                 <header>
-                    <button type="object" class="oe_highlight bg-dark" name="open_media_log" string="View Media Log(s)" attrs="{'invisible': [('id', '=', False)]}" />
+                    <button type="object" class="oe_highlight bg-dark" name="open_media_log" string="View Media Log(s)" attrs="{'invisible': [('alert_ids', '=', [])]}" />
                     <button type="object" class="oe_highlight bg-dark" name="scan_news_articles" string="Run Media Screening" attrs="{'invisible': [('id', '=', False)]}" />
                 </header>
 
@@ -47,6 +47,8 @@
                             <field name="partner_risk_score" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'" />
 
                             <field name="monitoring_status"/>
+                           
+                            <field name="alert_ids" invisible="1"/>
 
                         </group>
                         <group>

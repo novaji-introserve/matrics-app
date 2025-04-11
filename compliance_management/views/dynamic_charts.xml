@@ -1,0 +1,86 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="res_charts_tree">
+            <field name="name">res.dashboard.charts.tree</field>
+            <field name="model">res.dashboard.charts</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="chart_type"/>
+                    <field name="color_scheme"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="res_charts_form">
+            <field name="name">res.dashboard.charts.form</field>
+            <field name="model">res.dashboard.charts</field>
+            <field name="arch" type="xml">
+                
+                 <form string="Dynamic Chart">
+                    <header>
+                     <!-- <button name="get_chart_data" string="Preview Query" type="object" class="btn-primary mt-3"/> -->
+                      <field name="state" widget="statusbar" options="{'clickable':'1'}" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" placeholder="Chart Name"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="chart_type"/>
+                                <field name="color_scheme"/>
+                                <field name="branch_filter"/>
+                                <field name="branch_field" attrs="{'invisible': [('branch_filter', '=', False)], 'required': [('branch_filter', '=', True)]}"/>
+                                <field name="column"/>
+                            </group>
+                            <group>
+                                <field name="x_axis_field"/>
+                                <field name="y_axis_field"/>
+                                <field name="date_field"/>
+                                <field name="target_model_id" options="{'no_create': True}"/>
+                                <field name="domain_field_id" options="{'no_create': True}" context="{'ir_model_id': target_model_id}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="SQL Query">
+                                <field name="query" widget="ace" placeholder="SELECT column_1 as label, column_2 as value FROM table"/>
+                                <div class="mt-3 text-muted">
+                                    <p>Enter a valid SQL query that returns at least two columns: one for labels (X-axis) and one for values (Y-axis).</p>
+                                    <p>query requires date parameters, please specify a date field above for sorting.</p>
+                                    <p class="text-danger">Note: Only SELECT queries are allowed. DDL and DML operations are prohibited.</p>
+                                </div>
+                               
+                            </page>
+                            <page string="Description">
+                                <field name="description" placeholder="Describe the purpose of this chart"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="res_charts_action">
+            <field name="name">Dashboard Charts</field>
+            <field name="res_model">res.dashboard.charts</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first dynamic chart
+                </p>
+                <p>
+                    Configure SQL queries to generate dynamic charts for your Odoo data.
+                </p>
+            </field>
+        </record>
+
+      
+    </data>
+</odoo>

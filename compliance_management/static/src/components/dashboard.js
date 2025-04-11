@@ -19,7 +19,7 @@ export class ComplianceDashboard extends Component {
       branches_id: [],
       stats: [],
       totalstat: 0,
-      datepicked: 0,
+      datepicked: 20000,
       chartData: [],
       scrollLeft: sessionStorage.getItem("user_scroll_left")
         ? sessionStorage.getItem("user_scroll_left")
@@ -30,6 +30,7 @@ export class ComplianceDashboard extends Component {
       screenedchart: [],
       highriskchart: [],
       topbranch: [],
+      dynamic_chart: []
     });
 
 
@@ -90,47 +91,56 @@ export class ComplianceDashboard extends Component {
     }
   };
 
-  async displayOdooView(category) {
-    const formatDate = (date) => date.toISOString().slice(0, 10);
+  async displayOdooView(category, query) {
+    // const formatDate = (date) => date.toISOString().slice(0, 10);
 
-    let prevDate, currentDate;
+    // let prevDate, currentDate;
 
-    if (this.state.datepicked > 0) {
-      prevDate = moment()
-        .subtract(this.state.datepicked, "days")
-        .format("YYYY-MM-DD");
-      currentDate = formatDate(new Date()); // Today's date
-    } else {
-      currentDate = formatDate(new Date()); // Today's date
-      prevDate = currentDate; // Same as today if datepicked is 0
+    // if (this.state.datepicked > 0) {
+    //   prevDate = moment()
+    //     .subtract(this.state.datepicked, "days")
+    //     .format("YYYY-MM-DD");
+    //   currentDate = formatDate(new Date()); // Today's date
+    // } else {
+    //   currentDate = formatDate(new Date()); // Today's date
+    //   prevDate = currentDate; // Same as today if datepicked is 0
+    // }
+
+    // const odooPrevDate = `${prevDate} 00:00:00`; // For Odoo's datetime field
+    // const odooCurrentDate = `${currentDate} 23:59:59`; // For Odoo's datetime field
+
+    // this.state.prevDate = odooPrevDate; // Update the state
+    // this.state.currentDate = odooCurrentDate; // Update the state
+
+    // let domain = [
+    //   ["create_date", ">=", odooPrevDate], // Use the formatted dates
+    //   ["create_date", "<=", odooCurrentDate], // Use <= for inclusive end date
+    //   ["scope", "=", category],
+    // ];
+
+    const response = await this.rpc("/dashboard/dynamic_sql", { sql_query: query });      
+        
+    if(response.error){
+      alert(response.error)
+    }else{
+      
+      
+      this.navigate.doAction({
+        type: "ir.actions.act_window",
+        res_model: response.replace(/_/g, "."),
+        name: category,
+        domain: [],
+        views: [
+          [false, "tree"],
+          [false, "form"],
+        ],
+      });
     }
 
-    const odooPrevDate = `${prevDate} 00:00:00`; // For Odoo's datetime field
-    const odooCurrentDate = `${currentDate} 23:59:59`; // For Odoo's datetime field
-
-    this.state.prevDate = odooPrevDate; // Update the state
-    this.state.currentDate = odooCurrentDate; // Update the state
-
-    let domain = [
-      ["create_date", ">=", odooPrevDate], // Use the formatted dates
-      ["create_date", "<=", odooCurrentDate], // Use <= for inclusive end date
-      ["scope", "=", category],
-    ];
-
-    this.navigate.doAction({
-      type: "ir.actions.act_window",
-      res_model: "res.compliance.stat",
-      name: category,
-      domain: domain,
-      views: [
-        [false, "tree"],
-        [false, "form"],
-      ],
-    });
+    
   }
   async getcurrentuser() {
     let result = await this.rpc("/dashboard/user");
-    console.log(result);
     
     this.state.branches_id = result.branch;
     this.state.cco = result.group;
@@ -155,12 +165,14 @@ export class ComplianceDashboard extends Component {
       category: name,
       datepicked: Number(this.state.datepicked),
     });
+    
 
     this.state.stats = result.data;
     this.state.totalstat = result.total;
   }
 
   displaybycategory = async (name) => {
+
     this.state.isCategorySortingEnabled = false;
 
     if (name == "all") {
@@ -174,51 +186,78 @@ export class ComplianceDashboard extends Component {
 
   filterByDate = async () => {
     await this.getAllStats();
-    await this.fetchScreenedChart();
-    await this.TopBranches();
-    await this.highRiskBranches();
+    // await this.fetchScreenedChart();
+    // await this.TopBranches();
+    // await this.highRiskBranches();
+    await this.fetchDashboardCharts()
   };
 
 
-  async fetchScreenedChart() {
-    const response = await this.rpc("/dashboard/get_top_screened_rules", {
-      cco: this.state.cco,
-      branches_id: this.state.branches_id,
-      datepicked: Number(this.state.datepicked),
-    });  
+  // async fetchScreenedChart() {
+  //   const response = await this.rpc("/dashboard/get_top_screened_rules", {
+  //     cco: this.state.cco,
+  //     branches_id: this.state.branches_id,
+  //     datepicked: Number(this.state.datepicked),
+  //   });  
 
    
-    this.state.screenedchart = response
+  //   this.state.screenedchart = response
     
 
-  }
-  async TopBranches() {
-    const response = await this.rpc("/dashboard/get_branch_by_customer", {
-      cco: this.state.cco,
-      branches_id: this.state.branches_id,
-      datepicked: Number(this.state.datepicked),
-    });  
+  // }
+  // async TopBranches() {
+  //   const response = await this.rpc("/dashboard/get_branch_by_customer", {
+  //     cco: this.state.cco,
+  //     branches_id: this.state.branches_id,
+  //     datepicked: Number(this.state.datepicked),
+  //   });  
 
 
     
 
-    this.state.topbranch = response
+  //   this.state.topbranch = response
 
-  }
-  async highRiskBranches() {
-    const response = await this.rpc("/dashboard/get_high_risk_customer_by_branch",
+  // }
+  // async highRiskBranches() {
+  //   const response = await this.rpc("/dashboard/get_high_risk_customer_by_branch",
+  //     {
+  //       cco: this.state.cco,
+  //       branches_id: this.state.branches_id,
+  //       datepicked: Number(this.state.datepicked),
+  //     }
+  //   );  
+    
+    
+  //   this.state.highriskchart = response
+    
+  // }
+  
+  async fetchDashboardCharts(){
+    
+    const response = await this.rpc(`/dashboard/dynamic_charts/`,
       {
         cco: this.state.cco,
         branches_id: this.state.branches_id,
         datepicked: Number(this.state.datepicked),
       }
     );  
+    
 
-
-    this.state.highriskchart = response
-
+    if (response && response.error) {
+      alert(`Error fetching dashboard charts: ${response.error}`);
+      this.state.dynamic_chart = []; // Or some other appropriate error state
+    } else if (response) {
+      this.state.dynamic_chart = response;
+    } else {
+      alert("Error: Empty response received while fetching dashboard charts.");
+      this.state.dynamic_chart = [];
+    }
+    
+      
+    }
+    
   }
-}
+
 
 ComplianceDashboard.template = "owl.ComplianceDashboard";
 ComplianceDashboard.components = { Card, ChartRenderer };

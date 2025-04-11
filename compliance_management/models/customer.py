@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 from psycopg2 import ProgrammingError
 import logging
 from dotenv import load_dotenv
+import psycopg2, os
 
 
 load_dotenv()
@@ -42,31 +43,31 @@ class Customer(models.Model):
          "Customer ID already exists. Value must be unique!"),
     ]
 
-    customer_id = fields.Char(string="Customer ID", index=True, tracking=True)
+    customer_id = fields.Char(string="Customer ID", index=True, tracking=True, readonly=True)
     bvn = fields.Char(string='BVN', tracking=True, readonly=True)
     branch_id = fields.Many2one(
-        comodel_name='res.branch', string='Branch', index=True, tracking=True)
+        comodel_name='res.branch', string='Branch', index=True, tracking=True, readonly=True)
     education_level_id = fields.Many2one(
-        comodel_name='res.education.level', string='Education Level', index=True, tracking=True)
+        comodel_name='res.education.level', string='Education Level', index=True, tracking=True, readonly=True)
     kyc_limit_id = fields.Many2one(
         comodel_name='res.partner.kyc.limit', string='KYC Limit')
     tier_id = fields.Many2one(
         comodel_name='res.partner.tier', string='Customer Tier', index=True)
     identification_type_id = fields.Many2one(
-        comodel_name='res.identification.type', string='Identification Type', index=True, tracking=True)
+        comodel_name='res.identification.type', string='Identification Type', index=True, tracking=True, readonly=True)
     identification_number = fields.Char(
-        string='Identification Number', tracking=True)
+        string='Identification Number', tracking=True, readonly=True)
     identification_expiry_date = fields.Date(
-        string='Identification Expiry Date', index=True, tracking=True)
+        string='Identification Expiry Date', index=True, tracking=True, readonly=True)
     dob = fields.Date(
         string='Date of Birth', tracking=True, readonly=True)
     vat = fields.Char(string='Tax ID/TIN', index=True,
                       help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.", readonly=True)
     region_id = fields.Many2one(
-        comodel_name='res.partner.region', string='Region', tracking=True)
+        comodel_name='res.partner.region', string='Region', tracking=True, readonly=True)
     sector_id = fields.Many2one(
         
-        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True)
+        comodel_name='res.partner.sector', string='Sector', index=True, tracking=True, readonly=True)
     industry_id = fields.Many2one(
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
@@ -77,8 +78,8 @@ class Customer(models.Model):
     # fullname = fields.Char(string='Fullname')
     short_name = fields.Char(string='Short name', readonly=True)
     lastname = fields.Char(string='Lastname', readonly=True)
-    middlename = fields.Char(string='Middle Name')
-    othername = fields.Char(string='Other Name')
+    middlename = fields.Char(string='Middle Name', readonly=True)
+    othername = fields.Char(string='Other Name', readonly=True)
     town = fields.Char(string='Town', readonly=True)
     registration_date = fields.Date(
         string='Registration Date', tracking=True, required=False, readonly=True)
@@ -143,8 +144,48 @@ class Customer(models.Model):
     is_greylist = fields.Boolean(
         string="Is Greylist", default=False, tracking=True)    
      
-    # industry =
 
+
+    def cron_run_risk_assessment(self):
+        self.update_global_pep_status()
+        self.compute_risk_score_for_all_users()
+
+
+    def update_global_pep_status(self):
+        _logger.info("Starting PEP status check using SQL query.")
+
+        # Fetch first and last names from res_partner
+        query_fetch = """
+            SELECT id, firstname, lastname 
+            FROM res_partner
+            WHERE firstname IS NOT NULL AND lastname IS NOT NULL
+        """
+        self.env.cr.execute(query_fetch)
+        partners = self.env.cr.fetchall()
+
+        if not partners:
+            _logger.info("No customers found in res_partner.")
+            return
+
+        # Prepare a set of unique full names
+        full_names = list(set(f"{first} {last}" for _, first, last in partners))
+        _logger.info(f"Unique customer full names: {full_names}")
+
+        # Step 3: Update res_partner if name exists in res_pep
+        query_update = """
+            UPDATE res_partner
+            SET global_pep = True
+            FROM res_pep
+            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = LOWER(TRIM(res_pep.name))
+        """
+
+        self.env.cr.execute(query_update)
+        self.env.cr.commit()
+
+        _logger.info("PEP status check completed. Unique customers updated.")
+
+
+    # industry =
 
     def init(self):
         # Drop the trigger if it exists
@@ -159,6 +200,35 @@ class Customer(models.Model):
             CREATE OR REPLACE FUNCTION set_partner_defaults_func()
             RETURNS TRIGGER AS $$
             BEGIN
+
+                -- Check if this is demo data (active = FALSE)
+                IF NEW.active IS NOT NULL AND NEW.active = FALSE THEN
+                    -- For demo data: Set defaults but preserve certain fields like risk_level
+                    -- Save the original risk_level value if it exists
+                    DECLARE original_risk_level VARCHAR;
+                    BEGIN
+                        original_risk_level := NEW.risk_level;
+                        
+                        -- Set basic defaults
+                        NEW.create_uid = 1;
+                        NEW.write_uid = 1;
+                        NEW.type = 'contact';
+                        NEW.lang = 'en_US';
+                        NEW.color = 0;
+                        NEW.tz = 'Africa/Lagos';
+                        NEW.internal_category = 'customer';
+                        
+                        NEW.active = TRUE;
+                        
+                        -- Restore the original risk_level if it was set
+                        IF original_risk_level IS NOT NULL THEN
+                            NEW.risk_level := original_risk_level;
+                        END IF;
+                        
+                        RETURN NEW;
+                    END;
+                END IF;
+
                 IF NEW.active IS NULL THEN
                     NEW.active = TRUE;
                 END IF;
@@ -197,6 +267,14 @@ class Customer(models.Model):
                 
                 IF NEW.internal_category IS NULL THEN
                     NEW.internal_category = 'customer';
+                END IF;
+                
+                IF NEW.commercial_partner_id IS NULL THEN
+                    NEW.commercial_partner_id = NEW.id;
+                END IF;
+
+                IF (NEW.display_name IS NULL OR TRIM(NEW.display_name) = '') AND NEW.name IS NOT NULL THEN
+                    NEW.display_name = NEW.name;
                 END IF;
                 
                 -- Set commercial_partner_id to the record's ID after insert
@@ -287,7 +365,8 @@ class Customer(models.Model):
                 )
 
                 # Invalidate cache for these fields
-                record.invalidate_cache(['risk_score', 'risk_level'])
+                record.invalidate_recordset(['risk_score', 'risk_level'])
+                # record.invalidate_cache(['risk_score', 'risk_level'])
 
         return result
         
@@ -502,7 +581,27 @@ class Customer(models.Model):
         return '%s risk' % (self.risk_level)
 
    
-        
+
+    # logic to commpute total risk sore of all users
+    @api.model
+    def compute_risk_score_for_all_users(self):
+        records = self.search([])
+        for record in records:
+            score = record._get_risk_score_from_plan()
+            risk_level = record.compute_risk_level()
+
+            # Use direct SQL update to avoid triggering write()
+            self.env.cr.execute(
+                """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+                WHERE id = %%s""" % self._table,
+                (score, risk_level, record.id)
+            )
+
+            # Invalidate cache for these fields
+            record.invalidate_cache(['risk_score', 'risk_level'])
+
+        return True
+    
     def action_compute_risk_score_with_plan(self):
         """Manual action to compute risk score"""
         for record in self:
