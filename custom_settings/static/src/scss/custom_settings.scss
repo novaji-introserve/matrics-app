@@ -1,0 +1,93 @@
+/* Custom Settings - Hide specific elements based on exact structure */
+
+// Hide sidebar items except General Settings
+.settings_tab {
+    .tab:not(.selected) {
+      display: none !important;
+    }
+  }
+  
+  // Hide specific sections in General Settings
+  .app_settings_block {
+    // Discuss section
+    > h2 {
+      &[data-section="discuss"] {
+        display: none !important;
+        
+        + .row {
+          display: none !important;
+        }
+      }
+    }
+    
+    // Target sections by position (fallback method)
+    > h2 {
+      &:nth-of-type(5),
+      &:nth-of-type(8),
+      &:nth-of-type(9),
+      &:nth-of-type(10) {
+        display: none !important;
+        
+        + .row {
+          display: none !important;
+        }
+      }
+    }
+    
+    // Target sections by data attributes in containers
+    > div.row.mt16.o_settings_container {
+      &[data-section="discuss"],
+      &[data-section="permissions"],
+      &[data-section="integrations"],
+      &[data-section="performance"] {
+        display: none !important;
+      }
+      
+      // Alternative targeting using nested elements
+      &:has(input[data-section="discuss"]),
+      &:has(input[data-section="permissions"]),
+      &:has(input[data-section="integrations"]),
+      &:has(input[data-section="performance"]) {
+        display: none !important;
+      }
+    }
+  }
+  
+  // Specific sections by ID
+  #statistics {
+    display: none !important;
+  }
+  
+  #contacts_settings {
+    display: none !important;
+  }
+  
+  #developer_tool,
+  .o_widget_res_config_dev_tool {
+    display: none !important;
+  }
+  
+  #about {
+    display: none !important;
+  }
+  
+  // Re-enable important headings we want to keep
+  #invite_users,
+  #languages,
+  #companies {
+    h2 {
+      visibility: visible !important;
+      display: block !important;
+    }
+  }
+  
+  h2 {
+    &#section_users,
+    &#section_languages,
+    &#section_companies,
+    &#section_theme {
+      visibility: visible !important;
+      display: block !important;
+    }
+  }
+  

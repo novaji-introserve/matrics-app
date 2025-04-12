@@ -1003,3 +1003,27 @@ class CSVImportController(http.Controller):
         except Exception as e:
             # Don't let message sending failures affect the main operation
             _logger.warning(f"Failed to send log message: {str(e)}")
+            
+    @http.route('/csv_import/ws_status', type='json', auth='user')
+    def get_websocket_status(self, **kw):
+        from ..services.websocket.manager import get_server_status
+        status = get_server_status()
+        
+        # Add additional connectivity test
+        import socket
+        status['port_test'] = False
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(1)
+            s.connect(('localhost', int(status['port'])))
+            s.close()
+            status['port_test'] = True
+        except:
+            pass
+        
+        return status
+
+    @http.route('/csv_import/start_ws_server', type='json', auth='user')
+    def start_websocket_server(self, **kw):
+        from ..services.websocket.manager import start_websocket_server
+        return {'success': start_websocket_server()}

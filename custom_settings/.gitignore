@@ -1,0 +1,15 @@
+# Ignore Python bytecode
+__pycache__/
+
+# Compiled Python files (Python 3.5+)
+*.pyc
+*.pyo
+*.pyd
+
+# macOS
+.DS_Store
+
+.env
+.env.development
+.env.production
+.env.staging

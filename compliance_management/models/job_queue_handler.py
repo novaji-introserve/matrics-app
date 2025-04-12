@@ -13,6 +13,7 @@ class OpenSanctionsJobQueue(models.Model):
     """
     _name = 'opensanctions.job.queue'
     _description = 'OpenSanctions Job Queue'
+    _inherit = ["mail.activity.mixin", "mail.thread"]
     _order = 'priority desc, create_date desc'
     
     name = fields.Char('Job Name', required=True)
@@ -57,7 +58,7 @@ class OpenSanctionsJobQueue(models.Model):
     debug_mode = fields.Boolean('Debug Mode', default=False,
                                help="Enable verbose logging for debugging")
 
-    base_url = fields.Char(related='source_id.base_url', string='Base URL', readonly=True)
+    base_url = fields.Char(related='source_id.base_url', string='Base URL', readonly=True, store=True)
     csv_path = fields.Char(related='source_id.csv_path', string='CSV Path', readonly=True)
     csv_delimiter = fields.Char(related='source_id.csv_delimiter', string='CSV Delimiter', readonly=True)
     use_api = fields.Boolean(related='source_id.use_api', string='Use API', readonly=True)
