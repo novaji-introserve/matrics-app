@@ -172,3 +172,16 @@ class Statistic(models.Model):
         finally:
             self.env.cr.rollback() #Rollback the cursor to prevent any unintended changes
 
+    
+    def open_action(self):
+        pass
+        # query = self.env.context.get('query')
+        # # Process any logic based on the stat_id
+        
+        # # Return action to open web page
+        # return {
+        #     'type': 'ir.actions.act_url',
+        #     'url': '/your_controller_path/%s' % query,
+        #     'target': 'self',  # or 'new' for a new window/tab
+        # }
+
