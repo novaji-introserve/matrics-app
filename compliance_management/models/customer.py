@@ -522,7 +522,8 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
+            # 'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
+            'domain': [('internal_category','=','customer')],
             'context': {'search_default_group_branch': 1}
         }
         
@@ -576,6 +577,18 @@ class Customer(models.Model):
 
     def get_risk_level(self):
         return self.risk_level
+    
+    @api.depends('risk_score')
+    def _compute_risk_level(self):
+        for record in self:
+            if record.risk_score <= LOW_RISK_THRESHOLD:
+                record.risk_level = "low"
+            elif record.risk_score <= MEDIUM_RISK_THRESHOLD:
+                record.risk_level = "medium"
+            else:
+                record.risk_level = "high"
+
+
 
     def get_risk_level_name(self):
         return '%s risk' % (self.risk_level)

@@ -110,6 +110,9 @@
             'compliance_management/static/src/components/**/*.js',
             'compliance_management/static/src/components/**/*.xml',
             'compliance_management/static/src/components/**/*.css',
+            
+            'compliance_management/static/src/js/pep_auto_refresh.js',
+            'compliance_management/static/src/xml/pep_auto_refresh.xml',
 
 
             'compliance_management/static/src/img/logov.png',

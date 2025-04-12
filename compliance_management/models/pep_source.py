@@ -11,6 +11,7 @@ _logger = logging.getLogger(__name__)
 class PEPSource(models.Model):
     _name = 'pep.source'
     _description = 'PEP Source'
+    _inherit = ["mail.thread", "mail.activity.mixin"]
     
     name = fields.Char('Source Name', required=True)
     domain = fields.Char('Domain/URL', required=True)
