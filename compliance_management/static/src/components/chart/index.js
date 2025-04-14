@@ -48,13 +48,16 @@ export class ChartRenderer extends Component {
   renderChart() {
     this.destroyChart(); // Destroy existing chart before rendering a new one
 
-    if (this.props.title === "Top 10 Branches By Customer") {
+    if (this.props.title === "Top 10 Branches By Customer" && !this.props.dynamic) {
       // Use constant for comparison
       this.renderTopBranchesChart();
-    } else if (this.props.title === "Top 10 Screened Transaction By Rules") {
+    } else if (this.props.title === "Top 10 Screened Transaction By Rules" && !this.props.dynamic) {
       this.renderScreenedChart();
-    } else if (this.props.title === "Top 10 High-Risk Customer By Branch") {
+    } else if (this.props.title === "Top 10 High-Risk Customer By Branch" && !this.props.dynamic) {
       this.renderHighRiskchart()
+    
+    } else if (this.props.dynamic) {
+      this.renderDynamicChart()
     }
   }
 
@@ -349,6 +352,99 @@ export class ChartRenderer extends Component {
           legend: {
             position: "top",
             align: "center",
+          },
+        },
+      },
+    });
+  }
+
+  renderDynamicChart() {
+    if (!this.props.data) {
+      return; // Exit if no data to render
+    }
+
+    const formatDate = (date) => date.toISOString().slice(0, 10);
+
+    let prevDate, currentDate;
+
+    if (this.props.date > 0) {
+      prevDate = moment()
+        .subtract(this.props.date, "days")
+        .format(DATE_FORMAT_YYYY_MM_DD); // Use constant for date format
+      currentDate = formatDate(new Date());
+    } else {
+      currentDate = formatDate(new Date());
+      prevDate = currentDate;
+    }
+
+    const odooPrevDate = `${prevDate} ${TIME_00_00_00}`; // Use constants for time and date format
+    const odooCurrentDate = `${currentDate} ${TIME_23_59_59}`;
+
+    this.myChartInstance = new Chart(this.chartRef.el, {
+      type: this.props.data.type,
+      data: {
+        labels: this.props.data.labels,
+        datasets: this.props.data.datasets
+      },
+      options: {
+        onClick: (event, elements) => {
+          if (!elements || elements.length === 0) return;
+
+          let dateField = ""
+          const clickedIndex = elements[0].index;
+          const modelName = this.props.data.model_name
+          const filterColumn = this.props.data.filter
+          const filterID = this.props.data.ids[clickedIndex];
+          
+          let splitDateField = this.props.data.datefield.split(".") 
+
+          if(splitDateField.length > 1){
+            dateField = splitDateField[1]
+          }else{
+            dateField = this.props.data.datefield
+          }
+          
+          let domain = [[filterColumn, "=", filterID]]
+          
+           if (this.props.date > 0) {
+             domain.push([dateField, ">=", prevDate]);
+             domain.push([dateField, "<=", currentDate]);
+           }
+
+      
+           const replacedString = modelName.replaceAll(".", "_");
+           const firstChar = replacedString.charAt(0).toUpperCase();
+           const restOfString = replacedString.slice(1);
+           
+           
+          let action = {
+            type: "ir.actions.act_window",
+            name: firstChar + restOfString, // Use constant for action name
+            res_model: modelName, // Use constant for .model name
+            domain: domain,
+            views: [
+              [false, "tree"], // Use constants for view types
+              [false, "form"],
+            ],
+          };
+
+          this.navigate.doAction(action);
+        },
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+          y: {
+            ticks: {
+              stepSize: 100,
+              callback: function (value) {
+                return value;
+              },
+            },
+          },
+        },
+        plugins: {
+          title: {
+            text: this.props.data.title,
           },
         },
       },

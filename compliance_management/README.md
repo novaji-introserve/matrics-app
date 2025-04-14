@@ -112,6 +112,8 @@ sudo systemctl start odoo
 
 ### 1. Install Nginx
 
+**For MacOS/Linux:**
+
 ```bash
 # MacOS
 brew install nginx
@@ -122,6 +124,10 @@ sudo apt-get install nginx
 # CentOS/RHEL
 sudo yum install nginx
 ```
+
+**For Windows:**
+
+Visit the official nginx website (<https://nginx.org/en/download.html>) and download the latest version for Windows.
 
 ### 2. Create Nginx Configuration File
 
@@ -141,7 +147,16 @@ sudo mkdir -p /etc/nginx/sites-enabled
 sudo nano /etc/nginx/sites-available/compliance_websocket.conf
 ```
 
-Add the following content:
+**For Windows:**
+
+```powershell
+mkdir C:\nginx\conf\sites-available
+mkdir C:\nginx\conf\sites-enabled
+```
+
+Open Notepad, and save an empty file as `compliance_websocket.conf` in the `C:\nginx\conf\sites-available` directory.
+
+Add the following content to your configuration file:
 
 ```nginx
 # Nginx configuration for Odoo with WebSocket support
@@ -171,12 +186,16 @@ server {
         proxy_buffering off;
         
         # For MacOS:
-        error_log /usr/local/var/log/nginx/websocket_error.log debug;
-        access_log /usr/local/var/log/nginx/websocket_access.log;
+        # error_log /usr/local/var/log/nginx/websocket_error.log debug;
+        # access_log /usr/local/var/log/nginx/websocket_access.log;
         
-        # For Linux (uncomment these lines and comment out the MacOS ones):
+        # For Linux:
         # error_log /var/log/nginx/websocket_error.log debug;
         # access_log /var/log/nginx/websocket_access.log;
+        
+        # For Windows:
+        error_log C:/nginx/logs/websocket_error.log debug;
+        access_log C:/nginx/logs/websocket_access.log;
     }    
 
     location /websocket {
@@ -225,7 +244,7 @@ sudo nano /usr/local/etc/nginx/nginx.conf
 sudo nano /etc/nginx/nginx.conf
 ```
 
-Add the following content:
+Add the following content for MacOS/Linux:
 
 ```nginx
 worker_processes auto;
@@ -282,6 +301,70 @@ http {
 }
 ```
 
+**For Windows:**
+
+Edit `C:\nginx\conf\nginx.conf` and replace the content with:
+
+```nginx
+#user  nobody;
+worker_processes  1;
+
+# Error log file
+error_log  C:/nginx/logs/error.log debug;
+
+# PID file
+pid  C:/nginx/logs/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    # MIME types for content-type handling
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    # Log format (commented out, but available for customization if needed)
+    # log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    # Access log file (commented out, but can be customized)
+    # access_log  C:/nginx/logs/access.log main;
+
+    sendfile        on;
+    # tcp_nopush     on;
+
+    # Keepalive timeout
+    # keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    # Enable gzip compression for performance optimization
+    # gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        # Root and index file settings
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+
+        # Error page handling
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+
+    # Include Windows-specific configuration files
+    include C:/nginx/conf/sites-available/*.conf;  
+    include C:/nginx/conf/sites-enabled/*.conf;      
+}
+```
+
 ### 4. Create Symbolic Link and Test Nginx Configuration
 
 **For MacOS:**
@@ -306,8 +389,29 @@ sudo ln -s /etc/nginx/sites-available/compliance_websocket.conf /etc/nginx/sites
 # Test Nginx configuration
 sudo nginx -t
 
+sudo mkdir -p /usr/local/var/log/nginx/
+
+sudo touch /usr/local/var/log/nginx/websocket_error.log
+
+sudo chown www-data:www-data /usr/local/var/log/nginx/websocket_error.log
+
+sudo systemctl start nginx
+
 # Reload Nginx
 sudo systemctl reload nginx
+```
+
+**For Windows:**
+
+```powershell
+# Create symbolic link
+mklink C:\nginx\conf\sites-enabled\compliance_websocket.conf C:\nginx\conf\sites-available\compliance_websocket.conf
+
+# Test Nginx configuration
+C:\nginx\nginx.exe -t
+
+# Start or reload Nginx
+nginx -s reload
 ```
 
 ## Testing the Setup
@@ -317,15 +421,11 @@ sudo systemctl reload nginx
 Odoo provides built-in WebSocket debugging interfaces to help troubleshoot connection issues:
 
 ```bash
+WebSocket Debug Interface:
+http://localhost:8069/ws/debug
 
-#### WebSocket Debug Interface
-
-<http://localhost:8069/ws/debug>
-
-#### WebSocket Test Interface
-
-<http://localhost:8069/ws/test>
-
+WebSocket Test Interface:
+http://localhost:8069/ws/test
 ```
 
 Replace `8069` with your Odoo port if different. These interfaces allow you to:
@@ -337,9 +437,17 @@ Replace `8069` with your Odoo port if different. These interfaces allow you to:
 
 ### 2. Test WebSocket Connection using Command Line
 
-Install wscat for testing WebSockets:
+**For MacOS/Linux:**
 
 ```bash
+npm install -g wscat
+```
+
+**For Windows:**
+
+Ensure you have Node.js installed on your Windows system. If not, download and install it from the Node.js Official Website.
+
+```cmd
 npm install -g wscat
 ```
 
@@ -351,20 +459,28 @@ wscat -c ws://localhost:8072/csv_import/ws
 
 If the connection is successful, you'll see a connected message.
 
-## 3. Check Queue Job Workers
+### 3. Check Queue Job Workers
 
-Verify that job queue workers are running:
+**For MacOS/Linux:**
 
 ```bash
-# For both MacOS and Linux
 ps aux | grep odoo | grep queue_job
 ```
 
 You should see several Odoo processes running, including some with the `--load=web,queue_job` parameter.
 
+**For Windows:**
+
+```powershell
+# List Odoo processes related to queue jobs
+tasklist | findstr /I "odoo"
+```
+
+You should see Odoo processes running, including some with the `--load=web,queue_job` parameter.
+
 ### 4. Test Import Functionality
 
-1. Go to your Odoo instance at <http://localhost:8069>
+1. Open your Odoo instance in a browser: `http://localhost:8069`
 2. Navigate to the CSV Import module
 3. Upload a test CSV or Excel file
 4. Verify that the import starts and shows progress updates
@@ -373,70 +489,127 @@ You should see several Odoo processes running, including some with the `--load=w
 
 ### Connectivity Issues
 
-If you're experiencing connectivity issues with WebSockets:
+If you are experiencing connectivity issues with WebSockets:
 
-1. Check Nginx logs
+**For MacOS/Linux:**
 
-   ```bash
-   # MacOS
-   tail -f /usr/local/var/log/nginx/websocket_error.log
+```bash
+# MacOS
+tail -f /usr/local/var/log/nginx/websocket_error.log
    
-   # Linux
-   tail -f /var/log/nginx/websocket_error.log
-   ```
+# Linux
+tail -f /var/log/nginx/websocket_error.log
+```
 
-2. Verify Odoo is running with WebSockets enabled:
+**For Windows:**
 
-   ```bash
-   grep "enable_websockets" logfile.log
-   ```
+```powershell
+# Windows: Tail the Nginx WebSocket error log
+Get-Content C:\nginx\logs\websocket_error.log -Wait
+```
 
-3. Ensure the WebSocket server started properly:
+Verify that Odoo is running with WebSockets enabled:
 
-   ```bash
-   grep "WebSocket server started" logfile.log
-   ```
+**For MacOS/Linux:**
 
-4. Use the WebSocket debug interface to check connection status
+```bash
+grep "enable_websockets" logfile.log
+```
 
-   ```bash
-   <http://localhost:8069/ws/debug>
-   ```
+**For Windows:**
+
+```powershell
+Select-String -Path "C:\odoo\logs\odoo.log" -Pattern "enable_websockets"
+```
+
+Ensure the WebSocket server started properly:
+
+**For MacOS/Linux:**
+
+```bash
+grep "WebSocket server started" logfile.log
+```
+
+**For Windows:**
+
+```powershell
+Select-String -Path "C:\odoo\logs\odoo.log" -Pattern "WebSocket server started"
+```
+
+Use the WebSocket debug interface to check connection status:
+
+```bash
+http://localhost:8069/ws/debug
+```
 
 ### Queue Job Issues
 
 If jobs are not being processed:
 
-1. Verify queue_job module is installed and enabled in Odoo
+1. Verify the `queue_job` module is installed and enabled in Odoo
 2. Check Odoo logs for job queue errors:
 
-   ```bash
-   grep "queue_job" logfile.log
-   ```
+    **For MacOS/Linux:**
 
-3. Restart Odoo with correct parameters:
+    ```bash
+    grep "queue_job" logfile.log
+    ```
 
-   ```bash
-   # For direct execution
-   python3 odoo-bin -c odoo.conf --workers=4 --load=web,queue_job
+    **For Windows:**
+
+    ```powershell
+    Select-String -Path "C:\odoo\logs\odoo.log" -Pattern "queue_job"
+    ```
+
+3. Restart Odoo with the correct parameters:
+
+**For MacOS/Linux:**
+
+```bash
+# For direct execution
+python3 odoo-bin -c odoo.conf --workers=4 --load=web,queue_job
    
-   # For systemd service (Linux)
-   sudo systemctl restart odoo
-   ```
+# For systemd service (Linux)
+sudo systemctl restart odoo
+```
+
+**For Windows:**
+
+```powershell
+# Stop the Odoo process
+Stop-Process -Name "odoo" -Force
+
+# Restart Odoo with workers and queue_job enabled
+Start-Process -FilePath "C:\odoo\odoo-bin" -ArgumentList "-c C:\odoo\odoo.conf --workers=4 --load=web,queue_job"
+```
 
 ### Import Process Issues
 
 If imports are not processing correctly:
 
-1. Check if the required fields are properly handled:
-   - Verify the CSV processor is updated with the latest code
-   - Ensure the import_log model has the process_file_batch method
-   - Look for "NULL value in column" errors in the logs
+1. **Check if the required fields are properly handled:**
+   - Verify the CSV processor is updated with the latest code.
+   - Ensure the `import_log` model has the `process_file_batch` method.
+   - Look for "NULL value in column" errors in the logs.
 
-2. Database connection issues:
-   - Check PostgreSQL logs for connection errors or serialization failures
-   - Increase connection limits if needed
-   - Try reducing the batch size to prevent long transactions
+2. **Database connection issues:**
+
+**For MacOS/Linux:**
+
+- Check PostgreSQL logs for connection errors or serialization failures
+- Increase connection limits if needed
+- Try reducing the batch size to prevent long transactions
+
+**For Windows:**
+
+- Check PostgreSQL logs for connection errors:
+
+     ```powershell
+     Select-String -Path "C:\Program Files\PostgreSQL\data\pg_log\*.log" -Pattern "ERROR"
+     ```
+
+- Increase connection limits in `postgresql.conf` if needed
+- Try reducing the batch size to prevent long transactions
 
 ## Security Considerations
 
@@ -445,4 +618,4 @@ If imports are not processing correctly:
 - Regularly monitor logs for unusual activity
 - Consider setting up rate limiting for file uploads
 
-By following these steps, you should have a fully functional CSV Import System with batch processing capabilities using Odoo's queue job framework and real-time progress updates via WebSockets.
+By following these steps, you should have a fully functional CSV Import System with batch processing capabilities using Odoo's queue job framework and real-time progress updates via WebSockets on Windows, Linux, or MacOS.

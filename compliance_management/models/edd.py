@@ -1,10 +1,18 @@
-from odoo import _, api, fields, models
+import os
+import logging
+from datetime import datetime
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+
 # from odoo.exceptions import ValidationError, UserError
+_logger = logging.getLogger(__name__)
 
 class CustomerEDD(models.Model):
     _name = 'res.partner.edd'
     _description = 'Enhanced Due Diligence'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+
+
 
     name = fields.Char(string="Name", tracking=True)
     status = fields.Selection(
@@ -101,11 +109,114 @@ class CustomerEDD(models.Model):
             # Check if the approved_by matches the current user ID
             record.is_current_user_approving_officer = (record.approving_officer_id.id == self.env.user.id)
 
+
+    # logic to send email
+    def _send_email_to_officers(self, template_ref, to_cco_only, officer = None):
+        try:
+            template = self.env.ref(template_ref, raise_if_not_found=False)
+            if not template:
+                _logger.error(f"Email template not found: {template_ref}")
+                raise ValidationError("Email template not found")
+
+            # Fetch CCO user group
+            cco_group = self.env.ref('compliance_management.group_compliance_chief_compliance_officer')
+            cco_users = cco_group.users
+            # Get the initiating CCO details (user who created the record)
+            initiating_cco = self.create_uid
+
+            cco_email = initiating_cco.email if initiating_cco in cco_users and initiating_cco.email else None
+            cco_name = initiating_cco.name if cco_email else None
+
+            # Select the officer, ensuring one of the officers exists
+            officer = self.approving_officer_id or officer.responsible_id
+            officer_email = officer.email
+
+            if officer is None or not officer_email:
+                _logger.warning("No valid officer found or officer has no email.")
+                raise ValidationError("No valid officer to send email to.")
+
+
+            ctx = {
+                'officer_name': officer.name,
+                'cco': cco_name
+            }
+            _logger.info(f"your officer {officer.name}")
+            if to_cco_only:
+
+                email_values = {
+                    'email_to': cco_email
+                }
+                _logger.info(f"{template.name} notification sent to {cco_email}")
+
+            else: 
+                  email_values = {
+                    'email_to': officer_email,
+                    'email_cc': cco_email
+                }
+                  _logger.info(f"{template.name} notification sent to {officer.email} with CC to {cco_email}")
+
+            template.with_context(**ctx).send_mail(
+                self.id,
+                force_send=True,
+                email_values=email_values
+            )
+            _logger.info(f"here are your {email_values}")
+        except Exception as e:
+            _logger.error(f"{template.name}Failed to send notification: {str(e)}")
+            raise ValidationError(f"{template.name}Failed to send notification: {str(e)}")
+                
+
+
+  
+    @api.model
+    def cron_send_for_assessment(self):
+        records = self.search([
+                ('status', '=', 'draft'),
+                ('responsible_id', '!=', False),
+                ('create_date', '!=', False)
+            ])
+        for record in records:
+                self._send_email_to_officers(
+                    'compliance_management.enhanced_due_diligence_assessment_template', 
+                    to_cco_only=False,
+                    officer= record
+                )
+               
+
+
+
     def action_submit_for_review(self):
         self.ensure_one()
         self.write({
             'status': 'completed'           
-        })   
+        })
+
+        self._send_email_to_officers('compliance_management.enhanced_due_diligence_review_template', to_cco_only=False)
+       
+        # try:
+        #     template = self.env.ref('compliance_management.enhanced_due_diligence_review_template', raise_if_not_found=False)
+        #     if not template:
+        #         _logger.error("Email template not found: compliance_management.enhanced_due_diligence_review_template")
+        #         raise ValidationError("Email template not found")
+        #     approving_officer = self.approving_officer_id 
+        #     if not approving_officer or not approving_officer.email:
+        #         _logger.warning("No approving officer configured or missing email")
+        #         return
+            
+        #     ctx = {
+        #         # "" add a context to the email template
+        #     }
+        #     template.with_context(**ctx).send_mail(
+        #         self.id, force_send=True, email_values={
+        #             'email_to': approving_officer.email,
+        #         }
+        #     )
+        #     _logger.info(f"Review notification sent to {approving_officer.email}")
+        # except Exception as e:
+        #     _logger.error(f"Failed to send review notification: {str(e)}")
+        #     raise ValidationError(f"Failed to send review notification: {str(e)}")
+        #     # end of email logic
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),
@@ -124,6 +235,7 @@ class CustomerEDD(models.Model):
             },
         }
 
+
     def action_approve(self):
         self.ensure_one()
         self.write({
@@ -131,6 +243,9 @@ class CustomerEDD(models.Model):
             'approved_by': self.env.user.id,
             'date_approved': fields.Date.today(),
         })
+
+        self._send_email_to_officers("compliance_management.enhanced_due_diligence_approved_template", to_cco_only=False)
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),
@@ -157,6 +272,9 @@ class CustomerEDD(models.Model):
             'approved_by': "",
             'date_approved': False,
         })
+
+        self._send_email_to_officers('compliance_management.enhanced_due_diligence_cancellation_template', to_cco_only=True)
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),
@@ -175,6 +293,7 @@ class CustomerEDD(models.Model):
             },
         }
 
+
     def action_send_back(self):
         self.ensure_one()
         self.write({
@@ -182,6 +301,9 @@ class CustomerEDD(models.Model):
             'approved_by': "",
             'date_approved': False,
         })
+        self._send_email_to_officers('compliance_management.enhanced_due_diligence_sent_back_template', to_cco_only=True)
+
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),
@@ -200,11 +322,15 @@ class CustomerEDD(models.Model):
             },
         }
 
+
     def action_archive(self):
         self.ensure_one()
         self.write({
             'status': 'archived',
         })
+
+        self._send_email_to_officers('compliance_management.enhanced_due_diligence_archived_template', to_cco_only=True)
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),

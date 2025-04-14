@@ -637,24 +637,18 @@
             </field>
         </record>
 
-        
-       
-
-
-
-
         <!-- Menu Items -->
         <menuitem
             id="hr.menu_hr_root"
             name="Employees"
-            groups="base.group_system"
+            groups="compliance_management.group_compliance_chief_compliance_officer"
             web_icon="hr,static/description/icon.svg"
             sequence="500" />
         <menuitem name="Settings"
             id="base.menu_administration"
             web_icon="compliance_management,static/description/icon-settings.png"
             sequence="550"
-            groups="base.group_erp_manager" />
+            groups="compliance_management.group_compliance_chief_compliance_officer" />
         <menuitem id="base.menu_management" name="Apps" sequence="500"
             web_icon="compliance_management,static/description/icon-apps.png"
             groups="base.group_system" />
@@ -762,8 +756,18 @@
 
         <menuitem id="menu_compliance_risk_settings" name="Configuration"
             parent="menu_compliance_configuration" sequence="500" />
+       
+        <menuitem id="menu_compliance_dashboard_charts" name="Dashboard Charts"
+            parent="menu_compliance_configuration" sequence="100" />
 
-
+        <menuitem
+            id="menu_dashboard_chart"
+            action="res_charts_action"
+            parent="menu_compliance_dashboard_charts"
+            name="Charts"
+            sequence="10" 
+            groups="group_compliance_compliance_officer"
+        />
       
 
     </data>

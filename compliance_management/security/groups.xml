@@ -53,6 +53,17 @@
   <field name="category_id" ref="module_category_compliance"/>
 </record>
 
+<record id="group_no_access" model="res.groups">
+    <field name="name">Restrict Access</field>
+    <!-- This ensures the group starts with no users -->
+    <field name="users" eval="[(5, 0, 0)]"/>
+    <field name="comment">Hide Data From The UI</field>
+    <field name="category_id" ref="module_category_compliance"/>
+</record>
+
+
+
+
 <!--
 <record id="group_compliance_close_case" model="res.groups">
   <field name="name">Close Case</field>

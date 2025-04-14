@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="owl.ComplianceDashboard" owl="1">
@@ -30,140 +31,90 @@
 
             <div class="container-fluid" style="margin-bottom:7rem;">
 
-                <div class="row">
+    
 
+                <div class="row second-section mb-4 pt-2 g-md-5 justify-content-between align-items-center">
 
-                    <div class="col-lg-9 position-relative">
-
-                     
-                            <div  class="d-flex position-relative card-container gap-3 py-4">
-                            
-                               <t t-if="state.stats and state.stats.length > 0">
-                                <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
-                                    <Card t-on-click="() => displayOdooView(stat.scope)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
-                                </t>
-                               </t>
-                               <t t-else="">
-                                <h4 class="" style="padding: 5rem;">No Data!! Please click on the configuration menu then statistic and start creating</h4>
-                               </t>
-                                 
+                        <div class="col-md-10">
+                        
+                            <div  class="d-flex align-items-center position-relative card-container gap-3 py-2">
+                                    
+                                    <t t-if="state.stats and state.stats.length > 0">
+                                        <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                                            <Card t-on-click="() => displayOdooView(stat.scope, stat.query)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <h4 class="" style="padding: 5rem; cursor:pointer;">No Data!! Please click on the configuration menu then statistic and start creating</h4>
+                                    </t>
+                                        
                             </div>
-                            
-                            <div class="position-relative">
-                                <t t-if="state.stats and state.stats.length > 3 and !state.scrollRight">
-                                    <div class="overflow-indicator-right mt-1 fade-blink">&#x2192;</div>
-                                </t>
-                                <t t-if="state.stats and state.stats.length > 3 and !state.scrollLeft">
-                                    <div  class="overflow-indicator-left mt-1 fade-blink">&#x2190;</div>
-                                </t>
-                            </div>
-
-                       
-                        <div class="row g-md-2 mt-md-3 mt-5 ">
-                            <div class="col-md-6">
-                               
-                                <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                                    <h3 class="lead fw-bold text-dark">Top 10 Screened Transaction By Rules</h3>
-                                    <button class="btn btn-dark">
-                                        <i class="fa fa-angle-right"></i>
-                                    </button>
-                                </div>
-                            <t t-if="state.screenedchart.length > 0">
-                                <div class="chart mt-4 ml-1 bg-white shadow shadow-1">
-                                    <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'bar'" title="'Top 10 Screened Transaction By Rules'" data="state.screenedchart" />
-                                </div>
-                            </t>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="d-flex bg-white shadow shadow-1  p-3 rounded justify-content-between align-items-center">
-                                    <h3 class="lead fw-bold text-dark">Top 10 Branches By Customer</h3>
-                                    <button class="btn btn-dark">
-                                        <i class="fa fa-angle-right"></i>
-                                    </button>
-                                </div>
-                                <t t-if="state.topbranch.length > 0">
-                                    <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
-                                        <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'line'" title="'Top 10 Branches By Customer'"
-                                            data="state.topbranch" />
-                                    </div>
-                                </t>
-                            </div>
+                                    
                         </div>
 
-                    </div>
+                        <div style="min-height:12rem;" class="shadow gap-2 bg-white col-md-2 position-relative shadow-lg py-2 d-flex flex-column justify-content-center align-items-center">
 
-                    <div class="col-lg-3 rightside p-4 ">
-
-
-                        <div class="shadow bg-white shadow-lg p-4 d-flex justify-content-between gap-md-2">
+                            <div class="">
+                                <select class="form-select-cat" t-on-change="(event) => displaybycategory(event.target.value)">
+                                    <option value="bank">Bank</option>
+                                    <option value="risk">Risk</option>
+                                    <option value="branch">Branch</option>
+                                    <option value="compliance">Compliance</option>
+                                    <option value="regulatory">Regulatory</option>
+                                    <option selected="selected" value="all">ALL</option>
+                                </select>
+                            </div>
 
                             <div class="circle">
                                 <t t-out="state.totalstat" />
                             </div>
 
-                            <div>
+                        
 
-                                <div t-on-click="() => displaybycategory('bank')"
-                                    class="d-flex gap-2 mb-2 cursor-pointer  align-items-center justify-content-between">
-                                    <h5>Bank</h5>
-                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
-                                </div>
-                                <div t-on-click="() => displaybycategory('risk')"
-                                    class="d-flex gap-2 mb-2 cursor-pointer  align-items-center justify-content-between">
-                                    <h5>Risk</h5>
-                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
-                                </div>
-                                <div t-on-click="() => displaybycategory('compliance')"
-                                    class="d-flex  gap-2 mb-2 cursor-pointer align-items-center justify-content-between">
-                                    <h5>Compliance</h5>
-                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
-                                </div>
-                                <div t-on-click="() => displaybycategory('branch')"
-                                    class="d-flex gap-2  mb-2 cursor-pointer align-items-center justify-content-between">
-                                    <h5>Branch</h5>
-                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
-                                </div>
-                                <div t-on-click="() => displaybycategory('regulatory')"
-                                    class="d-flex gap-2  mb-2 cursor-pointer align-items-center justify-content-between">
-                                    <h5>Regulatory</h5>
-                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
-                                </div>
-                                <div t-on-click="() => displaybycategory('all')"
-                                    class="d-flex gap-2  mb-2 cursor-pointer align-items-center justify-content-between">
-                                    <h5>All</h5>
-                                    <div style="background-color: ''; min-height: 1rem; min-width:2rem"></div>
-                                </div>
-
-                            </div>
-
+                        
                         </div>
-
-                        <div class="shadow shadow-lg mt-3 bg-white doughnut">
-
-                            <div class="d-flex bg-white shadow shadow-1  rounded justify-content-between p-2 align-items-center">
-                                <h6 class=" fw-bold text-dark">Top 10 High-Risk Customer By Branch</h6>
-                                <button class="btn btn-dark">
-                                    <i class="fa fa-angle-right"></i>
-                                </button>
-                            </div>
-                            <t t-if="state.highriskchart.length > 0">
-                                <div class="chart mt-4 ml-1 shadow shadow-1 bg-white p1">
-                                <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="'Top 10 High-Risk Customer By Branch'"
-                                    data="state.highriskchart" />
-                                </div>
-                            </t>
-
-                            
-
-                        </div>
-
-
-
-                    </div>
-                   
-
-
+                    
+                        
                 </div>
+
+                <div class="position-relative">
+                     <t t-if="state.stats and state.stats.length > 3 and !state.scrollRight">
+                         <div class="overflow-indicator-right mt-1 fade-blink">&#x2192;</div>
+                     </t>
+                     <t t-if="state.stats and state.stats.length > 3 and !state.scrollLeft">
+                         <div  class="overflow-indicator-left mt-1 fade-blink">&#x2190;</div>
+                     </t>
+                </div>
+
+
+
+                <div class="row g-md-2 mt-md-3 mt-5 ">
+
+                            <t t-if="state.dynamic_chart.length > 0">
+                                <t t-foreach="state.dynamic_chart" t-as="chart" t-key="chart.id">
+
+                                    <div t-attf-class="col-md-{{ chart.column }}">
+                                        <div class="d-flex bg-white shadow shadow-1  rounded justify-content-between p-2 align-items-center">
+                                            <h6 class=" fw-bold text-capitalize text-dark">
+                                                <t t-out="chart.title"/>
+                                            </h6>
+                                            <button class="btn btn-dark">
+                                                <i class="fa fa-angle-right"></i>
+                                            </button>
+                                        </div>
+                                        <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
+                                            <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="chart.title"
+                                                data="chart" dynamic="true" 
+                                            />
+                                        </div>
+                                    </div>
+                            
+                                </t>
+                            </t>
+                            
+                        </div>
+
+                    </div>  
 
             </div>
 
@@ -171,5 +122,3 @@
         </div>
     </t>
 </templates>
-
-

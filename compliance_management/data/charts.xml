@@ -1,0 +1,77 @@
+<odoo>
+    <data noupdate="1">
+        <record id="demo_chart_top10_branch_by_customer" model="res.dashboard.charts">
+            <field name="name">top 10 branch by customer</field>
+            <field name="description">top 10 branch by customer</field>
+            <field name="chart_type">bar</field>
+            <field name="query">
+            SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
+            FROM res_branch rb
+            JOIN res_partner rp ON rb.id = rp.branch_id
+            GROUP BY rb.id, rb.name
+            ORDER BY customer_count DESC
+            LIMIT 10;
+            </field>
+            <field name="color_scheme">default</field>
+            <field name="x_axis_field">name</field>
+            <field name="y_axis_field">customer_count</field>
+            <field name="branch_filter" eval="True"/>
+            <field name="date_field">rp.create_date</field>
+            <field name="branch_field">rb.id</field>
+            <field name="state">active</field>
+            <field name="target_model_id" ref="compliance_management.model_res_partner" />
+            <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
+        </record>
+        
+        
+        <record id="demo_chart_top10_high_risk_branch" model="res.dashboard.charts">
+            <field name="name">Top 10 High Risk Branch</field>
+            <field name="description">Top 10 High Risk Branch</field>
+            <field name="chart_type">pie</field>
+            <field name="query">
+                SELECT rb.id, rb.name AS name, COUNT(rp.id) AS high_risk_customers
+                    FROM res_branch rb
+                    JOIN res_partner rp ON rb.id = rp.branch_id
+                    WHERE rp.risk_level = 'high'
+                    GROUP BY rb.id, rb.name
+                    ORDER BY high_risk_customers DESC
+                    LIMIT 10
+            </field>
+            <field name="color_scheme">rainbow</field>
+            <field name="x_axis_field">name</field>
+            <field name="y_axis_field">high_risk_customers</field>
+            <field name="branch_filter" eval="True"/>
+            <field name="date_field">rp.create_date</field>
+            <field name="branch_field">rb.id</field>
+            <field name="state">active</field>
+            <field name="target_model_id" ref="compliance_management.model_res_partner"/>
+            <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
+
+        </record>
+        
+        
+        <record id="demo_chart_top10_screened_transaction" model="res.dashboard.charts">
+            <field name="name">Top 10 Screened Transaction By Rules</field>
+            <field name="description">Top 10 Screened Transaction By Rules</field>
+            <field name="chart_type">line</field>
+            <field name="query">
+            SELECT rtsr.id, rtsr.name AS name, COUNT(rct.id) AS hit_count
+            FROM res_transaction_screening_rule rtsr
+            JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+            GROUP BY rtsr.id, rtsr.name
+            ORDER BY hit_count DESC
+            LIMIT 10;
+            </field>
+            <field name="color_scheme">cool</field>
+            <field name="x_axis_field">name</field>
+            <field name="y_axis_field">hit_count</field>
+            <field name="branch_filter" eval="True"/>
+            <field name="date_field">rct.date_created</field>
+            <field name="branch_field">rct.branch_id</field>
+            <field name="state">active</field>
+             <field name="target_model_id" ref="compliance_management.model_res_customer_transaction" />
+           <field name="domain_field_id" ref="compliance_management.field_res_customer_transaction__rule_id"/>
+        </record>
+        
+    </data>
+</odoo>

@@ -23,7 +23,7 @@
                     <div class="oe_title" colspan="2">
                         <label for="val" class="oe_edit_only" />
                         <h1>
-                            <field name="val" />
+                            <field name="val" readonly="1" />
                         </h1>
                     </div>
                     <group>
@@ -102,6 +102,14 @@
                 No records yet
             </p>
         </field>
+    </record>
+
+    <!-- server -->
+    <record id="action_stat_card_click" model="ir.actions.server">
+    <field name="name">Stat Card Click</field>
+    <field name="model_id" ref="model_res_compliance_stat"/>
+    <field name="state">code</field>
+    <field name="code">action = model.open_action()</field>
     </record>
     <!-- Menu -->
     <menuitem
