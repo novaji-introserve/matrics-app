@@ -3,6 +3,9 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import re
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class Statistic(models.Model):
     _name = 'res.compliance.stat'
@@ -160,18 +163,35 @@ class Statistic(models.Model):
     
 
 
-
     def update_stat(self):
-       
-        try:
+        statistic = self.env['res.compliance.stat'].search([])
+        
+        # Define pattern outside the loop for better performance
+        aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
+        pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\("
+        
+        for stat in statistic:
+            try:
+                if not stat.sql_query:
+                    continue
+                    
+                self.env.cr.execute(stat.sql_query)
+                match = re.search(pattern, stat.sql_query, re.IGNORECASE)
                 
-          statistic = self.env['res.compliance.stat'].search([])
+                if match:
+                    result = self.env.cr.fetchone()
+                    stat.val = str(result[0]) if result and result[0] is not None else '0'
+                else:
+                    records = self.env.cr.fetchall()
+                    stat.val = str(len(records)) if records else '0'
+                    
+            except Exception as e:
+                _logger.error(f"Error updating stat {stat.name}: {str(e)}")
+                
+        
+       
 
-          for stat in statistic:
-              self.env.cr.execute(stat.sql_query)
-        finally:
-            self.env.cr.rollback() #Rollback the cursor to prevent any unintended changes
-
+    
     
     def open_action(self):
         pass
