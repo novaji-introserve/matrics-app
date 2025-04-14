@@ -43,3 +43,6 @@ from . import open_sanctions_extension
 from . import job_queue_handler
 from . import web_scraping
 from . import dynamic_charts
+from . import risk_assessment_control
+from . import risk_assesment_mitigation
+from . import res_risk_implication

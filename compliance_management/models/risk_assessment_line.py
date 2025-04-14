@@ -2,7 +2,7 @@
 
 from odoo import models, fields, api, _
 
-CONTROL_EFFECTIVENESS_MAX_SCORE = 25
+# CONTROL_EFFECTIVENESS_MAX_SCORE = 25
 
 
 class RiskAssessmentLine(models.Model):
@@ -17,10 +17,9 @@ class RiskAssessmentLine(models.Model):
         comodel_name='res.risk.category', string='Category', required=True)
     risk_assessment_id = fields.Many2one(
         comodel_name='res.risk.assessment', string='Risk Assessment', ondelete="cascade")
-    implication = fields.Text(string='Implication', required=True)
+    implication = fields.Many2many("risk.assessment.implication","res_risk_assessment_line_implication_rel", tracking=True)
     inherent_risk_score = fields.Float(
         string='Inherent Risk Score', required=True, tracking=True)
-    # existing_controls = fields.Text(string='Existing Controls', required=True)
     existing_controls = fields.Many2many("risk.assessment.control", "res_risk_assessment_line_risk_assessment_control_rel", tracking=True)
     control_effectiveness_score = fields.Float(
         string='Control Effectiveness Score', tracking=True)
@@ -31,10 +30,18 @@ class RiskAssessmentLine(models.Model):
     planned_mitigation = fields.Many2many("risk.assessment.mitigation", "res_risk_assessment_line_risk_assessment_mitigation_rel", tracking=True)
     department_id = fields.Many2one(
         comodel_name='hr.department', string='Department', required=True, help="Department Responsible")
-    implementation_date = fields.Date(
-        string='Implementation Deadline', help="Recurring deadline for implementation")
+    implementation_date = fields.Selection([
+        ('0', 'Immediate'),
+        ('7', '7 Days'),
+        ('14', '14 Days'),
+        ('21', '21 Days'),
+        ('30', 'A month'),
+        ('60', '2 month'),
+        ('90', '3 month'),
+    ],string='Implementation Deadline',default="0", help="Recurring deadline for implementation")
     residual_risk_score = fields.Float(
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
+
 
     @api.model
     def create(self, vals):
@@ -66,10 +73,18 @@ class RiskAssessmentLine(models.Model):
                 probability, record.residual_risk_impact)
             record.residual_risk_probability = probability
             record.residual_risk_score = score
+    
+    def get_control_effectiveness_max_score(self):
+        """Retrieves the maximum control effectiveness score from system parameters."""
+        return int(self.env['ir.config_parameter'].sudo().get_param('risk_management.control_effectiveness_max_score') or 25)
 
     def _compute_risk_probability(self, control_effectiveness_score):
+        max_score = self.get_control_effectiveness_max_score()
+        if max_score == 0:
+            return 100.0  # Avoid division by zero
+        
         return (
-            1 - (control_effectiveness_score / CONTROL_EFFECTIVENESS_MAX_SCORE)) * 100
+            1 - (control_effectiveness_score / max_score)) * 100
 
     def _compute_residual_risk_score(self, probability, impact):
         return (probability/100) * impact

@@ -31,7 +31,7 @@
                     </group>
                     <group>
                         <group colspan="2">
-                            <field name="implication"/>
+                            <field name="implication" widget="many2many_tags"/>
                         </group>
                     </group>
                     <group>
