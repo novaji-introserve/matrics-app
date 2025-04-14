@@ -103,7 +103,7 @@
 
     <!-- Menu Items -->
     <!-- <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499"/> -->
-    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499"/>
+    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499" groups="group_compliance_chief_compliance_officer"/>
 
     <menuitem id="menu_adverse_media" name="Media Watchlist" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/>
     <!-- <menuitem id="menu_adverse_media" name="Monitoring Configuration" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/> -->
