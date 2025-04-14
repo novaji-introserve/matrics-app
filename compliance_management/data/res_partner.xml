@@ -155,7 +155,7 @@
             <field name="city">IBADAN</field>
             <field name="state_id" ref="compliance_management.state_ng_16"/>
             <field name="country_id" ref="base.ng"/>
-           <field name="title" ref="base.res_partner_title_prof" />
+            <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">False</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <field name="risk_level">low</field>
@@ -210,14 +210,14 @@
             <field name="city">BENIN CITY</field>
             <field name="state_id" ref="compliance_management.state_ng_1"/>
             <field name="country_id" ref="base.ng"/>
-           <field name="title" ref="base.res_partner_title_mister" />
+            <field name="title" ref="base.res_partner_title_mister" />
             <field name="active">False</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <field name="risk_level">low</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
-         <record id="demo_data_17" model="res.partner">
+        <record id="demo_data_17" model="res.partner">
             <field name="name">Olamide Fashola</field>
             <field name="phone">09064567890</field>
             <field name="street">4 Fashola Gardens</field>
@@ -229,6 +229,7 @@
             <field name="risk_level">medium</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
+        
         <record id="demo_data_18" model="res.partner">
             <field name="name">Rahima Belloo</field>
             <field name="phone">08115678901</field>
@@ -241,6 +242,7 @@
             <field name="risk_level">low</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
+
         <record id="demo_data_19" model="res.partner">
             <field name="name">Chibuzo EzeE</field>
             <field name="phone">07056789012</field>
@@ -251,8 +253,10 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020052' />
             <field name="risk_level">high</field>
+            <field name="risk_score">25.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
+
         <record id="demo_data_20" model="res.partner">
             <field name="name">Sadiya Garbar</field>
             <field name="phone">08087890123</field>
@@ -263,8 +267,10 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020052' />
             <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
+
         <record id="demo_data_21" model="res.partner">
             <field name="name">Tayo Ade</field>
             <field name="phone">09018901234</field>
@@ -275,8 +281,10 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020006' />
             <field name="risk_level">medium</field>
+            <field name="risk_score">14.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
+
         <record id="demo_data_22" model="res.partner">
             <field name="name">Samiraa Yakubu</field>
             <field name="phone">08159012345</field>
@@ -287,8 +295,10 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
+
         <record id="demo_data_23" model="res.partner">
             <field name="name">Tochukwu Ibee</field>
             <field name="phone">07090123456</field>
@@ -299,8 +309,10 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <field name="risk_level">high</field>
+            <field name="risk_score">25.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
+
         <record id="demo_data_24" model="res.partner">
             <field name="name">Ummii Adamu</field>
             <field name="phone">08041234567</field>
@@ -311,8 +323,10 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
+
         <record id="demo_data_25" model="res.partner">
             <field name="name">Wale Soyinka o</field>
             <field name="phone">09032345678</field>
@@ -323,6 +337,7 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <field name="risk_level">medium</field>
+            <field name="risk_score">14.0</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
         <record id="demo_data_26" model="res.partner">
@@ -335,6 +350,7 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
         <record id="demo_data_27" model="res.partner">
@@ -347,6 +363,7 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <field name="risk_level">high</field>
+            <field name="risk_score">25</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
         <record id="demo_data_28" model="res.partner">
@@ -359,6 +376,7 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
         <record id="demo_data_29" model="res.partner">
@@ -371,6 +389,7 @@
             <field name="active">False</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <field name="risk_level">medium</field>
+            <field name="risk_score">14.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
         <record id="demo_data_30" model="res.partner">
