@@ -125,7 +125,7 @@ export class ComplianceDashboard extends Component {
     this.navigate.doAction({
       type: "ir.actions.act_window",
       res_model: response.table.replace(/_/g, "."),
-      name: category,
+      name: `${category[0].toUpperCase()}${category.slice(1,)}`,
       domain: response.domain,
       views: [
         [false, "tree"],
