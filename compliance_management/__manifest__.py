@@ -54,6 +54,7 @@
 
         "data/schedules/global_pep_list_cron.xml",
         "views/dynamic_charts.xml",
+        "views/fcra_score.xml",
         "views/configuration.xml",
         "views/edd.xml",
         "views/kyc.xml",
@@ -79,6 +80,8 @@
         "views/transaction_screening_rule.xml",
         "data/charts.xml",
         "data/res_partner.xml",
+        "data/fcra_score.xml",
+        
         
         
     ],

@@ -753,6 +753,14 @@
             name="Risk Types"
             groups="group_compliance_compliance_officer"
             sequence="4" />
+    
+        <menuitem
+            id="menu_compliance_risk_fcra_score"
+            action="action_fcra_score_action"
+             parent="menu_risk_assessment"
+            name="FCRA Risk Score"
+            groups="group_compliance_compliance_officer"
+            sequence="5" />
 
         <menuitem id="menu_compliance_risk_settings" name="Configuration"
             parent="menu_compliance_configuration" sequence="500" />

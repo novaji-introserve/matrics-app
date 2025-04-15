@@ -42,6 +42,44 @@ class RiskAssessmentLine(models.Model):
     residual_risk_score = fields.Float(
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
 
+    def _get_score_range(self, score_name):
+        """Get min/max values from res.fcra.score model"""
+        score_record = self.env['res.fcra.score'].search([('name', '=', score_name)], limit=1)
+        return score_record.min_score if score_record else 1, score_record.max_score if score_record else 25
+    
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        res = super(RiskAssessmentLine, self).fields_get(allfields, attributes)
+
+        
+        # Get ranges from res.fcra.score
+        inherent_min, inherent_max = self._get_score_range('Inherent Score')
+        control_min, control_max = self._get_score_range('Control Effectiveness')
+        residual_min, residual_max = self._get_score_range('Residual Risk')
+        
+        # Update field attributes
+        if 'inherent_risk_score' in res:
+            res['inherent_risk_score']['min'] = inherent_min
+            res['inherent_risk_score']['max'] = inherent_max
+            print(inherent_max)
+            print("*********************")
+        
+        if 'control_effectiveness_score' in res:
+            res['control_effectiveness_score']['min'] = control_min
+            res['control_effectiveness_score']['max'] = control_max
+            print(control_max)
+            print("*********************")
+        
+        if 'residual_risk_impact' in res:
+            res['residual_risk_impact']['min'] = residual_min
+            res['residual_risk_impact']['max'] = residual_max
+            print(residual_min)
+            print("*********************")
+        
+        return res
+
+
+
 
     @api.model
     def create(self, vals):
