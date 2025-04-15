@@ -171,7 +171,7 @@
 
             <xpath expr="//field[@name='function']" position="replace">
                 <field name="employment_status" invisible="0" />
-
+                <field name="active" invisible="1" />
             </xpath>
           
 

@@ -27,7 +27,7 @@ class AdverseMedia(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     partner_id = fields.Many2one(
-        'res.partner', string='Partner',tracking=True, required=True, index=True)
+        'res.partner', string='Partner', tracking=True, required=True, index=True, ondelete='cascade')
     partner_risk_score = fields.Float(
         related='partner_id.risk_score', tracking=True, string="Risk Score")
     partner_risk_level = fields.Char(

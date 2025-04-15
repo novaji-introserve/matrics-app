@@ -58,10 +58,15 @@ class Compliance(http.Controller):
             condition_string = where_match.group(1)
             domain = self._parse_condition_to_odoo_domain(condition_string)  
 
-    
         return {'table': table, 'domain': domain}
 
     def _parse_condition_to_odoo_domain(self, condition_string: str):
+
+        python_values = {
+            "null": None,
+            "true": True,
+            "false": False
+        }
        
         domain = []
         # Basic splitting of AND conditions (very simplified)
@@ -80,6 +85,7 @@ class Compliance(http.Controller):
                     value = value[1:-1]
                 elif value.startswith('"') and value.endswith('"'):
                     value = value[1:-1]
+                
                 # Convert SQL operators to Odoo domain operators
                 if operator == '=':
                     odoo_operator = '='
@@ -107,6 +113,12 @@ class Compliance(http.Controller):
                     value = value.replace("(", '[').replace(")", ']')
                 else:
                     continue # Ignore unsupported operators
+
+                for word in python_values:
+                    if word == value:
+                        value = python_values[word]
+                        break
+
                 domain.append([field, odoo_operator, value])
         return domain
 

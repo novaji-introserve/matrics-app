@@ -52,6 +52,7 @@
         'data/email_templates/enhanced_due_diligence_sent_back_template.xml',
         'data/email_templates/enhanced_due_diligence_archived_template.xml',
 
+        "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
         "views/dynamic_charts.xml",
         "views/fcra_score.xml",
