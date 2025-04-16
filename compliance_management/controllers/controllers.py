@@ -58,7 +58,6 @@ class Compliance(http.Controller):
             condition_string = where_match.group(1)
             domain = self._parse_condition_to_odoo_domain(condition_string)  
 
-
         return {'table': table, 'domain': domain}
 
     def _parse_condition_to_odoo_domain(self, condition_string: str):
@@ -78,8 +77,9 @@ class Compliance(http.Controller):
                 field, operator, value = parts
                 field = field.strip()
                 operator = operator.strip().lower()
-                value = value.strip()
+                value = value.strip() # select count(id) from res_partner where bvn is null
 
+        
                 # Clean the value
                 if value.startswith("'") and value.endswith("'"):
                     value = value[1:-1]

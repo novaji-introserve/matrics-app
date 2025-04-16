@@ -1,0 +1,123 @@
+<odoo>
+
+<record id="risk_control_fcra_permissible_purpose" model="risk.assessment.control">
+    <field name="name">Permissible Purpose Verification</field>
+    <field name="code">FCRA-CTRL-001</field>
+    <field name="description">Verification process to ensure consumer reports are obtained only for permissible purposes under FCRA Section 604.</field>
+    <field name="control_type">preventive</field>
+    <field name="control_nature">semi_automated</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">3</field>
+    <field name="effectiveness_score">4</field>
+    <field name="state">active</field>
+</record>
+
+<record id="risk_control_fcra_adverse_action" model="risk.assessment.control">
+    <field name="name">Adverse Action Notice Process</field>
+    <field name="code">FCRA-CTRL-002</field>
+    <field name="description">Automated system to generate and send adverse action notices when credit is denied based on consumer report information.</field>
+    <field name="control_type">detective</field>
+    <field name="control_nature">automated</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">3</field>
+    <field name="effectiveness_score">4</field>
+    <field name="state">active</field>
+</record>
+
+<record id="risk_control_fcra_dispute_resolution" model="risk.assessment.control">
+    <field name="name">Consumer Dispute Resolution Process</field>
+    <field name="code">FCRA-CTRL-003</field>
+    <field name="description">Process for handling, investigating, and resolving consumer disputes regarding information accuracy within required timeframes.</field>
+    <field name="control_type">corrective</field>
+    <field name="control_nature">manual</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">2</field>
+    <field name="effectiveness_score">3</field>
+    <field name="state">active</field>
+</record>
+
+<record id="risk_control_fcra_access_controls" model="risk.assessment.control">
+    <field name="name">Consumer Information Access Controls</field>
+    <field name="code">FCRA-CTRL-004</field>
+    <field name="description">Role-based access controls restricting access to consumer credit information only to authorized personnel.</field>
+    <field name="control_type">preventive</field>
+    <field name="control_nature">automated</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">3</field>
+    <field name="effectiveness_score">5</field>
+    <field name="state">active</field>
+</record>
+
+<record id="risk_control_fcra_info_accuracy" model="risk.assessment.control">
+    <field name="name">Information Accuracy Verification</field>
+    <field name="code">FCRA-CTRL-005</field>
+    <field name="description">Quality control process to verify accuracy of information before inclusion in consumer reports.</field>
+    <field name="control_type">detective</field>
+    <field name="control_nature">semi_automated</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">2</field>
+    <field name="effectiveness_score">4</field>
+    <field name="state">active</field>
+</record>
+
+<record id="risk_control_fcra_staff_training" model="risk.assessment.control">
+    <field name="name">FCRA Compliance Training</field>
+    <field name="code">FCRA-CTRL-006</field>
+    <field name="description">Mandatory training program for all staff handling consumer credit information on FCRA requirements and obligations.</field>
+    <field name="control_type">directive</field>
+    <field name="control_nature">manual</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">2</field>
+    <field name="effectiveness_score">4</field>
+    <field name="state">active</field>
+</record>
+
+<record id="risk_control_fcra_risk_pricing" model="risk.assessment.control">
+    <field name="name">Risk-Based Pricing Notice Process</field>
+    <field name="code">FCRA-CTRL-007</field>
+    <field name="description">System to identify when risk-based pricing notices are required and generate appropriate notifications.</field>
+    <field name="control_type">preventive</field>
+    <field name="control_nature">automated</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">2</field>
+    <field name="effectiveness_score">3</field>
+    <field name="state">active</field>
+</record>
+
+<record id="risk_control_fcra_vendor_management" model="risk.assessment.control">
+    <field name="name">Credit Agency Vendor Management</field>
+    <field name="code">FCRA-CTRL-008</field>
+    <field name="description">Process for evaluating, selecting, and monitoring credit reporting agencies and other vendors handling consumer information.</field>
+    <field name="control_type">preventive</field>
+    <field name="control_nature">manual</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">2</field>
+    <field name="effectiveness_score">4</field>
+    <field name="state">active</field>
+</record>
+
+<record id="risk_control_fcra_data_security" model="risk.assessment.control">
+    <field name="name">Consumer Data Security Controls</field>
+    <field name="code">FCRA-CTRL-009</field>
+    <field name="description">Technical controls for securing consumer credit information, including encryption, access logs, and intrusion detection.</field>
+    <field name="control_type">preventive</field>
+    <field name="control_nature">automated</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">3</field>
+    <field name="effectiveness_score">4</field>
+    <field name="state">active</field>
+</record>
+
+<record id="risk_control_fcra_disposal" model="risk.assessment.control">
+    <field name="name">Information Disposal Process</field>
+    <field name="code">FCRA-CTRL-010</field>
+    <field name="description">Process for secure disposal of consumer information when no longer needed, in compliance with Disposal Rule.</field>
+    <field name="control_type">preventive</field>
+    <field name="control_nature">semi_automated</field>
+    <field name="is_fcra_relevant">True</field>
+    <field name="priority">2</field>
+    <field name="effectiveness_score">3</field>
+    <field name="state">active</field>
+</record>
+
+</odoo>
