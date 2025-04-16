@@ -1,0 +1,349 @@
+<odoo>
+    <data>
+        <record id="case_creation_alert_template" model ="mail.template">
+            <field name="name">Case Creation Alert</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="subject">Case Creation</field>
+            <field name="email_from">${object.email_from or 'noreply@example.com'}</field>
+            <field name="email_to">${object.email_to or 'noreply@example.com' }</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="email_cc">${object.email_cc or ''}</field>
+            <field name="body_html"><![CDATA[
+                <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding:10px;padding-bottom:40px">
+                        <tr>
+                            <td align="left">
+                                <img src="/compliance_management/static/img/alt_bank_logo.png"
+                                     alt="alt bank logo" width="170"/>
+                                <br/><br/><br/><br/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table width="100%" border="0" cellspacing="0" cellpadding="10">
+                        <tr>
+                            <td colspan="2" style="border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                                <i>The exception below was raised on a transaction
+                                    you processed or an activity within your scope of responsibility.</i><br/>
+                                <i>Please respond to the exception immediately,
+                                    explaining the reason(s) behind it as well as what you are doing to prevent
+                                    re-occurrence.</i><br/>
+                                <i><b>NOTE</b>: The exception will remain open and
+                                    therefore count against you unless resolved.</i>
+                            </td>
+                        </tr>
+
+                        <!-- Rows for data -->
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Event Date</b></td>
+                            <td><t t-esc="object.event_date or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Alert Id</b></td>
+                            <td><t t-esc="object.alert_name or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Narration</b></td>
+                            <td><t t-esc="object.title or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Severity Rating</b></td>
+                            <td><t t-esc="object.rating_name or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Department</b></td>
+                            <td><t t-esc="object.staff_dept or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Status</b></td>
+                            <td><t t-esc="object.status_name or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Exception Process</b></td>
+                            <td><t t-esc="object.exception_process or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Exception Process Type</b></td>
+                            <td><t t-esc="object.process_type or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Exception Process Category</b></td>
+                            <td><t t-esc="object.process_category or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Recommended Action</b></td>
+                            <td><t t-esc="object.case_action or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px;"><b>Additional Details</b></td>
+                            <td><t t-esc="object.description or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 30px 10px;"><b>Employee Response</b></td>
+                            <td>
+                                <a t-att-href="object.response_link or '#'">CLICK here to respond</a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" style="padding-top: 40px; border-top: 1px solid #eee;">
+                                <h5><b>Required Action</b></h5>
+                                <p><i>Please review and ensure compliance.</i></p>
+                                <p><i>Please ensure 100% review of this exception.</i></p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding-top: 10px;padding-left:10px">
+                        <tr>
+                            <td>
+                                <a t-att-href="''" style="color: #0056b3;">
+                                    Login to iComply portal
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            ]]></field>
+        </record>
+
+
+        <record id="case_response_alert_template" model ="mail.template">
+            <field name="name"> Case response Alert</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="subject">Case Response</field>
+            <field name="email_from">${object.email_from or 'noreply@example.com'}</field>
+            <field name="email_to">${object.email_to or 'noreply@example.com' }</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="email_cc">${object.email_cc or ''}</field>
+            <field name="body_html"><![CDATA[
+                <div style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding:10px;padding-bottom:40px">
+                        <tr>
+                            <td align="left">
+                                <img src="/compliance_management/static/img/alt_bank_logo.png"
+                                     alt="alt bank logo" width="170"/>
+                                <br/><br/><br/><br/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table width="100%" border="0" cellspacing="0" cellpadding="10">
+                        <tr>
+                        <td colspan="2" style="border-bottom: 1px solid #eee; padding-bottom: 15px; word-wrap: break-word;">
+                            <i>
+                            An exception initiated by
+                            <t t-if="object.user_email">
+                                <t t-esc="object.user_name"/> (<t t-esc="object.user_email"/>)
+                            </t>
+                            has been responded to by
+                            <t t-if="object.responder_email">
+                                <t t-esc="object.responder_name"/> (<t t-esc="object.responder_email"/>)
+                            </t>.
+                            <b>SEE</b> details below:
+                            </i>
+                        </td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Event Date</b></td>
+                        <td><t t-esc="object.event_date or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Alert Id</b></td>
+                        <td><t t-esc="object.alert_name or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Title</b></td>
+                        <td><t t-esc="object.title or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Rating</b></td>
+                        <td><t t-esc="object.rating_name or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Department</b></td>
+                        <td><t t-esc="object.staff_dept or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Status</b></td>
+                        <td><t t-esc="object.status_name or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Exception Process</b></td>
+                        <td><t t-esc="object.exception_process or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Exception Process Type</b></td>
+                        <td><t t-esc="object.process_type or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Exception Process Category</b></td>
+                        <td><t t-esc="object.process_category or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Action</b></td>
+                        <td><t t-esc="object.case_action or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td width="350" style="padding: 8px 10px;"><b>Response Message</b></td>
+                        <td><t t-esc="object.response or 'NULL'"/></td>
+                        </tr>
+
+                        <tr>
+                        <td colspan="2" style="padding-top: 40px; border-top: 1px solid #eee;">
+                            <h5 style="margin: 0 0 10px 0;"><b>Required Action</b></h5>
+                            <p style="margin: 0 0 10px 0;"><i>Please review and ensure compliance.</i></p>
+                            <p style="margin: 0;"><i>Please ensure 100% review of this exception.</i></p>
+                        </td>
+                        </tr>
+                    </table>
+
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding-top: 10px;padding-left:10px">
+                        <tr>
+                        <td>
+                            <a t-att-href="''" style="color: #0056b3;">
+                            Login to iComply portal
+                            </a>
+                        </td>
+                        </tr>
+                    </table>
+                    </div>
+            ]]></field>
+        </record>
+
+
+        <record id="case_closure_alert_template" model ="mail.template">
+            <field name="name"> Case Closure Alert</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="subject">Case Closure</field>
+            <field name="email_from">${object.email_from or 'noreply@example.com'}</field>
+            <field name="email_to">${object.email_to or 'noreply@example.com' }</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="email_cc">${object.email_cc or ''}</field>
+            <field name="body_html"><![CDATA[
+                <body style="border: none; margin: 0; padding: 0; font-family: Arial, sans-serif;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding:10px;padding-bottom:40px">
+                        <tr>
+                            <td align="left">
+                               <img src="/compliance_management/static/img/alt_bank_logo.png"
+                                     alt="alt bank logo" width="170"/>
+                                <br/><br/><br/><br/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table width="100%" cellpadding="10" cellspacing="0" border="0">
+                        <tr>
+                            <td colspan="2" style="border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                                <i>
+                                    An exception initiated by
+                                    <t t-if="close_case.get('user_name')">
+                                        <t t-esc="close_case['user_name']"/>
+                                    </t>
+                                    <t t-if="close_case.get('user_email')">
+                                        (<t t-esc="close_case['user_email']"/>)
+                                    </t> has been closed. SEE details below:
+                                </i>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td width="350" style="padding: 8px 10px; vertical-align: top;"><b>Event Date</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('event_date', 'NULL')"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Alert Id</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('alert_name', 'NULL')"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Title</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('title', 'NULL')"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Rating</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('rating_name', 'NULL')"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Department</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('staff_dept', 'NULL')"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Status</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('status_name', 'NULL')"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Exception Process</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('exception_process', 'NULL')"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Exception Process Type</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('process_type', 'NULL')"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Exception Process Category</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('process_category', 'NULL')"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Reason For Close</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('close_remarks', 'NULL').title()"/></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px 10px; vertical-align: top;"><b>Action</b></td>
+                            <td style="padding: 8px 10px;"><t t-esc="close_case.get('case_action', 'NULL').title()"/></td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" style="padding-top: 40px; border-top: 1px solid #eee;">
+                                <h5 style="margin: 0 0 10px 0;"><b>Required Action</b></h5>
+                                <p style="margin: 0 0 10px 0;"><i>Please review and ensure compliance.</i></p>
+                                <p style="margin: 0;"><i>Please ensure 100% review of this exception.</i></p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding-top: 10px; padding-left: 10px;">
+                        <tr>
+                            <td>
+                                <a href="" style="color: #0056b3;">Login to iComply portal</a>
+                            </td>
+                        </tr>
+                    </table>
+            </body>
+            ]]></field>
+        </record>
+    
+    
+    </data>
+</odoo>
