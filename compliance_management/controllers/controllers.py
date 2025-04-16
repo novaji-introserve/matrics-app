@@ -32,60 +32,95 @@ class Compliance(http.Controller):
             return branches_id
 
     @http.route('/dashboard/dynamic_sql', auth='public', type='json')
-    def execute_sql_query_limited_columns(self, sql_query:str, max_columns=7):
-        # query = sql_query.strip().lower()
+    def extract_table_and_domain(self, sql_query: str):
 
-        # # Basic check if it's a SELECT COUNT query
-        # if not query.startswith("select count(") or "from" not in query:
-        #     return None
+        lower_query = sql_query.lower()
+        table = None
+        domain = []
 
-        # # Extract the table name
-        # match_from = re.search(r"from\s+(\w+)", query)
-        # if not match_from:
-        #     return None
-        # table_name = match_from.group(1)
+        # Check for aggregation functions (sum, avg, min, max) in the SELECT clause
+        if re.search(r"\b(?:sum|avg|min|max)\s*\(", lower_query):
+           return None
 
-        # # Extract any existing WHERE clause
-        # match_where = re.search(r"(where\s+.*)", query)
-        # where_clause = ""
-        # if match_where:
-        #     where_clause = " " + match_where.group(1)
-
-        # # Assume we want to retrieve the 'id' column.
-        # # In a real application, you'd likely pass the desired column name as another parameter.
-        # column_to_retrieve = "*"
-
-        # # Construct the new SELECT statement
-        # new_query = f"SELECT {column_to_retrieve} FROM {table_name}{where_clause}"
-
-        # return new_query
-        """Executes SQL and returns a limited number of columns."""
-        try:
-            lower_query = sql_query.lower()
-
-            # Regular expressions to match table names in common SQL clauses
-            from_match = re.search(r'\bfrom\s+([\w.]+)', lower_query)
-            join_match = re.search(r'\bjoin\s+([\w.]+)', lower_query)
-            update_match = re.search(r'\bupdate\s+([\w.]+)', lower_query)
-            into_match = re.search(r'\binto\s+([\w.]+)', lower_query)
-            delete_match = re.search(r'\bdelete\s+from\s+([\w.]+)', lower_query)
-
-            if from_match:
-                return from_match.group(1)
-            elif join_match:
-                return join_match.group(1)
-            elif update_match:
-                return {'error': "Not Allowed"}
-            elif into_match:
-                return {'error': "Not Allowed"}
-            elif delete_match:
-               return {'error': "Not Allowed"}
-            else:
+        # Extract table name (simplified, assumes single primary table or first table in JOIN)
+        from_match = re.search(r"\bfrom\s+([\w.]+)", lower_query)
+        if from_match:
+            table = from_match.group(1)
+        else:
+            join_match = re.search(r"\b(?:inner|left|right|full outer)?\s+join\s+([\w.]+)", lower_query)
+            if join_match:
+                # table = join_match.group(1) # Gets the first table in the JOIN
                 return None
+        
+        # Extract WHERE clause conditions and convert to Odoo domain format
+        where_match = re.search(r"\bwhere\s+(.+)", lower_query)
+        if where_match:
+            condition_string = where_match.group(1)
+            domain = self._parse_condition_to_odoo_domain(condition_string)  
 
 
-        except Exception as e:
-            return {'error': str(e)}
+        return {'table': table, 'domain': domain}
+
+    def _parse_condition_to_odoo_domain(self, condition_string: str):
+
+        python_values = {
+            "null": None,
+            "true": True,
+            "false": False
+        }
+       
+        domain = []
+        # Basic splitting of AND conditions (very simplified)
+        conditions = re.split(r"\s+and\s+", condition_string)
+        for cond in conditions:
+            parts = re.split(r"(is|=|>|<|>=|<=|!=|like|ilike|in|not\s+in)\s+", cond.strip(), maxsplit=1) # Split only once
+            if len(parts) == 3:
+                field, operator, value = parts
+                field = field.strip()
+                operator = operator.strip().lower()
+                value = value.strip()
+
+                # Clean the value
+                if value.startswith("'") and value.endswith("'"):
+                    value = value[1:-1]
+                elif value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1]
+                
+                # Convert SQL operators to Odoo domain operators
+                if operator == '=':
+                    odoo_operator = '='
+                elif operator == 'is':
+                    odoo_operator = '='
+                elif operator == '>':
+                    odoo_operator = '>'
+                elif operator == '<':
+                    odoo_operator = '<'
+                elif operator == '>=':
+                    odoo_operator = '>='
+                elif operator == '<=':
+                    odoo_operator = '<='
+                elif operator == '!=':
+                    odoo_operator = '!='
+                elif operator == 'like':
+                    odoo_operator = 'like'
+                elif operator == 'ilike':
+                    odoo_operator = 'ilike'
+                elif operator == 'in':
+                    odoo_operator = 'in'
+                    value = value.replace("(", '[').replace(")", ']')
+                elif operator == 'not in':
+                    odoo_operator = 'not in'
+                    value = value.replace("(", '[').replace(")", ']')
+                else:
+                    continue # Ignore unsupported operators
+
+                for word in python_values:
+                    if word == value:
+                        value = python_values[word]
+                        break
+
+                domain.append([field, odoo_operator, value])
+        return domain
 
     @http.route('/dashboard/stats', auth='public', type='json')
     def getAllstats(self, cco, branches_id, datepicked, **kw):

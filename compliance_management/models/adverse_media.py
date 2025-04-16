@@ -27,11 +27,11 @@ class AdverseMedia(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     partner_id = fields.Many2one(
-        'res.partner', string='Partner', required=True, index=True)
+        'res.partner', string='Partner', tracking=True, required=True, index=True, ondelete='cascade')
     partner_risk_score = fields.Float(
-        related='partner_id.risk_score', string="Risk Score")
+        related='partner_id.risk_score', tracking=True, string="Risk Score")
     partner_risk_level = fields.Char(
-        related='partner_id.risk_level', string="Risk Level")
+        related='partner_id.risk_level', tracking=True, string="Risk Level")
 
     monitoring_status = fields.Selection([
         ('active', 'Active'),
@@ -43,10 +43,11 @@ class AdverseMedia(models.Model):
         ('weekly', 'Weekly'),
         ('monthly', 'Monthly'),
         # ('yearly', 'Yearly'),
-    ], string='Monitoring Frequency', default='daily', tracking=True)
+    ], string='Monitoring Frequency',default='daily', tracking=True)
 
-    last_scan_date = fields.Datetime(string='Last Scan')
-    next_scan_date = fields.Datetime(string='Next Scan Date', compute='_compute_next_scan_date', store=True)
+    last_scan_date = fields.Datetime(string='Last Scan', tracking=True,)
+    next_scan_date = fields.Datetime(
+        string='Next Scan Date', tracking=True, compute='_compute_next_scan_date', store=True)
     
     keyword_id = fields.Many2many(
         'media.keyword', string='Keywords for Monitoring', required=True,
@@ -85,7 +86,7 @@ class AdverseMedia(models.Model):
         except AccessError:
             # If the user lacks permissions, raise a friendly message
             raise AccessError(
-                "You do not have the necessary permissions to view the Reply Log.")
+                "You do not have the necessary permissions to view the Media Log.")
 
     def _prepare_search_query(self):
         """Prepare search query for NewsAPI"""
@@ -97,6 +98,7 @@ class AdverseMedia(models.Model):
                     "Partner name is required for media screening")
 
             keywords = self.keyword_id.mapped('name')
+            _logger.critical(f"keywords to be used {keywords}")
             if not keywords:
                 _logger.error(
                     f"No keywords configured for record ID: {self.id}")
@@ -221,7 +223,8 @@ class AdverseMedia(models.Model):
                 'content': article['content'],
                 'source_date': fields.Date.from_string(article['publishedAt'][:10]),
                 'risk_score': risk_score,
-                'status': 'new'
+                'status': 'new',
+                # 'matched_keyword': matched_keywords
             })
 
             _logger.info(
@@ -304,6 +307,7 @@ class AdverseMedia(models.Model):
                 f"Error in notification process: {str(e)}", exc_info=True)
             raise ValidationError(f"Failed to send notifications: {str(e)}")
 
+    
     def scan_news_articles(self):
         """Main method to scan for news articles with comprehensive error handling"""
         for record in self:
@@ -327,61 +331,82 @@ class AdverseMedia(models.Model):
                 new_alerts = self.env['adverse.media.alert']
 
                 for article in response_data['articles']:
-                    try:
-                        articles_processed += 1
+                    # Create a savepoint for each article to isolate potential database issues
+                    with self.env.cr.savepoint():
+                        try:
+                            articles_processed += 1
+                            article_title = article.get('title', 'Unknown')
 
-                        # Check for existing alert
-                        existing_alert = self.env['adverse.media.alert'].search([
-                            ('media_id', '=', record.id),
-                            ('name', '=', article['title'])
-                        ])
+                            # Check for existing alert - wrapped in its own savepoint
+                            try:
+                                existing_alert = self.env['adverse.media.alert'].search([
+                                    ('media_id', '=', record.id),
+                                    ('name', '=', article_title)
+                                ], limit=1)  # Adding limit=1 for efficiency
+                            except Exception as db_error:
+                                _logger.error(
+                                    f"Database error checking for existing alert '{article_title}': {str(db_error)}")
+                                continue  # Skip this article and move to the next one
 
-                        if existing_alert:
+                            if existing_alert:
+                                _logger.info(
+                                    f"Skipping duplicate article: {article_title}")
+                                continue
+
+                            # Process article
+                            article_text = f"{article_title} {article.get('description', '')} {article.get('content', '')}"
+
+                            matched_keywords = [
+                                f"{k.name}"
+                                for k in record.keyword_id
+                                if record.partner_id.name.lower() in article_text.lower() and k.name.lower() in article_text.lower()
+                            ]
+
                             _logger.info(
-                                f"Skipping duplicate article: {article['title']}")
+                                f"Matched keywords for '{article_title}': {matched_keywords}")
+
+                            if matched_keywords:
+                                risk_score = record._calculate_risk_score(
+                                    article, matched_keywords)
+                                alert = record._create_alert(
+                                    article, matched_keywords, risk_score)
+
+                                if alert:
+                                    new_alerts |= alert
+                                    alerts_created += 1
+                                    _logger.info(
+                                        f"Created alert for article: {article_title}")
+
+                        except Exception as e:
+                            _logger.error(
+                                f"Error processing article '{article.get('title', 'Unknown')}': {str(e)}", exc_info=True)
+                            # The savepoint will be rolled back automatically for this article
                             continue
 
-                        # Process article
-                        article_text = f"{article['title']} {article['description']} {article['content']}"
+                # Update scan date in a separate transaction
+                try:
+                    with self.env.cr.savepoint():
+                        _logger.info(f"Scan completed for {record.partner_id.name}. "
+                                    f"Processed {articles_processed} articles, created {alerts_created} alerts.")
 
-                        matched_keywords = [
-                            f"{k.name}"
-                            for k in record.keyword_id
-                            if record.partner_id.name.lower() in article_text.lower() and k.name.lower() in article_text.lower()
-                        ]
+                        if new_alerts:
+                            record._notify_officers(new_alerts)
+                            _logger.info(
+                                f"Created {len(new_alerts)} new alerts for {record.partner_id.name}")
 
-                        _logger.info(f"matched keywoods {matched_keywords}")
-
-                        if matched_keywords:
-                            risk_score = record._calculate_risk_score(
-                                article, matched_keywords)
-                            alert = record._create_alert(
-                                article, matched_keywords, risk_score)
-
-                            if alert:
-                                new_alerts |= alert
-                                _logger.info(
-                                    f"Created alert for article: {article['title']}")
-
-                    except Exception as e:
-                        _logger.error(
-                            f"Error processing article {article.get('title', 'Unknown')}: {str(e)}", exc_info=True)
-                        continue
-
-                _logger.info(f"Scan completed for {record.partner_id.name}. "
-                             f"Processed {articles_processed} articles, created {new_alerts} alerts.")
-                if new_alerts:
-                    record._notify_officers(new_alerts)
-                    _logger.info(
-                        f"Created {len(new_alerts)} new alerts for {record.partner_id.name}")
-
-                record.last_scan_date = fields.Datetime.now()
+                        # Update the last scan date
+                        record.write({
+                            'last_scan_date': fields.Datetime.now(),
+                            'next_scan_date': fields.Datetime.now() + timedelta(days=1)
+                        })
+                except Exception as update_error:
+                    _logger.error(
+                        f"Error updating scan dates for {record.partner_id.name}: {str(update_error)}", exc_info=True)
 
             except Exception as e:
                 _logger.error(
                     f"Error scanning news for partner {record.partner_id.name}: {str(e)}", exc_info=True)
                 continue
-    
           
     @api.model
     def scan_adverse_media(self):
@@ -453,11 +478,18 @@ class AdverseMediaAlert(models.Model):
         ('under_review', 'Under Review'),
         ('confirmed', 'Confirmed Risk'),
         ('closed', 'Closed')
-    ], string='Status', default='new', tracking=True)
+    ], string='Status', default='new', tracking=True, inverse='_inverse_status')
     risk_score = fields.Integer(string='Risk Score', default=1, index=True)
     
     risk_score_decoration = fields.Char(
         compute='_compute_risk_score_decoration')
+    _sql_constraints = [
+        ('name_uniq', 'unique (media_id, name)',
+         "Alert title must be unique for each media configuration!"),
+    ]
+    
+    # matched_keyword = fields.Many2one(
+    #     'media.keyword', string='Matched Keyword', ondelete='cascade')
 
     @api.depends('risk_score')
     def _compute_risk_score_decoration(self):
@@ -469,11 +501,46 @@ class AdverseMediaAlert(models.Model):
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
     
+    def _inverse_status(self):
+        """Triggered when status field is changed"""
+        for record in self:
+            _logger.info(
+                f"_inverse_status triggered for record {record.id}, status: {record.status}")
+            if record.status == 'confirmed':
+                self.update_partner_risk()
 
-    _sql_constraints = [
-        ('name_uniq', 'unique (media_id, name)',
-         "Alert title must be unique for each media configuration!"),
-    ]
+
+    def update_partner_risk(self):
+        """ method to update partner risk"""
+        _logger.info(f"update_partner_risk called for records: {self}")
+        for record in self:
+            _logger.info(
+                f"Processing record {record.id}, status: {record.status}, media_id: {record.media_id}, partner_id: {record.media_id.partner_id if record.media_id else None}")
+
+            if record.status == 'confirmed' and record.media_id and record.media_id.partner_id:
+                _logger.info(
+                    f"Conditions met, searching for media_keyword with risk_score: {record.risk_score}")
+                media_keyword = self.env['media.keyword'].search(
+                    [('risk_score', '=', record.risk_score)], limit=1)
+
+                _logger.info(f"Found media_keyword: {media_keyword}")
+                if media_keyword:
+                    _logger.info(
+                        f"Updating partner {record.media_id.partner_id} with risk_score: {media_keyword.risk_score}, risk_level: {media_keyword.media_risk_level}")
+
+                    # Use direct SQL update to avoid triggering write() method
+                    self.env.cr.execute(
+                        """UPDATE res_partner SET risk_score = %s, risk_level = %s 
+                        WHERE id = %s""",
+                        (media_keyword.risk_score, media_keyword.media_risk_level,
+                        record.media_id.partner_id.id)
+                    )
+
+                    # Invalidate cache for the partner
+                    record.media_id.partner_id.invalidate_recordset(
+                        ['risk_score', 'risk_level'])
+
+                    _logger.info(f"Partner updated successfully")
 
 
 class MediaKeyword(models.Model):
@@ -497,6 +564,8 @@ class MediaKeyword(models.Model):
 
     risk_score_decoration = fields.Char(
         compute='_compute_risk_score_decoration')
+    active = fields.Boolean(default=True, tracking=True)
+
     
     
 

@@ -1,0 +1,445 @@
+<odoo>
+
+    <data noupdate="1">
+        <record id="demo_partner_1" model="res.partner">
+            <field name="name">OKANLAWO ABDULRAMHAN</field>
+            <field name="phone">08021318413</field>
+            <field name="street">35 MUSTAPHA STREET OLODI APAPA</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_2" model="res.partner">
+            <field name="name">OJEBODE MOSES</field>
+            <field name="phone">09058328864</field>
+            <field name="street">NO 56 OLADELE PHASE NOT BY PWER BCJ</field>
+            <field name="city">IBADAN</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020001"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_3" model="res.partner">
+            <field name="name">JAME HAPPINESS</field>
+            <field name="phone">08034310</field>
+            <field name="street">49 PIKE STREET HAWLEY BUS STOP</field>
+            <field name="city"></field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_4" model="res.partner">
+            <field name="name">SALN GANIYU</field>
+            <field name="phone">081461795</field>
+            <field name="street">32 SALAMI STREET BOGIJE BUS STOP</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_5" model="res.partner">
+            <field name="name">DANI NMERICHUKWU</field>
+            <field name="phone">08167260</field>
+            <field name="street">NO 2 OGUNBODE STREET IJEGUN</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_doctor" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_6" model="res.partner">
+            <field name="name">OLO IMIEWARIN FRANCHESCA</field>
+            <field name="phone">08023058122</field>
+            <field name="street">1 SURA MOGAJI STREET OBANIKORO</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_miss" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_7" model="res.partner">
+            <field name="name">AMUZAT ADE YUSUF</field>
+            <field name="phone">09039510227</field>
+            <field name="street">2, ILAYE ROUNDABOUT SAGAMU</field>
+            <field name="city">SAGAMU</field>
+            <field name="state_id" ref="compliance_management.state_ng_1"/>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="risk_level">medium</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_8" model="res.partner">
+            <field name="name">SALAMI ABIODIN</field>
+            <field name="phone">08169234961</field>
+            <field name="street">FALEGAN AREA ADO EKITI</field>
+            <field name="city">ADO EKITI</field>
+            <field name="state_id" ref="compliance_management.state_ng_11"/>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_9" model="res.partner">
+            <field name="name">EZE CHIDELA</field>
+            <field name="phone">09034583265</field>
+            <field name="street">NO. 4 BY TRANSFORMER ROAD KARIMO</field>
+            <field name="city"></field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_10" model="res.partner">
+            <field name="name">AMA CLEMENT</field>
+            <field name="phone">08136692210</field>
+            <field name="street">NO 27 IITA ONNE ELEME RIVERS STATE.</field>
+            <field name="city"></field>
+            <field name="state_id" ref="compliance_management.state_ng_13"/>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_11" model="res.partner">
+            <field name="name">GOZIE JOHN</field>
+            <field name="phone">08141166412</field>
+            <field name="street">1 COLLEGE ROAD 33 NKWELLE-EZUNAKO</field>
+            <field name="city"></field>
+            <field name="state_id" ref="compliance_management.state_ng_16"/>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_12" model="res.partner">
+            <field name="name">ADE TUNDE</field>
+            <field name="phone">08095114195</field>
+            <field name="street">SW4109 ADEOYO RINGROAD IBADAN</field>
+            <field name="city">IBADAN</field>
+            <field name="state_id" ref="compliance_management.state_ng_16"/>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_13" model="res.partner">
+            <field name="name">OKUNOLA IDAYAT</field>
+            <field name="phone">08028881799</field>
+            <field name="street">10 BEACH ROADOWUTU AGRIC IKORODU</field>
+            <field name="city">LAGOS</field>
+            <field name="state_id" ref="compliance_management.state_ng_10"/>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_14" model="res.partner">
+            <field name="name">GUOROCHI EEBENEZER</field>
+            <field name="phone">07032697753</field>
+            <field name="street">32 ST PHILIP ROAD OMUMA ABAABIA</field>
+            <field name="city"></field>
+            <field name="state_id" ref="compliance_management.state_ng_10"/>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        <record id="demo_partner_15" model="res.partner">
+            <field name="name">BIACHI EMMANUEL</field>
+            <field name="phone">08112446262</field>
+            <field name="street">NEAR TIMBER MARKET JABI ZHULLU</field>
+            <field name="city"></field>
+            <field name="state_id" ref="compliance_management.state_ng_10"/>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="risk_level">medium</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_partner_16" model="res.partner">
+            <field name="name">OMOREGEE JONATHAN</field>
+            <field name="phone">08102768699</field>
+            <field name="street">3 OWOBU WAY, OFF 1ST UGBOR ROAD.</field>
+            <field name="city">BENIN CITY</field>
+            <field name="state_id" ref="compliance_management.state_ng_1"/>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_data_17" model="res.partner">
+            <field name="name">Olamide Fashola</field>
+            <field name="phone">09064567890</field>
+            <field name="street">4 Fashola Gardens</field>
+            <field name="city">Ikeja</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020052'/>
+            <field name="risk_level">medium</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        
+        <record id="demo_data_18" model="res.partner">
+            <field name="name">Rahima Belloo</field>
+            <field name="phone">08115678901</field>
+            <field name="street">17 Bello Street</field>
+            <field name="city">Zaria</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_miss" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020006'/>
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_data_19" model="res.partner">
+            <field name="name">Chibuzo EzeE</field>
+            <field name="phone">07056789012</field>
+            <field name="street">2 Eze Compound</field>
+            <field name="city">Aba</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020052' />
+            <field name="risk_level">high</field>
+            <field name="risk_score">25.0</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_data_20" model="res.partner">
+            <field name="name">Sadiya Garbar</field>
+            <field name="phone">08087890123</field>
+            <field name="street">20 Garba Road</field>
+            <field name="city">Gombe</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020052' />
+            <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
+            <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_data_21" model="res.partner">
+            <field name="name">Tayo Ade</field>
+            <field name="phone">09018901234</field>
+            <field name="street">5 Adeyemi Street</field>
+            <field name="city">Oshogbo</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020006' />
+            <field name="risk_level">medium</field>
+            <field name="risk_score">14.0</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_data_22" model="res.partner">
+            <field name="name">Samiraa Yakubu</field>
+            <field name="phone">08159012345</field>
+            <field name="street">13 Yakubu Lane</field>
+            <field name="city">Yola</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_data_23" model="res.partner">
+            <field name="name">Tochukwu Ibee</field>
+            <field name="phone">07090123456</field>
+            <field name="street">7 Ibe Avenue</field>
+            <field name="city">Nnewi</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">high</field>
+            <field name="risk_score">25.0</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_data_24" model="res.partner">
+            <field name="name">Ummii Adamu</field>
+            <field name="phone">08041234567</field>
+            <field name="street">24 Adamu Street</field>
+            <field name="city">Damaturu</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+        <record id="demo_data_25" model="res.partner">
+            <field name="name">Wale Soyinka o</field>
+            <field name="phone">09032345678</field>
+            <field name="street">9 Soyinka Drive</field>
+            <field name="city">Abeokuta</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">medium</field>
+            <field name="risk_score">14.0</field>
+            <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        <record id="demo_data_26" model="res.partner">
+            <field name="name">Adama Dialloo</field>
+            <field name="phone">08173456789</field>
+            <field name="street">16 Diallo Close</field>
+            <field name="city">Calabar</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        <record id="demo_data_27" model="res.partner">
+            <field name="name">Beni Okoye</field>
+            <field name="phone">07074567890</field>
+            <field name="street">3 Okoye Street</field>
+            <field name="city">Awka</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">high</field>
+            <field name="risk_score">25</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        <record id="demo_data_28" model="res.partner">
+            <field name="name">Khadija Mani</field>
+            <field name="phone">08055678901</field>
+            <field name="street">10 Mai Road</field>
+            <field name="city">Jalingo</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">low</field>
+            <field name="risk_score">8.0</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        <record id="demo_data_29" model="res.partner">
+            <field name="name">Femi Akinsanya P</field>
+            <field name="phone">09026789012</field>
+            <field name="street">8 Akinsanya Estate</field>
+            <field name="city">Surulere</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">medium</field>
+            <field name="risk_score">14.0</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        <record id="demo_data_30" model="res.partner">
+            <field name="name">Safiya Balaa</field>
+            <field name="phone">08187890123</field>
+            <field name="street">19 Bala Street</field>
+            <field name="city">Sokoto</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        <record id="demo_data_31" model="res.partner">
+            <field name="name">Ifeanyi Okeke G</field>
+            <field name="phone">07018901234</field>
+            <field name="street">4 Okeke Plaza</field>
+            <field name="city">Nsukka</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">high</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        <record id="demo_data_32" model="res.partner">
+            <field name="name">Jamila Isaa</field>
+            <field name="phone">08099012345</field>
+            <field name="street">12 Isa Avenue</field>
+            <field name="city">Katsina</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">low</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+        <record id="demo_data_33" model="res.partner">
+            <field name="name">Segun Ogunleyee</field>
+            <field name="phone">09080123456</field>
+            <field name="street">6 Ogunleye Street</field>
+            <field name="city">Sagamu</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_mister" />
+            <field name="active">False</field>
+            <field name="branch_id" ref='compliance_management.res_branch_0020039' />
+            <field name="risk_level">medium</field>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record>
+
+    </data>
+</odoo>

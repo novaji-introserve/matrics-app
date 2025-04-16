@@ -221,6 +221,34 @@ class Customer(models.Model):
             CREATE OR REPLACE FUNCTION set_partner_defaults_func()
             RETURNS TRIGGER AS $$
             BEGIN
+
+                -- Check if this is demo data (active = FALSE)
+                IF NEW.active IS NOT NULL AND NEW.active = FALSE THEN
+                    -- For demo data: Set defaults but preserve certain fields like risk_level
+                    -- Save the original risk_level value if it exists
+                    DECLARE original_risk_level VARCHAR;
+                    BEGIN
+                        original_risk_level := NEW.risk_level;
+                        
+                        -- Set basic defaults
+                        NEW.create_uid = 1;
+                        NEW.write_uid = 1;
+                        NEW.type = 'contact';
+                        NEW.lang = 'en_US';
+                        NEW.color = 0;
+                        NEW.tz = 'Africa/Lagos';
+                        NEW.internal_category = 'customer';
+                        
+                        
+                        -- Restore the original risk_level if it was set
+                        IF original_risk_level IS NOT NULL THEN
+                            NEW.risk_level := original_risk_level;
+                        END IF;
+                        
+                        RETURN NEW;
+                    END;
+                END IF;
+
                 IF NEW.active IS NULL THEN
                     NEW.active = TRUE;
                 END IF;
@@ -357,7 +385,8 @@ class Customer(models.Model):
                 )
 
                 # Invalidate cache for these fields
-                record.invalidate_cache(['risk_score', 'risk_level'])
+                record.invalidate_recordset(['risk_score', 'risk_level'])
+                # record.invalidate_cache(['risk_score', 'risk_level'])
 
         return result
         
@@ -427,6 +456,20 @@ class Customer(models.Model):
                 return 'high'
         except:
             return 'low'
+        
+    @api.model
+    def update_partner_risk_levels(self):
+        """
+        Cron job to update all partners' risk levels based on their risk scores.
+        This method should be called by a scheduled action.
+        """
+        partners = self.search([])
+        for partner in partners:
+            risk_score = partner.risk_score  # Assuming risk_score is a field on res.partner
+            risk_level = self._get_risk_level_from_score(risk_score)
+            partner.write({'risk_level': risk_level})  # Assuming risk_level is a field on res.partner
+        
+        return True
     
 
     def _get_current_branch(self):
@@ -506,67 +549,174 @@ class Customer(models.Model):
             'context': {'search_default_group_branch': 1}
         }
 
+    # @api.model
+    # def open_customers(self):
+    #     return {
+    #         'name': _('Customers'),
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'res.partner',
+    #         'view_mode': 'tree,form',
+    #         'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
+    #         # 'domain': [('internal_category','=','customer')],
+    #         'context': {'search_default_group_branch': 1}
+    #     }
+        
     @api.model
     def open_customers(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = [('internal_category', '=', 'customer')]
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+                ('internal_category', '=', 'customer')
+            ]
+
         return {
             'name': _('Customers'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
         
     @api.model
     def open_vendors(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = [('internal_category', '=', 'vendor')]
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id]),
+                ('internal_category', '=', 'vendor')
+            ]
+
         return {
             'name': _('Vendors'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','vendor')],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
+
+      
     
     @api.model
     def open_partners(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = [('internal_category', '=', 'partner')]
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id]),
+                ('internal_category', '=', 'partner')
+            ]
+
         return {
             'name': _('Partners'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','partner')],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
+       
     
     @api.model
     def open_correspondents(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = [('internal_category', '=', 'correspondent')]
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id]),
+                ('internal_category', '=', 'correspondent')
+            ]
+
         return {
             'name': _('Correspondents'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','correspondent')],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
+       
     
     @api.model
     def open_respondents(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = [('internal_category', '=', 'respondent')]
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id]),
+                ('internal_category', '=', 'respondent')
+            ]
+
         return {
             'name': _('Respondents'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','respondent')],
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
+        
 
     def get_risk_score(self):
         return self.risk_score
 
     def get_risk_level(self):
         return self.risk_level
+    
+    @api.depends('risk_score')
+    def _compute_risk_level(self):
+        for record in self:
+            if record.risk_score <= LOW_RISK_THRESHOLD:
+                record.risk_level = "low"
+            elif record.risk_score <= MEDIUM_RISK_THRESHOLD:
+                record.risk_level = "medium"
+            else:
+                record.risk_level = "high"
+
+
 
     def get_risk_level_name(self):
         return '%s risk' % (self.risk_level)
@@ -580,6 +730,7 @@ class Customer(models.Model):
         for record in records:
             score = record._get_risk_score_from_plan()
             risk_level = record.compute_risk_level()
+            
 
             # Use direct SQL update to avoid triggering write()
             self.env.cr.execute(

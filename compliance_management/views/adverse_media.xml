@@ -30,7 +30,7 @@
             <form string="Media Watchlist">
 
                 <header>
-                    <button type="object" class="oe_highlight bg-dark" name="open_media_log" string="View Media Log(s)" attrs="{'invisible': [('id', '=', False)]}" />
+                    <button type="object" class="oe_highlight bg-dark" name="open_media_log" string="View Media Log(s)" attrs="{'invisible': [('alert_ids', '=', [])]}" />
                     <button type="object" class="oe_highlight bg-dark" name="scan_news_articles" string="Run Media Screening" attrs="{'invisible': [('id', '=', False)]}" />
                 </header>
 
@@ -47,6 +47,8 @@
                             <field name="partner_risk_score" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'" />
 
                             <field name="monitoring_status"/>
+                           
+                            <field name="alert_ids" invisible="1"/>
 
                         </group>
                         <group>
@@ -101,7 +103,7 @@
 
     <!-- Menu Items -->
     <!-- <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499"/> -->
-    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499"/>
+    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499" groups="group_compliance_chief_compliance_officer"/>
 
     <menuitem id="menu_adverse_media" name="Media Watchlist" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/>
     <!-- <menuitem id="menu_adverse_media" name="Monitoring Configuration" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/> -->

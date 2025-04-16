@@ -24,6 +24,7 @@
         "security/groups.xml",
         "security/ir.model.access.csv",
         "data/res.country.state.csv",
+        "data/settings/email_smtp.xml",
         "data/department.xml",
         "data/res.branch.csv",
         "data/media_keywords.xml",
@@ -31,6 +32,9 @@
         "data/schedules/adverse_media_cron.xml",
         "data/schedules/send_assessment_notification_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
+        "data/schedules/send_assessment_notification_cron.xml",
+        'data/schedules/run_risk_assessment_cron.xml',
+
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/enhanced_due_diligence_assessment_template.xml',
         'data/email_templates/enhanced_due_diligence_approved_template.xml',
@@ -38,6 +42,14 @@
         'data/email_templates/enhanced_due_diligence_cancellation_template.xml',
         'data/email_templates/enhanced_due_diligence_sent_back_template.xml',
         'data/email_templates/enhanced_due_diligence_archived_template.xml',
+        'data/email_templates/enhanced_due_diligence_assessment_template.xml',
+        'data/email_templates/enhanced_due_diligence_approved_template.xml',
+        'data/email_templates/enhanced_due_diligence_review_template.xml',
+        'data/email_templates/enhanced_due_diligence_cancellation_template.xml',
+        'data/email_templates/enhanced_due_diligence_sent_back_template.xml',
+        'data/email_templates/enhanced_due_diligence_archived_template.xml',
+
+        "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
         "views/dynamic_charts.xml",
         "views/configuration.xml",
@@ -57,11 +69,16 @@
         "views/statistics.xml",
         "data/schedules/update_statistic_cron.xml",
         "views/dashboard.xml",
+        "views/card_dashboard_template.xml",
         "views/risk_assessment_plan.xml",
         "views/settings.xml",
         "views/customer_accounts.xml",
         "views/transaction.xml",
-        "views/transaction_screening_rule.xml"
+        "views/transaction_screening_rule.xml",
+        "data/charts.xml",
+        "data/res_partner.xml",
+        
+        
     ],
     # only loaded in demonstration mode
     "demo": [
@@ -94,11 +111,15 @@
             'compliance_management/static/src/components/**/*.js',
             'compliance_management/static/src/components/**/*.xml',
             'compliance_management/static/src/components/**/*.css',
+            
+            'compliance_management/static/src/js/pep_auto_refresh.js',
+            'compliance_management/static/src/xml/pep_auto_refresh.xml',
 
 
             'compliance_management/static/src/img/logov.png',
             'compliance_management/static/img/alt_bank_logo.png',
             'compliance_management/static/img/alt_bank_logo_.png',
+            
 
         ]
     },
