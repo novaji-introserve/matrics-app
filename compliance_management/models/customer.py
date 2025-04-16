@@ -715,6 +715,18 @@ class Customer(models.Model):
                 record.risk_level = "medium"
             else:
                 record.risk_level = "high"
+    
+                
+                
+                
+    @api.onchange('risk_score')
+    def _onchange_risk_score(self):
+        if self.risk_score <= LOW_RISK_THRESHOLD:
+            self.risk_level = "low"
+        elif self.risk_score <= MEDIUM_RISK_THRESHOLD:
+            self.risk_level = "medium"
+        else:
+            self.risk_level = "high"
 
 
 
@@ -740,7 +752,8 @@ class Customer(models.Model):
             )
 
             # Invalidate cache for these fields
-            record.invalidate_cache(['risk_score', 'risk_level'])
+            # record.invalidate_cache(['risk_score', 'risk_level'])
+            record.invalidate_recordset(['risk_score', 'risk_level'])
 
         return True
     

@@ -116,7 +116,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">False</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
-            <field name="risk_level">low</field>
+            <field name="bvn">88494944433</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
@@ -130,7 +130,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">False</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
-            <field name="risk_level">low</field>
+            <field name="bvn">19494999393</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
@@ -144,7 +144,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">False</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
-            <field name="risk_level">low</field>
+            <field name="bvn">994858858539</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
@@ -158,7 +158,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">False</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
-            <field name="risk_level">low</field>
+            <field name="bvn">848590993933</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
@@ -172,7 +172,7 @@
             <field name="title" ref="base.res_partner_title_mister" />
             <field name="active">False</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
-            <field name="risk_level">low</field>
+            <field name="bvn">2019928393</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 

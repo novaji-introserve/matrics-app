@@ -33,8 +33,10 @@
                         <group>
                             <field name="code"/>
                             <!-- <field name="risk_score" widget="percentage"/> -->
-                            <field name="risk_score" widget="slider" step="0.5" min="0.5" max="25" />
-                            <field name="media_risk_level"/>
+                            <field name="risk_score" widget="slider" step="0.5" min="0.5" max="25" on_change="1" />
+                            <!-- <field name="media_risk_level"/> -->
+                            <field string="Risk Level" name="media_risk_level" widget="badge" decoration-danger="media_risk_level == 'high'" decoration-warning="media_risk_level == 'medium'" decoration-success="media_risk_level == 'low'"/>
+
                             <!-- <field name="active" invisible="1"/> -->
 
 

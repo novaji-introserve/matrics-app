@@ -15,12 +15,12 @@
                 <field name="customer_id" optional="show" />
                 <field name="firstname" optional="show" />
                 <field name="lastname" optional="show" />
-                <field name="risk_score" widget="badge" decoration-info="1" />
+                <field name="risk_score" widget="badge" decoration-info="1" on_change="1" />
                 <field name="risk_level" 
                     widget="badge"
                     decoration-danger="risk_level == 'high'"
-                    decoration-warning="risk_level in ('medium')"
-                    decoration-success="risk_level in ('low')"
+                    decoration-warning="risk_level == 'medium'"
+                    decoration-success="risk_level =='low'"
                 />
                 <field name="branch_id" optional="hide" />
                 <field name="registration_date" optional="hide"  />
