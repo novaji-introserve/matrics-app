@@ -49,7 +49,7 @@
         'data/hr/hr_dpt.xml',
         'data/hr/hr_job.xml',
         # 'data/hr/hr_employee.xml',
-        'data/users.xml',
+        # 'data/users.xml',
 
         # menus
         'views/menus.xml',
