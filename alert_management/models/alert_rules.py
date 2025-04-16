@@ -21,7 +21,7 @@ _logger = logging.getLogger(__name__)
 
 class alert_rules(models.Model):
     _name = 'alert.rules'
-    _description = "alert rules for exception management"
+    _description = "Alert Rules"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
     
@@ -325,7 +325,9 @@ class alert_rules(models.Model):
                         "email": ",".join(list(email)) if len(list(email)) > 0 else "techsupport@novajii.com",
                         "email_cc": ",".join(list(emailcc)),
                         "narration": rule.narration,
-                        "name": rule.name
+                        "name": rule.name,
+                        "source": self._description
+
                     
             })
                     

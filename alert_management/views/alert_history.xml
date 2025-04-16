@@ -7,10 +7,10 @@
         <field name="arch" type="xml">
             <tree string="Alert History List" create="false" >
                 <field name="alert_id" string="Alert Reference" />
-                <field name="process_id" />
                 <field name="risk_rating" />
                 <!-- <field name="narration" /> -->
                 <field name="email" />
+                <field name="source" />
                 <field name="last_checked" string="Date"   />
                 <field name="time" string="Time"/>
 
@@ -38,6 +38,15 @@
                 <group>
                     <group string="RISK RATING">
                         <field name="risk_rating" string="Rating"/>
+                    </group>
+        
+                </group>
+                <group>
+                    <group string="">
+                        <field name="process_id" string="Process" attrs="{'invisible': [('process_id', '=', False)]}"/>
+                    </group>
+                    <group string="SOURCE">
+                        <field name="source" string="Source" />
                     </group>
                 </group>
 

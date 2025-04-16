@@ -20,6 +20,7 @@ class alert_history(models.Model):
     email = fields.Char()
     email_cc = fields.Char()
     time = fields.Char(compute='get_time', store=False)
+    source = fields.Char(required=True)
     
     user_in_emails = fields.Boolean(compute='_compute_user_in_emails', search='_search_user_in_emails')
 
@@ -105,4 +106,5 @@ class alert_history(models.Model):
                     'url': url,
                     'target': 'self',
                 }
- 
+    
+    

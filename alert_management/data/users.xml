@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="user_uche" model="res.users">
+            <field name="name">Chimma Ikenna</field>
+            <field name="job_title">Account Officer</field>
+            <field name="login">uche.i@novajii.com</field>
+            <field name="work_phone">+23412345601</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_hanson" model="res.users">
+            <field name="name">Hanson Edet</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">hanson.e@novajii.com</field>
+            <field name="work_phone">+23412345602</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_olumide" model="res.users">
+            <field name="name">Olumide Olatunji</field>
+            <field name="job_title">Chief Executive Officer</field>
+            <field name="login">olumide.o@novajii.com</field>
+            <field name="work_phone">+23412345603</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_timson" model="res.users">
+            <field name="name">Timson Femi</field>
+            <field name="job_title">Chief Financial Officer</field>
+            <field name="login">timson.f@novajii.com</field>
+            <field name="work_phone">+23412345604</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_peace" model="res.users">
+            <field name="name">Peace Obinna</field>
+            <field name="job_title">HR Manager</field>
+            <field name="login">peace.o@novajii.com</field>
+            <field name="work_phone">+23412345605</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_omowunmi" model="res.users">
+            <field name="name">Omowunmi Oladele</field>
+            <field name="job_title">Marketing Manager</field>
+            <field name="login">omowunmi.o@novajii.com</field>
+            <field name="work_phone">+23412345606</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_kayode" model="res.users">
+            <field name="name">Kayode Ogunleye</field>
+            <field name="job_title">Sales Manager</field>
+            <field name="login">jimohkayodeyusuf@gmail.com</field>
+            <field name="work_phone">+23412345607</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_adebayo" model="res.users">
+            <field name="name">Adebayo Olawale</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">adebayo.o@novajii.com</field>
+            <field name="work_phone">+23412345608</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_chioma" model="res.users">
+            <field name="name">Chioma Nwosu</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">chioma.n@novajii.com</field>
+            <field name="work_phone">+23412345609</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_emeka" model="res.users">
+            <field name="name">Emeka Okafor</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">emeka.o@novajii.com</field>
+            <field name="work_phone">+23412345610</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_tunde" model="res.users">
+            <field name="name">Tunde Bakare</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">tunde.b@novajii.com</field>
+            <field name="work_phone">+23412345611</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_folake" model="res.users">
+            <field name="name">Folake Adeyemi</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">folake.a@novajii.com</field>
+            <field name="work_phone">+23412345612</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_segun" model="res.users">
+            <field name="name">Segun Ogunbanjo</field>
+            <field name="job_title">Operations Manager</field>
+            <field name="login">segun.o@novajii.com</field>
+            <field name="work_phone">+23412345613</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_funke" model="res.users">
+            <field name="name">Funke Akindele</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">funke.a@novajii.com</field>
+            <field name="work_phone">+23412345614</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_biodun" model="res.users">
+            <field name="name">Biodun Shobanjo</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">biodun.s@novajii.com</field>
+            <field name="work_phone">+23412345615</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_yetunde" model="res.users">
+            <field name="name">Yetunde Alabi</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">yetunde.a@novajii.com</field>
+            <field name="work_phone">+23412345616</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_damilola" model="res.users">
+            <field name="name">Damilola Adeniyi</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">damilola.a@novajii.com</field>
+            <field name="work_phone">+23412345617</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_ngozi" model="res.users">
+            <field name="name">Ngozi Ekezie</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">ngozi.e@novajii.com</field>
+            <field name="work_phone">+23412345618</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_chinedu" model="res.users">
+            <field name="name">Chinedu Eze</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">chinedu.e@novajii.com</field>
+            <field name="work_phone">+23412345619</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_victoria" model="res.users">
+            <field name="name">Victoria Adekunle</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">victoria.a@novajii.com</field>
+            <field name="work_phone">+23412345620</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_samuel" model="res.users">
+            <field name="name">Samuel Ojo</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">samuel.o@novajii.com</field>
+            <field name="work_phone">+23412345621</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_blessing" model="res.users">
+            <field name="name">Blessing Okonkwo</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">blessing.o@novajii.com</field>
+            <field name="work_phone">+23412345622</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_tosin" model="res.users">
+            <field name="name">Tosin Adegbite</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">tosin.a@novajii.com</field>
+            <field name="work_phone">+23412345623</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_aisha" model="res.users">
+            <field name="name">Aisha Bello</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">aisha.b@novajii.com</field>
+            <field name="work_phone">+23412345624</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_kunle" model="res.users">
+            <field name="name">Kunle Adeleke</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="login">kunle.a@novajii.com</field>
+            <field name="work_phone">+23412345625</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_nneka" model="res.users">
+            <field name="name">Nneka Igwe</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">nneka.i@novajii.com</field>
+            <field name="work_phone">+23412345626</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_yemi" model="res.users">
+            <field name="name">Yemi Adekunle</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">yemi.a@novajii.com</field>
+            <field name="work_phone">+23412345627</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_bola" model="res.users">
+            <field name="name">Bola Tinubu</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">bola.t@novajii.com</field>
+            <field name="work_phone">+23412345628</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_wale" model="res.users">
+            <field name="name">Wale Johnson</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">wale.j@novajii.com</field>
+            <field name="work_phone">+23412345629</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_amina" model="res.users">
+            <field name="name">Amina Ibrahim</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">amina.i@novajii.com</field>
+            <field name="work_phone">+23412345630</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_femi" model="res.users">
+            <field name="name">Femi Adesina</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">femi.a@novajii.com</field>
+            <field name="work_phone">+23412345631</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_habiba" model="res.users">
+            <field name="name">Habiba Mohammed</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">habiba.m@novajii.com</field>
+            <field name="work_phone">+23412345632</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_kehinde" model="res.users">
+            <field name="name">Kehinde Ogunlana</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">kehinde.o@novajii.com</field>
+            <field name="work_phone">+23412345633</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_zainab" model="res.users">
+            <field name="name">Zainab Usman</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">zainab.u@novajii.com</field>
+            <field name="work_phone">+23412345634</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_gbenga" model="res.users">
+            <field name="name">Gbenga Adeboye</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">gbenga.a@novajii.com</field>
+            <field name="work_phone">+23412345635</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_kemi" model="res.users">
+            <field name="name">Kemi Olunloyo</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">kemi.o@novajii.com</field>
+            <field name="work_phone">+23412345636</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_taiwo" model="res.users">
+            <field name="name">Taiwo Ogunlana</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">taiwo.o@novajii.com</field>
+            <field name="work_phone">+23412345637</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_halima" model="res.users">
+            <field name="name">Halima Abubakar</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">halima.a@novajii.com</field>
+            <field name="work_phone">+23412345638</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_tola" model="res.users">
+            <field name="name">Tola Odutola</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">tola.o@novajii.com</field>
+            <field name="work_phone">+23412345639</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_hassan" model="res.users">
+            <field name="name">Hassan Suleiman</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">hassan.s@novajii.com</field>
+            <field name="work_phone">+23412345640</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_mary" model="res.users">
+            <field name="name">Mary Okonkwo</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">mary.o@novajii.com</field>
+            <field name="work_phone">+23412345641</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_ibrahim" model="res.users">
+            <field name="name">Ibrahim Musa</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">ibrahim.m@novajii.com</field>
+            <field name="work_phone">+23412345642</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_fatima" model="res.users">
+            <field name="name">Fatima Aliyu</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">fatima.a@novajii.com</field>
+            <field name="work_phone">+23412345643</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_david" model="res.users">
+            <field name="name">David Oyelowo</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="login">david.o@novajii.com</field>
+            <field name="work_phone">+23412345644</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="user_grace" model="res.users">
+            <field name="name">Grace Okafor</field>
+            <field name="job_title">Software Developer</field>
+            <field name="login">grace.o@novajii.com</field>
+            <field name="work_phone">+23412345645</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="user_umar" model="res.users">
+            <field name="name">Umar Abdullahi</field>
+            <field name="job_title">Accountant</field>
+            <field name="login">umar</field>
+            <field name="work_phone">+2341234545</field>
+            <field name="gender">female</field>
+        </record>
+    </data>
+</odoo>
