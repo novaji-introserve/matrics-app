@@ -17,7 +17,7 @@
     "category": "iComply",
     "version": "0.3",
     # any module necessary for this one to work correctly
-    'depends': ['base', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation'],
+    'depends': ['base', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'alert_management'],
 
     # always loaded
     'data': [
@@ -27,6 +27,9 @@
         "data/settings/email_smtp.xml",
         "data/department.xml",
         "data/res.branch.csv",
+        "data/risk_assessment_control_data.xml",
+        "data/risk_assessment_mitigation.xml",
+        "data/res_risk_implication.xml",
         "data/media_keywords.xml",
         "security/security.xml",
         "data/schedules/adverse_media_cron.xml",
@@ -52,6 +55,7 @@
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
         "views/dynamic_charts.xml",
+        "views/fcra_score.xml",
         "views/configuration.xml",
         "views/edd.xml",
         "views/kyc.xml",
@@ -77,6 +81,9 @@
         "views/transaction_screening_rule.xml",
         "data/charts.xml",
         "data/res_partner.xml",
+        "data/fcra_score.xml",
+
+        
         
         
     ],
