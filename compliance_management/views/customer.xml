@@ -7,8 +7,10 @@
         <field name="arch" type="xml">
             <!-- Update the tree attributes instead of replacing the entire tree -->
             <xpath expr="//tree" position="attributes">
+                <attribute name="sample"/>
                 <attribute name="create">false</attribute>
             </xpath>
+
  
             <!-- Replace the phone field with custom fields -->
             <xpath expr="//field[@name='phone']" position="before">
