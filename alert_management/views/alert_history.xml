@@ -60,7 +60,9 @@
                 </group>
                 <notebook>
                     <page string="Record">
-                        <field name="html_body" widget="html" />
+                        <div style="overflow-x: auto; max-width: 100%;">
+                            <field name="html_body" widget="html" style="max-height: 800px; overflow-y: auto;" />
+                        </div>
                     </page>
                 </notebook>
                </sheet>
