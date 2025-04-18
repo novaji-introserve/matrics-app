@@ -10,7 +10,7 @@
             </tree>
         </field>
     </record>
-    <record id="contacts.action_contacts" model="ir.actions.act_window">
+    <!-- <record id="contacts.action_contacts" model="ir.actions.act_window">
         <field name="name">Customers</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.partner</field>
@@ -25,7 +25,7 @@
                 Track all activities related to your customers
             </p>
         </field>
-    </record>
+    </record> -->
 
     <record model="ir.ui.view" id="partner_inherit_form_view">
         <field name="name">compliance.customer.form.view</field>
@@ -251,7 +251,7 @@
         <field name="code">action = model.open_correspondents()</field>
     </record>
 
-    <menuitem id="base.menu_board_root" name="Dashboards" sequence="260"
+    <!-- <menuitem id="base.menu_board_root" name="Dashboards" sequence="260"
         web_icon="compliance_management,static/description/icon-dashboard.png"
         groups="base.group_user" />
     <menuitem
@@ -270,20 +270,20 @@
         action="contacts.action_contacts"
         groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
         parent="contacts.menu_contacts"
-        sequence="2" />
+        sequence="2" /> -->
     <menuitem
         id="hr.menu_hr_root"
         name="Employees"
         groups="hr.group_hr_manager,hr.group_hr_user"
         web_icon="compliance_management,static/description/icon-employee.png"
         sequence="75" />
-    <menuitem
+    <!-- <menuitem
         id="mail.menu_root_discuss"
         name="Messaging"
         action="mail.action_discuss"
         web_icon="compliance_management,static/description/icon-chat.png"
         groups="base.group_user"
-        sequence="1" />
+        sequence="1" /> -->
     <menuitem
         id="menu_compliance_dd"
         name="Due Diligence"
