@@ -13,7 +13,7 @@ This module customizes the settings page by:
     'author': "Olumide Awodeji (Synth corp)",
     'website': "https://cybercraftsmen.tech",
 
-    'category': 'iComply',
+    'category': 'icomply',
     'version': '1.0.0',
 
     'depends': ['base', 'base_setup', 'web'],
