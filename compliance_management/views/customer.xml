@@ -321,9 +321,9 @@
     </record>
 
     <!-- Override the menu item to use the new action -->
-    <record id="contacts.res_partner_menu_contacts" model="ir.ui.menu">
+    <!-- <record id="contacts.res_partner_menu_contacts" model="ir.ui.menu">
         <field name="action" ref="contacts_action_contacts_inherit"/>
-    </record>
+    </record> -->
 
     <!-- Disable create in tree view -->
     <record id="view_partner_tree_no_create" model="ir.ui.view">

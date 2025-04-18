@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Database Type/Connection Views -->
+    <record id="view_etl_database_type_tree" model="ir.ui.view">
+        <field name="name">etl.database.type.tree</field>
+        <field name="model">etl.database.type</field>
+        <field name="arch" type="xml">
+            <tree string="Database Types">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="driver_module"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_etl_database_type_form" model="ir.ui.view">
+        <field name="name">etl.database.type.form</field>
+        <field name="model">etl.database.type</field>
+        <field name="arch" type="xml">
+            <form string="Database Type">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="driver_module"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Connection and Query Templates">
+                        <!-- Changed from ACE widget to regular text -->
+                        <field name="connection_template" placeholder="e.g., 'Driver={{ODBC Driver 18 for SQL Server}};Server={server};Database={database};UID={username};PWD={password};TrustServerCertificate=yes;'"/>
+                        <field name="query_format" placeholder="e.g., 'SELECT {columns} FROM [{table}]'"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_etl_database_connection_tree" model="ir.ui.view">
+        <field name="name">etl.database.connection.tree</field>
+        <field name="model">etl.database.connection</field>
+        <field name="arch" type="xml">
+            <tree string="Database Connections">
+                <field name="name"/>
+                <field name="db_type_id"/>
+                <field name="server"/>
+                <field name="database"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_etl_database_connection_form" model="ir.ui.view">
+        <field name="name">etl.database.connection.form</field>
+        <field name="model">etl.database.connection</field>
+        <field name="arch" type="xml">
+            <form string="Database Connection">
+                <header>
+                    <button name="action_test_connection" 
+                            string="Test Connection" 
+                            type="object" 
+                            class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="e.g., Production MSSQL Server"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="db_type_id"/>
+                            <field name="db_type_code" invisible="1"/>
+                            <field name="requires_driver" invisible="1"/>
+                            <field name="connection_method" invisible="1"/>
+                            <field name="server"/>
+                            <field name="port"/>
+                        </group>
+                        <group>
+                            <field name="database"/>
+                            <field name="username"/>
+                            <field name="password" password="1"/>
+                        </group>
+                    </group>
+                    <group string="Default Settings">
+                        <field name="is_default_source"/>
+                        <field name="is_default_target"/>
+                    </group>
+                    <group string="Advanced">
+                        <field name="driver_name" 
+                            attrs="{'invisible': [('requires_driver', '=', False)], 
+                                    'required': [('requires_driver', '=', True)]}"
+                            placeholder="ODBC Driver 18 for SQL Server"/>
+                        <field name="connection_options" 
+                            placeholder='{"option1": "value1", "option2": "value2"}'
+                            help="Enter valid JSON format. Example: {'option1': 'value1', 'option2': 'value2'}"/>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Modified ETL Source Table Form View -->
+    <record id="view_etl_source_table_form" model="ir.ui.view">
+        <field name="name">etl.source.table.form</field>
+        <field name="model">etl.source.table</field>
+        <field name="arch" type="xml">
+            <form string="ETL Table Configuration">
+                <header>
+                    <button name="action_test_connection" 
+                            string="Test Connection" 
+                            type="object" 
+                            class="btn-secondary"/>
+                    <button name="action_sync_table" 
+                            string="Sync Now" 
+                            type="object" 
+                            class="oe_highlight"
+                            confirm="Are you sure you want to sync this table now?"/>
+                    <field name="last_sync_status" widget="statusbar"/>
+                    <field name="progress_percentage" widget="progressbar" attrs="{'invisible': [('last_sync_status', '!=', 'running')]}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="e.g., tbl_customer"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="target_table"/>
+                            <field name="primary_key"/>
+                            <field name="batch_size"/>
+                            <field name="is_base_table"/>
+                        </group>
+                        <group>
+                            <field name="category_id"/>
+                            <field name="frequency_id"/>
+                            <field name="last_sync_time"/>
+                            <field name="total_records_synced"/>
+                        </group>
+                    </group>
+                    <group string="Database Connections">
+                        <field name="source_db_connection_id"/>
+                        <field name="target_db_connection_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Column Mappings">
+                            <field name="mapping_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="source_column"/>
+                                    <field name="target_column"/>
+                                    <field name="mapping_type"/>
+                                    <field name="lookup_table" 
+                                        attrs="{'invisible': [('mapping_type', '!=', 'lookup')],
+                                                'required': [('mapping_type', '=', 'lookup')]}"/>
+                                    <field name="lookup_key" 
+                                        attrs="{'invisible': [('mapping_type', '!=', 'lookup')],
+                                                'required': [('mapping_type', '=', 'lookup')]}"/>
+                                    <field name="lookup_value" 
+                                        attrs="{'invisible': [('mapping_type', '!=', 'lookup')],
+                                                'required': [('mapping_type', '=', 'lookup')]}"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Dependencies">
+                            <field name="dependency_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Sync Logs">
+                            <field name="sync_log_ids">
+                                <tree>
+                                    <field name="create_date"/>
+                                    <field name="status"/>
+                                    <field name="total_records"/>
+                                    <field name="new_records"/>
+                                    <field name="updated_records"/>
+                                    <field name="error_message"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Job Information" attrs="{'invisible': [('job_uuid', '=', False)]}">
+                            <group>
+                                <field name="job_uuid" readonly="1"/>
+                                <field name="job_status" readonly="1"/>
+                            </group>
+                            <button name="action_view_jobs" string="View Jobs" type="object" class="oe_highlight" attrs="{'invisible': [('job_uuid', '=', False)]}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Database Type and Connection Actions -->
+    <record id="action_etl_database_type" model="ir.actions.act_window">
+        <field name="name">Database Types</field>
+        <field name="res_model">etl.database.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_etl_database_connection" model="ir.actions.act_window">
+        <field name="name">Database Connections</field>
+        <field name="res_model">etl.database.connection</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>
