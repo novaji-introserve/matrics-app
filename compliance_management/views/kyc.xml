@@ -68,6 +68,7 @@
                             <field name="branch_id" />
                             <field name="account_officer_id" />
                             <field name="bvn" />
+                            <field name="nin" />
                             <field name="identification_type_id" />
                             <field name="identification_number" />
                             <field name="identification_expiry_date" />
