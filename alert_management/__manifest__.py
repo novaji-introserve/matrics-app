@@ -31,14 +31,33 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base',  'mail',],
+    'depends': ['base', 'mail', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/templates.xml',
-        'views/mail_mail_views.xml',
-        'views/views.xml',
+        'views/alert_group.xml',
+        'views/alert_history.xml',
+        'views/alert_rules_view.xml',
+        'views/control_officer.xml',
+        'views/frequency_view.xml',
+        'views/mail_template.xml',
+        'views/sql_view.xml', 
+
+        # demo data
+
+        'data/hr/hr_dpt.xml',
+        'data/hr/hr_job.xml',
+        # 'data/hr/hr_employee.xml',
+        # 'data/users.xml',
+
+        # menus
+        'views/menus.xml',
+
+        # cron job
+        'data/schedule/cron_job.xml',
+        # mail conf
+        'data/email_smtp.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

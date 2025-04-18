@@ -118,24 +118,20 @@ export class ComplianceDashboard extends Component {
     //   ["scope", "=", category],
     // ];
 
-    const response = await this.rpc("/dashboard/dynamic_sql", { sql_query: query });      
+    const response = await this.rpc("/dashboard/dynamic_sql", { sql_query: query });          
         
-    if(response.error){
-      alert(response.error)
-    }else{
-      
-      
-      this.navigate.doAction({
-        type: "ir.actions.act_window",
-        res_model: response.replace(/_/g, "."),
-        name: category,
-        domain: [],
-        views: [
-          [false, "tree"],
-          [false, "form"],
-        ],
-      });
-    }
+    if(!response) return;
+
+    this.navigate.doAction({
+      type: "ir.actions.act_window",
+      res_model: response.table.replace(/_/g, "."),
+      name: `${category[0].toUpperCase()}${category.slice(1,)}`,
+      domain: response.domain,
+      views: [
+        [false, "tree"],
+        [false, "form"],
+      ],
+    });
 
     
   }

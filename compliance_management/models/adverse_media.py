@@ -14,6 +14,7 @@ from requests.exceptions import RequestException, HTTPError, ConnectionError, Ti
 from odoo.modules.module import get_module_resource
 import base64
 import logging
+from .customer import LOW_RISK_THRESHOLD, MEDIUM_RISK_THRESHOLD, HIGH_RISK_THRESHOLD
 
 
 load_dotenv()
@@ -27,7 +28,7 @@ class AdverseMedia(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     partner_id = fields.Many2one(
-        'res.partner', string='Partner',tracking=True, required=True, index=True)
+        'res.partner', string='Partner', tracking=True, required=True, index=True, ondelete='cascade')
     partner_risk_score = fields.Float(
         related='partner_id.risk_score', tracking=True, string="Risk Score")
     partner_risk_level = fields.Char(
@@ -578,3 +579,13 @@ class MediaKeyword(models.Model):
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
+
+    
+    @api.onchange('risk_score')
+    def _onchange_risk_score(self):
+        if self.risk_score <= LOW_RISK_THRESHOLD:
+            self.media_risk_level = "low"
+        elif self.risk_score <= MEDIUM_RISK_THRESHOLD:
+            self.media_risk_level = "medium"
+        else:
+            self.media_risk_level = "high"

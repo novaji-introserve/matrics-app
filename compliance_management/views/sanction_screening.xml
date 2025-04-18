@@ -18,16 +18,17 @@
         <!-- Actions for Blacklist-->
         <record id="action_res_partner_blacklist" model="ir.actions.act_window">
             <field name="name">Black List</field>
-            <field name="res_model">res.partner</field>
-            <field name="view_mode">kanban,tree,form</field>
-            <field name="domain">[('is_blacklist', '=', True)]</field>
+            <field name="res_model">res.partner.blacklist</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
         </record>
 
+        <!-- Actions for Watchlist-->
         <record id="action_res_partner_watchlist" model="ir.actions.act_window">
             <field name="name">Watchlist</field>
-            <field name="res_model">res.partner</field>
-            <field name="view_mode">kanban,tree,form</field>
-            <field name="domain">[('is_watchlist', '=', True)]</field>
+            <field name="res_model">res.partner.watchlist</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
         </record>
 
         <!-- Actions for Greylist-->
@@ -45,7 +46,79 @@
             <field name="type">ir.actions.client</field>
         </record>
 
+
+        <!-- Views for watchlist -->
+        <!-- Tree View -->
+        <record id="view_watchlist_tree" model="ir.ui.view">
+            <field name="name">res.partner.watchlist.tree</field>
+            <field name="model">res.partner.watchlist</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="surname"/>
+                    <field name="first_name"/>
+                    <field name="middle_name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_watchlist_form" model="ir.ui.view">
+            <field name="name">res.partner.watchlist.form</field>
+            <field name="model">res.partner.watchlist</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="surname"/>
+                            <field name="first_name"/>
+                            <field name="middle_name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+
+        <!-- Views for blacklist -->
+         <!-- Tree View -->
+        <record id="view_blacklist_tree" model="ir.ui.view">
+            <field name="name">res.partner.blacklist.tree</field>
+            <field name="model">res.partner.blacklist</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="surname"/>
+                    <field name="first_name"/>
+                    <field name="middle_name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_blacklist_form" model="ir.ui.view">
+            <field name="name">res.partner.blacklist.form</field>
+            <field name="model">res.partner.blacklist</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="surname"/>
+                            <field name="first_name"/>
+                            <field name="middle_name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+
         <!-- Form Views for Global PEP -->
+
         <!-- Views for Global PEP List-->
         <record id="view_res_global_pep_tree" model="ir.ui.view">
             <field name="name">res.pep.tree</field>
@@ -230,13 +303,13 @@
             groups="group_compliance_compliance_officer"
             sequence="10" />
 
-        <menuitem
+        <!-- <menuitem
             id="menu_is_fep"
             action="action_res_partner_fep"
             parent="menu_sanction_screening_root"
             name="FEP List"
             groups="group_compliance_compliance_officer"
-            sequence="20" />
+            sequence="20" /> -->
 
         <menuitem
             id="menu_watchlist"

@@ -1,15 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_res_internal_control_account_monitoring,access_res_internal_control_account_monitoring,internal_control.model_res_internal_control_account_monitoring,base.group_user,1,1,1,1
 access_res_internal_control_fraud_monitoring,access_res_internal_control_fraud_monitoring,internal_control.model_res_internal_control_fraud_monitoring,base.group_user,1,1,1,1
-access_alert_rules,access right alert rules,internal_control.model_alert_rules,base.group_user,1,1,1,1
-access_exception_frequency_rules,access exception frequency rules,internal_control.model_exception_frequency,base.group_user,1,1,1,1
 access_process_category_rules,access process category rules,internal_control.model_process_category,base.group_user,1,1,1,1
 access_process_rules,access process rules,internal_control.model_process,base.group_user,1,1,1,1
-access_internal_control_sql_rule,access internal control sql rules,internal_control.model_process_sql,base.group_user,1,1,1,1
-access_internal_control_alert_history,access internal control alert history,internal_control.model_alert_history,base.group_user,1,1,1,1
 access_internal_control_screening_rule,access internal control screening rules,internal_control.model_res_transaction_screening_rule,base.group_user,1,1,1,1
-access_internal_control_alert_group,access internal control alert group,internal_control.model_alert_group,base.group_user,1,1,1,1
-access_internal_control_officer,access internal control officer,internal_control.model_control_officer,base.group_user,1,1,1,1
 access_res_partner_town,access res partner town,internal_control.model_res_partner_town,base.group_user,1,1,1,1
 access_res_partner_title,access res partner title,internal_control.model_res_partner_title,base.group_user,1,1,1,1
 access_res_country_state,access res country state,internal_control.model_res_country_state,base.group_user,1,1,1,1
