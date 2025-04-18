@@ -286,6 +286,17 @@ class AdverseMedia(models.Model):
                 # Render the template with context
                 template_id = template.with_context(**ctx)
 
+                # Get the rendered HTML content
+                rendered_html = template_id._render_template(
+                    template_id.body_html,
+                    template_id.model,
+                    [self.id],
+                    engine='qweb',
+                    add_context=ctx
+                )[self.id]
+                
+                # _logger.critical(f"Rendered html {rendered_html}")
+
                 # Send email
                 template_id.send_mail(
                     self.id,
