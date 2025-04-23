@@ -1,5 +1,5 @@
 <odoo>
-    <data>
+    <data noupdate="0">
         <!-- Account Types Report -->
         <record id="compliance_customer_account_type_tree" model="ir.ui.view">
             <field name="name">res_partner_account_type_tree</field>
@@ -638,27 +638,91 @@
         </record>
 
         <!-- Menu Items -->
-        <menuitem
+        <!-- <menuitem
             id="hr.menu_hr_root"
             name="Employees"
             groups="compliance_management.group_compliance_chief_compliance_officer"
             web_icon="hr,static/description/icon.svg"
-            sequence="500" />
-        <menuitem name="Settings"
+            sequence="500" /> -->
+
+            <menuitem 
+            id="menu_hr_root" 
+            name="Employees" 
+            groups="compliance_management.group_compliance_chief_compliance_officer"
+            web_icon="hr,static/description/icon.svg" 
+            sequence="500"/>
+
+
+            <menuitem 
+            id="menu_etl_root" 
+            name="ETL Manager" 
+            sequence="100" 
+            web_icon="custom_etl,static/description/icon.png"
+            groups="group_tech_support"/>
+
+            <menuitem 
+            id="link_tracker_menu_main" 
+            name="Link Tracker" 
+             groups="group_tech_support"/>
+          
+            <menuitem 
+            name="Project" 
+            id="menu_main_pm" 
+            groups="group_tech_support" 
+            web_icon="project,static/description/icon.svg" 
+            />
+
+            <menuitem 
+            id="mass_mailing_sms_menu_root" 
+            name="SMS Marketing" 
+            web_icon="mass_mailing_sms,static/description/icon.svg" 
+            groups="group_tech_support"/>
+
+            <menuitem name="Surveys" 
+            id="menu_surveys" 
+            groups="group_tech_support" 
+            web_icon="survey,static/description/icon.svg"/>
+
+            <menuitem 
+            name="Contacts" 
+            id="menu_contacts" 
+            web_icon="contacts,static/description/icon.svg" 
+            groups="group_tech_support"/>
+
+            <menuitem
+             id="menu_queue_job_root" 
+            name="Job Queue" 
+            web_icon="queue_job,static/description/icon.png" 
+            groups="group_tech_support" />
+
+
+
+            <menuitem 
+            id="menu_board_root" 
+            name="Dashboards"
+            web_icon="base,static/description/board.png" 
+            groups="group_tech_support"/>
+
+
+       
+            <menuitem name="Settings"
             id="base.menu_administration"
             web_icon="compliance_management,static/description/icon-settings.png"
             sequence="550"
             groups="compliance_management.group_compliance_chief_compliance_officer" />
-        <menuitem id="base.menu_management" name="Apps" sequence="500"
+        
+            <menuitem id="base.menu_management" name="Apps" sequence="500"
             web_icon="compliance_management,static/description/icon-apps.png"
-            groups="base.group_system" />
-        <menuitem
+            groups="group_tech_support" />
+       
+            <menuitem
             id="menu_compliance_root"
             name="Compliance"
             groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
             web_icon="compliance_management,static/description/icons-compliance.png"
             sequence="-1000" />
-        <menuitem
+     
+            <menuitem
             id="menu_compliance_configuration"
             name="Configuration"
             groups="group_compliance_compliance_officer,base.group_system"
@@ -691,36 +755,40 @@
             sequence="90" />
 
         <menuitem id="menu_customer" name="Customer"
-            parent="menu_compliance_configuration" sequence="90" />
+            parent="menu_compliance_configuration"
+            groups="group_tech_support"/>
 
-        <menuitem
+        <!-- <menuitem
             id="menu_compliance_sector"
             action="action_list_customer_sector"
             parent="menu_customer"
             name="Customer Sectors"
             groups="group_compliance_compliance_officer"
-            sequence="1" />
-        <menuitem
+            sequence="1" /> -->
+       
+            <!-- <menuitem
             id="menu_compliance_customer_tier"
             action="action_list_customer_tier"
             parent="menu_customer"
             name="Customer Tiers"
             groups="group_compliance_compliance_officer"
-            sequence="2" />
-        <menuitem
+            sequence="2" /> -->
+       
+            <!-- <menuitem
             id="menu_compliance_customer_region"
             action="action_list_customer_region"
             parent="menu_customer"
             name="Customer Regions"
             groups="group_compliance_compliance_officer"
-            sequence="3" />
-        <menuitem
+            sequence="3" /> -->
+       
+            <!-- <menuitem
             id="menu_compliance_education_level"
             action="action_list_education_level"
             parent="menu_customer"
             name="Education Levels"
             groups="group_compliance_compliance_officer"
-            sequence="4" />
+            sequence="4" /> -->
 
         <menuitem id="menu_risk_assessment" name="Risk Management"
             parent="menu_compliance_configuration" sequence="100" />

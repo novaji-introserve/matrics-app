@@ -35,7 +35,9 @@ class CustomerEDD(models.Model):
     approved_by = fields.Many2one(comodel_name='res.users', string='Approver', readonly=True)
     customer_id = fields.Many2one(comodel_name='res.partner', string='Customer', index=True)
     responsible_id = fields.Many2one(comodel_name='res.users', string='Responsible User', index=True)
-    risk_score = fields.Float(string='Risk Score', tracking=True)
+    risk_score = fields.Float(
+        # Add a default value
+        string='Risk Score', tracking=True, inverse='_inverse_risk_score', store=True, default=1.0)
     date_approved = fields.Date(string="Date Approved", readonly=True, tracking=True)
     approving_officer_id = fields.Many2one(comodel_name='res.users', string='Approving Officer', tracking=True)
     account_status = fields.Selection(
@@ -348,3 +350,20 @@ class CustomerEDD(models.Model):
                 'sticky': False,
             },
         }
+        
+    def _inverse_risk_score(self):
+        for record in self:
+            # Convert to float first to ensure it's a number
+            try:
+                value = float(record.risk_score)
+                # Cap the value at 25
+                if value > 25:
+                    record.risk_score = 25.0
+                # Ensure it's not below minimum
+                elif value < 0.5:
+                    record.risk_score = 0.5
+            except (ValueError, TypeError):
+                # If conversion fails, set a default value
+                record.risk_score = 1.0
+                
+    

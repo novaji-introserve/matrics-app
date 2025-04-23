@@ -141,8 +141,17 @@ class Customer(models.Model):
     customer_rating = fields.Char(
         string="Customer Rating", required=False, readonly=True)
     active = fields.Boolean(default=True, readonly=True)
+    
     is_greylist = fields.Boolean(
-        string="Is Greylist", default=False, tracking=True)    
+        string="Is Greylist", default=False, tracking=True)   
+    
+    
+      
+    
+    # is_branch_compliance = fields.Boolean(
+    #     string="Is Branch Compliance Officer",
+    #     compute="_compute_is_branch_compliance"
+    # )
      
 
 
@@ -357,7 +366,7 @@ class Customer(models.Model):
             )
 
             # Invalidate cache for these fields
-            record.invalidate_cache(['risk_score', 'risk_level'])
+            record.invalidate_recordset(['risk_score', 'risk_level'])
 
         return records
 
@@ -771,7 +780,7 @@ class Customer(models.Model):
             )
 
             # Invalidate cache for these fields
-            record.invalidate_cache(['risk_score', 'risk_level'])
+            record.invalidate_recordset(['risk_score', 'risk_level'])
 
         return True
         
@@ -838,4 +847,17 @@ class Customer(models.Model):
         for e in self:
             e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
+
+    # @api.model
+    # def _compute_is_branch_compliance(self):
+    #     # Check if the current user belongs to the Chief Compliance Officer group
+    #     # coo_group = self.env.ref(
+    #     #     'compliance_management.group_compliance_chief_compliance_officer')
+
+    #     is_branch_compliance_officer = self.env.ref(
+    #         'compliance_management.group_compliance_branch_compliance_officer')
+    #     # Set domain based on user group
+    #     for record in self:
+    #         record.is_branch_compliance = is_branch_compliance_officer
             
+        
