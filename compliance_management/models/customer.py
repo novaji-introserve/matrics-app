@@ -141,8 +141,14 @@ class Customer(models.Model):
     customer_rating = fields.Char(
         string="Customer Rating", required=False, readonly=True)
     active = fields.Boolean(default=True, readonly=True)
+    
     is_greylist = fields.Boolean(
-        string="Is Greylist", default=False, tracking=True)    
+        string="Is Greylist", default=False, tracking=True)   
+    
+    origin = fields.Selection(string='Data Origin', selection=[('demo', 'Demo Data'), (
+        'test', 'Test Data'), ('prod', 'Production Data')], index=True, readonly=True)
+    
+      
     
     # is_branch_compliance = fields.Boolean(
     #     string="Is Branch Compliance Officer",
