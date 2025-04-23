@@ -12,7 +12,7 @@
             ORDER BY customer_count DESC
             LIMIT 10;
             </field>
-            <field name="color_scheme">default</field>
+            <field name="color_scheme">cool</field>
             <field name="x_axis_field">name</field>
             <field name="y_axis_field">customer_count</field>
             <field name="branch_filter" eval="True"/>
@@ -37,7 +37,7 @@
                     ORDER BY high_risk_customers DESC
                     LIMIT 10
             </field>
-            <field name="color_scheme">rainbow</field>
+            <field name="color_scheme">cool</field>
             <field name="x_axis_field">name</field>
             <field name="y_axis_field">high_risk_customers</field>
             <field name="branch_filter" eval="True"/>
