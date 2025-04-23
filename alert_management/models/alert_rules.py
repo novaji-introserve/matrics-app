@@ -479,13 +479,7 @@ class alert_rules(models.Model):
         template = self.env.ref('alert_management.alert_rules_mail_template')
         
         if template:
-                
-                    
-            # generate random string attached for each alert to be send
-            alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
-                    
-                
-                    
+                             
             attachment = {
                         'name': 'report.csv',
                         'mimetype': 'text/csv',  # The MIME type for CSV files
@@ -499,19 +493,18 @@ class alert_rules(models.Model):
                         
             # record the history
             new_alert_history = self.env['alert.history'].create({
-                        "alert_id": alert_id,
-                        "attachment_data": attachment_id.id,
-                        "attachment_link": f"/web/content/{attachment_id.id}?download=true",
-                        "html_body": table_html,
-                        "alert_rule_id": rule.id,
-                        "process_id": rule.process_id,
-                        "risk_rating": rule.risk_rating,
-                        "last_checked": rule.last_checked,
-                        "email": ",".join([str(e) for e in email]) if email else "techsupport@novajii.com",
-                        "email_cc": ",".join(list(emailcc)),
-                        "narration": rule.narration,
-                        "name": rule.name,
-                        "source": self._description
+                "attachment_data": attachment_id.id,
+                "attachment_link": f"/web/content/{attachment_id.id}?download=true",
+                "html_body": table_html,
+                "ref_id": f"{self._name},{rule.id}",
+                "process_id": rule.process_id,
+                "risk_rating": rule.risk_rating,
+                "last_checked": rule.last_checked,
+                "email": ",".join([str(e) for e in email]) if email else "techsupport@novajii.com",
+                "email_cc": ",".join(list(emailcc)),
+                "narration": rule.narration,
+                "name": rule.name,
+                "source": self._description
 
                     
             })
@@ -522,6 +515,9 @@ class alert_rules(models.Model):
             
                 mail_record = self.env['mail.mail'].browse(mail_id)
 
+                print(mail_record.id)
+                print(mail_record.state)
+
                 if mail_record.state in ["exception", "cancel"]:
                     # Log the failure reason
                     _logger.error(f"Failed to send alert email: {mail_record.failure_reason}")
@@ -529,9 +525,10 @@ class alert_rules(models.Model):
                     if history.exists():
                         history.unlink()
                 else:
+        
                     history = self.env['alert.history'].browse(new_alert_history.id)
-                    history.html_body = mail_record.body_html
-                    history.save()
+                    history.write({'html_body': mail_record.body_html})
+                    
                     
 
                     
