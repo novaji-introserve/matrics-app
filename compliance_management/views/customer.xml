@@ -7,8 +7,10 @@
         <field name="arch" type="xml">
             <!-- Update the tree attributes instead of replacing the entire tree -->
             <xpath expr="//tree" position="attributes">
+                <attribute name="sample"/>
                 <attribute name="create">false</attribute>
             </xpath>
+
  
             <!-- Replace the phone field with custom fields -->
             <xpath expr="//field[@name='phone']" position="before">
@@ -338,9 +340,9 @@
     </record>
 
     <!-- Override the menu item to use the new action -->
-    <record id="contacts.res_partner_menu_contacts" model="ir.ui.menu">
+    <!-- <record id="contacts.res_partner_menu_contacts" model="ir.ui.menu">
         <field name="action" ref="contacts_action_contacts_inherit"/>
-    </record>
+    </record> -->
 
     <!-- Disable create in tree view -->
     <record id="view_partner_tree_no_create" model="ir.ui.view">

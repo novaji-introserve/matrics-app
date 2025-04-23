@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Default Categories -->
+        <record id="etl_category_master" model="etl.category">
+            <field name="name">Master Data</field>
+            <field name="code">master</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="etl_category_customer" model="etl.category">
+            <field name="name">Customer Data</field>
+            <field name="code">customer</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="etl_category_account" model="etl.category">
+            <field name="name">Account Data</field>
+            <field name="code">account</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="etl_category_transaction" model="etl.category">
+            <field name="name">Transaction Data</field>
+            <field name="code">transaction</field>
+            <field name="sequence">40</field>
+        </record>
+        
+        <!-- Default Frequencies -->
+        <record id="etl_frequency_hourly" model="etl.frequency">
+            <field name="name">Hourly</field>
+            <field name="code">hourly</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="etl_frequency_daily" model="etl.frequency">
+            <field name="name">Daily</field>
+            <field name="code">daily</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="etl_frequency_weekly" model="etl.frequency">
+            <field name="name">Weekly</field>
+            <field name="code">weekly</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="sequence">30</field>
+        </record>
+    </data>
+</odoo>
