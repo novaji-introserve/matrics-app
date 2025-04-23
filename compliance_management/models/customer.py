@@ -145,8 +145,6 @@ class Customer(models.Model):
     is_greylist = fields.Boolean(
         string="Is Greylist", default=False, tracking=True)   
     
-    origin = fields.Selection(string='Data Origin', selection=[('demo', 'Demo Data'), (
-        'test', 'Test Data'), ('prod', 'Production Data')], index=True, readonly=True)
     
       
     
