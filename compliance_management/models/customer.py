@@ -570,15 +570,12 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'customer'),
-                      ('partner_share', '=', True )
-                      ]
+            domain = [('internal_category', '=', 'customer')]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'customer'),
-                ('partner_share', '=', True )
+                ('internal_category', '=', 'customer')
                 
 
             ]
@@ -601,17 +598,14 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'vendor'),
-                      ('partner_share', '=', True ),
-
-                      ]
+            domain = [('internal_category', '=', 'vendor')]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'vendor'),
-                ('partner_share', '=', True ),
+                ('internal_category', '=', 'vendor')
+              
             ]
 
         return {
@@ -634,15 +628,13 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'partner'),
-                      ('partner_share', '=', True),]
+            domain = [('internal_category', '=', 'partner')]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'partner'),
-                ('partner_share', '=', True),
+                ('internal_category', '=', 'partner')
             ]
 
         return {
@@ -664,16 +656,13 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'correspondent'),
-                      ('partner_share', '=', True)]
+            domain = [('internal_category', '=', 'correspondent')]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'correspondent'),
-                ('partner_share', '=', True)
-            ]
+                ('internal_category', '=', 'correspondent')]
 
         return {
             'name': _('Correspondents'),
@@ -694,15 +683,14 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'respondent')
-                      ('partner_share', '=', True)]
+            domain = [('internal_category', '=', 'respondent')]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
                 ('internal_category', '=', 'respondent')
-                ('partner_share', '=', True)
+
             ]
 
         return {

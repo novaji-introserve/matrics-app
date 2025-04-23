@@ -33,7 +33,7 @@
         "data/media_keywords.xml",
         "security/security.xml",
         "data/schedules/adverse_media_cron.xml",
-        "data/schedules/send_assessment_notification_cron.xml",
+        # "data/schedules/send_assessment_notification_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
 
         "data/email_templates/adverse_media_alert_template.xml",
@@ -55,7 +55,7 @@
         "data/data.xml",
         "views/risk_assessment.xml",
         # "views/open_sanctions.xml",
-        "views/res_users.xml",
+        # "views/res_users.xml",
         "views/sanction_screening.xml",
         "views/customer.xml",
         "views/statistics.xml",
