@@ -28,6 +28,11 @@ class PepCustomer(models.Model):
            )""")
 
     def action_view_customer_pep(self):
+        # domain = [
+        #     ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
+        #     ('internal_category', '=', 'customer')
+        # ]
+
         return {
             'name': _('Customers matching PEP'),
             'type': 'ir.actions.act_window',
