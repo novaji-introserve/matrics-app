@@ -585,6 +585,8 @@ class Customer(models.Model):
             domain = [
                 ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
                 ('internal_category', '=', 'customer')
+                
+
             ]
 
         return {
@@ -612,6 +614,7 @@ class Customer(models.Model):
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
                 ('internal_category', '=', 'vendor')
+              
             ]
 
         return {
@@ -668,8 +671,7 @@ class Customer(models.Model):
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'correspondent')
-            ]
+                ('internal_category', '=', 'correspondent')]
 
         return {
             'name': _('Correspondents'),
@@ -697,6 +699,7 @@ class Customer(models.Model):
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
                 ('internal_category', '=', 'respondent')
+
             ]
 
         return {
