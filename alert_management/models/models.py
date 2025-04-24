@@ -3,9 +3,9 @@
 # from odoo import models, fields, api
 
 
-# class inactivity_timeout(models.Model):
-#     _name = 'inactivity_timeout.inactivity_timeout'
-#     _description = 'inactivity_timeout.inactivity_timeout'
+# class alert_management(models.Model):
+#     _name = 'alert_management.alert_management'
+#     _description = 'alert_management.alert_management'
 
 #     name = fields.Char()
 #     value = fields.Integer()

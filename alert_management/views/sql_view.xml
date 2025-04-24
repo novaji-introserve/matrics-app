@@ -59,9 +59,6 @@
             <p class="o_view_nocontent_smiling_face">
                 Create new query for exception management.
             </p>
-            <p>
-                write an sql query to fetch data that will be send to system user.
-            </p>
         </field>
     </record>
 

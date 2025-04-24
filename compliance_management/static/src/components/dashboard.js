@@ -74,9 +74,6 @@ export class ComplianceDashboard extends Component {
 
     const atLeft = container.scrollLeft <= 5; // Left end
 
-  
-
-
     if (atRight && !sessionStorage.getItem("user_scroll_left")) {
       this.state.scrollRight = true;
       this.state.scrollLeft = false;
@@ -91,7 +88,7 @@ export class ComplianceDashboard extends Component {
     }
   };
 
-  async displayOdooView(category, query) {
+  async displayOdooView(category, query, branch_filter, branch_field) {
     // const formatDate = (date) => date.toISOString().slice(0, 10);
 
     // let prevDate, currentDate;
@@ -118,9 +115,12 @@ export class ComplianceDashboard extends Component {
     //   ["scope", "=", category],
     // ];
 
-    const response = await this.rpc("/dashboard/dynamic_sql", { sql_query: query });          
+    const response = await this.rpc("/dashboard/dynamic_sql", { sql_query: query, branches_id: this.state.branches_id, cco: this.state.cco });          
         
     if(!response) return;
+
+  
+    
 
     this.navigate.doAction({
       type: "ir.actions.act_window",
