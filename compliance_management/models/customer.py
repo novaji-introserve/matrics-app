@@ -141,8 +141,20 @@ class Customer(models.Model):
     customer_rating = fields.Char(
         string="Customer Rating", required=False, readonly=True)
     active = fields.Boolean(default=True, readonly=True)
+    
     is_greylist = fields.Boolean(
-        string="Is Greylist", default=False, tracking=True)    
+        string="Is Greylist", default=False, tracking=True)   
+    
+    origin = fields.Selection(string='Data Origin', selection=[('demo', 'Demo Data'), (
+        'test', 'Test Data'), ('prod', 'Production Data')], index=True)
+    
+    
+      
+    
+    # is_branch_compliance = fields.Boolean(
+    #     string="Is Branch Compliance Officer",
+    #     compute="_compute_is_branch_compliance"
+    # )
      
 
 
@@ -222,8 +234,8 @@ class Customer(models.Model):
             RETURNS TRIGGER AS $$
             BEGIN
 
-                -- Check if this is demo data (active = FALSE)
-                IF NEW.active IS NOT NULL AND NEW.active = FALSE THEN
+                -- Check if this is demo data (origin = 'demo')
+                IF NEW.origin = 'demo' THEN
                     -- For demo data: Set defaults but preserve certain fields like risk_level
                     -- Save the original risk_level value if it exists
                     DECLARE original_risk_level VARCHAR;
@@ -237,7 +249,7 @@ class Customer(models.Model):
                         NEW.lang = 'en_US';
                         NEW.color = 0;
                         NEW.tz = 'Africa/Lagos';
-                        NEW.internal_category = 'customer';
+                        
                         
                         
                         -- Restore the original risk_level if it was set
@@ -333,7 +345,7 @@ class Customer(models.Model):
             FOR EACH ROW
             EXECUTE FUNCTION set_partner_defaults_after_func();
         """)
-    
+        
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -357,7 +369,7 @@ class Customer(models.Model):
             )
 
             # Invalidate cache for these fields
-            record.invalidate_cache(['risk_score', 'risk_level'])
+            record.invalidate_recordset(['risk_score', 'risk_level'])
 
         return records
 
@@ -576,6 +588,8 @@ class Customer(models.Model):
             domain = [
                 ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
                 ('internal_category', '=', 'customer')
+                
+
             ]
 
         return {
@@ -603,6 +617,7 @@ class Customer(models.Model):
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
                 ('internal_category', '=', 'vendor')
+              
             ]
 
         return {
@@ -659,8 +674,7 @@ class Customer(models.Model):
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'correspondent')
-            ]
+                ('internal_category', '=', 'correspondent')]
 
         return {
             'name': _('Correspondents'),
@@ -688,6 +702,7 @@ class Customer(models.Model):
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
                 ('internal_category', '=', 'respondent')
+
             ]
 
         return {
@@ -771,7 +786,7 @@ class Customer(models.Model):
             )
 
             # Invalidate cache for these fields
-            record.invalidate_cache(['risk_score', 'risk_level'])
+            record.invalidate_recordset(['risk_score', 'risk_level'])
 
         return True
         
@@ -838,4 +853,17 @@ class Customer(models.Model):
         for e in self:
             e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
+
+    # @api.model
+    # def _compute_is_branch_compliance(self):
+    #     # Check if the current user belongs to the Chief Compliance Officer group
+    #     # coo_group = self.env.ref(
+    #     #     'compliance_management.group_compliance_chief_compliance_officer')
+
+    #     is_branch_compliance_officer = self.env.ref(
+    #         'compliance_management.group_compliance_branch_compliance_officer')
+    #     # Set domain based on user group
+    #     for record in self:
+    #         record.is_branch_compliance = is_branch_compliance_officer
             
+        

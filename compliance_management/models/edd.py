@@ -35,7 +35,9 @@ class CustomerEDD(models.Model):
     approved_by = fields.Many2one(comodel_name='res.users', string='Approver', readonly=True)
     customer_id = fields.Many2one(comodel_name='res.partner', string='Customer', index=True)
     responsible_id = fields.Many2one(comodel_name='res.users', string='Responsible User', index=True)
-    risk_score = fields.Float(string='Risk Score', tracking=True)
+    risk_score = fields.Float(
+        # Add a default value
+        string='Risk Score', tracking=True, inverse='_inverse_risk_score', store=True, default=1.0)
     date_approved = fields.Date(string="Date Approved", readonly=True, tracking=True)
     approving_officer_id = fields.Many2one(comodel_name='res.users', string='Approving Officer', tracking=True)
     account_status = fields.Selection(
@@ -134,11 +136,17 @@ class CustomerEDD(models.Model):
             if officer is None or not officer_email:
                 _logger.warning("No valid officer found or officer has no email.")
                 raise ValidationError("No valid officer to send email to.")
+            
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+
+            edd_url = f"{base_url}/web#id={self.id}&model=res.partner.edd&view_type=tree"
+            _logger.info(f"EDD URL: {edd_url}")
 
 
             ctx = {
                 'officer_name': officer.name,
-                'cco': cco_name
+                'cco': cco_name,
+                'edd_url': edd_url,
             }
             _logger.info(f"your officer {officer.name}")
             if to_cco_only:
@@ -166,21 +174,39 @@ class CustomerEDD(models.Model):
             raise ValidationError(f"{template.name}Failed to send notification: {str(e)}")
                 
 
-
-  
     @api.model
-    def cron_send_for_assessment(self):
-        records = self.search([
-                ('status', '=', 'draft'),
-                ('responsible_id', '!=', False),
-                ('create_date', '!=', False)
-            ])
-        for record in records:
-                self._send_email_to_officers(
-                    'compliance_management.enhanced_due_diligence_assessment_template', 
-                    to_cco_only=False,
-                    officer= record
-                )
+    def create(self, vals):
+        _logger.info(f"Creating EDD record with values: {vals}")
+        record = super(CustomerEDD, self).create(vals)
+        _logger.info(f"Created EDD record ID: {record.id}")
+
+        if record.status == 'draft' and record.create_date:
+            _logger.info(f"EDD record is in draft and has create_date — sending email.")
+            record._send_email_to_officers(
+                'compliance_management.enhanced_due_diligence_assessment_template', 
+                to_cco_only=False,
+                officer=record
+            )
+        else:
+            _logger.info("EDD record is not in draft or has no create_date, skipping email.")
+        return record
+ 
+
+
+
+    # @api.model
+    # def cron_send_for_assessment(self):
+    #     records = self.search([
+    #             ('status', '=', 'draft'),
+    #             ('responsible_id', '!=', False),
+    #             ('create_date', '!=', False)
+    #         ])
+    #     for record in records:
+    #             self._send_email_to_officers(
+    #                 'compliance_management.enhanced_due_diligence_assessment_template', 
+    #                 to_cco_only=False,
+    #                 officer= record
+    #             )
                
 
 
@@ -348,3 +374,20 @@ class CustomerEDD(models.Model):
                 'sticky': False,
             },
         }
+        
+    def _inverse_risk_score(self):
+        for record in self:
+            # Convert to float first to ensure it's a number
+            try:
+                value = float(record.risk_score)
+                # Cap the value at 25
+                if value > 25:
+                    record.risk_score = 25.0
+                # Ensure it's not below minimum
+                elif value < 0.5:
+                    record.risk_score = 0.5
+            except (ValueError, TypeError):
+                # If conversion fails, set a default value
+                record.risk_score = 1.0
+                
+    

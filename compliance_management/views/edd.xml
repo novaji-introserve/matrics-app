@@ -87,11 +87,11 @@
                         </group>
 
                         <group>
-                            <field name="approving_officer_id" attrs="{'readonly': [('is_cco', '=', False)], 'required': [('is_cco', '=', False)]}"/>
+                            <field name="approving_officer_id" attrs="{'readonly': [('is_cco', '=', False)], 'required': [('is_cco', '=', True)]}"/>
                         </group>
 
                         <group>
-                            <field name="responsible_id" string="Officer in Charge" attrs="{'readonly': [('is_cco', '=', False)], 'required': [('is_cco', '=', False)]}"/>
+                            <field name="responsible_id" string="Officer in Charge" attrs="{'readonly': [('is_cco', '=', False)], 'required': [('is_cco', '=', True)]}"/>
                             <field name="is_current_user_responsible" invisible="1"/>
                         </group>
 

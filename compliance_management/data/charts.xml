@@ -12,12 +12,13 @@
             ORDER BY customer_count DESC
             LIMIT 10;
             </field>
-            <field name="color_scheme">default</field>
+            <field name="color_scheme">cool</field>
             <field name="x_axis_field">name</field>
             <field name="y_axis_field">customer_count</field>
             <field name="branch_filter" eval="True"/>
             <field name="date_field">rp.create_date</field>
             <field name="branch_field">rb.id</field>
+            <field name="column">6</field>
             <field name="state">active</field>
             <field name="target_model_id" ref="compliance_management.model_res_partner" />
             <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
@@ -37,12 +38,13 @@
                     ORDER BY high_risk_customers DESC
                     LIMIT 10
             </field>
-            <field name="color_scheme">rainbow</field>
+            <field name="color_scheme">cool</field>
             <field name="x_axis_field">name</field>
             <field name="y_axis_field">high_risk_customers</field>
             <field name="branch_filter" eval="True"/>
             <field name="date_field">rp.create_date</field>
             <field name="branch_field">rb.id</field>
+            <field name="column">6</field>
             <field name="state">active</field>
             <field name="target_model_id" ref="compliance_management.model_res_partner"/>
             <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
@@ -68,6 +70,7 @@
             <field name="branch_filter" eval="True"/>
             <field name="date_field">rct.date_created</field>
             <field name="branch_field">rct.branch_id</field>
+            <field name="column">12</field>
             <field name="state">active</field>
              <field name="target_model_id" ref="compliance_management.model_res_customer_transaction" />
            <field name="domain_field_id" ref="compliance_management.field_res_customer_transaction__rule_id"/>

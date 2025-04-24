@@ -29,6 +29,7 @@ class Statistic(models.Model):
     # val = fields.Char(string='Value')
     val = fields.Char(string='Value', compute='_compute_val', store=True, readonly=True)
     narration = fields.Text(string='Narration')
+
   
     
     scope_color = fields.Char()

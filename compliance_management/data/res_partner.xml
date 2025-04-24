@@ -1,6 +1,6 @@
 <odoo>
 
-    <data noupdate="1">
+    <data noupdate="0">
         <record id="demo_partner_1" model="res.partner">
             <field name="name">OKANLAWO ABDULRAMHAN</field>
             <field name="phone">08021318413</field>
@@ -8,9 +8,12 @@
             <field name="city">LAGOS</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
-            <field name="risk_level">low</field>
+            
+            <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
@@ -21,9 +24,12 @@
             <field name="city">IBADAN</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020001"/>
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
+             
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
@@ -34,9 +40,12 @@
             <field name="city"></field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
+             
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
@@ -47,9 +56,12 @@
             <field name="city">LAGOS</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
+             
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
@@ -60,9 +72,12 @@
             <field name="city">LAGOS</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_doctor" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
+             
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
         </record>
 
@@ -73,10 +88,14 @@
             <field name="city">LAGOS</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_miss" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_partner_7" model="res.partner">
@@ -87,10 +106,14 @@
             <field name="state_id" ref="compliance_management.state_ng_1"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
-            <field name="risk_level">medium</field>
+            <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_partner_8" model="res.partner">
@@ -101,10 +124,14 @@
             <field name="state_id" ref="compliance_management.state_ng_11"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_partner_9" model="res.partner">
@@ -114,10 +141,14 @@
             <field name="city"></field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
             <field name="bvn">88494944433</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_partner_10" model="res.partner">
@@ -128,10 +159,14 @@
             <field name="state_id" ref="compliance_management.state_ng_13"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
             <field name="bvn">19494999393</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_partner_11" model="res.partner">
@@ -142,10 +177,14 @@
             <field name="state_id" ref="compliance_management.state_ng_16"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <field name="bvn">994858858539</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_partner_12" model="res.partner">
@@ -156,10 +195,14 @@
             <field name="state_id" ref="compliance_management.state_ng_16"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <field name="bvn">848590993933</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_partner_13" model="res.partner">
@@ -170,10 +213,14 @@
             <field name="state_id" ref="compliance_management.state_ng_10"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">partner</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <field name="bvn">2019928393</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_partner_14" model="res.partner">
@@ -184,10 +231,14 @@
             <field name="state_id" ref="compliance_management.state_ng_10"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">partner</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
         <record id="demo_partner_15" model="res.partner">
             <field name="name">BIACHI EMMANUEL</field>
@@ -197,10 +248,14 @@
             <field name="state_id" ref="compliance_management.state_ng_10"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">partner</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
-            <field name="risk_level">medium</field>
+            <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_partner_16" model="res.partner">
@@ -211,10 +266,14 @@
             <field name="state_id" ref="compliance_management.state_ng_1"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">partner</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_data_17" model="res.partner">
@@ -224,10 +283,14 @@
             <field name="city">Ikeja</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">partner</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020052'/>
-            <field name="risk_level">medium</field>
+            <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
         
         <record id="demo_data_18" model="res.partner">
@@ -237,10 +300,14 @@
             <field name="city">Zaria</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_miss" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">respondent</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020006'/>
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_data_19" model="res.partner">
@@ -250,11 +317,15 @@
             <field name="city">Aba</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">respondent</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020052' />
-            <field name="risk_level">high</field>
+            <!-- <field name="risk_level">high</field> -->
             <field name="risk_score">25.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_data_20" model="res.partner">
@@ -264,11 +335,15 @@
             <field name="city">Gombe</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">respondent</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020052' />
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_data_21" model="res.partner">
@@ -278,11 +353,15 @@
             <field name="city">Oshogbo</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">respondent</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020006' />
-            <field name="risk_level">medium</field>
+            <!-- <field name="risk_level">medium</field> -->
             <field name="risk_score">14.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_data_22" model="res.partner">
@@ -292,11 +371,15 @@
             <field name="city">Yola</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">respondent</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_data_23" model="res.partner">
@@ -306,11 +389,15 @@
             <field name="city">Nnewi</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">respondent</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">high</field>
+            <!-- <field name="risk_level">high</field> -->
             <field name="risk_score">25.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_data_24" model="res.partner">
@@ -320,11 +407,15 @@
             <field name="city">Damaturu</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">respondent</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
         <record id="demo_data_25" model="res.partner">
@@ -334,12 +425,17 @@
             <field name="city">Abeokuta</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">respondent</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">medium</field>
+            <!-- <field name="risk_level">medium</field> -->
             <field name="risk_score">14.0</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
+
         <record id="demo_data_26" model="res.partner">
             <field name="name">Adama Dialloo</field>
             <field name="phone">08173456789</field>
@@ -347,12 +443,17 @@
             <field name="city">Calabar</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">vendor</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
+
         <record id="demo_data_27" model="res.partner">
             <field name="name">Beni Okoye</field>
             <field name="phone">07074567890</field>
@@ -360,12 +461,17 @@
             <field name="city">Awka</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">vendor</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">high</field>
+            <!-- <field name="risk_level">high</field> -->
             <field name="risk_score">25</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
+
         <record id="demo_data_28" model="res.partner">
             <field name="name">Khadija Mani</field>
             <field name="phone">08055678901</field>
@@ -373,12 +479,17 @@
             <field name="city">Jalingo</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">vendor</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
+
         <record id="demo_data_29" model="res.partner">
             <field name="name">Femi Akinsanya P</field>
             <field name="phone">09026789012</field>
@@ -386,12 +497,17 @@
             <field name="city">Surulere</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">vendor</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">medium</field>
+            <!-- <field name="risk_level">medium</field> -->
             <field name="risk_score">14.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
+
         <record id="demo_data_30" model="res.partner">
             <field name="name">Safiya Balaa</field>
             <field name="phone">08187890123</field>
@@ -399,11 +515,16 @@
             <field name="city">Sokoto</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">vendor</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
+
         <record id="demo_data_31" model="res.partner">
             <field name="name">Ifeanyi Okeke G</field>
             <field name="phone">07018901234</field>
@@ -411,11 +532,16 @@
             <field name="city">Nsukka</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">vendor</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">high</field>
+            <!-- <field name="risk_level">high</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
+
         <record id="demo_data_32" model="res.partner">
             <field name="name">Jamila Isaa</field>
             <field name="phone">08099012345</field>
@@ -423,11 +549,16 @@
             <field name="city">Katsina</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">vendor</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">low</field>
+            <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
+
         <record id="demo_data_33" model="res.partner">
             <field name="name">Segun Ogunleyee</field>
             <field name="phone">09080123456</field>
@@ -435,10 +566,14 @@
             <field name="city">Sagamu</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
-            <field name="active">False</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">vendor</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
-            <field name="risk_level">medium</field>
+            <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+            
+
         </record>
 
     </data>

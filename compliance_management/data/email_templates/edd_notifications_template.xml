@@ -10,8 +10,8 @@
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-                    <div style="text-align: center; padding-bottom: 20px;">
-                        <img src="/compliance_management/static/img/alt_bank_logo.png" alt="Company Logo" style="max-width: 150px; height: auto;"/>
+                    <div style="text-align: left; padding-bottom: 20px;">
+                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <p>Dear <t t-out="ctx.get('officer_name')"></t>,</p>
@@ -22,7 +22,7 @@
                     </p>
 
                     <p style="text-align: center; margin: 20px 0;">
-                        <a href="${ctx.get('edd_url', '#')}"
+                        <a t-att-href="ctx.get('edd_url')"
                             style="background-color:#95536c;color:white;padding:10px 20px;text-decoration:none;border-radius:5px; display: inline-block;">
                             View Details
                         </a>
@@ -46,8 +46,8 @@
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-                    <div style="text-align: center; padding-bottom: 20px;">
-                        <img src="/compliance_management/static/img/alt_bank_logo.png" alt="Company Logo" style="max-width: 150px; height: auto;"/>
+                    <div style="text-align: left; padding-bottom: 20px;">
+                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 `
                     <p>Dear <t t-out="ctx.get('cco')"></t>,</p>
@@ -58,7 +58,7 @@
                     </p>
 
                     <p style="text-align: center; margin: 20px 0;">
-                        <a href="${ctx.get('edd_url', '#')}"
+                        <a t-att-href="ctx.get('edd_url')"
                             style="background-color:#95536c;color:white;padding:10px 20px;text-decoration:none;border-radius:5px; display: inline-block;">
                             View Details
                         </a>
@@ -83,8 +83,8 @@
                 <![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
 
-                    <div style="text-align: center; padding-bottom: 20px;">
-                        <img src="/compliance_management/static/img/alt_bank_logo.png" alt="Company Logo" style="max-width: 150px; height: auto;"/>
+                    <div style="text-align: left; padding-bottom: 20px;">
+                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <!-- Email Content -->
@@ -98,7 +98,7 @@
 
                         <!-- Button -->
                         <p style="text-align: center; margin: 20px 0;">
-                        <a href="${ctx.get('edd_url', '#')}"
+                        <a t-att-href="ctx.get('edd_url')"
                             style="background-color:#95536c;color:white;padding:10px 20px;text-decoration:none;border-radius:5px; display: inline-block;">
                             View Details
                         </a>
@@ -126,9 +126,9 @@
             <field name="body_html">
                 <![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-                    <div style="text-align: center; padding-bottom: 20px;">
+                    <div style="text-align: left; padding-bottom: 20px;">
                      
-                        <img src="/compliance_management/static/img/alt_bank_logo.png" alt="Company Logo" style="max-width: 150px; height: auto;"/>
+                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <p>Dear <t t-out="ctx.get('cco')"></t>,</p>
@@ -140,7 +140,7 @@
 
                     <!-- Button -->
                     <p style="text-align: center; margin: 20px 0;">
-                        <a href="${ctx.get('edd_url', '#')}"
+                        <a t-att-href="ctx.get('edd_url')"
                             style="background-color:#95536c;color:white;padding:10px 20px;text-decoration:none;border-radius:5px; display: inline-block;">
                             View Details
                         </a>
@@ -168,9 +168,9 @@
             <field name="body_html">
                 <![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-                    <div style="text-align: center; padding-bottom: 20px;">
+                    <div style="text-align: left; padding-bottom: 20px;">
                       
-                         <img src="/compliance_management/static/img/alt_bank_logo.png" alt="Company Logo" style="max-width: 150px; height: auto;"/>
+                         <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <p>Dear <t t-out="ctx.get('officer_name')"></t>,</p> 
@@ -182,7 +182,7 @@
 
                     <!-- Button -->
                     <p style="text-align: center; margin: 20px 0;">
-                        <a href="${ctx.get('edd_url', '#')}"
+                        <a t-att-href="ctx.get('edd_url')"
                             style="background-color:#95536c;color:white;padding:10px 20px;text-decoration:none;border-radius:5px; display: inline-block;">
                             View Details
                         </a>
@@ -209,9 +209,9 @@
             <field name="body_html">
                 <![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-                    <div style="text-align: center; padding-bottom: 20px;">
+                    <div style="text-align: left; padding-bottom: 20px;">
                      
-                        <img src="/compliance_management/static/img/alt_bank_logo.png" alt="Company Logo" style="max-width: 150px; height: auto;"/>
+                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <p>Dear <t t-out="ctx.get('cco')"></t>,</p>
@@ -223,7 +223,7 @@
 
                     <!-- View Details Button -->
                     <p style="text-align: center; margin: 20px 0;">
-                        <a href="${ctx.get('edd_url', '#')}"
+                        <a t-att-href="ctx.get('edd_url')"
                             style="background-color:#95536c;color:white;padding:10px 20px;text-decoration:none;border-radius:5px; display: inline-block;">
                             View Details
                         </a>

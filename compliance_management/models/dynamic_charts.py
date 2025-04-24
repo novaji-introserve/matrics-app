@@ -32,7 +32,7 @@ class ResCharts(models.Model):
         ('cool', 'Cool Colors'),
         ('warm', 'Warm Colors'),
         ('rainbow', 'Rainbow'),
-    ], string="Color Scheme", default='default')
+    ], string="Color Scheme", default='cool')
     
     x_axis_field = fields.Char('X-Axis Field', help="Column name to use for X-axis labels", required=True)
     y_axis_field = fields.Char('Y-Axis Field', help="Column name to use for Y-axis values",required=True)

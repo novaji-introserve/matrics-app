@@ -1,16 +1,24 @@
 from odoo import models, fields, api
 from datetime import datetime
+import time
+import uuid
 class alert_history(models.Model):
     _name = 'alert.history'
     _description = "alert history"
     _rec_name = "alert_id"
     _order = 'id desc'
 
-    alert_id = fields.Char(string="alert_id", required=True)
+    alert_id = fields.Char(string="alert_id", required=True, index=True, default=lambda self: self._generate_alert_id())
     attachment_data = fields.Char()
     attachment_link = fields.Char()
     html_body = fields.Html(string="html body")
-    alert_rule_id = fields.Many2one("alert.rules")
+    ref_id = fields.Reference(selection=[
+        ('alert.rules', 'Alert Rules'),
+        ('adverse.media', 'Adverse Media'),
+        ('res.partner.edd', 'EDD')
+        ],
+        string='Alert Source'
+    )
     last_checked = fields.Char()
     risk_rating = fields.Char()
     process_id = fields.Char()
@@ -23,6 +31,11 @@ class alert_history(models.Model):
     source = fields.Char(required=True)
     
     user_in_emails = fields.Boolean(compute='_compute_user_in_emails', search='_search_user_in_emails')
+
+    @api.model
+    def _generate_alert_id(self):
+        """Generates a unique Alert ID."""
+        return f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
 
     @api.depends('email', 'email_cc')
     def _compute_user_in_emails(self):
