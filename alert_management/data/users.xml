@@ -4,7 +4,7 @@
         <record id="user_uche" model="res.users">
             <field name="name">Chimma Ikenna</field>
             <field name="job_title">Account Officer</field>
-            <field name="login">uche.i@novajii.com</field>
+            <field name="login">uche.l@novajii.com</field>
             <field name="work_phone">+23412345601</field>
             <field name="gender">male</field>
         </record>
@@ -20,7 +20,7 @@
         <record id="user_olumide" model="res.users">
             <field name="name">Olumide Olatunji</field>
             <field name="job_title">Chief Executive Officer</field>
-            <field name="login">olumide.o@novajii.com</field>
+            <field name="login">olumide.a@novajii.com</field>
             <field name="work_phone">+23412345603</field>
             <field name="gender">male</field>
         </record>
