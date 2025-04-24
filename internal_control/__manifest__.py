@@ -18,22 +18,12 @@
     'version': '0.3',
 
     # any module necessary for this one to work correctly
-<<<<<<< HEAD
-    'depends': ['icomply_dashboard', 'compliance_management', 'bi_sql_editor', 'psql_query_execute'],
-=======
     'depends': ['icomply_dashboard', 'compliance_management', 'bi_sql_editor', 'psql_query_execute', 'alert_management'],
->>>>>>> alert_module
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         # 'views/actions.xml',
-<<<<<<< HEAD
-        'views/alert_rules_view.xml',
-        'views/alert_group.xml',
-        'views/alert_history.xml',
-=======
->>>>>>> alert_module
         # 'views/branch_view.xml',
         # 'views/account_monitoring_views.xml',
         'views/screen_rules_cron_job.xml',
@@ -43,21 +33,10 @@
         'views/customer.xml',
         'views/customer_account.xml',
         'views/tinymce.xml',
-<<<<<<< HEAD
-        'views/mail_template.xml',
-        'views/fraud_monitoring_views.xml',
-        'views/frequency_view.xml',
-        'views/process_view.xml',
-        'views/process_category_view.xml',        
-        # 'views/department.xml',
-        'views/control_officer.xml',
-        'views/sql_view.xml', 
-=======
         'views/fraud_monitoring_views.xml',
         'views/process_view.xml',
         'views/process_category_view.xml',        
         # 'views/department.xml',
->>>>>>> alert_module
         'views/user_profile.xml',
         'views/emplpyee.xml',
         'views/sql_panel.xml', 
@@ -66,11 +45,7 @@
         
      
         # cron job
-<<<<<<< HEAD
-        'data/schedule/cron_job.xml',
-=======
         
->>>>>>> alert_module
         'data/schedule/cron_trans_screening.xml',
         'data/schedule/cron_branch_sync.xml',
         'data/schedule/account_trans_metrics.xml',

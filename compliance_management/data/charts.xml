@@ -18,6 +18,7 @@
             <field name="branch_filter" eval="True"/>
             <field name="date_field">rp.create_date</field>
             <field name="branch_field">rb.id</field>
+            <field name="column">6</field>
             <field name="state">active</field>
             <field name="target_model_id" ref="compliance_management.model_res_partner" />
             <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
@@ -43,6 +44,7 @@
             <field name="branch_filter" eval="True"/>
             <field name="date_field">rp.create_date</field>
             <field name="branch_field">rb.id</field>
+            <field name="column">6</field>
             <field name="state">active</field>
             <field name="target_model_id" ref="compliance_management.model_res_partner"/>
             <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
@@ -68,6 +70,7 @@
             <field name="branch_filter" eval="True"/>
             <field name="date_field">rct.date_created</field>
             <field name="branch_field">rct.branch_id</field>
+            <field name="column">12</field>
             <field name="state">active</field>
              <field name="target_model_id" ref="compliance_management.model_res_customer_transaction" />
            <field name="domain_field_id" ref="compliance_management.field_res_customer_transaction__rule_id"/>

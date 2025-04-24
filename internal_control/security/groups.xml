@@ -13,10 +13,7 @@
     <field name="comment">Tech support oversees the internal configuation</field>
     <field name="category_id" ref="internal_control.module_support_internal_control" />
 </record>
-<<<<<<< HEAD
-=======
 
 
 
->>>>>>> alert_module
 </odoo>

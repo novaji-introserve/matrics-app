@@ -226,8 +226,8 @@ class Customer(models.Model):
             RETURNS TRIGGER AS $$
             BEGIN
 
-                -- Check if this is demo data (origin = demo)
-                IF NEW.origin = demo THEN
+                -- Check if this is demo data (origin = 'demo')
+                IF NEW.origin = 'demo' THEN
                     -- For demo data: Set defaults but preserve certain fields like risk_level
                     -- Save the original risk_level value if it exists
                     DECLARE original_risk_level VARCHAR;
