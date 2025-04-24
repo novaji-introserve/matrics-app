@@ -27,7 +27,7 @@ Technical Information:
     'author': "Olumide Awodeji (Synth corp)",
     'website': "https://cybercraftsmen.tech",
     
-    'category': 'Technical',
+    'category': 'icomply',
     'version': '1.0.0',
     
     'depends': ['base', 'web'],

@@ -17,7 +17,7 @@
     "category": "iComply",
     "version": "0.3",
     # any module necessary for this one to work correctly
-    'depends': ['base', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'alert_management'],
+    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification', 'alert_management' ],
 
     # always loaded
     'data': [
@@ -33,24 +33,12 @@
         "data/media_keywords.xml",
         "security/security.xml",
         "data/schedules/adverse_media_cron.xml",
-        "data/schedules/send_assessment_notification_cron.xml",
-        'data/schedules/run_risk_assessment_cron.xml',
-        "data/schedules/send_assessment_notification_cron.xml",
+        # "data/schedules/send_assessment_notification_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
 
         "data/email_templates/adverse_media_alert_template.xml",
-        'data/email_templates/enhanced_due_diligence_assessment_template.xml',
-        'data/email_templates/enhanced_due_diligence_approved_template.xml',
-        'data/email_templates/enhanced_due_diligence_review_template.xml',
-        'data/email_templates/enhanced_due_diligence_cancellation_template.xml',
-        'data/email_templates/enhanced_due_diligence_sent_back_template.xml',
-        'data/email_templates/enhanced_due_diligence_archived_template.xml',
-        'data/email_templates/enhanced_due_diligence_assessment_template.xml',
-        'data/email_templates/enhanced_due_diligence_approved_template.xml',
-        'data/email_templates/enhanced_due_diligence_review_template.xml',
-        'data/email_templates/enhanced_due_diligence_cancellation_template.xml',
-        'data/email_templates/enhanced_due_diligence_sent_back_template.xml',
-        'data/email_templates/enhanced_due_diligence_archived_template.xml',
+        'data/email_templates/edd_notifications_template.xml',
+        'data/email_templates/case_alert_template.xml',
 
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",

@@ -14,6 +14,7 @@ from requests.exceptions import RequestException, HTTPError, ConnectionError, Ti
 from odoo.modules.module import get_module_resource
 import base64
 import logging
+from .customer import LOW_RISK_THRESHOLD, MEDIUM_RISK_THRESHOLD, HIGH_RISK_THRESHOLD
 
 
 load_dotenv()
@@ -43,12 +44,12 @@ class AdverseMedia(models.Model):
         ('weekly', 'Weekly'),
         ('monthly', 'Monthly'),
         # ('yearly', 'Yearly'),
-    ], string='Monitoring Frequency',default='daily', tracking=True)
+    ], string='Monitoring Frequency', default='daily', tracking=True)
 
     last_scan_date = fields.Datetime(string='Last Scan', tracking=True,)
     next_scan_date = fields.Datetime(
         string='Next Scan Date', tracking=True, compute='_compute_next_scan_date', store=True)
-    
+
     keyword_id = fields.Many2many(
         'media.keyword', string='Keywords for Monitoring', required=True,
         tracking=True, index=True,        default=lambda self: self._default_keywords())
@@ -58,11 +59,11 @@ class AdverseMedia(models.Model):
 
     risk_score_decoration = fields.Char(
         compute='_compute_risk_score_decoration')
-    
+
     def _default_keywords(self):
         """Return all records from media.keyword as default value."""
         return self.env['media.keyword'].search([]).ids
-    
+
     @api.depends('partner_risk_score')
     def _compute_risk_score_decoration(self):
         for record in self:
@@ -72,7 +73,6 @@ class AdverseMedia(models.Model):
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
-
 
     def open_media_log(self):
         try:
@@ -285,17 +285,59 @@ class AdverseMedia(models.Model):
                 # Render the template with context
                 template_id = template.with_context(**ctx)
 
+                # Get the rendered HTML content
+                rendered_html = template_id._render_template(
+                    template_id.body_html,
+                    template_id.model,
+                    [self.id],
+                    engine='qweb',
+                    add_context=ctx
+                )[self.id]
+
+                risk_scores = new_alerts.mapped('risk_score')
+                highest_risk_score = max(risk_scores) if risk_scores else 0
+
+                # Determine risk level based on the highest risk score
+                alert_risk_level = None
+                if highest_risk_score <= LOW_RISK_THRESHOLD:
+                    alert_risk_level = "low"
+                elif highest_risk_score <= MEDIUM_RISK_THRESHOLD:
+                    alert_risk_level = "medium"
+                else:
+                    alert_risk_level = "high"
+
+                _logger.critical(
+                    f"Rendered html {rendered_html} /n .. Model name {self._description}.. /n Record id  {self.id}  ../n  new alert records to determine risk level {new_alerts}  ..highest risk score {highest_risk_score}  official risk level {alert_risk_level}")
+
                 # Send email
-                template_id.send_mail(
+                email_result = template_id.send_mail(
                     self.id,
                     force_send=True,
+                    raise_exception=True,
                     email_values={
                         'email_to': officers_email,
                         'email_from': email_from,
                     }
                 )
-                _logger.info(
-                    f"Consolidated notification sent to officers ({officers_email})")
+
+                mail = self.env['mail.mail'].browse(email_result)
+                if mail.state == 'sent':
+                    # insert into alert history table
+                    self.env['alert.history'].sudo(flag=True).create({
+                        'alert_id': self.id,  # Or whatever ID you want to reference
+                        'html_body': rendered_html,
+                        'attachment_data':  None,
+                        'attachment_link':  None,
+                        'last_checked': fields.Datetime.now(),
+                        'risk_rating': alert_risk_level if alert_risk_level else 'low',
+                        'process_id': None,
+                        'source': self._description,
+                        'date_created': fields.Datetime.now(),
+                        'email': officers_email
+                        # Include other fields as needed
+                    })
+                    _logger.info(
+                        f"Consolidated notification sent to officers ({officers_email})")
 
             except Exception as e:
                 _logger.error(
@@ -307,7 +349,6 @@ class AdverseMedia(models.Model):
                 f"Error in notification process: {str(e)}", exc_info=True)
             raise ValidationError(f"Failed to send notifications: {str(e)}")
 
-    
     def scan_news_articles(self):
         """Main method to scan for news articles with comprehensive error handling"""
         for record in self:
@@ -387,7 +428,7 @@ class AdverseMedia(models.Model):
                 try:
                     with self.env.cr.savepoint():
                         _logger.info(f"Scan completed for {record.partner_id.name}. "
-                                    f"Processed {articles_processed} articles, created {alerts_created} alerts.")
+                                     f"Processed {articles_processed} articles, created {alerts_created} alerts.")
 
                         if new_alerts:
                             record._notify_officers(new_alerts)
@@ -407,33 +448,34 @@ class AdverseMedia(models.Model):
                 _logger.error(
                     f"Error scanning news for partner {record.partner_id.name}: {str(e)}", exc_info=True)
                 continue
-          
+
     @api.model
     def scan_adverse_media(self):
         """Cron job method to scan adverse media based on frequency"""
         current_time = fields.Datetime.now()
-        
+
         # Find records that are active and due for scanning
         records = self.env['adverse.media'].search([
             ('monitoring_status', '=', 'active'),
             ('next_scan_date', '<=', current_time)
         ])
-        
+
         for record in records:
             try:
-                _logger.info(f"Starting scan for partner: {record.partner_id.name}")
+                _logger.info(
+                    f"Starting scan for partner: {record.partner_id.name}")
                 record.scan_news_articles()
-                
+
                 # Update last scan date after successful scan
                 record.write({
                     'last_scan_date': current_time
                 })
                 # next_scan_date will be automatically computed
-                
+
             except Exception as e:
-                _logger.error(f"Error scanning news for {record.partner_id.name}: {str(e)}")
-                           
-                              
+                _logger.error(
+                    f"Error scanning news for {record.partner_id.name}: {str(e)}")
+
     @api.depends('last_scan_date', 'monitoring_frequency')
     def _compute_next_scan_date(self):
         """Compute the next scan date based on frequency and last scan"""
@@ -441,9 +483,9 @@ class AdverseMedia(models.Model):
             if not record.last_scan_date:
                 record.next_scan_date = fields.Datetime.now()
                 continue
-                
+
             last_scan = fields.Datetime.from_string(record.last_scan_date)
-            
+
             if record.monitoring_frequency == 'daily':
                 next_scan = last_scan + timedelta(days=1)
             elif record.monitoring_frequency == 'weekly':
@@ -451,9 +493,11 @@ class AdverseMedia(models.Model):
             elif record.monitoring_frequency == 'monthly':
                 # Add one month while handling month end cases
                 next_month = last_scan.replace(day=1) + timedelta(days=32)
-                next_scan = next_month.replace(day=min(last_scan.day, (next_month.replace(day=1) - timedelta(days=1)).day))
-            
+                next_scan = next_month.replace(
+                    day=min(last_scan.day, (next_month.replace(day=1) - timedelta(days=1)).day))
+
             record.next_scan_date = fields.Datetime.to_string(next_scan)
+
 
 class AdverseMediaAlert(models.Model):
     _name = 'adverse.media.alert'
@@ -480,14 +524,14 @@ class AdverseMediaAlert(models.Model):
         ('closed', 'Closed')
     ], string='Status', default='new', tracking=True, inverse='_inverse_status')
     risk_score = fields.Integer(string='Risk Score', default=1, index=True)
-    
+
     risk_score_decoration = fields.Char(
         compute='_compute_risk_score_decoration')
     _sql_constraints = [
         ('name_uniq', 'unique (media_id, name)',
          "Alert title must be unique for each media configuration!"),
     ]
-    
+
     # matched_keyword = fields.Many2one(
     #     'media.keyword', string='Matched Keyword', ondelete='cascade')
 
@@ -500,7 +544,7 @@ class AdverseMediaAlert(models.Model):
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
-    
+
     def _inverse_status(self):
         """Triggered when status field is changed"""
         for record in self:
@@ -508,7 +552,6 @@ class AdverseMediaAlert(models.Model):
                 f"_inverse_status triggered for record {record.id}, status: {record.status}")
             if record.status == 'confirmed':
                 self.update_partner_risk()
-
 
     def update_partner_risk(self):
         """ method to update partner risk"""
@@ -533,7 +576,7 @@ class AdverseMediaAlert(models.Model):
                         """UPDATE res_partner SET risk_score = %s, risk_level = %s 
                         WHERE id = %s""",
                         (media_keyword.risk_score, media_keyword.media_risk_level,
-                        record.media_id.partner_id.id)
+                         record.media_id.partner_id.id)
                     )
 
                     # Invalidate cache for the partner
@@ -566,9 +609,6 @@ class MediaKeyword(models.Model):
         compute='_compute_risk_score_decoration')
     active = fields.Boolean(default=True, tracking=True)
 
-    
-    
-
     @api.depends('risk_score')
     def _compute_risk_score_decoration(self):
         for record in self:
@@ -578,3 +618,12 @@ class MediaKeyword(models.Model):
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
+
+    @api.onchange('risk_score')
+    def _onchange_risk_score(self):
+        if self.risk_score <= LOW_RISK_THRESHOLD:
+            self.media_risk_level = "low"
+        elif self.risk_score <= MEDIUM_RISK_THRESHOLD:
+            self.media_risk_level = "medium"
+        else:
+            self.media_risk_level = "high"
