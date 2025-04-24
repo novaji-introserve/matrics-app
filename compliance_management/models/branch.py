@@ -13,6 +13,7 @@ class Branch(models.Model):
     
     name = fields.Char(string="Branch")
     code = fields.Char(string="Code")
+    co_code = fields.Char(string="Co-Code")
     users = fields.Many2many(
         'res.users', 'res_branch_users_rel', 'branch_id', 'user_id', required=False)
     region = fields.Char(string="Region", required=False)
