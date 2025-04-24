@@ -2,6 +2,7 @@
 from . import transaction_monitoring
 from . import account_monitoring
 from . import fraud_monitoring
+<<<<<<< HEAD
 from . import alert_group
 from . import alert_rules
 from . import exception_frequency
@@ -10,11 +11,19 @@ from . import process
 from . import transaction_screening_rule
 from . import sql
 from . import alert_history
+=======
+from . import process_category
+from . import process
+from . import transaction_screening_rule
+>>>>>>> alert_module
 from . import department
 from . import user_profile
 from . import branch
 from . import res_group
+<<<<<<< HEAD
 from . import control_officer
+=======
+>>>>>>> alert_module
 from . import customer_account
 from . import customer
 from . import customer_tier

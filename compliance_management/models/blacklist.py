@@ -10,5 +10,8 @@ class Blacklist(models.Model):
          "Customer ID already exists. Value must be unique!")
     ]
 
-    name = fields.Char(string='')
-    customer_id = fields.Many2one(comodel_name='res.partner', string='Customer',required=True,index=True)
+    name = fields.Char(string="Name")
+    surname = fields.Char(string="Surname",tracking=True,required=True,index=True)
+    first_name = fields.Char(string="First Name",tracking=True,required=True,index=True)
+    middle_name = fields.Char(string="Middle Name")
+    customer_id = fields.Many2one(comodel_name='res.partner', string='Customer',required=False,index=True)

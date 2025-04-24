@@ -48,15 +48,16 @@ export class ChartRenderer extends Component {
   renderChart() {
     this.destroyChart(); // Destroy existing chart before rendering a new one
 
-    if (this.props.title === "Top 10 Branches By Customer" && !this.props.dynamic) {
-      // Use constant for comparison
-      this.renderTopBranchesChart();
-    } else if (this.props.title === "Top 10 Screened Transaction By Rules" && !this.props.dynamic) {
-      this.renderScreenedChart();
-    } else if (this.props.title === "Top 10 High-Risk Customer By Branch" && !this.props.dynamic) {
-      this.renderHighRiskchart()
+    // if (this.props.title === "Top 10 Branches By Customer" && !this.props.dynamic) {
+    //   // Use constant for comparison
+    //   this.renderTopBranchesChart();
+    // } else if (this.props.title === "Top 10 Screened Transaction By Rules" && !this.props.dynamic) {
+    //   this.renderScreenedChart();
+    // } else if (this.props.title === "Top 10 High-Risk Customer By Branch" && !this.props.dynamic) {
+    //   this.renderHighRiskchart()
     
-    } else if (this.props.dynamic) {
+    // } 
+    if (this.props.dynamic) {
       this.renderDynamicChart()
     }
   }
@@ -443,8 +444,13 @@ export class ChartRenderer extends Component {
           },
         },
         plugins: {
+          legend: {
+            display: this.props.data.type === "bar" || this.props.data.type === "line" || this.props.data.type === "radar"  ? false : true,
+            position: "top",
+          },
           title: {
-            text: this.props.data.title,
+            display: true,
+            position: "bottom",
           },
         },
       },
@@ -457,6 +463,7 @@ export class ChartRenderer extends Component {
       maintainAspectRatio: false,
       plugins: {
         legend: {
+          display: true,
           position: "top",
         },
         title: {

@@ -21,7 +21,7 @@ _logger = logging.getLogger(__name__)
 
 class alert_rules(models.Model):
     _name = 'alert.rules'
-    _description = "alert rules for exception management"
+    _description = "Alert Rules"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
     
@@ -144,62 +144,247 @@ class alert_rules(models.Model):
                 return cell
         else:
             return cell
-
-
-    def format_query(self,rule):
+    
+    def has_sql_aliases(self, query):
+        # Strip unnecessary whitespace
+        query = query.strip()
         
-        query = ""
-
-        if "*" in rule.sql_text.query:
-                    
-            query = rule.sql_text.query
+        # Patterns to detect various forms of SQL aliases
+        patterns = [
+            # Table alias pattern: "table alias" or "table as alias" (case insensitive for AS)
+            r'\b\w+\b\s+(?!ON|JOIN|WHERE|FROM|SELECT|GROUP|ORDER|HAVING|UNION|EXCEPT|INTERSECT)\b\w+\b',
+            r'\b\w+\b\s+(?i:AS)\s+\b\w+\b'
+        ]
+        
+        # Check each pattern
+        for pattern in patterns:
+            if re.search(pattern, query):
+                return True
                 
-        elif re.search(r"\w+\.\w+\s+AS\s+\w+", rule.sql_text.query, re.IGNORECASE): 
-            query_lower = rule.sql_text.query.lower()
+        return False
+    
+    def append_branch_condition(self, query, branch_id):
+        # Check if query uses aliases
+        has_aliases = self.has_sql_aliases(query)
         
-            select_clause, from_clause = query_lower.split("from", 1)
-            select_clause = select_clause.strip()
-
-            # Check if 'alias.branch_id' 
-            check_pattern = re.search(r"(\w+)\.branch_id\b", rule.sql_text.query, re.IGNORECASE)
-
-            if not check_pattern:
-                # Find the alias for res_branch
-                match = re.search(r"res_branch\s+(\w+)", from_clause.lower(), re.IGNORECASE)
-                if match:
-                    branch_alias = match.group(1)
-                    modified_select_clause = f"{select_clause}, {branch_alias}.id AS branch_id"
-                    query = f"{modified_select_clause} FROM {from_clause}"
+        # Process query based on presence of WHERE clause
+        if " WHERE " in query.upper():
+            # Fix multiple WHERE clauses if present
+            parts = query.split(';')
+            cleaned_parts = []
+            
+            first_where_found = False
+            for part in parts:
+                part = part.strip()
+                if not part:
+                    continue
                     
+                if " WHERE " in part.upper() and first_where_found:
+                    # Replace second WHERE with AND
+                    part = " AND " + part.split(" WHERE ", 1)[1]
+                elif " WHERE " in part.upper():
+                    first_where_found = True
+                    
+                cleaned_parts.append(part)
+            
+            query = " ".join(cleaned_parts)
+            
+            # Now append our condition - use appropriate table reference
+            if has_aliases:
+                # If using aliases, we need to use the correct one
+                query += " AND branch_id = %s"  # You'll need logic to determine correct alias
             else:
-                match = check_pattern
-                branch_alias = match.group(1)
-                modified_select_clause = f"{select_clause}, {branch_alias}.branch_id AS branch_id"
-                query = f"{modified_select_clause} FROM {from_clause}"
-
+                query += " AND branch_id = %s"
         else:
-                    
-            if "branch_id" not in rule.sql_text.query:
-                
-                columns = rule.sql_text.query.split(",")
-                
-                # join the columns into string
-                query_string = ', '.join(columns)
-                
-                # Insert 'subbranchcode' before 'from'
-                query_string = query_string.replace(' from ', ', branch_id from ')
-                
-                query = query_string
+            # No WHERE clause, add one
+            if has_aliases:
+                query += " WHERE branch_id = %s"  # You'll need logic to determine correct alias
             else:
-                
-                query = rule.sql_text.query
+                query += " WHERE branch_id = %s"
+            
+        return query, [branch_id]
 
-                print(query)
+
+
+    # def format_query(self,rule):
+        
+    #     query = ""
+
+    #     if "*" in rule.sql_text.query:
+                    
+    #         query = rule.sql_text.query
+                
+    #     elif re.search(r"\w+\.\w+\s+AS\s+\w+", rule.sql_text.query, re.IGNORECASE): 
+    #         query_lower = rule.sql_text.query.lower()
+        
+    #         select_clause, from_clause = query_lower.split("from", 1)
+    #         select_clause = select_clause.strip()
+
+    #         # Check if 'alias.branch_id' 
+    #         # check_pattern = re.search(r"(\w+)\.branch_id\b", rule.sql_text.query, re.IGNORECASE)
+    #         check_pattern = re.search(r"(\w+)\.branch_id\b\s+(AS\s+)?(\w+)", rule.sql_text.query, re.IGNORECASE)
+
+    #         if not check_pattern:
+    #             # Find the alias for res_branch
+    #             match = re.search(r"\w*branch\w*\s+(\w+)", from_clause.lower(), re.IGNORECASE)
+    #             if match:
+    #                 branch_alias = match.group(1)
+    #                 modified_select_clause = f"{select_clause}, {branch_alias}.id AS branch_id"
+    #                 query = f"{modified_select_clause} FROM {from_clause}"
+                    
+    #         elif check_pattern and check_pattern.group(2) and check_pattern.group(3) == 'branch_id':
+    #             query = f"{select_clause} FROM {from_clause}"
+            
+    #         else:
+    #             # Replace the existing alias instead of adding a new column
+    #             original_text = f"{check_pattern.group(1)}.branch_id as {check_pattern.group(3)}"
+    #             replacement_text = f"{check_pattern.group(1)}.branch_id AS branch_id"
+    #             modified_select_clause = select_clause.replace(original_text.lower(), replacement_text)
+    #             query = f"{modified_select_clause} FROM {from_clause}"
         
 
-        return query
+                
+    #     else:
+                    
+    #         if "branch_id" not in rule.sql_text.query:
+                
+    #             columns = rule.sql_text.query.split(",")
+                
+    #             # join the columns into string
+    #             query_string = ', '.join(columns)
+                
+    #             # Insert 'subbranchcode' before 'from'
+    #             query_string = query_string.replace(' from ', ', branch_id from ')
+                
+    #             query = query_string
+    #         else:
+                
+    #             query = rule.sql_text.query
+
+
+    #     return query
+
+    def format_query(self, rule):
+        """
+        Format SQL query to ensure it has a 'branch_id' column properly defined.
+        
+        This function identifies if branch_id already exists in the query (either directly or as an alias),
+        and modifies the query as needed to ensure the column is properly present as 'branch_id'.
+
+        Returns:
+            str: Modified SQL query with proper branch_id handling
+        """
+        # If query is empty or None, return empty string
+        if not rule.sql_text.query:
+            return ""
+        
+        # If the query uses * wildcard, return it unchanged
+        if "*" in rule.sql_text.query:
+            return rule.sql_text.query
+        
+        # Create a working copy to preserve case in the original query
+        original_query:str = rule.sql_text.query
+        query_lower:str = original_query.lower()
+        
+        # Handle queries that don't have a direct 'SELECT...FROM' structure
+        if "select " not in query_lower or " from " not in query_lower:
+            return original_query
+        
+        try:
+            # Split the query into parts
+            select_part = query_lower.split(" from ")[0].replace("select ", "").strip()
+            from_part = "from " + query_lower.split(" from ", 1)[1].strip()
+            
+            # Check for various branch_id patterns
+            # Case 1: column named exactly branch_id with no alias
+            has_branch_id_column = re.search(r"\bbranch_id\b(?!\s+as)", query_lower)
+            
+            # Case 2: column.branch_id AS branch_id
+            has_branch_id_alias = re.search(r"(\w+)\.branch_id\b\s+as\s+branch_id\b", query_lower)
+            
+            # Case 3: column.branch_id AS something_else
+            other_branch_id_alias = re.search(r"(\w+)\.branch_id\b\s+as\s+(\w+)(?!branch_id\b)", query_lower)
+            
+            # Case 4: column.branch_id with no AS (implicit naming)
+            implicit_branch_id = re.search(r"(\w+)\.branch_id\b(?!\s+as)", query_lower)
+            
+            # If branch_id already exists with correct alias, return query unchanged
+            if has_branch_id_column or has_branch_id_alias:
+                return original_query
+                
+            # If branch_id exists with wrong alias, replace the alias
+            elif other_branch_id_alias:
+                table_alias = other_branch_id_alias.group(1)
+                wrong_alias = other_branch_id_alias.group(2)
+                
+                # Find the actual case-sensitive version in the original query
+                pattern = re.compile(f"{re.escape(table_alias)}.branch_id\\s+as\\s+{re.escape(wrong_alias)}", 
+                                    re.IGNORECASE)
+                match = pattern.search(original_query)
+                if match:
+                    original_text = match.group(0)
+                    replacement = f"{table_alias}.branch_id AS branch_id"
+                    return original_query.replace(original_text, replacement)
+                    
+            # If branch_id column exists without explicit alias, add AS branch_id
+            elif implicit_branch_id:
+                table_alias = implicit_branch_id.group(1)
+                
+                # Find the actual case-sensitive version in the original query
+                pattern = re.compile(f"{re.escape(table_alias)}.branch_id\\b(?!\\s+as)", re.IGNORECASE)
+                match = pattern.search(original_query)
+                if match:
+                    original_text = match.group(0)
+                    replacement = f"{original_text} AS branch_id"
+                    return original_query.replace(original_text, replacement)
+                    
+            # If no branch_id found, look for a branch table to add the column
+            else:
+                # First try to find a branch table by looking for 'branchX alias' pattern
+                branch_table_match = re.search(r"\b(\w*branch\w*)\s+(\w+)", from_part)
+                
+                if branch_table_match:
+                    branch_alias = branch_table_match.group(2)
+                    
+                    # Format the addition to match original query style (comma position and spaces)
+                    if select_part.endswith(","):
+                        modified_select = f"{select_part} {branch_alias}.id AS branch_id"
+                    else:
+                        modified_select = f"{select_part}, {branch_alias}.id AS branch_id"
+                    
+                    # Get correct casing for "SELECT" from original query
+                    select_keyword = "select"
+                    if "SELECT" in original_query[:10]:  # Check first 10 chars for "SELECT"
+                        select_keyword = "SELECT"
                         
- 
+                    # Get correct casing for "FROM" from original query
+                    from_keyword = "from"
+                    if "FROM" in original_query:
+                        from_keyword = "FROM"
+                        
+                    # Rebuild the query with proper casing
+                    from_part_original = original_query.split(select_part, 1)[1]
+                    return f"{select_keyword} {modified_select} {from_part_original}"
+                    
+                # If no branch table, add branch_id column by itself as a placeholder
+                else:
+                    if select_part.endswith(","):
+                        modified_select = f"{select_part} branch_id"
+                    else:
+                        modified_select = f"{select_part}, branch_id"
+                        
+                    # Get correct casing for "SELECT" from original query
+                    select_keyword = "select"
+                    if "SELECT" in original_query[:10]:
+                        select_keyword = "SELECT"
+                        
+                    return f"{select_keyword} {modified_select} {original_query.split(select_part, 1)[1]}"
+        
+        except Exception as e:
+            # If anything fails, return the original query and optionally log the error
+            # print(f"Error formatting SQL query: {e}")
+            return original_query                        
+    
     
     def create_csv(self, columns, rows):
                          
@@ -291,16 +476,10 @@ class alert_rules(models.Model):
     
     def prepare_email(self, rule, table_html, encoded_content, email, emailcc):
 
-        template = self.env.ref('internal_control.alert_rules_mail_template')
+        template = self.env.ref('alert_management.alert_rules_mail_template')
         
         if template:
-                
-                    
-            # generate random string attached for each alert to be send
-            alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
-                    
-                
-                    
+                             
             attachment = {
                         'name': 'report.csv',
                         'mimetype': 'text/csv',  # The MIME type for CSV files
@@ -314,29 +493,44 @@ class alert_rules(models.Model):
                         
             # record the history
             new_alert_history = self.env['alert.history'].create({
-                        "alert_id": alert_id,
-                        "attachment_data": attachment_id.id,
-                        "attachment_link": f"/web/content/{attachment_id.id}?download=true",
-                        "html_body": table_html,
-                        "alert_rule_id": rule.id,
-                        "process_id": rule.process_id,
-                        "risk_rating": rule.risk_rating,
-                        "last_checked": rule.last_checked,
-                        "email": ",".join(list(email)) if len(list(email)) > 0 else "techsupport@novajii.com",
-                        "email_cc": ",".join(list(emailcc)),
-                        "narration": rule.narration,
-                        "name": rule.name
+                "attachment_data": attachment_id.id,
+                "attachment_link": f"/web/content/{attachment_id.id}?download=true",
+                "html_body": table_html,
+                "ref_id": f"{self._name},{rule.id}",
+                "process_id": rule.process_id,
+                "risk_rating": rule.risk_rating,
+                "last_checked": rule.last_checked,
+                "email": ",".join([str(e) for e in email]) if email else "techsupport@novajii.com",
+                "email_cc": ",".join(list(emailcc)),
+                "narration": rule.narration,
+                "name": rule.name,
+                "source": self._description
+
                     
             })
                     
                     
             try:
                 mail_id =  template.send_mail(new_alert_history.id, force_send=True)
-                if not mail_id:
+            
+                mail_record = self.env['mail.mail'].browse(mail_id)
+
+                print(mail_record.id)
+                print(mail_record.state)
+
+                if mail_record.state in ["exception", "cancel"]:
+                    # Log the failure reason
+                    _logger.error(f"Failed to send alert email: {mail_record.failure_reason}")
                     history = self.env['alert.history'].browse(new_alert_history.id)
-                    
                     if history.exists():
                         history.unlink()
+                else:
+        
+                    history = self.env['alert.history'].browse(new_alert_history.id)
+                    history.write({'html_body': mail_record.body_html})
+                    
+                    
+
                     
             except Exception as e:
                 history = self.env['alert.history'].browse(new_alert_history.id)
@@ -358,7 +552,7 @@ class alert_rules(models.Model):
     def send_alert(self, rule):
         try:
 
-            query = self.format_query(rule)
+            query:str = self.format_query(rule)
     
             # first query to create csv
             self.env.cr.execute(f'{query}')
@@ -387,8 +581,8 @@ class alert_rules(models.Model):
                         pass
                     elif branchcode not in branches:
                         branches.append(branchcode) 
+
             
-                
                 if rule.alert_id.tag != "internal":
 
             
@@ -399,34 +593,43 @@ class alert_rules(models.Model):
                         branch_officer = self.env['control.officer'].sudo().search([("branch_id", '=', int(branch))])
                         
                         if branch_officer and rule.alert_id.id == branch_officer.alert_id.id:
-                            print(f"branch officer exists {branch_officer.alert_id.email}")
 
+                            if query.endswith(';'):
+                                query = query[:-1]
+
+                            if "WHERE" in query.upper():
+                                branch_officer_query = f"{query} AND branch_id = '{branch_officer.branch_id.id}'"
+                            else:
+                                branch_officer_query = f"{query} WHERE branch_id = '{branch_officer.branch_id.id}'"
+                           
                             # retrieve data for branch officer by branch 
-                            self.env.cr.execute(f"{query} WHERE branch_id = '{branch_officer.branch_id.id}';")
+                            self.env.cr.execute(branch_officer_query)
 
                             rows = self.env.cr.fetchall()
                             columns = [desc[0] for desc in self.env.cr.description]
                             
                             alert_group = branch_officer.alert_id.email
                             alert_group_cc = branch_officer.alert_id.email_cc
+                            
+                            # mailcc = set()  # Initialize mailcc as a set
                             # specific mail recepients
-                            for user in rule.specific_email_recipients:
-                                mailcc.add(user.login)
+                            # for user in rule.specific_email_recipients:
+                            #     mailcc.add(user.login)
                             
                             
-                            for user in alert_group:
+                            # for user in alert_group:
                                     
-                                mailcc.add(user.login) 
+                            #     mailcc.add(user.login) 
                                 
-                            for user in alert_group_cc:
+                            # for user in alert_group_cc:
                                     
-                                mailcc.add(user.login) 
+                            #     mailcc.add(user.login) 
                             
                             encoded_content = self.create_csv(columns, rows)
                             
                             table_html = self.generate_table(columns, rows)
  
-                            self.prepare_email(rule, table_html, encoded_content, [branch_officer.officer.email], "")
+                            self.prepare_email(rule, table_html, encoded_content, [branch_officer.officer.login], "")
                             
                         else:
 
@@ -445,16 +648,16 @@ class alert_rules(models.Model):
                             alert_group_cc = rule.alert_id.email_cc
                             # specific mail recepients
                             for user in rule.specific_email_recipients:
-                                mailcc.add(user.email)
+                                mailcc.add(user.login)
                             
                             
                             for user in alert_group:
                                     
-                                mailto.add(user.email) 
+                                mailto.add(user.login) 
                                 
                             for user in alert_group_cc:
                                     
-                                mailcc.add(user.email) 
+                                mailcc.add(user.login) 
                             
                             encoded_content = self.create_csv(columns, rows)
                            

@@ -48,6 +48,9 @@
             <!-- <xpath expr="//header" position="replace">
                 <header />
             </xpath> -->
+            <xpath expr="//form" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
             
             <xpath expr="//header" position="replace">
                 <header>
@@ -61,7 +64,7 @@
             <xpath expr="//button[@name='get_risk_score']" position="replace" />
             <xpath expr="//button[@name='action_view_partner_invoices']" position="replace" />
             <xpath expr="//button[@name='action_view_sale_order']" position="replace" />
-            <xpath expr="//button[@name='get_risk_level']" position="replace" />
+            <!-- <xpath expr="//button[@name='get_risk_level']" position="replace" /> -->
             <xpath expr="//page[@name='plans']" position="replace" />
             <xpath expr="//page[@name='accounts']" position="replace" />
             <xpath expr="//page[@name='risk_assessment']" position="replace" />
@@ -80,9 +83,9 @@
             <xpath expr="//form//field[@name='company_id']" position="attributes" >
                <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//form//field[@name='website']" position="attributes" >
+            <!-- <xpath expr="//form//field[@name='website']" position="attributes" >
                <attribute name="invisible">1</attribute>
-            </xpath>
+            </xpath> -->
             <xpath expr="//form//field[@name='parent_id']" position="attributes" >
                <attribute name="invisible">1</attribute>
             </xpath>

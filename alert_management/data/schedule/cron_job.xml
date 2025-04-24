@@ -4,7 +4,7 @@
         <!-- Cron Job for Alert Rules Processing -->
         <record id="ir_cron_alert_rules_processing" model="ir.cron">
             <field name="name">Process Alert Rules</field>
-            <field name="model_id" ref="model_alert_rules" />
+            <field name="model_id" ref="alert_management.model_alert_rules" />
             <field name="state">code</field>
             <field name="code">model.process_alert_rules()</field>
             <field name="active" eval="True" />

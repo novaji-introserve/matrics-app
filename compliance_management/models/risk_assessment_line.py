@@ -2,7 +2,7 @@
 
 from odoo import models, fields, api, _
 
-CONTROL_EFFECTIVENESS_MAX_SCORE = 25
+# CONTROL_EFFECTIVENESS_MAX_SCORE = 25
 
 
 class RiskAssessmentLine(models.Model):
@@ -17,24 +17,69 @@ class RiskAssessmentLine(models.Model):
         comodel_name='res.risk.category', string='Category', required=True)
     risk_assessment_id = fields.Many2one(
         comodel_name='res.risk.assessment', string='Risk Assessment', ondelete="cascade")
-    implication = fields.Text(string='Implication', required=True)
+    implication = fields.Many2many("risk.assessment.implication","res_risk_assessment_line_implication_rel", tracking=True)
     inherent_risk_score = fields.Float(
         string='Inherent Risk Score', required=True, tracking=True)
-    existing_controls = fields.Text(string='Existing Controls', required=True)
+    existing_controls = fields.Many2many("risk.assessment.control", "res_risk_assessment_line_risk_assessment_control_rel", tracking=True)
     control_effectiveness_score = fields.Float(
         string='Control Effectiveness Score', tracking=True)
     residual_risk_probability = fields.Float(
         string='Residual Risk Probability', compute='_compute_risk_probability', store=True)
     residual_risk_impact = fields.Float(
         string='Residual Risk Impact', required=True, tracking=True)
-    planned_mitigation = fields.Text(
-        string='Planned Mitigation', required=True)
+    planned_mitigation = fields.Many2many("risk.assessment.mitigation", "res_risk_assessment_line_risk_assessment_mitigation_rel", tracking=True)
     department_id = fields.Many2one(
         comodel_name='hr.department', string='Department', required=True, help="Department Responsible")
-    implementation_date = fields.Date(
-        string='Implementation Deadline', help="Recurring deadline for implementation")
+    implementation_date = fields.Selection([
+        ('0', 'Immediate'),
+        ('7', '7 Days'),
+        ('14', '14 Days'),
+        ('21', '21 Days'),
+        ('30', 'A month'),
+        ('60', '2 month'),
+        ('90', '3 month'),
+    ],string='Implementation Deadline',default="0", help="Recurring deadline for implementation")
     residual_risk_score = fields.Float(
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
+
+    def _get_score_range(self, score_name):
+        """Get min/max values from res.fcra.score model"""
+        score_record = self.env['res.fcra.score'].search([('name', '=', score_name)], limit=1)
+        return score_record.min_score if score_record else 1, score_record.max_score if score_record else 25
+    
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        res = super(RiskAssessmentLine, self).fields_get(allfields, attributes)
+
+        
+        # Get ranges from res.fcra.score
+        inherent_min, inherent_max = self._get_score_range('Inherent Score')
+        control_min, control_max = self._get_score_range('Control Effectiveness')
+        residual_min, residual_max = self._get_score_range('Residual Risk')
+        
+        # Update field attributes
+        if 'inherent_risk_score' in res:
+            res['inherent_risk_score']['min'] = inherent_min
+            res['inherent_risk_score']['max'] = inherent_max
+            print(inherent_max)
+            print("*********************")
+        
+        if 'control_effectiveness_score' in res:
+            res['control_effectiveness_score']['min'] = control_min
+            res['control_effectiveness_score']['max'] = control_max
+            print(control_max)
+            print("*********************")
+        
+        if 'residual_risk_impact' in res:
+            res['residual_risk_impact']['min'] = residual_min
+            res['residual_risk_impact']['max'] = residual_max
+            print(residual_min)
+            print("*********************")
+        
+        return res
+
+
+
 
     @api.model
     def create(self, vals):
@@ -66,10 +111,18 @@ class RiskAssessmentLine(models.Model):
                 probability, record.residual_risk_impact)
             record.residual_risk_probability = probability
             record.residual_risk_score = score
+    
+    def get_control_effectiveness_max_score(self):
+        """Retrieves the maximum control effectiveness score from system parameters."""
+        return int(self.env['ir.config_parameter'].sudo().get_param('risk_management.control_effectiveness_max_score') or 25)
 
     def _compute_risk_probability(self, control_effectiveness_score):
+        max_score = self.get_control_effectiveness_max_score()
+        if max_score == 0:
+            return 100.0  # Avoid division by zero
+        
         return (
-            1 - (control_effectiveness_score / CONTROL_EFFECTIVENESS_MAX_SCORE)) * 100
+            1 - (control_effectiveness_score / max_score)) * 100
 
     def _compute_residual_risk_score(self, probability, impact):
         return (probability/100) * impact

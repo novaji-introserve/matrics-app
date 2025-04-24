@@ -5,6 +5,11 @@ class Watchlist(models.Model):
     _name = 'res.partner.watchlist'
     _description = 'Watchlist'
 
-    name = fields.Char(string='')
+
+
+    name = fields.Char(string="Name")
+    surname = fields.Char(string="Surname",tracking=True,required=True,index=True)
+    first_name = fields.Char(string="First Name",tracking=True,required=True,index=True)
+    middle_name = fields.Char(string="Middle Name")
     customer_id = fields.Many2one(
-        comodel_name='res.partner', string='Customer', required=True, index=True)
+        comodel_name='res.partner', string='Customer', required=False, index=True)

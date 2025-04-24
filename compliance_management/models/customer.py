@@ -151,11 +151,11 @@ class Customer(models.Model):
 
 
     def cron_run_risk_assessment(self):
-        self.update_global_pep_status()
+        self.update_sanction_status()
         self.compute_risk_score_for_all_users()
 
 
-    def update_global_pep_status(self):
+    def update_sanction_status(self):
         _logger.info("Starting PEP status check using SQL query.")
 
         # Fetch first and last names from res_partner
@@ -175,18 +175,39 @@ class Customer(models.Model):
         full_names = list(set(f"{first} {last}" for _, first, last in partners))
         _logger.info(f"Unique customer full names: {full_names}")
 
-        # Step 3: Update res_partner if name exists in res_pep
-        query_update = """
+        #  DB Update
+
+    #   Update global_pep from res_pep
+        query_update_pep = """
             UPDATE res_partner
             SET global_pep = True
             FROM res_pep
             WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = LOWER(TRIM(res_pep.name))
         """
+        self.env.cr.execute(query_update_pep)
 
-        self.env.cr.execute(query_update)
+        #  Update is_blacklist from res_partner_blacklist
+        query_update_blacklist = """
+            UPDATE res_partner
+            SET is_blacklist = TRUE
+            FROM res_partner_blacklist
+            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = 
+            LOWER(TRIM(res_partner_blacklist.first_name)) || ' ' || LOWER(TRIM(res_partner_blacklist.surname))
+        """
+        self.env.cr.execute(query_update_blacklist)
+
+        # Update is_watchlist from res_partner_watchlist
+        query_update_watchlist = """
+            UPDATE res_partner
+            SET is_watchlist = TRUE
+            FROM res_partner_watchlist
+            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) =
+            LOWER(TRIM(res_partner_watchlist.first_name)) || ' ' || LOWER(TRIM(res_partner_watchlist.surname))
+        """
+        self.env.cr.execute(query_update_watchlist)
+
         self.env.cr.commit()
-
-        _logger.info("PEP status check completed. Unique customers updated.")
+        _logger.info("Sanction status update completed for global_pep, blacklist, and watchlist.")
 
 
     # industry =

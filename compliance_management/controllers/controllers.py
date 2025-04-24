@@ -32,7 +32,7 @@ class Compliance(http.Controller):
             return branches_id
 
     @http.route('/dashboard/dynamic_sql', auth='public', type='json')
-    def extract_table_and_domain(self, sql_query: str):
+    def extract_table_and_domain(self, sql_query: str, branches_id, cco):
 
         lower_query = sql_query.lower()
         table = None
@@ -57,7 +57,10 @@ class Compliance(http.Controller):
         if where_match:
             condition_string = where_match.group(1)
             domain = self._parse_condition_to_odoo_domain(condition_string)  
-
+        
+        # check if it is not cco
+        if not cco:
+            domain.append(["branch_id", "in", self.check_branches_id(branches_id)])
 
         return {'table': table, 'domain': domain}
 
@@ -78,8 +81,9 @@ class Compliance(http.Controller):
                 field, operator, value = parts
                 field = field.strip()
                 operator = operator.strip().lower()
-                value = value.strip()
+                value = value.strip() # select count(id) from res_partner where bvn is null
 
+        
                 # Clean the value
                 if value.startswith("'") and value.endswith("'"):
                     value = value[1:-1]
@@ -147,39 +151,72 @@ class Compliance(http.Controller):
                     "total": len(results)
                 }
         else:
-            # fetch data for branches
-
+            # First get all compliance stats in the date range
             query = """
-            SELECT rcs.*
-            FROM res_compliance_stat rcs
-            WHERE rcs.create_date >= %s
-              AND rcs.create_date < %s
-              AND rcs.create_uid IN (
-                  SELECT rbur.user_id
-                  FROM res_branch_users_rel rbur
-                  WHERE rbur.branch_id = ANY(%s::integer[])
-              );
+                SELECT rcs.*
+                FROM res_compliance_stat rcs
+                WHERE rcs.create_date >= %s
+                AND rcs.create_date < %s;
             """
-            branches_id = self.check_branches_id(branches_id)
-           
-            request.env.cr.execute(query, (start_of_prev_day, end_of_today, branches_id))
 
-            # Fetch results
-            # Get column names
+            request.env.cr.execute(query, (start_of_prev_day, end_of_today))
+
+            # Get column names and results
             columns = [desc[0] for desc in request.env.cr.description]
-            result_tuple = request.env.cr.fetchall()
+            stat_records = [dict(zip(columns, row)) for row in request.env.cr.fetchall()]
 
-            results = [dict(zip(columns, row)) for row in result_tuple]
+            # Convert branches_id to a proper PostgreSQL array parameter
+            branches_array = list(map(int, branches_id))  # Make sure all elements are integers
 
+            # Process each compliance stat and execute its SQL query with branch filtering
             computed_results = []
+            for stat in stat_records:
+                query:str = stat['sql_query']
+            
+                
+                if "res_partner" in query or "res.partner" in query or "tier" in query or "transaction" in query:
+                    # Remove trailing semicolon if present
+                    if query.endswith(";"):
+                        query = query[:-1]
+                    
+                    # Add branch filtering to the query
+                    if branches_array:
+                        if " where " in query.lower() or " WHERE " in query:
+                            query += f" AND branch_id = ANY(%s::integer[])"
+                        else:
+                            query += f" WHERE branch_id = ANY(%s::integer[])"
+                            
+                        # Execute the query with branch filter
+                        request.env.cr.execute(query, (branches_array,))
+                    else:
+                        # If no branches, add a condition that returns no results
+                        if " where " in query.lower() or " WHERE " in query:
+                            query += " AND 1=0"
+                        else:
+                            query += " WHERE 1=0"
+                            
+                        request.env.cr.execute(query)
+                
+                    # For count queries, we expect a single row with a single value
+                    result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
 
-            for result in results:
-                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
+                    
+                    # Add the results to our collection with the specific format you want
+                    computed_results.append({
+                        "name": stat["name"],
+                        "scope": stat["scope"],
+                        "val": result_value,  # This is the result of the SQL query
+                        "id": stat["id"],
+                        "scope_color": stat["scope_color"],
+                        "query": stat["sql_query"]
+                    })
 
             return {
-                    "data": computed_results,
-                    "total": len(results)
+                "data": computed_results,
+                "total": len(computed_results)
             }
+
+           
 
     @http.route('/dashboard/statsbycategory', auth='public', type='json')
     def getAllstatsByCategory(self, cco, branches_id, category, datepicked, **kw):
@@ -207,206 +244,69 @@ class Compliance(http.Controller):
                     "total": len(results)
                 }
         else:
-            # fetch data for branches
-
+             # First get all compliance stats in the date range
             query = """
-            SELECT rcs.*
-            FROM res_compliance_stat rcs
-            WHERE rcs.create_date >= %s
-              AND rcs.create_date < %s
-              AND rcs.scope = %s
-              AND rcs.create_uid IN (
-                  SELECT rbur.user_id
-                  FROM res_branch_users_rel rbur
-                  WHERE rbur.branch_id = ANY(%s::integer[])
-              );
+                SELECT rcs.*
+                FROM res_compliance_stat rcs
+                WHERE rcs.create_date >= %s
+                AND rcs.create_date < %s AND rcs.scope = %s;
             """
-            branches_id = self.check_branches_id(branches_id)
 
-            request.env.cr.execute(query, (start_of_prev_day, end_of_today, category, branches_id))
+            request.env.cr.execute(query, (start_of_prev_day, end_of_today, category))
 
-            # Fetch results
-            # Get column names
+            # Get column names and results
             columns = [desc[0] for desc in request.env.cr.description]
-            result_tuple = request.env.cr.fetchall()
+            stat_records = [dict(zip(columns, row)) for row in request.env.cr.fetchall()]
 
-            results = [dict(zip(columns, row)) for row in result_tuple]
+            # Convert branches_id to a proper PostgreSQL array parameter
+            branches_array = list(map(int, branches_id))  # Make sure all elements are integers
 
+            # Process each compliance stat and execute its SQL query with branch filtering
             computed_results = []
-
-            for result in results:
-                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
+            for stat in stat_records:
+                query:str = stat['sql_query']
+                
+                
+                if "res_partner" in query or "res.partner" in query or "tier" in query or "transaction" in query:
+                    # Remove trailing semicolon if present
+                    if query.endswith(";"):
+                        query = query[:-1]
+                    
+                    # Add branch filtering to the query
+                    if branches_array:
+                        if " where " in query.lower() or " WHERE " in query:
+                            query += f" AND branch_id = ANY(%s::integer[])"
+                        else:
+                            query += f" WHERE branch_id = ANY(%s::integer[])"
+                            
+                        # Execute the query with branch filter
+                        request.env.cr.execute(query, (branches_array,))
+                    else:
+                        # If no branches, add a condition that returns no results
+                        if " where " in query.lower() or " WHERE " in query:
+                            query += " AND 1=0"
+                        else:
+                            query += " WHERE 1=0"
+                            
+                    request.env.cr.execute(query)
+                    
+                    # For count queries, we expect a single row with a single value
+                    result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                    
+                    # Add the results to our collection with the specific format you want
+                    computed_results.append({
+                        "name": stat["name"],
+                        "scope": stat["scope"],
+                        "val": result_value,  # This is the result of the SQL query
+                        "id": stat["id"],
+                        "scope_color": stat["scope_color"],
+                        "query": stat["sql_query"]
+                    })
 
             return {
-                    "data": computed_results,
-                    "total": len(results)
+                "data": computed_results,
+                "total": len(computed_results)
             }
 
-    # @http.route('/dashboard/get_top_screened_rules', auth='public', type='json')
-    # def get_transaction_data(self, cco, branches_id, datepicked, **kw):
 
-
-    #     today = datetime.now().date()  # Get today's date
-    #     prevDate = today - timedelta(days=datepicked)  # Get previous date
-
-    #     if cco == True:
-    #         # fetch all data for chief compliance officer
-    #         sql = """
-    #             SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-    #             FROM res_transaction_screening_rule rtsr
-    #             JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-    #             WHERE rct.date_created BETWEEN %s AND %s
-    #             GROUP BY rtsr.id, rtsr.name
-    #             ORDER BY hit_count DESC
-    #             LIMIT 10;
-    #         """
-    #         request.env.cr.execute(sql,(prevDate, today))
-
-    #         results = request.env.cr.fetchall()
-
-    #         customer_counts = []
-
-    #         for row in results:
-    #             customer_counts.append({
-    #                 "id": row[0],
-    #                 'name': row[1],
-    #                 'count': row[2]
-    #             })
-
-    #         return customer_counts
-
-    #     else:
-
-    #         if not branches_id:
-    #             return []
-                
-    #         sql = """
-    #         SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-    #         FROM res_transaction_screening_rule rtsr
-    #         JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-    #         WHERE rct.date_created BETWEEN %s AND %s AND rct.branch_id IN %s
-    #         GROUP BY rtsr.id, rtsr.name
-    #         ORDER BY hit_count DESC
-    #         LIMIT 10;
-    #         # """
-    #         request.env.cr.execute(sql,(prevDate, today, tuple(branches_id)))
-    #         results = request.env.cr.fetchall()
-
-    #         customer_counts = []
-
-    #         for row in results:
-    #             customer_counts.append({
-    #                 "id": row[0],
-    #                 'name': row[1],
-    #                 'count': row[2]
-    #             })
-
-    #         return customer_counts
-
-    # @http.route('/dashboard/get_high_risk_customer_by_branch', auth='public', type='json')
-    # def get_high_risk(self, cco, branches_id, datepicked, **kw):
-
-    #     today = datetime.now().date()  # Get today's date
-    #     prev_date = today - timedelta(days=datepicked)  # Get previous date
-        
-
-    #     def _execute_query(sql, params=None):
-    #         request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
-    #         results = request.env.cr.fetchall()
-    #         return [{
-    #             "id": row[0],
-    #             'name': row[1],
-    #             'count': row[2]
-    #         } for row in results]
-
-    #     if cco:
-    #         sql = """
-    #                 SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
-    #                 FROM res_branch rb
-    #                 JOIN res_partner rp ON rb.id = rp.branch_id
-    #                 WHERE rp.risk_level = 'high' AND rp.create_date BETWEEN %s AND %s 
-    #                 GROUP BY rb.id, rb.name
-    #                 ORDER BY high_risk_customers DESC
-    #                 LIMIT 10
-    #             """
-    #         return _execute_query(sql, (prev_date, today))
-
-    #     else:
-
-    #         if not branches_id:
-    #             return []
-
-    #         sql = """
-    #                 SELECT rb.id, rb.name, COUNT(rp.id) AS high_risk_customers
-    #                 FROM res_branch rb
-    #                 JOIN res_partner rp ON rb.id = rp.branch_id
-    #                 WHERE rp.risk_level = 'high' AND rp.create_date BETWEEN %s AND %s AND rb.id IN %s
-    #                 GROUP BY rb.id, rb.name
-    #                 ORDER BY high_risk_customers DESC
-    #                 LIMIT 10
-
-    #                 """
-    #         return _execute_query(sql, (prev_date, today,tuple(branches_id)))
-
-    # @http.route('/dashboard/get_branch_by_customer', auth='public', type='json')
-    # def get_branch_data(self, cco, branches_id, datepicked, **kw):
-    #     today = datetime.now().date()
-    #     prevDate = today - timedelta(days=datepicked)
-
-    #     start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
-    #     end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
-
-    #     if cco == True:
-    #         # This part of the code works fine
-    #         sql = """
-    #         SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
-    #         FROM res_branch rb
-    #         JOIN res_partner rp ON rb.id = rp.branch_id
-    #         WHERE rp.create_date BETWEEN %s AND %s
-    #         GROUP BY rb.id, rb.name
-    #         ORDER BY customer_count DESC
-    #         LIMIT 10;
-    #         """
-    #         request.env.cr.execute(sql, (start_of_prev_day, end_of_today))
-
-    #         results = request.env.cr.fetchall()
-
-    #         customer_counts = []
-
-    #         for row in results:
-    #             customer_counts.append({
-    #                 "id": row[0],
-    #                 'branch_name': row[1],
-    #                 'customer_count': row[2]
-    #             })
-
-        #     return customer_counts
-
-        # else:
-        #     # Check if branches_id is empty
-        #     if not branches_id:
-        #         return []  # Return empty result if no branches provided
-
-        #     sql = """
-        #     SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
-        #     FROM res_branch rb
-        #     JOIN res_partner rp ON rb.id = rp.branch_id
-        #     WHERE rb.id IN %s AND rp.create_date BETWEEN %s AND %s
-        #     GROUP BY rb.id, rb.name
-        #     ORDER BY customer_count DESC;
-        #     """
-
-        #     request.env.cr.execute(sql, (tuple(branches_id), start_of_prev_day, end_of_today))
-        #     results = request.env.cr.fetchall()
-
-        #     customer_counts = []
-
-        #     for row in results:
-        #         customer_counts.append({
-        #             "id": row[0],
-        #             'branch_name': row[1],
-        #             'customer_count': row[2]
-        #         })
-
-        #     return customer_counts
-
+    

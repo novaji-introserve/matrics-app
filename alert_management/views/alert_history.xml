@@ -7,10 +7,10 @@
         <field name="arch" type="xml">
             <tree string="Alert History List" create="false" >
                 <field name="alert_id" string="Alert Reference" />
-                <field name="process_id" />
                 <field name="risk_rating" />
                 <!-- <field name="narration" /> -->
                 <field name="email" />
+                <field name="source" />
                 <field name="last_checked" string="Date"   />
                 <field name="time" string="Time"/>
 
@@ -24,10 +24,10 @@
         <field name="model">alert.history</field>
         <field name="arch" type="xml" >
             <form string="Alert History List" edit="false" delete="false">
-                <header>
-                    <!-- Add the button to generate and download CSV -->
+                <!-- <header>
+                    Add the button to generate and download CSV
                     <button name="generate_csv" type="object" string="Download CSV" style="background-color: #007046;" />
-                </header>
+                </header> -->
                <sheet>
                 <div class="oe_title">
                     <label for="alert_id" class="oe_edit_only" />
@@ -35,11 +35,23 @@
                         <field name="alert_id" string="Alert Reference" />
                     </h1>
                 </div>
-                <group>
-                    <group string="RISK RATING">
-                        <field name="risk_rating" string="Rating"/>
+                
+        
+                <group string="RELATED INFORMATION">
+                
+                    <group>
+                        <field name="risk_rating" string="Rating" />
                     </group>
+                    <group>
+                        <field name="source" string="Source" colspan="3" />
+                    </group>
+                    
+                    <group attrs="{'invisible': [('process_id', '=', False)]}">
+                        <field name="process_id" string="Process"/>
+                    </group>
+                    
                 </group>
+
 
                 <group string="DATE INFORMATION">
                     <group>
@@ -51,7 +63,9 @@
                 </group>
                 <notebook>
                     <page string="Record">
-                        <field name="html_body" widget="html" />
+                        <div style="overflow-x: auto; max-width: 100%;">
+                            <field name="html_body" widget="html" style="max-height: 800px; overflow-y: auto;" />
+                        </div>
                     </page>
                 </notebook>
                </sheet>

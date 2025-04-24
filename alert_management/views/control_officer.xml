@@ -45,6 +45,14 @@
             <field name="name">Control Officer</field>
             <field name="res_model">control.officer</field>
             <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create new Officer .
+            </p>
+            <p>
+                control officer in charge of a group of alert.
+            </p>
+        </field>
         </record>
 
       
