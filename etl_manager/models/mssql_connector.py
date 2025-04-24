@@ -210,7 +210,7 @@ class MSSQLConnector(models.AbstractModel):
             INNER JOIN 
                 sys.types t ON c.user_type_id = t.user_type_id
             WHERE 
-                OBJECT_ID = OBJECT_ID(%s)
+                OBJECT_ID = OBJECT_ID(?)
             ORDER BY 
                 c.column_id
         """
@@ -345,3 +345,4 @@ class MSSQLConnector(models.AbstractModel):
         except Exception as e:
             _logger.error(f"Error in SQL Server batch_update for table {table}: {str(e)}")
             raise UserError(f"Failed to update records in SQL Server table {table}: {str(e)}")
+        

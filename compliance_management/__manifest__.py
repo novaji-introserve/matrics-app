@@ -69,11 +69,7 @@
         "views/transaction_screening_rule.xml",
         "data/charts.xml",
         "data/res_partner.xml",
-        "data/fcra_score.xml",
-
-        
-        
-        
+        "data/fcra_score.xml",    
     ],
     # only loaded in demonstration mode
     "demo": [

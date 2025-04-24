@@ -34,6 +34,7 @@
                             type="object" 
                             class="oe_highlight"
                             confirm="Are you sure you want to sync this table now?"/>
+                    <button name="action_sync_table_csv" type="object" string="Sync with CSV Mode" class="oe_highlight" confirm="Are you sure you want to sync this table now?" attrs="{'invisible': [('use_csv_mode', '=', False)]}" />
                     <field name="last_sync_status" widget="statusbar"/>
                     <field name="progress_percentage" widget="progressbar" attrs="{'invisible': [('last_sync_status', '!=', 'running')]}"/>
                 </header>
@@ -53,12 +54,14 @@
                             <field name="primary_key"/>
                             <field name="batch_size"/>
                             <field name="is_base_table"/>
+                            <field name="sync_method" widget="radio"/>
                         </group>
                         <group>
                             <field name="category_id"/>
                             <field name="frequency_id"/>
                             <field name="last_sync_time"/>
                             <field name="total_records_synced"/>
+                            <field name="use_csv_mode"/>
                         </group>
                     </group>
                     <!-- Add a new group for database connections -->
