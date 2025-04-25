@@ -355,13 +355,13 @@ class Customer(models.Model):
         records = super(Customer, self).create(vals_list)
 
         # Trigger notification for UI refresh
-        self.env['bus.bus']._sendmany([
-            ('dashboard_refresh_channel', 'refresh', {
-                'type': 'refresh', 
-                'channelName': 'dashboard_refresh_channel', 
-                'model': self._name
-            })
-        ])
+        # self.env['bus.bus']._sendmany([
+        #     ('dashboard_refresh_channel', 'refresh', {
+        #         'type': 'refresh', 
+        #         'channelName': 'dashboard_refresh_channel', 
+        #         'model': self._name
+        #     })
+        # ])
    
         # Create a context to prevent recursion
         new_ctx = dict(self.env.context, computing_risk=True)
@@ -390,13 +390,13 @@ class Customer(models.Model):
         result = super(Customer, self).write(vals)
 
         # Trigger notification for UI refresh
-        self.env['bus.bus']._sendmany([
-           ('dashboard_refresh_channel', 'refresh', {
-               'type': 'refresh', 
-               'channelName': 'dashboard_refresh_channel', 
-               'model': self._name
-           })
-        ])
+        # self.env['bus.bus']._sendmany([
+        #    ('dashboard_refresh_channel', 'refresh', {
+        #        'type': 'refresh', 
+        #        'channelName': 'dashboard_refresh_channel', 
+        #        'model': self._name
+        #    })
+        # ])
 
         
 
