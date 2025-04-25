@@ -382,7 +382,7 @@
         </field>
     </record>
 
-    <!-- Report on Settings -->
+    <!-- customers matching pep tree view -->
     <record id="compliance_pep_customers_tree" model="ir.ui.view">
         <field name="name">res_compliance_pep_customers_tree</field>
         <field name="model">res.customer.pep</field>
@@ -392,12 +392,34 @@
                 <field name="customer_id" />
                 <field name="firstname" />
                 <field name="lastname" />
-                <field name="unique_identifier" />
+                <!-- <field name="unique_identifier"/> -->
                 <field name="branch_id" />
                 <field name="pep_id" invisible="1"/>
             </tree>
         </field>
     </record>
+
+     <!-- customers matching pep form -->
+   <record id="view_form_res_customer_pep" model="ir.ui.view">
+    <field name="name">res.customer.pep.form</field>
+    <field name="model">res.customer.pep</field>
+    <field name="arch" type="xml">
+        <form string="PEP Match Detail" create="false" edit="false">
+            <group>
+                <field name="customer_id" readonly="1"/>
+                <field name="branch_id" readonly="1"/>
+                <field name="firstname" readonly="1"/>
+                <field name="lastname" readonly="1"/>
+                <field name="internal_category" readonly="1"/>
+                <field name="name" readonly="1"/>
+                <field name="pep_id" readonly="1"/>
+            </group>
+        </form>
+    </field>
+    </record>
+
+
+
 
     <record id="view_customer_pep_search" model="ir.ui.view">
         <field name="name">Customer PEP Search Custom</field>
