@@ -352,6 +352,15 @@ class Customer(models.Model):
         # Create records
         records = super(Customer, self).create(vals_list)
 
+        # Trigger notification for UI refresh
+        self.env['bus.bus']._sendmany([
+            ('dashboard_refresh_channel', 'refresh', {
+                'type': 'refresh', 
+                'channelName': 'dashboard_refresh_channel', 
+                'model': self._name
+            })
+        ])
+   
         # Create a context to prevent recursion
         new_ctx = dict(self.env.context, computing_risk=True)
         self = self.with_context(new_ctx)
@@ -371,11 +380,23 @@ class Customer(models.Model):
             # Invalidate cache for these fields
             record.invalidate_recordset(['risk_score', 'risk_level'])
 
+             
         return records
 
     def write(self, vals):
         # Apply updates from vals
         result = super(Customer, self).write(vals)
+
+        # Trigger notification for UI refresh
+        self.env['bus.bus']._sendmany([
+           ('dashboard_refresh_channel', 'refresh', {
+               'type': 'refresh', 
+               'channelName': 'dashboard_refresh_channel', 
+               'model': self._name
+           })
+        ])
+
+        
 
         # Only update risk scores if we're not already in a risk score update
         # This prevents recursion
@@ -399,6 +420,9 @@ class Customer(models.Model):
                 # Invalidate cache for these fields
                 record.invalidate_recordset(['risk_score', 'risk_level'])
                 # record.invalidate_cache(['risk_score', 'risk_level'])
+            
+           
+
 
         return result
         

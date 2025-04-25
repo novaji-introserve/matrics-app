@@ -15,7 +15,8 @@ class alert_history(models.Model):
     ref_id = fields.Reference(selection=[
         ('alert.rules', 'Alert Rules'),
         ('adverse.media', 'Adverse Media'),
-        ('res.partner.edd', 'EDD')
+        ('res.partner.edd', 'EDD'),
+        ('case.management', 'Case'),
         ],
         string='Alert Source'
     )
@@ -107,6 +108,28 @@ class alert_history(models.Model):
         return None  #
     
    
+
+    # def open_reference_record(self):
+    #     """Open the referenced record in form view."""
+    #     self.ensure_one()
+    #     if not self.ref_id:
+    #         return False
+            
+    #     # Extract model name and record ID from the reference field
+    #     ref_model = self.ref_id._name
+    #     ref_id = self.ref_id.id
+
+    #     print(ref_id)
+    #     print(ref_model)
+        
+        # Return action to open the form view of the referenced record
+        # return {
+        #     'type': 'ir.actions.act_window',
+        #     'res_model': ref_model,
+        #     'view_mode': 'form',
+        #     'res_id': ref_id,
+        #     'target': 'current',
+        # }
    
     def generate_csv(self):
         

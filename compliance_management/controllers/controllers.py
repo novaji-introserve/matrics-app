@@ -58,6 +58,9 @@ class Compliance(http.Controller):
             condition_string = where_match.group(1)
             domain = self._parse_condition_to_odoo_domain(condition_string)  
         
+        if table == "res_partner":
+            domain.append(["origin", "in", ["demo", "test", "prod"]])
+        
         # check if it is not cco
         if not cco:
             domain.append(["branch_id", "in", self.check_branches_id(branches_id)])
@@ -180,7 +183,18 @@ class Compliance(http.Controller):
                         query = query[:-1]
                     
                     # Add branch filtering to the query
-                    if branches_array:
+                    if branches_array and "res.partner" in query:
+                        if " where " in query.lower() or " WHERE " in query:
+                            query += f" AND branch_id = ANY(%s::integer[])"
+                        else:
+                            query += f" WHERE branch_id = ANY(%s::integer[])"
+                            
+                        query += " AND origin = ANY(['demo','test','prod'])"
+                        # Execute the query with branch filter
+                        request.env.cr.execute(query, (branches_array,))
+                    
+                    elif branches_array and "res.partner" not in query:
+                        
                         if " where " in query.lower() or " WHERE " in query:
                             query += f" AND branch_id = ANY(%s::integer[])"
                         else:
@@ -188,6 +202,7 @@ class Compliance(http.Controller):
                             
                         # Execute the query with branch filter
                         request.env.cr.execute(query, (branches_array,))
+
                     else:
                         # If no branches, add a condition that returns no results
                         if " where " in query.lower() or " WHERE " in query:
@@ -273,7 +288,19 @@ class Compliance(http.Controller):
                         query = query[:-1]
                     
                     # Add branch filtering to the query
-                    if branches_array:
+                    if branches_array and "res.partner" in query:
+                        
+                        if " where " in query.lower() or " WHERE " in query:
+                            query += f" AND branch_id = ANY(%s::integer[])"
+                        else:
+                            query += f" WHERE branch_id = ANY(%s::integer[])"
+                            
+                        # Execute the query with branch filter
+                        query += " AND origin = ANY(['demo','test','prod'])"
+                        request.env.cr.execute(query, (branches_array,))
+
+                    elif branches_array and "res.partner" not in query:
+                        
                         if " where " in query.lower() or " WHERE " in query:
                             query += f" AND branch_id = ANY(%s::integer[])"
                         else:
