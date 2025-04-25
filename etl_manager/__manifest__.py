@@ -34,6 +34,7 @@ Technical Benefits:
         'security/ir.model.access.csv',
         'data/preloaded_data/etl_default_data.xml',
         'data/preloaded_data/etl_database_types.xml',
+        # 'data/settings/queue_job_function.xml',
         'views/etl_database_views.xml',
         'views/etl_sync_log_views.xml',
         'views/etl_config_views.xml',
@@ -52,6 +53,7 @@ Technical Benefits:
     'maintainer': 'Synth Corporation',
     'support': 'olumide.awodeji@hotmail.com',
     'demo': [],
+    'post_init_hook': 'post_init_hook',
     # 'external_dependencies': {
     #     'python': ['psycopg2', 'mysql-connector-python', 'pyodbc', 'cx_Oracle', 'sqlite3'],
     # },
