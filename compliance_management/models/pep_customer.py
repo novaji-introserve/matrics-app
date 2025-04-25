@@ -15,17 +15,18 @@ class PepCustomer(models.Model):
     name = fields.Char(string='Name')
     pep_id = fields.Integer(string='Pep ID')
 
+
     def init(self):
         tools.drop_view_if_exists(self._cr, 'res_customer_pep')
         self._cr.execute("""
-           create or replace view res_customer_pep as (
-            select c.id as id,c.customer_id,c.branch_id,c.firstname,c.lastname,
-            c.internal_category,p.unique_identifier,c.name,p.id pep_id
+        create or replace view res_customer_pep as (
+            select c.id as id, c.customer_id, c.branch_id, c.firstname, c.lastname,
+            c.internal_category, p.unique_identifier, c.name, p.id pep_id
             from res_partner c 
             join res_pep p
-            on lower(c.firstname) = lower(p.first_name) and lower(c.lastname) = lower(p.surname) 
-            where c.global_pep_id is null
-           )""")
+            on lower(c.firstname) = lower(p.first_name) and lower(c.lastname) = lower(p.surname)
+            where c.global_pep_id is null and c.is_pep = True
+        )""")
 
     def action_view_customer_pep(self):
         # domain = [
@@ -36,9 +37,10 @@ class PepCustomer(models.Model):
         return {
             'name': _('Customers matching PEP'),
             'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.pep',
+            'res_model': 'res.partner',
             'view_mode': 'tree',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
+            'domain': [('is_pep', '=', True)],
+            # 'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
             'context': {'search_default_group_branch': 1}
         }
     
