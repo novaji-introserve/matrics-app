@@ -13,3 +13,4 @@ class Watchlist(models.Model):
     middle_name = fields.Char(string="Middle Name")
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', required=False, index=True)
+    bvn = fields.Char(string='BVN', tracking=True, index = True)
