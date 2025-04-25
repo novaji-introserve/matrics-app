@@ -8,8 +8,6 @@ class PepCustomer(models.Model):
     _name = 'res.customer.pep'
     _auto = False
     _description = 'Customers matching PEP'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
-
 
     customer_id = fields.Many2one('res.partner', string='Customer',tracking=True)
     branch_id = fields.Many2one('res.branch', string='Branch', tracking=True)
