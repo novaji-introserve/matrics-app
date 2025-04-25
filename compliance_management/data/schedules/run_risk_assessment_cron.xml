@@ -9,7 +9,7 @@
             <field name="interval_number">5</field>
             <field name="interval_type">minutes</field>
             <field name="doall" eval="True"/>
-            <field name="active">True</field>
+            <field name="active">False</field>
         </record>
     </data>
 </odoo>
