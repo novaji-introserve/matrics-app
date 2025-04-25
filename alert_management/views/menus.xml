@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Main Menu -->
-    <menuitem web_icon="alert_management,static/description/icon.png" id="menu_alert_management_main"  name="Alert" sequence="-400"/>
+    <menuitem web_icon="alert_management,static/description/icon.png" id="menu_alert_management_main"  name="Alert Management" sequence="-400"/>
 
 
     <!-- Alert Monitoring -->

@@ -9,3 +9,4 @@ __pycache__/
 # macOS
 .DS_Store
 
+etl_csv_files/

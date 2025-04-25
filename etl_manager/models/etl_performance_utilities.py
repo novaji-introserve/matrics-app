@@ -1,62 +1,78 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 import logging
-import gc
 import time
-import threading
 import psutil
 import os
-from contextlib import contextmanager
-from datetime import datetime, timedelta
-import functools
+import gc
+import tempfile
 import json
+import threading
+from contextlib import contextmanager
+from functools import wraps
+import weakref
 
 _logger = logging.getLogger(__name__)
 
-def log_execution_time(func):
-    """Decorator to log execution time of functions"""
-    @functools.wraps(func)
+def memory_tracked(func):
+    """Decorator to track memory usage of functions"""
+    @wraps(func)
     def wrapper(*args, **kwargs):
+        process = psutil.Process(os.getpid())
+        memory_before = process.memory_info().rss / 1024 / 1024  # MB
+        
+        # Force garbage collection before operation
+        gc.collect()
+        
         start_time = time.time()
+        result = None
+        
         try:
             result = func(*args, **kwargs)
             return result
         finally:
-            end_time = time.time()
-            execution_time = end_time - start_time
-            _logger.info(f"Function {func.__name__} executed in {execution_time:.2f} seconds")
-            # Log to database if execution time exceeds threshold
-            if execution_time > 10:  # Only log if > 10 seconds
+            # Force garbage collection after operation
+            gc.collect()
+            
+            memory_after = process.memory_info().rss / 1024 / 1024  # MB
+            memory_diff = memory_after - memory_before
+            execution_time = time.time() - start_time
+            
+            # Get function name and calling class if possible
+            func_name = func.__name__
+            class_name = ""
+            
+            if args and hasattr(args[0], "__class__") and hasattr(args[0].__class__, "__name__"):
+                class_name = args[0].__class__.__name__
+            
+            _logger.info(f"Memory usage for {class_name}.{func_name}: "
+                        f"Before={memory_before:.1f}MB, After={memory_after:.1f}MB, "
+                        f"Diff={memory_diff:+.1f}MB, Time={execution_time:.2f}s")
+            
+            # Log to database if significant memory change or slow execution
+            if abs(memory_diff) > 50 or execution_time > 5.0:
                 try:
-                    self = args[0] if args else None
-                    if hasattr(self, 'env'):
+                    # Extract self if it exists in args
+                    self = args[0] if args and hasattr(args[0], 'env') else None
+                    
+                    if self and hasattr(self, 'env'):
+                        # Log performance data
                         self.env['etl.performance.log'].sudo().create({
-                            'name': func.__name__,
+                            'name': f"{class_name}.{func_name}",
                             'execution_time': execution_time,
-                            'date': fields.Datetime.now(),
+                            'memory_before': memory_before,
+                            'memory_after': memory_after,
+                            'memory_diff': memory_diff,
+                            'details': json.dumps({
+                                'args': str(args[1:])[:100] if len(args) > 1 else '',
+                                'kwargs': str(kwargs)[:100] if kwargs else ''
+                            })
                         })
                 except Exception as e:
-                    _logger.error(f"Failed to log performance: {str(e)}")
-    return wrapper
-
-@contextmanager
-def memory_profile():
-    """Context manager to profile memory usage"""
-    process = psutil.Process(os.getpid())
-    mem_before = process.memory_info().rss / 1024 / 1024  # MB
-    gc.collect()  # Force garbage collection before starting
+                    _logger.warning(f"Failed to log performance data: {str(e)}")
     
-    start_time = time.time()
-    try:
-        yield
-    finally:
-        end_time = time.time()
-        gc.collect()  # Force garbage collection after execution
-        mem_after = process.memory_info().rss / 1024 / 1024  # MB
-        elapsed_time = end_time - start_time
-        
-        _logger.info(f"Memory usage: Before={mem_before:.2f}MB, After={mem_after:.2f}MB, "
-                    f"Diff={mem_after - mem_before:.2f}MB, Time={elapsed_time:.2f}s")
+    return wrapper
 
 class ETLPerformanceLog(models.Model):
     _name = 'etl.performance.log'
@@ -218,6 +234,25 @@ class ETLBatchProcessor(models.AbstractModel):
             model.clear_caches()
             
         return record_ids
+
+@contextmanager
+def memory_profile():
+    """Context manager to profile memory usage"""
+    process = psutil.Process(os.getpid())
+    mem_before = process.memory_info().rss / 1024 / 1024  # MB
+    gc.collect()  # Force garbage collection before starting
+    
+    start_time = time.time()
+    try:
+        yield
+    finally:
+        end_time = time.time()
+        gc.collect()  # Force garbage collection after execution
+        mem_after = process.memory_info().rss / 1024 / 1024  # MB
+        elapsed_time = end_time - start_time
+        
+        _logger.info(f"Memory usage: Before={mem_before:.2f}MB, After={mem_after:.2f}MB, "
+                    f"Diff={mem_after - mem_before:.2f}MB, Time={elapsed_time:.2f}s")
 
 class ETLSystemMonitor(models.AbstractModel):
     _name = 'etl.system.monitor'
@@ -405,3 +440,98 @@ class ETLSystemLog(models.Model):
     
     def name_get(self):
         return [(log.id, f"System Log - {log.date}") for log in self]
+
+class MemoryEfficientJSONSerializer:
+    """Utility for memory-efficient JSON serialization/deserialization"""
+    
+    @staticmethod
+    def serialize_to_file(data, file_path=None):
+        """Serialize data to a file with minimal memory usage"""
+        if file_path is None:
+            # Create a temp file
+            with tempfile.NamedTemporaryFile(delete=False, mode='w+') as f:
+                file_path = f.name
+        
+        with open(file_path, 'w') as f:
+            # Handle different data types
+            if isinstance(data, list):
+                # Write as JSON lines for large lists
+                f.write('[')
+                for i, item in enumerate(data):
+                    if i > 0:
+                        f.write(',')
+                    json.dump(item, f)
+                f.write(']')
+            else:
+                # Regular JSON for other types
+                json.dump(data, f)
+        
+        return file_path
+    
+    @staticmethod
+    def deserialize_from_file(file_path):
+        """Deserialize data from a file with minimal memory usage"""
+        with open(file_path, 'r') as f:
+            return json.load(f)
+    
+    @staticmethod
+    def stream_large_list(file_path):
+        """Stream a large list from a file one item at a time"""
+        with open(file_path, 'r') as f:
+            # Check if it starts with a bracket
+            char = f.read(1)
+            if char != '[':
+                f.seek(0)
+                # Not a JSON array, try to parse whole file
+                return json.load(f)
+            
+            # Start parsing array items
+            buffer = ""
+            depth = 1  # We've already seen one [
+            in_string = False
+            escape_next = False
+            
+            while True:
+                char = f.read(1)
+                if not char:  # End of file
+                    break
+                
+                buffer += char
+                
+                # Handle string boundaries
+                if char == '"' and not escape_next:
+                    in_string = not in_string
+                elif char == '\\' and in_string and not escape_next:
+                    escape_next = True
+                    continue
+                
+                if not in_string:
+                    if char == '{':
+                        depth += 1
+                    elif char == '}':
+                        depth -= 1
+                    elif char == '[':
+                        depth += 1
+                    elif char == ']':
+                        depth -= 1
+                    elif char == ',' and depth == 1:
+                        # We've reached the end of an item at the top level
+                        try:
+                            item = json.loads(buffer[:-1])  # Remove the comma
+                            yield item
+                        except json.JSONDecodeError as e:
+                            _logger.error(f"Error parsing JSON item: {str(e)}, content: {buffer}")
+                        buffer = ""
+                
+                escape_next = False
+            
+            # Handle the last item
+            if buffer.rstrip().endswith(']'):
+                buffer = buffer[:-1]  # Remove the closing bracket
+            
+            if buffer.strip():
+                try:
+                    item = json.loads(buffer)
+                    yield item
+                except json.JSONDecodeError as e:
+                    _logger.error(f"Error parsing last JSON item: {str(e)}, content: {buffer}")

@@ -145,6 +145,9 @@ class Customer(models.Model):
     is_greylist = fields.Boolean(
         string="Is Greylist", default=False, tracking=True)   
     
+    origin = fields.Selection(string='Data Origin', selection=[('demo', 'Demo Data'), (
+        'test', 'Test Data'), ('prod', 'Production Data')], index=True)
+    
     
       
     
@@ -231,8 +234,8 @@ class Customer(models.Model):
             RETURNS TRIGGER AS $$
             BEGIN
 
-                -- Check if this is demo data (active = FALSE)
-                IF NEW.active IS NOT NULL AND NEW.active = FALSE THEN
+                -- Check if this is demo data (origin = 'demo')
+                IF NEW.origin = 'demo' THEN
                     -- For demo data: Set defaults but preserve certain fields like risk_level
                     -- Save the original risk_level value if it exists
                     DECLARE original_risk_level VARCHAR;
@@ -246,7 +249,7 @@ class Customer(models.Model):
                         NEW.lang = 'en_US';
                         NEW.color = 0;
                         NEW.tz = 'Africa/Lagos';
-                        NEW.internal_category = 'customer';
+                        
                         
                         
                         -- Restore the original risk_level if it was set
@@ -342,7 +345,7 @@ class Customer(models.Model):
             FOR EACH ROW
             EXECUTE FUNCTION set_partner_defaults_after_func();
         """)
-    
+        
     
     @api.model_create_multi
     def create(self, vals_list):
