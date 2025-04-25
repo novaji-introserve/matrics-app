@@ -28,6 +28,8 @@
                     Add the button to generate and download CSV
                     <button name="generate_csv" type="object" string="Download CSV" style="background-color: #007046;" />
                 </header> -->
+                 <!-- <button name="open_reference_record" string="View Source Record" type="object" 
+                        class="oe_highlight float-right" attrs="{'invisible': [('ref_id', '=', False)]}"/> -->
                <sheet>
                 <div class="oe_title">
                     <label for="alert_id" class="oe_edit_only" />
@@ -48,6 +50,9 @@
                     
                     <group attrs="{'invisible': [('process_id', '=', False)]}">
                         <field name="process_id" string="Process"/>
+                    </group>
+                    <group>
+                        <field name="ref_id" string="Reference "/>
                     </group>
                     
                 </group>

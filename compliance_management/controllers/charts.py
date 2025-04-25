@@ -33,56 +33,8 @@ class DynamicChartController(http.Controller):
         # If no clauses found, add WHERE at the end
         return query + f" WHERE {where_clause}"
 
-    # def _add_where_to_query(self, query, where_clause):
-    #     # Initialize variable to store conditions with values (as a list)
-    #     conditions_with_values = []
-        
-    #     if 'WHERE' in query.upper():
-    #         # Find the position of WHERE
-    #         where_pos = query.upper().find('WHERE')
-            
-    #         # Find the end of the WHERE clause
-    #         end_pos = len(query)
-    #         for clause in ['GROUP BY', 'ORDER BY', 'LIMIT']:
-    #             clause_pos = query.upper().find(clause, where_pos)
-    #             if clause_pos != -1:
-    #                 end_pos = min(end_pos, clause_pos)
-            
-    #         # Get everything after WHERE up to the next clause (the original conditions)
-    #         where_content = query[where_pos + 5:end_pos].strip()
-            
-    #         # Store conditions with values
-    #         if where_content:
-    #             # Split by AND to handle multiple conditions
-    #             conditions = where_content.split(' AND ')
-    #             for condition in conditions:
-    #                 condition = condition.strip()
-    #                 if '=' in condition:
-    #                     conditions_with_values.append(condition)
-            
-    #         # Determine whether we need to add an AND
-    #         if where_content:
-    #             # There are existing conditions, so add AND
-    #             new_where = f"WHERE {where_clause} AND {where_content}"
-    #         else:
-    #             # No existing conditions after WHERE
-    #             new_where = f"WHERE {where_clause}"
-                
-    #         return query[:where_pos] + new_where
-        
-    #     # If no WHERE clause exists, add it before GROUP BY, ORDER BY, etc.
-    #     for clause in ['GROUP BY', 'ORDER BY', 'LIMIT']:
-    #         if clause in query.upper():
-    #             position = query.upper().find(clause)
-    #             return query[:position] + f" WHERE {where_clause} " + query[position:]
-        
-    #     # If no clauses found, add WHERE at the end
-    #     return query + f" WHERE {where_clause}"
-    
 
     def _process_query_results(self, chart, query):
-
-      
        
         try:
             request.env.cr.execute(query)
@@ -183,6 +135,9 @@ class DynamicChartController(http.Controller):
 
                 # Modify query to include WHERE clause
                 query = self._add_where_to_query(chart.query, where_clause)
+
+                # print("this is query*********************")
+                # print(query)
 
                 
                 # Execute query and process results
