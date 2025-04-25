@@ -9,12 +9,12 @@ class PepCustomer(models.Model):
     _auto = False
     _description = 'Customers matching PEP'
 
-    customer_id = fields.Many2one('res.partner', string='Customer')
-    branch_id = fields.Many2one('res.branch', string='Branch')
-    firstname = fields.Char(string='Firstname')
-    lastname = fields.Char(string='Lastname')
-    internal_category = fields.Char(string='Internal Category')
-    name = fields.Char(string='Name')
+    customer_id = fields.Many2one('res.partner', string='Customer',tracking=True)
+    branch_id = fields.Many2one('res.branch', string='Branch', tracking=True)
+    firstname = fields.Char(string='Firstname', tracking=True)
+    lastname = fields.Char(string='Lastname', tracking=True)
+    internal_category = fields.Char(string='Internal Category', tracking=True)
+    name = fields.Char(string='Name', tracking=True)
     pep_id = fields.Integer(string='PEP ID')
     is_pep = fields.Boolean(string="Is PEP")
 
