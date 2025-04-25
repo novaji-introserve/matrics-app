@@ -65,10 +65,17 @@ class Statistic(models.Model):
 
         if sql_query:  # Check if sql_query is provided
             try:
-                query = sql_query.strip().lower()
+                query:str = sql_query.strip().lower()
 
                 if not query.startswith('select'):
                     raise ValidationError('Query not supported.\nHint: Start with SELECT')
+                
+                if "res.partner" in query:
+
+                    if query.endswith(";"):
+                        query[:-1]
+                    
+                    query += " AND origin = ANY(['demo','test','prod'])"
                 
                 self.env.cr.execute(query)
 
