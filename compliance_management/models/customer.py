@@ -395,7 +395,6 @@ class Customer(models.Model):
                'model': self._name
            })
         ])
-
         
 
         # Only update risk scores if we're not already in a risk score update
