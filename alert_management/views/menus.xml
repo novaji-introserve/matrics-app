@@ -18,8 +18,8 @@
         name="Configurations"
         parent="menu_alert_management_main"
         sequence="2"
-        groups="compliance_management.group_tech_support"
     />
+        <!-- groups="compliance_management.group_tech_support" -->
 
     <menuitem id="menu_internal_ctrl_alert_monitoring"
               name="Internal Control"
