@@ -4,7 +4,8 @@ from odoo import models, fields, api, _
 from psycopg2 import ProgrammingError
 import logging
 from dotenv import load_dotenv
-import psycopg2, os
+import psycopg2
+import os
 
 
 load_dotenv()
@@ -29,12 +30,16 @@ class Shareholders(models.Model):
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Partner', ondelete="cascade")
 
+
 class PartnerRiskPlanLines(models.Model):
-    _name="res.partner.risk.plan.line"
-    _description="Partner Risk Plan Lines"
-    partner_id = fields.Many2one('res.partner', string='Partner', ondelete="cascade",index=True)
-    plan_line_id = fields.Many2one('res.compliance.risk.assessment.plan', string='Plan Line',index=True)
-    risk_score = fields.Float(string='Risk Score', digits=(10,2))
+    _name = "res.partner.risk.plan.line"
+    _description = "Partner Risk Plan Lines"
+    partner_id = fields.Many2one(
+        'res.partner', string='Partner', ondelete="cascade", index=True)
+    plan_line_id = fields.Many2one(
+        'res.compliance.risk.assessment.plan', string='Plan Line', index=True)
+    risk_score = fields.Float(string='Risk Score', digits=(10, 2))
+
 
 class Customer(models.Model):
     _inherit = 'res.partner'
@@ -43,7 +48,8 @@ class Customer(models.Model):
          "Customer ID already exists. Value must be unique!"),
     ]
 
-    customer_id = fields.Char(string="Customer ID", index=True, tracking=True, readonly=True)
+    customer_id = fields.Char(string="Customer ID",
+                              index=True, tracking=True, readonly=True)
     bvn = fields.Char(string='BVN', tracking=True, readonly=True)
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True, tracking=True, readonly=True)
@@ -66,12 +72,11 @@ class Customer(models.Model):
     region_id = fields.Many2one(
         comodel_name='res.partner.region', string='Region', tracking=True, readonly=True)
     sector_id = fields.Many2one(
-        
+
         comodel_name='res.partner.sector', string='Sector', index=True, tracking=True, readonly=True)
     industry_id = fields.Many2one(
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
-    
     sex_id = fields.Many2one(
         comodel_name='res.partner.gender', string='Sex', index=True, readonly=True)
     firstname = fields.Char(string='Firstname', readonly=True)
@@ -99,7 +104,8 @@ class Customer(models.Model):
         comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
-    risk_plan_line_ids = fields.One2many(comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
+    risk_plan_line_ids = fields.One2many(
+        comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
     risk_assessment_ids = fields.One2many(
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
     is_pep = fields.Boolean(string="Is PEP", default=False, tracking=True)
@@ -127,41 +133,38 @@ class Customer(models.Model):
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
         string='Accounts', compute='_total_accounts', store=True)
-    global_pep_id = fields.Many2one('res.pep', string='Related Global PEP',tracking=True)
-    
+    global_pep_id = fields.Many2one(
+        'res.pep', string='Related Global PEP', tracking=True)
+
     address = fields.Char(string="Address", required=False, readonly=True)
     customer_title = fields.Char(string="Title", required=False, readonly=True)
     gender = fields.Char(string="Gender", required=False, readonly=True)
     marital_status = fields.Char(
         string="Marital Status", required=False, readonly=True)
-    employment_status = fields.Char(string="Employment Status", required=False,readonly=True)
-    state_residence = fields.Char(string="Region", required=False, readonly=True)
+    employment_status = fields.Char(
+        string="Employment Status", required=False, readonly=True)
+    state_residence = fields.Char(
+        string="Region", required=False, readonly=True)
     nin = fields.Char(
         string="National Identification Number (NIN)", required=False, readonly=True)
     customer_rating = fields.Char(
         string="Customer Rating", required=False, readonly=True)
     active = fields.Boolean(default=True, readonly=True)
-    
+
     is_greylist = fields.Boolean(
-        string="Is Greylist", default=False, tracking=True)   
-    
+        string="Is Greylist", default=False, tracking=True)
+
     origin = fields.Selection(string='Data Origin', selection=[('demo', 'Demo Data'), (
         'test', 'Test Data'), ('prod', 'Production Data')], index=True)
-    
-    
-      
-    
+
     # is_branch_compliance = fields.Boolean(
     #     string="Is Branch Compliance Officer",
     #     compute="_compute_is_branch_compliance"
     # )
-     
-
 
     def cron_run_risk_assessment(self):
         self.update_sanction_status()
         self.compute_risk_score_for_all_users()
-
 
     def update_sanction_status(self):
         _logger.info("Starting PEP status check using SQL query.")
@@ -180,7 +183,8 @@ class Customer(models.Model):
             return
 
         # Prepare a set of unique full names
-        full_names = list(set(f"{first} {last}" for _, first, last in partners))
+        full_names = list(
+            set(f"{first} {last}" for _, first, last in partners))
         _logger.info(f"Unique customer full names: {full_names}")
 
         #  DB Update
@@ -215,8 +219,8 @@ class Customer(models.Model):
         self.env.cr.execute(query_update_watchlist)
 
         self.env.cr.commit()
-        _logger.info("Sanction status update completed for global_pep, blacklist, and watchlist.")
-
+        _logger.info(
+            "Sanction status update completed for global_pep, blacklist, and watchlist.")
 
     # industry =
 
@@ -226,7 +230,6 @@ class Customer(models.Model):
             "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
-
 
         # Create the trigger
         self.env.cr.execute("""
@@ -326,7 +329,7 @@ class Customer(models.Model):
             FOR EACH ROW
             EXECUTE FUNCTION set_partner_defaults_func();
         """)
-        
+
         # Create AFTER INSERT trigger for commercial_partner_id
         self.env.cr.execute("""
             CREATE OR REPLACE FUNCTION set_partner_defaults_after_func()
@@ -345,21 +348,20 @@ class Customer(models.Model):
             FOR EACH ROW
             EXECUTE FUNCTION set_partner_defaults_after_func();
         """)
-        
-    
+
     @api.model_create_multi
     def create(self, vals_list):
         # Create records
         records = super(Customer, self).create(vals_list)
 
         # Trigger notification for UI refresh
-        self.env['bus.bus']._sendmany([
-            ('dashboard_refresh_channel', 'refresh', {
-                'type': 'refresh', 
-                'channelName': 'dashboard_refresh_channel', 
-                'model': self._name
-            })
-        ])
+        # self.env['bus.bus']._sendmany([
+        #     ('dashboard_refresh_channel', 'refresh', {
+        #         'type': 'refresh', 
+        #         'channelName': 'dashboard_refresh_channel', 
+        #         'model': self._name
+        #     })
+        # ])
    
         # Create a context to prevent recursion
         new_ctx = dict(self.env.context, computing_risk=True)
@@ -424,13 +426,13 @@ class Customer(models.Model):
 
 
         return result
-        
+
     def scan_news_articles(self):
         """Trigger news scanning via adverse.media"""
         self.ensure_one()  # Ensure we're working with a single record
         # adverse_media = self.adverse_media_id
         # if not adverse_media:
-            # Create or find an adverse.media record if no direct link exists
+        # Create or find an adverse.media record if no direct link exists
         adverse_media = self.env['adverse.media'].search(
             [('partner_id', '=', self.id)], limit=1)
         if not adverse_media:
@@ -442,7 +444,7 @@ class Customer(models.Model):
 
         # Call the original method from adverse.media
         return adverse_media.scan_news_articles()
-    
+
     @api.depends('account_ids')
     def _total_accounts(self):
         for e in self:
@@ -457,7 +459,7 @@ class Customer(models.Model):
             'domain': [('customer_id.id', 'in', [self.id])],
             'context': {'search_default_group_branch': 1}
         }
-        
+
     def action_risk_level(self):
         return {
             'type': 'ir.actions.client',
@@ -477,9 +479,9 @@ class Customer(models.Model):
                     return 'high'
             except:
                 return 'low'
-    
+
     @api.model
-    def _get_risk_level_from_score(self,risk_score):
+    def _get_risk_level_from_score(self, risk_score):
         try:
             if risk_score is None:
                 return 'low'
@@ -491,7 +493,7 @@ class Customer(models.Model):
                 return 'high'
         except:
             return 'low'
-        
+
     @api.model
     def update_partner_risk_levels(self):
         """
@@ -502,10 +504,10 @@ class Customer(models.Model):
         for partner in partners:
             risk_score = partner.risk_score  # Assuming risk_score is a field on res.partner
             risk_level = self._get_risk_level_from_score(risk_score)
-            partner.write({'risk_level': risk_level})  # Assuming risk_level is a field on res.partner
-        
+            # Assuming risk_level is a field on res.partner
+            partner.write({'risk_level': risk_level})
+
         return True
-    
 
     def _get_current_branch(self):
         for record in self:
@@ -519,10 +521,10 @@ class Customer(models.Model):
             'view_mode': 'form',
             'context': {"default_customer_id": self.id},
         }
-    
+
     def action_unmark_pep(self):
         for e in self:
-            e.write({'is_pep':False,'global_pep':False,'global_pep_id': None})
+            e.write({'is_pep': False, 'global_pep': False, 'global_pep_id': None})
             e.action_compute_risk_score_with_plan()
 
     def action_add_pep(self):
@@ -580,7 +582,7 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]), ('internal_category', '=', 'customer')],
             'context': {'search_default_group_branch': 1}
         }
 
@@ -595,7 +597,7 @@ class Customer(models.Model):
     #         # 'domain': [('internal_category','=','customer')],
     #         'context': {'search_default_group_branch': 1}
     #     }
-        
+
     @api.model
     def open_customers(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -605,13 +607,16 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'customer')]
+            domain = [('internal_category', '=', 'customer'),
+                      ('origin', 'in', ['demo', 'test', 'prod'])]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'customer')
-                
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id]),
+                ('internal_category', '=', 'customer'),
+                ('origin', 'in', ['demo', 'test', 'prod'])
+
 
             ]
 
@@ -623,7 +628,7 @@ class Customer(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-        
+
     @api.model
     def open_vendors(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -633,14 +638,16 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'vendor')]
+            domain = [('internal_category', '=', 'vendor'),
+                      ('origin', 'in', ['demo', 'test', 'prod'])]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'vendor')
-              
+                ('internal_category', '=', 'vendor'), ('origin',
+                                                       'in', ['demo', 'test', 'prod'])
+
             ]
 
         return {
@@ -652,8 +659,6 @@ class Customer(models.Model):
             'context': {'search_default_group_branch': 1}
         }
 
-      
-    
     @api.model
     def open_partners(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -669,7 +674,8 @@ class Customer(models.Model):
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'partner')
+                ('internal_category', '=', 'partner'), ('origin',
+                                                        'in', ['demo', 'test', 'prod'])
             ]
 
         return {
@@ -680,8 +686,7 @@ class Customer(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-       
-    
+
     @api.model
     def open_correspondents(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -691,13 +696,14 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'correspondent')]
+            domain = [('internal_category', '=', 'correspondent'),
+                      ('origin', 'in', ['demo', 'test', 'prod'])]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'correspondent')]
+                ('internal_category', '=', 'correspondent'), ('origin', 'in', ['demo', 'test', 'prod'])]
 
         return {
             'name': _('Correspondents'),
@@ -707,8 +713,7 @@ class Customer(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-       
-    
+
     @api.model
     def open_respondents(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -718,13 +723,15 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'respondent')]
+            domain = [('internal_category', '=', 'respondent'),
+                      ('origin', 'in', ['demo', 'test', 'prod'])]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'respondent')
+                ('internal_category', '=', 'respondent'), 
+                ('origin','in', ['demo', 'test', 'prod'])
 
             ]
 
@@ -736,14 +743,13 @@ class Customer(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-        
 
     def get_risk_score(self):
         return self.risk_score
 
     def get_risk_level(self):
         return self.risk_level
-    
+
     @api.depends('risk_score')
     def _compute_risk_level(self):
         for record in self:
@@ -753,10 +759,7 @@ class Customer(models.Model):
                 record.risk_level = "medium"
             else:
                 record.risk_level = "high"
-    
-                
-                
-                
+
     @api.onchange('risk_score')
     def _onchange_risk_score(self):
         if self.risk_score <= LOW_RISK_THRESHOLD:
@@ -766,21 +769,17 @@ class Customer(models.Model):
         else:
             self.risk_level = "high"
 
-
-
     def get_risk_level_name(self):
         return '%s risk' % (self.risk_level)
 
-   
-
     # logic to commpute total risk sore of all users
+
     @api.model
     def compute_risk_score_for_all_users(self):
         records = self.search([])
         for record in records:
             score = record._get_risk_score_from_plan()
             risk_level = record.compute_risk_level()
-            
 
             # Use direct SQL update to avoid triggering write()
             self.env.cr.execute(
@@ -794,7 +793,7 @@ class Customer(models.Model):
             record.invalidate_recordset(['risk_score', 'risk_level'])
 
         return True
-    
+
     def action_compute_risk_score_with_plan(self):
         """Manual action to compute risk score"""
         for record in self:
@@ -812,9 +811,7 @@ class Customer(models.Model):
             record.invalidate_recordset(['risk_score', 'risk_level'])
 
         return True
-        
-        
-    
+
     def _get_risk_score_from_plan(self):
         setting = self.env['res.compliance.settings'].search(
             [('code', '=', 'risk_plan_computation')], limit=1)
@@ -888,5 +885,3 @@ class Customer(models.Model):
     #     # Set domain based on user group
     #     for record in self:
     #         record.is_branch_compliance = is_branch_compliance_officer
-            
-        
