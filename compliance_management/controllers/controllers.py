@@ -97,6 +97,20 @@ class Compliance(http.Controller):
                 is_not = null_match.group(2) is not None
                 domain.append([field, '!=' if is_not else '=', None])
                 continue
+
+             # Handle IS TRUE specially
+            true_match = re.match(r"([\w.]+)\s+is\s+true", cond, re.IGNORECASE)
+            if true_match:
+                field = true_match.group(1).strip()
+                domain.append([field, '=', True])
+                continue
+            
+            # Handle IS FALSE specially
+            false_match = re.match(r"([\w.]+)\s+is\s+false", cond, re.IGNORECASE)
+            if false_match:
+                field = false_match.group(1).strip()
+                domain.append([field, '=', False])
+                continue
             
             # Handle standard operators
             operators = ['>=', '<=', '!=', '<>', '=', '>', '<', ' like ', ' ilike ', ' in ', ' not in ']
@@ -330,6 +344,9 @@ class Compliance(http.Controller):
                 AND rcs.create_date < %s;
             """
 
+            # Execute the query first (assuming parameters are defined elsewhere)
+            request.env.cr.execute(query, (start_of_prev_day, end_of_today))
+
             # Get column names and results
             columns = [desc[0] for desc in request.env.cr.description]
             stat_records = [dict(zip(columns, row)) for row in request.env.cr.fetchall()]
@@ -345,7 +362,7 @@ class Compliance(http.Controller):
                 needs_modification = False
                 
                 # Check if we need to modify this query
-                if any(table in query for table in ["res_partner", "res.partner", "tier", "transaction"]):
+                if any(table in query for table in ["res_partner", "res.partner", "transaction"]):
                     needs_modification = True
                     
                     # Remove trailing semicolon if present
@@ -392,24 +409,21 @@ class Compliance(http.Controller):
                         else:
                             original_query += condition_str
                 
-                # Execute the query with or without parameters
-                if needs_modification and branches_array and any(param in conditions[0] for param in ["%s", "ANY(%s"]):
-                    request.env.cr.execute(original_query, (branches_array,))
-                else:
-                    request.env.cr.execute(original_query)
                 
-                # For count queries, we expect a single row with a single value
-                result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                        request.env.cr.execute(original_query, (branches_array,))
+                    
+                        # For count queries, we expect a single row with a single value
+                        result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
                 
-                # Add the results to our collection
-                computed_results.append({
-                    "name": stat["name"],
-                    "scope": stat["scope"],
-                    "val": result_value,
-                    "id": stat["id"],
-                    "scope_color": stat["scope_color"],
-                    "query": stat["sql_query"]
-                })
+                        # Add the results to our collection
+                        computed_results.append({
+                            "name": stat["name"],
+                            "scope": stat["scope"],
+                            "val": result_value,
+                            "id": stat["id"],
+                            "scope_color": stat["scope_color"],
+                            "query": stat["sql_query"]
+                        })
 
             return {
                 "data": computed_results,
@@ -490,24 +504,26 @@ class Compliance(http.Controller):
                         else:
                             original_query += condition_str
                 
-                # Execute the query with or without parameters
-                if needs_modification and branches_array and any(param in conditions[0] for param in ["%s", "ANY(%s"]):
-                    request.env.cr.execute(original_query, (branches_array,))
-                else:
-                    request.env.cr.execute(original_query)
+                        # Execute the query with or without parameters
+                        request.env.cr.execute(original_query, (branches_array,))
+                        
                 
-                # For count queries, we expect a single row with a single value
-                result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
-                
-                # Add the results to our collection
-                computed_results.append({
-                    "name": stat["name"],
-                    "scope": stat["scope"],
-                    "val": result_value,
-                    "id": stat["id"],
-                    "scope_color": stat["scope_color"],
-                    "query": stat["sql_query"]
-                })
+                        # For count queries, we expect a single row with a single value
+                        result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                        
+                        # Add the results to our collection
+                        computed_results.append({
+                            "name": stat["name"],
+                            "scope": stat["scope"],
+                            "val": result_value,
+                            "id": stat["id"],
+                            "scope_color": stat["scope_color"],
+                            "query": stat["sql_query"]
+                        })
+            return {
+                "data": computed_results,
+                "total": len(results)
+            }
         else:
              # First get all compliance stats in the date range
             query = """
@@ -533,7 +549,7 @@ class Compliance(http.Controller):
                 needs_modification = False
                 
                 # Check if we need to modify this query
-                if any(table in query for table in ["res_partner", "res.partner", "tier", "transaction"]):
+                if any(table in query for table in ["res_partner", "res.partner", "transaction"]):
                     needs_modification = True
                     
                     # Remove trailing semicolon if present
@@ -579,29 +595,23 @@ class Compliance(http.Controller):
                             original_query = original_query[:clause_pos] + condition_str + original_query[clause_pos:]
                         else:
                             original_query += condition_str
+                        
+                        request.env.cr.execute(original_query, (branches_array,))
+                        result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
                 
-                # Execute the query with or without parameters
-                if needs_modification and branches_array and any(param in conditions[0] for param in ["%s", "ANY(%s"]):
-                    request.env.cr.execute(original_query, (branches_array,))
-                else:
-                    request.env.cr.execute(original_query)
-                
-                # For count queries, we expect a single row with a single value
-                result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
-                
-                # Add the results to our collection
-                computed_results.append({
-                    "name": stat["name"],
-                    "scope": stat["scope"],
-                    "val": result_value,
-                    "id": stat["id"],
-                    "scope_color": stat["scope_color"],
-                    "query": stat["sql_query"]
-                })
+                        # Add the results to our collection
+                        computed_results.append({
+                            "name": stat["name"],
+                            "scope": stat["scope"],
+                            "val": result_value,
+                            "id": stat["id"],
+                            "scope_color": stat["scope_color"],
+                            "query": stat["sql_query"]
+                        })
 
             return {
-                "data": computed_results,
-                "total": len(computed_results)
+                    "data": computed_results,
+                    "total": len(computed_results)
             }
 
 
