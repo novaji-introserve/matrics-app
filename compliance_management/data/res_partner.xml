@@ -18,7 +18,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">OKANLAWO.a@example.com</field>
-            <field name="customer_id">09083663</field>
+            <field name="customer_id">01901</field>
 
 
 
@@ -41,12 +41,9 @@
 
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">moses.j@example.com</field>
-            <field name="customer_id">2637337</field>
-
-
-
-
+            <field name="customer_id">019</field>
         </record>
+
 
         <record id="demo_partner_3" model="res.partner">
             <field name="name">JAME HAPPINESS</field>
@@ -64,11 +61,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">jame.h@example.com</field>
-            <field name="customer_id">3162347</field>
-
-
-
-
+            <field name="customer_id">0012</field>
         </record>
 
         <record id="demo_partner_4" model="res.partner">
@@ -87,10 +80,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">saln.g@example.com</field>
-            <field name="customer_id">4817337</field>
-
-
-
+            <field name="customer_id">0034</field>
 
         </record>
 
@@ -110,11 +100,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">dani.n@example.com</field>
-            <field name="customer_id">3642137</field>
-
-
-
-
+            <field name="customer_id">0050</field>
         </record>
 
         <record id="demo_partner_6" model="res.partner">
@@ -133,7 +119,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">olo.f@example.com</field>
-            <field name="customer_id">0977337</field>
+            <field name="customer_id">0505</field>
 
 
 
@@ -158,7 +144,7 @@
             <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">yusuf.a@example.com</field>
-            <field name="customer_id">335737</field>
+            <field name="customer_id">0110</field>
 
 
 
@@ -183,7 +169,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">salami.a@example.com</field>
-            <field name="customer_id">3610537</field>
+            <field name="customer_id">03003</field>
 
 
 
@@ -207,7 +193,7 @@
             <field name="bvn">88494944433</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">eze.c@example.com</field>
-            <field name="customer_id">6195737</field>
+            <field name="customer_id">02210</field>
 
 
 
@@ -232,7 +218,7 @@
             <field name="bvn">19494999393</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">ama.c@example.com</field>
-            <field name="customer_id">6894073</field>
+            <field name="customer_id">00101</field>
 
 
 
@@ -258,7 +244,7 @@
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">gozie.j@example.com</field>
             <field name="email">gozie.j@example.com</field>
-            <field name="customer_id">15157337</field>
+            <field name="customer_id">023</field>
         </record>
 
         <record id="demo_partner_12" model="res.partner">
@@ -278,7 +264,7 @@
             <field name="bvn">848590993933</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">ade.t@example.com</field>
-            <field name="customer_id">1634132</field>
+            <field name="customer_id">0102</field>
 
         </record>
 
@@ -299,7 +285,7 @@
             <field name="bvn">2019928393</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">idayat.o@example.com</field>
-            <field name="customer_id">0684412</field>
+            <field name="customer_id">0290</field>
 
 
 
@@ -325,7 +311,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">EEBENEZER.g@example.com</field>
-            <field name="customer_id">5638207</field>
+            <field name="customer_id">0621</field>
 
 
 
@@ -350,7 +336,7 @@
             <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">biachi.e@example.com</field>
-            <field name="customer_id">47569774</field>
+            <field name="customer_id">0120</field>
         </record>
 
         <record id="demo_partner_16" model="res.partner">
@@ -370,7 +356,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">jonathan.o@example.com</field>
-            <field name="customer_id">6678943</field>
+            <field name="customer_id">0308</field>
 
 
 
@@ -394,11 +380,7 @@
             <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">fashola.o@example.com</field>
-            <field name="customer_id">1245321</field>
-
-
-
-
+            <field name="customer_id">0031</field>
 
         </record>
 
@@ -418,7 +400,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">bello.r@example.com</field>
-            <field name="customer_id">568564</field>
+            <field name="customer_id">0080</field>
 
 
 
@@ -443,7 +425,7 @@
             <field name="risk_score">25.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">ezee.c@example.com</field>
-            <field name="customer_id">2209861</field>
+            <field name="customer_id">0190</field>
 
 
 
@@ -468,7 +450,7 @@
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">garbar.s@example.com</field>
-            <field name="customer_id">9917084</field>
+            <field name="customer_id">0900</field>
 
 
 
@@ -494,7 +476,7 @@
             <field name="risk_score">14.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">tayo.a@example.com</field>
-            <field name="customer_id">2850074</field>
+            <field name="customer_id">0074</field>
 
 
 
@@ -520,7 +502,7 @@
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">yakubu.s@example.com</field>
-            <field name="customer_id">4558301</field>
+            <field name="customer_id">0317</field>
 
 
 
@@ -546,7 +528,7 @@
             <field name="risk_score">25.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">ibee.t@example.com</field>
-            <field name="customer_id">58984931</field>
+            <field name="customer_id">00120</field>
 
 
 
@@ -572,7 +554,7 @@
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">adamu.u@example.com</field>
-            <field name="customer_id">10576210</field>
+            <field name="customer_id">02010</field>
 
 
 
@@ -599,7 +581,7 @@
             <field name="risk_score">14.0</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">wale.s@example.com</field>
-            <field name="customer_id">38950291</field>
+            <field name="customer_id">0101</field>
 
 
 
@@ -626,7 +608,7 @@
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">adama.d@example.com</field>
-            <field name="customer_id">18894951</field>
+            <field name="customer_id">01996</field>
 
         </record>
 
@@ -648,7 +630,7 @@
             <field name="risk_score">25</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">beni.o@example.com</field>
-            <field name="customer_id">09586713</field>
+            <field name="customer_id">01021</field>
 
         </record>
 
@@ -669,7 +651,7 @@
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">mani.j@example.com</field>
-            <field name="customer_id">8945981</field>
+            <field name="customer_id">0220</field>
         </record>
 
         <record id="demo_data_29" model="res.partner">
@@ -689,7 +671,7 @@
             <field name="risk_score">14.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">femi.p@example.com</field>
-            <field name="customer_id">33893981</field>
+            <field name="customer_id">0330</field>
 
         </record>
 
@@ -710,7 +692,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">balaa.s@example.com</field>
-            <field name="customer_id">86884949</field>
+            <field name="customer_id">0440</field>
         </record>
 
         <record id="demo_data_31" model="res.partner">
@@ -729,7 +711,7 @@
             <!-- <field name="risk_level">high</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">okeke.g@example.com</field>
-            <field name="customer_id">745454387</field>
+            <field name="customer_id">0550</field>
 
         </record>
 
@@ -749,7 +731,7 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">james.i@example.com</field>
-            <field name="customer_id">867756762</field>
+            <field name="customer_id">0660</field>
         </record>
 
         <record id="demo_data_33" model="res.partner">
@@ -757,7 +739,7 @@
             <field name="firstname">Segun</field>
             <field name="lastname">Ogunleyee</field>
             <field name="email">Ogunleyee.o@example.com</field>
-            <field name="customer_id">1553109</field>
+            <field name="customer_id">0770</field>
             <field name="phone">09080123456</field>
             <field name="street">6 Ogunleye Street</field>
             <field name="city">Sagamu</field>
