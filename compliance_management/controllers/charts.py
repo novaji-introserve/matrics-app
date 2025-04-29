@@ -2,9 +2,217 @@ from odoo import http
 from odoo.http import request
 import json
 from datetime import datetime, timedelta
-
+import re
 class DynamicChartController(http.Controller):
- 
+
+    
+
+
+    def extract_where_clauses(self, sql_query):
+        """Extract all clauses attached to the WHERE statement in an SQL query, handling BETWEEN clauses properly."""
+        # Normalize the query
+        sql_query = ' '.join(sql_query.strip().split())
+        
+        # Find the WHERE clause (if any)
+        where_pattern = re.compile(r'\bWHERE\b(.*?)(?:\bGROUP BY\b|\bHAVING\b|\bORDER BY\b|\bLIMIT\b|\bOFFSET\b|$)', 
+                                re.IGNORECASE | re.DOTALL)
+        where_match = where_pattern.search(sql_query)
+        
+        if not where_match:
+            return []
+        
+        where_content = where_match.group(1).strip()
+        
+        if not where_content:
+            return []
+        
+        # Use a more sophisticated approach to parse the WHERE clause
+        clauses = []
+        i = 0
+        current_clause = ""
+        paren_level = 0
+        in_between = False
+        in_quotes = False
+        quote_char = None
+        
+        while i < len(where_content):
+            char = where_content[i]
+            current_clause += char
+            
+            # Handle quotes - track when we're inside a string literal
+            if char in ["'", '"'] and (i == 0 or where_content[i-1] != '\\'):
+                if not in_quotes:
+                    in_quotes = True
+                    quote_char = char
+                elif char == quote_char:
+                    in_quotes = False
+                    quote_char = None
+            
+            # Only process special characters if we're not inside quotes
+            if not in_quotes:
+                if char == '(':
+                    paren_level += 1
+                elif char == ')':
+                    paren_level -= 1
+                
+                # Check if we're starting a BETWEEN clause
+                if paren_level == 0 and re.search(r'\bBETWEEN\b\s*$', current_clause, re.IGNORECASE):
+                    in_between = True
+                
+                # Check if we're ending a BETWEEN clause (after consuming the value after AND)
+                if in_between and paren_level == 0:
+                    # Look for the AND within the BETWEEN clause
+                    if i >= 3 and where_content[i-3:i+1].upper() == ' AND':
+                        # We found the AND in BETWEEN x AND y, now look for the end of the value
+                        j = i + 1
+                        # Skip whitespace
+                        while j < len(where_content) and where_content[j].isspace():
+                            j += 1
+                        
+                        # If it's a quoted value, find the closing quote
+                        if j < len(where_content) and where_content[j] in ["'", '"']:
+                            quote = where_content[j]
+                            j += 1
+                            while j < len(where_content) and where_content[j] != quote:
+                                j += 1
+                            if j < len(where_content):  # Found closing quote
+                                j += 1
+                        else:
+                            # If it's not quoted, find the end of the value
+                            while j < len(where_content) and where_content[j] not in [' ', '\t', '\n']:
+                                j += 1
+                        
+                        # Move past any whitespace after the value
+                        while j < len(where_content) and where_content[j].isspace():
+                            j += 1
+                        
+                        # If the next token is AND/OR, we've completed the BETWEEN clause
+                        if j < len(where_content) and (where_content[j:j+5].upper() == 'AND (' or 
+                                                    where_content[j:j+4].upper() == 'AND ' or
+                                                    where_content[j:j+4].upper() == 'OR (' or
+                                                    where_content[j:j+3].upper() == 'OR '):
+                            in_between = False
+                
+                # Only split at top-level AND/OR operators that are not part of BETWEEN
+                if paren_level == 0 and not in_between:
+                    and_match = re.search(r'\bAND\b\s*$', current_clause, re.IGNORECASE)
+                    or_match = re.search(r'\bOR\b\s*$', current_clause, re.IGNORECASE)
+                    
+                    if and_match:
+                        clauses.append(current_clause[:-len(and_match.group(0))].strip())
+                        current_clause = ""
+                    elif or_match:
+                        clauses.append(current_clause[:-len(or_match.group(0))].strip())
+                        current_clause = ""
+            
+            i += 1
+        
+        if current_clause.strip():
+            clauses.append(current_clause.strip())
+        
+        return clauses
+    
+    def _clean_sql_value(self, value):
+        """Clean SQL values by removing quotes and converting special values."""
+        value = value.strip()
+        # Remove quotes if present
+        if (value.startswith("'") and value.endswith("'")) or (value.startswith('"') and value.endswith('"')):
+            value = value[1:-1]
+        # Convert SQL NULL to Python None/False
+        elif value.upper() == 'NULL':
+            value = False
+        # Convert numbers
+        elif value.isdigit():
+            value = int(value)
+        elif re.match(r'^-?\d+(\.\d+)?$', value):
+            value = float(value)
+        return value
+
+    def sql_where_to_odoo_domain_no_dates(self, sql_query):
+        """Convert SQL WHERE conditions to Odoo domain format, excluding date-related fields."""
+        clauses = self.extract_where_clauses(sql_query)
+        if not clauses:
+            return []
+        
+        domain = []
+        date_related_keywords = ['date', 'date_created', 'date_create', 'create_date', 'write_date', 'time', 'datetime']
+        
+        for clause in clauses:
+            # Skip date-related fields - more thorough check
+            if any(date_keyword in clause.lower() for date_keyword in date_related_keywords):
+                continue
+            
+            # Handle different operators
+            if ' = ' in clause:
+                field, value = clause.split(' = ', 1)
+                field = field.strip().split('.')[-1]  # Get only the field name, not table.field
+                value = self._clean_sql_value(value)
+                domain.append((field, '=', value))
+            
+            elif ' >= ' in clause:
+                field, value = clause.split(' >= ', 1)
+                field = field.strip().split('.')[-1]
+                value = self._clean_sql_value(value)
+                domain.append((field, '>=', value))
+            
+            elif ' <= ' in clause:
+                field, value = clause.split(' <= ', 1)
+                field = field.strip().split('.')[-1]
+                value = self._clean_sql_value(value)
+                domain.append((field, '<=', value))
+            
+            elif ' > ' in clause:
+                field, value = clause.split(' > ', 1)
+                field = field.strip().split('.')[-1]
+                value = self._clean_sql_value(value)
+                domain.append((field, '>', value))
+            
+            elif ' < ' in clause:
+                field, value = clause.split(' < ', 1)
+                field = field.strip().split('.')[-1]
+                value = self._clean_sql_value(value)
+                domain.append((field, '<', value))
+            
+            elif ' LIKE ' in clause.upper():
+                field, value = clause.upper().split(' LIKE ', 1)
+                field = field.strip().split('.')[-1].lower()
+                value = self._clean_sql_value(value)
+                # Convert SQL LIKE pattern to Odoo pattern
+                value = value.replace('%', '*')
+                domain.append((field, 'ilike', value))
+            
+            elif ' IN ' in clause.upper():
+                field, value_list = clause.upper().split(' IN ', 1)
+                field = field.strip().split('.')[-1].lower()
+                # Extract values from IN clause: (val1, val2, ...)
+                if value_list.strip().startswith('(') and value_list.strip().endswith(')'):
+                    value_list = value_list.strip()[1:-1]
+                    values = [self._clean_sql_value(v.strip()) for v in value_list.split(',')]
+                    domain.append((field, 'in', values))
+            
+            elif 'BETWEEN' in clause.upper() and ' AND ' in clause.upper():
+                # Parse BETWEEN clause (already filtered date-related fields)
+                parts = re.split(r'\bBETWEEN\b', clause, flags=re.IGNORECASE)
+                if len(parts) == 2:
+                    field = parts[0].strip().split('.')[-1]
+                    between_parts = re.split(r'\bAND\b', parts[1], flags=re.IGNORECASE, maxsplit=1)
+                    if len(between_parts) == 2:
+                        start_val = self._clean_sql_value(between_parts[0])
+                        end_val = self._clean_sql_value(between_parts[1])
+                        domain.append('&')
+                        domain.append((field, '>=', start_val))
+                        domain.append((field, '<=', end_val))
+            
+            elif ' IS NULL' in clause.upper():
+                field = clause.upper().split(' IS NULL')[0].strip().split('.')[-1].lower()
+                domain.append((field, '=', False))
+            
+            elif ' IS NOT NULL' in clause.upper():
+                field = clause.upper().split(' IS NOT NULL')[0].strip().split('.')[-1].lower()
+                domain.append((field, '!=', False))
+        
+        return domain
+
 
     def _add_where_to_query(self, query, where_clause):
         
@@ -73,6 +281,8 @@ class DynamicChartController(http.Controller):
         
         # Generate colors based on selected scheme
         colors = self._generate_colors(chart.color_scheme, len(results))
+
+        domain_filter = self.sql_where_to_odoo_domain_no_dates(query)
         
         return {
             'id': chart.id,
@@ -89,7 +299,8 @@ class DynamicChartController(http.Controller):
                 'backgroundColor': colors,
                 'borderColor': colors if chart.chart_type in ['line', 'radar'] else [],
                 'borderWidth': 1
-            }]
+            }],
+            'domain_filter': domain_filter
         }
 
     
@@ -101,6 +312,12 @@ class DynamicChartController(http.Controller):
 
         today = datetime.now().date()  # Get today's date
         prevDate = today - timedelta(days=datepicked)  # Get previous date
+
+        TIME_00_00_00 = "00:00:00"
+        TIME_23_59_59 = "23:59:59"
+
+        odooCurrentDate = f"{today} {TIME_23_59_59}"
+        odooPrevDate = f"{prevDate} {TIME_00_00_00}"
 
         chartsData = []
         
@@ -115,14 +332,17 @@ class DynamicChartController(http.Controller):
             try:
 
 
+               
+
+
                 # Build where clause based on conditions
-                where_clause = f"{chart.date_field} BETWEEN '{prevDate}' AND '{today}'"
+                where_clause = f"{chart.date_field} >= '{odooPrevDate}'" if datepicked == 20000 else f"{chart.date_field} BETWEEN '{odooPrevDate}' AND '{odooCurrentDate}'"
                 
                 # Add branch filtering if needed
                 if not cco and chart.branch_filter and branches_id and len(branches_id) > 0:
             
                     # where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
-                    if len(branches_id) == 1:
+                    if len(branches_id) == 1: 
                         where_clause += f" AND {chart.branch_field} = {branches_id[0]}"
                        
                     else:
@@ -135,9 +355,6 @@ class DynamicChartController(http.Controller):
 
                 # Modify query to include WHERE clause
                 query = self._add_where_to_query(chart.query, where_clause)
-
-                # print("this is query*********************")
-                # print(query)
 
                 
                 # Execute query and process results
