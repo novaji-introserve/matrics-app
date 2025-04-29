@@ -63,7 +63,7 @@ class IrUiMenu(models.Model):
         # 2. Second attempt: Hide by name
         menu_names = [
             'Project', 'Projects', 'Email Marketing', 'Link Tracker',
-            'Contacts', 'Customers', 'Messaging', 'Discuss', 'Surveys'
+            'Contacts', 'Messaging', 'Discuss', 'Surveys'
         ]
         for name in menu_names:
             try:
