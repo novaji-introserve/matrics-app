@@ -152,39 +152,12 @@ export class ComplianceDashboard extends Component {
 
   async displayOdooView(category, query, branch_filter, branch_field) {
     
-    // const formatDate = (date) => date.toISOString().slice(0, 10);
-
-    // let prevDate, currentDate;
-
-    // if (this.state.datepicked > 0) {
-    //   prevDate = moment()
-    //     .subtract(this.state.datepicked, "days")
-    //     .format("YYYY-MM-DD");
-    //   currentDate = formatDate(new Date()); // Today's date
-    // } else {
-    //   currentDate = formatDate(new Date()); // Today's date
-    //   prevDate = currentDate; // Same as today if datepicked is 0
-    // }
-
-    // const odooPrevDate = `${prevDate} 00:00:00`; // For Odoo's datetime field
-    // const odooCurrentDate = `${currentDate} 23:59:59`; // For Odoo's datetime field
-
-    // this.state.prevDate = odooPrevDate; // Update the state
-    // this.state.currentDate = odooCurrentDate; // Update the state
-
-    // let domain = [
-    //   ["create_date", ">=", odooPrevDate], // Use the formatted dates
-    //   ["create_date", "<=", odooCurrentDate], // Use <= for inclusive end date
-    //   ["scope", "=", category],
-    // ];
-
     const response = await this.rpc("/dashboard/dynamic_sql", { sql_query: query, branches_id: this.state.branches_id, cco: this.state.cco });          
         
     if(!response) return;
 
-  
+    console.log(response.domain);
     
-
     this.navigate.doAction({
       type: "ir.actions.act_window",
       res_model: response.table.replace(/_/g, "."),
@@ -213,9 +186,6 @@ export class ComplianceDashboard extends Component {
       branches_id: this.state.branches_id,
       datepicked: Number(this.state.datepicked),
     });
-
-   
-    console.log(result);
     
     this.state.stats = [...result.data];
     this.state.totalstat = result.total;
