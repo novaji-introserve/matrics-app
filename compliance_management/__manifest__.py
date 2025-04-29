@@ -64,7 +64,6 @@
         "views/sanction_screening.xml",
         "views/customer.xml",
         "views/statistics.xml",
-        "data/schedules/update_statistic_cron.xml",
         "views/dashboard.xml",
         "views/card_dashboard_template.xml",
         "views/risk_assessment_plan.xml",

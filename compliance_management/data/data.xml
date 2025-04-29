@@ -63,13 +63,13 @@
         <field name="name">Customers without BVN</field>
         <field name="code">customers_no_bvn</field>
         <field name="scope">regulatory</field>
-        <field name="sql_query">select count(id) from res_partner where bvn is null</field>
+        <field name="sql_query">select count(id) from res_partner where bvn is null </field>
     </record>
     <record id="res_compl_stat_4" model="res.compliance.stat">
         <field name="name">PEP Customers</field>
         <field name="code">pep_customers</field>
         <field name="scope">regulatory</field>
-        <field name="sql_query">select count(id) from res_partner where is_pep is true</field>
+        <field name="sql_query">select count(id) from res_partner where is_pep is true </field>
     </record>
     <record id="res_compl_stat_5" model="res.compliance.stat">
         <field name="name">Branches</field>

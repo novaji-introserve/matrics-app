@@ -119,8 +119,8 @@ export class ComplianceDashboard extends Component {
   
       if (notification.type === 'refresh' && this.refreshModels.includes(notification.model)) {
           // Reload the view
-          // await this.filterByDate();
-          window.location.reload();
+          await this.filterByDate();
+          this.render();
       }
   }
 
@@ -151,6 +151,7 @@ export class ComplianceDashboard extends Component {
   };
 
   async displayOdooView(category, query, branch_filter, branch_field) {
+    
     // const formatDate = (date) => date.toISOString().slice(0, 10);
 
     // let prevDate, currentDate;
@@ -216,8 +217,7 @@ export class ComplianceDashboard extends Component {
    
     console.log(result);
     
-
-    this.state.stats = result.data;
+    this.state.stats = [...result.data];
     this.state.totalstat = result.total;
   }
   async getAllStatsByCategory(name) {
