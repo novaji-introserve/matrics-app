@@ -17,7 +17,12 @@
     "category": "iComply",
     "version": "0.3",
     # any module necessary for this one to work correctly
-    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification', 'alert_management' ],
+    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification', 'alert_management', 'project',
+        'mass_mailing',
+        'utm',
+        'contacts',
+        'mail',
+        'survey', ],
 
     # always loaded
     'data': [
@@ -55,7 +60,7 @@
         "data/data.xml",
         "views/risk_assessment.xml",
         # "views/open_sanctions.xml",
-        "views/res_users.xml",
+        # "views/res_users.xml",
         "views/sanction_screening.xml",
         "views/customer.xml",
         "views/statistics.xml",
@@ -67,7 +72,7 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-        "data/charts.xml",
+        # "data/charts.xml",
         "data/res_partner.xml",
         "data/fcra_score.xml",    
     ],

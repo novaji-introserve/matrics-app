@@ -637,6 +637,10 @@
             </field>
         </record>
 
+        <record id="hr.menu_hr_root" model="ir.ui.menu">
+            <field name="groups_id" eval="[(6, 0, [ref('compliance_management.group_compliance_chief_compliance_officer')])]"/>
+        </record> 
+
         <!-- Menu Items -->
         <!-- <menuitem
             id="hr.menu_hr_root"
@@ -646,12 +650,12 @@
             sequence="500" /> -->
 
             <menuitem 
-            id="menu_hr_root" 
+            id="hr.menu_hr_root" 
             name="Employees" 
-            groups="compliance_management.group_compliance_chief_compliance_officer"
             web_icon="hr,static/description/icon.svg" 
-            sequence="500"/>
-
+            sequence="500"
+            groups="compliance_management.group_compliance_chief_compliance_officer"/>
+            
 
             <menuitem 
             id="menu_etl_root" 
