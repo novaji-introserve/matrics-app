@@ -103,7 +103,7 @@
             </xpath>
 
             <xpath expr="//field[@name='website']" position="replace">
-                <field name="industry_id" invisible="0" />
+                <field name="industry_id" invisible="1" />
                 <!-- <attribute name="invisible">1</attribute> -->
             </xpath>
 
@@ -226,9 +226,10 @@
                 <attribute name="readonly">1</attribute>
             </xpath>
 
-            <xpath expr="//field[@name='industry_id']" position="attributes">
-                <attribute name="readonly">1</attribute>
+            <xpath expr="//field[@name='industry_id']" position="replace">
+                <field name="customer_industry_id" readonly="1"/>
             </xpath>
+
 
             <xpath expr="//field[@name='title']" position="attributes">
                 <attribute name="readonly">1</attribute>

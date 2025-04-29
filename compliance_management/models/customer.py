@@ -74,7 +74,8 @@ class Customer(models.Model):
     sector_id = fields.Many2one(
 
         comodel_name='res.partner.sector', string='Sector', index=True, tracking=True, readonly=True)
-    industry_id = fields.Many2one(
+    
+    customer_industry_id = fields.Many2one(
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
     sex_id = fields.Many2one(
