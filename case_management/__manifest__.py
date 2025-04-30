@@ -1,33 +1,58 @@
-# -*- coding: utf-8 -*-
 {
-    "name": "Case Management",
-    "summary": """
-       Submodule of icomply""",
-    "description": """
-       Case Management is a systematic approach to managing and resolving issues, inquiries, or requests within an organization or service environment. It involves the coordination of processes and resources to ensure that cases are handled efficiently and effectively.
-    """,
-    "author": "Novaji Introserve",
-    "website": "https://novajii.com",
-    "sequence": -10008,
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    "category": "iComply",
-    "version": "0.1",
-    # any module necessary for this one to work correctly
-    "depends": ["base",'utility','mail' ],
-    # always loaded
-    "data": [
+    'name': 'Case Management',
+    'version': '1.0',
+    'summary': 'A module for managing cases',
+    'description': """This module helps in managing cases.""",
+    'author': 'Novaji',
+    'website': 'https://novajii.com',
+    'category': 'Custom',
+    'depends': ['base', 'web', 'mail'],
+    'data': [
+        'data/email_templates.xml',
+        'data/case_closure.xml',
+        'security/case_access_rule.xml',
+        'security/security_two.xml',
+        'security/security.xml',
         'security/ir.model.access.csv',
-        "views/views.xml",
-        "views/templates.xml",
-        "views/case_management_views.xml",
+        'views/message_alert_views.xml',
+        'views/case_form_inherit_disable_save_discard.xml',
+        'views/all_open_case.xml',
+        'views/case_status.xml',
+        'views/all_treated_case_views.xml',
+        'views/close_case_wizard.xml',
+        'views/all_closed_case.xml',
+        'views/created_by_me_views.xml',
+        'views/assigned_to_me.xml',
+        'views/overdue_cases.xml',
+        'views/case_dashboard.xml',# Load menus first
+        'views/case_form_inherit.xml',
+        'views/new_case.xml',        # Then load views and connect to menus
+        # 'views/all_open_case.xml',        # Then load views and connect to menus
+        'data/cron.xml',
     ],
-    # only loaded in demonstration mode
-    "demo": [
-        "demo/demo.xml",
-    ],
-    "installable": True,
-    "application": True,
-    "auto_install": False,
+    'demo': [],
+    'assets': {
+        'web.assets_backend': [
+            # 'case_mgt/static/src/components/**/*.js',
+            # 'case_mgt/static/src/components/**/*.xml', #add this line
+            # 'case_mgt/static/src/components/kpi_card/kpi_card.js',
+            # 'case_mgt/static/src/components/case_dashboard.js',
+            # 'case_mgt/static/src/components/kpi_card/kpi_card.xml',
+            # 'case_mgt/static/src/components/case_dashboard.xml',
+            'case_management/static/src/js/case_form_action.js',
+            'case_management/static/src/js/success_message.js',
+            'case_management/static/src/components/kpi_card/kpi_card.js',
+            'case_management/static/src/components/chart_renderer/chart_renderers.js',  # ADD THIS
+            'case_management/static/src/components/case_dashboard.js',
+            'case_management/static/src/components/kpi_card/kpi_card.xml',
+            'case_management/static/src/components/chart_renderer/chart_renderers.xml', # ADD THIS
+            'case_management/static/src/components/case_dashboard.xml',
+            'case_management/static/src/css/case_form.css',
+            
+
+        ],
+    },
+    'installable': True,
+    'application': True,
+    'license': 'LGPL-3',
 }

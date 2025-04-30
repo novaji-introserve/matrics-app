@@ -1,0 +1,811 @@
+LATEST WORKING 
+
+ITS COMPONENTS 
+/** @odoo-module */
+
+import { registry } from "@web/core/registry";
+import { Component, useRef, onWillStart, onMounted, useState } from "@odoo/owl";
+import { KpiCard } from "./kpi_card/kpi_card";
+import { ChartRenderer } from "./chart_renderer/chart_renderers";
+import { loadJS, useService } from "@web/core/utils/hooks"; // Import useService
+
+class CaseDashboard extends Component {
+    setup() {
+        this.chartRef = useRef("chart");
+        this.rpc = useService("rpc");
+        this.dashboardData = useState({ kpi_data: {}, chart_data: {} });
+
+        onWillStart(async () => {
+            console.log("📡 CaseDashboard is about to fetch data...");
+            try {
+                const data = await this.rpc("/case_dashboard/data");
+                Object.assign(this.dashboardData, data);  //  Preserve reactivity
+                console.log(" Dashboard data fetched:", this.dashboardData);
+            } catch (error) {
+                console.error(" Error fetching dashboard data:", error);
+                this.dashboardData.error = error.message || "Failed to load dashboard data.";
+            }
+        });
+
+        onMounted(() => {
+            //  Log the final dashboardData to verify structure
+            console.log("CaseDashboard mounted with data:", JSON.stringify(this.dashboardData, null, 2));
+        });
+    }
+}
+
+CaseDashboard.template = "owl.CaseDashboard";
+CaseDashboard.components = { KpiCard, ChartRenderer };
+
+registry.category("actions").add("owl.case_dashboard", CaseDashboard);
+
+
+
+
+
+
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="owl.CaseDashboard" owl="1">
+        <div class="vh-100 overflow-auto bg-muted">
+            <div class="row m-2">
+                <div class="col-lg-12">
+                    <!-- Header Section -->
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-1 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h1 class="text-primary fw-bold fs-4 mb-0">Case Overview</h1>
+                                    <div>
+                                        <select class="form-select form-select-sm" style="max-width: 150px;">
+                                            <option value="0">Select Period</option>
+                                            <option value="7">Last 7 Days</option>
+                                            <option value="30">Last 30 Days</option>
+                                            <option value="90">Last 90 Days</option>
+                                            <option value="365">Last 365 Days</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- KPI Cards Row -->
+                    <div class="row g-1">
+                        <t t-if="dashboardData.kpi_data">
+                            <KpiCard name="'All Cases'" t-props="dashboardData.kpi_data.all_cases"/>
+                            <KpiCard name="'Open Cases'" t-props="dashboardData.kpi_data.open_cases"/>
+                            <KpiCard name="'Closed Cases'" t-props="dashboardData.kpi_data.closed_cases"/>
+                            <KpiCard name="'Overdue Cases'" t-props="dashboardData.kpi_data.overdue_cases"/>
+                        </t>
+                    </div>
+                    
+                    <!-- First Row of Charts: Cases by Severity and Cases by Status -->
+                    <div class="row g-1">
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-1 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <h3 class="text-primary fw-bold fs-6 mb-0">Cases By Severity</h3>
+                                    <div class="px-1 py-0 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white small"/>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center" style="height: 180px;">
+                                    <t t-if="dashboardData.chart_data.cases_by_severity">
+                                        <ChartRenderer type="'line'"
+                                                    tags="dashboardData.chart_data.cases_by_severity.labels"
+                                                    label_1="'Low'"
+                                                    label_2="'Medium'"
+                                                    label_3="'High'"
+                                                    text="'Cases By Severity'"
+                                                    backGroundColor="dashboardData.chart_data.cases_by_severity.datasets[0].backgroundColor"
+                                                    data="dashboardData.chart_data.cases_by_severity.datasets[0].data"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-1 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <h3 class="text-primary fw-bold fs-6 mb-0">Cases By Status</h3>
+                                    <div class="px-1 py-0 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white small"/>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center" style="height: 180px;">
+                                    <t t-if="dashboardData.chart_data.cases_by_status">
+                                        <ChartRenderer type="'bar'"
+                                                    tags="dashboardData.chart_data.cases_by_status.labels"
+                                                    label_1="'Open'"
+                                                    label_3="'Close'"
+                                                    label_2="'Overdue'"
+                                                    backGroundColor="dashboardData.chart_data.cases_by_status.datasets[0].backgroundColor"
+                                                    data="dashboardData.chart_data.cases_by_status.datasets[0].data"/>
+                                        
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Second Row of Charts: Cases by Category and Case Rate -->
+                    <div class="row g-1">
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-1 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <h3 class="text-primary fw-bold fs-6 mb-0">Cases By Category</h3>
+                                    <div class="px-1 py-0 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white small"/>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center" style="height: 180px;">
+                                    <t t-if="dashboardData.chart_data.cases_by_category">
+                                        <ChartRenderer type="'bar'"
+                                                    tags="dashboardData.chart_data.cases_by_category.process.map(item => item.label)"
+                                                    label_1="'Process Category'"
+                                                    backGroundColor="['rgb(255,99,132)', 'rgb(255,205,8)']"
+                                                    data="dashboardData.chart_data.cases_by_category.process.map(item => item.value)"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-1 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <h3 class="text-primary fw-bold fs-6 mb-0">Case Rate</h3>
+                                    <div class="px-1 py-0 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white small"/>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center" style="height: 180px;">
+                                    <t t-if="dashboardData.chart_data.case_rate">
+                                        <ChartRenderer type="'line'"
+                                                    tags="dashboardData.chart_data.case_rate.labels"
+                                                    label_1="'Open Rate'"
+                                                    label_2="'Close Rate'"
+                                                    label_3="'Overdue Rate'"
+                                                    text="'Cases Rate'"
+                                                    backGroundColor="dashboardData.chart_data.case_rate.datasets[0].backgroundColor"
+                                                    data="dashboardData.chart_data.case_rate.datasets[0].data"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="owl.CaseDashboard" owl="1">
+        <div class="vh-100 overflow-auto bg-muted">
+            <div class="row m-3">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h1 class="text-primary fw-bold">Case Overview</h1>
+                                    <div>
+                                        <select class="form-select">
+                                            <option value="0">Select Period</option>
+                                            <option value="7">Last 7 Days</option>
+                                            <option value="30">Last 30 Days</option>
+                                            <option value="90">Last 90 Days</option>
+                                            <option value="365">Last 365 Days</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <t t-if="dashboardData.kpi_data">
+                            <KpiCard name="'All Cases'" t-props="dashboardData.kpi_data.all_cases"/>
+                            <KpiCard name="'Open Cases'" t-props="dashboardData.kpi_data.open_cases"/>
+                            <KpiCard name="'Closed Cases'" t-props="dashboardData.kpi_data.closed_cases"/>
+                            <KpiCard name="'Overdue Cases'" t-props="dashboardData.kpi_data.overdue_cases"/>
+                        </t>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Cases By Category</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white"/>
+                                    </div>
+                                </div>
+                                <t t-if="dashboardData.chart_data.cases_by_category">
+                                    <ChartRenderer type="'pie'"
+                                                   tags="dashboardData.chart_data.cases_by_category.process.map(item => item.label)"
+                                                   label_1="'Process Category'"
+                                                   backGroundColor="['rgb(255,99,132)', 'rgb(255,205,8)']"
+                                                   data="dashboardData.chart_data.cases_by_category.process.map(item => item.value)"/>
+                                    <!-- <ChartRenderer type="'line'"
+                                                   tags="dashboardData.chart_data.cases_by_category.root.map(item => item.label)"
+                                                   label_1="'Root Category'"
+                                                   backGroundColor="['#17a2b8', '#28a745']"
+                                                   data="dashboardData.chart_data.cases_by_category.root.map(item => item.value)"/> -->
+                                </t>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Case rate</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white"/>
+                                    </div>
+                                </div>
+                                <t t-if="dashboardData.chart_data.case_rate">
+                                    <ChartRenderer type="'doughnut'"
+                                                   tags="dashboardData.chart_data.case_rate.labels"
+                                                   label_1="'Open Rate'"
+                                                   label_2="'Close Rate'"
+                                                   label_3="'Overdue Rate'"
+                                                   text="'Cases Rate'"
+                                                   backGroundColor="dashboardData.chart_data.case_rate.datasets[0].backgroundColor"
+                                                   data="dashboardData.chart_data.case_rate.datasets[0].data"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Cases By Severity</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white"/>
+                                    </div>
+                                </div>
+                                <t t-if="dashboardData.chart_data.cases_by_severity">
+                                    <ChartRenderer type="'polarArea'"
+                                                   tags="dashboardData.chart_data.cases_by_severity.labels"
+                                                   label_1="'Low'"
+                                                   label_2="'Medium'"
+                                                   label_3="'High'"
+                                                   text="'Cases By Severity'"
+                                                   backGroundColor="dashboardData.chart_data.cases_by_severity.datasets[0].backgroundColor"
+                                                   data="dashboardData.chart_data.cases_by_severity.datasets[0].data"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Cases By Status</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white"/>
+                                    </div>
+                                </div>
+                                <t t-if="dashboardData.chart_data.cases_by_status">
+                                    <ChartRenderer type="'bar'"
+                                                   tags="dashboardData.chart_data.cases_by_status.labels"
+                                                   label_1="'Open'"
+                                                   label_3="'Close'"
+                                                   label_2="'Overdue'"
+                                                   backGroundColor="dashboardData.chart_data.cases_by_status.datasets[0].backgroundColor"
+                                                   data="dashboardData.chart_data.cases_by_status.datasets[0].data"/>
+                                    <ChartRenderer type="'line'"
+                                                   tags="dashboardData.chart_data.cases_by_status.labels"
+                                                   label_1="'Open'"
+                                                   label_3="'Close'"
+                                                   label_2="'Overdue'"
+                                                   text="'Cases By Status'"
+                                                   backGroundColor="dashboardData.chart_data.cases_by_status.datasets[0].backgroundColor"
+                                                   data="dashboardData.chart_data.cases_by_status.datasets[0].data"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/** @odoo-module */
+
+import { registry } from "@web/core/registry";
+import { Component, useRef, onWillStart, onMounted } from "@odoo/owl";
+import { KpiCard } from "./kpi_card/kpi_card";
+import { ChartRenderer } from "./chart_renderer/chart_renderers";
+import { loadJS } from "@web/core/assets";
+
+class CaseDashboard extends Component {
+    setup() {
+        // Ref to a DOM element
+        this.chartRef = useRef("chart");
+ 
+        // Load External JS Before Rendering
+        onWillStart(async () => {
+            console.log("CaseDashboard is about to start...");
+            await loadJS("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js");
+        });
+
+        // Perform Actions After Mounting
+        onMounted(() => {
+            // Add a null check for the chartRef
+            if (this.chartRef.el) {
+                try {
+                    new Chart(
+                        this.chartRef.el,
+                        {
+                            type: 'doughnut',
+                            data: {
+                                labels: [
+                                    'Red',
+                                    'Blue',
+                                    'Yellow'
+                                ],
+                                datasets: [{
+                                    label: 'My First Dataset',
+                                    data: [300, 50, 100],
+                                    backgroundColor: [
+                                        'rgb(255, 99, 132)',
+                                        'rgb(54, 162, 235)',
+                                        'rgb(255, 205, 86)'
+                                    ],
+                                    hoverOffset: 4
+                                },{
+                                    label: 'My Second Dataset',
+                                    data: [211, 23, 76],
+                                    backgroundColor: [
+                                        'red',
+                                        'yellow',
+                                        'blue'
+                                    ],
+                                    hoverOffset: 4
+                                }], 
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Chart.js Doughnut Chart',
+                                        position: 'bottom',
+                                    }
+                                }
+                            },
+                        }
+                    );
+                } catch (error) {
+                    console.error('Error initializing chart:', error);
+                }
+            } else {
+                console.warn('Chart element not found');
+            }
+        });
+    }
+}
+
+CaseDashboard.template = "owl.CaseDashboard";
+CaseDashboard.components = { KpiCard, ChartRenderer };
+
+// Register CaseDashboard
+// // // //registry.category("actions").add("owl.case_dashboard", CaseDashboard);
+// //registry.category("action_components").add("owl.case_dashboard", CaseDashboard);
+registry.category("actions").add("owl.case_dashboard", CaseDashboard);
+
+
+
+
+
+ITS LATEST XML 
+
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="owl.CaseDashboard" owl="1">
+        <div class="vh-100 overflow-auto bg-muted">
+            <div class="row m-3">
+                <div class="col-lg-7">
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h1 class="text-primary fw-bold">Case Overview</h1>
+                                    <div>
+                                        <select class="form-select">
+                                            <option value="0">Select Period</value>
+                                            <option value="7">Last 7 Days</value>
+                                            <option value="30">Last 30 Days</value>
+                                            <option value="90">Last 90 Days</value>
+                                            <option value="365">Last 365 Days</value>
+
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <KpiCard name="'All Cases'" value="'210'" percentage="'6'"/>
+                        <KpiCard name="'Open Cases'" value="'23'" percentage="'8'" />
+                        <KpiCard name="'Closed Cases'" value="'10'" percentage="'3'" />
+                        <!-- <KpiCard name="'Open Case Rate'" />
+                        <KpiCard name="'Close Case Rate'" /> -->
+                        <KpiCard name="'Overdue Cases'" value="'18'" percentage="'15'" />
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Cases By Category</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white" />
+                                    </div>
+                                </div>
+                                <!-- <canvas t-ref="chart" /> -->
+                                <ChartRenderer type="'pie'" tags="['Process', 'Root']" label_1="'Process Category'" label_2="'Root Category'" backGroundColor="['rgb(255,99,132)', 'rgb(255,205,8)']" data="[300,100]"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Case rate</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white" />
+                                    </div>
+                                </div>
+                                <ChartRenderer type="'doughnut'" tags="['Open Case Rate', 'Close Case Rate', 'Overdue Case Rate']" label_1="'Open Rate'" label_2="'Close Rate'" label_3="'Overdue Rate'" text="'Cases Rate'" backGroundColor="['yellow', 'blue', 'red']" data="[300,100,65]"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Cases By Severity</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white" />
+                                    </div>
+
+                                </div>
+                                    <ChartRenderer type="'polarArea'" tags="['Low', 'Medium', 'High']" label_1="'Low'" label_2="'Medium'" label_3="'High'" text="'Cases By Severity'" backGroundColor="['red', 'yellow', 'blue']" data="[300,100,230]"/>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-2 p-4 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="text-primary fw-bold">Cases By Status</h3>
+                                    <div class="px-3 py-1 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white" />
+                                    </div>
+                                </div>
+                                <ChartRenderer type="'bar'" tags="['Open', 'Close', 'Overdue']" label_1="'Open'" label_2="'Close'" label_3="'Overdue'"  backGroundColor="['yellow', 'green', 'red']" data="[300,100, 28]"/>
+                                <ChartRenderer type="'line'" tags="['Open', 'Close', 'Overdue']" label_1="'Open'" label_2="'Close'" label_3="'Overdue'" text="'Cases By Status'" backGroundColor="['yellow', 'green', 'red']" data="[30,87, 44]"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import { registry } from "@web/core/registry";
+// import { Component, useRef, onWillStart, onMounted } from "@odoo/owl";
+// import { KpiCard } from "./kpi_card/kpi_card";
+// import { ChartRenderer } from "./chart_renderer/chart_renderers";
+// import { loadJS } from "@web/core/assets";
+
+// class CaseDashboard extends Component {
+//     setup() {
+//         // Ref to a DOM element
+//         this.chartRef = useRef("chart");
+ 
+//         // Load External JS Before Rendering
+//         onWillStart(async () => {
+//             console.log("CaseDashboard is about to start...");
+//             await loadJS("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"); // Example script
+//         });
+
+//         // Perform Actions After Mounting
+//         onMounted(() => {
+//             const data = [
+//                 { year: 2010, count: 10 },
+//                 { year: 2011, count: 20 },
+//                 { year: 2012, count: 15 },
+//                 { year: 2013, count: 25 },
+//                 { year: 2014, count: 22 },
+//                 { year: 2015, count: 30 },
+//                 { year: 2016, count: 28 },
+//               ];
+            
+//               new Chart(
+//                 this.chartRef.el,
+//                 {
+//                   type: 'doughnut',
+//                   data: {
+//                     labels: [
+//                         'Red',
+//                         'Blue',
+//                         'Yellow'
+//                       ],
+//                       datasets: [{
+//                         label: 'My First Dataset',
+//                         data: [300, 50, 100],
+//                         backgroundColor: [
+//                           'rgb(255, 99, 132)',
+//                           'rgb(54, 162, 235)',
+//                           'rgb(255, 205, 86)'
+//                         ],
+//                         hoverOffset: 4
+//                       },{
+//                         label: 'My Second Dataset',
+//                         data: [211, 23, 76],
+//                         backgroundColor: [
+//                           'red',
+//                           'yellow',
+//                           'blue'
+//                         ],
+//                         hoverOffset: 4
+//                       }], 
+                    
+//                   },
+//                   options: {
+//                     responsive: true,
+//                     plugins: {
+//                       legend: {
+//                         position: 'bottom',
+//                       },
+//                       title: {
+//                         display: true,
+//                         text: 'Chart.js Doughnut Chart',
+//                         position: 'bottom',
+//                       }
+//                     }
+//                   },
+                
+//                 }
+//               );
+//         });
+//     }
+// }
+
+// CaseDashboard.template = "owl.CaseDashboard";
+// CaseDashboard.components = { KpiCard, ChartRenderer };
+
+// // Register CaseDashboard
+// registry.category("actions").add("owl.case_dashboard", CaseDashboard);
+
+
+
+
+
+
+
+
+
+// // /** @odoo-module */
+
+// // import { registry } from "@web/core/registry";
+// // import { Component } from "@odoo/owl";
+// // import { KpiCard } from "./kpi_card/kpi_card";
+// // import { loadJS } from "@web/core/assets"
+
+// // class CaseDashboard extends Component {}
+
+// // CaseDashboard.template = "owl.CaseDashboard";  
+// // CaseDashboard.components = { KpiCard };
+
+// // //  Register CaseDashboard
+// // registry.category("actions").add("owl.case_dashboard", CaseDashboard);
+
+
+
+
+
+
+
+
+// // // /** @odoo-module */
+
+// // // import { registry } from "@web/core/registry";
+// // // import { Component, xml } from "@odoo/owl";
+// // // import { KpiCard } from "./kpi_card/kpi_card"
+// // // class CaseDashboard extends Component {}
+
+// // CaseDashboard.template = "owl.CaseDashboard";  
+// // CaseDashboard.components = { KpiCard }
+
+// // registry.category("actions").add("owl.case_dashboard", CaseDashboard);  

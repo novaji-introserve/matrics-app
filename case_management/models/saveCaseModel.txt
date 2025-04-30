@@ -1,0 +1,514 @@
+Latest Methods 
+
+# def action_open_cases(self):
+    #     # Get the current user
+    #     user = self.env.user
+    #     user_id = user.id
+        
+    #     # Common domain for all searches - only open cases
+    #     open_domain = [('status_id.name', '=', 'open')]
+        
+    #     # Get cases the user should be able to access as creator or assigned staff
+    #     staff_cases = self.search(open_domain + [
+    #         '|',
+    #         ('user_id', '=', user_id),
+    #         ('staff_id', '=', user_id)
+    #     ])
+        
+    #     # Get cases where user is a supervisor
+    #     supervisor_cases = self.search(open_domain + [
+    #         '|', '|',
+    #         ('supervisor_one_id', '=', user_id),
+    #         ('supervisor_two_id', '=', user_id),
+    #         ('supervisor_three_id', '=', user_id)
+    #     ])
+        
+    #     # Combine all accessible cases
+    #     accessible_cases = (staff_cases | supervisor_cases).ids
+        
+    #     # Return the action with context and domain
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Open Cases',
+    #         'res_model': 'case',
+    #         'view_mode': 'tree,form',
+    #         'domain': [('id', 'in', accessible_cases)],  # This ensures only the filtered cases appear
+    #         'context': {'accessible_cases': accessible_cases},
+    #         'views': [(self.env.ref('case_management.view_open_cases_tree').id, 'tree'),
+    #                 (self.env.ref('case_management.view_case_form_staff_only').id, 'form')],
+    #     }
+        
+    
+    
+    
+    
+    
+    
+    # def action_open_cases(self):
+    #     # Get the current user
+    #     user = self.env.user
+    #     user_id = user.id
+        
+    #     # Get cases the user should be able to access as creator or assigned staff
+    #     staff_cases = self.search([
+    #         ('status_id.name', '=', 'open'),
+    #         '|',
+    #         ('user_id', '=', user_id),
+    #         ('staff_id', '=', user_id)
+    #     ])
+        
+    #     # Get cases where user is a supervisor
+    #     supervisor_cases = self.search([
+    #         ('status_id.name', '=', 'open'),
+    #         '|', '|',
+    #         ('supervisor_one_id', '=', user_id),
+    #         ('supervisor_two_id', '=', user_id),
+    #         ('supervisor_three_id', '=', user_id)
+    #     ])
+        
+    #     # Combine all accessible cases
+    #     accessible_cases = (staff_cases | supervisor_cases).ids
+        
+    #     # Return the action with context and domain
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Open Cases',
+    #         'res_model': 'case',
+    #         'view_mode': 'tree,form',
+    #         'domain': [('id', 'in', accessible_cases)],
+    #         'context': {'accessible_cases': accessible_cases},
+    #         'views': [(self.env.ref('case_management.view_open_cases_tree').id, 'tree'),
+    #                 (self.env.ref('case_management.view_case_form_staff_only').id, 'form')],
+    #     }
+        
+        
+    # def action_open_cases(self):
+    #     # Get cases the user should be able to access
+    #     user_id = self.env.user.id
+    #     accessible_cases = self.search([
+    #         ('status_id.name', '=', 'open'),
+    #         '|',
+    #         ('user_id', '=', user_id),
+    #         ('staff_id', '=', user_id)
+    #     ]).ids
+        
+    #     # domain
+    #     domain= [('status_id.name', '=', 'open'), ('id', 'in', accessible_cases)]
+        
+        
+    #     # Return the action with context
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Open Cases',
+    #         'res_model': 'case',
+    #         'view_mode': 'tree,form',
+    #         'domain': domain,
+    #         'context': {'accessible_cases': accessible_cases}
+    #     }
+
+    # @api.model
+    # def action_open_cases(self):
+    #     # Get all cases the user should have access to
+    #     cases = self.env['case'].search([('status_id.name', '=', 'open'), 
+    #                                     '|', ('user_id', '=', self.env.user.id), 
+    #                                         ('staff_id', '=', self.env.user.id)])
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Open Cases',
+    #         'res_model': 'case',
+    #         'view_mode': 'tree,form',
+    #         'views': [(self.env.ref('case_management.view_open_cases_tree').id, 'tree'),
+    #                 (self.env.ref('case_management.view_case_form_staff_only').id, 'form')],
+    #         'domain': [('id', 'in', cases.ids)],
+    #         'context': {'create': False},
+    #         'target': 'current',
+    #     }
+    
+    # # In your Case model
+    # @api.model
+    # def get_accessible_cases(self):
+    #     cases = self.search([('status_id.name', '=', 'open'), 
+    #                         '|', ('user_id', '=', self.env.user.id), 
+    #                             ('staff_id', '=', self.env.user.id)])
+    #     action = self.env.ref('case_management.case_action').read()[0]
+    #     action['context'] = {'accessible_cases': cases.ids}
+    #     return action
+
+    # def action_open_cases(self):
+    # # Get all cases the user should have access to
+    #     cases = self.env['case'].search([('status_id.name', '=', 'open'), 
+    #                                     '|', ('user_id', '=', self.env.user.id), 
+    #                                         ('staff_id', '=', self.env.user.id)])
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Open Cases',
+    #         'res_model': 'case',
+    #         'view_mode': 'tree,form',
+    #         'context': {'accessible_cases': cases.ids},
+    #     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from odoo import models, fields, api
+from odoo.exceptions import UserError
+from datetime import timedelta
+import logging
+
+_logger = logging.getLogger(__name__)
+
+
+class Cases(models.Model):
+    _name = 'case'
+    _description = 'Cases'
+    _inherit = ['mail.thread']
+    _rec_name = 'name'
+
+    # Basic Info
+    name = fields.Char(string="Name", compute='_compute_name', store=True, tracking=True)
+    transaction_reference = fields.Char(string='Transaction Reference')
+    cases_description = fields.Text(string='Narration', compute='_compute_description', store=True)
+    further_description = fields.Html(string='Further Description')
+    data_source = fields.Text(string="Data Source", required=False)
+    attachment_ids = fields.Many2many('ir.attachment', string='Attachments')
+
+    # Severity
+    title = fields.Selection([
+        ('1', 'Low'),
+        ('2', 'Medium'),
+        ('3', 'High')
+    ], string='Severity', required=False)
+    rating_id = fields.Many2one('case.rating', string='Severity Rating', readonly=True)
+    severity_level = fields.Integer(string="Severity Level", compute="_compute_severity_level", store=True)
+
+    # Status
+    status_id = fields.Many2one('case.status', string='Status', required=False, default=lambda self: self._default_status())
+    status_name = fields.Char(string="Status Name", compute="_compute_status_name", store=True)
+    status_html = fields.Html(compute='_compute_status_html', string='Status')
+    is_reported = fields.Boolean(string="Reported", default=False)
+
+    # Dates
+    created_at = fields.Datetime(string='Event Date')
+    updated_at = fields.Datetime(string='Updated At')
+    start_date = fields.Datetime(string="Start Date", compute="_compute_start_date", store=True)
+    end_date = fields.Datetime(string="End Date", compute="_compute_end_date", store=True)
+    current_date = fields.Datetime(string='Current Date', compute='_compute_current_date')
+
+    # Relations
+    branch_id = fields.Many2one('branch', string='Branch')
+    team_id = fields.Many2one('team', string='Team')
+    staff_id = fields.Many2one('staff', string='Staff', required=True)
+    staff_user_id = fields.Many2one('res.users', string='Staff User', related='staff_id.user_id', store=True, readonly=True)
+    user_id = fields.Many2one('res.users', string='Customer')
+    supervisor_one_id = fields.Many2one('staff', string='Supervisor One', required=True)
+    supervisor_two_id = fields.Many2one('staff', string='Supervisor Two')
+    supervisor_three_id = fields.Many2one('staff', string='Supervisor Three')
+    alert_id = fields.Many2one('alert', string='Alert')
+    process_category_id = fields.Many2one('exception.category', string='Process Category')
+    process_id = fields.Many2one('exception.process', string='Process')
+    root_category_id = fields.Many2one('exception.process.type', string='Root Category')
+    root_category_process_id = fields.Many2one('exception.process.type', string='Root Category Process')
+
+    # Actions & Notes
+    response_note = fields.Text(string='Report')
+    cases_action = fields.Text(string='Action (Text)')
+
+    # Button Flags
+    show_report_button = fields.Boolean(compute='_compute_show_buttons')
+    show_close_button = fields.Boolean(compute='_compute_show_buttons')
+
+    # ------------------- COMPUTES -------------------
+
+    @api.depends('title')
+    def _compute_name(self):
+        for rec in self:
+            label = dict(self._fields['title'].selection).get(rec.title, '')
+            rec.name = f"{label} Case"
+
+    @api.depends('title')
+    def _compute_description(self):
+        for rec in self:
+            rec.cases_description = {
+                '1': 'This is a Low case',
+                '2': 'This is a Medium case',
+                '3': 'This is a High case'
+            }.get(rec.title, '')
+
+    @api.depends('title')
+    def _compute_severity_level(self):
+        for rec in self:
+            rec.severity_level = rec.rating_id.ref or 0
+
+    @api.depends('status_id')
+    def _compute_status_name(self):
+        for rec in self:
+            rec.status_name = rec.status_id.name if rec.status_id else ''
+
+    @api.depends('status_id')
+    def _compute_status_html(self):
+        for rec in self:
+            color = {
+                'overdue': 'danger',
+                'closed': 'success',
+                'open': 'primary',
+                'treated': 'info',
+            }.get(rec.status_id.name, 'warning')
+            status = rec.status_id.name.capitalize() if rec.status_id else 'Unknown'
+            rec.status_html = f'<span class="badge bg-{color}">{status}</span>'
+
+    @api.depends('created_at')
+    def _compute_start_date(self):
+        for rec in self:
+            rec.start_date = rec.created_at or fields.Datetime.now()
+
+    @api.depends('start_date')
+    def _compute_end_date(self):
+        for rec in self:
+            rec.end_date = rec.start_date + timedelta(hours=1) if rec.start_date else False
+
+    @api.depends()
+    def _compute_current_date(self):
+        now = fields.Datetime.now()
+        for rec in self:
+            rec.current_date = now
+
+    @api.depends('is_reported', 'status_name', 'staff_id.user_id')
+    def _compute_show_buttons(self):
+        for rec in self:
+            current_user = self.env.user
+            is_responsible = current_user == rec.staff_id.user_id
+            rec.show_report_button = is_responsible and rec.status_name == 'open' and not rec.is_reported
+            rec.show_close_button = is_responsible and rec.status_name == 'treated' and rec.is_reported
+
+    # ------------------- ONCHANGES -------------------
+
+    @api.onchange('title')
+    def _onchange_title_set_rating(self):
+        if self.title:
+            rating = self.env['case.rating'].search([('ref', '=', int(self.title))], limit=1)
+            self.rating_id = rating
+        else:
+            self.rating_id = False
+
+        # Reset supervisors
+        self.supervisor_one_id = False
+        self.supervisor_two_id = False
+        self.supervisor_three_id = False
+
+    @api.onchange('staff_id', 'team_id', 'status_id', 'rating_id', 'process_category_id', 'alert_id',
+                  'supervisor_one_id', 'supervisor_two_id', 'supervisor_three_id', 'root_category_process_id')
+    def _onchange_safe_fields(self):
+        fields_to_check = [
+            'staff_id', 'team_id', 'status_id', 'rating_id', 'process_id',
+            'supervisor_one_id', 'supervisor_two_id', 'supervisor_three_id', 'root_category_process_id',
+            'process_category_id', 'root_category_id', 'branch_id'
+        ]
+        for field_name in fields_to_check:
+            value = getattr(self, field_name)
+            if value and not value.id:
+                setattr(self, field_name, False)
+
+    # ------------------- DEFAULT -------------------
+
+    @api.model
+    def _default_status(self):
+        return self.env['case.status'].search([('name', '=', 'open')], limit=1).id
+
+    # ------------------- ACTIONS -------------------
+
+    def action_close_case(self):
+        """Handles reporting and closing of the case in two steps."""
+        self.ensure_one()
+
+        if self.env.user != self.staff_id.user_id:
+            pass
+           # raise UserError("Only the assigned staff can perform this action.")
+
+        treated_status = self.env.ref('case_management.case_status_treated', raise_if_not_found=False)
+        closed_status = self.env.ref('case_management.case_status_closed', raise_if_not_found=False)
+
+        if not treated_status or not closed_status:
+            
+            raise UserError("Required case statuses not found (treated or closed).")
+
+        if self.status_id.name == 'open' and not self.is_reported:
+            self.is_reported = True
+            self.status_id = treated_status.id
+            self.message_post(body="Case reported and moved to Treated Cases.")
+            msg = "Case has been reported and moved to Treated Cases."
+
+        elif self.status_id.name == 'treated' and self.is_reported:
+            self.status_id = closed_status.id
+            self.message_post(body="Case has been successfully closed.")
+            msg = "Case has been successfully closed."
+
+        elif self.status_id.name == 'closed':
+            raise UserError("This case is already closed.")
+        else:
+            raise UserError(f"Cannot perform action on case with status: {self.status_id.name}")
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': msg,
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    def action_open_close_popup(self):
+        """Opens a popup form to report or close the case based on its status"""
+        self.ensure_one()
+        
+        if self.status_name == 'open':
+            # For Open cases, show the report form
+            return {
+                'name': 'Report on Case',
+                'type': 'ir.actions.act_window',
+                'res_model': 'case',
+                'res_id': self.id,
+                'view_mode': 'form',
+                'view_id': self.env.ref('case_management.view_case_report_form').id,
+                'target': 'new',
+            }
+        else:
+            # For Treated cases, show the close form
+            return {
+                'name': 'Close Case',
+                'type': 'ir.actions.act_window',
+                'res_model': 'case',
+                'res_id': self.id,
+                'view_mode': 'form',
+                'view_id': self.env.ref('case_management.view_case_close_form').id,
+                'target': 'new',
+            }
+
+    def action_confirm_report(self):
+        """Used when confirming a report on an open case"""
+        self.ensure_one()
+        
+        if self.env.user != self.staff_id.user_id:pass
+            #raise UserError("Only the assigned staff can perform this action.")
+            
+        if not self.response_note:
+            raise UserError("Please enter a response note before confirming report.")
+            
+        treated_status = self.env.ref('case_management.case_status_treated', raise_if_not_found=False)
+        if not treated_status:
+            raise UserError("Required case status 'treated' not found.")
+            
+        if self.status_id.name == 'open' and not self.is_reported:
+            self.is_reported = True
+            self.status_id = treated_status.id
+            self.message_post(body="Case reported and moved to Treated Cases.")
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'message': "Case has been reported and moved to Treated Cases.",
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+        else:
+            raise UserError(f"Cannot perform report action on case with status: {self.status_id.name}")
+    # def action_open_close_popup(self):
+    #     self.ensure_one()
+    #     return {
+    #         'name': 'Report/Close Case',
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'case',
+    #         'res_id': self.id,
+    #         'view_mode': 'form',
+    #         'view_id': self.env.ref('case_management.view_case_close_form').id,
+    #         'target': 'new',
+    #     }
+    
+    # def action_report_popup(self):
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Case Report',
+    #         'view_mode': 'form',
+    #         'res_model': 'case',
+    #         'res_id': self.id,
+    #         'view_id': self.env.ref('case_management.view_case_report_form').id,
+    #         'target': 'new',  # this makes it a popup
+    #     }
+        
+    # def action_confirm_report(self):
+    #     for rec in self:
+    #        if not rec.response_note:
+    #             raise UserError("Please enter a response note before confirming report.")
+
+    #        if not rec.is_reported:
+    #             rec.is_reported = True
+    #             rec.status_id = self.env.ref('case_management.case_status_treated').id
+
+    
+    def action_save_and_notify(self):
+        vals = self._convert_to_write({name: self[name] for name in self._cache})
+        new_record = self.create([vals])
+        return new_record.action_notification_after_save()
+
+    def action_notification_after_save(self):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': f"Case '{self.name}' created successfully!",
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+        
+    def action_confirm_case(self):
+        for rec in self:
+            if not rec.is_reported:
+                rec.is_reported = True
+                rec.status_id = self.env.ref('case_management.case_status_treated').id
+            else:
+                rec.status_id = self.env.ref('case_management.case_status_closed').id
+
+
+    # ------------------- CRON -------------------
+
+    @api.model
+    def cron_check_overdue_cases(self):
+        overdue_status = self.env['case.status'].search([('name', '=', 'overdue')], limit=1)
+        if not overdue_status:
+            _logger.warning("Overdue status not found!")
+            return
+
+        deadline = fields.Datetime.now() - timedelta(hours=48)
+        open_cases = self.search([('status_id.name', '=', 'open'), ('created_at', '<=', deadline)])
+        open_cases.write({'status_id': overdue_status.id})
+
+    # ------------------- OVERRIDES -------------------
+
+    def write(self, vals):
+        closed_status_id = self.env['case.status'].search([('name', '=', 'closed')], limit=1).id
+        if 'status_id' in vals and vals['status_id'] == closed_status_id:
+            for rec in self:
+                if self.env.uid != rec.staff_id.user_id.id:
+                    pass
+                    #raise UserError("Only the assigned staff can close this case.")
+        return super(Cases, self).write(vals)

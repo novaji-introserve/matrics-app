@@ -1,0 +1,114 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_case_tree_assigned_to_me" model="ir.ui.view">
+        <field name="name">case.tree.assigned.to.me</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="transaction_reference"/>
+                <field name="title" string="Severity" readonly="1" />
+                <field name="created_at" string="Start Date"/>
+                <field name="user_id" string="Created By"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="data_source" readonly="1"/>
+                <field name="cases_action" string="Recommended Action" readonly="1"/>
+                <field name="team_id"/>
+                <field name="status_html" widget="html"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View that works for response writing -->
+    <record id="view_case_form_response_only" model="ir.ui.view">
+        <field name="name">case.form.response.only</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Case" create="false" delete="false">
+                <header>
+                    <!-- <field name="status_id" widget="statusbar" readonly="1"/> -->
+                    <field name="status_id" widget="statusbar" readonly="1" 
+                        decoration-danger="status_id == 'overdue'" 
+                        decoration-success="status_id == 'closed'" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="created_at" string="Start Date" readonly="1"/>
+                            <field name="transaction_reference" readonly="1"/>
+                            <field name="branch_id" options="{'no_open': True, 'no_create': True}" readonly="1"/>
+                            <field name="team_id" options="{'no_open': True, 'no_create': True}" readonly="1"/>
+                            <field name="data_source" readonly="1"/>
+                            <field name="cases_action" string="Recommended Action" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="staff_id" string="Staff Responsible" options="{'no_open': True, 'no_create': True}" groups="base.group_user" readonly="1"/>
+                            <field name="user_id" string="Created By" readonly="1" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="title" string="Severity" readonly="1"/>
+                            <field name="severity_level" invisible="1"/>
+                            <field name="rating_id" readonly="1" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="process_category_id" string="Process Category"/>
+                            <field name="process_id" string="Process"/>
+                        </group>
+                    </group>
+
+                    <!-- Responses Tab -->
+                    <notebook>
+                        <page string="Description">
+                            <group>
+                                <field name="cases_description" readonly="1"/>
+                                <field name="further_description" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Responses">
+                            <field name="response_ids" nolabel="1">
+                                <tree string="Responses" editable="bottom">
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="create_uid" string="Responder" options="{'no_open': True, 'no_create': True}"/>
+                                    <field name="response" required="1"/>
+                                    <field name="case_id" invisible="1"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="create_uid" readonly="1"/>
+                                        <field name="create_date" readonly="1"/>
+                                        <field name="response"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <!-- <field name="activity_ids" widget="mail_activity"/> -->
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action with both tree and form views -->
+    <record id="action_case_assigned_to_me" model="ir.actions.act_window">
+        <field name="name">Cases Assigned to Me</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('staff_id', '=', uid)]</field>
+        <field name="context">{}</field>
+        <field name="view_ids" eval="[(5, 0, 0), 
+                                     (0, 0, {'view_mode': 'tree', 'view_id': ref('view_case_tree_assigned_to_me')}),
+                                     (0, 0, {'view_mode': 'form', 'view_id': ref('view_case_form_response_only')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No case has been assigned to you yet.
+            </p>
+        </field>
+    </record>
+</odoo>

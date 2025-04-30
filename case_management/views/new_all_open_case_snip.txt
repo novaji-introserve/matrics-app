@@ -1,0 +1,101 @@
+<odoo>
+
+    <!-- Tree View - Replace your existing open_case_list_view -->
+<record id="open_case_list_view" model="ir.ui.view">
+    <field name="name">case.list</field>
+    <field name="model">case</field>
+    <field name="arch" type="xml">
+        <tree string="Open Cases" create="false" edit="false">
+            <field name="created_at" string="Start Date"/>
+            <field name="end_date" string="End Date"/>
+            <field name="data_source" string="Data Source"/>
+            <field name="staff_id" string="Staff Responsible"/>
+            <field name="rating_id" string="Rating"/>
+            <field name="status_id" string="Status"/>
+            <field name="user_id" string="Created By"/>
+            <field name="process_category_id" string="Process Category"/>
+            <field name="process_id" string="Process"/>
+            <field name="cases_action" string="Action" />
+            <field name="status_name" invisible="1"/>
+            <field name="is_reported" invisible="1"/>
+            <field name="staff_user_id" invisible="1"/>
+            
+
+            <!-- Report on Case button - visible only when:
+                 1. Status is open
+                 2. Not yet reported
+                 3. Current user is the staff responsible -->
+            <button name="action_open_close_popup"
+                    string="Report on Case"
+                    type="object"
+                    class="btn-primary"
+                    attrs="{'invisible': ['|', '|', ('status_name', '=', 'closed'), ('is_reported', '=', True)]}"/>
+
+            <!-- Close Case button - visible only when:
+                 1. Status is open
+                 2. Already reported
+                 3. Current user is the staff responsible -->
+            <button name="action_open_close_popup"
+                    string="Close Case"
+                    type="object"
+                    class="btn-danger"
+                    attrs="{'invisible': ['|', '|', ('status_name', '=', 'closed'), ('is_reported', '=', False)]}"/>
+        </tree>
+    </field>
+</record>
+
+<!-- Popup Form View - Replace your existing view_case_close_form -->
+<record id="view_case_close_form" model="ir.ui.view">
+    <field name="name">case.close.form</field>
+    <field name="model">case</field>
+    <field name="arch" type="xml">
+        <form string="Case Action" create="false">
+            <sheet>
+                <group>
+                    <field name="created_at" readonly="1"/>
+                    <field name="end_date" readonly="1"/>
+                    <field name="data_source" readonly="1"/>
+                    <field name="staff_id" readonly="1"/>
+                    <field name="rating_id" readonly="1"/>
+                    <field name="status_id" readonly="1"/>
+                    <field name="user_id" readonly="1"/>
+                    <field name="process_category_id" readonly="1"/>
+                    <field name="process_id" readonly="1"/>
+                    <field name="cases_action" readonly="1"/>
+                    <field name="response_note"/>
+                    <field name="is_reported" invisible="1"/>
+                    <field name="staff_user_id" invisible="1"/>
+                </group>
+                <footer>
+                    <!-- Report button - only when not reported -->
+                    <button name="action_close_case" 
+                            string="Report on Case" 
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('is_reported', '=', True)]}"/>
+
+                    <!-- Close button - only when already reported -->
+                    <button name="action_close_case" 
+                            string="Close Case" 
+                            type="object"
+                            class="btn-danger"
+                            attrs="{'invisible': [('is_reported', '=', False)]}"/>
+
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </sheet>
+        </form>
+    </field>
+</record>
+<!-- Action for Tree View -->
+<!-- Action for Tree View -->
+<record id="open_case_action" model="ir.actions.act_window">
+    <field name="name">Open Cases</field>
+    <field name="res_model">case</field>
+    <field name="view_mode">tree</field>
+    <field name="view_id" ref="open_case_list_view"/>
+    <field name="domain">[("status_id.name", "=", "open")]</field>
+    <field name="context">{'create': False}</field>
+</record>
+
+</odoo>

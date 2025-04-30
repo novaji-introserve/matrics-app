@@ -1,0 +1,509 @@
+LATESSSSST
+
+### Email ALERT ######
+    
+    def _send_case_creation_alert(self):
+        """Send email alert when a case is created"""
+        self.ensure_one()
+        template = self.env.ref('case_management.case_creation_alert_template')
+
+        if not template:
+            _logger.error("Case creation email template not found")
+            return False
+            
+        # Prepare recipient data
+        staff_user = self.staff_id
+        creator_user = self.user_id
+        supervisors = [self.supervisor_one_id]
+        if self.supervisor_two_id:
+            supervisors.append(self.supervisor_two_id)
+        if self.supervisor_three_id:
+            supervisors.append(self.supervisor_three_id)
+            
+        # CC list - creator and supervisors
+        cc_emails = []
+        if creator_user and creator_user.email:
+            cc_emails.append(creator_user.email)
+        for supervisor in supervisors:
+            if supervisor and supervisor.email:
+                cc_emails.append(supervisor.email)
+                
+        # Prepare mail values
+        mail_values = {
+            'email_to': staff_user.email if staff_user else '',
+            'email_cc': ','.join(cc_emails),
+            'email_from': 'noreply@example.com',
+        }
+        
+        # Add data for template
+        ctx = {
+            'event_date': self.event_date,
+            'alert_name': self.name,
+            'title': self.cases_description,
+            'rating_name': self.rating_id.name if self.rating_id else '',
+            'staff_dept': self.team_id.name if self.team_id else '',
+            'status_name': self.status_name,
+            'exception_process': self.process_id.name if self.process_id else '',
+            'process_type': self.root_category_id.name if self.root_category_id else '',
+            'process_category': self.process_category_id.name if self.process_category_id else '',
+            'case_action': self.cases_action,
+            'description': self.further_description,
+            'response_link': f'/web#id={self.id}&model=case&view_type=form'
+        }
+        
+        _logger.info("Context for case creation alert:")
+        for key, value in ctx.items():
+            _logger.info(f"{key}: {value}")
+
+        
+        try:
+            # Send email using the CASE ID rather than partner ID
+            template.with_context(**ctx).send_mail(
+                self.id,  # Use the case ID instead of partner ID
+                force_send=True,
+                email_values=mail_values
+            )
+            _logger.info(f"Case creation alert sent for case {self.id}")
+            return True
+        except Exception as e:
+            _logger.error(f"Failed to send case creation alert for case {self.id}: {str(e)}")
+            return False
+            
+    def _send_case_response_alert(self, response):
+        """Send email alert when a case receives a response"""
+        self.ensure_one()
+        template = self.env.ref('case_management.case_response_alert_template')
+
+        if not template:
+            _logger.error("Case response email template not found")
+            return False
+            
+        # Prepare recipient data
+        creator_user = self.user_id
+        staff_user = self.staff_id
+        responder_user = response.create_uid
+        supervisors = [self.supervisor_one_id]
+        if self.supervisor_two_id:
+            supervisors.append(self.supervisor_two_id)
+        if self.supervisor_three_id:
+            supervisors.append(self.supervisor_three_id)
+            
+        # CC list - staff and supervisors
+        cc_emails = []
+        if staff_user and staff_user.email:
+            cc_emails.append(staff_user.email)
+        for supervisor in supervisors:
+            if supervisor and supervisor.email:
+                cc_emails.append(supervisor.email)
+                
+        # Prepare mail values
+        mail_values = {
+            'email_to': creator_user.email if creator_user else '',
+            'email_cc': ','.join(cc_emails),
+            'email_from': 'noreply@example.com',
+        }
+        
+        # Add data for template
+        ctx = {
+            'event_date': self.event_date,
+            'alert_name': self.name,
+            'title': self.cases_description,
+            'rating_name': self.rating_id.name if self.rating_id else '',
+            'staff_dept': self.team_id.name if self.team_id else '',
+            'status_name': self.status_name,
+            'exception_process': self.process_id.name if self.process_id else '',
+            'process_type': self.root_category_id.name if self.root_category_id else '',
+            'process_category': self.process_category_id.name if self.process_category_id else '',
+            'case_action': self.cases_action,
+            'response': response.response,
+            'user_name': self.user_id.name,
+            'user_email': self.user_id.email,
+            'responder_name': responder_user.name,
+            'responder_email': responder_user.email
+        }
+        
+        _logger.info("Context for RESPONSE alert:")
+        for key, value in ctx.items():
+            _logger.info(f"{key}: {value}")
+
+        
+        try:
+            # Send email using the CASE ID rather than partner ID
+            template.with_context(**ctx).send_mail(
+                self.id,  # Use the case ID instead of partner ID
+                force_send=True,
+                email_values=mail_values
+            )
+            _logger.info(f"Case response alert sent for case {self.id}")
+            return True
+        except Exception as e:
+            _logger.error(f"Failed to send case response alert for case {self.id}: {str(e)}")
+            return False
+
+    def _send_case_closure_alert(self):
+        """Send email alert when a case is closed"""
+        self.ensure_one()
+        template = self.env.ref('case_management.case_closure_alert_template')
+
+        if not template:
+            _logger.error("Case closure email template not found")
+            return False
+            
+        # Prepare recipient data
+        staff_user = self.staff_id
+        creator_user = self.user_id
+        supervisors = [self.supervisor_one_id]
+        if self.supervisor_two_id:
+            supervisors.append(self.supervisor_two_id)
+        if self.supervisor_three_id:
+            supervisors.append(self.supervisor_three_id)
+            
+        # CC list - creator and supervisors
+        cc_emails = []
+        if creator_user and creator_user.email:
+            cc_emails.append(creator_user.email)
+        for supervisor in supervisors:
+            if supervisor and supervisor.email:
+                cc_emails.append(supervisor.email)
+                
+        # Prepare mail values
+        mail_values = {
+            'email_to': staff_user.email if staff_user else '',
+            'email_cc': ','.join(cc_emails),
+            'email_from': 'noreply@example.com',
+        }
+        
+        # Add data for template - this passes close_case as a dictionary
+        # because the template uses close_case[] rather than object
+        close_case = {
+            'event_date': self.event_date,
+            'alert_name': self.name,
+            'title': self.cases_description,
+            'rating_name': self.rating_id.name if self.rating_id else '',
+            'staff_dept': self.team_id.name if self.team_id else '',
+            'status_name': self.status_name,
+            'exception_process': self.process_id.name if self.process_id else '',
+            'process_type': self.root_category_id.name if self.root_category_id else '',
+            'process_category': self.process_category_id.name if self.process_category_id else '',
+            'case_action': self.cases_action,
+            'close_remarks': "Case closed successfully",
+            'user_name': self.user_id.name,
+            'user_email': self.user_id.email
+        }
+        
+        _logger.info("Context for closure alert:")
+        for key, value in close_case.items():
+            _logger.info(f"{key}: {value}")
+
+        
+        try:
+            # Send email using the CASE ID rather than partner ID
+            template.with_context(**close_case).send_mail(
+                self.id,  # Use the case ID instead of partner ID
+                force_send=True,
+                email_values=mail_values
+            )
+            _logger.info(f"Case closure alert sent for case {self.id}")
+            return True
+        except Exception as e:
+            _logger.error(f"Failed to send case closure alert for case {self.id}: {str(e)}")
+            return False
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # @api.model
+    # def create(self, vals):
+    #     # Create the record using the super method
+    #     record = super(Cases, self).create(vals)
+        
+    #     # Post a message on the case record indicating that it's created
+    #     record.message_post(body="Case created successfully!", subtype_xmlid="mail.mt_comment")
+
+    #     # Optionally, you can trigger some action (like setting the state or triggering a success popup)
+    #     if 'status_id' in vals and vals['status_id'] == self.env.ref('case_management.case_status_open').id:
+    #         # You can put any additional logic here if you need to trigger success under certain conditions
+    #         record.message_post(body="Case is now in 'Open' status.", subtype_xmlid="mail.mt_comment")
+        
+    #     return record
+
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    # def write(self, vals):
+    #     """Override write method to handle case closure properly"""
+    #     # Get closed status ID once
+    #     closed_status_id = self.env['case.status'].search([('name', '=', 'closed')], limit=1).id
+        
+    #     # For each record in the recordset
+    #     for record in self:
+    #         # Make a copy of vals for this specific record
+    #         record_vals = dict(vals)
+            
+    #         # Apply business logic checks
+    #         if record.status_id.name == 'open':
+    #             # If trying to close the case
+    #             if 'status_id' in record_vals and record_vals['status_id'] == closed_status_id:
+    #                 # Only staff responsible can close the case
+    #                 if self.env.uid != record.staff_id.user_id.id:
+    #                     raise UserError("Only the Staff Responsible can close this case.")
+                
+    #             # If staff responsible adds action, auto-close the case
+    #             if self.env.uid == record.staff_id.user_id.id and 'cases_action' in record_vals and record_vals['cases_action']:
+    #                 record_vals['status_id'] = closed_status_id
+                
+    #             # Prevent non-staff from modifying other fields
+    #             if self.env.uid != record.staff_id.user_id.id and any(field in record_vals for field in self._fields if field not in ['status_id', 'end_date']):
+    #                 raise UserError("Only the Staff Responsible can modify other fields for this open case.")
+            
+    #         # Skip the ORM and use direct SQL to update only this specific record
+    #         if record_vals:
+    #             query = "UPDATE case SET "
+    #             params = []
+                
+    #             # Build the SQL update query
+    #             for field, value in record_vals.items():
+    #                 query += f"{field} = %s, "
+    #                 params.append(value)
+                    
+    #             # Remove trailing comma and space
+    #             query = query.rstrip(', ')
+                
+    #             # Add WHERE clause for this specific record
+    #             query += " WHERE id = %s"
+    #             params.append(record.id)
+                
+    #             # Execute the SQL query
+    #             self._cr.execute(query, params)
+        
+    #     return True
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # @api.model
+    # def write(self, values):
+    #     # Handle single record updates
+    #     if len(self) == 1:
+    #         record = self[0]
+    #         if record.status_id.name == 'open':
+    #             # Check if current user is Staff Responsible
+    #             if self.env.uid != record.staff_id.user_id.id and 'status_id' in values and values['status_id'] == self.env['case.status'].search([('name', '=', 'closed')], limit=1).id:
+    #                 raise UserError("Only the Staff Responsible can close this case.")
+                
+    #             # Prevent non-staff from modifying other fields
+    #             elif self.env.uid != record.staff_id.user_id.id and any(field in values for field in self._fields if field not in ['status_id', 'end_date']):
+    #                 raise UserError("Only the Staff Responsible can modify other fields for this open case.")
+                
+    #             # Automatically close the case if 'cases_action' is updated by the Staff Responsible
+    #             elif self.env.uid == record.staff_id.user_id.id and 'cases_action' in values and values['cases_action']:
+    #                 closed_status = self.env['case.status'].search([('name', '=', 'closed')], limit=1)
+    #                 values['status_id'] = closed_status.id
+    #                 # Remove this line: record.status_id = closed_status  # This was causing the issue
+        
+    #     # Handle bulk updates
+    #     else:
+    #         for record in self:
+    #             if record.status_id.name == 'open' and 'status_id' in values:
+    #                 # Prevent bulk closure
+    #                 if values['status_id'] == self.env['case.status'].search([('name', '=', 'closed')], limit=1).id:
+    #                     raise UserError("Bulk status updates are not allowed. Please update cases individually.")
+
+    #     return super(Cases, self).write(values)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    # @api.model
+    # def write(self, values):
+    #     # This will only execute if we are writing to a single record
+    #     if len(self) == 1:
+    #         record = self[0]
+    #         # Ensure that we are modifying the 'status_id' for this specific record
+    #         if record.status_id.name == 'open':
+    #             # Check if the current user is the Staff Responsible
+    #             if self.env.uid != record.staff_id.user_id.id and 'status_id' in values and values['status_id'] == self.env['case.status'].search([('name', '=', 'closed')], limit=1).id:
+    #                 raise UserError("Only the Staff Responsible can close this case.")
+                
+    #             # Prevent non-staff from modifying other fields
+    #             elif self.env.uid != record.staff_id.user_id.id and any(field in values for field in self._fields if field not in ['status_id', 'end_date']):
+    #                 raise UserError("Only the Staff Responsible can modify other fields for this open case.")
+                
+    #             # Automatically close the case if 'cases_action' is updated by the Staff Responsible
+    #             elif self.env.uid == record.staff_id.user_id.id and 'cases_action' in values and values['cases_action']:
+    #                 closed_status = self.env['case.status'].search([('name', '=', 'closed')], limit=1)
+    #                 values['status_id'] = closed_status.id
+    #                 record.status_id = closed_status  # Explicitly set status for this record
+
+    #     # If it's a bulk update, make sure the logic only applies where necessary
+    #     else:
+    #         for record in self:
+    #             if record.status_id.name == 'open' and 'status_id' in values:
+    #                 # Perform checks only for records with 'open' status and prevent bulk closure
+    #                 if 'status_id' in values and values['status_id'] == self.env['case.status'].search([('name', '=', 'closed')], limit=1).id:
+    #                     raise UserError("Bulk status updates are not allowed. Please update cases individually.")
+
+    #     return super(Cases, self).write(values)
+
+        
+    
+    
+    
+    # # @api.model
+    # # def write(self, values):
+    #     for record in self:
+    #         # Only proceed with status update for the specific record being updated
+    #         if record.status_id.name == 'open':
+    #             if self.env.uid != record.staff_id.user_id.id and 'status_id' in values and values['status_id'] == self.env['case.status'].search([('name', '=', 'closed')], limit=1).id:
+    #                 raise UserError("Only the Staff Responsible can close this case.")
+    #             elif self.env.uid != record.staff_id.user_id.id and any(field in values for field in self._fields if field not in ['status_id', 'end_date']): 
+    #                 raise UserError("Only the Staff Responsible can modify other fields for this open case.")
+    #             elif self.env.uid == record.staff_id.user_id.id and record.status_id.name == 'open' and 'cases_action' in values and values['cases_action']:
+    #                 closed_status = self.env['case.status'].search([('name', '=', 'closed')], limit=1)
+    #                 values['status_id'] = closed_status.id
+    #                 record.status_id = closed_status  # Explicitly change status on the record itself
+    #     return super(Cases, self).write(values)
+
+    
+    
+    
+    # @api.model
+    # def write(self, values):
+    #     for record in self:
+    #         if record.status_id.name == 'open':
+    #             if self.env.uid != record.staff_id.user_id.id and 'status_id' in values and values['status_id'] == self.env['case.status'].search([('name', '=', 'closed')], limit=1).id:
+    #                 raise UserError("Only the Staff Responsible can close this case.")
+    #             elif self.env.uid != record.staff_id.user_id.id and any(field in values for field in self._fields if field not in ['status_id', 'end_date']): # Prevent non-staff from editing other fields
+    #                 raise UserError("Only the Staff Responsible can modify this open case.")
+    #             elif self.env.uid == record.staff_id.user_id.id and record.status_id.name == 'open' and 'cases_action' in values and values['cases_action']: # Example: Close if action is updated
+    #                 closed_status = self.env['case.status'].search([('name', '=', 'closed')], limit=1)
+    #                 values['status_id'] = closed_status.id
+    #     return super(Cases, self).write(values)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # @api.model
+    # def write(self, values):
+    #     if 'status_id' in values and values['status_id']:
+    #         if values['status_id'] == self.env['case.status'].search([('name', '=', 'closed')], limit=1).id:
+    #             if self.staff_id != self.env.user:
+    #                 raise UserError("Only the Staff Responsible can close this case.")
+    #     return super(Cases, self).write(values)
+
+
+# from odoo import models, fields, api
+
+# class Cases(models.Model):
+#     _name = 'case'
+#     _description = 'Cases'
+#     _rec_name = 'title'
+    
+    
+#     name = fields.Char(string="Name", compute='_compute_name', store=True)
+
+
+#     title = fields.Selection([
+#         ('1', 'Low'),
+#         ('2', 'Medium'),
+#         ('3', 'High')
+#     ], string='Title', required=False)
+    
+#     cases_description = fields.Text(string='Narration', compute='_compute_description', store=True)
+    
+#     cases_action = fields.Char(string='Cases Action', required=False)
+    
+#     created_at = fields.Datetime(string='Created At', required=False)
+#     updated_at = fields.Datetime(string='Updated At', required=False)
+#     current_date = fields.Datetime(string='Current Date', required=False)
+    
+#     status_id = fields.Many2one('case.status', string='Status', required=False)
+#     alert_id = fields.Many2one('alert', string='Alert', required=False)
+#     team_id = fields.Many2one('team', string='Team', required=False)
+#     staff_id = fields.Many2one('staff', string='Staff', required=False)
+#     user_id = fields.Many2one('res.users', string='User', required=False)
+#     rating_id = fields.Many2one('case.rating', string='Rating', required=False)
+#     exception_process_id = fields.Many2one('exception.process', string='Exception Process', required=False)
+    
+#     response_note = fields.Integer(string='Response Note', required=False)
+#     data_source=fields.Text(string="Data Source", required=False)
+#     attachment = fields.Binary(string='Attachment')
+    
+    
+#     @api.depends('title')
+#     def _compute_name(self):
+#         for record in self:
+#             label = dict(self._fields['title'].selection).get(record.title, '')
+#             record.name = f"{label} Case"
+
+    
+    
+#     # this is to catch bad values from creating an unchange error
+#     @api.onchange('staff_id', 'team_id', 'status_id', 'rating_id', 'exception_process_id', 'alert_id')
+#     def _onchange_safe_fields(self):
+#         for field_name in ['staff_id', 'team_id', 'status_id', 'rating_id', 'exception_process_id', 'alert_id']:
+#             value = getattr(self, field_name)
+#             if value and not value.id:
+#                 setattr(self, field_name, False)
+
+        
+#     @api.depends('title')
+#     def _compute_description(self):
+#         for record in self:
+#             if record.title == '1':
+#                 record.cases_description = 'This is a Low case'
+#             elif record.title == '2':
+#                 record.cases_description = 'This is a Medium case'
+#             elif record.title == '3':
+#                 record.cases_description = 'This is a High case'
+#             else:
+#                 record.cases_description = ''

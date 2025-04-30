@@ -1,0 +1,1230 @@
+LATEST SNIPS
+
+<odoo>
+    <!-- Tree View for Open Cases -->
+    <record id="view_open_cases_tree" model="ir.ui.view">
+        <field name="name">open.cases.tree</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="Open Cases" create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="transaction_reference"/>
+                <field name="status_id"/>
+                <field name="staff_id"/>
+                <field name="created_at"/>
+                <field name="severity_level" invisible ="1"/>
+                <field name="has_responses" invisible="1"/>
+                <field name="is_creator" invisible="1"/>
+                <field name="is_assigned_staff" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for Cases with Proper Access Control -->
+    <record id="view_case_form_staff_only" model="ir.ui.view">
+        <field name="name">case.form.staff.only</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Case Details" create="false" edit="false" delete="false">
+                <header>
+                    <!-- Close button only for creator and only if there are responses -->
+                    <button name="action_close_case" 
+                            string="Close Case" 
+                            type="object" 
+                            class="oe_highlight" 
+                            attrs="{'invisible': ['|', ('is_creator', '=', False), ('has_responses', '=', False)]}"/>
+                    <field name="status_id" widget="statusbar" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="transaction_reference" readonly="1"/>
+                            <field name="title" readonly="1"/>
+                            <field name="created_at" readonly="1"/>
+                            <field name="branch_id" readonly="1"/>
+                            <field name="team_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="staff_id" readonly="1"/>
+                            <field name="supervisor_one_id" readonly="1"/>
+                            <field name="severity_level" invisible="1"/>
+                            <field name="status_html" readonly="1"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="is_creator" invisible="1"/>
+                            <field name="is_assigned_staff" invisible="1"/>
+                            <field name="has_responses" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description">
+                            <group>
+                                <field name="cases_description" readonly="1"/>
+                                <field name="further_description" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Responses">
+                            <!-- Responses writable only for assigned staff -->
+                            <field name="response_ids" attrs="{'readonly': [('is_assigned_staff', '=', False)]}">
+                                <tree editable="bottom">
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="create_uid" readonly="1"/>
+                                    <field name="response"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="response"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for Open Cases -->
+    <!-- <record id="case_action" model="ir.actions.act_window">
+        <field name="name">Open Cases</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('status_id.name', '=', 'open')]</field>
+        <field name="view_ids" eval="[(5, 0, 0), 
+                                      (0, 0, {'view_mode': 'tree', 'view_id': ref('view_open_cases_tree')}),
+                                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_case_form_staff_only')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No open cases found
+            </p>
+            <p>
+                All current open cases will appear here.
+            </p>
+        </field>
+    </record> -->
+    <!-- Action for Open Cases -->
+        <record id="case_action" model="ir.actions.act_window">
+            <field name="name">Open Cases</field>
+            <field name="res_model">case</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('status_id.name', '=', 'open')]</field>
+            <field name="view_ids" eval="[(5, 0, 0), 
+                                        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_open_cases_tree')}),
+                                        (0, 0, {'view_mode': 'form', 'view_id': ref('view_case_form_staff_only')})]"/>
+            <field name="context">{'create': False}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No open cases found
+                </p>
+                <p>
+                    All current open cases will appear here.
+                </p>
+            </field>
+        </record>
+
+    
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<odoo>
+    <!-- Tree View for Open Cases -->
+    <record id="view_open_cases_tree" model="ir.ui.view">
+        <field name="name">open.cases.tree</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="Open Cases">
+                <field name="name"/>
+                <field name="transaction_reference"/>
+                <field name="status_id"/>
+                <field name="staff_id"/>
+                <field name="created_at"/>
+                <field name="severity_level" invisible ="1"/>
+                <field name="has_responses" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for Cases with Staff-only Editing -->
+    <record id="view_case_form_staff_only" model="ir.ui.view">
+        <field name="name">case.form.staff.only</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Case Details">
+                <header>
+                    <field name="status_id" widget="statusbar" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="transaction_reference" readonly="1"/>
+                            <field name="title" readonly="1"/>
+                            <field name="created_at" readonly="1"/>
+                            <field name="branch_id" readonly="1"/>
+                            <field name="team_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="staff_id" readonly="1"/>
+                            <field name="supervisor_one_id" readonly="1"/>
+                            <field name="severity_level" readonly="1"/>
+                            <field name="status_html" readonly="1"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="is_creator" invisible="1"/>
+                            <field name="is_assigned_staff" invisible="1"/>
+                            <field name="has_responses" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description">
+                            <group>
+                                <field name="cases_description" readonly="1"/>
+                                <field name="further_description" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Responses">
+                            <!-- Simple readonly check for non-staff -->
+                            <field name="response_ids" readonly="0">
+                                <tree editable="bottom">
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="create_uid" readonly="1"/>
+                                    <field name="response"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="response"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for Open Cases -->
+    <record id="case_action" model="ir.actions.act_window">
+        <field name="name">Open Cases</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('status_id.name', '=', 'open')]</field>
+        <field name="view_ids" eval="[(5, 0, 0), 
+                                      (0, 0, {'view_mode': 'tree', 'view_id': ref('view_open_cases_tree')}),
+                                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_case_form_staff_only')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No open cases found
+            </p>
+            <p>
+                All current open cases will appear here.
+            </p>
+        </field>
+    </record>
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<odoo>
+    <!-- Tree View for Open Cases -->
+    <record id="open_case_list_view" model="ir.ui.view">
+        <field name="name">case.open.tree</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="Open Cases" create="false" edit="true" delete="false">
+                <field name="created_at" string="Start Date"/>
+                <field name="end_date" string="End Date"/>
+                <field name="data_source" string="Data Source"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="rating_id" string="Rating"/>
+                <field name="status_id" string="Status"/>
+                <field name="user_id" string="Created By"/>
+                <field name="process_category_id" string="Process Category"/>
+                <field name="process_id" string="Process"/>
+                <field name="cases_action" string="Action"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for Cases -->
+    <record id="view_case_form" model="ir.ui.view">
+        <field name="name">case.form</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Case">
+                <header>
+                    <!-- Staff Response button (only visible to assigned staff) -->
+                    <!-- <button name="action_open_response_wizard"
+                            string="Report on Case"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('is_assigned_staff', '=', False)]}"/> -->
+                    
+                    <!-- Close button (only visible to creator when responses exist) -->
+                    <!-- <button name="action_close_case"
+                            string="Close Case"
+                            type="object"
+                            class="btn-success"
+                            attrs="{'invisible': ['|', ('is_creator', '=', False), ('has_responses', '=', False)]}"/>
+                     -->
+                     <button name="action_open_response_wizard"
+                            string="Report on Case"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('is_assigned_staff', '=', False)]}"/>
+
+                    <button name="action_close_case"
+                            string="Close Case"
+                            type="object"
+                            class="btn-success"
+                            attrs="{'invisible': ['|', ('is_creator', '=', False), ('has_responses', '=', False)]}"/>
+
+                    <field name="is_creator" invisible="1"/>
+                    <field name="is_assigned_staff" invisible="1"/>
+                    <field name="status_id" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="created_at"/>
+                            <field name="data_source"/>
+                            <field name="staff_id"/>
+                            <field name="rating_id"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="is_creator" invisible="1"/>
+                            <field name="is_assigned_staff" invisible="1"/>
+                            <field name="has_responses" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="end_date"/>
+                            <field name="process_category_id"/>
+                            <field name="process_id"/>
+                            <field name="cases_action"/>
+                            <field name="title"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="cases_description"/>
+                            <field name="further_description"/>
+                        </page>
+                        <page string="Responses">
+                            <field name="response_ids" readonly="1" nolabel="1" context="{'default_case_id': active_id}">
+                                <tree>
+                                    <field name="create_uid" string="Responder"/>
+                                    <field name="create_date" string="Date" widget="datetime"/>
+                                    <field name="response" string="Response" widget="text"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="create_uid" readonly="1"/>
+                                        <field name="create_date" readonly="1"/>
+                                        <field name="response" readonly="1" widget="text"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Response Wizard Form -->
+    <record id="view_case_response_wizard_form" model="ir.ui.view">
+        <field name="name">case.response.wizard.form</field>
+        <field name="model">case.response.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Response">
+                <sheet>
+                    <group>
+                        <field name="case_id" invisible="1"/>
+                        <field name="response" required="true"/>
+                    </group>
+                    <footer>
+                        <button name="action_submit_response" 
+                                string="Submit Response" 
+                                type="object" 
+                                class="btn-primary"/>
+                        <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window Action for Cases -->
+    <record id="case_action" model="ir.actions.act_window">
+        <field name="name">Cases</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="open_case_list_view"/>
+        <field name="context">{'create': True, 'search_default_order': 'create_date desc'}</field>
+    </record>
+</odoo>
+
+
+
+
+
+
+
+
+
+<odoo>
+    <record id="open_case_list_view" model="ir.ui.view">
+    <record id="open_case_form_action" model="ir.actions.act_window">
+        <field name="name">Open Case Form</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+        <field name="name">case.list</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="Open Cases" create="false" edit="false">
+                <field name="created_at" string="Start Date"/>
+                <field name="end_date" string="End Date"/>
+                <field name="data_source" string="Data Source"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="rating_id" string="Rating"/>
+                <field name="status_id" string="Status"/>
+                <field name="user_id" string="Created By"/>
+                <field name="process_category_id" string="Process Category"/>
+                <field name="process_id" string="Process"/>
+                <field name="cases_action" string="Action" />
+                <field name="status_name" invisible="1"/>
+                <button name="%(open_case_form_action)d" string="Close Case" type="action" class="btn-primary"
+                        attrs="{'invisible': [('status_name', '=', 'closed')]}"/>
+
+                <!-- <button name="action_close_case" string="Close Case" type="object" class="btn-success" context="{'active_id': id}"
+                        attrs="{'invisible': [('status_name', '=', 'closed')]}"/> -->
+
+            </tree>
+        </field>
+        
+    </record>
+
+    <record id="open_case_action" model="ir.actions.act_window">
+        <field name="name">Open Cases</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="open_case_list_view"/>
+        <!-- <field name="domain">[('status_name', '=', 'open')]</field> -->
+        <field name="domain">[('status_id.name', '=', 'open')]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+    <record id="case_status_closed" model="case.status">
+        <field name="name">closed</field>
+    </record>
+    
+
+
+    <menuitem name="All Open Cases" 
+              id="all_open_cases" 
+              parent="menu_case" 
+              sequence="12" 
+              action="open_case_action"/>
+    <!-- <record id="all_open_cases" model="ir.ui.menu">
+        <field name="name">Open Cases</field>
+        <field name="action" ref="open_case_action"/>
+    </record> -->
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+<odoo>
+    <record id="open_case_form_action" model="ir.actions.act_window">
+        <field name="name">Open Case Form</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="open_case_list_view" model="ir.ui.view">
+        <field name="name">case.list</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="Open Cases" create="false" edit="false">
+                <field name="created_at" string="Start Date"/>
+                <field name="end_date" string="End Date"/>
+                <field name="data_source" string="Data Source"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="rating_id" string="Rating"/>
+                <field name="status_id" string="Status"/>
+                <field name="user_id" string="Created By"/>
+                <field name="process_category_id" string="Process Category"/>
+                <field name="process_id" string="Process"/>
+                <field name="cases_action" string="Action" />
+                <field name="status_name" invisible="1"/>
+                <button name="%(open_case_form_action)d" string="Close Case" type="action" class="btn-primary"
+                        attrs="{'invisible': [('status_name', '=', 'closed')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="open_case_action" model="ir.actions.act_window">
+        <field name="name">Open Cases</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="open_case_list_view"/>
+        <field name="domain">[('status_id.name', '=', 'open')]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <record id="case_status_closed" model="case.status">
+        <field name="name">closed</field>
+    </record>
+
+    <menuitem name="All Open Cases" 
+              id="all_open_cases" 
+              parent="menu_case" 
+              sequence="12" 
+              action="open_case_action"/>
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<odoo>
+
+    <!-- Popup Form View (Move this up to avoid reference errors) -->
+    <record id="view_case_close_form" model="ir.ui.view">
+        <field name="name">case.close.form</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Close Case" create="false">
+                <sheet>
+                    <group>
+                        <field name="created_at" readonly="1"/>
+                        <field name="end_date" readonly="1"/>
+                        <field name="data_source" readonly="1"/>
+                        <field name="staff_id" readonly="1"/>
+                        <field name="rating_id" readonly="1"/>
+                        <field name="status_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="process_category_id" readonly="1"/>
+                        <field name="process_id" readonly="1"/>
+                        <field name="cases_action" readonly="1"/>
+                        <field name="response_note"/> <!-- Editable -->
+                    </group>
+                    <footer>
+                        <button name="action_close_case" string="Confirm Report" type="object" class="btn-primary"/>
+                        <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Popup Action: Must be above tree view -->
+    <record id="action_open_close_case_popup" model="ir.actions.act_window">
+        <field name="name">Close Case</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_case_close_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Tree View (AFTER popup action is defined) -->
+    <record id="open_case_list_view" model="ir.ui.view">
+        <field name="name">case.list</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="Open Cases" create="false" edit="false">
+                <field name="created_at" string="Start Date"/>
+                <field name="end_date" string="End Date"/>
+                <field name="data_source" string="Data Source"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="rating_id" string="Rating"/>
+                <field name="status_id" string="Status"/>
+                <field name="user_id" string="Created By"/>
+                <field name="process_category_id" string="Process Category"/>
+                <field name="process_id" string="Process"/>
+                <field name="cases_action" string="Action" />
+                <field name="status_name" invisible="1"/>
+                <button name="action_open_close_popup"
+                    string="Report on Case"
+                    type="object"
+                    class="btn-primary"
+                    attrs="{'invisible': [('status_name', '=', 'closed')]}"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action for Tree View -->
+    <record id="open_case_action" model="ir.actions.act_window">
+        <field name="name">Open Cases</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="open_case_list_view"/>
+        <field name="domain">[('status_id.name', '=', 'open')]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <!-- Optional: Default Closed Status -->
+    <record id="case_status_closed" model="case.status">
+        <field name="name">closed</field>
+    </record>
+
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<odoo>
+
+    <!-- Popup Form View (Move this up to avoid reference errors) -->
+    <record id="view_case_close_form" model="ir.ui.view">
+        <field name="name">case.close.form</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Close Case" create="false">
+                <sheet>
+                    <group>
+                        <field name="created_at" readonly="1"/>
+                        <field name="end_date" readonly="1"/>
+                        <field name="data_source" readonly="1"/>
+                        <field name="staff_id" readonly="1"/>
+                        <field name="rating_id" readonly="1"/>
+                        <field name="status_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="process_category_id" readonly="1"/>
+                        <field name="process_id" readonly="1"/>
+                        <field name="cases_action" readonly="1"/>
+                        <field name="response_note"/> <!-- Editable -->
+                        <!-- Add 'is_reported' field (invisible) -->
+                        <field name="is_reported" invisible="1"/>
+                    </group>
+                    <footer>
+                        <button name="action_close_case"
+                                string="Confirm Report"
+                                type="object"
+                                class="btn-primary"
+                                attrs="{'invisible': [('is_reported', '=', True)]}"/>
+
+                        <button name="action_close_case"
+                                string="Confirm Close"
+                                type="object"
+                                class="btn-danger"
+                                attrs="{'invisible': [('is_reported', '=', False)]}"/>
+
+                        <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Popup Action: Must be above tree view -->
+    <record id="action_open_close_case_popup" model="ir.actions.act_window">
+        <field name="name">Close Case</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_case_close_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Tree View (AFTER popup action is defined) -->
+    <record id="open_case_list_view" model="ir.ui.view">
+        <field name="name">case.list</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="Open Cases" create="false" edit="false">
+                <field name="created_at" string="Start Date"/>
+                <field name="end_date" string="End Date"/>
+                <field name="data_source" string="Data Source"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="rating_id" string="Rating"/>
+                <field name="status_id" string="Status"/>
+                <field name="user_id" string="Created By"/>
+                <field name="process_category_id" string="Process Category"/>
+                <field name="process_id" string="Process"/>
+                <field name="cases_action" string="Action" />
+                <field name="status_name" invisible="1"/>
+                <field name="is_reported" invisible="1"/>
+
+                <button name="action_open_close_popup"
+                        string="Report on Case"
+                        type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': [('status_name', '=', 'closed'), ('is_reported', '=', True)]}"/>
+
+                <button name="action_open_close_popup"
+                        string="Close Case"
+                        type="object"
+                        class="btn-danger"
+                        attrs="{'invisible': [('status_name', '=', 'closed'), ('is_reported', '=', False)]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action for Tree View -->
+    <record id="open_case_action" model="ir.actions.act_window">
+        <field name="name">Open Cases</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="open_case_list_view"/>
+        <field name="domain">[("status_id.name", "=", "open")]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <!-- Optional: Default Closed Status -->
+    <record id="case_status_closed" model="case.status">
+        <field name="name">closed</field>
+    </record>
+
+</odoo>
+
+
+
+
+
+LATEST SAVE SNIPS
+<odoo>
+    <!-- Tree View for Open Cases: Fully Readonly and Non-clickable -->
+    <record id="open_case_list_view" model="ir.ui.view">
+        <field name="name">case.open.tree</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="Open Cases" create="false" edit="false" delete="false" action="false">
+                <field name="created_at" string="Start Date"/>
+                <field name="end_date" string="End Date"/>
+                <field name="data_source" string="Data Source"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="rating_id" string="Rating"/>
+                <field name="status_id" string="Status"/>
+                <field name="user_id" string="Created By"/>
+                <field name="process_category_id" string="Process Category"/>
+                <field name="process_id" string="Process"/>
+                <field name="cases_action" string="Action"/>
+                <field name="status_name" invisible="1"/>
+                <field name="is_reported" invisible="1"/>
+                <field name="staff_user_id" invisible="1"/>
+
+                <!-- Report on Case button -->
+                <button name="action_open_close_popup"
+                        string="Report on Case"
+                        type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': ['|', ('status_name', '!=', 'open'), ('is_reported', '=', True)]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Popup Form View for Reporting on Open Cases: Fully Readonly (except buttons and no response_note) -->
+    <record id="view_case_report_form" model="ir.ui.view">
+        <field name="name">case.report.form.readonly</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Report on Case" create="false">
+                <sheet>
+                    <group>
+                        <field name="created_at" readonly="1"/>
+                        <field name="end_date" readonly="1"/>
+                        <field name="data_source" readonly="1"/>
+                        <field name="staff_id" readonly="1"/>
+                        <field name="rating_id" readonly="1"/>
+                        <field name="status_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="process_category_id" readonly="1"/>
+                        <field name="process_id" readonly="1"/>
+                        <field name="cases_action" readonly="1"/>
+                        <field name="is_reported" invisible="1"/>
+                        <field name="staff_user_id" invisible="1"/>
+                        <field name="response_note" string="Report Response" readonly="0"/>
+                    </group>
+                    <footer>
+                        <!-- Report button - only when not reported -->
+                        <button name="action_confirm_report"
+                            string="Confirm Report"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('is_reported', '=', True)]}"/>
+
+                        <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window Action for Open Cases -->
+    <record id="open_case_action" model="ir.actions.act_window">
+        <field name="name">Open Cases</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="open_case_list_view"/>
+        <field name="view_ids" eval="[(5, 0, 0), 
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('open_case_list_view')}), 
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_case_report_form')})
+        ]"/>
+        <field name="domain">[("status_id.name", "=", "open")]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <!-- Status Records -->
+    <record id="case_status_open" model="case.status">
+        <field name="name">open</field>
+    </record>
+
+    <record id="case_status_treated" model="case.status">
+        <field name="name">treated</field>
+    </record>
+</odoo>
+
+
+
+
+LASTEST SAVE SNIPS
+
+<!-- Tree View for Open Cases: Fully Readonly and Non-clickable -->
+<record id="open_case_list_view" model="ir.ui.view">
+    <field name="name">case.open.tree</field>
+    <field name="model">case</field>
+    <field name="arch" type="xml">
+        <tree string="Open Cases" create="false" edit="false" delete="false">
+            <field name="created_at" string="Start Date"/>
+            <field name="end_date" string="End Date"/>
+            <field name="data_source" string="Data Source"/>
+            <field name="staff_id" string="Staff Responsible"/>
+            <field name="rating_id" string="Rating"/>
+            <field name="status_id" string="Status"/>
+            <field name="user_id" string="Created By"/>
+            <field name="process_category_id" string="Process Category"/>
+            <field name="process_id" string="Process"/>
+            <field name="cases_action" string="Action"/>
+            <field name="status_name" invisible="1"/>
+            <field name="has_responses" invisible="1"/>
+            <field name="staff_user_id" invisible="1"/>
+            <!-- No buttons in tree view as per requirements -->
+        </tree>
+    </field>
+</record>
+
+<!-- Main Form View for Cases -->
+<record id="view_case_form" model="ir.ui.view">
+    <field name="name">case.form</field>
+    <field name="model">case</field>
+    <field name="arch" type="xml">
+        <form string="Case">
+            <header>
+                <!-- Report button - only visible to assigned staff -->
+                <button name="action_open_report_wizard"
+                        string="Report on Case"
+                        type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': [('is_assigned_staff', '=', False)]}"/>
+                
+                <!-- Close button - only visible to creator and when has responses -->
+                <button name="action_close_case"
+                        string="Close Case"
+                        type="object"
+                        class="btn-success"
+                        confirm="Are you sure you want to close this case?"
+                        attrs="{'invisible': ['|', ('is_creator', '=', False), ('has_responses', '=', False)]}"/>
+                
+                <field name="status_id" widget="statusbar"/>
+            </header>
+            <sheet>
+                <div class="oe_title">
+                    <h1><field name="name" readonly="1"/></h1>
+                </div>
+                <group>
+                    <group>
+                        <field name="created_at"/>
+                        <field name="data_source"/>
+                        <field name="staff_id"/>
+                        <field name="rating_id"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="is_creator" invisible="1"/>
+                        <field name="is_assigned_staff" invisible="1"/>
+                        <field name="has_responses" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="end_date"/>
+                        <field name="status_id"/>
+                        <field name="process_category_id"/>
+                        <field name="process_id"/>
+                        <field name="cases_action"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Description">
+                        <field name="cases_description"/>
+                        <field name="further_description"/>
+                    </page>
+                    <page string="Responses" attrs="{'invisible': [('is_assigned_staff', '=', False), ('is_creator', '=', False)]}">
+                        <field name="response_ids" readonly="1">
+                            <tree>
+                                <field name="create_date"/>
+                                <field name="create_uid"/>
+                                <field name="response"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+            <div class="oe_chatter">
+                <field name="message_follower_ids"/>
+                <field name="message_ids"/>
+            </div>
+        </form>
+    </field>
+</record>
+
+<!-- Response Wizard Form -->
+<record id="view_case_response_wizard_form" model="ir.ui.view">
+    <field name="name">case.response.wizard.form</field>
+    <field name="model">case.response.wizard</field>
+    <field name="arch" type="xml">
+        <form string="Add Response">
+            <sheet>
+                <group>
+                    <field name="case_id" invisible="1"/>
+                    <field name="response" required="true"/>
+                </group>
+                <footer>
+                    <button name="action_submit_response" 
+                            string="Submit Response" 
+                            type="object" 
+                            class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<!-- Window Action for Open Cases -->
+<record id="open_case_action" model="ir.actions.act_window">
+    <field name="name">Open Cases</field>
+    <field name="res_model">case</field>
+    <field name="view_mode">tree,form</field>
+    <field name="view_id" ref="open_case_list_view"/>
+    <field name="domain">[("status_id.name", "=", "open")]</field>
+    <field name="context">{'create': True}</field>
+</record>
+
+<!-- Status Records -->
+<record id="case_status_open" model="case.status">
+    <field name="name">open</field>
+</record>
+
+<record id="case_status_closed" model="case.status">
+    <field name="name">closed</field>
+</record>
+
+
+
+
+LATEST
+
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View for Open Cases -->
+    <record id="open_case_list_view" model="ir.ui.view">
+        <field name="name">case.open.tree</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="Open Cases" create="false" edit="true" delete="false">
+                <field name="created_at" string="Start Date"/>
+                <field name="end_date" string="End Date"/>
+                <field name="data_source" string="Data Source"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="rating_id" string="Rating"/>
+                <field name="status_id" string="Status"/>
+                <field name="user_id" string="Created By"/>
+                <field name="process_category_id" string="Process Category"/>
+                <field name="process_id" string="Process"/>
+                <field name="cases_action" string="Action"/>
+                <!-- No buttons in tree view as per requirements -->
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for Cases -->
+    <record id="view_case_form" model="ir.ui.view">
+        <field name="name">case.form</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Case">
+                <header>
+                    <!-- Staff Response button (only visible to assigned staff) -->
+                    <button name="action_open_response_wizard"
+                            string="Report on Case"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('is_assigned_staff', '=', False)]}"/>
+                    
+                    <!-- Close button (only visible to creator when responses exist) -->
+                    <button name="action_close_case"
+                            string="Close Case"
+                            type="object"
+                            class="btn-success"
+                            attrs="{'invisible': ['|', ('is_creator', '=', False), ('has_responses', '=', False)]}"/>
+                    
+                    <field name="status_id" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="created_at"/>
+                            <field name="data_source"/>
+                            <field name="staff_id"/>
+                            <field name="rating_id"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="is_creator" invisible="1"/>
+                            <field name="is_assigned_staff" invisible="1"/>
+                            <field name="has_responses" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="end_date"/>
+                            <field name="process_category_id"/>
+                            <field name="process_id"/>
+                            <field name="cases_action"/>
+                            <field name="title"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="cases_description"/>
+                            <field name="further_description"/>
+                        </page>
+                        <page string="Responses">
+                            <field name="response_ids" readonly="1" nolabel="1" context="{'default_case_id': active_id}">
+                                <tree>
+                                    <field name="create_uid" string="Responder"/>
+                                    <field name="create_date" string="Date" widget="datetime"/>
+                                    <field name="response" string="Response" widget="text"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="create_uid" readonly="1"/>
+                                        <field name="create_date" readonly="1"/>
+                                        <field name="response" readonly="1" widget="text"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Response Wizard Form -->
+    <record id="view_case_response_wizard_form" model="ir.ui.view">
+        <field name="name">case.response.wizard.form</field>
+        <field name="model">case.response.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Response">
+                <sheet>
+                    <group>
+                        <field name="case_id" invisible="1"/>
+                        <field name="response" required="true"/>
+                    </group>
+                    <footer>
+                        <button name="action_submit_response" 
+                                string="Submit Response" 
+                                type="object" 
+                                class="btn-primary"/>
+                        <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window Action for Cases -->
+    <record id="case_action" model="ir.actions.act_window">
+        <field name="name">Cases</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="open_case_list_view"/>
+        <!-- <field name="context">{'create': True}</field> -->
+        <field name="context">{'create': True, 'search_default_order': 'create_date desc'}</field>
+
+    </record>
+
+    <!-- Menu Items -->
+    <!-- <menuitem id="menu_case_root" name="Case Management" sequence="10"/>
+    <menuitem id="menu_case_main" name="Cases" parent="menu_case_root" sequence="10"/>
+    <menuitem id="menu_case_all" name="All Cases" parent="menu_case_main" action="case_action" sequence="10"/> -->
+</odoo>

@@ -1,0 +1,116 @@
+<!-- <?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="open_case_manager_form_action" model="ir.actions.client">
+            <field name="name">New Case</field>
+            <field name="tag">case_mgt.open_case_manager_form</field>
+        </record>
+
+
+        <record id="action_owl_case_dashboard" model="ir.actions.client">
+            <field name="name">Case Dashboard</field>
+            <field name="tag">owl.case_dashboard</field>
+        </record>
+        <menuitem name="CASE MANAGEMENT" id="menu_case_mgt" sequence="10">
+            <menuitem name="Dashboard" id="menu_case_dashboard" sequence="10" action="action_owl_case_dashboard" />
+            <menuitem name="Case" id="menu_case" sequence="11" />
+        </menuitem>
+
+        <!-- sub menues of Case -->
+        <menuitem name="New Case" id="new_case" parent="menu_case" sequence="12" action="open_case_manager_form_action"/>
+        <!-- <menuitem name="New Case" id= "new_case" parent="menu_case" sequence="12" action="open_case_manager_form_action" /> -->
+        <menuitem name="All Open Cases" id= "all_open_cases" parent="menu_case" sequence="12" action="action_owl_case_dashboard"/>
+        <menuitem name="All Closed Cases" id= "all_closed_cases" parent="menu_case" sequence="12" action="action_owl_case_dashboard"/>
+        <menuitem name="Created By Me" id= "created_by_me" parent="menu_case" sequence="12" action="action_owl_case_dashboard"/>
+        <menuitem name="Assigned To Me" id= "assigned_to_me" parent="menu_case" sequence="12" action="action_owl_case_dashboard"/>
+        <menuitem name="My Alerts" id= "my_alerts" parent="menu_case" sequence="12" action="action_owl_case_dashboard"/>
+        <menuitem name="Overdue Cases" id= "overdue_cases" parent="menu_case" sequence="12" action="action_owl_case_dashboard"/>
+    </data>
+</odoo> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="open_case_manager_form_action" model="ir.actions.client">
+        <field name="name">Case Manager</field>
+        <field name="tag">case_mgt.open_case_manager_form</field>
+        <field name="target">fullscreen</field>
+    </record>
+
+    <menuitem 
+        id="new_case" 
+        name="Case Manager" 
+        parent="menu_case"
+        sequence="12"
+        action="open_case_manager_form_action"/>
+
+    <record id="case_manager_form_view" model="ir.ui.view">
+        <field name="name">case.manager.form</field>
+        <field name="model">case.manager</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="process_category"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="root_category"/>
+                            <field name="event_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Details">
+                            <group>
+                                <field name="narration"/>
+                                <field name="recommended_action"/>
+                                <field name="data_source"/>
+                                <field name="transaction_reference"/>
+                            </group>
+                        </page>
+                        <page string="Staff Information">
+                            <group>
+                                <field name="severity"/>
+                                <field name="staff_responsible"/>
+                                <field name="department"/>
+                                <field name="supervisor_one"/>
+                                <field name="supervisor_two"/>
+                                <field name="supervisor_three"/>
+                            </group>
+                        </page>
+                        <page string="Documents">
+                            <field name="supporting_document"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo> -->

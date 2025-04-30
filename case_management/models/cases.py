@@ -1,62 +1,1038 @@
 from odoo import models, fields, api
+from odoo.exceptions import UserError
+from datetime import timedelta
+import logging
 
-class CaseManagement(models.Model):
-    _name = 'case.management'
-    _description = 'Case Management'
-    
-    process_category = fields.Selection([
-        ('category1', 'Category 1'),
-        ('category2', 'Category 2'),
-    ], string="Process Category", required=True)
+_logger = logging.getLogger(__name__)
 
-    process_status = fields.Selection([
-        ('open', 'Open'),
-        ('closed', 'Closed'),
-        ('overdue', 'Overdue'),
-    ], string="Process Status", required=True)
+
+class CaseResponse(models.Model):
+    _name = 'case.response'
+    _description = 'Case Responses'
+    _order = 'create_date desc'
+    _rec_name = 'response' 
+    
+    case_id = fields.Many2one('case', string='Case', required=True, ondelete='cascade')
+    response = fields.Text(string='Response', required=True)
+    create_date = fields.Datetime(string='Response Date', default=fields.Datetime.now, readonly=True)
+    #response_date = fields.Datetime(string='Response Date', default=fields.Datetime.now)
+    create_uid = fields.Many2one('res.users', string='Responder', readonly=True)
+
+
+class CaseResponseWizard(models.TransientModel):
+    _name = 'case.response.wizard'
+    _description = 'Add Response to Case'
+    
+    case_id = fields.Many2one('case', string='Case', required=True)
+    response = fields.Text(string='Response', required=True)
+    
+    def action_submit_response(self):
+        self.ensure_one()
+        
+        # Check if user is the assigned staff
+        if self.env.user != self.case_id.staff_id:
+            raise UserError("Only the assigned staff can add responses to this case.")
+            
+        # # Check if user is the assigned staff
+        # if self.env.user != self.case_id.staff_id.user_id:
+        #     raise UserError("Only the assigned staff can add responses to this case.")
+            
+        # Create response record
+        response = self.env['case.response'].create({
+            'case_id': self.case_id.id,
+            'response': self.response,
+        })
+
+       # Force flush and clear the cache to update response_ids
+        self.case_id.invalidate_cache()
+        self.case_id._compute_has_responses()
+        # Now you can use the 'response' variable for further logic if necessary
+        # Example of additional logic using the created response
+        if response:
+            # Do something with the response, e.g., send a notification or update a log
+            _logger.info(f"Response {response.id} successfully created for case {self.case_id.id}")
+                
+        # Log in chatter
+        self.case_id.message_post(
+            body=f"<p>New response added:</p><p>{self.response}</p>",
+            subtype_xmlid='mail.mt_note'
+        )
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': "Response submitted successfully",
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+
+class Cases(models.Model):
+    _name = 'case'
+    _description = 'Cases'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _rec_name = 'name'
+    _order = 'created_at desc'
+
+    # Basic Info
+    name = fields.Char(string="Name", compute='_compute_name', store=True, tracking=True)
+    transaction_reference = fields.Char(string='Transaction Reference')
+    cases_description = fields.Text(string='Narration', compute='_compute_description', store=True)
+    further_description = fields.Html(string='Further Description')
+    data_source = fields.Text(string="Data Source", required=False)
+    attachment_ids = fields.Many2many('ir.attachment', string='Attachments')
+
+    # Responses
+    response_ids = fields.One2many('case.response', 'case_id', string='Responses')
+    has_responses = fields.Boolean(string='Has Responses', compute='_compute_has_responses', store=True)
+
+    # Severity
+    title = fields.Selection([
+        ('1', 'Low'),
+        ('2', 'Medium'),
+        ('3', 'High')
+    ], string='Severity', required=True)
+    rating_id = fields.Many2one('case.rating', string='Severity Rating', readonly=True)
+    severity_level = fields.Integer(string="Severity Level", compute="_compute_severity_level", store=True)
+
+    # Status
+    status_id = fields.Many2one('case.status', string='Status', required=False, default=lambda self: self._default_status())
+    status_name = fields.Char(string="Status Name", compute="_compute_status_name", store=True)
+    statuses = fields.Selection(related='status_id.name', string='Status Name', store=True) # for a modification in created by me
+    status_html = fields.Html(compute='_compute_status_html', string='Status')
+
+    # Dates
+    created_at = fields.Datetime(string='Created_at', default=fields.Datetime.now)
+    event_date = fields.Datetime(string='Event Date', required=True)
+    updated_at = fields.Datetime(string='Updated At')
+    start_date = fields.Datetime(string="Start Date", compute="_compute_start_date", store=True)
+    end_date = fields.Datetime(string="End Date", compute="_compute_end_date", store=True)
+    current_date = fields.Datetime(string='Current Date', compute='_compute_current_date')
+    created_at_formatted_datetime = fields.Char(string='Case Creation Date', compute='_compute_created_at_formatted_datetime')
+    event_date_formatted_datetime = fields.Char(string='Date of Event', compute='_compute_event_date_formatted_datetime')
+
+
+    # Relations
+    branch_id = fields.Many2one('branch', string='Branch')
+    team_id = fields.Many2one('team', string='Team')
+    staff_id = fields.Many2one('res.users', string='Staff', required=True)
+    #staff_user_id = fields.Many2one('res.users', string='Staff User', related='staff_id.user_id', store=True, readonly=True)
+    user_id = fields.Many2one('res.users', string='Created By', default=lambda self: self.env.user, readonly=True)
+    supervisor_one_id = fields.Many2one('res.users', string='Supervisor One', required=True)
+    supervisor_two_id = fields.Many2one('res.users', string='Supervisor Two')
+    supervisor_three_id = fields.Many2one('res.users', string='Supervisor Three')
+    alert_id = fields.Many2one('alert', string='Alert')
+    process_category_id = fields.Many2one('exception.category', string='Process Category')
+    process_id = fields.Many2one('exception.process', string='Process')
+    root_category_id = fields.Many2one('exception.process.type', string='Root Category')
+    root_category_process_id = fields.Many2one('exception.process.type', string='Root Category Process')
+
+    # Actions & Notes
+    cases_action = fields.Text(string='Action (Text)', required=True)
+
+    # UI Helper Fields
+    is_creator = fields.Boolean(compute='_compute_user_roles', compute_sudo=False)
+    is_assigned_staff = fields.Boolean(compute='_compute_user_roles', compute_sudo=False)
+    is_supervisor = fields.Boolean(compute='_compute_is_supervisor', store=False)
+    response_text = fields.Text(string="Response", compute="_compute_latest_response", store=False)
+
+    
+    
+        
+        
+    
+    # is_creator = fields.Boolean(compute='_compute_user_roles', store=True)
+    # is_assigned_staff = fields.Boolean(compute='_compute_user_roles', store=True)
+    
+    
+    #------Formatted Date and Time for human readability------#
+    
+    def get_created_at_formatted_datetime(self):
+        self.ensure_one()
+        if self.created_at:
+            day = self.created_at.strftime('%d')
+            if day[-1] == '1' and day[-2:] not in ('11', '12', '13'):
+                suffix = 'st'
+            elif day[-1] == '2' and day[-2:] not in ('11', '12', '13'):
+                suffix = 'nd'
+            elif day[-1] == '3' and day[-2:] not in ('11', '12', '13'):
+                suffix = 'rd'
+            else:
+                suffix = 'th'
+            formatted_datetime = self.created_at.strftime(f'%B, %Y at %I:%M%p').replace(' 0', ' ')
+            return f"{day}{suffix} {formatted_datetime}"
+        return False
+    
+    def get_event_date_formatted_datetime(self):
+        self.ensure_one()
+        if self.event_date:
+            day = self.event_date.strftime('%d')
+            if day[-1] == '1' and day[-2:] not in ('11', '12', '13'):
+                suffix = 'st'
+            elif day[-1] == '2' and day[-2:] not in ('11', '12', '13'):
+                suffix = 'nd'
+            elif day[-1] == '3' and day[-2:] not in ('11', '12', '13'):
+                suffix = 'rd'
+            else:
+                suffix = 'th'
+            formatted_datetime = self.event_date.strftime(f'%B, %Y at %I:%M%p').replace(' 0', ' ')
+            return f"{day}{suffix} {formatted_datetime}"
+        return False
+
+    # ------------------- COMPUTES -------------------
+    
+    
+    @api.depends('response_ids')
+    def _compute_latest_response(self):
+        for rec in self:
+            if rec.response_ids:
+                rec.response_text = rec.response_ids[-1].response  # or [0] for first
+            else:
+                rec.response_text = ''
+
+    @api.depends('supervisor_one_id', 'supervisor_two_id', 'supervisor_three_id')
+    def _compute_is_supervisor(self):
+        for record in self:
+            user = self.env.user
+            record.is_supervisor = user.id in [record.supervisor_one_id.id, 
+                                              record.supervisor_two_id.id, 
+                                              record.supervisor_three_id.id]
+        
+    @api.depends('created_at')
+    def _compute_created_at_formatted_datetime(self):
+        for record in self:
+            record.created_at_formatted_datetime = record.get_created_at_formatted_datetime()
+            
+    @api.depends('event_date')
+    def _compute_event_date_formatted_datetime(self):
+        for record in self:
+            record.event_date_formatted_datetime = record.get_event_date_formatted_datetime()
+
+    @api.depends('title')
+    def _compute_name(self):
+        for rec in self:
+            label = dict(self._fields['title'].selection).get(rec.title, '')
+            rec.name = f"{label} Case"
+
+    @api.depends('title')
+    def _compute_description(self):
+        for rec in self:
+            rec.cases_description = {
+                '1': 'This is a Low case',
+                '2': 'This is a Medium case',
+                '3': 'This is a High case'
+            }.get(rec.title, '')
+
+    @api.depends('title')
+    def _compute_severity_level(self):
+        for rec in self:
+            rec.severity_level = rec.rating_id.ref or 0
+
+    @api.depends('status_id')
+    def _compute_status_name(self):
+        for rec in self:
+            rec.status_name = rec.status_id.name if rec.status_id else ''
+            
+            
+    @api.depends('status_id')
+    def _compute_status_html(self):
+        for rec in self:
+            color = {
+                'overdue': 'danger',
+                'closed': 'success',
+                'open': 'primary',
+            }.get(rec.status_id.name, 'warning')
+            status = rec.status_id.name.capitalize() if rec.status_id else 'Unknown'
+            rec.status_html = f'<span class="badge bg-{color}" style="color: white; font-weight: bold;">{status}</span>'
+
+    # @api.depends('status_id')
+    # def _compute_status_html(self):
+    #     for rec in self:
+    #         color = {
+    #             'overdue': 'danger',
+    #             'closed': 'success',
+    #             'open': 'primary',
+    #         }.get(rec.status_id.name, 'warning')
+    #         status = rec.status_id.name.capitalize() if rec.status_id else 'Unknown'
+    #         rec.status_html = f'<span class="badge bg-{color}">{status}</span>'
+
+    @api.depends('created_at')
+    def _compute_start_date(self):
+        for rec in self:
+            rec.start_date = rec.created_at or fields.Datetime.now()
+
+    @api.depends('start_date')
+    def _compute_end_date(self):
+        for rec in self:
+            rec.end_date = rec.start_date + timedelta(hours=1) if rec.start_date else False
+
+    @api.depends()
+    def _compute_current_date(self):
+        now = fields.Datetime.now()
+        for rec in self:
+            rec.current_date = now
+
+    
+    
+    @api.depends('response_ids')
+    def _compute_has_responses(self):
+        for rec in self:
+            responses_count = self.env['case.response'].search_count([('case_id', '=', rec.id)])
+            rec.has_responses = responses_count > 0
+            _logger.info(f"Case {rec.id}: Computing has_responses = {rec.has_responses} (responses count: {responses_count})")
+        
+    # @api.depends('response_ids')
+    # def _compute_has_responses(self):
+    #     for rec in self:
+    #         _logger.info(f"HAS RESPONSES CHECK: {rec.name} has {len(rec.response_ids)} responses")
+    #         rec.has_responses = bool(rec.response_ids)
+    
+    
+    # @api.depends('user_id', 'staff_id')
+    # def _compute_user_roles(self):
+    #     current_user_id = self.env.user.id
+    #     for rec in self:
+    #         rec.is_creator = current_user_id == rec.user_id.id  # Compare IDs
+    #         rec.is_assigned_staff = current_user_id == rec.staff_id.id  # Compare IDs
+    
+    
+    @api.depends('user_id', 'staff_id')
+    @api.depends_context('uid')  
+    def _compute_user_roles(self):
+        current_user_id = self.env.uid  # More reliable than self.env.user.id
+        for rec in self:
+            rec.is_creator = (rec.user_id.id == current_user_id)
+            rec.is_assigned_staff = (rec.staff_id.id == current_user_id)
+            _logger.info(f"Computing roles for case {rec.id}: Current user={current_user_id}, "
+                        f"Creator={rec.user_id.id} (is_creator={rec.is_creator}), "
+                        f"Staff={rec.staff_id.id} (is_assigned_staff={rec.is_assigned_staff})")
+        
+
+
+    # ------------------- ONCHANGES -------------------
+
+    @api.onchange('title')
+    def _onchange_title_set_rating(self):
+        if self.title:
+            rating = self.env['case.rating'].search([('ref', '=', int(self.title))], limit=1)
+            self.rating_id = rating
+        else:
+            self.rating_id = False
+
+        # Reset supervisors
+        self.supervisor_one_id = False
+        self.supervisor_two_id = False
+        self.supervisor_three_id = False
+        
+    @api.onchange('user_id')
+    def _onchange_user_id(self):
+        self._compute_user_roles()
+
+    @api.onchange('staff_id')
+    def _onchange_staff_id(self):
+        self._compute_user_roles()
+
+
+    # ------------------- DEFAULT -------------------
+
+    @api.model
+    def _default_status(self):
+        return self.env['case.status'].search([('name', '=', 'open')], limit=1).id
+
+    # ------------------- ACTIONS -------------------
+    
+    
+    
+    def action_open_cases(self):
+        # Get the current user
+        user = self.env.user
+        user_id = user.id
+        
+        # First, fetch ALL open cases regardless of access
+        open_cases = self.search([('status_id.name', '=', 'open')])
+        
+        # Now filter these by user access rights
+        staff_accessible = open_cases.filtered(lambda c: c.user_id.id == user_id or c.staff_id.id == user_id)
+        
+        supervisor_accessible = open_cases.filtered(lambda c: 
+            user_id in [c.supervisor_one_id.id, c.supervisor_two_id.id, c.supervisor_three_id.id]
+        )
+        
+        # Combine accessible cases
+        accessible_cases = (staff_accessible | supervisor_accessible)
+        
+        # Double-check we only have open cases
+        final_cases = accessible_cases.filtered(lambda c: c.status_id.name == 'open')
+        
+        # Return the action with a very specific domain
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Open Cases',
+            'res_model': 'case',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', final_cases.ids), ('status_id.name', '=', 'open')],
+            'context': {'accessible_cases': final_cases.ids},
+            'views': [(self.env.ref('case_management.view_open_cases_tree').id, 'tree'),
+                    (self.env.ref('case_management.view_case_form_staff_only').id, 'form')],
+        }
+        
     
 
-    event_date = fields.Date(string="Event Date", required=True)
-    narration = fields.Text(string="Narration")
-    data_source = fields.Char(string="Data Source", default="default")
-    # customer_id = fields.Many2one('res.', string="Customer", required=True)
-    transaction_reference = fields.Char(string="Transaction Reference")
-    recommended_action = fields.Text(string="Recommended Action")
+
+
+
+
+    def action_open_response_wizard(self):
+        """Opens a wizard for the assigned staff to add a response"""
+        self.ensure_one()
+        
+        if self.env.user.id != self.staff_id.id:
+            raise UserError("Only the assigned staff can report on this case.")
+        
+        # if self.env.user != self.staff_id:
+        #     raise UserError("Only the assigned staff can report on this case.")
     
-    severity_id = fields.Many2one('sla.severity', string="Case Severity")
     
-    branch_staff_responsible_id = fields.Many2one('res.users', string="Branch Staff Responsible")
-    # responsible_department = fields.Many2one('hr.department', string="Responsible Department/Unit")
-    supervisor_one_id = fields.Many2one('res.users', string="Supervisor One")
-    supervisor_two_id = fields.Many2one('res.users', string="Supervisor Two")
-    supervisor_three_id = fields.Many2one('res.users', string="Supervisor Three")
-    further_description = fields.Text(string="Further Description")
-    attachment = fields.Binary(string="Attachment")
-    
-    risk_rating = fields.Selection([
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
-    ], string="Risk Rating", required=True)
-    
-    reply_log = fields.One2many('case.reply.log', 'case_id', string="Reply Log")
+            
+        return {
+            'name': 'Add Response to Case',
+            'type': 'ir.actions.act_window',
+            'res_model': 'case.response.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_case_id': self.id,
+            }
+        }
+        
+    def action_view_closed_cases(self):
+        # Get the current user
+        user = self.env.user
+        user_id = user.id
+        
+        # Common domain for all searches - only closed cases
+        closed_domain = [('status_id.name', '=', 'closed')]
+        
+        # Get cases the user should be able to access as creator or assigned staff
+        staff_cases = self.search(closed_domain + [
+            '|',
+            ('user_id', '=', user_id),
+            ('staff_id', '=', user_id)
+        ])
+        
+        # Get cases where user is a supervisor
+        supervisor_cases = self.search(closed_domain + [
+            '|', '|',
+            ('supervisor_one_id', '=', user_id),
+            ('supervisor_two_id', '=', user_id),
+            ('supervisor_three_id', '=', user_id)
+        ])
+        
+        # Combine all accessible cases
+        accessible_cases = (staff_cases | supervisor_cases).ids
+        
+        # Return the action with context and domain
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Closed Cases',
+            'res_model': 'case',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', accessible_cases)],
+            'context': {'create': False},
+            'views': [(self.env.ref('case_management.case_list_closed_tree_view').id, 'tree'),
+                    (self.env.ref('case_management.case_closed_form_view').id, 'form')],
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def action_close_case(self):
+        """Closes the case - only available to the creator and when responses exist"""
+        self.ensure_one()
+        
+        if self.env.user.id != self.user_id.id: 
+            raise UserError("Only the case creator can close this case.")
+            
+        if not self.has_responses:
+            _logger.info(f"Case {self.id} cannot be closed because the assigned staff has not responded.")
+            raise UserError("This case cannot be closed until it has at least one response.")
+        
+        _logger.info(f"Case {self.id} can be closed because the assigned staff has responded.")
+            
+        closed_status = self.env['case.status'].search([('name', '=', 'closed')], limit=1)
+        if not closed_status:
+            raise UserError("Required case status 'closed' not found.")
+            
+        self.status_id = closed_status.id
+        self.message_post(body="<p>Case has been closed.</p>", subtype_xmlid='mail.mt_note')
+        
+        # Send email alert
+        try:
+            self._send_case_closure_alert()
+        except Exception as e:
+            _logger.error(f"Error sending case closure alert: {str(e)}")
+        
+        
+        return {
+        'type': 'ir.actions.act_window',
+        'res_model': 'case',
+        'res_id': self.id,
+        'view_mode': 'form',
+        'target': 'current',
+    }
+       
+    def action_add_response(self):
+        for rec in self:
+            if rec.response_text:
+                new_response = self.env['case.response'].create({
+                    'case_id': rec.id,
+                    'response': rec.response_text,
+                })
+                _logger.info(f"Response created: {new_response.id} - {new_response.response}")
+                
+                # Trigger email alert for new response
+                # rec._send_case_response_alert(new_response)
+                # rec._send_case_response_alert(new_response)
+                rec.response_ids._send_case_response_alert(new_response)
+
+                
+                # Log in chatter
+                rec.case_id.message_post(
+                    body=f"<p>New response added:</p><p>{rec.response}</p>",
+                    subtype_xmlid='mail.mt_note'
+                )
+                
+                rec.response_text = False
+
+
+       
+       
+        
+        # return {
+        #     'type': 'ir.actions.client',
+        #     'tag': 'display_notification',
+        #     'params': {
+        #         'message': "Case has been successfully closed.",
+        #         'type': 'success',
+        #         'sticky': False,
+        #     }
+        # }
+
+    # ------------------- CRON -------------------
+
+    @api.model
+    def cron_check_overdue_cases(self):
+        overdue_status = self.env['case.status'].search([('name', '=', 'overdue')], limit=1)
+        if not overdue_status:
+            _logger.warning("Overdue status not found!")
+            return
+
+        deadline = fields.Datetime.now() - timedelta(hours=48)
+        open_cases = self.search([('status_id.name', '=', 'open'), ('created_at', '<=', deadline)])
+        open_cases.write({'status_id': overdue_status.id})
+
+    # ------------------- OVERRIDES -------------------
     
     @api.model
     def create(self, vals):
-        record = super(CaseManagement, self).create(vals)
-        # Add additional logic if needed
+        # Ensure creator is properly set to current user
+        vals['user_id'] = self.env.user.id
+        
+        # Create the record
+        record = super(Cases, self).create(vals)
+        
+        # Flush to database to make sure record truly exists
+        record.flush()
+        
+        # Make sure key computed fields are up-to-date
+        record._compute_user_roles()
+        record._compute_has_responses()
+        
+        # Log the creation
+        _logger.info(f"Created case {record.id} with creator {record.user_id.name} and assigned staff {record.staff_id.name}")
+        
+        # Send email alert with proper error handling
+        try:
+            success = record._send_case_creation_alert()
+            if success:
+                _logger.info(f"Successfully sent creation alert for case {record.id}")
+            else:
+                _logger.warning(f"Failed to send creation alert for case {record.id}")
+        except Exception as e:
+            _logger.error(f"Error sending case creation alert for case {record.id}: {str(e)}")
+        
+        # Trigger a message in the chatter
+        record.message_post(
+            body=f"<p>Case created by {record.user_id.name}.</p>",
+            subtype_xmlid='mail.mt_note'
+        )
+        
         return record
 
-  
-    def action_reply_log(self):
-        print(self.branch_staff_responsible_id)
-        """ This method will open the reply log related to the case """
+    
+    
+    # @api.model
+    # def create(self, vals):
+    #     # Ensure creator is properly set to current user
+    #     vals['user_id'] = self.env.user.id
+        
+    #     # Create the record
+    #     record = super(Cases, self).create(vals)
+        
+    #     # Make sure key computed fields are up-to-date
+    #     record._compute_user_roles()
+    #     record._compute_has_responses()
+        
+    #     # Log the creation
+    #     _logger.info(f"Created case {record.id} with creator {record.user_id.name} and assigned staff {record.staff_id.name}")
+        
+    #     # Send email alert with proper error handling
+    #     try:
+    #         success = record._send_case_creation_alert()
+    #         if success:
+    #             _logger.info(f"Successfully sent creation alert for case {record.id}")
+    #         else:
+    #             _logger.warning(f"Failed to send creation alert for case {record.id}")
+    #     except Exception as e:
+    #         _logger.error(f"Error sending case creation alert for case {record.id}: {str(e)}")
+        
+    #     # Trigger a message in the chatter
+    #     record.message_post(
+    #         body=f"<p>Case created by {record.user_id.name}.</p>",
+    #         subtype_xmlid='mail.mt_note'
+    #     )
+        
+    #     return record
+    
+    
+    
+    # @api.model
+    # def create(self, vals):
+    #     vals['user_id'] = self.env.user.id  # Ensure creator is set
+    #     record = super(Cases, self).create(vals)
+    #     # Manually trigger the computation of 'is_creator'
+    #     record._compute_user_roles()  # Ensure it's recomputed
+    #     #_logger.info(f"Created case {record.id} with user_id {record.user_id.id} (Creator: {self.env.user.id})")
+        
+    #     # Send email alert
+    #     try:
+    #         record._send_case_creation_alert()
+    #     except Exception as e:
+    #         _logger.error(f"Error sending case creation alert: {str(e)}")
+            
+    #     return record
+    
+    @api.model
+    def default_get(self, fields_list):
+        defaults = super(Cases, self).default_get(fields_list)
+        if 'created_at' in fields_list and 'created_at' not in defaults:
+            defaults['created_at'] = fields.Datetime.now()
+        return defaults
+    
+   
+   
+   
+    # EMAIL ALERT
+
+    def _send_case_creation_alert(self):
+        """Send email alert when a case is created"""
         self.ensure_one()
-        return {
-            'name': 'Reply Log',
-            'type': 'ir.actions.act_window',
-            'res_model': 'case.reply.log',
-            'view_mode': 'tree,form',
-            'domain': [('case_id', '=', self.id)],
-            'context': dict(self.env.context),
+        template = self.env.ref('case_management.case_creation_alert_template')
+
+        if not template:
+            _logger.error("Case creation email template not found")
+            return False
+        
+        # Prepare recipient data
+        staff_user = self.staff_id
+        creator_user = self.user_id
+        supervisors = [self.supervisor_one_id]
+        if self.supervisor_two_id:
+            supervisors.append(self.supervisor_two_id)
+        if self.supervisor_three_id:
+            supervisors.append(self.supervisor_three_id)
+        
+        # CC list - creator and supervisors
+        cc_emails = []
+        if creator_user and creator_user.email:
+            cc_emails.append(creator_user.email)
+        for supervisor in supervisors:
+            if supervisor and supervisor.email:
+                cc_emails.append(supervisor.email)
+        
+        # Prepare mail values
+        mail_values = {
+            'email_to': staff_user.email if staff_user else '',
+            'email_cc': ','.join(cc_emails),
+            'email_from': 'noreply@example.com',
         }
+
+        
+        for rec in self:
+            # Extract values directly from the record fields (no self in ctx)
+            event_date = rec.event_date
+            alert_name = rec.name
+            title = rec.cases_description
+            rating_name = rec.rating_id.name if rec.rating_id else ''
+            staff_dept = rec.team_id.name if rec.team_id else ''
+            status_name = rec.status_name
+            exception_process = rec.process_id.name if rec.process_id else ''
+            process_type = rec.root_category_id.name if rec.root_category_id else ''
+            process_category = rec.process_category_id.name if rec.process_category_id else ''
+            case_action = rec.cases_action
+            description = rec.further_description
+            response_link = f'/web#id={rec.id}&model=case&view_type=form'
+            
+        # Context for email template
+            ctx = {
+                'event_date': event_date,
+                'alert_name': alert_name,
+                'title': title,
+                'rating_name': rating_name,
+                'staff_dept': staff_dept,
+                'status_name': status_name,
+                'exception_process': exception_process,
+                'process_type': process_type,
+                'process_category': process_category,
+                'case_action': case_action,
+                'description': description,
+                'response_link': response_link,
+                'creator_user_name': creator_user.name if creator_user else '',
+                'creator_user_email': creator_user.email if creator_user else ''
+            }
+
+            _logger.info("Rendering template with context:")
+            for k, v in ctx.items():
+                _logger.info(f"{k}: {v}")
+
+            try:
+                # Use the template with the context
+                template_id = template.with_context(**ctx)
+                
+                # Render the email content using the context
+                rendered_html = template_id._render_template(
+                    template_id.body_html,
+                    template_id.model,
+                    [self.id],
+                    engine='qweb',
+                    add_context=ctx
+                )[self.id]
+
+                # Optional: log the rendered HTML
+                _logger.debug(f"Rendered email HTML for case {self.id}:\n{rendered_html}")
+
+                # Send the email
+                email_result = template_id.send_mail(
+                    self.id,
+                    force_send=True,
+                    raise_exception=True,
+                    email_values=mail_values
+                )
+
+                _logger.info(f"Case creation alert sent for case {self.id}")
+                return True
+
+            except Exception as e:
+                _logger.error(f"Failed to send case creation alert for case {self.id}: {str(e)}")
+                return False
+
+
+    
+    def _send_case_response_alert(self, response):
+        """Send email alert when a case receives a response"""
+        _logger.info(f"Starting _send_case_response_alert for case {self.id} with response {response.id}")
+        self.ensure_one()
+        
+        try:
+            template = self.env.ref('case_management.case_response_alert_template')
+            
+            if not template:
+                _logger.error("Case response email template not found")
+                return False
+            
+            _logger.info(f"Found template: {template.name} (ID: {template.id})")
+            
+            # Prepare recipient data
+            creator_user = self.user_id
+            staff_user = self.staff_id
+            responder_user = response.create_uid
+            
+            _logger.info(f"Recipients - Creator: {creator_user.name if creator_user else 'None'}, "
+                        f"Staff: {staff_user.name if staff_user else 'None'}, "
+                        f"Responder: {responder_user.name if responder_user else 'None'}")
+            
+            supervisors = [self.supervisor_one_id]
+            if self.supervisor_two_id:
+                supervisors.append(self.supervisor_two_id)
+            if self.supervisor_three_id:
+                supervisors.append(self.supervisor_three_id)
+            
+            # CC list - staff and supervisors
+            cc_emails = []
+            if staff_user and staff_user.email:
+                cc_emails.append(staff_user.email)
+            for supervisor in supervisors:
+                if supervisor and supervisor.email:
+                    cc_emails.append(supervisor.email)
+            
+            # Prepare mail values
+            mail_values = {
+                'email_to': creator_user.email if creator_user and creator_user.email else '',
+                'email_cc': ','.join(cc_emails),
+                'email_from': 'noreply@example.com',
+            }
+            
+            _logger.info(f"Mail values: To={mail_values['email_to']}, CC={mail_values['email_cc']}")
+            
+            # Check if we have valid recipient
+            if not mail_values['email_to']:
+                _logger.warning(f"No valid email_to address for case {self.id} - creator email missing")
+                return False
+
+            for rec in self:
+                _logger.info(f"Processing record ID: {rec.id}")
+                
+                # Extract values directly from the record fields
+                try:
+                    event_date = rec.event_date
+                    alert_name = rec.name
+                    title = rec.cases_description
+                    rating_name = rec.rating_id.name if rec.rating_id else ''
+                    staff_dept = rec.team_id.name if rec.team_id else ''
+                    status_name = rec.status_name
+                    exception_process = rec.process_id.name if rec.process_id else ''
+                    process_type = rec.root_category_id.name if rec.root_category_id else ''
+                    process_category = rec.process_category_id.name if rec.process_category_id else ''
+                    case_action = rec.cases_action
+                    response_text = response.response
+                    user_name = rec.user_id.name if rec.user_id else ''
+                    user_email = rec.user_id.email if rec.user_id else ''
+                    responder_name = responder_user.name if responder_user else ''
+                    responder_email = responder_user.email if responder_user else ''
+                    response_link = f'/web#id={rec.id}&model=case&view_type=form'
+                except Exception as e:
+                    _logger.error(f"Error extracting field values: {str(e)}")
+                    return False
+                
+                # Context for email template
+                ctx = {
+                    'event_date': event_date,
+                    'alert_name': alert_name,
+                    'title': title,
+                    'rating_name': rating_name,
+                    'staff_dept': staff_dept,
+                    'status_name': status_name,
+                    'exception_process': exception_process,
+                    'process_type': process_type,
+                    'process_category': process_category,
+                    'case_action': case_action,
+                    'response': response_text,
+                    'user_name': user_name,
+                    'user_email': user_email,
+                    'responder_name': responder_name,
+                    'responder_email': responder_email,
+                    'response_link': response_link
+                }
+
+                _logger.info("Rendering template with context:")
+                for k, v in ctx.items():
+                    _logger.info(f"{k}: {v}")
+
+                try:
+                    # Use the template with the context
+                    template_id = template.with_context(**ctx)
+                    
+                    _logger.info(f"Preparing to render template for case {rec.id}")
+                    
+                    # Render the email content using the context
+                    rendered_html = template_id._render_template(
+                        template_id.body_html,
+                        template_id.model,
+                        [rec.id],
+                        engine='qweb',
+                        add_context=ctx
+                    )[rec.id]
+
+                    _logger.info(f"Successfully rendered HTML template for case {rec.id}")
+                    _logger.debug(f"Rendered email HTML for case {rec.id}:\n{rendered_html}")
+
+                    _logger.info(f"Preparing to send email for case {rec.id}")
+                    
+                    # Send the email
+                    email_result = template_id.send_mail(
+                        rec.id,
+                        force_send=True,
+                        raise_exception=True,
+                        email_values=mail_values
+                    )
+
+                    _logger.info(f"Case response alert sent for case {rec.id} - Result: {email_result}")
+                    return True
+
+                except Exception as e:
+                    import traceback
+                    _logger.error(f"Failed to send case response alert for case {rec.id}: {str(e)}")
+                    _logger.error(f"Traceback: {traceback.format_exc()}")
+                    return False
+        except Exception as e:
+            import traceback
+            _logger.error(f"Unexpected error in _send_case_response_alert: {str(e)}")
+            _logger.error(f"Traceback: {traceback.format_exc()}")
+            return False
+        
+        
+        
+    
+    
+        
+    
+    def _send_case_closure_alert(self):
+        """Send email alert when a case is closed"""
+        _logger.info(f"Starting _send_case_closure_alert for case {self.id}")
+        self.ensure_one()
+        
+        try:
+            template = self.env.ref('case_management.case_closure_alert_template')
+            
+            if not template:
+                _logger.error("Case closure email template not found")
+                return False
+            
+            _logger.info(f"Found template: {template.name} (ID: {template.id})")
+            
+            # Prepare recipient data
+            staff_user = self.staff_id
+            creator_user = self.user_id
+            supervisors = [self.supervisor_one_id]
+            if self.supervisor_two_id:
+                supervisors.append(self.supervisor_two_id)
+            if self.supervisor_three_id:
+                supervisors.append(self.supervisor_three_id)
+            
+            _logger.info(f"Recipients - Staff: {staff_user.name if staff_user else 'None'}, "
+                        f"Creator: {creator_user.name if creator_user else 'None'}")
+            
+            # CC list - creator and supervisors
+            cc_emails = []
+            if creator_user and creator_user.email:
+                cc_emails.append(creator_user.email)
+            for supervisor in supervisors:
+                if supervisor and supervisor.email:
+                    cc_emails.append(supervisor.email)
+            
+            # Prepare mail values
+            mail_values = {
+                'email_to': staff_user.email if staff_user and staff_user.email else '',
+                'email_cc': ','.join(cc_emails),
+                'email_from': 'noreply@example.com',
+            }
+            
+            _logger.info(f"Mail values: To={mail_values['email_to']}, CC={mail_values['email_cc']}")
+            
+            # Check if we have valid recipient
+            if not mail_values['email_to']:
+                _logger.warning(f"No valid email_to address for case {self.id} - staff email missing")
+                return False
+
+            for rec in self:
+                _logger.info(f"Processing record ID: {rec.id}")
+                
+                # Extract values directly from the record fields
+                try:
+                    event_date = rec.event_date
+                    alert_name = rec.name
+                    title = rec.cases_description
+                    rating_name = rec.rating_id.name if rec.rating_id else ''
+                    staff_dept = rec.team_id.name if rec.team_id else ''
+                    status_name = rec.status_name
+                    exception_process = rec.process_id.name if rec.process_id else ''
+                    process_type = rec.root_category_id.name if rec.root_category_id else ''
+                    process_category = rec.process_category_id.name if rec.process_category_id else ''
+                    case_action = rec.cases_action
+                    close_remarks = "Case closed successfully"
+                    user_name = rec.user_id.name if rec.user_id else ''
+                    user_email = rec.user_id.email if rec.user_id else ''
+                    response_link = f'/web#id={rec.id}&model=case&view_type=form'
+                except Exception as e:
+                    _logger.error(f"Error extracting field values: {str(e)}")
+                    return False
+                
+                # Context for email template - use direct variable names, not nested dictionary
+                ctx = {
+                    'event_date': event_date,
+                    'alert_name': alert_name,
+                    'title': title,
+                    'rating_name': rating_name,
+                    'staff_dept': staff_dept,
+                    'status_name': status_name,
+                    'exception_process': exception_process,
+                    'process_type': process_type,
+                    'process_category': process_category,
+                    'case_action': case_action,
+                    'close_remarks': close_remarks,
+                    'user_name': user_name,
+                    'user_email': user_email,
+                    'response_link': response_link,
+                    'creator_user_name': creator_user.name if creator_user else '',
+                    'creator_user_email': creator_user.email if creator_user else ''
+                }
+
+                _logger.info("Rendering template with context:")
+                for k, v in ctx.items():
+                    _logger.info(f"{k}: {v}")
+
+                try:
+                    # Use the template with the context
+                    template_id = template.with_context(**ctx)
+                    
+                    _logger.info(f"Preparing to render template for case {rec.id}")
+                    
+                    # Render the email content using the context
+                    rendered_html = template_id._render_template(
+                        template_id.body_html,
+                        template_id.model,
+                        [rec.id],
+                        engine='qweb',
+                        add_context=ctx
+                    )[rec.id]
+
+                    _logger.info(f"Successfully rendered HTML template for case {rec.id}")
+                    _logger.debug(f"Rendered email HTML for case {rec.id}:\n{rendered_html[:500]}...")
+
+                    _logger.info(f"Preparing to send email for case {rec.id}")
+                    
+                    # Send the email
+                    email_result = template_id.send_mail(
+                        rec.id,
+                        force_send=True,
+                        raise_exception=True,
+                        email_values=mail_values
+                    )
+
+                    _logger.info(f"Case closure alert sent for case {rec.id} - Result: {email_result}")
+                    return True
+
+                except Exception as e:
+                    import traceback
+                    _logger.error(f"Failed to send case closure alert for case {rec.id}: {str(e)}")
+                    _logger.error(f"Traceback: {traceback.format_exc()}")
+                    return False
+        except Exception as e:
+            import traceback
+            _logger.error(f"Unexpected error in _send_case_closure_alert: {str(e)}")
+            _logger.error(f"Traceback: {traceback.format_exc()}")
+            return False

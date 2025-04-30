@@ -1,0 +1,195 @@
+THIS IS WORKING Form
+
+
+<odoo>
+    <record id="view_case_form_response_only" model="ir.ui.view">
+        <field name="name">case.form.response.only</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Case">
+                <sheet>
+                    <group>
+                        <field name="name" string="Case Name" readonly="1"/>
+                        <field name="transaction_reference" readonly="1"/>
+                        <field name="status_html" widget="html" readonly="1"/>
+                        <field name="staff_id" options="{'no_open': True, 'no_create': True}" groups="base.group_user" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Details">
+                            <group>
+                                <field name="created_at" readonly="1"/>
+                                <field name="user_id" string="Created By" readonly="1" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="branch_id" options="{'no_open': True, 'no_create': True}" readonly="1"/>
+                                <field name="team_id" options="{'no_open': True, 'no_create': True}" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="title" readonly="1"/>
+                                <field name="severity_level" readonly="1"/>
+                                <field name="rating_id" readonly="1" options="{'no_open': True, 'no_create': True}"/>
+                            </group>
+                            <field name="further_description" nolabel="1" readonly="1"/>
+                            <field name="attachment_ids" widget="many2many_binary" readonly="1"/>
+                            <field name="cases_action" nolabel="1" readonly="1"/>
+                        </page>
+                        <page string="Responses">
+                            <field name="response_ids" mode="tree">
+                                <tree string="Responses" editable="bottom">
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="create_uid" string="Responder" readonly="1" options="{'no_open': True, 'no_create': True}"/>
+                                    <field name="response" required="1"/>
+                                    <field name="case_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_case_assigned_to_me" model="ir.actions.act_window">
+        <field name="name">Cases Assigned to Me</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_case_form_response_only"/>
+        <field name="domain">[('staff_id', '=', uid)]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No case has been assigned to you yet.
+            </p>
+        </field>
+    </record>
+
+    
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<odoo>
+    <record id="view_case_tree_assigned_to_me" model="ir.ui.view">
+        <field name="name">case.tree.assigned.to.me</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree create="false" delete="false" edit="false">
+                <field name="name"/>
+                <field name="rating_id" string="Rating"/>
+                <field name="created_at" string="Start Date"/>
+                <field name="end_date" string="End Date"/>
+                <field name="user_id" string="Created By"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="process_category_id"/>
+                <field name="process_id"/>
+                <field name="data_source"/>
+                <field name="status_html" widget="html"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_case_form_assigned_to_me" model="ir.ui.view">
+        <field name="name">case.form.assigned.to.me</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Assigned Case" create="false" delete="false" edit="context.get('is_assigned_staff', False)">
+                <sheet>
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="rating_id" readonly="1"/>
+                        <field name="created_at" readonly="1"/>
+                        <field name="end_date" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="staff_id" readonly="1"/>
+                        <field name="process_category_id" readonly="1"/>
+                        <field name="process_id" readonly="1"/>
+                        <field name="data_source" readonly="1"/>
+                        <field name="is_assigned_staff" invisible="1"/>  <field name="cases_action" readonly="1"/>
+                        <field name="status_html" widget="html" readonly="1"/>
+                        <field name="further_description" readonly="1"/>
+                    </group>
+                    <group>
+                        <button name="action_open_response_wizard" type="object"
+                                string="Add Response"
+                                attrs="{'invisible': [('is_assigned_staff', '=', False)]}"
+                                class="btn btn-primary"/>
+                    </group>
+                    <notebook>
+                        <page string="Responses">
+                            <field name="response_ids">
+                                 <tree>
+                                    <field name="create_date"/>
+                                    <field name="response"/>
+                                    <field name="create_uid"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_case_assigned_to_me" model="ir.actions.act_window">
+        <field name="name">Assigned to Me</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('staff_id', '=', uid)]</field>
+        <field name="context">{'create': False, 'search_default_order': 'create_date desc'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No cases assigned to you yet.
+            </p>
+        </field>
+    </record>
+
+    </odoo>
