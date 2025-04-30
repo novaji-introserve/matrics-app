@@ -21,9 +21,7 @@
                     
                     <group>
                         
-                        <group>
                             <field name="alert_officers" widget="many2many_tags" help="Officer(s) to get alerted for new regulatory documents"/>
-                        </group>
                     </group>
                     <group>
                         <field name="active" widget="boolean_toggle"/>
