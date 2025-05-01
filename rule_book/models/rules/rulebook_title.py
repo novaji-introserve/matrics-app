@@ -80,7 +80,6 @@ class RulebookTitle(models.Model):
     email_subject = fields.Char('Email Subject')
     email_body = fields.Html('Email Body')
 
-    
     _email_data = {}
 
     # to send the data to the template
@@ -191,8 +190,6 @@ class RulebookTitle(models.Model):
             # Clean up the stored email data after sending
             if self.id in self._email_data:
                 del self._email_data[self.id]
-
-  
 
     @api.model
     def fetch_new_ai_titles(self):
@@ -381,9 +378,9 @@ class RulebookTitle(models.Model):
                                     _logger.info(
                                         f"Created SEC record for: {new_record}")
                                     self.env.cr.commit()  # Explicitly commit the transaction
-                                    
+
                                     self._notify_reg_officers(
-                                        document_url, source.name)
+                                        document_url, source.name, new_record.name)
 
                                 except Exception as e:
                                     _logger.error(
@@ -521,8 +518,9 @@ class RulebookTitle(models.Model):
                 app_base_url = self.env['ir.config_parameter'].sudo(
                 ).get_param('web.base.url')
                 document_url = f"{app_base_url}/web#id={new_record.id}&model=rulebook.title&view_type=form"
-                
-                self._notify_reg_officers(document_url, source.name)
+
+                self._notify_reg_officers(
+                    document_url, source.name, new_record.name)
             except requests.RequestException as e:
                 _logger.error(f"Failed to download {doc['title']}: {e}")
 
@@ -677,7 +675,8 @@ class RulebookTitle(models.Model):
                 ).get_param('web.base.url')
                 document_url = f"{app_base_url}/web#id={new_record.id}&model=rulebook.title&view_type=form"
 
-                self._notify_reg_officers(document_url, source.name)
+                self._notify_reg_officers(
+                    document_url, source.name, new_record.name)
             except Exception as e:
                 # print(f"Error creating records for batch: {str(e)}")
                 _logger.critical(f"Error creating records for batch: {str(e)}")
@@ -793,8 +792,9 @@ class RulebookTitle(models.Model):
                 ).get_param('web.base.url')
                 document_url = f"{app_base_url}/web#id={new_record.id}&model=rulebook.title&view_type=form"
 
-                self._notify_reg_officers(document_url, source.name)
-                
+                self._notify_reg_officers(
+                    document_url, source.name, new_record.name)
+
             except Exception as e:
                 _logger.critical(f"Error creating records in bulk: {str(e)}")
                 return "Failed: Error creating records"
@@ -1580,7 +1580,7 @@ class RulebookTitle(models.Model):
         # Join all formatted paragraphs
         return ''.join(formatted_paragraphs)
 
-    def _notify_reg_officers(self, action_url, regulator):
+    def _notify_reg_officers(self, action_url, regulator, name):
         """Send consolidated email notification to responsible officers"""
         try:
             template = self.env.ref(
@@ -1610,9 +1610,7 @@ class RulebookTitle(models.Model):
             now_without_microseconds = now.replace(microsecond=0)
             timestamp = self.env["reply.log"]._compute_formatted_date(
                 now_without_microseconds) if hasattr(self.env["reply.log"], "_compute_formatted_date") else str(now_without_microseconds)
-            
-            _logger.info(
-                f"link gotten from regulator from _notify_reg_officers: {action_url}")
+
 
             email_data = {
                 'regulator': regulator,
@@ -1620,6 +1618,7 @@ class RulebookTitle(models.Model):
                 'email_from': email_from,
                 'officers_name': officers_name,
                 'datetime': timestamp,
+                'title': name,
                 "current_year": datetime.now().year,
                 'email_to': officers_email,
                 'email_cc': '',  # Add an empty email_cc to prevent KeyError
@@ -1638,6 +1637,7 @@ class RulebookTitle(models.Model):
                     email_from=email_from,
                     officers_name=officers_name,
                     datetime=timestamp,
+                    title= name,
                     current_year=datetime.now().year,
                     email_to=officers_email
                 )
@@ -1672,77 +1672,3 @@ class RulebookTitle(models.Model):
                 f"Error in regulatory alert process: {str(e)}", exc_info=True)
             raise ValidationError(
                 f"Failed to send regulatory alert email: {str(e)}")
-    
-    # def _notify_reg_officers(self, action_url, regulator):
-    #     """Send consolidated email notification to responsible officers"""
-    #     try:
-    #         template = self.env.ref(
-    #             'rule_book.email_template_reg_document_alert')
-    #         if not template:
-    #             _logger.error(
-    #                 "Email template not found")
-    #             raise ValidationError("Email template not found")
-
-    #         # Search for all records in reg.model
-    #         reg_records = self.env['regulatory.alert'].search([])
-
-    #         # Collect all users from the alert_officers Many2many field
-    #         officers = reg_records.mapped('alert_officers')
-    #         if not officers:
-    #             _logger.warning("No officers configured for alerts")
-    #             return
-
-    #         # Get email from address
-    #         email_from = os.getenv("EMAIL_FROM")
-    #         if not email_from:
-    #             _logger.error("EmailFrom environment variable not configured")
-    #             raise ValidationError("Email sender address not configured")
-
-    #         # Prepare email values
-    #         officers_name = ", ".join(officers.mapped('name')) or ""
-    #         officers_email = ", ".join(officers.mapped('email')) or ""
-    #         ctx = {
-    #             'regulator': regulator,
-    #             'record_link': action_url,
-    #             'email_from': email_from,
-    #             'officers_name': officers_name,
-    #             'datetime': datetime.now().replace(microsecond=0),
-    #             "current_year": fields.Date.today().year,
-    #             'email_to': officers_email,  # Add email_to to the context
-    #         }
-
-
-    #         try:
-    #             # Render the template with context
-    #             template_id = template.with_context(**ctx)
-
-    #             email_result = template_id.send_mail(
-    #                 self.id,
-    #                 force_send=True,
-    #                 raise_exception=True,
-    #                 email_values={
-    #                     'email_to': officers_email,
-    #                     'email_from': email_from,
-    #                     'email_cc': '',
-    #                 }
-    #             )
-
-    #             mail = self.env['mail.mail'].browse(email_result)
-    #             if mail.state == 'sent':
-    #                 # insert into alert history table
-    #                 _logger.info(
-    #                     f"Consolidated email sent to regulatory alert officers ({officers_email})")
-
-    #         except Exception as e:
-    #             _logger.error(
-    #                 f"Failed to send regulatory alert email: {str(e)}")
-    #             raise
-
-    #     except Exception as e:
-    #         _logger.error(
-    #             f"Error in regulatory alert process: {str(e)}", exc_info=True)
-    #         raise ValidationError(
-    #             f"Failed to send regulatory alert email: {str(e)}")
-
-
-

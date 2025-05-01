@@ -26,6 +26,12 @@
                             <t t-esc="ctx.get('datetime')"/>
 
                         </p>
+
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                            <strong style="color: #004225;">Document Title:</strong>
+                            <t t-esc="ctx.get('title')"/>
+
+                        </p>
                         
                         <p style="font-size: 16px; color: #333333; line-height: 1.6;">
                            <strong style="color: #004225;">Regulator:</strong>
