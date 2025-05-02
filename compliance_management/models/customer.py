@@ -158,6 +158,8 @@ class Customer(models.Model):
     origin = fields.Selection(string='Data Origin', selection=[('demo', 'Demo Data'), (
         'test', 'Test Data'), ('prod', 'Production Data')], index=True)
 
+    first_risk_rating = fields.Char(string='Bank Risk Rating', index=True)
+    
     # is_branch_compliance = fields.Boolean(
     #     string="Is Branch Compliance Officer",
     #     compute="_compute_is_branch_compliance"
@@ -587,17 +589,6 @@ class Customer(models.Model):
             'context': {'search_default_group_branch': 1}
         }
 
-    # @api.model
-    # def open_customers(self):
-    #     return {
-    #         'name': _('Customers'),
-    #         'type': 'ir.actions.act_window',
-    #         'res_model': 'res.partner',
-    #         'view_mode': 'tree,form',
-    #         'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
-    #         # 'domain': [('internal_category','=','customer')],
-    #         'context': {'search_default_group_branch': 1}
-    #     }
 
     @api.model
     def open_customers(self):
