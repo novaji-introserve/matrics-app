@@ -144,6 +144,16 @@ class CustomerAccount(models.Model):
 
     state = fields.Selection(string='Status', selection=[('active', 'Active'), ('inactive', 'Inactive'), ('dormant', 'Dormant'), ('flagged','Flagged'), ('closed', 'Closed')],tracking=True,default='active',required=False) #sta_code
     active = fields.Boolean(default=True, tracking=True)
+    customer = fields.Char(string='Customer Id')
+    max_debit_daily = fields.Float(string='Max. Debit - Daily', digits=(10,2))
+    overdraft_limit = fields.Float(string='OverDraft Limit', digits=(10,2))
+    uncleared_balance = fields.Float(string='Uncleared Balance', digits=(10,2))
+    start_year_balance = fields.Float(string='Start Year Balance', digits=(10,2))
+    date_last_credit_customer = fields.Char(string='Date Last Credit Customer')
+    amount_last_credit_customer = fields.Char(string='Amount Last Credit Customer')
+    date_last_debit_customer = fields.Char(string='Date Last Dedit Customer')
+
+    
 
     
      
