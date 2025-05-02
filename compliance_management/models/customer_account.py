@@ -142,7 +142,7 @@ class CustomerAccount(models.Model):
     max_debit_last1y = fields.Float(string='Max. Debit - Last 1Y', digits=(10,2))
     tot_debit_last1y = fields.Float(string='Total Debit Amount - Last 1Y', digits=(15,2))
 
-    state = fields.Selection(string='Status', selection=[('active', 'Active'), ('dormant', 'Dormant'),('locked','Locked')],tracking=True,default='active',required=False) #sta_code
+    state = fields.Selection(string='Status', selection=[('active', 'Active'), ('inactive', 'Inactive'), ('dormant', 'Dormant'), ('flagged','Flagged'), ('closed', 'Closed')],tracking=True,default='active',required=False) #sta_code
     active = fields.Boolean(default=True, tracking=True)
 
     

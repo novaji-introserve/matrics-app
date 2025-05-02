@@ -153,3 +153,5 @@ compliance_management.res_risk_assessment_mitigation,risk assessment mitigation,
 compliance_management.res_risk_assessment_implication,risk assessment implication,compliance_management.model_risk_assessment_implication,base.group_user,1,1,1,1
 
 compliance_management.res.fcra.score,fcra risk score,compliance_management.model_res_fcra_score,base.group_user,1,1,1,1
+
+compliance_management.access_res_partner_account,access_res_partner_account,compliance_management.model_res_partner_account,base.group_user,1,1,1,0
