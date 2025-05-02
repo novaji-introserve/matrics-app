@@ -73,6 +73,7 @@
                                     <field name="customer_id" readonly="1" />
                                     <field name="product_id" readonly="1" />
                                     <field name="account_type" readonly="1" />
+                                    <field name="account_position" readonly="1" />
                                     <field name="currency" readonly="1" />
                                     <field name="branch_id" readonly="1" />
                                 </group>
@@ -89,20 +90,22 @@
                         </page>
                         <page name="transaction_profile" string="Transaction Profile">
                             <group>
-                                <group string="Last 6 Months - Inflows (Credit)">
+
+                                <field name="last_transaction_date" readonly="1" />
+                                <!-- <group string="Last 6 Months - Inflows (Credit)">
                                     <field name="num_credit_last6m" readonly="1" />
                                     <field name="avg_credit_last6m" readonly="1" />
                                     <field name="max_credit_last6m" readonly="1" />
                                     <field name="tot_credit_last6m" readonly="1" />
-                                </group>
-                                <group string="Last 1 Year - Inflows (Credit)">
+                                </group> -->
+                                <!-- <group string="Last 1 Year - Inflows (Credit)">
                                     <field name="num_credit_last1y" readonly="1" />
                                     <field name="avg_credit_last1y" readonly="1" />
                                     <field name="max_credit_last1y" readonly="1" />
                                     <field name="tot_credit_last1y" readonly="1" />
-                                </group>
+                                </group> -->
                             </group>
-                            <group>
+                            <!-- <group>
                                 <group string="Last 6 Months - Outflows (Debit)">
                                     <field name="num_debit_last6m" readonly="1" />
                                     <field name="avg_debit_last6m" readonly="1" />
@@ -115,7 +118,7 @@
                                     <field name="max_debit_last1y" readonly="1" />
                                     <field name="tot_debit_last1y" readonly="1" />
                                 </group>
-                            </group>
+                            </group> -->
                             <group>
                                 <separator />
                             </group>
