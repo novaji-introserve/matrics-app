@@ -152,11 +152,47 @@ class CustomerAccount(models.Model):
     date_last_credit_customer = fields.Char(string='Date Last Credit Customer')
     amount_last_credit_customer = fields.Char(string='Amount Last Credit Customer')
     date_last_debit_customer = fields.Char(string='Date Last Dedit Customer')
+    _sql_constraints = [
+        ('customer_unique', 'unique(customer)', 'Customer ID must be unique!'),
+    ]
 
     
+    def init(self):
+        """Initialize database triggers when module is installed/updated"""
+        # Drop existing trigger if it exists
+        self.env.cr.execute(
+            "DROP TRIGGER IF EXISTS update_customer_id_field ON res_partner_account;")
 
-    
-     
+        # Create new trigger
+        self.env.cr.execute("""
+            CREATE OR REPLACE FUNCTION update_customer_id_field_func()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                -- Check if customer field is empty and customer_id is set
+                IF (NEW.customer IS NULL OR TRIM(NEW.customer) = '') AND NEW.customer_id IS NOT NULL THEN
+                    -- Set customer field to the ID value from customer_id
+                    NEW.customer = NEW.customer_id::TEXT;
+                END IF;
+                
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            
+            -- Create the trigger
+            CREATE TRIGGER update_customer_id_field
+            BEFORE INSERT OR UPDATE ON res_partner_account
+            FOR EACH ROW
+            EXECUTE FUNCTION update_customer_id_field_func();
+        """)
+
+        # Update existing records with empty customer field
+        self.env.cr.execute("""
+            UPDATE res_partner_account
+            SET customer = customer_id::TEXT
+            WHERE (customer IS NULL OR TRIM(customer) = '')
+            AND customer_id IS NOT NULL;
+        """)
+
     @api.model
     def open_accounts(self):
         # Check if the current user belongs to the Chief Compliance Officer group
