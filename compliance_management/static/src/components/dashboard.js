@@ -7,6 +7,45 @@ import { ChartRenderer } from "./chart";
 const { Component, useState, useEffect, useRef, onMounted, onWillStart } = owl;
 
 
+export function useBusListener(channelName, callback) {
+  const bus = useService("bus_service");
+  
+  useEffect(
+    () => {
+      // Add the channel we want to listen to
+      bus.addChannel(channelName);
+      
+      // Define the handler function
+      const handler = (ev) => {
+        const notifications = ev.detail;
+        for (const notification of notifications) {
+          
+          // Check if this is a 3-part notification with the channel we care about
+          if (Array.isArray(notification) && notification[0] === channelName) {
+            // Pass the message (third parameter) to the callback
+            callback(notification[2]);
+
+          }else if(!Array.isArray(notification) && notification.payload && notification.payload.channelName === channelName){
+            callback(notification.payload);
+          }
+        }
+      };
+    
+      // Add the event listener
+      bus.addEventListener('notification', handler);
+
+     
+      // Cleanup function
+      return () => {
+        bus.removeEventListener('notification', handler);
+        bus.deleteChannel(channelName);
+      };
+    },
+    () => [bus, channelName, callback]
+  );
+}
+
+
 export class ComplianceDashboard extends Component {
   setup() {
     this.left_indicator = useRef("left");
@@ -32,6 +71,14 @@ export class ComplianceDashboard extends Component {
       topbranch: [],
       dynamic_chart: []
     });
+
+    // Models that should trigger a refresh
+    this.refreshModels = ['res.partner', 'res.branch'];
+
+     // Setup bus listener for refreshing the dashboard
+    useBusListener('dashboard_refresh_channel', this.handleRefreshNotification.bind(this));
+    
+    
 
 
     useEffect(() => {
@@ -60,6 +107,21 @@ export class ComplianceDashboard extends Component {
     });
 
     this.displayOdooView = this.displayOdooView.bind(this); // Bind the function!
+    
+  }
+
+    /**
+     * Handle notifications from the bus
+     * @param {Object} notification - The notification payload
+     */
+    async handleRefreshNotification(notification) {
+      console.log("Received notification:", notification);
+  
+      if (notification.type === 'refresh' && this.refreshModels.includes(notification.model)) {
+          // Reload the view
+          await this.filterByDate();
+          this.render();
+      }
   }
 
   _onHorizontalScroll = () => {
@@ -89,39 +151,13 @@ export class ComplianceDashboard extends Component {
   };
 
   async displayOdooView(category, query, branch_filter, branch_field) {
-    // const formatDate = (date) => date.toISOString().slice(0, 10);
-
-    // let prevDate, currentDate;
-
-    // if (this.state.datepicked > 0) {
-    //   prevDate = moment()
-    //     .subtract(this.state.datepicked, "days")
-    //     .format("YYYY-MM-DD");
-    //   currentDate = formatDate(new Date()); // Today's date
-    // } else {
-    //   currentDate = formatDate(new Date()); // Today's date
-    //   prevDate = currentDate; // Same as today if datepicked is 0
-    // }
-
-    // const odooPrevDate = `${prevDate} 00:00:00`; // For Odoo's datetime field
-    // const odooCurrentDate = `${currentDate} 23:59:59`; // For Odoo's datetime field
-
-    // this.state.prevDate = odooPrevDate; // Update the state
-    // this.state.currentDate = odooCurrentDate; // Update the state
-
-    // let domain = [
-    //   ["create_date", ">=", odooPrevDate], // Use the formatted dates
-    //   ["create_date", "<=", odooCurrentDate], // Use <= for inclusive end date
-    //   ["scope", "=", category],
-    // ];
-
+    
     const response = await this.rpc("/dashboard/dynamic_sql", { sql_query: query, branches_id: this.state.branches_id, cco: this.state.cco });          
         
     if(!response) return;
 
-  
+    console.log(response.domain);
     
-
     this.navigate.doAction({
       type: "ir.actions.act_window",
       res_model: response.table.replace(/_/g, "."),
@@ -137,6 +173,9 @@ export class ComplianceDashboard extends Component {
   }
   async getcurrentuser() {
     let result = await this.rpc("/dashboard/user");
+
+    console.log(result);
+    
     
     this.state.branches_id = result.branch;
     this.state.cco = result.group;
@@ -147,11 +186,8 @@ export class ComplianceDashboard extends Component {
       branches_id: this.state.branches_id,
       datepicked: Number(this.state.datepicked),
     });
-
-   
     
-
-    this.state.stats = result.data;
+    this.state.stats = [...result.data];
     this.state.totalstat = result.total;
   }
   async getAllStatsByCategory(name) {

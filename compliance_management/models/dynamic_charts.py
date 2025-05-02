@@ -86,6 +86,7 @@ class ResCharts(models.Model):
     string='Domain Field Name',
     store=True
     )
+    domain_filter = fields.Char(string="Domain Filter", help="Domain filter for the action window")
 
    
 

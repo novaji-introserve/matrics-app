@@ -29,85 +29,75 @@ class Statistic(models.Model):
     # val = fields.Char(string='Value')
     val = fields.Char(string='Value', compute='_compute_val', store=True, readonly=True)
     narration = fields.Text(string='Narration')
-
-  
-    
     scope_color = fields.Char()
 
-    # @api.depends('sql_query')
-    # def _compute_val(self):
-    #     for record in self:
-    #         if record.sql_query:
-    #             try:
-    #                 query = record.sql_query.strip().lower()
-    #                 if not query.startswith('select'):
-    #                     raise ValidationError('Query not supported.\nHint: Start with SELECT')
-    #                 record.env.cr.execute(query)
-    #                 aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
-    #                 pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\("
-    #                 match = re.search(pattern, query, re.IGNORECASE)
-    #                 if match:
-    #                     record.val = record.env.cr.fetchone()[0]
-    #                 else:
-    #                     records = record.env.cr.fetchall()
-    #                     record.val = str(len(records)) # convert to string, because val is a Char.
-    #             except Exception as e:
-    #                 record.val = 'Error'
-    #                 raise ValidationError(f'Invalid SQL query:\n{str(e)}')
-    #         else:
-    #             record.val = '0'
-
-
+    def _prepare_and_validate_query(self, sql_query):
+        """Helper method to prepare and validate SQL query with consistent filtering"""
+        if not sql_query:
+            return None
+            
+        try:
+            # Keep original query for execution but use lowercase for checks
+            original_query = sql_query.strip()
+            query = original_query.lower()
+            
+            if not query.startswith('select'):
+                raise ValidationError('Query not supported.\nHint: Start with SELECT')
+            
+            if "res_partner" in query:
+                # Remove trailing semicolon if present
+                if query.endswith(";"):
+                    query = query[:-1]
+                    original_query = original_query[:-1]
+                
+                has_where = bool(re.search(r'\bwhere\b', query))
+                
+                # Determine the condition to add
+                condition = " AND origin IN ('demo','test','prod')" if has_where else " WHERE origin IN ('demo','test','prod')"
+                
+                # Add the condition before any GROUP BY, ORDER BY, LIMIT, etc.
+                for clause in ['group by', 'order by', 'limit', 'offset', 'having']:
+                    clause_pos = query.find(' ' + clause + ' ')
+                    if clause_pos > -1:
+                        # Insert condition before this clause in the original query
+                        original_query = original_query[:clause_pos] + condition + original_query[clause_pos:]
+                        break
+                else:
+                    # No such clauses found, append at the end
+                    original_query += condition
+                    
+            return original_query, query
+            
+        except Exception as e:
+            self.env.cr.rollback()  # Important: rollback on error
+            raise ValidationError(f'Invalid SQL query:\n{str(e)}')
+    
+    def _execute_query_and_get_value(self, original_query, query):
+        """Execute the query and return the appropriate value"""
+        self.env.cr.execute(original_query)
+        
+        aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
+        pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\("
+        match = re.search(pattern, query, re.IGNORECASE)
+        
+        if match:
+            result = self.env.cr.fetchone()
+            return str(result[0]) if result and result[0] is not None else '0'
+        else:
+            records = self.env.cr.fetchall()
+            return str(len(records)) if records else '0'
+   
     @api.model
     def create(self, vals):
-        sql_query = vals.get('sql_query')  # Get the sql_query from the values
-        scope = vals.get('scope')
-
-        if sql_query:  # Check if sql_query is provided
+        sql_query = vals.get('sql_query')
+        
+        if sql_query:
             try:
-                query = sql_query.strip().lower()
-
-                if not query.startswith('select'):
-                    raise ValidationError('Query not supported.\nHint: Start with SELECT')
-                
-                self.env.cr.execute(query)
-
-                aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
-                pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\(" 
-                match = re.search(pattern, query, re.IGNORECASE)
-
-                if match:
-                    count = self.env.cr.fetchone()[0]
-                    self.val = count if count is not None else '0'
-                    
-                else:
-                    records = self.env.cr.fetchall()
-                    if records:
-                        self.val = len(records)  # Store the length of the records
-                    else:
-                        self.val = 0  # Store 0 if no records
-
-
-                # assign the color
-                if scope:
-                    # vals['scope_color'] = {
-                    #     'bank': '#FEEEF1',
-                    #     'branch': '#D9FAE7',
-                    #     'compliance': '#8BB8D9',
-                    #     'regulatory': '#F7E8BD',
-                    #     'risk': '#FEF2DC',
-                    # }.get(scope, '#00F2AD')
-                    
-                    vals['scope_color'] = {
-                        'bank': '#FFD700',
-                        'branch': '#66B2FF',
-                        'compliance': '#C8102E',
-                        'regulatory': '#4CAF50',
-                        'risk': '#999999',
-                    }.get(scope, '#FFD700')
-
+                original_query, query = self._prepare_and_validate_query(sql_query)
+                val = self._execute_query_and_get_value(original_query, query)
+                # We don't need to set vals['val'] here since it's a computed field
             except Exception as e:
-                self.env.cr.rollback() # Important: rollback on error
+                self.env.cr.rollback()
                 raise ValidationError(f'Invalid SQL query:\n{str(e)}')
         
         return super(Statistic, self).create(vals)
@@ -120,28 +110,11 @@ class Statistic(models.Model):
                 continue
                 
             try:
-                query = record.sql_query.strip().lower()
-                
-                if not query.startswith('select'):
-                    raise ValidationError('Query not supported.\nHint: Start with SELECT')
-                    
-                record.env.cr.execute(query)
-                
-                aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
-                pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\("
-                match = re.search(pattern, query, re.IGNORECASE)
-                
-                if match:
-                    result = record.env.cr.fetchone()
-                    record.val = str(result[0]) if result and result[0] is not None else '0'
-                else:
-                    records = record.env.cr.fetchall()
-                    record.val = str(len(records)) if records else '0'
-                    
+                original_query, query = record._prepare_and_validate_query(record.sql_query)
+                if original_query:
+                    record.val = record._execute_query_and_get_value(original_query, query)
             except Exception as e:
                 record.val = 'Error'
-                # Logging the error might be better than raising here
-                # since this is a computed field
                 record.env.cr.rollback()
     
     @api.onchange('sql_query')
@@ -149,45 +122,47 @@ class Statistic(models.Model):
         # This will update the field in the UI before saving
         self._compute_val()
 
+    # Method below is not used but kept for reference
     def compute_stat(self):
-        query = self.sql_query.lower()
-        if 'delete' in query:
-            pass
-        elif 'update' in query:
-            pass
-        else:
-            self.env.cr.execute(self.sql_query)
-            rec = self.env.cr.fetchone()
-            result = rec[0] if rec is not None else 0.0
-            self.write({"val":result})
+        try:
+            original_query, query = self._prepare_and_validate_query(self.sql_query)
+            if original_query:
+                if 'delete' in query or 'update' in query:
+                    pass  # Block delete and update operations
+                else:
+                    val = self._execute_query_and_get_value(original_query, query)
+                    self.write({"val": val})
+        except Exception as e:
+            self.env.cr.rollback()
+            raise ValidationError(f'Error computing stat: {str(e)}')
 
     
 
 
-    def update_stat(self):
-        statistic = self.env['res.compliance.stat'].search([])
+    # def update_stat(self):
+    #     statistic = self.env['res.compliance.stat'].search([])
         
-        # Define pattern outside the loop for better performance
-        aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
-        pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\("
+    #     # Define pattern outside the loop for better performance
+    #     aggregate_functions = ["count", "sum", "avg", "max", "min", "round"]
+    #     pattern = r"\b(" + "|".join(aggregate_functions) + r")\s*\("
         
-        for stat in statistic:
-            try:
-                if not stat.sql_query:
-                    continue
+    #     for stat in statistic:
+    #         try:
+    #             if not stat.sql_query:
+    #                 continue
                     
-                self.env.cr.execute(stat.sql_query)
-                match = re.search(pattern, stat.sql_query, re.IGNORECASE)
+    #             self.env.cr.execute(stat.sql_query)
+    #             match = re.search(pattern, stat.sql_query, re.IGNORECASE)
                 
-                if match:
-                    result = self.env.cr.fetchone()
-                    stat.val = str(result[0]) if result and result[0] is not None else '0'
-                else:
-                    records = self.env.cr.fetchall()
-                    stat.val = str(len(records)) if records else '0'
+    #             if match:
+    #                 result = self.env.cr.fetchone()
+    #                 stat.val = str(result[0]) if result and result[0] is not None else '0'
+    #             else:
+    #                 records = self.env.cr.fetchall()
+    #                 stat.val = str(len(records)) if records else '0'
                     
-            except Exception as e:
-                _logger.error(f"Error updating stat {stat.name}: {str(e)}")
+    #         except Exception as e:
+    #             _logger.error(f"Error updating stat {stat.name}: {str(e)}")
                 
         
        

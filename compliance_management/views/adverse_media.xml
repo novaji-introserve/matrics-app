@@ -6,7 +6,7 @@
         <field name="model">adverse.media</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="partner_id"/>
+                <field name="partner_id" />
                 <field name="partner_risk_level" widget="badge" decoration-danger="partner_risk_level == 'high'" decoration-warning="partner_risk_level in ('medium')" decoration-success="partner_risk_level in ('low')" />
                 <!-- <field name="partner_risk_level"/> -->
                 <!-- <field name="partner_risk_score" /> -->
@@ -75,7 +75,7 @@
         <field name="model">adverse.media</field>
         <field name="arch" type="xml">
             <search>
-                <field name="partner_id"/>
+                <field name="partner_id" />
                 <separator/>
                 <filter string="Active Monitoring" name="active_monitoring" domain="[('monitoring_status', '=', 'active')]"/>
                 <filter string="Inactive Monitoring" name="inactive_monitoring" domain="[('monitoring_status', '=', 'inactive')]"/>

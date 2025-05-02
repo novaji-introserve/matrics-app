@@ -74,6 +74,8 @@
                             <field name="surname"/>
                             <field name="first_name"/>
                             <field name="middle_name"/>
+                            <field name="bvn"/>
+                            
                         </group>
                     </sheet>
                 </form>
@@ -109,6 +111,7 @@
                             <field name="surname"/>
                             <field name="first_name"/>
                             <field name="middle_name"/>
+                            <field name= "bvn"/>
                         </group>
                     </sheet>
                 </form>

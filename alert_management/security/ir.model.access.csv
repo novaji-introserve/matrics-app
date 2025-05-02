@@ -1,7 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_alert_group,alert group,alert_management.model_alert_group,base.group_system,1,1,1,1
-access_alert_history,alert history,alert_management.model_alert_history,base.group_system,1,1,1,1
-access_alert_rules,alert rules,alert_management.model_alert_rules,base.group_system,1,1,1,1
-access_alert_query,alert query,alert_management.model_process_sql,base.group_system,1,1,1,1
-access_alert_exception_frequency,alert exception frequency,alert_management.model_exception_frequency,base.group_system,1,1,1,1
-access_alert_control_officer,alert control officer,alert_management.model_control_officer,base.group_system,1,1,1,1
+access_alert_group,alert group,alert_management.model_alert_group,base.group_user,1,1,1,1
+access_alert_history,alert history,alert_management.model_alert_history,base.group_user,1,1,1,1
+access_alert_rules,alert rules,alert_management.model_alert_rules,base.group_user,1,1,1,1
+access_alert_query,alert query,alert_management.model_process_sql,base.group_user,1,1,1,1
+access_alert_exception_frequency,alert exception frequency,alert_management.model_exception_frequency,base.group_user,1,1,1,1
+access_alert_control_officer,alert control officer,alert_management.model_control_officer,base.group_user,1,1,1,1

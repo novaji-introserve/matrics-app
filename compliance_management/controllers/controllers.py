@@ -6,6 +6,7 @@ from odoo import fields
 import re
 
 
+
 class Compliance(http.Controller):
     @http.route('/dashboard/user', auth='public', type='json')
     def index(self, **kw):
@@ -33,30 +34,37 @@ class Compliance(http.Controller):
 
     @http.route('/dashboard/dynamic_sql', auth='public', type='json')
     def extract_table_and_domain(self, sql_query: str, branches_id, cco):
-
+        """
+        Extract table names and WHERE conditions from SQL queries using regex patterns.
+        Ignores COUNT aggregation function while still blocking other aggregation functions.
+        """
         lower_query = sql_query.lower()
         table = None
         domain = []
 
         # Check for aggregation functions (sum, avg, min, max) in the SELECT clause
+        # Specifically exclude COUNT from the check
         if re.search(r"\b(?:sum|avg|min|max)\s*\(", lower_query):
-           return None
+            return None
 
-        # Extract table name (simplified, assumes single primary table or first table in JOIN)
+        # Extract table name (improved to handle more cases)
         from_match = re.search(r"\bfrom\s+([\w.]+)", lower_query)
         if from_match:
             table = from_match.group(1)
         else:
             join_match = re.search(r"\b(?:inner|left|right|full outer)?\s+join\s+([\w.]+)", lower_query)
             if join_match:
-                # table = join_match.group(1) # Gets the first table in the JOIN
+                # We're not handling complex joins in this version
                 return None
         
         # Extract WHERE clause conditions and convert to Odoo domain format
-        where_match = re.search(r"\bwhere\s+(.+)", lower_query)
+        where_match = re.search(r"\bwhere\s+(.+?)(?:\s+(?:group\s+by|order\s+by|limit|having)\s+|\s*$)", lower_query, re.DOTALL)
         if where_match:
-            condition_string = where_match.group(1)
-            domain = self._parse_condition_to_odoo_domain(condition_string)  
+            condition_string = where_match.group(1).strip()
+            domain = self._parse_conditions_to_odoo_domain(condition_string)  
+        
+        if table == "res_partner":
+            domain.append(["origin", "in", ["demo", "test", "prod"]])
         
         # check if it is not cco
         if not cco:
@@ -64,67 +72,184 @@ class Compliance(http.Controller):
 
         return {'table': table, 'domain': domain}
 
-    def _parse_condition_to_odoo_domain(self, condition_string: str):
-
+    def _parse_conditions_to_odoo_domain(self, condition_string: str):
+        """
+        Parse SQL WHERE conditions and convert to Odoo domain format.
+        Handles multiple AND conditions and IS NULL/IS NOT NULL.
+        """
         python_values = {
             "null": None,
             "true": True,
             "false": False
         }
-       
-        domain = []
-        # Basic splitting of AND conditions (very simplified)
-        conditions = re.split(r"\s+and\s+", condition_string)
-        for cond in conditions:
-            parts = re.split(r"(is|=|>|<|>=|<=|!=|like|ilike|in|not\s+in)\s+", cond.strip(), maxsplit=1) # Split only once
-            if len(parts) == 3:
-                field, operator, value = parts
-                field = field.strip()
-                operator = operator.strip().lower()
-                value = value.strip() # select count(id) from res_partner where bvn is null
-
         
-                # Clean the value
-                if value.startswith("'") and value.endswith("'"):
-                    value = value[1:-1]
-                elif value.startswith('"') and value.endswith('"'):
-                    value = value[1:-1]
-                
-                # Convert SQL operators to Odoo domain operators
-                if operator == '=':
-                    odoo_operator = '='
-                elif operator == 'is':
-                    odoo_operator = '='
-                elif operator == '>':
-                    odoo_operator = '>'
-                elif operator == '<':
-                    odoo_operator = '<'
-                elif operator == '>=':
-                    odoo_operator = '>='
-                elif operator == '<=':
-                    odoo_operator = '<='
-                elif operator == '!=':
-                    odoo_operator = '!='
-                elif operator == 'like':
-                    odoo_operator = 'like'
-                elif operator == 'ilike':
-                    odoo_operator = 'ilike'
-                elif operator == 'in':
-                    odoo_operator = 'in'
-                    value = value.replace("(", '[').replace(")", ']')
-                elif operator == 'not in':
-                    odoo_operator = 'not in'
-                    value = value.replace("(", '[').replace(")", ']')
-                else:
-                    continue # Ignore unsupported operators
+        domain = []
+        # Split AND conditions, respecting parentheses
+        conditions = self._split_and_conditions(condition_string)
+        
+        for cond in conditions:
+            cond = cond.strip()
+            
+            # Handle IS NULL and IS NOT NULL specially
+            null_match = re.match(r"([\w.]+)\s+is\s+(not\s+)?null", cond, re.IGNORECASE)
+            if null_match:
+                field = null_match.group(1).strip()
+                is_not = null_match.group(2) is not None
+                domain.append([field, '!=' if is_not else '=', None])
+                continue
 
-                for word in python_values:
-                    if word == value:
-                        value = python_values[word]
+             # Handle IS TRUE specially
+            true_match = re.match(r"([\w.]+)\s+is\s+true", cond, re.IGNORECASE)
+            if true_match:
+                field = true_match.group(1).strip()
+                domain.append([field, '=', True])
+                continue
+            
+            # Handle IS FALSE specially
+            false_match = re.match(r"([\w.]+)\s+is\s+false", cond, re.IGNORECASE)
+            if false_match:
+                field = false_match.group(1).strip()
+                domain.append([field, '=', False])
+                continue
+            
+            # Handle standard operators
+            operators = ['>=', '<=', '!=', '<>', '=', '>', '<', ' like ', ' ilike ', ' in ', ' not in ']
+            operator_found = False
+            
+            for op in operators:
+                if f" {op.strip()} " in f" {cond} ":
+                    parts = cond.split(op, 1)
+                    if len(parts) == 2:
+                        field = parts[0].strip()
+                        value = parts[1].strip()
+                        
+                        # Clean the value
+                        if value.startswith("'") and value.endswith("'"):
+                            value = value[1:-1]
+                        elif value.startswith('"') and value.endswith('"'):
+                            value = value[1:-1]
+                        
+                        # Handle IN and NOT IN lists
+                        if op.strip() in ('in', 'not in'):
+                            if value.startswith('(') and value.endswith(')'):
+                                # Extract values from parentheses and convert to list
+                                value = value[1:-1]  # Remove parentheses
+                                value_list = []
+                                
+                                # Split by comma, handling quoted strings properly
+                                in_quote = False
+                                quote_char = None
+                                current_item = ""
+                                
+                                for char in value:
+                                    if char in ("'", '"') and (quote_char is None or char == quote_char):
+                                        in_quote = not in_quote
+                                        quote_char = char if in_quote else None
+                                        continue
+                                    
+                                    if char == ',' and not in_quote:
+                                        value_list.append(current_item.strip().strip("'\""))
+                                        current_item = ""
+                                    else:
+                                        current_item += char
+                                
+                                if current_item:
+                                    value_list.append(current_item.strip().strip("'\""))
+                                
+                                value = value_list
+                        
+                        # Convert Python values
+                        if isinstance(value, str) and value.lower() in python_values:
+                            value = python_values[value.lower()]
+                        
+                        # Map SQL operators to Odoo operators
+                        odoo_op = self._map_operator_to_odoo(op.strip())
+                        domain.append([field, odoo_op, value])
+                        operator_found = True
                         break
-
-                domain.append([field, odoo_operator, value])
+            
+            # If no standard operator found, check for more complex conditions
+            if not operator_found and ' or ' in cond.lower():
+                # Basic OR handling (simplified)
+                or_conditions = cond.split(' or ')
+                or_domain = []
+                
+                for or_cond in or_conditions:
+                    sub_domain = self._parse_conditions_to_odoo_domain(or_cond)
+                    if sub_domain:
+                        or_domain.extend(sub_domain)
+                
+                if or_domain:
+                    # Add Odoo's OR operator syntax
+                    or_operators = ['|'] * (len(or_domain) - 1)
+                    domain.extend(or_operators + or_domain)
+        
         return domain
+
+    def _split_and_conditions(self, condition_string: str):
+        """
+        Split a condition string by AND operators,
+        respecting parentheses and quoted strings.
+        """
+        conditions = []
+        current_condition = ""
+        
+        # State tracking
+        paren_level = 0
+        in_quote = False
+        quote_char = None
+        
+        i = 0
+        while i < len(condition_string):
+            c = condition_string[i]
+            
+            # Handle quotes
+            if c in ("'", '"') and (quote_char is None or c == quote_char):
+                in_quote = not in_quote
+                quote_char = c if in_quote else None
+                current_condition += c
+            
+            # Handle parentheses
+            elif c == '(' and not in_quote:
+                paren_level += 1
+                current_condition += c
+            elif c == ')' and not in_quote:
+                paren_level -= 1
+                current_condition += c
+            
+            # Check for AND operator, but only when not inside quotes or parentheses
+            elif (paren_level == 0 and not in_quote and 
+                condition_string[i:i+5].lower() == ' and '):
+                conditions.append(current_condition.strip())
+                current_condition = ""
+                i += 4  # Skip ahead past "and"
+            else:
+                current_condition += c
+            
+            i += 1
+        
+        if current_condition:
+            conditions.append(current_condition.strip())
+        
+        return conditions
+
+    def _map_operator_to_odoo(self, sql_op: str):
+        """Map SQL operators to Odoo domain operators."""
+        odoo_operators = {
+            '=': '=',
+            '>': '>',
+            '<': '<',
+            '>=': '>=',
+            '<=': '<=',
+            '!=': '!=',
+            '<>': '!=',
+            'like': 'like',
+            'ilike': 'ilike',
+            'in': 'in',
+            'not in': 'not in'
+        }
+        
+        return odoo_operators.get(sql_op, sql_op)
 
     @http.route('/dashboard/stats', auth='public', type='json')
     def getAllstats(self, cco, branches_id, datepicked, **kw):
@@ -144,12 +269,72 @@ class Compliance(http.Controller):
             computed_results = []
 
             for result in results:
-                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
+
+                original_query = result['sql_query']
+                query = original_query.lower()  # Use lowercase for checks but keep original for execution
+                needs_modification = False
+                
+                # Check if we need to modify this query
+                if any(table in query for table in ["res_partner", "res.partner", "tier", "transaction"]):
+                    needs_modification = True
+                    
+                    # Remove trailing semicolon if present
+                    if query.endswith(";"):
+                        query = query[:-1]
+                        original_query = original_query[:-1]
+                    
+                    
+                    has_where = bool(re.search(r'\bwhere\b', query))
+                    
+                    # Prepare conditions to add
+                    conditions = []
+
+                     # Add origin filter for partner tables
+                    if "res_partner" in query or "res.partner" in query:
+                        conditions.append("origin IN ('demo','test','prod')")
+                    
+                    # Build the final condition string
+                    if conditions:
+                        if has_where:
+                            condition_str = " AND " + " AND ".join(conditions)
+                        else:
+                            condition_str = " WHERE " + " AND ".join(conditions)
+                    
+                        # Find the position to insert the condition (before any clause)
+                        clauses = ['group by', 'order by', 'limit', 'offset', 'having']
+                        clause_pos = -1
+                        for clause in clauses:
+                            pos = query.find(' ' + clause + ' ')
+                            if pos > -1:
+                                if clause_pos == -1 or pos < clause_pos:
+                                    clause_pos = pos
+                        
+                        # Insert the condition at the appropriate position
+                        if clause_pos > -1:
+                            original_query = original_query[:clause_pos] + condition_str + original_query[clause_pos:]
+                        else:
+                            original_query += condition_str
+                        
+                        if needs_modification and any(param in conditions[0] for param in ["%s", "ANY(%s"]):
+                            request.env.cr.execute(original_query)
+                        else:
+                            request.env.cr.execute(original_query)
+                        
+                        # For count queries, we expect a single row with a single value
+                        result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                
+                        computed_results.append({"name": result["name"],"scope": result["scope"], "val": result_value, "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
+                else:
+                    request.env.cr.execute(original_query)
+                    
+                    # For count queries, we expect a single row with a single value
+                    result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                    computed_results.append({"name": result["name"],"scope": result["scope"], "val": result_value, "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
 
             return {
-                    "data": computed_results,
-                    "total": len(results)
-                }
+                "data": computed_results,
+                "total": len(results)
+            }
         else:
             # First get all compliance stats in the date range
             query = """
@@ -159,6 +344,7 @@ class Compliance(http.Controller):
                 AND rcs.create_date < %s;
             """
 
+            # Execute the query first (assuming parameters are defined elsewhere)
             request.env.cr.execute(query, (start_of_prev_day, end_of_today))
 
             # Get column names and results
@@ -171,50 +357,79 @@ class Compliance(http.Controller):
             # Process each compliance stat and execute its SQL query with branch filtering
             computed_results = []
             for stat in stat_records:
-                query:str = stat['sql_query']
-            
+                original_query = stat['sql_query']
+                query = original_query.lower()  # Use lowercase for checks but keep original for execution
+                needs_modification = False
                 
-                if "res_partner" in query or "res.partner" in query or "tier" in query or "transaction" in query:
+                # Check if we need to modify this query
+                if any(table in query for table in ["res_partner", "res.partner", "transaction"]):
+                    needs_modification = True
+                    
                     # Remove trailing semicolon if present
                     if query.endswith(";"):
                         query = query[:-1]
+                        original_query = original_query[:-1]
                     
-                    # Add branch filtering to the query
+                    
+                    has_where = bool(re.search(r'\bwhere\b', query))
+                    
+                    # Prepare conditions to add
+                    conditions = []
+                    
+                    # Add branch filter if branches are specified
                     if branches_array:
-                        if " where " in query.lower() or " WHERE " in query:
-                            query += f" AND branch_id = ANY(%s::integer[])"
-                        else:
-                            query += f" WHERE branch_id = ANY(%s::integer[])"
-                            
-                        # Execute the query with branch filter
-                        request.env.cr.execute(query, (branches_array,))
+                        conditions.append(f"branch_id = ANY(%s::integer[])")
                     else:
                         # If no branches, add a condition that returns no results
-                        if " where " in query.lower() or " WHERE " in query:
-                            query += " AND 1=0"
-                        else:
-                            query += " WHERE 1=0"
-                            
-                        request.env.cr.execute(query)
-                
-                    # For count queries, we expect a single row with a single value
-                    result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
-
+                        conditions.append("1=0")
                     
-                    # Add the results to our collection with the specific format you want
-                    computed_results.append({
-                        "name": stat["name"],
-                        "scope": stat["scope"],
-                        "val": result_value,  # This is the result of the SQL query
-                        "id": stat["id"],
-                        "scope_color": stat["scope_color"],
-                        "query": stat["sql_query"]
-                    })
+                    # Add origin filter for partner tables
+                    if "res_partner" in query or "res.partner" in query:
+                        conditions.append("origin IN ('demo','test','prod')")
+                    
+                    # Build the final condition string
+                    if conditions:
+                        if has_where:
+                            condition_str = " AND " + " AND ".join(conditions)
+                        else:
+                            condition_str = " WHERE " + " AND ".join(conditions)
+                    
+                        # Find the position to insert the condition (before any clause)
+                        clauses = ['group by', 'order by', 'limit', 'offset', 'having']
+                        clause_pos = -1
+                        for clause in clauses:
+                            pos = query.find(' ' + clause + ' ')
+                            if pos > -1:
+                                if clause_pos == -1 or pos < clause_pos:
+                                    clause_pos = pos
+                        
+                        # Insert the condition at the appropriate position
+                        if clause_pos > -1:
+                            original_query = original_query[:clause_pos] + condition_str + original_query[clause_pos:]
+                        else:
+                            original_query += condition_str
+                
+                
+                        request.env.cr.execute(original_query, (branches_array,))
+                    
+                        # For count queries, we expect a single row with a single value
+                        result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                
+                        # Add the results to our collection
+                        computed_results.append({
+                            "name": stat["name"],
+                            "scope": stat["scope"],
+                            "val": result_value,
+                            "id": stat["id"],
+                            "scope_color": stat["scope_color"],
+                            "query": stat["sql_query"]
+                        })
 
             return {
                 "data": computed_results,
                 "total": len(computed_results)
             }
+
 
            
 
@@ -231,18 +446,84 @@ class Compliance(http.Controller):
         end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
 
         if cco == True:
-            # fetch all data for chief compliance officer
-            results = request.env["res.compliance.stat"].search([('scope', '=', category),('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today)])
+            results = request.env["res.compliance.stat"].search([('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today)])
 
             computed_results = []
 
             for result in results:
-                computed_results.append({"name": result["name"],"scope": result["scope"], "val": result["val"], "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
 
+                original_query = result['sql_query']
+                query = original_query.lower()  # Use lowercase for checks but keep original for execution
+                needs_modification = False
+                
+                  # Check if we need to modify this query
+                if any(table in query for table in ["res_partner", "res.partner", "tier", "transaction"]):
+                    needs_modification = True
+                    
+                    # Remove trailing semicolon if present
+                    if query.endswith(";"):
+                        query = query[:-1]
+                        original_query = original_query[:-1]
+                    
+                    
+                    has_where = bool(re.search(r'\bwhere\b', query))
+                    
+                    # Prepare conditions to add
+                    conditions = []
+                    
+                    # Add branch filter if branches are specified
+                    if branches_array:
+                        conditions.append(f"branch_id = ANY(%s::integer[])")
+                    else:
+                        # If no branches, add a condition that returns no results
+                        conditions.append("1=0")
+                    
+                    # Add origin filter for partner tables
+                    if "res_partner" in query or "res.partner" in query:
+                        conditions.append("origin IN ('demo','test','prod')")
+                    
+                    # Build the final condition string
+                    if conditions:
+                        if has_where:
+                            condition_str = " AND " + " AND ".join(conditions)
+                        else:
+                            condition_str = " WHERE " + " AND ".join(conditions)
+                    
+                        # Find the position to insert the condition (before any clause)
+                        clauses = ['group by', 'order by', 'limit', 'offset', 'having']
+                        clause_pos = -1
+                        for clause in clauses:
+                            pos = query.find(' ' + clause + ' ')
+                            if pos > -1:
+                                if clause_pos == -1 or pos < clause_pos:
+                                    clause_pos = pos
+                        
+                        # Insert the condition at the appropriate position
+                        if clause_pos > -1:
+                            original_query = original_query[:clause_pos] + condition_str + original_query[clause_pos:]
+                        else:
+                            original_query += condition_str
+                
+                        # Execute the query with or without parameters
+                        request.env.cr.execute(original_query, (branches_array,))
+                        
+                
+                        # For count queries, we expect a single row with a single value
+                        result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                        
+                        # Add the results to our collection
+                        computed_results.append({
+                            "name": stat["name"],
+                            "scope": stat["scope"],
+                            "val": result_value,
+                            "id": stat["id"],
+                            "scope_color": stat["scope_color"],
+                            "query": stat["sql_query"]
+                        })
             return {
-                    "data": computed_results,
-                    "total": len(results)
-                }
+                "data": computed_results,
+                "total": len(results)
+            }
         else:
              # First get all compliance stats in the date range
             query = """
@@ -261,51 +542,76 @@ class Compliance(http.Controller):
             # Convert branches_id to a proper PostgreSQL array parameter
             branches_array = list(map(int, branches_id))  # Make sure all elements are integers
 
-            # Process each compliance stat and execute its SQL query with branch filtering
             computed_results = []
             for stat in stat_records:
-                query:str = stat['sql_query']
+                original_query = stat['sql_query']
+                query = original_query.lower()  # Use lowercase for checks but keep original for execution
+                needs_modification = False
                 
-                
-                if "res_partner" in query or "res.partner" in query or "tier" in query or "transaction" in query:
+                # Check if we need to modify this query
+                if any(table in query for table in ["res_partner", "res.partner", "transaction"]):
+                    needs_modification = True
+                    
                     # Remove trailing semicolon if present
                     if query.endswith(";"):
                         query = query[:-1]
+                        original_query = original_query[:-1]
                     
-                    # Add branch filtering to the query
+                    
+                    has_where = bool(re.search(r'\bwhere\b', query))
+                    
+                    # Prepare conditions to add
+                    conditions = []
+                    
+                    # Add branch filter if branches are specified
                     if branches_array:
-                        if " where " in query.lower() or " WHERE " in query:
-                            query += f" AND branch_id = ANY(%s::integer[])"
-                        else:
-                            query += f" WHERE branch_id = ANY(%s::integer[])"
-                            
-                        # Execute the query with branch filter
-                        request.env.cr.execute(query, (branches_array,))
+                        conditions.append(f"branch_id = ANY(%s::integer[])")
                     else:
                         # If no branches, add a condition that returns no results
-                        if " where " in query.lower() or " WHERE " in query:
-                            query += " AND 1=0"
+                        conditions.append("1=0")
+                    
+                    # Add origin filter for partner tables
+                    if "res_partner" in query or "res.partner" in query:
+                        conditions.append("origin IN ('demo','test','prod')")
+                    
+                    # Build the final condition string
+                    if conditions:
+                        if has_where:
+                            condition_str = " AND " + " AND ".join(conditions)
                         else:
-                            query += " WHERE 1=0"
-                            
-                    request.env.cr.execute(query)
+                            condition_str = " WHERE " + " AND ".join(conditions)
                     
-                    # For count queries, we expect a single row with a single value
-                    result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
-                    
-                    # Add the results to our collection with the specific format you want
-                    computed_results.append({
-                        "name": stat["name"],
-                        "scope": stat["scope"],
-                        "val": result_value,  # This is the result of the SQL query
-                        "id": stat["id"],
-                        "scope_color": stat["scope_color"],
-                        "query": stat["sql_query"]
-                    })
+                        # Find the position to insert the condition (before any clause)
+                        clauses = ['group by', 'order by', 'limit', 'offset', 'having']
+                        clause_pos = -1
+                        for clause in clauses:
+                            pos = query.find(' ' + clause + ' ')
+                            if pos > -1:
+                                if clause_pos == -1 or pos < clause_pos:
+                                    clause_pos = pos
+                        
+                        # Insert the condition at the appropriate position
+                        if clause_pos > -1:
+                            original_query = original_query[:clause_pos] + condition_str + original_query[clause_pos:]
+                        else:
+                            original_query += condition_str
+                        
+                        request.env.cr.execute(original_query, (branches_array,))
+                        result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                
+                        # Add the results to our collection
+                        computed_results.append({
+                            "name": stat["name"],
+                            "scope": stat["scope"],
+                            "val": result_value,
+                            "id": stat["id"],
+                            "scope_color": stat["scope_color"],
+                            "query": stat["sql_query"]
+                        })
 
             return {
-                "data": computed_results,
-                "total": len(computed_results)
+                    "data": computed_results,
+                    "total": len(computed_results)
             }
 
 

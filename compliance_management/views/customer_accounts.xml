@@ -61,6 +61,7 @@
                             <label for="account_name" string="Account Name" />
                              <div>
                                 <field name="account_name" class="oe_inline" readonly="1" />
+                                <field name="active" invisible="1"/>
                             </div>
                         </div>
                     </div>
@@ -71,8 +72,8 @@
                                 <group>
                                     <field name="customer_id" readonly="1" />
                                     <field name="product_id" readonly="1" />
-                                    <field name="account_type_id" readonly="1" />
-                                    <field name="currency_id" readonly="1" />
+                                    <field name="account_type" readonly="1" />
+                                    <field name="currency" readonly="1" />
                                     <field name="branch_id" readonly="1" />
                                 </group>
                                 <group>

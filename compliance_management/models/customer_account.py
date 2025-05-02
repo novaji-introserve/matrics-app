@@ -143,16 +143,34 @@ class CustomerAccount(models.Model):
     tot_debit_last1y = fields.Float(string='Total Debit Amount - Last 1Y', digits=(15,2))
 
     state = fields.Selection(string='Status', selection=[('active', 'Active'), ('dormant', 'Dormant'),('locked','Locked')],tracking=True,default='active',required=False) #sta_code
+    active = fields.Boolean(default=True, tracking=True)
+
     
      
     @api.model
     def open_accounts(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = []
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id])
+
+            ]
+
         return {
             'name': _('Accounts'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner.account',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         } 
         
