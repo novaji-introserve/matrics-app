@@ -135,5 +135,5 @@
 
     <!-- Add menu item for Alert Log -->
 
-    <menuitem id="menu_keyword_alert_log" name="Keyword Logs" parent="menu_rulebook_details" action="action_keyword_alert_log" sequence="50"/>
+    <menuitem id="menu_keyword_alert_log" name="Keyword Logs" parent="menu_rulebook_details" action="action_keyword_alert_log" sequence="50" groups="rule_book.group_compliance_manager_" />
 </odoo>

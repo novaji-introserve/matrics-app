@@ -44,6 +44,7 @@
         "data/email_templates/first_line_escalation.xml",
         "data/email_templates/share_document_template.xml",
         "data/email_templates/keyword_alert.xml",
+        'data/email_templates/regulatory_alert.xml',
 
         "data/schedules/rule_book.xml",
         # "views/dashboard.xml",
@@ -67,6 +68,7 @@
         'views/keyword_tracking.xml',
         'data/sequence/keyword.xml',
         'views/keyword_logs.xml',
+        'views/reg_alert.xml',
 
 
     ],
