@@ -155,6 +155,7 @@ class CustomerAccount(models.Model):
     _sql_constraints = [
         ('customer_unique', 'unique(customer)', 'Customer ID must be unique!'),
     ]
+    
 
     
     def init(self):
@@ -171,8 +172,14 @@ class CustomerAccount(models.Model):
                 -- Check if customer field is empty and customer_id is set
                 IF (NEW.customer IS NULL OR TRIM(NEW.customer) = '') AND NEW.customer_id IS NOT NULL THEN
                     -- Set customer field to the ID value from customer_id
-                    NEW.customer = NEW.customer_id::TEXT;
+                    NEW.customer = NEW.customer_id::TEXT;                    
                 END IF;
+                
+                IF NEW.active IS NULL THEN
+                    -- Set active field to True
+                    NEW.active = True;
+                END IF;
+                
                 
                 RETURN NEW;
             END;
@@ -191,6 +198,12 @@ class CustomerAccount(models.Model):
             SET customer = customer_id::TEXT
             WHERE (customer IS NULL OR TRIM(customer) = '')
             AND customer_id IS NOT NULL;
+        """)
+        # Update existing records where active field is NULL
+        self.env.cr.execute("""
+            UPDATE res_partner_account
+            SET active = TRUE
+            WHERE active IS NULL;
         """)
 
     @api.model
