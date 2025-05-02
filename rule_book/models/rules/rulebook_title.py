@@ -270,11 +270,6 @@ class RulebookTitle(models.Model):
 
         return record
 
-    # general webscrapping functino
-    def run_webscrapping(self):
-
-        _logger.critical("web scrapper run sucessfully")
-        self.CBNScraper()
 
     @api.model
     def SECScraper(self):

@@ -1,19 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <data>
-        <!-- Cron Job for checking rulebooks and updating due dates -->
-        <record id="cron_web_scraping" model="ir.cron">
-            <field name="name">Webscraping For Regulatory document</field>
-            <field name="model_id" ref="model_rulebook_title" />
-            <field name="state">code</field>
-            <field name="code">model.run_webscrapping()</field>
-            <field name="active" eval="True" />
-            <field name="interval_type">hours</field>
-            <field name="interval_number">8</field>
-            <field name="numbercall">-1</field>
-            <!-- <field name="doall" eval="True" /> -->
-            <field name="nextcall" eval="(datetime.now() + timedelta(hours=8)).replace(minute=0, second=0, microsecond=0)" />
-        </record>
 
         <!-- Cron Job for checking rulebooks and updating due dates -->
         <record id="cron_web_nfiu" model="ir.cron">
@@ -35,7 +22,7 @@
             <field name="model_id" ref="model_rulebook_title" />
             <field name="state">code</field>
             <field name="code">model.NDICScrapper()</field>
-            <field name="active" eval="True" />
+            <field name="active" eval="False" />
             <field name="interval_type">hours</field>
             <field name="interval_number">8</field>
             <field name="numbercall">-1</field>
