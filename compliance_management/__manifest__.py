@@ -60,7 +60,6 @@
         "data/data.xml",
         "views/risk_assessment.xml",
         # "views/open_sanctions.xml",
-        # "views/res_users.xml",
         "views/sanction_screening.xml",
         "views/customer.xml",
         "views/statistics.xml",
@@ -74,6 +73,7 @@
         # "data/charts.xml",
         "data/res_partner.xml",
         "data/fcra_score.xml",    
+        # "views/res_users.xml",
     ],
     # only loaded in demonstration mode
     "demo": [
