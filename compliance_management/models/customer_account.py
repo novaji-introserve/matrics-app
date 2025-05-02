@@ -25,7 +25,7 @@ class CustomerAccount(models.Model):
     last_transaction_date = fields.Date(
         string='Last Transaction Date', required=False)
     opening_date = fields.Date(
-        string='Last Opening Date', required=False)
+        string='Opening Date', required=False)
     
 
     account_officer_id = fields.Many2one(
