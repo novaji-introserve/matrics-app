@@ -61,6 +61,7 @@
                             <label for="account_name" string="Account Name" />
                              <div>
                                 <field name="account_name" class="oe_inline" readonly="1" />
+                                <field name="active" invisible="1"/>
                             </div>
                         </div>
                     </div>

@@ -143,6 +143,8 @@ class CustomerAccount(models.Model):
     tot_debit_last1y = fields.Float(string='Total Debit Amount - Last 1Y', digits=(15,2))
 
     state = fields.Selection(string='Status', selection=[('active', 'Active'), ('dormant', 'Dormant'),('locked','Locked')],tracking=True,default='active',required=False) #sta_code
+    active = fields.Boolean(default=True, tracking=True)
+
     
      
     @api.model
