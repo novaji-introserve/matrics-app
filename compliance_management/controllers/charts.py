@@ -382,8 +382,37 @@ class DynamicChartController(http.Controller):
             base_colors = ['#ff6600', '#ff9933', '#ffcc66', '#ff0000', '#cc0000']
         elif color_scheme == 'rainbow':
             base_colors = ['#ff0000', '#ff9900', '#ffff00', '#00ff00', '#0099ff', '#6633ff']
+        elif color_scheme == 'brown':
+            base_colors = [
+                '#483E1D',  # Dark earthy brown
+                '#F2D473',  # Light golden brown
+                '#564B2B',  # Dark earthy brown
+                '#ECDFA4',  # Light cream brown
+                '#83733F',  # Medium-dark olive brown
+                '#ECE1A2',  # Light beige
+                '#5F5330',  # Medium earthy brown
+                '#B78C00',  # Golden amber brown
+                '#6A5D36',  # Medium-light brown
+                '#C4AA55',  # Medium-light golden brown
+                # '#4D4323',  # Similar darkness with slightly more green
+                # '#5A4F2A',  # Middle-tone earthy brown
+                # '#665839',  # Medium-light earthy brown
+                # '#524628',  # Medium-dark earthy brown
+            ]
         else:  # default
-            base_colors = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099', '#0099c6']
+            base_colors = [
+                '#483E1D',  # Dark earthy brown
+                '#F2D473',  # Light golden brown
+                '#564B2B',  # Dark earthy brown
+                '#ECDFA4',  # Light cream brown
+                '#83733F',  # Medium-dark olive brown
+                '#ECE1A2',  # Light beige
+                '#5F5330',  # Medium earthy brown
+                '#B78C00',  # Golden amber brown
+                '#6A5D36',  # Medium-light brown
+                '#C4AA55',  # Medium-light golden brown
+            ]
+            # base_colors = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099', '#0099c6']
         
         colors = []
         for i in range(count):
