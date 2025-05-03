@@ -6,6 +6,9 @@ import logging
 from dotenv import load_dotenv
 import psycopg2
 import os
+from datetime import timedelta, datetime
+import pytz
+from dateutil.relativedelta import relativedelta
 
 
 load_dotenv()
@@ -50,7 +53,7 @@ class Customer(models.Model):
 
     customer_id = fields.Char(string="Customer ID",
                               index=True, tracking=True, readonly=True)
-    bvn = fields.Char(string='BVN', tracking=True, readonly=True)
+    bvn = fields.Char(string='BVN', tracking=True, readonly=True, index=True)
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True, tracking=True, readonly=True)
     education_level_id = fields.Many2one(
@@ -109,7 +112,7 @@ class Customer(models.Model):
         comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
     risk_assessment_ids = fields.One2many(
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
-    is_pep = fields.Boolean(string="Is PEP", default=False, tracking=True)
+    is_pep = fields.Boolean(string="Is PEP", default=False, tracking=True, index=True)
     is_watchlist = fields.Boolean(
         string="Is Watchlist", default=False, tracking=True)
     is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
@@ -165,68 +168,208 @@ class Customer(models.Model):
     #     compute="_compute_is_branch_compliance"
     # )
 
-    def cron_run_risk_assessment(self):
-        self.update_sanction_status()
-        self.compute_risk_score_for_all_users()
+    # def cron_run_risk_assessment(self):
+    #     self.update_sanction_status()
+    #     self.compute_risk_score_for_all_users()
 
-    def update_sanction_status(self):
-        _logger.info("Starting PEP status check using SQL query.")
+    # def update_sanction_status(self):
 
-        # Fetch first and last names from res_partner
-        query_fetch = """
-            SELECT id, firstname, lastname 
-            FROM res_partner
-            WHERE firstname IS NOT NULL AND lastname IS NOT NULL
-        """
-        self.env.cr.execute(query_fetch)
-        partners = self.env.cr.fetchall()
+    #     query_fetch = """
+    #         SELECT id, firstname, lastname 
+    #         FROM res_partner
+    #         WHERE firstname IS NOT NULL AND lastname IS NOT NULL
+    #     """
+    #     self.env.cr.execute(query_fetch)
+    #     partners = self.env.cr.fetchall()
 
-        if not partners:
-            _logger.info("No customers found in res_partner.")
-            return
+    #     if not partners:
+    #         _logger.info("No customers found in res_partner.")
+    #         return
 
-        # Prepare a set of unique full names
-        full_names = list(
-            set(f"{first} {last}" for _, first, last in partners))
-        _logger.info(f"Unique customer full names: {full_names}")
+    #     # Prepare a set of unique full names
+    #     full_names = list(
+    #         set(f"{first} {last}" for _, first, last in partners))
+    #     _logger.info(f"Unique customer full names: {full_names}")
 
-        #  DB Update
+    #     #  DB Update
 
-    #   Update global_pep from res_pep
-        query_update_pep = """
-            UPDATE res_partner
-            SET global_pep = True
-            FROM res_pep
-            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = LOWER(TRIM(res_pep.name))
-        """
-        self.env.cr.execute(query_update_pep)
+    # #   Update global_pep from res_pep
+    #     query_update_pep = """
+    #         UPDATE res_partner
+    #         SET global_pep = True
+    #         FROM res_pep
+    #         WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = LOWER(TRIM(res_pep.name))
+    #     """
+    #     self.env.cr.execute(query_update_pep)
 
-        #  Update is_blacklist from res_partner_blacklist
-        query_update_blacklist = """
-            UPDATE res_partner
-            SET is_blacklist = TRUE
-            FROM res_partner_blacklist
-            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = 
-            LOWER(TRIM(res_partner_blacklist.first_name)) || ' ' || LOWER(TRIM(res_partner_blacklist.surname))
-        """
-        self.env.cr.execute(query_update_blacklist)
+    #     #  Update is_blacklist from res_partner_blacklist
+    #     query_update_blacklist = """
+    #         UPDATE res_partner
+    #         SET is_blacklist = TRUE
+    #         FROM res_partner_blacklist
+    #         WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = 
+    #         LOWER(TRIM(res_partner_blacklist.first_name)) || ' ' || LOWER(TRIM(res_partner_blacklist.surname))
+    #     """
+    #     self.env.cr.execute(query_update_blacklist)
 
-        # Update is_watchlist from res_partner_watchlist
-        query_update_watchlist = """
-            UPDATE res_partner
-            SET is_watchlist = TRUE
-            FROM res_partner_watchlist
-            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) =
-            LOWER(TRIM(res_partner_watchlist.first_name)) || ' ' || LOWER(TRIM(res_partner_watchlist.surname))
-        """
-        self.env.cr.execute(query_update_watchlist)
+    #     # Update is_watchlist from res_partner_watchlist
+    #     query_update_watchlist = """
+    #         UPDATE res_partner
+    #         SET is_watchlist = TRUE
+    #         FROM res_partner_watchlist
+    #         WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) =
+    #         LOWER(TRIM(res_partner_watchlist.first_name)) || ' ' || LOWER(TRIM(res_partner_watchlist.surname))
+    #     """
+    #     self.env.cr.execute(query_update_watchlist)
 
-        self.env.cr.commit()
-        _logger.info(
-            "Sanction status update completed for global_pep, blacklist, and watchlist.")
+    #     self.env.cr.commit()
+    #     _logger.info(
+    #         "Sanction status update completed for global_pep, blacklist, and watchlist.")
 
     # industry =
 
+    @api.model
+    def cron_run_risk_assessment(self):
+        """
+        Main entry point for risk assessment cron job with protection against
+        concurrent execution.
+        """
+        # Get a timestamp to use as a unique identifier
+        cron_name = "risk_assessment_cron"
+        cron_record = self.env.ref(
+            'compliance_management.ir_cron_run_risk_assessment')
+
+        # Check if the cron is already running
+        if cron_record.nextcall and fields.Datetime.from_string(cron_record.nextcall) > fields.Datetime.now():
+            _logger.info(
+                "Risk assessment job already running or scheduled, skipping this run")
+            return False
+
+        try:
+            # Set the nextcall far in the future to prevent new runs starting
+            cron_record.write({
+                'nextcall': fields.Datetime.now() + timedelta(hours=24)
+            })
+            self.env.cr.commit()
+
+            _logger.info("Starting scheduled risk assessment process")
+            results = {'sanction_status': {}, 'risk_scores': 0}
+
+            try:
+                results['sanction_status'] = self.update_sanction_status()
+                _logger.info("Sanction status update completed successfully")
+            except Exception as e:
+                _logger.error(
+                    f"Error in update_sanction_status: {str(e)}", exc_info=True)
+
+            try:
+                results['risk_scores'] = self.compute_risk_score_for_all_users()
+                _logger.info("Risk score computation completed successfully")
+            except Exception as e:
+                _logger.error(
+                    f"Error in compute_risk_score_for_all_users: {str(e)}", exc_info=True)
+
+            _logger.info(f"Completed full risk assessment process: {results}")
+            return results
+
+        finally:
+            # Reset the nextcall to 5 minutes from now
+            next_run = fields.Datetime.now() + timedelta(minutes=5)
+            cron_record.write({
+                'nextcall': next_run
+            })
+            self.env.cr.commit()
+     
+    def update_sanction_status(self):
+        _logger.info("Starting PEP status check using Odoo ORM for tracking.")
+
+        # Process in batches to avoid memory issues
+        batch_size = 1000
+        processed = 0
+
+        # Step 1: Find matches using SQL but let ORM handle the writes
+
+        # Update global_pep from res_pep
+        self.env.cr.execute("""
+            SELECT rp.id 
+            FROM res_partner rp
+            JOIN res_pep pep ON LOWER(TRIM(rp.firstname)) || ' ' || LOWER(TRIM(rp.lastname)) = LOWER(TRIM(pep.name))
+            WHERE rp.firstname IS NOT NULL AND rp.lastname IS NOT NULL
+        """)
+        global_pep_ids = [r[0] for r in self.env.cr.fetchall()]
+
+        # Process global_pep matches in batches
+        total_pep = len(global_pep_ids)
+        _logger.info(f"Found {total_pep} partners matching PEP records")
+
+        for i in range(0, total_pep, batch_size):
+            batch = global_pep_ids[i:i+batch_size]
+            partners = self.env['res.partner'].browse(batch)
+            partners.write({'global_pep': True})
+            self.env.cr.commit()  # Commit each batch
+            processed += len(batch)
+            _logger.info(
+                f"Updated global_pep for {processed}/{total_pep} partners")
+
+        # Update is_blacklist from res_partner_blacklist
+        self.env.cr.execute("""
+            SELECT rp.id 
+            FROM res_partner rp
+            JOIN res_partner_blacklist bl ON LOWER(TRIM(rp.firstname)) || ' ' || LOWER(TRIM(rp.lastname)) = 
+                                            LOWER(TRIM(bl.first_name)) || ' ' || LOWER(TRIM(bl.surname))
+            WHERE rp.firstname IS NOT NULL AND rp.lastname IS NOT NULL
+        """)
+        blacklist_ids = [r[0] for r in self.env.cr.fetchall()]
+
+        # Process blacklist matches in batches
+        total_blacklist = len(blacklist_ids)
+        processed = 0
+        _logger.info(
+            f"Found {total_blacklist} partners matching blacklist records")
+
+        for i in range(0, total_blacklist, batch_size):
+            batch = blacklist_ids[i:i+batch_size]
+            partners = self.env['res.partner'].browse(batch)
+            partners.write({'is_blacklist': True})
+            self.env.cr.commit()  # Commit each batch
+            processed += len(batch)
+            _logger.info(
+                f"Updated is_blacklist for {processed}/{total_blacklist} partners")
+
+        # Update is_watchlist from res_partner_watchlist
+        self.env.cr.execute("""
+            SELECT rp.id 
+            FROM res_partner rp
+            JOIN res_partner_watchlist wl ON LOWER(TRIM(rp.firstname)) || ' ' || LOWER(TRIM(rp.lastname)) = 
+                                            LOWER(TRIM(wl.first_name)) || ' ' || LOWER(TRIM(wl.surname))
+            WHERE rp.firstname IS NOT NULL AND rp.lastname IS NOT NULL
+        """)
+        watchlist_ids = [r[0] for r in self.env.cr.fetchall()]
+
+        # Process watchlist matches in batches
+        total_watchlist = len(watchlist_ids)
+        processed = 0
+        _logger.info(
+            f"Found {total_watchlist} partners matching watchlist records")
+
+        for i in range(0, total_watchlist, batch_size):
+            batch = watchlist_ids[i:i+batch_size]
+            partners = self.env['res.partner'].browse(batch)
+            partners.write({'is_watchlist': True})
+            self.env.cr.commit()  # Commit each batch
+            processed += len(batch)
+            _logger.info(
+                f"Updated is_watchlist for {processed}/{total_watchlist} partners")
+
+        _logger.info(
+            "Sanction status update completed for global_pep, blacklist, and watchlist.")
+        return {
+            'global_pep_updated': len(global_pep_ids),
+            'blacklist_updated': len(blacklist_ids),
+            'watchlist_updated': len(watchlist_ids)
+        }
+    
+    
     def init(self):
         # Drop the trigger if it exists
         self.env.cr.execute(
@@ -409,20 +552,20 @@ class Customer(models.Model):
             new_ctx = dict(self.env.context, computing_risk=True)
             self = self.with_context(new_ctx)
 
-            # Update risk score and level for all records
-            for record in self:
-                score = record._get_risk_score_from_plan()
-                risk_level = record.compute_risk_level()
+            # # Update risk score and level for all records
+            # for record in self:
+            #     score = record._get_risk_score_from_plan()
+            #     risk_level = record.compute_risk_level()
 
-                # Use direct SQL update to avoid triggering write() again
-                self.env.cr.execute(
-                    """UPDATE %s SET risk_score = %%s, risk_level = %%s 
-                    WHERE id = %%s""" % self._table,
-                    (score, risk_level, record.id)
-                )
+            #     # Use direct SQL update to avoid triggering write() again
+            #     self.env.cr.execute(
+            #         """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+            #         WHERE id = %%s""" % self._table,
+            #         (score, risk_level, record.id)
+            #     )
 
-                # Invalidate cache for these fields
-                record.invalidate_recordset(['risk_score', 'risk_level'])
+            #     # Invalidate cache for these fields
+            #     record.invalidate_recordset(['risk_score', 'risk_level'])
                 # record.invalidate_cache(['risk_score', 'risk_level'])
             
            
@@ -482,6 +625,19 @@ class Customer(models.Model):
                     return 'high'
             except:
                 return 'low'
+    
+    def compute_customer_rating(self,score):
+        try:
+            if score is None:
+                return 'low'
+            if score <= LOW_RISK_THRESHOLD:
+                return 'low'
+            if score <= MEDIUM_RISK_THRESHOLD:
+                return 'medium'
+            if score <= HIGH_RISK_THRESHOLD:
+                return 'high'
+        except:
+            return 'low'
 
     @api.model
     def _get_risk_level_from_score(self, risk_score):
@@ -766,42 +922,105 @@ class Customer(models.Model):
 
     # logic to commpute total risk sore of all users
 
+    # @api.model
+    # def compute_risk_score_for_all_users(self):
+    #     records = self.search([])
+    #     for record in records:
+    #         score = record._get_risk_score_from_plan()
+    #         risk_level = record.compute_risk_level()
+
+    #         # Use direct SQL update to avoid triggering write()
+    #         self.env.cr.execute(
+    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+    #             WHERE id = %%s""" % self._table,
+    #             (score, risk_level, record.id)
+    #         )
+
+    #         # Invalidate cache for these fields
+    #         # record.invalidate_cache(['risk_score', 'risk_level'])
+    #         record.invalidate_recordset(['risk_score', 'risk_level'])
+
+    #     return True
+
     @api.model
     def compute_risk_score_for_all_users(self):
-        records = self.search([])
-        for record in records:
-            score = record._get_risk_score_from_plan()
-            risk_level = record.compute_risk_level()
+        _logger.info(
+            "Starting risk score computation for all users with ORM tracking")
 
-            # Use direct SQL update to avoid triggering write()
-            self.env.cr.execute(
-                """UPDATE %s SET risk_score = %%s, risk_level = %%s 
-                WHERE id = %%s""" % self._table,
-                (score, risk_level, record.id)
-            )
+        # Configuration
+        batch_size = 500  # Smaller batch size since ORM operations are heavier
+        total_processed = 0
+        total_records = self.search_count([])
 
-            # Invalidate cache for these fields
-            # record.invalidate_cache(['risk_score', 'risk_level'])
-            record.invalidate_recordset(['risk_score', 'risk_level'])
+        # Process in batches to reduce memory usage
+        offset = 0
+        while offset < total_records:
+            # Get batch of records
+            batch = self.search([], limit=batch_size, offset=offset)
 
+            # Group records by risk score and level for bulk processing
+            groups = {}
+            for record in batch:
+                score = record._get_risk_score_from_plan()
+                risk_level = self.compute_customer_rating(score)
+                key = (score, risk_level)
+                if key not in groups:
+                    groups[key] = self.env[self._name]
+                groups[key] |= record
+
+            # Use ORM write for each group of records with same values
+            for (score, risk_level), records in groups.items():
+                records.write({
+                    'risk_score': score,
+                    'risk_level': risk_level
+                })
+
+            # Commit transaction to free memory
+            self.env.cr.commit()
+
+            # Update progress
+            total_processed += len(batch)
+            _logger.info(
+                f"Processed risk scores: {total_processed}/{total_records}")
+
+            # Move to next batch
+            offset += batch_size
+
+        _logger.info(
+            f"Completed risk score computation for {total_processed} users")
         return True
+    
+    
+    # def action_compute_risk_score_with_plan(self):
+    #     """Manual action to compute risk score"""
+    #     for record in self:
+    #         score = record._get_risk_score_from_plan()
+    #         risk_level = record.compute_risk_level()
 
+    #         # Use direct SQL update to avoid triggering write()
+    #         self.env.cr.execute(
+    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+    #             WHERE id = %%s""" % self._table,
+    #             (score, risk_level, record.id)
+    #         )
+
+    #         # Invalidate cache for these fields
+    #         record.invalidate_recordset(['risk_score', 'risk_level'])
+
+    #     return True
     def action_compute_risk_score_with_plan(self):
-        """Manual action to compute risk score"""
+        """Manual action to compute risk score using ORM for proper tracking"""
         for record in self:
+            # Calculate the risk score and level
             score = record._get_risk_score_from_plan()
-            risk_level = record.compute_risk_level()
-
-            # Use direct SQL update to avoid triggering write()
-            self.env.cr.execute(
-                """UPDATE %s SET risk_score = %%s, risk_level = %%s 
-                WHERE id = %%s""" % self._table,
-                (score, risk_level, record.id)
-            )
-
-            # Invalidate cache for these fields
-            record.invalidate_recordset(['risk_score', 'risk_level'])
-
+            risk_level = self.compute_customer_rating(score)
+            
+            # Use ORM write method to update and track changes
+            record.sudo().write({
+                'risk_score': score,
+                'risk_level': risk_level
+            })
+        
         return True
 
     def _get_risk_score_from_plan(self):
