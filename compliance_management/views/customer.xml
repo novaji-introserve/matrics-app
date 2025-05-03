@@ -168,6 +168,10 @@
 
             </xpath>
 
+            <xpath expr="//div[@class='o_address_format']"  position="before">
+                <field name="first_risk_rating" invisible="0" readonly="1"/>
+            </xpath>
+
 
             <xpath expr="//field[@name='education_level_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
