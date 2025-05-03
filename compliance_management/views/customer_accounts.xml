@@ -9,12 +9,16 @@
                 <field name="name" string="Account Number" />
                 <field name="account_name" optional="show"/>
                 <field name="branch_id" optional="show"/>
-                <field name="currency_id" optional="show"/>
-                <field name="account_type_id" optional="show"/>
-                <field name="product_id" optional="show"/>
+                <!-- <field name="currency_id" optional="show"/> -->
+                <!-- <field name="account_type_id" optional="show"/> -->
+                <!-- <field name="product_id" optional="show"/> -->
+                <field name="currency" readonly="1" />
+                <field name="account_type" readonly="1" />
+                <field name="account_position" readonly="1" />
+
                 <field name="risk_score" optional="show"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" optional="show"/>
-                <field name="state" widget="badge" decoration-danger="state == 'locked'" decoration-warning="state in ('dormant')" decoration-success="state in ('active')" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'Active'" decoration-warning="state in ('Dormant', 'Flagged')" decoration-danger="state in ('Inactive', 'Closed')" optional="show"/>
                 <field name="date_created" optional="show"/>
             </tree>
         </field>
@@ -26,7 +30,7 @@
         <field name="arch" type="xml">
             <form readonly="1">
                 <header>
-                    <field name="state" widget="statusbar" statusbar_visible="active,dormant,locked" clickable="True" />
+                    <field name="state" widget="statusbar" statusbar_visible="Active,Inactive,Dormant,Flagged,Closed" clickable="True" />
                 </header>
                 <sheet string="Account">
                     <div class="oe_button_box" name="button_box">
