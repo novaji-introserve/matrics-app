@@ -425,11 +425,20 @@ export class ChartRenderer extends Component {
            const replacedString = modelName.replaceAll(".", "_");
            const firstChar = replacedString.charAt(0).toUpperCase();
            const restOfString = replacedString.slice(1);
-           
+          
+          const selectedLabel = this.props.data.labels[clickedIndex];
+          
+          const chartTitle = this.props.data.title ? 
+            this.props.data.title.charAt(0).toUpperCase() + this.props.data.title.slice(1).toLowerCase() : 
+            "Chart results";
+            
+          const displayTitle = `${chartTitle} - ${selectedLabel}`;
            
           let action = {
             type: "ir.actions.act_window",
-            name: firstChar + restOfString, // Use constant for action name
+            // name: this.props.data.title,
+            name: displayTitle,
+            // name: firstChar + restOfString, // Use constant for action name
             res_model: modelName, // Use constant for .model name
             domain: domain,
             views: [
