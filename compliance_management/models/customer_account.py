@@ -16,7 +16,7 @@ class CustomerAccount(models.Model):
     customer_id = fields.Many2one(comodel_name='res.partner', string='Customer',index=True) #customer
     name = fields.Char(string="Account Number")
     account_name = fields.Char(string='Account Name', index=True) #account_title1
-    account_position = fields.Char(string='Account Position', required=False)
+    account_position = fields.Char(string='Account Position', required=False)    
     account_type = fields.Char(string='Account Type', required=False)
     account_code = fields.Char(string='Account Code', required=False)
     account_status = fields.Char(string='Account Status', required=False)
