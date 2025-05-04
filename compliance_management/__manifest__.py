@@ -109,7 +109,7 @@
             
             'compliance_management/static/src/js/pep_auto_refresh.js',
             'compliance_management/static/src/xml/pep_auto_refresh.xml',
-            'compliance_management/static/src/js/custom_title_service.js',
+
 
             'compliance_management/static/src/img/logov.png',
             'compliance_management/static/img/alt_bank_logo.png',
