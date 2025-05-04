@@ -15,7 +15,7 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/12.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
-    'category': 'Uncategorized',
+    'category': 'icomply',
     'version': '0.1',
 
     # any module necessary for this one to work correctly
@@ -37,4 +37,8 @@
             'muk_web_theme_default_sidebar_invisible/static/src/scss/chatter_position.scss',
         ],
     },
+    'license': 'LGPL-3',
+    'application': False,
+    'installable': True,
+    'auto_install': False,
 }
