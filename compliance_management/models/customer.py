@@ -97,13 +97,17 @@ class Customer(models.Model):
     risk_score = fields.Float(
         string='Risk Score', digits=(10, 2), tracking=True)
     risk_level = fields.Char(
-        string='Risk Level', index=True, default='low', tracking=True, readonly=True)
+        string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(
         comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts', readonly=True)
+    
+    res_partner_account_ids = fields.One2many(
+        'res.partner.account', 'customer_id', string='Accounts', readonly=True)
+    
     edd_ids = fields.One2many(
         comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
@@ -136,7 +140,7 @@ class Customer(models.Model):
     anti_money_laundering_file_name = fields.Char(
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
-        string='Accounts', compute='_total_accounts', store=True)
+        string='Accounts', compute='customer_total_accounts', store=True)
     global_pep_id = fields.Many2one(
         'res.pep', string='Related Global PEP', tracking=True)
 
@@ -247,6 +251,7 @@ class Customer(models.Model):
 
         try:
             # Set the nextcall far in the future to prevent new runs starting
+            
             cron_record.write({
                 'nextcall': fields.Datetime.now() + timedelta(hours=24)
             })
@@ -591,10 +596,15 @@ class Customer(models.Model):
         # Call the original method from adverse.media
         return adverse_media.scan_news_articles()
 
-    @api.depends('account_ids')
-    def _total_accounts(self):
+    # @api.depends('account_ids')
+    # def _total_accounts(self):
+    #     for e in self:
+    #         e.total_accounts = len(e.account_ids)
+            
+    @api.depends('res_partner_account_ids')
+    def customer_total_accounts(self):
         for e in self:
-            e.total_accounts = len(e.account_ids)
+            e.total_accounts = len(e.res_partner_account_ids)
 
     def action_total_accounts(self):
         return {
