@@ -119,7 +119,8 @@
 
 
             <xpath expr="//field[@name='mobile']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
+
             </xpath>
 
             <xpath expr="//field[@name='image_1920']" position="attributes">
@@ -214,7 +215,8 @@
             <!--  -->
 
             <xpath expr="//field[@name='vat']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <!-- <attribute name="readonly">1</attribute> -->
+                <attribute name="invisible">1</attribute>
             </xpath>
 
 
@@ -230,7 +232,11 @@
                 <attribute name="readonly">1</attribute>
             </xpath>
 
-            <xpath expr="//field[@name='industry_id']" position="replace">
+            <xpath expr="//field[@name='industry_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <xpath expr="//field[@name='vat']" position="replace">
                 <field name="customer_industry_id" readonly="1"/>
             </xpath>
 
