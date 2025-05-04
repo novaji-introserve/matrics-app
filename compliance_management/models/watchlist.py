@@ -4,8 +4,11 @@ from odoo import _, api, fields, models
 class Watchlist(models.Model):
     _name = 'res.partner.watchlist'
     _description = 'Watchlist'
+    _sql_constraints = [
 
-
+        ('watchlist_id', 'unique(watchlist_id)',
+         "Watch List ID already exists. Value must be unique!")
+    ]
 
     name = fields.Char(string="Name")
     watchlist_id = fields.Char(string="Watchlist ID")
