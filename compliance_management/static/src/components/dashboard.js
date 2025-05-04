@@ -150,18 +150,24 @@ export class ComplianceDashboard extends Component {
     }
   };
 
-  async displayOdooView(category, query, branch_filter, branch_field) {
+  async displayOdooView(category, query, branch_filter, branch_field, title) {
     
     const response = await this.rpc("/dashboard/dynamic_sql", { sql_query: query, branches_id: this.state.branches_id, cco: this.state.cco });          
         
     if(!response) return;
+
+    // Create a properly formatted title in sentence case
+    const displayTitle = title || (category ? 
+      category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
+      "Card Results");
 
     console.log(response.domain);
     
     this.navigate.doAction({
       type: "ir.actions.act_window",
       res_model: response.table.replace(/_/g, "."),
-      name: `${category[0].toUpperCase()}${category.slice(1,)}`,
+      name: displayTitle,
+      // name: `${category[0].toUpperCase()}${category.slice(1,)}`,
       domain: response.domain,
       views: [
         [false, "tree"],

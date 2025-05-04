@@ -391,8 +391,6 @@ export class ChartRenderer extends Component {
         onClick: (event, elements) => {
           if (!elements || elements.length === 0) return;
 
-  
-
           let dateField = ""
           const clickedIndex = elements[0].index;
           const modelName = this.props.data.model_name
@@ -419,9 +417,6 @@ export class ChartRenderer extends Component {
              domain.push([dateField, "<=", odooCurrentDate]);
            }
 
-
-
-      
            const replacedString = modelName.replaceAll(".", "_");
            const firstChar = replacedString.charAt(0).toUpperCase();
            const restOfString = replacedString.slice(1);
