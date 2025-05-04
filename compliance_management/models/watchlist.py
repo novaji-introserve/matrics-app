@@ -8,6 +8,8 @@ class Watchlist(models.Model):
 
 
     name = fields.Char(string="Name")
+    watchlist_id = fields.Char(string="Watchlist ID")
+    nationality = fields.Char(string="Nationality")
     surname = fields.Char(string="Surname",tracking=True,required=True,index=True)
     first_name = fields.Char(string="First Name",tracking=True,required=True,index=True)
     middle_name = fields.Char(string="Middle Name")

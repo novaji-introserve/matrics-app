@@ -135,13 +135,23 @@
                                 <field name="name" />
                             </h1>
                         </div>
-                        <group>
-                            <group string="Details">
-                                <field name="code" />
+                        <group string="Details">
+
+                            <group >
+                                <field name="product_type" />
+                                <field name="product_category" />
                             </group>
-                            <group string="Risk Assessment">
-                                <field name="risk_assessment" />
+
+                            <group>
+                                <field name="code" string="Product Code"/>
+                                <field name="description" />
                             </group>
+
+                        </group>
+
+
+                        <group string="Risk Assessment">
+                            <field name="risk_assessment" />
                         </group>
                     </sheet>
                 </form>
