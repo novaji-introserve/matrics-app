@@ -431,32 +431,34 @@ class Compliance(http.Controller):
             }
 
 
-           
-
     @http.route('/dashboard/statsbycategory', auth='public', type='json')
     def getAllstatsByCategory(self, cco, branches_id, category, datepicked, **kw):
-
-    
         today = datetime.now().date()  # Get today's date
         prevDate = today - timedelta(days=datepicked)  # Get previous date
 
         # Convert to datetime for start and end of the day
         start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
-
         end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
 
+        # Convert branches_id to array before any conditional logic
+        branches_array = list(map(int, branches_id)) if branches_id else []
+        
         if cco == True:
-            results = request.env["res.compliance.stat"].search([('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today)])
+            # For CCO users, filter stats by category
+            results = request.env["res.compliance.stat"].search([
+                ('create_date', '>=', start_of_prev_day), 
+                ('create_date', '<', end_of_today),
+                ('scope', '=', category)  # Add category filter here for CCO
+            ])
 
             computed_results = []
 
             for result in results:
-
                 original_query = result['sql_query']
-                query = original_query.lower()  # Use lowercase for checks but keep original for execution
+                query = original_query.lower()
                 needs_modification = False
                 
-                  # Check if we need to modify this query
+                # Check if we need to modify this query
                 if any(table in query for table in ["res_partner", "res.partner", "tier", "transaction"]):
                     needs_modification = True
                     
@@ -465,18 +467,10 @@ class Compliance(http.Controller):
                         query = query[:-1]
                         original_query = original_query[:-1]
                     
-                    
                     has_where = bool(re.search(r'\bwhere\b', query))
                     
                     # Prepare conditions to add
                     conditions = []
-                    
-                    # Add branch filter if branches are specified
-                    if branches_array:
-                        conditions.append(f"branch_id = ANY(%s::integer[])")
-                    else:
-                        # If no branches, add a condition that returns no results
-                        conditions.append("1=0")
                     
                     # Add origin filter for partner tables
                     if "res_partner" in query or "res.partner" in query:
@@ -504,28 +498,31 @@ class Compliance(http.Controller):
                         else:
                             original_query += condition_str
                 
-                        # Execute the query with or without parameters
-                        request.env.cr.execute(original_query, (branches_array,))
-                        
+                    # Execute the modified query
+                    request.env.cr.execute(original_query)
+                else:
+                    # For queries that don't need modification, just execute them directly
+                    request.env.cr.execute(original_query)
                 
-                        # For count queries, we expect a single row with a single value
-                        result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
-                        
-                        # Add the results to our collection
-                        computed_results.append({
-                            "name": stat["name"],
-                            "scope": stat["scope"],
-                            "val": result_value,
-                            "id": stat["id"],
-                            "scope_color": stat["scope_color"],
-                            "query": stat["sql_query"]
-                        })
+                # Get the result value
+                result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                
+                # Always add results to the collection regardless of whether the query was modified
+                computed_results.append({
+                    "name": result["name"],
+                    "scope": result["scope"],
+                    "val": result_value,
+                    "id": result["id"],
+                    "scope_color": result["scope_color"],
+                    "query": result["sql_query"]
+                })
+                    
             return {
                 "data": computed_results,
                 "total": len(results)
             }
         else:
-             # First get all compliance stats in the date range
+            # First get all compliance stats in the date range
             query = """
                 SELECT rcs.*
                 FROM res_compliance_stat rcs
@@ -538,9 +535,6 @@ class Compliance(http.Controller):
             # Get column names and results
             columns = [desc[0] for desc in request.env.cr.description]
             stat_records = [dict(zip(columns, row)) for row in request.env.cr.fetchall()]
-
-            # Convert branches_id to a proper PostgreSQL array parameter
-            branches_array = list(map(int, branches_id))  # Make sure all elements are integers
 
             computed_results = []
             for stat in stat_records:
@@ -557,7 +551,6 @@ class Compliance(http.Controller):
                         query = query[:-1]
                         original_query = original_query[:-1]
                     
-                    
                     has_where = bool(re.search(r'\bwhere\b', query))
                     
                     # Prepare conditions to add
@@ -610,9 +603,193 @@ class Compliance(http.Controller):
                         })
 
             return {
-                    "data": computed_results,
-                    "total": len(computed_results)
+                "data": computed_results,
+                "total": len(computed_results)
             }
+            
+            
+            
+        
+    # @http.route('/dashboard/statsbycategory', auth='public', type='json')
+    # def getAllstatsByCategory(self, cco, branches_id, category, datepicked, **kw):
+
+    
+    #     today = datetime.now().date()  # Get today's date
+    #     prevDate = today - timedelta(days=datepicked)  # Get previous date
+
+    #     # Convert to datetime for start and end of the day
+    #     start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
+
+    #     end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
+
+    #     if cco == True:
+    #         results = request.env["res.compliance.stat"].search([('create_date', '>=', start_of_prev_day), ('create_date', '<', end_of_today)])
+
+    #         computed_results = []
+
+    #         for result in results:
+
+    #             original_query = result['sql_query']
+    #             query = original_query.lower()  # Use lowercase for checks but keep original for execution
+    #             needs_modification = False
+                
+    #               # Check if we need to modify this query
+    #             if any(table in query for table in ["res_partner", "res.partner", "tier", "transaction"]):
+    #                 needs_modification = True
+                    
+    #                 # Remove trailing semicolon if present
+    #                 if query.endswith(";"):
+    #                     query = query[:-1]
+    #                     original_query = original_query[:-1]
+                    
+                    
+    #                 has_where = bool(re.search(r'\bwhere\b', query))
+                    
+    #                 # Prepare conditions to add
+    #                 conditions = []
+                    
+    #                 # Add branch filter if branches are specified
+    #                 if branches_array:
+    #                     conditions.append(f"branch_id = ANY(%s::integer[])")
+    #                 else:
+    #                     # If no branches, add a condition that returns no results
+    #                     conditions.append("1=0")
+                    
+    #                 # Add origin filter for partner tables
+    #                 if "res_partner" in query or "res.partner" in query:
+    #                     conditions.append("origin IN ('demo','test','prod')")
+                    
+    #                 # Build the final condition string
+    #                 if conditions:
+    #                     if has_where:
+    #                         condition_str = " AND " + " AND ".join(conditions)
+    #                     else:
+    #                         condition_str = " WHERE " + " AND ".join(conditions)
+                    
+    #                     # Find the position to insert the condition (before any clause)
+    #                     clauses = ['group by', 'order by', 'limit', 'offset', 'having']
+    #                     clause_pos = -1
+    #                     for clause in clauses:
+    #                         pos = query.find(' ' + clause + ' ')
+    #                         if pos > -1:
+    #                             if clause_pos == -1 or pos < clause_pos:
+    #                                 clause_pos = pos
+                        
+    #                     # Insert the condition at the appropriate position
+    #                     if clause_pos > -1:
+    #                         original_query = original_query[:clause_pos] + condition_str + original_query[clause_pos:]
+    #                     else:
+    #                         original_query += condition_str
+                
+    #                     # Execute the query with or without parameters
+    #                     request.env.cr.execute(original_query, (branches_array,))
+                        
+                
+    #                     # For count queries, we expect a single row with a single value
+    #                     result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                        
+    #                     # Add the results to our collection
+    #                     computed_results.append({
+    #                         "name": stat["name"],
+    #                         "scope": stat["scope"],
+    #                         "val": result_value,
+    #                         "id": stat["id"],
+    #                         "scope_color": stat["scope_color"],
+    #                         "query": stat["sql_query"]
+    #                     })
+    #         return {
+    #             "data": computed_results,
+    #             "total": len(results)
+    #         }
+    #     else:
+    #          # First get all compliance stats in the date range
+    #         query = """
+    #             SELECT rcs.*
+    #             FROM res_compliance_stat rcs
+    #             WHERE rcs.create_date >= %s
+    #             AND rcs.create_date < %s AND rcs.scope = %s;
+    #         """
+
+    #         request.env.cr.execute(query, (start_of_prev_day, end_of_today, category))
+
+    #         # Get column names and results
+    #         columns = [desc[0] for desc in request.env.cr.description]
+    #         stat_records = [dict(zip(columns, row)) for row in request.env.cr.fetchall()]
+
+    #         # Convert branches_id to a proper PostgreSQL array parameter
+    #         branches_array = list(map(int, branches_id))  # Make sure all elements are integers
+
+    #         computed_results = []
+    #         for stat in stat_records:
+    #             original_query = stat['sql_query']
+    #             query = original_query.lower()  # Use lowercase for checks but keep original for execution
+    #             needs_modification = False
+                
+    #             # Check if we need to modify this query
+    #             if any(table in query for table in ["res_partner", "res.partner", "transaction"]):
+    #                 needs_modification = True
+                    
+    #                 # Remove trailing semicolon if present
+    #                 if query.endswith(";"):
+    #                     query = query[:-1]
+    #                     original_query = original_query[:-1]
+                    
+                    
+    #                 has_where = bool(re.search(r'\bwhere\b', query))
+                    
+    #                 # Prepare conditions to add
+    #                 conditions = []
+                    
+    #                 # Add branch filter if branches are specified
+    #                 if branches_array:
+    #                     conditions.append(f"branch_id = ANY(%s::integer[])")
+    #                 else:
+    #                     # If no branches, add a condition that returns no results
+    #                     conditions.append("1=0")
+                    
+    #                 # Add origin filter for partner tables
+    #                 if "res_partner" in query or "res.partner" in query:
+    #                     conditions.append("origin IN ('demo','test','prod')")
+                    
+    #                 # Build the final condition string
+    #                 if conditions:
+    #                     if has_where:
+    #                         condition_str = " AND " + " AND ".join(conditions)
+    #                     else:
+    #                         condition_str = " WHERE " + " AND ".join(conditions)
+                    
+    #                     # Find the position to insert the condition (before any clause)
+    #                     clauses = ['group by', 'order by', 'limit', 'offset', 'having']
+    #                     clause_pos = -1
+    #                     for clause in clauses:
+    #                         pos = query.find(' ' + clause + ' ')
+    #                         if pos > -1:
+    #                             if clause_pos == -1 or pos < clause_pos:
+    #                                 clause_pos = pos
+                        
+    #                     # Insert the condition at the appropriate position
+    #                     if clause_pos > -1:
+    #                         original_query = original_query[:clause_pos] + condition_str + original_query[clause_pos:]
+    #                     else:
+    #                         original_query += condition_str
+                        
+    #                     request.env.cr.execute(original_query, (branches_array,))
+    #                     result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
+                
+    #                     # Add the results to our collection
+    #                     computed_results.append({
+    #                         "name": stat["name"],
+    #                         "scope": stat["scope"],
+    #                         "val": result_value,
+    #                         "id": stat["id"],
+    #                         "scope_color": stat["scope_color"],
+    #                         "query": stat["sql_query"]
+    #                     })
+
+    #         return {
+    #                 "data": computed_results,
+    #                 "total": len(computed_results)
+    #         }
 
 
     

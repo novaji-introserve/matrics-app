@@ -41,7 +41,8 @@
                                     
                                     <t t-if="state.stats and state.stats.length > 0">
                                         <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
-                                            <Card t-on-click="() => displayOdooView(stat.scope, stat.query)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
+                                            <!-- <Card t-on-click="() => displayOdooView(stat.scope, stat.query)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" /> -->
+                                            <Card t-on-click="() => displayOdooView(stat.scope, stat.query, null, null, stat.name)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
                                         </t>
                                     </t>
                                     <t t-else="">
