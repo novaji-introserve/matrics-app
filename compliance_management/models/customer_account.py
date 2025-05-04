@@ -8,9 +8,8 @@ class CustomerAccount(models.Model):
     _description = 'Account'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _sql_constraints = [
-        ('uniq_account_id', 'unique(customer_id)',
-         "Customer ID already exists. Value must be unique!"),
-        ('customer_unique', 'unique(customer)', 'Customer must be unique!')
+        ('uniq_account_id', 'unique(name)',
+         "Account Number already exists. Value must be unique!"),
     ]
    
     _order = "name" 

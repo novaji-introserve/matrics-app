@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
         <!-- Action for PEP -->
@@ -294,7 +295,7 @@
         <menuitem
             id="menu_sanction_screening_root"
             name="Sanction screening"
-            groups="group_compliance_compliance_officer"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
             parent="menu_compliance_root"
             sequence="150" />
 
@@ -303,7 +304,7 @@
             action="action_res_pep"
             parent="menu_sanction_screening_root"
             name="PEP List"
-            groups="group_compliance_compliance_officer"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
             sequence="10" />
 
         <!-- <menuitem
@@ -319,7 +320,7 @@
             action="action_res_partner_watchlist"
             parent="menu_sanction_screening_root"
             name="Watchlist"
-            groups="group_compliance_compliance_officer"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
             sequence="30" />
 
         <menuitem
@@ -327,7 +328,7 @@
             action="action_res_partner_blacklist"
             parent="menu_sanction_screening_root"
             name="Blacklist"
-            groups="group_compliance_compliance_officer"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
             sequence="40" />
 
         <menuitem
@@ -335,7 +336,7 @@
             action="action_res_global_pep"
             parent="menu_sanction_screening_root"
             name="Global PEP List"
-            groups="group_compliance_compliance_officer"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
             sequence="50" />
         
         <menuitem
@@ -343,7 +344,7 @@
             action="action_res_partner_greylist"
             parent="menu_sanction_screening_root"
             name="Greylist"
-            groups="group_compliance_compliance_officer"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
             sequence="60" />
 
         <menuitem 
@@ -351,7 +352,7 @@
             name="List Upload"
             parent="menu_sanction_screening_root"
             action="compliance_management.action_csv_import"
-            groups="group_compliance_compliance_officer"
+            groups="compliance_management.group_compliance_chief_compliance_officer"
             sequence="70" />
 
     </data>
