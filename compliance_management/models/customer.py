@@ -166,6 +166,22 @@ class Customer(models.Model):
         'test', 'Test Data'), ('prod', 'Production Data')], index=True)
 
     first_risk_rating = fields.Char(string='Bank Risk Rating', index=True)
+    pep = fields.Char(string='Bank Pep Customer', index=True)
+    # phone = fields.Char(string='Phone Number(s)', index=True)
+    
+    # phone = fields.Char(string='Phone Number(s)', index=True)
+    formatted_phone = fields.Char(
+        string='Phone Number(s)', compute='_compute_formatted_phone')
+
+    @api.depends('phone')
+    def _compute_formatted_phone(self):
+        for record in self:
+            if record.phone and '^' in record.phone:
+                record.formatted_phone = record.phone.replace(
+                    '^', ', ')
+            else:
+                record.formatted_phone = record.phone
+    
     
     # is_branch_compliance = fields.Boolean(
     #     string="Is Branch Compliance Officer",

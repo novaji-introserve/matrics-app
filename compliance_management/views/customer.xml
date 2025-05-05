@@ -119,8 +119,7 @@
 
 
             <xpath expr="//field[@name='mobile']" position="attributes">
-                <attribute name="readonly">1</attribute>
-
+                <attribute name="invisible">1</attribute>
             </xpath>
 
             <xpath expr="//field[@name='image_1920']" position="attributes">
@@ -224,8 +223,45 @@
                 <attribute name="readonly">1</attribute>
             </xpath>
 
-            <xpath expr="//field[@name='phone']" position="attributes">
-                <attribute name="readonly">1</attribute>
+
+            <!-- <xpath expr="//label[@for='phone']" position="attributes">
+                <attribute name="for">formatted_phone</attribute>
+            </xpath>
+
+            <xpath expr="//div[contains(@class, 'o_row_readonly')][.//field[@name='phone']]" position="replace">
+                <div class="o_row o_row_readonly">
+                    <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': formatted_phone}" attrs="{'invisible': [('phone_blacklisted', '=', False)]}"/>
+                    <field name="formatted_phone" widget="phone"/>
+                </div>
+            </xpath> -->
+
+            <!-- Replace the entire phone field structure more precisely -->
+            <xpath expr="//label[@for='phone']" position="attributes">
+                <attribute name="for">formatted_phone</attribute>
+            </xpath>
+
+            <xpath expr="//div[contains(@class, 'o_row_readonly')][.//field[@name='phone']]" position="replace">
+                <div class="o_row o_row_readonly">
+                    <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': formatted_phone}" attrs="{'invisible': [('phone_blacklisted', '=', False)]}"/>
+                    <field name="formatted_phone"  readonly="1"/>
+                </div>
+            </xpath>
+
+            <!-- Make sure to also hide the now-redundant fields that are creating the spacing -->
+            <xpath expr="//field[@name='phone_blacklisted']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='mobile_blacklisted']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//label[@for='mobile']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//div[contains(@class, 'o_row_readonly')][.//field[@name='mobile']]" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
 
             <xpath expr="//field[@name='email']" position="attributes">
