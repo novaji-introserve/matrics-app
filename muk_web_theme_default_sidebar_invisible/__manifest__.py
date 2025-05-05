@@ -33,8 +33,8 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'muk_web_theme_default_sidebar_invisible/static/src/js/chatter_position.js',
-            'muk_web_theme_default_sidebar_invisible/static/src/scss/chatter_position.scss',
+            # 'muk_web_theme_default_sidebar_invisible/static/src/js/chatter_position.js',
+            # 'muk_web_theme_default_sidebar_invisible/static/src/scss/chatter_position.scss',
         ],
     },
     'license': 'LGPL-3',
