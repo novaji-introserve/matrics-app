@@ -28,6 +28,7 @@
         "security/ir.model.access.csv",
 
         # "data/preloaded_data/rule_book_branch.xml",
+        "views/alert_dashboard.xml",
         "views/menu.xml",
         "views/rules/rule_theme.xml",
         "views/rules/rulebook_sources_views.xml",
@@ -62,7 +63,6 @@
         # "security/group_action.xml",
         "views/pdf_chat.xml",
         "views/alert_report_rulebook.xml",
-        "views/alert_dashboard.xml",
       
         'views/user_setting.xml',
         'views/keyword_tracking.xml',
