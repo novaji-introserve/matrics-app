@@ -6,8 +6,5 @@
             <field name="tag">alert_dashboard</field>
         </record>
 
-        <menuitem id="menu_rulebook_alert" name="Alert" parent="menu_rulebook_theme_root" sequence="3" groups="rule_book.group_compliance_manager_"/>
-
-
     </data>
 </odoo>

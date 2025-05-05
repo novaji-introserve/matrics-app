@@ -105,6 +105,7 @@
     <menuitem id="menu_pdf_chat" name="AI Assistance" parent="menu_rulebook_details" action="action_pdf_chat" sequence="3" groups="rule_book.group_compliance_manager_"/>
 
     <!-- Alerts -->
+    <menuitem id="menu_rulebook_alert" name="Alert" parent="menu_rulebook_theme_root" sequence="3" groups="rule_book.group_compliance_manager_"/>
     <menuitem id="menu_owl_alert_dashboard" name="Alert" parent="menu_rulebook_alert" action="action_owl_alert_dashboard" sequence="1" />
 
 
