@@ -132,26 +132,26 @@
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only" />
                             <h1>
-                                <field name="name" />
+                                <field name="name" readonly="1"/>
                             </h1>
                         </div>
                         <group string="Details">
 
                             <group >
-                                <field name="product_type" />
-                                <field name="product_category" />
+                                <field name="product_type" readonly="1" />
+                                <field name="product_category" readonly="1" />
                             </group>
 
                             <group>
-                                <field name="code" string="Product Code"/>
-                                <field name="description" />
+                                <field name="code" string="Product Code" readonly="1" />
+                                <field name="description" readonly="1" />
                             </group>
 
                         </group>
 
 
                         <group string="Risk Assessment">
-                            <field name="risk_assessment" />
+                            <field name="risk_assessment" readonly="1" />
                         </group>
                     </sheet>
                 </form>
@@ -743,13 +743,13 @@
         <menuitem id="menu_accounts" name="Accounts"
             parent="menu_compliance_configuration" sequence="80" />
 
-        <menuitem
+        <!-- <menuitem
             id="menu_compliance_account_type"
             action="action_list_customer_account_type"
             parent="menu_accounts"
             name="Account Types"
             groups="group_compliance_compliance_officer"
-            sequence="1" />
+            sequence="1" /> -->
         <menuitem
             id="menu_compliance_account_product"
             action="action_list_account_product"

@@ -60,9 +60,9 @@
 
                     <!-- <button name="action_remove_fep" type="object" string="Remove from FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '!=',True)]}" /> -->
 
-                    <button name="action_blacklist" class="oe_highlight" type="object" string="Add to Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '=',True)]}" />
+                    <!-- <button name="action_blacklist" class="oe_highlight" type="object" string="Add to Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '=',True)]}" /> -->
 
-                    <button name="action_remove_blacklist" type="object" string="Remove from Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '!=',True)]}" />
+                    <!-- <button name="action_remove_blacklist" type="object" string="Remove from Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '!=',True)]}" /> -->
 
                     <button name="action_watchlist" class="oe_highlight" type="object" string="Add to Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '=',True)]}" />
 
