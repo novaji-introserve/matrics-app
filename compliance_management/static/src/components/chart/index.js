@@ -404,9 +404,12 @@ export class ChartRenderer extends Component {
           }else{
             dateField = this.props.data.datefield
           }
+
+          
           
           let domain = [[filterColumn, "=", filterID], ...this.props.data.domain_filter]
 
+  
           console.log(modelName);
           
           console.log(domain);

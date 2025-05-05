@@ -250,6 +250,11 @@ class Compliance(http.Controller):
         }
         
         return odoo_operators.get(sql_op, sql_op)
+    
+    def format_number(self, result_value):
+        if isinstance(result_value, (int, float)):
+            result_value = "{:,}".format(result_value)
+            return result_value
 
     @http.route('/dashboard/stats', auth='public', type='json')
     def getAllstats(self, cco, branches_id, datepicked, **kw):
@@ -323,13 +328,13 @@ class Compliance(http.Controller):
                         # For count queries, we expect a single row with a single value
                         result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
                 
-                        computed_results.append({"name": result["name"],"scope": result["scope"], "val": result_value, "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
+                        computed_results.append({"name": result["name"],"scope": result["scope"], "val": self.format_number(result_value), "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
                 else:
                     request.env.cr.execute(original_query)
                     
                     # For count queries, we expect a single row with a single value
                     result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
-                    computed_results.append({"name": result["name"],"scope": result["scope"], "val": result_value, "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
+                    computed_results.append({"name": result["name"],"scope": result["scope"], "val": self.format_number(result_value), "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
 
             return {
                 "data": computed_results,
@@ -419,7 +424,7 @@ class Compliance(http.Controller):
                         computed_results.append({
                             "name": stat["name"],
                             "scope": stat["scope"],
-                            "val": result_value,
+                            "val": self.format_number(result_value),
                             "id": stat["id"],
                             "scope_color": stat["scope_color"],
                             "query": stat["sql_query"]
@@ -511,7 +516,7 @@ class Compliance(http.Controller):
                 computed_results.append({
                     "name": result["name"],
                     "scope": result["scope"],
-                    "val": result_value,
+                    "val": self.format_number(result_value),
                     "id": result["id"],
                     "scope_color": result["scope_color"],
                     "query": result["sql_query"]
@@ -596,7 +601,7 @@ class Compliance(http.Controller):
                         computed_results.append({
                             "name": stat["name"],
                             "scope": stat["scope"],
-                            "val": result_value,
+                            "val": self.format_number(result_value),
                             "id": stat["id"],
                             "scope_color": stat["scope_color"],
                             "query": stat["sql_query"]
