@@ -37,7 +37,8 @@
 
                         <div class="col-md-10">
                         
-                            <div  class="d-flex align-items-center position-relative card-container gap-3 py-2">
+                            <!-- <div  class="d-flex align-items-center position-relative card-container gap-3 py-2"> -->
+                            <div class="d-flex align-items-center position-relative card-container gap-3 py-2" t-ref="cardContainer">
                                     
                                     <t t-if="state.stats and state.stats.length > 0">
                                         <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
@@ -78,14 +79,14 @@
                         
                 </div>
 
-                <div class="position-relative">
+                <!-- <div class="position-relative">
                      <t t-if="state.stats and state.stats.length > 3 and !state.scrollRight">
                          <div class="overflow-indicator-right mt-1 fade-blink">&#x2192;</div>
                      </t>
                      <t t-if="state.stats and state.stats.length > 3 and !state.scrollLeft">
                          <div  class="overflow-indicator-left mt-1 fade-blink">&#x2190;</div>
                      </t>
-                </div>
+                </div> -->
 
 
 
