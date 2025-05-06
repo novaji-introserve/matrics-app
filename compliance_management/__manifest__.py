@@ -73,7 +73,7 @@
         # "data/charts.xml",
         # "data/res_partner.xml",
         "data/fcra_score.xml",    
-        # "views/res_users.xml",
+        "views/res_users.xml",
     ],
     # only loaded in demonstration mode
     "demo": [

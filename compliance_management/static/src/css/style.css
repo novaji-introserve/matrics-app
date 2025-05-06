@@ -6,14 +6,6 @@
 }
 
 
-.card-container{
-    overflow: scroll;
-}
-
-.card-container::-webkit-scrollbar{
-    display: none;
-   
-}
 
 .overflow-indicator-left{
     font-size: 3rem;
@@ -34,12 +26,35 @@
   100% { opacity: 1; } /* Fully visible */
 }
 
-.box{
-    min-width: 20rem;
-    min-height: 12rem;
-    border-radius: 0.7rem;
-    /* transition: all 5s ease-in-out; */
+
+.card-container {
+    display: flex; /* Ensure flexbox is enabled on the container */
+    overflow-x: auto;
+    align-items: center; /* Vertically align items if needed */
+    gap: 1rem; /* Use gap for spacing instead of margin on .box */
+    padding: 0.5rem 0; /* Use padding on container, not margin on box */
 }
+  
+.card-container::-webkit-scrollbar {
+    display: none;
+}
+  
+.box {
+    width: 24rem;
+    max-width: 24rem;
+    min-width: 24rem;
+    min-height: 9rem;
+    max-height: 9rem;
+    border-radius: 0.7rem;
+    font-size: 20px;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 0;
+}
+
+  
+
+
 
 /* .box:hover{
     transform: scale(1.1);
