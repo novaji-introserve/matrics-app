@@ -20,7 +20,7 @@
     <function model="ir.config_parameter" name="set_param"
         eval="('gemini_api_key', 'AIzaSyAvRsSTIahJWVT-iwPC1nPrSqUoK_fsBq4')" />
     <function model="ir.config_parameter" name="set_param"
-        eval="('opensanctions_api_key', '7d0ec3228b24f2c0bbb21e80c3ff8388')" />
+        eval="('opensanctions_api_key', '1731b7a13f6c63e6a9bbb550981e6a18')" />
      <function model="ir.config_parameter" name="set_param"
             eval="('risk_management.control_effectiveness_max_score', '25')" />
     <!--  Gender -->
