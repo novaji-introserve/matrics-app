@@ -35,6 +35,19 @@ class Transaction(models.Model):
     state = fields.Selection(string='Status', selection=[(
         'new', 'To Review'), ('done', 'Done')], tracking=True, index=True, default='new')
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
+    
+    account_officer_id = fields.Many2one(
+        comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
+    trans_code = fields.Char(string='Transaction Code')
+    currency = fields.Char(string='Currency')
+    inputter = fields.Char(string='Inputter')
+    authorizer = fields.Char(string='Authorizer')
+    transaction_type = fields.Selection(selection=[(
+        'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
+
+
+
+
 
     def get_risk_level(self):
         return self.risk_level
