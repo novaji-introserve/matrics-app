@@ -5,10 +5,10 @@ from odoo import models, fields, api, _
 class Transaction(models.Model):
     _name = 'res.customer.transaction'
     _description = 'Transaction'
-    # _sql_constraints = [
-    #     ('uniq_account_name', 'unique(name)',
-    #      "Account Name already exists. Value must be unique!"),
-    # ]
+    _sql_constraints = [
+        ('uniq_trans_name', 'unique(name)',
+         "Account Reference already exists. Value must be unique!"),
+    ]
     _order = 'date_created desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     name = fields.Char(string="Reference Number", index=True)
@@ -44,6 +44,8 @@ class Transaction(models.Model):
     authorizer = fields.Char(string='Authorizer')
     transaction_type = fields.Selection(selection=[(
         'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
+    active = fields.Boolean(default=True, readonly=True)
+
 
 
 
@@ -86,36 +88,72 @@ class Transaction(models.Model):
 
     @api.model
     def open_transactions(self):
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = []
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id])]
         return {
             'name': _('Transactions To Review'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'limit': 50,
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]), ('state', '=', 'new')],
+            'domain': domain,
             'context': {'search_default_group_branch': 1, 'default_state': 'new'}
         }
 
     @api.model
     def open_transactions_done(self):
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = []
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id])]
         return {
             'name': _('Transactions Reviewed'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'limit': 50,
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]), ('state', '=', 'done')],
-            'context': {'search_default_group_branch': 1, 'default_state': 'new'}
+            'domain': domain,
+            'context': {'search_default_group_branch': 1, 'default_state': 'done'}
         }
 
     @api.model
     def open_transactions_all(self):
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = []
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id])  ]
+
         return {
-            'name': _('Transactions To Review'),
+            'name': _('All Transactions'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
-            'limit': 50,
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
-            'context': {'search_default_group_branch': 1, 'default_state': 'new'}
+            'domain': domain,
+            'context': {'search_default_group_branch': 1}
         }
