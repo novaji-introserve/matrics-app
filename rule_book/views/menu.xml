@@ -109,6 +109,7 @@
     <menuitem id="menu_owl_alert_dashboard" name="Alert" parent="menu_rulebook_alert" action="action_owl_alert_dashboard" sequence="1" />
 
 
+    
     <!-- Reply Logs -->
     <menuitem id="menu_reply_log" name="Rulebook Logs" parent="menu_rulebook_details" action="open_reply_log" sequence="5" />
 
