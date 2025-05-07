@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-
+import logging
 # CONTROL_EFFECTIVENESS_MAX_SCORE = 25
+
+_logger = logging.getLogger(__name__)
 
 
 class RiskAssessmentLine(models.Model):
@@ -39,44 +41,40 @@ class RiskAssessmentLine(models.Model):
         ('60', '2 month'),
         ('90', '3 month'),
     ],string='Implementation Deadline',default="0", help="Recurring deadline for implementation")
+    
     residual_risk_score = fields.Float(
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
-
-    def _get_score_range(self, score_name):
-        """Get min/max values from res.fcra.score model"""
-        score_record = self.env['res.fcra.score'].search([('name', '=', score_name)], limit=1)
-        return score_record.min_score if score_record else 1, score_record.max_score if score_record else 25
     
-    @api.model
-    def fields_get(self, allfields=None, attributes=None):
-        res = super(RiskAssessmentLine, self).fields_get(allfields, attributes)
+    inherent_max_val = fields.Float(
+    string='Inherent Max', 
+    default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_max or 0.0
+    )
 
-        
-        # Get ranges from res.fcra.score
-        inherent_min, inherent_max = self._get_score_range('Inherent Score')
-        control_min, control_max = self._get_score_range('Control Effectiveness')
-        residual_min, residual_max = self._get_score_range('Residual Risk')
-        
-        # Update field attributes
-        if 'inherent_risk_score' in res:
-            res['inherent_risk_score']['min'] = inherent_min
-            res['inherent_risk_score']['max'] = inherent_max
-            print(inherent_max)
-            print("*********************")
-        
-        if 'control_effectiveness_score' in res:
-            res['control_effectiveness_score']['min'] = control_min
-            res['control_effectiveness_score']['max'] = control_max
-            print(control_max)
-            print("*********************")
-        
-        if 'residual_risk_impact' in res:
-            res['residual_risk_impact']['min'] = residual_min
-            res['residual_risk_impact']['max'] = residual_max
-            print(residual_min)
-            print("*********************")
-        
-        return res
+    inherent_min_val = fields.Float(
+        string='Inherent Min', 
+        default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_min or 0.0
+    )
+
+    control_max_val = fields.Float(
+        string='Control Max', 
+        default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_max or 0.0
+    )
+
+    control_min_val = fields.Float(
+        string='Control Min', 
+        default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_min or 0.0
+    )
+
+    residual_max_val = fields.Float(
+        string='Residual Max', 
+        default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_max or 0.0
+    )
+
+    residual_min_val = fields.Float(
+        string='Residual Min', 
+        default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_min or 0.0
+    )
+
 
 
 

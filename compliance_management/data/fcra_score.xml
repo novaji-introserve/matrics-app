@@ -1,19 +1,14 @@
 <odoo>
     <data noupdate="1">
-     <record id="inherent_score" model="res.fcra.score">
-        <field name="name">Inherent Score</field>
-        <field name="max_score">25</field>
-        <field name="min_score">1</field>
+     <record id="fcra_score" model="res.fcra.score">
+        <field name="name">FCRA Score</field>
+        <field name="inherent_risk_score_max">25</field>
+        <field name="inherent_risk_score_min">1</field>
+        <field name="control_effectiveness_score_max">25</field>
+        <field name="control_effectiveness_score_min">1</field>
+        <field name="residual_risk_score_max">25</field>
+        <field name="residual_risk_score_min">1</field>
     </record>
-     <record id="control_effectiveness_score" model="res.fcra.score">
-        <field name="name">Control Effectiveness</field>
-        <field name="max_score">25</field>
-        <field name="min_score">0</field>
-    </record>
-     <record id="residual_risk_score" model="res.fcra.score">
-        <field name="name">Residual Risk</field>
-        <field name="max_score">25</field>
-        <field name="min_score">0</field>
-    </record>
+    
     </data>
 </odoo>
