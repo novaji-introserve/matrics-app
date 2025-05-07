@@ -100,6 +100,7 @@ class Transaction(models.Model):
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]), ('state', '=', 'new')]
+            
         return {
             'name': _('Transactions To Review'),
             'type': 'ir.actions.act_window',
