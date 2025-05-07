@@ -172,7 +172,7 @@
 
             </xpath>
 
-            <xpath expr="//div[@class='o_address_format']"  position="before">
+            <xpath expr="//div[@class='o_address_format']" position="before">
                 <field name="first_risk_rating" invisible="0" readonly="1"/>
             </xpath>
 
@@ -228,7 +228,8 @@
             </xpath>
 
             <xpath expr="//field[@name='phone']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <!-- <attribute name="readonly">1</attribute> -->
+                <attribute name="invisible">1</attribute>
             </xpath>
 
             <xpath expr="//field[@name='email']" position="attributes">
@@ -238,7 +239,11 @@
             <xpath expr="//field[@name='industry_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            
+
+            <xpath expr="//field[@name='employment_status']" position="after">
+                <field name="formatted_phone" readonly="1"/>
+            </xpath>
+
             <xpath expr="//field[@name='vat']" position="replace">
                 <field name="customer_industry_id" readonly="1"/>
             </xpath>
@@ -357,7 +362,7 @@
                     </div>
 
                     <group>
-                        <group  string="Personal Information">
+                        <group string="Personal Information">
                             <field name="name" readonly="1"/>
                             <field name="firstname" readonly="1"/>
                             <field name="lastname" readonly="1"/>
@@ -373,7 +378,7 @@
                         <!-- <field name="pep_id" readonly="1"/> -->
                     </group>
                 </sheet>
-                
+
             </form>
         </field>
     </record>

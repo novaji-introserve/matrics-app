@@ -167,7 +167,7 @@ class Customer(models.Model):
 
     first_risk_rating = fields.Char(string='Bank Risk Rating', index=True)
     pep = fields.Char(string='Bank Pep Customer', index=True)
-    # phone = fields.Char(string='Phone Number(s)', index=True)
+    customer_phone = fields.Char(string='Phone Number(s)', index=True)
     
     # phone = fields.Char(string='Phone Number(s)', index=True)
     formatted_phone = fields.Char(
@@ -176,15 +176,14 @@ class Customer(models.Model):
     likely_sanction = fields.Boolean()
     likely_pep = fields.Boolean()
     
-
-    @api.depends('phone')
+    @api.depends('customer_phone')
     def _compute_formatted_phone(self):
         for record in self:
-            if record.phone and '^' in record.phone:
-                record.formatted_phone = record.phone.replace(
+            if record.customer_phone and '^' in record.customer_phone:
+                record.formatted_phone = record.customer_phone.replace(
                     '^', ', ')
             else:
-                record.formatted_phone = record.phone
+                record.formatted_phone = record.customer_phone
     
     
     # is_branch_compliance = fields.Boolean(
