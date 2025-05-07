@@ -259,21 +259,16 @@ class Compliance(http.Controller):
     @http.route('/dashboard/stats', auth='public', type='json')
     def getAllstats(self, cco, branches_id, datepicked, **kw):
         
-        # Generate cache key
-        cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}"
+        # Get current user ID
+        user_id = request.env.user.id
         
-        # Check if we have valid cache
-        user = request.env.user
-        primary_group_id = None
-        for group in user.groups_id:
-            if any(role in group.name.lower() for role in ['cco', 'bco', 'compliance']):
-                primary_group_id = group.id
-                break
+        # Generate cache key - include user ID to make it user-specific
+        cache_key = f"all_stats_{user_id}_{cco}_{branches_id}_{datepicked}"
         
-        if primary_group_id:
-            cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, primary_group_id)
-            if cache_data:
-                return cache_data
+        # Check if we have valid cache for this user
+        cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
+        if cache_data:
+            return cache_data
 
         today = datetime.now().date()  # Get today's date
         prevDate = today - timedelta(days=datepicked)  # Get previous date
@@ -360,11 +355,10 @@ class Compliance(http.Controller):
                 "data": computed_results,
                 "total": len(results)
             }
-
-            # Store in cache before returning
-            if primary_group_id:
-                request.env['res.dashboard.cache'].set_cache(cache_key, result, primary_group_id)
-
+            
+            # Store in cache before returning - using user_id
+            request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id)
+            
             return result
         else:
             # First get all compliance stats in the date range
@@ -459,11 +453,10 @@ class Compliance(http.Controller):
                 "data": computed_results,
                 "total": len(computed_results)
             }
-
-            # Store in cache before returning
-            if primary_group_id:
-                request.env['res.dashboard.cache'].set_cache(cache_key, result, primary_group_id)
-
+            
+            # Store in cache before returning - using user_id
+            request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id)
+            
             return result
 
             # return {

@@ -46,7 +46,7 @@ export function useBusListener(channelName, callback) {
  * @returns {Object} - Data fetching methods
  */
 function useDashboardData(params) {
-  const { rpc, state, serverCache } = params;
+  const { rpc, state, serverCache, userId } = params;
   
   // Data fetching methods with caching
   const fetchData = {
@@ -73,11 +73,11 @@ function useDashboardData(params) {
         datepicked: Number(state.datepicked),
       };
       
-      // Generate cache key
+      // Generate cache key - base key without user ID
       const cacheKey = `all_stats_${state.cco}_${JSON.stringify(state.branches_id)}_${state.datepicked}`;
       
-      // Try to get from server cache
-      const cachedData = await serverCache.getCache(cacheKey);
+      // Pass user ID to the cache service
+      const cachedData = await serverCache.getCache(cacheKey, userId);
       
       if (cachedData) {
         state.stats = [...cachedData.data];
@@ -95,8 +95,8 @@ function useDashboardData(params) {
         if (result) {
           state.stats = [...result.data];
           state.totalstat = result.total;
-          // Cache the result
-          await serverCache.setCache(cacheKey, result);
+          // Cache the result with user ID
+          await serverCache.setCache(cacheKey, result, userId);
         }
         state.loadingStates.stats = false;
         return result;
@@ -241,6 +241,7 @@ export class ComplianceDashboard extends Component {
     this.rpc = useService("rpc");
     this.navigate = useService("action");
     this.serverCache = useService("server_cache");
+    this.user = useService("user");
     
     // Initialize state with loading indicators
     this.state = useState({
@@ -268,12 +269,16 @@ export class ComplianceDashboard extends Component {
 
     // Setup bus listener for refreshing the dashboard
     useBusListener('dashboard_refresh_channel', this.handleRefreshNotification.bind(this));
+
+    // Get user ID from user service
+    const userId = this.user.userId;
     
     // Setup dashboard data
     this.dashboardData = useDashboardData({
       rpc: this.rpc,
       state: this.state,
-      serverCache: this.serverCache
+      serverCache: this.serverCache,
+      userId: userId
     });
 
     // Initialize component

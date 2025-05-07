@@ -3,37 +3,36 @@
 import { registry } from "@web/core/registry";
 
 /**
- * Service for interacting with server-side dashboard cache
- * @class ServerCacheService
+ * Service for interacting with server-side dashboard cache (user-specific)
  */
 export class ServerCacheService {
-    /**
-     * @constructor
-     * @param {Object} env - Odoo environment
-     */
     constructor(env) {
-        this.env = env;
         this.rpc = env.services.rpc;
         this.memoryCache = {}; // In-memory cache for faster repeat access
     }
 
     /**
      * Get data from cache
-     * @param {string} key - Cache key
+     * @param {string} key - Base cache key
+     * @param {number} userId - User ID for user-specific caching
      * @returns {Promise<Object|null>} - Cache data or null
      */
-    async getCache(key) {
+    async getCache(key, userId) {
+        // Create user-specific key
+        const userKey = `${key}_${userId}`;
+        
         // Check memory cache first
-        if (this.memoryCache[key] && this.memoryCache[key].expiry > Date.now()) {
-            return this.memoryCache[key].data;
+        if (this.memoryCache[userKey] && this.memoryCache[userKey].expiry > Date.now()) {
+            return this.memoryCache[userKey].data;
         }
 
         try {
+            // Pass the key directly - server side will use current user
             const response = await this.rpc('/dashboard/cache/get', { key });
             
             if (response.success && response.data) {
                 // Store in memory cache
-                this.memoryCache[key] = {
+                this.memoryCache[userKey] = {
                     data: response.data,
                     expiry: Date.now() + (5 * 60 * 1000) // 5 minutes
                 };
@@ -48,17 +47,22 @@ export class ServerCacheService {
 
     /**
      * Set data in cache
-     * @param {string} key - Cache key
+     * @param {string} key - Base cache key
      * @param {Object} data - Data to cache
+     * @param {number} userId - User ID for user-specific caching
      * @returns {Promise<boolean>} - Success status
      */
-    async setCache(key, data) {
+    async setCache(key, data, userId) {
+        // Create user-specific key
+        const userKey = `${key}_${userId}`;
+        
         try {
+            // The server-side will use the current user
             const response = await this.rpc('/dashboard/cache/set', { key, data });
             
             if (response.success) {
                 // Update memory cache
-                this.memoryCache[key] = {
+                this.memoryCache[userKey] = {
                     data: data,
                     expiry: Date.now() + (5 * 60 * 1000)
                 };

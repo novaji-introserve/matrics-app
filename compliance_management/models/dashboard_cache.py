@@ -11,17 +11,17 @@ class DashboardCache(models.Model):
     _description = 'Dashboard Cache Storage'
 
     name = fields.Char(string='Cache Key', required=True, index=True)
-    group_id = fields.Many2one('res.groups', string='User Group', required=True, index=True)
+    user_id = fields.Many2one('res.users', string='User', required=True, index=True)
     cache_data = fields.Binary(string='Cache Data', attachment=True)  # Uses filestore
     last_updated = fields.Datetime(string='Last Updated', default=fields.Datetime.now)
     expiry_time = fields.Datetime(string='Expiry Time')
     
     _sql_constraints = [
-        ('unique_cache_key_group', 'UNIQUE(name, group_id)', 'Cache key must be unique per group!')
+        ('unique_cache_key_user', 'UNIQUE(name, user_id)', 'Cache key must be unique per user!')
     ]
     
     @api.model
-    def set_cache(self, key, data, group_id, ttl=300):
+    def set_cache(self, key, data, user_id, ttl=300):
         """Store data in cache with expiry time (5 minutes default)"""
         json_data = json.dumps(data)
         binary_data = base64.b64encode(json_data.encode('utf-8'))
@@ -29,7 +29,7 @@ class DashboardCache(models.Model):
         expiry = datetime.now() + timedelta(seconds=ttl)
         
         # Find existing cache or create new
-        existing = self.search([('name', '=', key), ('group_id', '=', group_id)])
+        existing = self.search([('name', '=', key), ('user_id', '=', user_id)])
         if existing:
             existing.write({
                 'cache_data': binary_data,
@@ -39,7 +39,7 @@ class DashboardCache(models.Model):
         else:
             self.create({
                 'name': key,
-                'group_id': group_id,
+                'user_id': user_id,
                 'cache_data': binary_data,
                 'last_updated': fields.Datetime.now(),
                 'expiry_time': expiry
@@ -47,11 +47,11 @@ class DashboardCache(models.Model):
         return True
     
     @api.model
-    def get_cache(self, key, group_id):
+    def get_cache(self, key, user_id):
         """Retrieve data from cache if not expired"""
         cache = self.search([
             ('name', '=', key), 
-            ('group_id', '=', group_id),
+            ('user_id', '=', user_id),
             ('expiry_time', '>', fields.Datetime.now())
         ], limit=1)
         
@@ -77,4 +77,3 @@ class DashboardCache(models.Model):
             expired.unlink()
             return True
         return False
-    
