@@ -1,18 +1,15 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="owl.ComplianceDashboard" owl="1">
         <div class="vh-100 overflow-auto bg-muted ">
-            <!-- first section -->
+            <!-- Header section -->
             <div class="col-12">
                 <div class="col-12 m-0 p-0">
                     <div class="d-flex bg-white rounded shadow px-4 py-1 shadow-1 justify-content-between align-items-center">
-
                         <div class="flex-grow-1 me-3">
                             <img t-att-src="'/compliance_management/static/src/img/logov.png'" alt="Dashboard Icon"
                                 class="img-fluid" style="width: 300; max-height: 70px; object-fit: contain; " />
                         </div>
-
                         <div class="ms-3">
                             <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
                                 <option value="0">Today</option>
@@ -27,98 +24,68 @@
                 </div>
             </div>
 
-            <!-- second section -->
-
+            <!-- Main content -->
             <div class="container-fluid" style="margin-bottom:7rem;">
-
-    
-
                 <div class="row second-section mb-4 pt-2 g-md-5 justify-content-between align-items-center">
-
-                      
-                      
-                        
-                            <div  class="position-relative card-container" t-ref="cardContainer">
-                                    
-                                    <t t-if="state.stats and state.stats.length > 0">
-                                        <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
-                                            <!-- <Card t-on-click="() => displayOdooView(stat.scope, stat.query)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" /> -->
-                                            <Card t-on-click="() => displayOdooView(stat.scope, stat.query, null, null, stat.name)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
-                                        </t>
-                                    </t>
-                                    <t t-else="">
-                                        <h4 class="" style="padding: 5rem; cursor:pointer;">No Data!! Please click on the configuration menu then statistic and start creating</h4>
-                                    </t>
-                                        
+                    <div class="position-relative card-container" t-ref="cardContainer">
+                        <!-- Loading indicator for stats -->
+                        <div t-if="state.loadingStates.stats" class="d-flex justify-content-center align-items-center p-5">
+                            <div class="spinner-border text-primary me-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                                    
-                     
-
-                        <!-- <div style="min-height:12rem;" class="shadow gap-2 bg-white col-md-2 position-relative shadow-lg py-2 d-flex flex-column justify-content-center align-items-center">
-
-                            <div class="">
-                                <select class="form-select-cat" t-on-change="(event) => displaybycategory(event.target.value)">
-                                    <option value="bank">Bank</option>
-                                    <option value="risk">Risk</option>
-                                    <option value="branch">Branch</option>
-                                    <option value="compliance">Compliance</option>
-                                    <option value="regulatory">Regulatory</option>
-                                    <option selected="selected" value="all">ALL</option>
-                                </select>
-                            </div>
-
-                            <div class="circle">
-                                <t t-out="state.totalstat" />
-                            </div>
-
+                            <span class="text-muted">Loading statistics...</span>
+                        </div>
                         
-
-                        
-                        </div> -->
-                    
-                        
-                </div>
-
-                <!-- <div class="position-relative">
-                     <t t-if="state.stats and state.stats.length > 3 and !state.scrollRight">
-                         <div class="overflow-indicator-right mt-1 fade-blink">&#x2192;</div>
-                     </t>
-                     <t t-if="state.stats and state.stats.length > 3 and !state.scrollLeft">
-                         <div  class="overflow-indicator-left mt-1 fade-blink">&#x2190;</div>
-                     </t>
-                </div> -->
-
-
-
-                <div class="row g-md-2 mt-md-3 mt-5 ">
-
-                            <t t-if="state.dynamic_chart.length > 0">
-                                <t t-foreach="state.dynamic_chart" t-as="chart" t-key="chart.id">
-
-                                    <div t-attf-class="col-md-{{ chart.column }}">
-                                        <div class="d-flex bg-white shadow shadow-1 p-3 rounded justify-content-between p-2 align-items-center">
-                                            <h6 class=" fw-bold text-capitalize text-dark">
-                                                <t t-out="chart.title"/>
-                                            </h6>
-                                           
-                                        </div>
-                                        <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
-                                            <ChartRenderer admin="state.cco" branches_id="state.branches_id" date='state.datepicked' type="'pie'" title="chart.title"
-                                                data="chart" dynamic="true" 
-                                            />
-                                        </div>
-                                    </div>
-                            
+                        <t t-else="">
+                            <t t-if="state.stats and state.stats.length > 0">
+                                <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                                    <Card t-on-click="() => displayOdooView(stat.scope, stat.query, null, null, stat.name)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
                                 </t>
                             </t>
-                            
+                            <t t-else="">
+                                <h4 class="" style="padding: 5rem; cursor:pointer;">No Data!! Please click on the configuration menu then statistic and start creating</h4>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Chart section -->
+                <div class="row g-md-2 mt-md-3 mt-5">
+                    <!-- Loading indicator for charts -->
+                    <div t-if="state.loadingStates.charts" class="d-flex justify-content-center align-items-center col-12 p-5">
+                        <div class="spinner-border text-primary me-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
-
-                    </div>  
-
+                        <span class="text-muted">Loading charts...</span>
+                    </div>
+                    
+                    <t t-else="">
+                        <t t-if="state.dynamic_chart.length > 0">
+                            <t t-foreach="state.dynamic_chart" t-as="chart" t-key="chart.id">
+                                <div t-attf-class="col-md-{{ chart.column }}">
+                                    <div class="d-flex bg-white shadow shadow-1 p-3 rounded justify-content-between p-2 align-items-center">
+                                        <h6 class="fw-bold text-capitalize text-dark">
+                                            <t t-out="chart.title"/>
+                                        </h6>
+                                    </div>
+                                    <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
+                                        <ChartRenderer 
+                                            admin="state.cco" 
+                                            branches_id="state.branches_id" 
+                                            date='state.datepicked' 
+                                            type="'pie'" 
+                                            title="chart.title"
+                                            data="chart" 
+                                            dynamic="true" 
+                                            isLoading="state.loadingStates.charts" 
+                                        />
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                    </t>
+                </div>
             </div>
-
-
         </div>
     </t>
 </templates>

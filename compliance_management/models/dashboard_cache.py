@@ -1,0 +1,80 @@
+from odoo import models, fields, api
+import json
+import base64
+from datetime import datetime, timedelta
+import logging
+
+_logger = logging.getLogger(__name__)
+
+class DashboardCache(models.Model):
+    _name = 'res.dashboard.cache'
+    _description = 'Dashboard Cache Storage'
+
+    name = fields.Char(string='Cache Key', required=True, index=True)
+    group_id = fields.Many2one('res.groups', string='User Group', required=True, index=True)
+    cache_data = fields.Binary(string='Cache Data', attachment=True)  # Uses filestore
+    last_updated = fields.Datetime(string='Last Updated', default=fields.Datetime.now)
+    expiry_time = fields.Datetime(string='Expiry Time')
+    
+    _sql_constraints = [
+        ('unique_cache_key_group', 'UNIQUE(name, group_id)', 'Cache key must be unique per group!')
+    ]
+    
+    @api.model
+    def set_cache(self, key, data, group_id, ttl=300):
+        """Store data in cache with expiry time (5 minutes default)"""
+        json_data = json.dumps(data)
+        binary_data = base64.b64encode(json_data.encode('utf-8'))
+        
+        expiry = datetime.now() + timedelta(seconds=ttl)
+        
+        # Find existing cache or create new
+        existing = self.search([('name', '=', key), ('group_id', '=', group_id)])
+        if existing:
+            existing.write({
+                'cache_data': binary_data,
+                'last_updated': fields.Datetime.now(),
+                'expiry_time': expiry
+            })
+        else:
+            self.create({
+                'name': key,
+                'group_id': group_id,
+                'cache_data': binary_data,
+                'last_updated': fields.Datetime.now(),
+                'expiry_time': expiry
+            })
+        return True
+    
+    @api.model
+    def get_cache(self, key, group_id):
+        """Retrieve data from cache if not expired"""
+        cache = self.search([
+            ('name', '=', key), 
+            ('group_id', '=', group_id),
+            ('expiry_time', '>', fields.Datetime.now())
+        ], limit=1)
+        
+        if not cache:
+            return None
+            
+        try:
+            binary_data = cache.cache_data
+            json_data = base64.b64decode(binary_data).decode('utf-8')
+            return json.loads(json_data)
+        except Exception as e:
+            _logger.error(f"Error retrieving cache: {str(e)}")
+            return None
+    
+    @api.model
+    def clear_expired_cache(self):
+        """Clear all expired cache entries - called by cron job"""
+        expired = self.search([
+            ('expiry_time', '<', fields.Datetime.now())
+        ])
+        if expired:
+            _logger.info(f"Clearing {len(expired)} expired cache entries")
+            expired.unlink()
+            return True
+        return False
+    
