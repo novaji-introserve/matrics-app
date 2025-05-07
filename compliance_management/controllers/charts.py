@@ -5,8 +5,6 @@ from datetime import datetime, timedelta
 import re
 class DynamicChartController(http.Controller):
 
-    
-
 
     def extract_where_clauses(self, sql_query):
         """Extract all clauses attached to the WHERE statement in an SQL query, handling BETWEEN clauses properly."""
@@ -129,13 +127,25 @@ class DynamicChartController(http.Controller):
         return value
 
     def sql_where_to_odoo_domain_no_dates(self, sql_query):
-        """Convert SQL WHERE conditions to Odoo domain format, excluding date-related fields."""
+        """Convert SQL WHERE conditions to Odoo domain format, excluding date-related fields.
+        Maps table-prefixed fields to appropriate Odoo field names."""
         clauses = self.extract_where_clauses(sql_query)
         if not clauses:
             return []
         
         domain = []
         date_related_keywords = ['date', 'date_created', 'date_create', 'create_date', 'write_date', 'time', 'datetime']
+        
+        # Extract table aliases from the SQL query
+        table_aliases = self._extract_table_aliases(sql_query)
+        
+        # Define field mappings based on table and field patterns
+        field_patterns = {
+            'branch': {  # This covers any alias for res_branch table
+                'id': 'branch_id'  # Map any_branch_alias.id to branch_id
+            },
+            # Add other tables as needed
+        }
         
         for clause in clauses:
             # Skip date-related fields - more thorough check
@@ -145,75 +155,130 @@ class DynamicChartController(http.Controller):
             # Handle different operators
             if ' = ' in clause:
                 field, value = clause.split(' = ', 1)
-                field = field.strip().split('.')[-1]  # Get only the field name, not table.field
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '=', value))
+                domain.append((field_name, '=', value))
             
             elif ' >= ' in clause:
                 field, value = clause.split(' >= ', 1)
-                field = field.strip().split('.')[-1]
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '>=', value))
+                domain.append((field_name, '>=', value))
             
             elif ' <= ' in clause:
                 field, value = clause.split(' <= ', 1)
-                field = field.strip().split('.')[-1]
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '<=', value))
+                domain.append((field_name, '<=', value))
             
             elif ' > ' in clause:
                 field, value = clause.split(' > ', 1)
-                field = field.strip().split('.')[-1]
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '>', value))
+                domain.append((field_name, '>', value))
             
             elif ' < ' in clause:
                 field, value = clause.split(' < ', 1)
-                field = field.strip().split('.')[-1]
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '<', value))
+                domain.append((field_name, '<', value))
             
             elif ' LIKE ' in clause.upper():
                 field, value = clause.upper().split(' LIKE ', 1)
-                field = field.strip().split('.')[-1].lower()
+                field = field.strip()
+                field_name = self._map_field_name(field.lower(), table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
                 # Convert SQL LIKE pattern to Odoo pattern
                 value = value.replace('%', '*')
-                domain.append((field, 'ilike', value))
+                domain.append((field_name, 'ilike', value))
             
             elif ' IN ' in clause.upper():
                 field, value_list = clause.upper().split(' IN ', 1)
-                field = field.strip().split('.')[-1].lower()
+                field = field.strip()
+                field_name = self._map_field_name(field.lower(), table_aliases, field_patterns)
                 # Extract values from IN clause: (val1, val2, ...)
                 if value_list.strip().startswith('(') and value_list.strip().endswith(')'):
                     value_list = value_list.strip()[1:-1]
                     values = [self._clean_sql_value(v.strip()) for v in value_list.split(',')]
-                    domain.append((field, 'in', values))
+                    domain.append((field_name, 'in', values))
             
             elif 'BETWEEN' in clause.upper() and ' AND ' in clause.upper():
                 # Parse BETWEEN clause (already filtered date-related fields)
                 parts = re.split(r'\bBETWEEN\b', clause, flags=re.IGNORECASE)
                 if len(parts) == 2:
-                    field = parts[0].strip().split('.')[-1]
+                    field = parts[0].strip()
+                    field_name = self._map_field_name(field, table_aliases, field_patterns)
                     between_parts = re.split(r'\bAND\b', parts[1], flags=re.IGNORECASE, maxsplit=1)
                     if len(between_parts) == 2:
                         start_val = self._clean_sql_value(between_parts[0])
                         end_val = self._clean_sql_value(between_parts[1])
                         domain.append('&')
-                        domain.append((field, '>=', start_val))
-                        domain.append((field, '<=', end_val))
+                        domain.append((field_name, '>=', start_val))
+                        domain.append((field_name, '<=', end_val))
             
             elif ' IS NULL' in clause.upper():
-                field = clause.upper().split(' IS NULL')[0].strip().split('.')[-1].lower()
-                domain.append((field, '=', False))
+                field = clause.upper().split(' IS NULL')[0].strip()
+                field_name = self._map_field_name(field.lower(), table_aliases, field_patterns)
+                domain.append((field_name, '=', False))
             
             elif ' IS NOT NULL' in clause.upper():
-                field = clause.upper().split(' IS NOT NULL')[0].strip().split('.')[-1].lower()
-                domain.append((field, '!=', False))
+                field = clause.upper().split(' IS NOT NULL')[0].strip()
+                field_name = self._map_field_name(field.lower(), table_aliases, field_patterns)
+                domain.append((field_name, '!=', False))
         
         return domain
 
-
+    def _extract_table_aliases(self, sql_query):
+        """Extract table aliases from SQL query.
+        Returns a dictionary mapping aliases to table names."""
+        aliases = {}
+        
+        # Normalize query and convert to lowercase for easier parsing
+        sql_query = ' '.join(sql_query.strip().split()).lower()
+        
+        # Extract FROM clause
+        from_match = re.search(r'\bfrom\b(.*?)(?:\bwhere\b|\bjoin\b|\bgroup by\b|\bhaving\b|\border by\b|\blimit\b|\boffset\b|$)', 
+                            sql_query, re.IGNORECASE | re.DOTALL)
+        if from_match:
+            from_clause = from_match.group(1).strip()
+            # Extract table name and alias
+            table_match = re.search(r'(\w+)(?:\s+as)?\s+(\w+)', from_clause, re.IGNORECASE)
+            if table_match:
+                table_name, alias = table_match.group(1), table_match.group(2)
+                aliases[alias] = table_name
+        
+        # Extract JOIN clauses
+        join_pattern = re.compile(r'\bjoin\b\s+(\w+)(?:\s+as)?\s+(\w+)', re.IGNORECASE)
+        for match in join_pattern.finditer(sql_query):
+            table_name, alias = match.group(1), match.group(2)
+            aliases[alias] = table_name
+        
+        return aliases
+    
+    def _map_field_name(self, field, table_aliases, field_patterns):
+        """Map a table-prefixed field to the appropriate Odoo field name."""
+        if '.' not in field:
+            return field  # No table prefix, return as is
+        
+        alias, field_name = field.split('.', 1)
+        
+        # If we have an alias match
+        if alias in table_aliases:
+            table_name = table_aliases[alias]
+            
+            # Look for table patterns (e.g., if table contains 'branch')
+            for pattern, field_mappings in field_patterns.items():
+                if pattern in table_name and field_name in field_mappings:
+                    return field_mappings[field_name]
+        
+        # Default fallback: return just the field part
+        return field_name
+    
     def _add_where_to_query(self, query, where_clause):
         
         if 'WHERE' in query.upper():
@@ -245,6 +310,7 @@ class DynamicChartController(http.Controller):
     def _process_query_results(self, chart, query):
        
         try:
+           
             request.env.cr.execute(query)
             results = request.env.cr.dictfetchall()
         except Exception as e:
@@ -323,6 +389,7 @@ class DynamicChartController(http.Controller):
         
         for chart in charts:
 
+    
             
             
             chart = request.env['res.dashboard.charts'].browse(chart.id)
@@ -360,6 +427,7 @@ class DynamicChartController(http.Controller):
                 # Execute query and process results
                 result = self._process_query_results(chart, query)
 
+               
                 if result['title'] == '' and result['type'] == '' and result['labels'] == []:
                     pass
                     
@@ -382,8 +450,37 @@ class DynamicChartController(http.Controller):
             base_colors = ['#ff6600', '#ff9933', '#ffcc66', '#ff0000', '#cc0000']
         elif color_scheme == 'rainbow':
             base_colors = ['#ff0000', '#ff9900', '#ffff00', '#00ff00', '#0099ff', '#6633ff']
+        elif color_scheme == 'brown':
+            base_colors = [
+                '#483E1D',  # Dark earthy brown
+                '#F2D473',  # Light golden brown
+                '#564B2B',  # Dark earthy brown
+                '#ECDFA4',  # Light cream brown
+                '#83733F',  # Medium-dark olive brown
+                '#ECE1A2',  # Light beige
+                '#5F5330',  # Medium earthy brown
+                '#B78C00',  # Golden amber brown
+                '#6A5D36',  # Medium-light brown
+                '#C4AA55',  # Medium-light golden brown
+                # '#4D4323',  # Similar darkness with slightly more green
+                # '#5A4F2A',  # Middle-tone earthy brown
+                # '#665839',  # Medium-light earthy brown
+                # '#524628',  # Medium-dark earthy brown
+            ]
         else:  # default
-            base_colors = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099', '#0099c6']
+            base_colors = [
+                '#483E1D',  # Dark earthy brown
+                '#F2D473',  # Light golden brown
+                '#564B2B',  # Dark earthy brown
+                '#ECDFA4',  # Light cream brown
+                '#83733F',  # Medium-dark olive brown
+                '#ECE1A2',  # Light beige
+                '#5F5330',  # Medium earthy brown
+                '#B78C00',  # Golden amber brown
+                '#6A5D36',  # Medium-light brown
+                '#C4AA55',  # Medium-light golden brown
+            ]
+            # base_colors = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099', '#0099c6']
         
         colors = []
         for i in range(count):

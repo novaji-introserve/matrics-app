@@ -60,9 +60,9 @@
 
                     <!-- <button name="action_remove_fep" type="object" string="Remove from FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '!=',True)]}" /> -->
 
-                    <button name="action_blacklist" class="oe_highlight" type="object" string="Add to Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '=',True)]}" />
+                    <!-- <button name="action_blacklist" class="oe_highlight" type="object" string="Add to Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '=',True)]}" /> -->
 
-                    <button name="action_remove_blacklist" type="object" string="Remove from Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '!=',True)]}" />
+                    <!-- <button name="action_remove_blacklist" type="object" string="Remove from Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '!=',True)]}" /> -->
 
                     <button name="action_watchlist" class="oe_highlight" type="object" string="Add to Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '=',True)]}" />
 
@@ -168,6 +168,10 @@
 
             </xpath>
 
+            <xpath expr="//div[@class='o_address_format']" position="before">
+                <field name="first_risk_rating" invisible="0" readonly="1"/>
+            </xpath>
+
 
             <xpath expr="//field[@name='education_level_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -210,7 +214,8 @@
             <!--  -->
 
             <xpath expr="//field[@name='vat']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <!-- <attribute name="readonly">1</attribute> -->
+                <attribute name="invisible">1</attribute>
             </xpath>
 
 
@@ -219,14 +224,23 @@
             </xpath>
 
             <xpath expr="//field[@name='phone']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <!-- <attribute name="readonly">1</attribute> -->
+                <attribute name="invisible">1</attribute>
             </xpath>
 
             <xpath expr="//field[@name='email']" position="attributes">
                 <attribute name="readonly">1</attribute>
             </xpath>
 
-            <xpath expr="//field[@name='industry_id']" position="replace">
+            <xpath expr="//field[@name='industry_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='employment_status']" position="after">
+                <field name="formatted_phone" readonly="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='vat']" position="replace">
                 <field name="customer_industry_id" readonly="1"/>
             </xpath>
 
@@ -344,7 +358,7 @@
                     </div>
 
                     <group>
-                        <group  string="Personal Information">
+                        <group string="Personal Information">
                             <field name="name" readonly="1"/>
                             <field name="firstname" readonly="1"/>
                             <field name="lastname" readonly="1"/>
@@ -360,7 +374,7 @@
                         <!-- <field name="pep_id" readonly="1"/> -->
                     </group>
                 </sheet>
-                
+
             </form>
         </field>
     </record>

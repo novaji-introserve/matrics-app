@@ -31,8 +31,8 @@
         "data/res.country.state.csv",
         "data/settings/email_smtp.xml",
         "data/department.xml",
-        "data/res.branch.csv",
         "data/risk_assessment_control_data.xml",
+        # "data/res.branch.csv",
         "data/risk_assessment_mitigation.xml",
         "data/res_risk_implication.xml",
         "data/media_keywords.xml",
@@ -59,8 +59,7 @@
         # "data/schedules/queue_job_config.xml",
         "data/data.xml",
         "views/risk_assessment.xml",
-        # "views/open_sanctions.xml",
-        # "views/res_users.xml",
+        "views/open_sanctions.xml",
         "views/sanction_screening.xml",
         "views/customer.xml",
         "views/statistics.xml",
@@ -72,8 +71,9 @@
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
         # "data/charts.xml",
-        "data/res_partner.xml",
+        # "data/res_partner.xml",
         "data/fcra_score.xml",    
+        "views/res_users.xml",
     ],
     # only loaded in demonstration mode
     "demo": [
@@ -109,6 +109,7 @@
             
             'compliance_management/static/src/js/pep_auto_refresh.js',
             'compliance_management/static/src/xml/pep_auto_refresh.xml',
+            'compliance_management/static/src/js/custom_title_service.js',
 
 
             'compliance_management/static/src/img/logov.png',

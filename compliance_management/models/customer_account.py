@@ -8,15 +8,15 @@ class CustomerAccount(models.Model):
     _description = 'Account'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _sql_constraints = [
-        # ('uniq_account_name', 'unique(name)',
-        #  "Account Name already exists. Value must be unique!"),
-        ('uniq_account_id', 'unique(customer_id)',
-         "Customer ID already exists. Value must be unique!"),
+        ('uniq_account_id', 'unique(name)',
+         "Account Number already exists. Value must be unique!"),
     ]
+   
     _order = "name" 
+    customer_id = fields.Many2one(comodel_name='res.partner', string='Customer',index=True) #customer
     name = fields.Char(string="Account Number")
     account_name = fields.Char(string='Account Name', index=True) #account_title1
-    account_position = fields.Char(string='Account Position', required=False)
+    account_position = fields.Char(string='Account Position', required=False)    
     account_type = fields.Char(string='Account Type', required=False)
     account_code = fields.Char(string='Account Code', required=False)
     account_status = fields.Char(string='Account Status', required=False)
@@ -25,7 +25,7 @@ class CustomerAccount(models.Model):
     last_transaction_date = fields.Date(
         string='Last Transaction Date', required=False)
     opening_date = fields.Date(
-        string='Last Opening Date', required=False)
+        string='Opening Date', required=False)
     
 
     account_officer_id = fields.Many2one(
@@ -48,7 +48,6 @@ class CustomerAccount(models.Model):
     date_created = fields.Date(string='Date Created', index=True) #date_created
     ledger_id = fields.Many2one(comodel_name='res.partner.account.ledger', string='Ledger',index=True)
     closure_status = fields.Selection(string='Closure Status', selection=[('N', 'No'), ('Y', 'Yes')])
-    customer_id = fields.Many2one(comodel_name='res.partner', string='Customer',index=True) #customer
     branch_id = fields.Many2one(comodel_name='res.branch', string='Branch',index=True)
     balance = fields.Float(string='Balance', digits=(15,4)) #working_balance
     account_type_id = fields.Many2one(comodel_name='res.partner.account.type', string='Account Type',index=True)
@@ -142,17 +141,91 @@ class CustomerAccount(models.Model):
     max_debit_last1y = fields.Float(string='Max. Debit - Last 1Y', digits=(10,2))
     tot_debit_last1y = fields.Float(string='Total Debit Amount - Last 1Y', digits=(15,2))
 
-    state = fields.Selection(string='Status', selection=[('active', 'Active'), ('dormant', 'Dormant'),('locked','Locked')],tracking=True,default='active',required=False) #sta_code
+    state = fields.Selection(string='Status', selection=[('Active', 'Active'), ('Inactive', 'Inactive'), ('Dormant', 'Dormant'), ('Flagged','Flagged'), ('Closed', 'Closed')],tracking=True,default='Active',required=False) #sta_code
+    active = fields.Boolean(default=True, tracking=True)
+    customer = fields.Char(string='Customer Id')
+    max_debit_daily = fields.Float(string='Max. Debit - Daily', digits=(10,2))
+    overdraft_limit = fields.Float(string='OverDraft Limit', digits=(10,2))
+    uncleared_balance = fields.Float(string='Uncleared Balance', digits=(10,2))
+    start_year_balance = fields.Float(string='Start Year Balance', digits=(10,2))
+    date_last_credit_customer = fields.Char(string='Date Last Credit Customer')
+    amount_last_credit_customer = fields.Char(string='Amount Last Credit Customer')
+    date_last_debit_customer = fields.Char(string='Date Last Dedit Customer')
     
-     
+
+    
+    def init(self):
+        """Initialize database triggers when module is installed/updated"""
+        # Drop existing trigger if it exists
+        self.env.cr.execute(
+            "DROP TRIGGER IF EXISTS update_customer_id_field ON res_partner_account;")
+
+        # Create new trigger
+        self.env.cr.execute("""
+            CREATE OR REPLACE FUNCTION update_customer_id_field_func()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                -- Check if customer field is empty and customer_id is set
+                IF (NEW.customer IS NULL OR TRIM(NEW.customer) = '') AND NEW.customer_id IS NOT NULL THEN
+                    -- Set customer field to the ID value from customer_id
+                    NEW.customer = NEW.customer_id::TEXT;                    
+                END IF;
+                
+                IF NEW.active IS NULL THEN
+                    -- Set active field to True
+                    NEW.active = True;
+                END IF;
+                
+                
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            
+            -- Create the trigger
+            CREATE TRIGGER update_customer_id_field
+            BEFORE INSERT OR UPDATE ON res_partner_account
+            FOR EACH ROW
+            EXECUTE FUNCTION update_customer_id_field_func();
+        """)
+
+        # Update existing records with empty customer field
+        self.env.cr.execute("""
+            UPDATE res_partner_account
+            SET customer = customer_id::TEXT
+            WHERE (customer IS NULL OR TRIM(customer) = '')
+            AND customer_id IS NOT NULL;
+        """)
+        # Update existing records where active field is NULL
+        self.env.cr.execute("""
+            UPDATE res_partner_account
+            SET active = TRUE
+            WHERE active IS NULL;
+        """)
+
     @api.model
     def open_accounts(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = []
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id])
+
+            ]
+
         return {
             'name': _('Accounts'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner.account',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
+            'domain': domain,
             'context': {'search_default_group_branch': 1}
         } 
         

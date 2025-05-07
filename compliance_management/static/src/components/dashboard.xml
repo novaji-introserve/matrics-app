@@ -35,13 +35,15 @@
 
                 <div class="row second-section mb-4 pt-2 g-md-5 justify-content-between align-items-center">
 
-                        <div class="col-md-10">
+                      
+                      
                         
-                            <div  class="d-flex align-items-center position-relative card-container gap-3 py-2">
+                            <div  class="position-relative card-container" t-ref="cardContainer">
                                     
                                     <t t-if="state.stats and state.stats.length > 0">
                                         <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
-                                            <Card t-on-click="() => displayOdooView(stat.scope, stat.query)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
+                                            <!-- <Card t-on-click="() => displayOdooView(stat.scope, stat.query)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" /> -->
+                                            <Card t-on-click="() => displayOdooView(stat.scope, stat.query, null, null, stat.name)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
                                         </t>
                                     </t>
                                     <t t-else="">
@@ -50,9 +52,9 @@
                                         
                             </div>
                                     
-                        </div>
+                     
 
-                        <div style="min-height:12rem;" class="shadow gap-2 bg-white col-md-2 position-relative shadow-lg py-2 d-flex flex-column justify-content-center align-items-center">
+                        <!-- <div style="min-height:12rem;" class="shadow gap-2 bg-white col-md-2 position-relative shadow-lg py-2 d-flex flex-column justify-content-center align-items-center">
 
                             <div class="">
                                 <select class="form-select-cat" t-on-change="(event) => displaybycategory(event.target.value)">
@@ -72,19 +74,19 @@
                         
 
                         
-                        </div>
+                        </div> -->
                     
                         
                 </div>
 
-                <div class="position-relative">
+                <!-- <div class="position-relative">
                      <t t-if="state.stats and state.stats.length > 3 and !state.scrollRight">
                          <div class="overflow-indicator-right mt-1 fade-blink">&#x2192;</div>
                      </t>
                      <t t-if="state.stats and state.stats.length > 3 and !state.scrollLeft">
                          <div  class="overflow-indicator-left mt-1 fade-blink">&#x2190;</div>
                      </t>
-                </div>
+                </div> -->
 
 
 
