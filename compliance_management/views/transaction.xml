@@ -84,6 +84,8 @@
                                 <group>
                                     <field name="customer_id" readonly="1" />
                                     <field name="account_id" readonly="1" />
+                                    <field name="active" invisible="1" />
+
                                 </group>
                                 <group>
                                     <field name="currency_id" readonly="1" />
