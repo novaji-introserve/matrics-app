@@ -94,12 +94,12 @@ class Transaction(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = []
+            domain = [('state', '=', 'new')]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
-                 e.id for e in self.env.user.branches_id])]
+                 e.id for e in self.env.user.branches_id]), ('state', '=', 'new')]
         return {
             'name': _('Transactions To Review'),
             'type': 'ir.actions.act_window',
@@ -118,12 +118,12 @@ class Transaction(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = []
+            domain = [('state', '=', 'done')]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
-                 e.id for e in self.env.user.branches_id])]
+                 e.id for e in self.env.user.branches_id]), ('state', '=', 'done')]
         return {
             'name': _('Transactions Reviewed'),
             'type': 'ir.actions.act_window',
