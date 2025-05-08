@@ -90,6 +90,12 @@
         <field name="scope">regulatory</field>
         <field name="sql_query">select count(id) from res_pep</field>
     </record>
+    <record id="res_compl_stat_8" model="res.compliance.stat">
+        <field name="name">WatchList</field>
+        <field name="code">watch_list</field>
+        <field name="scope">regulatory</field>
+        <field name="sql_query">select count(id) from res_partner_watchlist</field>
+    </record>
 
     <!-- Risk Category -->
     <record id="compliance_inst_fc_risk_category_1" model="res.risk.category">
