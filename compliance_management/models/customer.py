@@ -175,6 +175,7 @@ class Customer(models.Model):
 
     likely_sanction = fields.Boolean()
     likely_pep = fields.Boolean()
+    branch_code = fields.Char(string="Branch Code")
     
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):

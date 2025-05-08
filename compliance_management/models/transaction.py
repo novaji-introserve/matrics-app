@@ -45,10 +45,7 @@ class Transaction(models.Model):
     transaction_type = fields.Selection(selection=[(
         'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
     active = fields.Boolean(default=True, readonly=True)
-
-
-
-
+    branch_code = fields.Char(string="Branch Code")
 
 
     def get_risk_level(self):
