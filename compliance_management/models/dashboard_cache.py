@@ -21,8 +21,11 @@ class DashboardCache(models.Model):
     ]
     
     @api.model
-    def set_cache(self, key, data, user_id, ttl=300):
+    def set_cache(self, key, data, user_id=None, ttl=300):
         """Store data in cache with expiry time (5 minutes default)"""
+        if user_id is None:
+            user_id = self.env.user.id
+            
         json_data = json.dumps(data)
         binary_data = base64.b64encode(json_data.encode('utf-8'))
         
@@ -47,8 +50,11 @@ class DashboardCache(models.Model):
         return True
     
     @api.model
-    def get_cache(self, key, user_id):
+    def get_cache(self, key, user_id=None):
         """Retrieve data from cache if not expired"""
+        if user_id is None:
+            user_id = self.env.user.id
+            
         cache = self.search([
             ('name', '=', key), 
             ('user_id', '=', user_id),

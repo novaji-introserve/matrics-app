@@ -4,7 +4,7 @@ import { loadJS } from "@web/core/assets";
 const { Component, onWillStart, useRef, useEffect, onWillUnmount } = owl;
 import { useService } from "@web/core/utils/hooks";
 
-// Constants for date formats and CDN URLs
+// Constants
 const CHARTJS_CDN = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js";
 
 /**
@@ -23,6 +23,7 @@ export class ChartRenderer extends Component {
 
     useEffect(
       () => {
+        // Only render chart if data exists and is not loading
         if (this.props.data && !this.props.isLoading) {
           this.renderChart();
         }

@@ -4,7 +4,13 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { Card } from "./card/card";
 import { ChartRenderer } from "./chart";
-const { Component, useState, useEffect, useRef, onMounted, onWillStart, onWillUnmount } = owl;
+const { Component, useState, useEffect, useRef, onWillStart, onWillUnmount } = owl;
+
+// Debug mode - set to false for production
+const DEBUG = true;
+function logDebug(...args) {
+  if (DEBUG) console.log(...args);
+}
 
 /**
  * Custom hook for bus service notifications
@@ -40,200 +46,6 @@ export function useBusListener(channelName, callback) {
   );
 }
 
-/**
- * Custom hook for dashboard data with server-side caching
- * @param {Object} params - Hook parameters
- * @returns {Object} - Data fetching methods
- */
-function useDashboardData(params) {
-  const { rpc, state, serverCache, userId } = params;
-  
-  // Data fetching methods with caching
-  const fetchData = {
-    // Get current user info
-    async getCurrentUser() {
-      try {
-        const result = await rpc("/dashboard/user");
-        if (result) {
-          state.branches_id = result.branch;
-          state.cco = result.group;
-        }
-        return result;
-      } catch (error) {
-        console.error("Error fetching current user:", error);
-        return null;
-      }
-    },
-
-    // Get all stats with caching
-    async getAllStats() {
-      const params = {
-        cco: state.cco,
-        branches_id: state.branches_id,
-        datepicked: Number(state.datepicked),
-      };
-      
-      // Generate cache key - base key without user ID
-      const cacheKey = `all_stats_${state.cco}_${JSON.stringify(state.branches_id)}_${state.datepicked}`;
-      
-      // Pass user ID to the cache service
-      const cachedData = await serverCache.getCache(cacheKey, userId);
-      
-      if (cachedData) {
-        state.stats = [...cachedData.data];
-        state.totalstat = cachedData.total;
-        state.loadingStates.stats = false;
-        return cachedData;
-      }
-      
-      try {
-        // Mark as loading
-        state.loadingStates.stats = true;
-        
-        const result = await rpc(`/dashboard/stats`, params);
-        
-        if (result) {
-          state.stats = [...result.data];
-          state.totalstat = result.total;
-          // Cache the result with user ID
-          await serverCache.setCache(cacheKey, result, userId);
-        }
-        state.loadingStates.stats = false;
-        return result;
-      } catch (error) {
-        console.error("Error fetching all stats:", error);
-        state.loadingStates.stats = false;
-        return null;
-      }
-    },
-
-    // Get stats by category with caching
-    async getStatsByCategory(name) {
-      const params = {
-        cco: state.cco,
-        branches_id: state.branches_id,
-        category: name,
-        datepicked: Number(state.datepicked),
-      };
-      
-      // Generate cache key
-      const cacheKey = `stats_category_${state.cco}_${JSON.stringify(state.branches_id)}_${name}_${state.datepicked}`;
-      const cachedData = await serverCache.getCache(cacheKey);
-      
-      if (cachedData) {
-        state.stats = cachedData.data;
-        state.totalstat = cachedData.total;
-        state.loadingStates.stats = false;
-        return cachedData;
-      }
-      
-      try {
-        state.loadingStates.stats = true;
-        const result = await rpc(`/dashboard/statsbycategory`, params);
-        
-        if (result) {
-          state.stats = result.data;
-          state.totalstat = result.total;
-          await serverCache.setCache(cacheKey, result);
-        }
-        state.loadingStates.stats = false;
-        return result;
-      } catch (error) {
-        console.error("Error fetching stats by category:", error);
-        state.loadingStates.stats = false;
-        return null;
-      }
-    },
-
-    // Fetch dashboard charts with caching
-    async fetchDashboardCharts() {
-      const params = {
-        cco: state.cco,
-        branches_id: state.branches_id,
-        datepicked: Number(state.datepicked),
-      };
-      
-      // Generate cache key
-      const cacheKey = `dynamic_charts_${state.cco}_${JSON.stringify(state.branches_id)}_${state.datepicked}`;
-      const cachedData = await serverCache.getCache(cacheKey);
-      
-      if (cachedData) {
-        state.dynamic_chart = cachedData;
-        state.loadingStates.charts = false;
-        return cachedData;
-      }
-      
-      try {
-        state.loadingStates.charts = true;
-        const response = await rpc(`/dashboard/dynamic_charts/`, params);  
-        
-        if (response && response.error) {
-          console.error(`Error fetching dashboard charts: ${response.error}`);
-          state.dynamic_chart = [];
-        } else if (response) {
-          state.dynamic_chart = response;
-          await serverCache.setCache(cacheKey, response);
-        } else {
-          console.error("Error: Empty response received while fetching dashboard charts.");
-          state.dynamic_chart = [];
-        }
-        
-        state.loadingStates.charts = false;
-        return response;
-      } catch (error) {
-        console.error("Error in fetchDashboardCharts:", error);
-        state.dynamic_chart = [];
-        state.loadingStates.charts = false;
-        return null;
-      }
-    },
-
-    // Filter by date with parallel requests
-    async filterByDate(forceRefresh = false) {
-      try {
-        // Reset loading states
-        state.loadingStates = {
-          stats: true,
-          charts: true
-        };
-        
-        // Using Promise.all for parallel execution
-        await Promise.all([
-          this.getAllStats(),
-          this.fetchDashboardCharts()
-        ]);
-        
-        return true;
-      } catch (error) {
-        console.error("Error in filterByDate:", error);
-        // Clear loading states on error
-        state.loadingStates.stats = false;
-        state.loadingStates.charts = false;
-        return false;
-      }
-    },
-
-    // Display by category
-    async displayByCategory(name) {
-      state.isCategorySortingEnabled = name !== "all";
-      
-      try {
-        if (name === "all") {
-          await this.getAllStats();
-        } else {
-          await this.getStatsByCategory(name);
-        }
-        return true;
-      } catch (error) {
-        console.error("Error in displayByCategory:", error);
-        return false;
-      }
-    }
-  };
-
-  return fetchData;
-}
-
 export class ComplianceDashboard extends Component {
   setup() {
     this.left_indicator = useRef("left");
@@ -243,7 +55,11 @@ export class ComplianceDashboard extends Component {
     this.serverCache = useService("server_cache");
     this.user = useService("user");
     
-    // Initialize state with loading indicators
+    // Get current user ID
+    this.userId = this.user.userId;
+    logDebug('Dashboard initializing for user ID:', this.userId);
+    
+    // Initialize state with loading indicators and debug info
     this.state = useState({
       isCategorySortingEnabled: false,
       cco: false,
@@ -261,7 +77,13 @@ export class ComplianceDashboard extends Component {
       loadingStates: {
         stats: true,
         charts: true
-      }
+      },
+      debug: DEBUG ? {
+        lastError: null,
+        dataLoaded: false,
+        lastUpdate: new Date().toISOString(),
+        cardsVisible: false
+      } : null
     });
     
     // Models that should trigger a refresh
@@ -269,25 +91,23 @@ export class ComplianceDashboard extends Component {
 
     // Setup bus listener for refreshing the dashboard
     useBusListener('dashboard_refresh_channel', this.handleRefreshNotification.bind(this));
-
-    // Get user ID from user service
-    const userId = this.user.userId;
     
-    // Setup dashboard data
-    this.dashboardData = useDashboardData({
-      rpc: this.rpc,
-      state: this.state,
-      serverCache: this.serverCache,
-      userId: userId
-    });
-
     // Initialize component
     onWillStart(async () => {
       try {
-        await this.dashboardData.getCurrentUser();
-        await this.dashboardData.filterByDate();
+        logDebug('Dashboard starting initialization');
+        await this.getCurrentUser();
+        await this.filterByDate();
+        if (this.state.debug) {
+          this.state.debug.dataLoaded = true;
+          this.state.debug.lastUpdate = new Date().toISOString();
+        }
+        logDebug('Data loaded successfully', this.state.stats);
       } catch (error) {
         console.error("Error in component initialization:", error);
+        if (this.state.debug) {
+          this.state.debug.lastError = error.message;
+        }
         this.state.loadingStates.stats = false;
         this.state.loadingStates.charts = false;
       }
@@ -296,8 +116,11 @@ export class ComplianceDashboard extends Component {
     // Set up auto-refresh every 5 minutes
     useEffect(() => {
       const refreshTimer = setInterval(async () => {
-        console.log("Auto-refreshing dashboard data...");
-        await this.dashboardData.filterByDate();
+        logDebug("Auto-refreshing dashboard data...");
+        await this.filterByDate(true);
+        if (this.state.debug) {
+          this.state.debug.lastUpdate = new Date().toISOString();
+        }
       }, 5 * 60 * 1000); // 5 minutes
       
       return () => {
@@ -318,6 +141,23 @@ export class ComplianceDashboard extends Component {
       };
     }, () => []);
     
+    // Debug effect to log state changes
+    if (DEBUG) {
+      useEffect(() => {
+        logDebug('State updated:', 
+          'stats length:', this.state.stats?.length,
+          'loading:', this.state.loadingStates.stats
+        );
+        // Check if cards should be visible
+        if (this.state.debug) {
+          this.state.debug.cardsVisible = 
+            this.state.stats && 
+            this.state.stats.length > 0 && 
+            !this.state.loadingStates.stats;
+        }
+      });
+    }
+    
     // Bind methods
     this.displayOdooView = this.displayOdooView.bind(this);
     this.displaybycategory = this.displaybycategory.bind(this);
@@ -330,15 +170,23 @@ export class ComplianceDashboard extends Component {
    * @param {Object} notification - The notification payload
    */
   async handleRefreshNotification(notification) {
-    console.log("Received notification:", notification);
+    logDebug("Received notification:", notification);
 
     if (notification.type === 'refresh' && this.refreshModels.includes(notification.model)) {
+      // Invalidate cache
+      await this.serverCache.invalidateCache();
+      
       // Reload the view
       try {
-        await this.dashboardData.filterByDate(true); // Force refresh
-        this.render();
+        await this.filterByDate(true); // Force refresh
+        if (this.state.debug) {
+          this.state.debug.lastUpdate = new Date().toISOString();
+        }
       } catch (error) {
         console.error("Error refreshing dashboard:", error);
+        if (this.state.debug) {
+          this.state.debug.lastError = error.message;
+        }
       }
     }
   }
@@ -366,24 +214,258 @@ export class ComplianceDashboard extends Component {
   }
 
   /**
+   * Get current user info
+   */
+  async getCurrentUser() {
+    try {
+      logDebug('Fetching current user');
+      const result = await this.rpc("/dashboard/user");
+      if (result) {
+        logDebug('Got user data:', result);
+        this.state.branches_id = result.branch;
+        this.state.cco = result.group;
+      }
+      return result;
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+      if (this.state.debug) {
+        this.state.debug.lastError = "Failed to fetch user: " + error.message;
+      }
+      return null;
+    }
+  }
+
+  /**
+   * Get all stats with caching
+   */
+  async getAllStats() {
+    const params = {
+      cco: this.state.cco,
+      branches_id: this.state.branches_id,
+      datepicked: Number(this.state.datepicked),
+    };
+    
+    logDebug('Getting all stats with params:', params);
+    
+    // Generate cache key
+    const cacheKey = `all_stats_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
+    
+    try {
+      // Mark as loading
+      this.state.loadingStates.stats = true;
+      
+      // Try to get from cache
+      const cachedData = await this.serverCache.getCache(cacheKey);
+      
+      if (cachedData) {
+        logDebug('Using cached stats data');
+        this.state.stats = [...cachedData.data];
+        this.state.totalstat = cachedData.total;
+        this.state.loadingStates.stats = false;
+        return cachedData;
+      }
+      
+      // Not in cache, fetch from server
+      logDebug('Fetching stats from server');
+      const result = await this.rpc(`/dashboard/stats`, params);
+      
+      if (result) {
+        logDebug('Got stats data:', result);
+        this.state.stats = [...result.data];
+        this.state.totalstat = result.total;
+        // Cache the result
+        await this.serverCache.setCache(cacheKey, result);
+      } else {
+        logDebug('No stats data returned from API');
+      }
+      
+      this.state.loadingStates.stats = false;
+      return result;
+    } catch (error) {
+      console.error("Error fetching all stats:", error);
+      if (this.state.debug) {
+        this.state.debug.lastError = "Failed to fetch stats: " + error.message;
+      }
+      this.state.loadingStates.stats = false;
+      return null;
+    }
+  }
+
+  /**
+   * Get stats by category with caching
+   */
+  async getStatsByCategory(name) {
+    const params = {
+      cco: this.state.cco,
+      branches_id: this.state.branches_id,
+      category: name,
+      datepicked: Number(this.state.datepicked),
+    };
+    
+    // Generate cache key
+    const cacheKey = `stats_category_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${name}_${this.state.datepicked}`;
+    
+    try {
+      this.state.loadingStates.stats = true;
+      
+      // Try to get from cache
+      const cachedData = await this.serverCache.getCache(cacheKey);
+      
+      if (cachedData) {
+        logDebug('Using cached category stats data');
+        this.state.stats = cachedData.data;
+        this.state.totalstat = cachedData.total;
+        this.state.loadingStates.stats = false;
+        return cachedData;
+      }
+      
+      // Not in cache, fetch from server
+      logDebug('Fetching category stats from server');
+      const result = await this.rpc(`/dashboard/statsbycategory`, params);
+      
+      if (result) {
+        this.state.stats = result.data;
+        this.state.totalstat = result.total;
+        // Cache the result
+        await this.serverCache.setCache(cacheKey, result);
+      }
+      
+      this.state.loadingStates.stats = false;
+      return result;
+    } catch (error) {
+      console.error("Error fetching stats by category:", error);
+      if (this.state.debug) {
+        this.state.debug.lastError = "Failed to fetch category stats: " + error.message;
+      }
+      this.state.loadingStates.stats = false;
+      return null;
+    }
+  }
+
+  /**
+   * Fetch dashboard charts with caching
+   */
+  async fetchDashboardCharts() {
+    const params = {
+      cco: this.state.cco,
+      branches_id: this.state.branches_id,
+      datepicked: Number(this.state.datepicked),
+    };
+    
+    // Generate cache key
+    const cacheKey = `dynamic_charts_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
+    
+    try {
+      this.state.loadingStates.charts = true;
+      
+      // Try to get from cache
+      const cachedData = await this.serverCache.getCache(cacheKey);
+      
+      if (cachedData) {
+        logDebug('Using cached chart data');
+        this.state.dynamic_chart = cachedData;
+        this.state.loadingStates.charts = false;
+        return cachedData;
+      }
+      
+      // Not in cache, fetch from server
+      logDebug('Fetching chart data from server');
+      const response = await this.rpc(`/dashboard/dynamic_charts/`, params);  
+      
+      if (response && response.error) {
+        console.error(`Error fetching dashboard charts: ${response.error}`);
+        if (this.state.debug) {
+          this.state.debug.lastError = "Chart error: " + response.error;
+        }
+        this.state.dynamic_chart = [];
+      } else if (response) {
+        this.state.dynamic_chart = response;
+        // Cache the result
+        await this.serverCache.setCache(cacheKey, response);
+      } else {
+        console.error("Error: Empty response received while fetching dashboard charts.");
+        if (this.state.debug) {
+          this.state.debug.lastError = "Empty chart response";
+        }
+        this.state.dynamic_chart = [];
+      }
+      
+      this.state.loadingStates.charts = false;
+      return response;
+    } catch (error) {
+      console.error("Error in fetchDashboardCharts:", error);
+      if (this.state.debug) {
+        this.state.debug.lastError = "Failed to fetch charts: " + error.message;
+      }
+      this.state.dynamic_chart = [];
+      this.state.loadingStates.charts = false;
+      return null;
+    }
+  }
+
+  /**
+   * Filter by date with parallel requests
+   */
+  async filterByDate(forceRefresh = false) {
+    try {
+      // If forcing refresh, invalidate cache
+      if (forceRefresh) {
+        await this.serverCache.invalidateCache();
+      }
+      
+      // Reset loading states
+      this.state.loadingStates = {
+        stats: true,
+        charts: true
+      };
+      
+      // Using Promise.all for parallel execution
+      await Promise.all([
+        this.getAllStats(),
+        this.fetchDashboardCharts()
+      ]);
+      
+      if (this.state.debug) {
+        this.state.debug.lastUpdate = new Date().toISOString();
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error in filterByDate:", error);
+      if (this.state.debug) {
+        this.state.debug.lastError = "Filter error: " + error.message;
+      }
+      // Clear loading states on error
+      this.state.loadingStates.stats = false;
+      this.state.loadingStates.charts = false;
+      return false;
+    }
+  }
+
+  /**
    * Display by category with proper error handling
    */
   async displaybycategory(name) {
     try {
-      await this.dashboardData.displayByCategory(name);
+      this.state.isCategorySortingEnabled = name !== "all";
+      
+      if (name === "all") {
+        await this.getAllStats();
+      } else {
+        await this.getStatsByCategory(name);
+      }
+      
+      if (this.state.debug) {
+        this.state.debug.lastUpdate = new Date().toISOString();
+      }
+      
+      return true;
     } catch (error) {
       console.error("Error in displayByCategory:", error);
-    }
-  }
-  
-  /**
-   * Filter by date with proper error handling
-   */
-  async filterByDate() {
-    try {
-      await this.dashboardData.filterByDate(true); // Force refresh on date change
-    } catch (error) {
-      console.error("Error in filterByDate:", error);
+      if (this.state.debug) {
+        this.state.debug.lastError = "Category display error: " + error.message;
+      }
+      return false;
     }
   }
 
@@ -414,10 +496,13 @@ export class ComplianceDashboard extends Component {
       
       if (!response) {
         console.error("Empty response from dynamic_sql");
+        if (this.state.debug) {
+          this.state.debug.lastError = "Empty SQL response";
+        }
         return;
       }
 
-      // Create a properly formatted title
+      // Create a properly formatted title in sentence case
       const displayTitle = title || (category ? 
         category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
         "Card Results");
@@ -434,6 +519,9 @@ export class ComplianceDashboard extends Component {
       });
     } catch (error) {
       console.error("Error in displayOdooView:", error);
+      if (this.state.debug) {
+        this.state.debug.lastError = "View error: " + error.message;
+      }
     }
   }
 }
