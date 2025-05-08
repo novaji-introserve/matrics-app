@@ -4,7 +4,9 @@ from odoo.http import request
 from datetime import datetime, timedelta
 from odoo import fields
 import re
+import logging
 
+_logger = logging.getLogger(__name__)
 
 
 class Compliance(http.Controller):
@@ -258,13 +260,23 @@ class Compliance(http.Controller):
 
     @http.route('/dashboard/stats', auth='public', type='json')
     def getAllstats(self, cco, branches_id, datepicked, **kw):
+        
+        # Get current user ID
+        user_id = request.env.user.id
+        
+        # Generate cache key - include user ID to make it user-specific
+        cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}"
+        
+        # Check if we have valid cache for this user
+        cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
+        if cache_data:
+            return cache_data
 
         today = datetime.now().date()  # Get today's date
         prevDate = today - timedelta(days=datepicked)  # Get previous date
 
         # Convert to datetime for start and end of the day
         start_of_prev_day = fields.Datetime.to_string(datetime.combine(prevDate, datetime.min.time()))
-
         end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
 
         if cco == True:
@@ -274,7 +286,6 @@ class Compliance(http.Controller):
             computed_results = []
 
             for result in results:
-
                 original_query = result['sql_query']
                 query = original_query.lower()  # Use lowercase for checks but keep original for execution
                 needs_modification = False
@@ -288,13 +299,12 @@ class Compliance(http.Controller):
                         query = query[:-1]
                         original_query = original_query[:-1]
                     
-                    
                     has_where = bool(re.search(r'\bwhere\b', query))
                     
                     # Prepare conditions to add
                     conditions = []
 
-                     # Add origin filter for partner tables
+                    # Add origin filter for partner tables
                     if "res_partner" in query or "res.partner" in query:
                         conditions.append("origin IN ('demo','test','prod')")
                     
@@ -335,11 +345,16 @@ class Compliance(http.Controller):
                     # For count queries, we expect a single row with a single value
                     result_value = request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
                     computed_results.append({"name": result["name"],"scope": result["scope"], "val": self.format_number(result_value), "id": result["id"], "scope_color": result["scope_color"], "query": result['sql_query']})
-
-            return {
+            
+            result = {
                 "data": computed_results,
                 "total": len(results)
             }
+            
+            # Store in cache before returning - use user_id instead of primary_group_id
+            request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id)
+            
+            return result
         else:
             # First get all compliance stats in the date range
             query = """
@@ -374,7 +389,6 @@ class Compliance(http.Controller):
                     if query.endswith(";"):
                         query = query[:-1]
                         original_query = original_query[:-1]
-                    
                     
                     has_where = bool(re.search(r'\bwhere\b', query))
                     
@@ -414,7 +428,6 @@ class Compliance(http.Controller):
                         else:
                             original_query += condition_str
                 
-                
                         request.env.cr.execute(original_query, (branches_array,))
                     
                         # For count queries, we expect a single row with a single value
@@ -429,11 +442,15 @@ class Compliance(http.Controller):
                             "scope_color": stat["scope_color"],
                             "query": stat["sql_query"]
                         })
-
-            return {
+            result = {  
                 "data": computed_results,
                 "total": len(computed_results)
             }
+            
+            # Store in cache before returning - use user_id instead of primary_group_id
+            request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id)
+            
+            return result
 
 
     @http.route('/dashboard/statsbycategory', auth='public', type='json')
