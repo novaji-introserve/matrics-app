@@ -7,26 +7,19 @@
         <field name="arch" type="xml">
             <tree string="Transactions" create="false">
                 <header>
-                    <button name="done" class="oe_highlight" type="object"
-                        string="Mark Reviewed"
-                        groups="compliance_management.group_compliance_branch_control_officer"
-                        confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" />
+                    <button name="done" class="oe_highlight" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" />
                 </header>
                 <field name="name" string="Reference Number" />
                 <field name="customer_id" optional="show" />
                 <field name="account_id" optional="show"/>
                 <field name="branch_id" optional="show"/>
-                <field name="currency_id" optional="show" />
+                <field name="currency" optional="show" />
                 <field name="amount" optional="show"/>
-                <field name="tran_type" optional="show"/>
+                <field name="transaction_type" optional="show"/>
                 <field name="rule_id" optional="show"/>
-                <field name="likely_fraud" widget="boolean_toggle"  readonly="1" optional="show"/>
-                <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'"
-                    decoration-warning="risk_level in ('medium')"
-                    decoration-success="risk_level in ('low')" />
-                <field name="state" widget="badge"
-                    decoration-warning="state in ('new')"
-                    decoration-success="state in ('done')" />
+                <field name="likely_fraud" widget="boolean_toggle" readonly="1" optional="show"/>
+                <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" />
+                <field name="state" widget="badge" decoration-warning="state in ('new')" decoration-success="state in ('done')" />
                 <field name="date_created" optional="show"/>
             </tree>
         </field>
@@ -38,29 +31,15 @@
         <field name="arch" type="xml">
             <form create="false">
                 <header>
-                    <button name="action_screen" class="oe_highlight" type="object"
-                        string="Run Transaction Screening"
-                        groups="compliance_management.group_compliance_compliance_risk_manager"
-                        confirm="Run screening rules. All transaction screening rules will be applied. The first exception found will flagged. Are you sure?" />
-                    <button
-                        name="done" class="oe_highlight" type="object"
-                        string="Mark Reviewed"
-                        groups="compliance_management.group_compliance_branch_control_officer"
-                        confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?"
-                        attrs="{'invisible': [('state', 'not in',['new'])]}" />
-                    <field
-                        name="state" widget="statusbar" statusbar_visible="new,done"
-                        clickable="True" />
+                    <button name="action_screen" class="oe_highlight" type="object" string="Run Transaction Screening" groups="compliance_management.group_compliance_compliance_risk_manager" confirm="Run screening rules. All transaction screening rules will be applied. The first exception found will flagged. Are you sure?" />
+                    <button name="done" class="oe_highlight" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" attrs="{'invisible': [('state', 'not in',['new'])]}" />
+                    <field name="state" widget="statusbar" statusbar_visible="new,done" clickable="True" />
 
                 </header>
                 <sheet string="Transaction">
                     <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" type="object" name="get_risk_level"
-                            icon="fa-thermometer-0">
-                            <span>Risk <field string="Risk Level" name="risk_level" widget="badge"
-                                    decoration-danger="risk_level == 'high'"
-                                    decoration-warning="risk_level in ('medium')"
-                                    decoration-success="risk_level in ('low')" />
+                        <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
+                            <span>Risk <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" />
                             </span>
                         </button>
                     </div>
@@ -84,17 +63,18 @@
                                 <group>
                                     <field name="customer_id" readonly="1" />
                                     <field name="account_id" readonly="1" />
+                                    <field name="active" invisible="1" />
+
                                 </group>
                                 <group>
-                                    <field name="currency_id" readonly="1" />
+                                    <field name="currency" readonly="1" />
                                     <field name="branch_id" readonly="1" />
                                     <field name="rule_id" readonly="1" />
-                                    <field name="likely_fraud" widget="boolean_toggle"  readonly="1"/>
+                                    <field name="likely_fraud" widget="boolean_toggle" readonly="1"/>
                                 </group>
                                 <group>
-                                    <field name="tran_type" readonly="1" />
-                                    <field name="date_created" string="Transaction Date"
-                                        readonly="1" />
+                                    <field name="transaction_type" readonly="1" />
+                                    <field name="date_created" string="Transaction Date" readonly="1" />
                                 </group>
                             </group>
                         </page>
@@ -120,32 +100,20 @@
                 <field name="name" />
                 <field name="customer_id" />
                 <separator />
-                <filter string="High Risk/ To Review" name="state_new"
-                    domain="[('state', '=', 'new'),('risk_level','=','high')]" />
-                <filter string="Medium Risk/ To Review" name="state_new"
-                    domain="[('state', '=', 'new'),('risk_level','=','medium')]" />
-                <filter string="Low Risk/ To Review" name="state_new"
-                    domain="[('state', '=', 'new'),('risk_level','=','low')]" />    
-                <filter string="Reviewed" name="state_done"
-                    domain="[('state', '=', 'done')]" />
-                <filter string="High Risk / Reviewed" name="risk_level_high"
-                    domain="[('risk_level', '=', 'high'),('state', '=', 'done')]" />
-                <filter string="Medium Risk / Reviewed" name="risk_level_medium"
-                    domain="[('risk_level', '=', 'medium'),('state', '=', 'done')]" />
-                <filter string="Low Risk / Reviewed" name="risk_level_low"
-                    domain="[('risk_level', '=', 'low'),('state', '=', 'done')]" />
+                <filter string="High Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','high')]" />
+                <filter string="Medium Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','medium')]" />
+                <filter string="Low Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','low')]" />
+                <filter string="Reviewed" name="state_done" domain="[('state', '=', 'done')]" />
+                <filter string="High Risk / Reviewed" name="risk_level_high" domain="[('risk_level', '=', 'high'),('state', '=', 'done')]" />
+                <filter string="Medium Risk / Reviewed" name="risk_level_medium" domain="[('risk_level', '=', 'medium'),('state', '=', 'done')]" />
+                <filter string="Low Risk / Reviewed" name="risk_level_low" domain="[('risk_level', '=', 'low'),('state', '=', 'done')]" />
                 <separator />
                 <group expand="0" name="group_by" string="Group By">
-                    <filter name="group_branch" string="Branch" domain="[]"
-                        context="{'group_by' : 'branch_id'}" />
-                    <filter name="group_customer" string="Customer" domain="[]"
-                        context="{'group_by' : 'customer_id'}" />
-                    <filter name="group_currency" string="Currency"
-                        context="{'group_by': 'currency_id'}" />
-                    <filter name="group_tran_type" string="Transaction Type"
-                        context="{'group_by': 'tran_type'}" />
-                    <filter name="group_state" string="Review Status"
-                        context="{'group_by': 'state'}" />
+                    <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" />
+                    <filter name="group_customer" string="Customer" domain="[]" context="{'group_by' : 'customer_id'}" />
+                    <filter name="group_currency" string="Currency" context="{'group_by': 'currency'}" />
+                    <filter name="group_tran_type" string="Transaction Type" context="{'group_by': 'transaction_type'}" />
+                    <filter name="group_state" string="Review Status" context="{'group_by': 'state'}" />
                 </group>
             </search>
         </field>
@@ -158,7 +126,7 @@
         <field name="code">action = model.open_transactions()</field>
     </record>
     <record id="open_transactions_done" model="ir.actions.server">
-        <field name="name">Open Transactions To Done</field>
+        <field name="name">Open Transactions Done</field>
         <field name="model_id" ref="model_res_customer_transaction" />
         <field name="type">ir.actions.server</field>
         <field name="state">code</field>
@@ -180,32 +148,9 @@
             action = records.done()
         </field>
     </record>
-    <menuitem
-        id="menu_compliance_transaction_monitoring"
-        parent="menu_compliance_kyc"
-        name="Transaction Monitoring"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="30" />
-    <menuitem
-        id="menu_compliance_transactions"
-        action="open_transactions"
-        parent="menu_compliance_transaction_monitoring"
-        name="Transactions To Review"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="10" />
-    <menuitem
-        id="menu_compliance_transactions_done"
-        action="open_transactions_done"
-        parent="menu_compliance_transaction_monitoring"
-        name="Transactions Reviewed"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="20" />
-    <menuitem
-        id="menu_compliance_transactions_all"
-        action="open_transactions_all"
-        parent="menu_compliance_transaction_monitoring"
-        name="All Transactions"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="30" />
+    <menuitem id="menu_compliance_transaction_monitoring" parent="menu_compliance_kyc" name="Transaction Monitoring" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
+    <menuitem id="menu_compliance_transactions" action="open_transactions" parent="menu_compliance_transaction_monitoring" name="Transactions To Review" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
+    <menuitem id="menu_compliance_transactions_done" action="open_transactions_done" parent="menu_compliance_transaction_monitoring" name="Transactions Reviewed" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
+    <menuitem id="menu_compliance_transactions_all" action="open_transactions_all" parent="menu_compliance_transaction_monitoring" name="All Transactions" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
 
 </odoo>

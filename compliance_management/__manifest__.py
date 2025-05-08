@@ -40,6 +40,7 @@
         "data/schedules/adverse_media_cron.xml",
         # "data/schedules/send_assessment_notification_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
+        'data/schedules/clean_cache.xml',
 
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
@@ -60,7 +61,7 @@
         "data/fcra_score.xml",    
         "data/data.xml",
         "views/risk_assessment.xml",
-        "views/open_sanctions.xml",
+        # "views/open_sanctions.xml",
         "views/sanction_screening.xml",
         "views/customer.xml",
         "views/statistics.xml",

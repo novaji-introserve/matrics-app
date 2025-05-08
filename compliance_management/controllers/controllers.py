@@ -33,6 +33,46 @@ class Compliance(http.Controller):
         else:
             return branches_id
 
+    # @http.route('/dashboard/dynamic_sql', auth='public', type='json')
+    # def extract_table_and_domain(self, sql_query: str, branches_id, cco):
+    #     """
+    #     Extract table names and WHERE conditions from SQL queries using regex patterns.
+    #     Ignores COUNT aggregation function while still blocking other aggregation functions.
+    #     """
+    #     lower_query = sql_query.lower()
+    #     table = None
+    #     domain = []
+
+    #     # Check for aggregation functions (sum, avg, min, max) in the SELECT clause
+    #     # Specifically exclude COUNT from the check
+    #     if re.search(r"\b(?:sum|avg|min|max)\s*\(", lower_query):
+    #         return None
+
+    #     # Extract table name (improved to handle more cases)
+    #     from_match = re.search(r"\bfrom\s+([\w.]+)", lower_query)
+    #     if from_match:
+    #         table = from_match.group(1)
+    #     else:
+    #         join_match = re.search(r"\b(?:inner|left|right|full outer)?\s+join\s+([\w.]+)", lower_query)
+    #         if join_match:
+    #             # We're not handling complex joins in this version
+    #             return None
+        
+    #     # Extract WHERE clause conditions and convert to Odoo domain format
+    #     where_match = re.search(r"\bwhere\s+(.+?)(?:\s+(?:group\s+by|order\s+by|limit|having)\s+|\s*$)", lower_query, re.DOTALL)
+    #     if where_match:
+    #         condition_string = where_match.group(1).strip()
+    #         domain = self._parse_conditions_to_odoo_domain(condition_string)  
+        
+    #     if table == "res_partner":
+    #         domain.append(["origin", "in", ["demo", "test", "prod"]])
+        
+    #     # check if it is not cco
+    #     if not cco and has_branch_id:
+    #         domain.append(["branch_id", "in", self.check_branches_id(branches_id)])
+
+    #     return {'table': table, 'domain': domain}
+    
     @http.route('/dashboard/dynamic_sql', auth='public', type='json')
     def extract_table_and_domain(self, sql_query: str, branches_id, cco):
         """
@@ -276,7 +316,19 @@ class Compliance(http.Controller):
 
 
     @http.route('/dashboard/stats', auth='public', type='json')
-    def getAllstats(self, cco, branches_id, datepicked,  offset=0, limit=10, **kw):
+    def getAllstats(self, cco, branches_id, datepicked, **kw):
+        
+        # Get current user ID
+        user_id = request.env.user.id
+        
+        # Generate cache key - include user ID to make it user-specific
+        cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}"
+        
+        # Check if we have valid cache for this user
+        cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
+        if cache_data:
+            return cache_data
+
         today = datetime.now().date()  # Get today's date
         prevDate = today - timedelta(days=datepicked)  # Get previous date
         
@@ -370,6 +422,11 @@ class Compliance(http.Controller):
                 "data": computed_results,
                 "total": len(results)
             }
+            
+            # Store in cache before returning - use user_id instead of primary_group_id
+            request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id)
+            
+            return result
         else:
             # First get all compliance stats in the date range
             query = """
@@ -531,6 +588,13 @@ class Compliance(http.Controller):
                 "data": computed_results,
                 "total": len(computed_results)
             }
+            
+            # Store in cache before returning - use user_id instead of primary_group_id
+            request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id)
+            
+            return result
+
+
     @http.route('/dashboard/statsbycategory', auth='public', type='json')
     def getAllstatsByCategory(self, cco, branches_id, category, datepicked, **kw):
         today = datetime.now().date()  # Get today's date
