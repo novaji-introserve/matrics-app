@@ -77,7 +77,8 @@
                 </div> -->
 
                 <!-- Chart section -->
-                <div class="row g-md-2" style="margin-bottom:7rem;" >
+                <!-- <div class="row g-md-2" style="margin-bottom:7rem;" > -->
+                <div class="row g-md-2 mt-md-5 mt-10" >
                     <!-- Loading indicator for charts -->
                     <div t-if="state.loadingStates.charts" class="d-flex justify-content-center align-items-center col-12 p-5">
                         <div class="spinner-border text-primary me-3" role="status">
