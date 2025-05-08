@@ -95,7 +95,7 @@ class Customer(models.Model):
     company_reg_date = fields.Date(
         string='Company Registration Date', tracking=True)
     risk_score = fields.Float(
-        string='Risk Score', digits=(10, 2), tracking=True)
+        string='Risk Score', digits=(10, 2), tracking=True, group_operator='avg')
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
@@ -173,6 +173,9 @@ class Customer(models.Model):
     formatted_phone = fields.Char(
         string='Phone Number(s)', compute='_compute_formatted_phone')
 
+    likely_sanction = fields.Boolean()
+    likely_pep = fields.Boolean()
+    
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
         for record in self:
@@ -911,6 +914,50 @@ class Customer(models.Model):
 
         return {
             'name': _('Respondents'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {'search_default_group_branch': 1}
+        }
+
+    @api.model
+    def action_view_likely_sanction_customer(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        domain = [('origin', 'in', ['demo', 'test', 'prod']), ('likely_sanction', '=', True)]
+
+        # Set domain based on user group
+        if not is_chief_compliance_officer:
+            domain.append(('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id]))
+
+        return {
+            'name': _('Likely Santions List'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {'search_default_group_branch': 1}
+        }
+
+    @api.model
+    def action_view_likely_pep(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        domain = [('origin', 'in', ['demo', 'test', 'prod']), ('likely_pep', '=', True)]
+
+        # Set domain based on user group
+        if not is_chief_compliance_officer:
+            domain.append(('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id]))
+
+        return {
+            'name': _('Likely Santions List'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',

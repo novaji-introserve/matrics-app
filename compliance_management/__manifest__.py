@@ -58,6 +58,7 @@
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
         # "data/schedules/queue_job_config.xml",
+        "data/fcra_score.xml",    
         "data/data.xml",
         "views/risk_assessment.xml",
         # "views/open_sanctions.xml",
@@ -73,7 +74,6 @@
         "views/transaction_screening_rule.xml",
         # "data/charts.xml",
         # "data/res_partner.xml",
-        "data/fcra_score.xml",    
         "views/res_users.xml",
     ],
     # only loaded in demonstration mode

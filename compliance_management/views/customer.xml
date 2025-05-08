@@ -34,6 +34,10 @@
                 <field name="user_id" optional="show" invisible="1" widget="many2one_avatar_user" domain="[('share', '=', False)]" />
             </xpath>
 
+            <!-- <xpath expr="//group" position="inside">
+                <field name="risk_score" type="measure" string="Average Risk Score" aggregate="avg"/>
+            </xpath> -->
+
 
 
         </field>
@@ -424,6 +428,16 @@
         <field name="code">action = model.action_view_customer_pep()</field>
     </record>
 
-    <menuitem id="menu_compliance_customer_pep" action="action_view_customer_pep" parent="menu_compliance_customer_heading" name="Customers Matching PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="50" />
+    <record id="action_view_likely_sanction_customer" model="ir.actions.server">
+        <field name="name">Customers Likely On Sanction List</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.action_view_likely_sanction_customer()</field>
+    </record>
+
+    <menuitem id="menu_compliance_customer_pep" action="action_view_customer_pep" parent="menu_compliance_customer_heading" name="PEPs Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="50" />
+    <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanction" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" />
+    <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_pep" parent="menu_compliance_customer_heading" name="Likely PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="70" />
 
 </odoo>

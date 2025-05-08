@@ -6,8 +6,12 @@
     <field name="arch" type="xml">
         <tree string="FCRA Scores" create="false" delete="false">
             <field name="name"/>
-            <field name="min_score"/>
-            <field name="max_score"/>
+            <field name="inherent_risk_score_max"/>
+            <field name="inherent_risk_score_min"/>
+            <field name="control_effectiveness_score_max"/>
+            <field name="control_effectiveness_score_min"/>
+            <field name="residual_risk_score_max"/>
+            <field name="residual_risk_score_min"/>
         </tree>
     </field>
 </record>
@@ -18,10 +22,20 @@
     <field name="arch" type="xml">
         <form string="FCRA Score">
             <sheet>
+                <div>
+                    <h1> <field name='name' /> </h1>
+                </div>
                 <group>
-                    <field name="name"/>
-                    <field name="min_score"/>
-                    <field name="max_score"/>
+                    <group>
+                        <field name="inherent_risk_score_max"/>
+                    </group>
+                    <group>
+                        <field name="inherent_risk_score_min"/>
+                    </group>
+                    <group><field name="control_effectiveness_score_max"/></group>
+                    <group><field name="control_effectiveness_score_min"/></group>
+                    <group><field name="residual_risk_score_max"/></group>
+                    <group><field name="residual_risk_score_min"/></group>
                 </group>
             </sheet>
              <div class="oe_chatter">

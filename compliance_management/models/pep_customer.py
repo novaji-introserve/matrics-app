@@ -39,7 +39,7 @@ class PepCustomer(models.Model):
 
     def action_view_customer_pep(self):
         return {
-            'name': _('Customers marked as PEP'),
+            'name': _('Customers In Pep List'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.pep',
             'view_mode': 'tree,form',
