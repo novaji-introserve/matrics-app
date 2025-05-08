@@ -45,35 +45,35 @@ class RiskAssessmentLine(models.Model):
     residual_risk_score = fields.Float(
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
     
-    inherent_max_val = fields.Float(
-    string='Inherent Max', 
-    default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_max or 0.0
-    )
+    # inherent_max_val = fields.Float(
+    # string='Inherent Max', 
+    # default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_max or 0.0
+    # )
 
-    inherent_min_val = fields.Float(
-        string='Inherent Min', 
-        default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_min or 0.0
-    )
+    # inherent_min_val = fields.Float(
+    #     string='Inherent Min', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_min or 0.0
+    # )
 
-    control_max_val = fields.Float(
-        string='Control Max', 
-        default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_max or 0.0
-    )
+    # control_max_val = fields.Float(
+    #     string='Control Max', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_max or 0.0
+    # )
 
-    control_min_val = fields.Float(
-        string='Control Min', 
-        default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_min or 0.0
-    )
+    # control_min_val = fields.Float(
+    #     string='Control Min', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_min or 0.0
+    # )
 
-    residual_max_val = fields.Float(
-        string='Residual Max', 
-        default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_max or 0.0
-    )
+    # residual_max_val = fields.Float(
+    #     string='Residual Max', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_max or 0.0
+    # )
 
-    residual_min_val = fields.Float(
-        string='Residual Min', 
-        default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_min or 0.0
-    )
+    # residual_min_val = fields.Float(
+    #     string='Residual Min', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_min or 0.0
+    # )
 
 
 
