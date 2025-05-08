@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Tree View -->
-    <record id="view_rulebook_keyword_tree" model="ir.ui.view">
+<record id="view_regulatory_alert_tree" model="ir.ui.view">
         <field name="name">regulatory.alert.tree</field>
         <field name="model">regulatory.alert</field>
         <field name="arch" type="xml">
@@ -12,7 +12,7 @@
     </record>
 
     <!-- Form View -->
-    <record id="view_rulebook_keyword_form" model="ir.ui.view">
+<record id="view_regulatory_alert_form" model="ir.ui.view">
         <field name="name">regulatory.alert.form</field>
         <field name="model">regulatory.alert</field>
         <field name="arch" type="xml">
