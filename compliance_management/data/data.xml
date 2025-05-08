@@ -63,7 +63,7 @@
         <field name="name">Customers without BVN</field>
         <field name="code">customers_no_bvn</field>
         <field name="scope">regulatory</field>
-        <field name="sql_query">SELECT count(id) FROM res_partner WHERE bvn IS NULL OR bvn ~ '[a-zA-Z]' OR bvn LIKE 'NOBVN%' </field>
+        <field name="sql_query">SELECT count(id) FROM res_partner WHERE bvn IS NULL AND customer_id is not NULL </field>
         <!-- <field name="sql_query">select count(id) from res_partner where bvn is null </field> -->
     </record>
     <record id="res_compl_stat_4" model="res.compliance.stat">
