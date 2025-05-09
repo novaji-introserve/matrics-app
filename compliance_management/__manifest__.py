@@ -104,6 +104,7 @@
             'compliance_management/static/src/components/file_upload/js/main.js',
         
             'compliance_management/static/src/css/style.css',
+            'compliance_management/static/src/css/slider.css',
             'compliance_management/static/src/components/**/*.js',
             'compliance_management/static/src/components/**/*.xml',
             'compliance_management/static/src/components/**/*.css',

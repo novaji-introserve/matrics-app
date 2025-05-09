@@ -22,7 +22,9 @@
     <function model="ir.config_parameter" name="set_param"
         eval="('opensanctions_api_key', '1731b7a13f6c63e6a9bbb550981e6a18')" />
      <function model="ir.config_parameter" name="set_param"
-            eval="('risk_management.control_effectiveness_max_score', '25')" />
+            eval="('risk_management.max_slider_score', '15')" />
+     <function model="ir.config_parameter" name="set_param"
+            eval="('risk_management.min_slider_score', '0')" />
     <!--  Gender -->
     <record id="res_partner_gender_male" model="res.partner.gender">
         <field name="name">Male</field>

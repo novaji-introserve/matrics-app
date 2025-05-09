@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="risk_assessment.RiskSliderField" owl="1">
+        <div class="o_risk_slider d-flex align-items-center gap-3">
+            <!-- Minimum Value Badge -->
+            <span class="o_risk_badge badge bg-primary text-white d-flex align-items-center justify-content-center"
+                  style="min-width: 48px; height: 28px; border-radius: 14px; font-size: 0.875rem;"
+                  t-att-title="'Minimum slider value: ' + state.minValue">
+                <t t-esc="state.minValue"/>
+            </span>
+
+            <!-- Slider with Dynamic Tooltip -->
+            <div class="o_slider_container position-relative flex-grow-1">
+                <input type="range"
+                       class="o_risk_range form-range"
+                       t-att-class="state.isDragging ? 'dragging' : ''"
+                       t-att-min="state.minValue"
+                       t-att-max="state.maxValue"
+                       t-att-step="props.step"
+                       t-att-value="state.value"
+                       t-on-input="onSliderInput"
+                       t-on-mousedown="onDragStart"
+                       t-on-mouseup="onDragEnd"
+                       t-on-keyup="onDragEnd"
+                       t-att-aria-label="'Risk score slider'"
+                       t-att-aria-valuemin="state.minValue"
+                       t-att-aria-valuemax="state.maxValue"
+                       t-att-aria-valuenow="state.value"/>
+                <t t-if="state.isDragging">
+                    <span class="o_value_tooltip badge text-white position-absolute"
+                          t-att-class="badgeClass"
+                          t-att-style="'top: -32px; transform: translateX(-50%);'"
+                          t-esc="formattedValue"/>
+                </t>
+            </div>
+
+            <!-- Maximum Value Badge -->
+            <span class="o_risk_badge badge bg-primary text-white d-flex align-items-center justify-content-center"
+                  style="min-width: 48px; height: 28px; border-radius: 14px; font-size: 0.875rem;"
+                  t-att-title="'Maximum slider value: ' + state.maxValue">
+                <t t-esc="state.maxValue"/>
+            </span>
+        </div>
+
+        <!-- Inline Styles -->
+        <style>
+            .o_risk_slider {
+                padding: 8px 0;
+            }
+            .o_risk_badge {
+                font-weight: 500;
+                line-height: 1;
+            }
+            .o_slider_container {
+                position: relative;
+                min-width: 100px;
+            }
+            .o_risk_range {
+                height: 8px;
+                border-radius: 4px;
+                background: #e9ecef;
+                transition: border 0.2s, box-shadow 0.2s;
+            }
+            .o_risk_range.dragging {
+                border: 2px solid #007bff;
+                box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+            }
+            .o_value_tooltip {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+                border-radius: 4px;
+                z-index: 10;
+                white-space: nowrap;
+                min-width: 40px;
+                text-align: center;
+            }
+            .o_risk_range::-webkit-slider-thumb {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #007bff;
+                cursor: pointer;
+                -webkit-appearance: none;
+                margin-top: -4px;
+            }
+            .o_risk_range::-moz-range-thumb {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #007bff;
+                cursor: pointer;
+                border: none;
+            }
+            .o_risk_range::-webkit-slider-runnable-track {
+                height: 8px;
+                border-radius: 4px;
+            }
+            .o_risk_range::-moz-range-track {
+                height: 8px;
+                border-radius: 4px;
+                background: #e9ecef;
+            }
+        </style>
+    </t>
+</templates>

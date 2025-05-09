@@ -389,7 +389,7 @@ class Compliance(http.Controller):
                     computed_results.append({
                         "name": result["name"],
                         "scope": result["scope"],
-                        "val": self.format_number(result_value),
+                        "val": self.format_number(result_value) if result_value is not None else 0.0,
                         "id": result["id"],
                         "scope_color": result["scope_color"],
                         "query": result['sql_query']
@@ -520,7 +520,7 @@ class Compliance(http.Controller):
                     computed_results.append({
                         "name": stat["name"],
                         "scope": stat["scope"],
-                        "val": self.format_number(result_value),
+                        "val": self.format_number(result_value) if result_value is not None else 0.0,
                         "id": stat["id"],
                         "scope_color": stat["scope_color"],
                         "query": stat["sql_query"]
@@ -535,6 +535,8 @@ class Compliance(http.Controller):
                         "scope_color": stat["scope_color"],
                         "query": stat["sql_query"]
                     })
+
+            _logger.info(f"the r is {computed_results}")
 
             result = {
                 "data": computed_results,
