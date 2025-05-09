@@ -142,7 +142,6 @@ class Customer(models.Model):
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
         string='Accounts', compute='customer_total_accounts', store=False)
-        string='Accounts', compute='customer_total_accounts', store=False)
     global_pep_id = fields.Many2one(
         'res.pep', string='Related Global PEP', tracking=True)
 
