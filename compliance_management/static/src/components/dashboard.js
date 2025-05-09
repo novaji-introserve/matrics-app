@@ -507,6 +507,9 @@ export class ComplianceDashboard extends Component {
         category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
         "Card Results");
       
+        console.log(response.domain);
+        
+
       this.navigate.doAction({
         type: "ir.actions.act_window",
         res_model: response.table.replace(/_/g, "."),
