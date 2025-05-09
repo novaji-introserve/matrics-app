@@ -4,7 +4,7 @@ from odoo.http import request
 from datetime import datetime, timedelta
 from odoo import fields
 import re
-from ..utils.get_client_ip import get_client_ip 
+from ..utils.cache_key_unique_identifier import get_unique_client_identifier
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -351,12 +351,11 @@ class Compliance(http.Controller):
         # Get current user ID
         user_id = request.env.user.id
 
-        # Generate user ip for unique cache key
-        # user_ip = request.httprequest.remote_addr
-        user_ip = get_client_ip()
-
-        # Generate cache key - include user ID and IP to make it user-specific
-        cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}_{user_ip}"
+        # Get unique identifier
+        unique_id = get_unique_client_identifier()
+        
+        # Generate cache key
+        cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}_{unique_id}"
 
         _logger.info(f"This is the cache key: {cache_key}")
 
