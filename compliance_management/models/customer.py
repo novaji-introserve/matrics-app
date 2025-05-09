@@ -187,70 +187,7 @@ class Customer(models.Model):
             else:
                 record.formatted_phone = record.customer_phone
 
-    # is_branch_compliance = fields.Boolean(
-    #     string="Is Branch Compliance Officer",
-    #     compute="_compute_is_branch_compliance"
-    # )
-
-    # def cron_run_risk_assessment(self):
-    #     self.update_sanction_status()
-    #     self.compute_risk_score_for_all_users()
-
-    # def update_sanction_status(self):
-
-    #     query_fetch = """
-    #         SELECT id, firstname, lastname
-    #         FROM res_partner
-    #         WHERE firstname IS NOT NULL AND lastname IS NOT NULL
-    #     """
-    #     self.env.cr.execute(query_fetch)
-    #     partners = self.env.cr.fetchall()
-
-    #     if not partners:
-    #         _logger.info("No customers found in res_partner.")
-    #         return
-
-    #     # Prepare a set of unique full names
-    #     full_names = list(
-    #         set(f"{first} {last}" for _, first, last in partners))
-    #     _logger.info(f"Unique customer full names: {full_names}")
-
-    #     #  DB Update
-
-    # #   Update global_pep from res_pep
-    #     query_update_pep = """
-    #         UPDATE res_partner
-    #         SET global_pep = True
-    #         FROM res_pep
-    #         WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = LOWER(TRIM(res_pep.name))
-    #     """
-    #     self.env.cr.execute(query_update_pep)
-
-    #     #  Update is_blacklist from res_partner_blacklist
-    #     query_update_blacklist = """
-    #         UPDATE res_partner
-    #         SET is_blacklist = TRUE
-    #         FROM res_partner_blacklist
-    #         WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) =
-    #         LOWER(TRIM(res_partner_blacklist.first_name)) || ' ' || LOWER(TRIM(res_partner_blacklist.surname))
-    #     """
-    #     self.env.cr.execute(query_update_blacklist)
-
-    #     # Update is_watchlist from res_partner_watchlist
-    #     query_update_watchlist = """
-    #         UPDATE res_partner
-    #         SET is_watchlist = TRUE
-    #         FROM res_partner_watchlist
-    #         WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) =
-    #         LOWER(TRIM(res_partner_watchlist.first_name)) || ' ' || LOWER(TRIM(res_partner_watchlist.surname))
-    #     """
-    #     self.env.cr.execute(query_update_watchlist)
-
-    #     self.env.cr.commit()
-    #     _logger.info(
-    #         "Sanction status update completed for global_pep, blacklist, and watchlist.")
-
-    # industry =
+    
 
     @api.model
     def cron_run_risk_assessment(self):
@@ -932,7 +869,7 @@ class Customer(models.Model):
                 e.id for e in self.env.user.branches_id]))
 
         return {
-            'name': _('Likely Santions List'),
+            'name': _('Customers on the Santions List'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
@@ -955,7 +892,7 @@ class Customer(models.Model):
                 e.id for e in self.env.user.branches_id]))
 
         return {
-            'name': _('Likely on Global PEP'),
+            'name': _('Customers on the Global PEP List'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
