@@ -96,7 +96,6 @@ class Customer(models.Model):
         string='Company Registration Date', tracking=True)
     risk_score = fields.Float(
         string='Risk Score', digits=(10, 2), tracking=True, group_operator='avg')
-        string='Risk Score', digits=(10, 2), tracking=True, group_operator='avg')
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
