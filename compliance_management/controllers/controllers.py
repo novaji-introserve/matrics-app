@@ -33,45 +33,6 @@ class Compliance(http.Controller):
         else:
             return branches_id
 
-    # @http.route('/dashboard/dynamic_sql', auth='public', type='json')
-    # def extract_table_and_domain(self, sql_query: str, branches_id, cco):
-    #     """
-    #     Extract table names and WHERE conditions from SQL queries using regex patterns.
-    #     Ignores COUNT aggregation function while still blocking other aggregation functions.
-    #     """
-    #     lower_query = sql_query.lower()
-    #     table = None
-    #     domain = []
-
-    #     # Check for aggregation functions (sum, avg, min, max) in the SELECT clause
-    #     # Specifically exclude COUNT from the check
-    #     if re.search(r"\b(?:sum|avg|min|max)\s*\(", lower_query):
-    #         return None
-
-    #     # Extract table name (improved to handle more cases)
-    #     from_match = re.search(r"\bfrom\s+([\w.]+)", lower_query)
-    #     if from_match:
-    #         table = from_match.group(1)
-    #     else:
-    #         join_match = re.search(r"\b(?:inner|left|right|full outer)?\s+join\s+([\w.]+)", lower_query)
-    #         if join_match:
-    #             # We're not handling complex joins in this version
-    #             return None
-        
-    #     # Extract WHERE clause conditions and convert to Odoo domain format
-    #     where_match = re.search(r"\bwhere\s+(.+?)(?:\s+(?:group\s+by|order\s+by|limit|having)\s+|\s*$)", lower_query, re.DOTALL)
-    #     if where_match:
-    #         condition_string = where_match.group(1).strip()
-    #         domain = self._parse_conditions_to_odoo_domain(condition_string)  
-        
-    #     if table == "res_partner":
-    #         domain.append(["origin", "in", ["demo", "test", "prod"]])
-        
-    #     # check if it is not cco
-    #     if not cco and has_branch_id:
-    #         domain.append(["branch_id", "in", self.check_branches_id(branches_id)])
-
-    #     return {'table': table, 'domain': domain}
     
     @http.route('/dashboard/dynamic_sql', auth='public', type='json')
     def extract_table_and_domain(self, sql_query: str, branches_id, cco):
@@ -102,149 +63,87 @@ class Compliance(http.Controller):
         where_match = re.search(r"\bwhere\s+(.+?)(?:\s+(?:group\s+by|order\s+by|limit|having)\s+|\s*$)", lower_query, re.DOTALL)
         if where_match:
             condition_string = where_match.group(1).strip()
-            domain = self._parse_conditions_to_odoo_domain(condition_string)  
+            domain = self.parse_condition_string(condition_string) 
         
-        if table == "res_partner":
-            domain.append(["origin", "in", ["demo", "test", "prod"]])
+        # Collect additional filters
+        additional_filters = []
 
-        
+
+
+        if table == "res_partner":
+            additional_filters.append(("origin", "in", ["demo", "test", "prod"]))
+
         check_query = """SELECT 1 FROM information_schema.columns 
-                            WHERE table_name = %s AND column_name = 'branch_id'
-                        """
+                        WHERE table_name = %s AND column_name = 'branch_id'
+                     """
         request.env.cr.execute(check_query, (table,))
-           
         has_branch_id = request.env.cr.fetchone() is not None
 
-        
-        # check if it is not cco
         if not cco and has_branch_id:
-            domain.append(["branch_id", "in", self.check_branches_id(branches_id)])
+            branch_ids = self.check_branches_id(branches_id)
+            
+            additional_filters.append(("branch_id", "in", branch_ids))
+            
+
+        # Combine domain with additional filters
+        if additional_filters:
+            if domain:
+                print(domain)
+                # Check if domain is complex (contains '|')
+                is_complex = any(op == '|' for op in domain if isinstance(op, str))
+                if is_complex:
+                    # Wrap complex domain to preserve precedence
+                    domain = ['&'] + domain + [additional_filters[0]]
+                    # Add remaining additional filters with '&' operators
+                    for filter_item in additional_filters[1:]:
+                        domain = ['&'] + domain + [filter_item]
+                else:
+                    # # For simple domain, add '&' operators
+                    # domain = ['&'] * (len(additional_filters) - 1 + 1) + [domain] + additional_filters
+                    # Simple domain: append filters directly without '&'
+                    # domain = domain + additional_filters
+                    # Simple domain: append filters with '&' operators if needed
+                    for filter_item in additional_filters:
+                        domain = ['&'] + domain + [filter_item]
+            else:
+                # No parsed domain, use only additional filters
+                domain = additional_filters
+        else:
+            # No additional filters, keep parsed domain
+            pass
+
+        _logger.info(f"Final domain: {domain}")
+       
 
         return {'table': table, 'domain': domain}
 
-    def _parse_conditions_to_odoo_domain(self, condition_string: str):
+    def parse_condition_string(self, condition_string: str):
         """
-        Parse SQL WHERE conditions and convert to Odoo domain format.
-        Handles multiple AND conditions and IS NULL/IS NOT NULL.
+        Parse a condition string into Odoo domain format.
+        Handles AND/OR operators and respects parentheses and quoted strings.
         """
-        python_values = {
-            "null": None,
-            "true": True,
-            "false": False
-        }
+        # Split by AND operators
+        and_conditions = self._split_by_operator(condition_string, ' AND ')
+        
+        if len(and_conditions) == 1:
+            return self._parse_single_condition(and_conditions[0])
         
         domain = []
-        # Split AND conditions, respecting parentheses
-        conditions = self._split_and_conditions(condition_string)
-        
-        for cond in conditions:
-            cond = cond.strip()
+        for i, cond in enumerate(and_conditions):
+            parsed_condition = self._parse_single_condition(cond)
+            if i < len(and_conditions) - 1:
+                domain.append('&')
+            domain.extend(parsed_condition)
             
-            # Handle IS NULL and IS NOT NULL specially
-            null_match = re.match(r"([\w.]+)\s+is\s+(not\s+)?null", cond, re.IGNORECASE)
-            if null_match:
-                field = null_match.group(1).strip()
-                is_not = null_match.group(2) is not None
-                domain.append([field, '!=' if is_not else '=', None])
-                continue
-
-             # Handle IS TRUE specially
-            true_match = re.match(r"([\w.]+)\s+is\s+true", cond, re.IGNORECASE)
-            if true_match:
-                field = true_match.group(1).strip()
-                domain.append([field, '=', True])
-                continue
-            
-            # Handle IS FALSE specially
-            false_match = re.match(r"([\w.]+)\s+is\s+false", cond, re.IGNORECASE)
-            if false_match:
-                field = false_match.group(1).strip()
-                domain.append([field, '=', False])
-                continue
-            
-            # Handle standard operators
-            operators = ['>=', '<=', '!=', '<>', '=', '>', '<', ' like ', ' ilike ', ' in ', ' not in ']
-            operator_found = False
-            
-            for op in operators:
-                if f" {op.strip()} " in f" {cond} ":
-                    parts = cond.split(op, 1)
-                    if len(parts) == 2:
-                        field = parts[0].strip()
-                        value = parts[1].strip()
-                        
-                        # Clean the value
-                        if value.startswith("'") and value.endswith("'"):
-                            value = value[1:-1]
-                        elif value.startswith('"') and value.endswith('"'):
-                            value = value[1:-1]
-                        
-                        # Handle IN and NOT IN lists
-                        if op.strip() in ('in', 'not in'):
-                            if value.startswith('(') and value.endswith(')'):
-                                # Extract values from parentheses and convert to list
-                                value = value[1:-1]  # Remove parentheses
-                                value_list = []
-                                
-                                # Split by comma, handling quoted strings properly
-                                in_quote = False
-                                quote_char = None
-                                current_item = ""
-                                
-                                for char in value:
-                                    if char in ("'", '"') and (quote_char is None or char == quote_char):
-                                        in_quote = not in_quote
-                                        quote_char = char if in_quote else None
-                                        continue
-                                    
-                                    if char == ',' and not in_quote:
-                                        value_list.append(current_item.strip().strip("'\""))
-                                        current_item = ""
-                                    else:
-                                        current_item += char
-                                
-                                if current_item:
-                                    value_list.append(current_item.strip().strip("'\""))
-                                
-                                value = value_list
-                        
-                        # Convert Python values
-                        if isinstance(value, str) and value.lower() in python_values:
-                            value = python_values[value.lower()]
-                        
-                        # Map SQL operators to Odoo operators
-                        odoo_op = self._map_operator_to_odoo(op.strip())
-                        domain.append([field, odoo_op, value])
-                        operator_found = True
-                        break
-            
-            # If no standard operator found, check for more complex conditions
-            if not operator_found and ' or ' in cond.lower():
-                # Basic OR handling (simplified)
-                or_conditions = cond.split(' or ')
-                or_domain = []
-                
-                for or_cond in or_conditions:
-                    sub_domain = self._parse_conditions_to_odoo_domain(or_cond)
-                    if sub_domain:
-                        or_domain.extend(sub_domain)
-                
-                if or_domain:
-                    # Add Odoo's OR operator syntax
-                    or_operators = ['|'] * (len(or_domain) - 1)
-                    domain.extend(or_operators + or_domain)
-        
         return domain
 
-    def _split_and_conditions(self, condition_string: str):
+    def _split_by_operator(self, condition_string: str, operator: str):
         """
-        Split a condition string by AND operators,
+        Split a condition string by a specified operator,
         respecting parentheses and quoted strings.
         """
         conditions = []
         current_condition = ""
-        
-        # State tracking
         paren_level = 0
         in_quote = False
         quote_char = None
@@ -253,26 +152,22 @@ class Compliance(http.Controller):
         while i < len(condition_string):
             c = condition_string[i]
             
-            # Handle quotes
             if c in ("'", '"') and (quote_char is None or c == quote_char):
                 in_quote = not in_quote
                 quote_char = c if in_quote else None
                 current_condition += c
-            
-            # Handle parentheses
             elif c == '(' and not in_quote:
                 paren_level += 1
                 current_condition += c
             elif c == ')' and not in_quote:
                 paren_level -= 1
                 current_condition += c
-            
-            # Check for AND operator, but only when not inside quotes or parentheses
             elif (paren_level == 0 and not in_quote and 
-                condition_string[i:i+5].lower() == ' and '):
+                  i + len(operator) <= len(condition_string) and
+                  condition_string[i:i+len(operator)].upper() == operator):
                 conditions.append(current_condition.strip())
                 current_condition = ""
-                i += 4  # Skip ahead past "and"
+                i += len(operator) - 1
             else:
                 current_condition += c
             
@@ -283,24 +178,158 @@ class Compliance(http.Controller):
         
         return conditions
 
-    def _map_operator_to_odoo(self, sql_op: str):
-        """Map SQL operators to Odoo domain operators."""
-        odoo_operators = {
-            '=': '=',
-            '>': '>',
-            '<': '<',
-            '>=': '>=',
-            '<=': '<=',
-            '!=': '!=',
-            '<>': '!=',
-            'like': 'like',
-            'ilike': 'ilike',
-            'in': 'in',
-            'not in': 'not in'
-        }
+    def _parse_single_condition(self, condition: str):
+        """
+        Parse a single condition which might contain OR operators.
+        Returns a list in Odoo domain format.
+        """
+        or_conditions = self._split_by_operator(condition, ' OR ')
         
-        return odoo_operators.get(sql_op, sql_op)
-    
+        if len(or_conditions) == 1:
+            condition = or_conditions[0].strip()
+            if condition.startswith('(') and condition.endswith(')'):
+                inner_condition = condition[1:-1].strip()
+                inner_or_conditions = self._split_by_operator(inner_condition, ' OR ')
+                if len(inner_or_conditions) > 1:
+                    or_conditions = inner_or_conditions
+                else:
+                    return self._convert_to_odoo_tuple(inner_condition)
+            else:
+                return self._convert_to_odoo_tuple(condition)
+        
+        domain = []
+        for i in range(len(or_conditions) - 1):
+            domain.append('|')
+        
+        for cond in or_conditions:
+            parsed = self._convert_to_odoo_tuple(cond.strip())
+            domain.extend(parsed)
+            
+        return domain
+
+    def _convert_to_odoo_tuple(self, condition: str):
+        """
+        Convert a simple condition string to an Odoo domain tuple.
+        Handles IS NULL, LIKE, IN, =, >, <, etc.
+        """
+        condition = condition.strip()
+        
+        if condition.startswith('(') and condition.endswith(')'):
+            condition = condition[1:-1].strip()
+        
+        lower_condition = condition.lower()
+        
+        if ' is true' in lower_condition:
+            field = lower_condition.split(' is true')[0].strip()
+            return [(field, '=', True)]
+            
+        if ' is false' in lower_condition:
+            field = lower_condition.split(' is false')[0].strip()
+            return [(field, '=', False)]
+        
+        if ' = true' in lower_condition:
+            field = lower_condition.split(' = true')[0].strip()
+            return [(field, '=', True)]
+            
+        if ' = false' in lower_condition:
+            field = lower_condition.split(' = false')[0].strip()
+            return [(field, '=', False)]
+        
+        if ' is null' in lower_condition:
+            field = lower_condition.split(' is null')[0].strip()
+            return [(field, '=', False)]
+        
+        if ' is not null' in lower_condition:
+            field = lower_condition.split(' is not null')[0].strip()
+            return [(field, '!=', False)]
+        
+        if ' like ' in lower_condition:
+            parts = condition.split(' like ', 1) if ' like ' in lower_condition else condition.split(' LIKE ', 1)
+            field = parts[0].strip()
+            value = self._extract_quoted_value(parts[1].strip())
+            return [(field, '=like', value)]
+        
+        if ' in ' in lower_condition:
+            parts = condition.split(' in ', 1) if ' in ' in lower_condition else condition.split(' IN ', 1)
+            field = parts[0].strip()
+            values_str = parts[1].strip()
+            
+            if values_str.startswith('(') and values_str.endswith(')'):
+                values_str = values_str[1:-1].strip()
+            
+            values = []
+            for val in values_str.split(','):
+                val = val.strip()
+                if (val.startswith("'") and val.endswith("'")) or (val.startswith('"') and val.endswith('"')):
+                    values.append(val[1:-1])
+                elif val.isdigit():
+                    values.append(int(val))
+                elif val.replace('.', '', 1).isdigit():
+                    values.append(float(val))
+                else:
+                    values.append(val)
+            
+            return [(field, 'in', values)]
+        
+        for op in ['!=', '>=', '<=', '=', '>', '<']:
+            if f' {op} ' in condition:
+                parts = condition.split(f' {op} ', 1)
+                field = parts[0].strip()
+                value = self._parse_value(parts[1].strip())
+                return [(field, op, value)]
+        
+        words = condition.strip().split()
+        if len(words) == 1:
+            return [(words[0], '=', True)]
+        
+        if "true" in lower_condition.split():
+            parts = lower_condition.split()
+            field_index = parts.index("true") - 1 if "true" in parts else 0
+            if field_index >= 0:
+                return [(parts[field_index], '=', True)]
+        
+        if "false" in lower_condition.split():
+            parts = lower_condition.split()
+            field_index = parts.index("false") - 1 if "false" in parts else 0
+            if field_index >= 0:
+                return [(parts[field_index], '=', False)]
+        
+        return [(condition, '=', True)]
+
+    def _extract_quoted_value(self, value_str: str):
+        """Extract a value from quotes."""
+        if (value_str.startswith("'") and value_str.endswith("'")) or (value_str.startswith('"') and value_str.endswith('"')):
+            return value_str[1:-1]
+        return value_str
+
+    def _parse_value(self, value_str: str):
+        """Parse a value string into the appropriate Python type."""
+        if (value_str.startswith("'") and value_str.endswith("'")) or (value_str.startswith('"') and value_str.endswith('"')):
+            return value_str[1:-1]
+        
+        if value_str.isdigit():
+            return int(value_str)
+        
+        try:
+            return float(value_str)
+        except ValueError:
+            pass
+        
+        if value_str.upper() == 'TRUE':
+            return True
+        if value_str.upper() == 'FALSE':
+            return False
+        
+        return value_str
+
+    def check_branches_id(self, branches_id):
+        """
+        Placeholder method to validate and return branch IDs.
+        Replace with actual implementation.
+        """
+        # Example implementation (replace with actual logic)
+        return branches_id if isinstance(branches_id, list) else [branches_id]
+        
     def format_number(self, result_value):
         if isinstance(result_value, (int, float)):
             result_value = "{:,}".format(result_value)
@@ -517,6 +546,8 @@ class Compliance(http.Controller):
                     request.env.cr.execute(original_query)
                     result_row = request.env.cr.fetchone()
                     result_value = result_row[0] if result_row is not None else 0
+                    print(stat['name'])
+                    print(stat['val'])
                     computed_results.append({
                         "name": stat["name"],
                         "scope": stat["scope"],
@@ -535,6 +566,8 @@ class Compliance(http.Controller):
                         "scope_color": stat["scope_color"],
                         "query": stat["sql_query"]
                     })
+            
+            
 
             result = {
                 "data": computed_results,
