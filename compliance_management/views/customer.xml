@@ -24,6 +24,16 @@
                 <field name="tier_id" optional="hide" />
             </xpath>
 
+            <!-- Hide the original phone field -->
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <!-- Add the formatted_phone field after hiding the original phone field -->
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="formatted_phone" optional="show" />
+            </xpath>
+
             <!-- Modify activity_ids field -->
             <xpath expr="//field[@name='activity_ids']" position="replace">
                 <field name="activity_ids" invisible="1" widget="list_activity" />
@@ -229,6 +239,7 @@
 
             <xpath expr="//field[@name='phone']" position="attributes">
                 <!-- <attribute name="readonly">1</attribute> -->
+                 
                 <attribute name="invisible">1</attribute>
             </xpath>
 

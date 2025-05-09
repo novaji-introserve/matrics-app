@@ -3,6 +3,10 @@ from odoo.http import request
 import json
 from datetime import datetime, timedelta
 import re
+import logging
+from ..utils.get_client_ip import get_client_ip 
+
+_logger = logging.getLogger(__name__)
 class DynamicChartController(http.Controller):
 
 
@@ -374,6 +378,23 @@ class DynamicChartController(http.Controller):
     def get_chart_data(self, cco, branches_id, datepicked, **kw):
         """Get chart data in JSON format"""
         
+        # Get current user ID
+        user_id = request.env.user.id
+
+        # Generate user ip for unique cache key
+        user_ip = get_client_ip()
+
+        # Generate cache key - include user ID and IP to make it user-specific
+        cache_key = f"charts_data_{cco}_{branches_id}_{datepicked}_{user_ip}"
+
+        _logger.info(f"This is the charts cache key: {cache_key}")
+        
+        # Check if we have valid cache for this user
+        cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
+        if cache_data:
+            return cache_data
+        
+        # Continue with existing functionality
         charts = request.env['res.dashboard.charts'].search([('state', '=', 'active')])
 
         today = datetime.now().date()  # Get today's date
@@ -388,20 +409,12 @@ class DynamicChartController(http.Controller):
         chartsData = []
         
         for chart in charts:
-
-    
-            
             
             chart = request.env['res.dashboard.charts'].browse(chart.id)
             if not chart.exists():
                 return {'error': 'Chart not found'}
             
             try:
-
-
-               
-
-
                 # Build where clause based on conditions
                 where_clause = f"{chart.date_field} >= '{odooPrevDate}'" if datepicked == 20000 else f"{chart.date_field} BETWEEN '{odooPrevDate}' AND '{odooCurrentDate}'"
                 
@@ -411,7 +424,7 @@ class DynamicChartController(http.Controller):
                     # where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
                     if len(branches_id) == 1: 
                         where_clause += f" AND {chart.branch_field} = {branches_id[0]}"
-                       
+                    
                     else:
                         where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
                 
@@ -427,7 +440,7 @@ class DynamicChartController(http.Controller):
                 # Execute query and process results
                 result = self._process_query_results(chart, query)
 
-               
+            
                 if result['title'] == '' and result['type'] == '' and result['labels'] == []:
                     pass
                     
@@ -438,7 +451,81 @@ class DynamicChartController(http.Controller):
             except Exception as e:
                 return {'error': str(e)}
         
+        # Store in cache before returning
+        request.env['res.dashboard.cache'].set_cache(cache_key, chartsData, user_id)
+        
         return chartsData
+
+
+    # @http.route('/dashboard/dynamic_charts/', type='json', auth='user')
+    # def get_chart_data(self, cco, branches_id, datepicked, **kw):
+    #     """Get chart data in JSON format"""
+        
+    #     charts = request.env['res.dashboard.charts'].search([('state', '=', 'active')])
+
+    #     today = datetime.now().date()  # Get today's date
+    #     prevDate = today - timedelta(days=datepicked)  # Get previous date
+
+    #     TIME_00_00_00 = "00:00:00"
+    #     TIME_23_59_59 = "23:59:59"
+
+    #     odooCurrentDate = f"{today} {TIME_23_59_59}"
+    #     odooPrevDate = f"{prevDate} {TIME_00_00_00}"
+
+    #     chartsData = []
+        
+    #     for chart in charts:
+
+    
+            
+            
+    #         chart = request.env['res.dashboard.charts'].browse(chart.id)
+    #         if not chart.exists():
+    #             return {'error': 'Chart not found'}
+            
+    #         try:
+
+
+               
+
+
+    #             # Build where clause based on conditions
+    #             where_clause = f"{chart.date_field} >= '{odooPrevDate}'" if datepicked == 20000 else f"{chart.date_field} BETWEEN '{odooPrevDate}' AND '{odooCurrentDate}'"
+                
+    #             # Add branch filtering if needed
+    #             if not cco and chart.branch_filter and branches_id and len(branches_id) > 0:
+            
+    #                 # where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
+    #                 if len(branches_id) == 1: 
+    #                     where_clause += f" AND {chart.branch_field} = {branches_id[0]}"
+                       
+    #                 else:
+    #                     where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
+                
+                
+    #             elif not cco and chart.branch_filter and len(branches_id) == 0:
+    #                 where_clause += " AND 1 = 0"
+                
+
+    #             # Modify query to include WHERE clause
+    #             query = self._add_where_to_query(chart.query, where_clause)
+
+                
+    #             # Execute query and process results
+    #             result = self._process_query_results(chart, query)
+
+               
+    #             if result['title'] == '' and result['type'] == '' and result['labels'] == []:
+    #                 pass
+                    
+    #             else:
+    #                 chartsData.append(result)
+                    
+
+    #         except Exception as e:
+    #             return {'error': str(e)}
+        
+    #     return chartsData
 
               
     

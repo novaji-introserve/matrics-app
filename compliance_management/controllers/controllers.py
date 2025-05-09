@@ -4,7 +4,9 @@ from odoo.http import request
 from datetime import datetime, timedelta
 from odoo import fields
 import re
+from ..utils.get_client_ip import get_client_ip 
 import logging
+
 _logger = logging.getLogger(__name__)
 
 
@@ -343,16 +345,28 @@ class Compliance(http.Controller):
             return from_match.group(1).strip()
         return None
 
-
     @http.route('/dashboard/stats', auth='public', type='json')
     def getAllstats(self, cco, branches_id, datepicked, **kw):
         
         # Get current user ID
         user_id = request.env.user.id
-        
-        # Generate cache key - include user ID to make it user-specific
-        cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}"
-        
+
+        # Generate user ip for unique cache key
+        # user_ip = request.httprequest.remote_addr
+        user_ip = get_client_ip()
+
+        # Generate cache key - include user ID and IP to make it user-specific
+        cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}_{user_ip}"
+
+        _logger.info(f"This is the cache key: {cache_key}")
+
+        # # Generate user ip for unique cache key
+        # user_ip = request.httprequest.remote_addr
+        # # Add timestamp for additional uniqueness
+        # timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+
+        # # Generate cache key - include user ID and IP to make it user-specific
+        # cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}_{user_ip}_{timestamp}"     
         
         # Check if we have valid cache for this user
         cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
