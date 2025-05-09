@@ -178,14 +178,41 @@ class Customer(models.Model):
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code")
 
+    # @api.depends('customer_phone')
+    # def _compute_formatted_phone(self):
+    #     for record in self:
+    #         if record.customer_phone and '^' in record.customer_phone:
+    #             record.formatted_phone = record.customer_phone.replace(
+    #                 '^', ', ')
+    #         else:
+    #             record.formatted_phone = record.customer_phone
+
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
         for record in self:
-            if record.customer_phone and '^' in record.customer_phone:
-                record.formatted_phone = record.customer_phone.replace(
-                    '^', ', ')
-            else:
-                record.formatted_phone = record.customer_phone
+            if not record.customer_phone:
+                record.formatted_phone = False
+                continue
+                
+            # Get the original phone number
+            phone = record.customer_phone
+            
+            # Step 1: Strip any trailing or leading commas
+            phone = phone.strip(',')
+            
+            # Step 2: Replace ^ with comma
+            phone = phone.replace('^', ',')
+            
+            # Step 3: Split by comma, clean each part, and rejoin with proper formatting
+            parts = [part.strip() for part in phone.split(',')]
+            
+            # Step 4: Filter out empty parts
+            parts = [part for part in parts if part]
+            
+            # Step 5: Join with comma+space
+            formatted = ', '.join(parts)
+            
+            record.formatted_phone = formatted
 
     
 
