@@ -77,7 +77,7 @@ class Customer(models.Model):
     sector_id = fields.Many2one(
 
         comodel_name='res.partner.sector', string='Sector', index=True, tracking=True, readonly=True)
-    
+
     customer_industry_id = fields.Many2one(
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
@@ -96,6 +96,7 @@ class Customer(models.Model):
         string='Company Registration Date', tracking=True)
     risk_score = fields.Float(
         string='Risk Score', digits=(10, 2), tracking=True, group_operator='avg')
+        string='Risk Score', digits=(10, 2), tracking=True, group_operator='avg')
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
@@ -104,10 +105,10 @@ class Customer(models.Model):
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(
         comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts', readonly=True)
-    
+
     res_partner_account_ids = fields.One2many(
         'res.partner.account', 'customer_id', string='Accounts', readonly=True)
-    
+
     edd_ids = fields.One2many(
         comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
@@ -116,7 +117,8 @@ class Customer(models.Model):
         comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
     risk_assessment_ids = fields.One2many(
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
-    is_pep = fields.Boolean(string="Is PEP", default=False, tracking=True, index=True)
+    is_pep = fields.Boolean(
+        string="Is PEP", default=False, tracking=True, index=True)
     is_watchlist = fields.Boolean(
         string="Is Watchlist", default=False, tracking=True)
     is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
@@ -140,6 +142,7 @@ class Customer(models.Model):
     anti_money_laundering_file_name = fields.Char(
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
+        string='Accounts', compute='customer_total_accounts', store=False)
         string='Accounts', compute='customer_total_accounts', store=False)
     global_pep_id = fields.Many2one(
         'res.pep', string='Related Global PEP', tracking=True)
@@ -168,7 +171,7 @@ class Customer(models.Model):
     first_risk_rating = fields.Char(string='Bank Risk Rating', index=True)
     pep = fields.Char(string='Bank Pep Customer', index=True)
     customer_phone = fields.Char(string='Phone Number(s)', index=True)
-    
+
     # phone = fields.Char(string='Phone Number(s)', index=True)
     formatted_phone = fields.Char(
         string='Phone Number(s)', compute='_compute_formatted_phone')
@@ -176,7 +179,7 @@ class Customer(models.Model):
     likely_sanction = fields.Boolean()
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code")
-    
+
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
         for record in self:
@@ -185,8 +188,7 @@ class Customer(models.Model):
                     '^', ', ')
             else:
                 record.formatted_phone = record.customer_phone
-    
-    
+
     # is_branch_compliance = fields.Boolean(
     #     string="Is Branch Compliance Officer",
     #     compute="_compute_is_branch_compliance"
@@ -199,7 +201,7 @@ class Customer(models.Model):
     # def update_sanction_status(self):
 
     #     query_fetch = """
-    #         SELECT id, firstname, lastname 
+    #         SELECT id, firstname, lastname
     #         FROM res_partner
     #         WHERE firstname IS NOT NULL AND lastname IS NOT NULL
     #     """
@@ -231,7 +233,7 @@ class Customer(models.Model):
     #         UPDATE res_partner
     #         SET is_blacklist = TRUE
     #         FROM res_partner_blacklist
-    #         WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = 
+    #         WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) =
     #         LOWER(TRIM(res_partner_blacklist.first_name)) || ' ' || LOWER(TRIM(res_partner_blacklist.surname))
     #     """
     #     self.env.cr.execute(query_update_blacklist)
@@ -271,7 +273,7 @@ class Customer(models.Model):
 
         try:
             # Set the nextcall far in the future to prevent new runs starting
-            
+
             cron_record.write({
                 'nextcall': fields.Datetime.now() + timedelta(hours=24)
             })
@@ -304,7 +306,7 @@ class Customer(models.Model):
                 'nextcall': next_run
             })
             self.env.cr.commit()
-     
+
     def update_sanction_status(self):
         _logger.info("Starting PEP status check using Odoo ORM for tracking.")
 
@@ -393,8 +395,7 @@ class Customer(models.Model):
             'blacklist_updated': len(blacklist_ids),
             'watchlist_updated': len(watchlist_ids)
         }
-    
-    
+
     def init(self):
         # Drop the trigger if it exists
         self.env.cr.execute(
@@ -528,12 +529,12 @@ class Customer(models.Model):
         # Trigger notification for UI refresh
         self.env['bus.bus']._sendmany([
             ('dashboard_refresh_channel', 'refresh', {
-                'type': 'refresh', 
-                'channelName': 'dashboard_refresh_channel', 
+                'type': 'refresh',
+                'channelName': 'dashboard_refresh_channel',
                 'model': self._name
             })
         ])
-   
+
         # Create a context to prevent recursion
         new_ctx = dict(self.env.context, computing_risk=True)
         self = self.with_context(new_ctx)
@@ -553,7 +554,6 @@ class Customer(models.Model):
             # Invalidate cache for these fields
             record.invalidate_recordset(['risk_score', 'risk_level'])
 
-             
         return records
 
     def write(self, vals):
@@ -562,13 +562,12 @@ class Customer(models.Model):
 
         # Trigger notification for UI refresh
         self.env['bus.bus']._sendmany([
-           ('dashboard_refresh_channel', 'refresh', {
-               'type': 'refresh', 
-               'channelName': 'dashboard_refresh_channel', 
-               'model': self._name
-           })
+            ('dashboard_refresh_channel', 'refresh', {
+                'type': 'refresh',
+                'channelName': 'dashboard_refresh_channel',
+                'model': self._name
+            })
         ])
-        
 
         # Only update risk scores if we're not already in a risk score update
         # This prevents recursion
@@ -584,17 +583,14 @@ class Customer(models.Model):
 
             #     # Use direct SQL update to avoid triggering write() again
             #     self.env.cr.execute(
-            #         """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+            #         """UPDATE %s SET risk_score = %%s, risk_level = %%s
             #         WHERE id = %%s""" % self._table,
             #         (score, risk_level, record.id)
             #     )
 
             #     # Invalidate cache for these fields
             #     record.invalidate_recordset(['risk_score', 'risk_level'])
-                # record.invalidate_cache(['risk_score', 'risk_level'])
-            
-           
-
+            # record.invalidate_cache(['risk_score', 'risk_level'])
 
         return result
 
@@ -620,13 +616,14 @@ class Customer(models.Model):
     # def _total_accounts(self):
     #     for e in self:
     #         e.total_accounts = len(e.account_ids)
-            
+
     @api.depends('res_partner_account_ids')
     def customer_total_accounts(self):
         for e in self:
             e.total_accounts = len(e.res_partner_account_ids)
 
     def action_total_accounts(self):
+        print(self.id)
         print(self.id)
         return {
             'name': _('Accounts'),
@@ -656,8 +653,8 @@ class Customer(models.Model):
                     return 'high'
             except:
                 return 'low'
-    
-    def compute_customer_rating(self,score):
+
+    def compute_customer_rating(self, score):
         try:
             if score is None:
                 return 'low'
@@ -775,7 +772,6 @@ class Customer(models.Model):
             'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]), ('internal_category', '=', 'customer')],
             'context': {'search_default_group_branch': 1}
         }
-
 
     @api.model
     def open_customers(self):
@@ -909,8 +905,8 @@ class Customer(models.Model):
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'respondent'), 
-                ('origin','in', ['demo', 'test', 'prod'])
+                ('internal_category', '=', 'respondent'),
+                ('origin', 'in', ['demo', 'test', 'prod'])
 
             ]
 
@@ -929,12 +925,13 @@ class Customer(models.Model):
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
 
-        domain = [('origin', 'in', ['demo', 'test', 'prod']), ('likely_sanction', '=', True)]
+        domain = [('origin', 'in', ['demo', 'test', 'prod']),
+                  ('likely_sanction', '=', True)]
 
         # Set domain based on user group
         if not is_chief_compliance_officer:
             domain.append(('branch_id.id', 'in', [
-                 e.id for e in self.env.user.branches_id]))
+                e.id for e in self.env.user.branches_id]))
 
         return {
             'name': _('Likely Santions List'),
@@ -946,20 +943,21 @@ class Customer(models.Model):
         }
 
     @api.model
-    def action_view_likely_pep(self):
+    def action_view_global_pep_customer(self):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
 
-        domain = [('origin', 'in', ['demo', 'test', 'prod']), ('likely_pep', '=', True)]
+        domain = [('origin', 'in', ['demo', 'test', 'prod']),
+                  ('likely_pep', '=', True)]
 
         # Set domain based on user group
         if not is_chief_compliance_officer:
             domain.append(('branch_id.id', 'in', [
-                 e.id for e in self.env.user.branches_id]))
+                e.id for e in self.env.user.branches_id]))
 
         return {
-            'name': _('Likely Santions List'),
+            'name': _('Likely on Global PEP'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
@@ -1006,7 +1004,7 @@ class Customer(models.Model):
 
     #         # Use direct SQL update to avoid triggering write()
     #         self.env.cr.execute(
-    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s
     #             WHERE id = %%s""" % self._table,
     #             (score, risk_level, record.id)
     #         )
@@ -1064,8 +1062,7 @@ class Customer(models.Model):
         _logger.info(
             f"Completed risk score computation for {total_processed} users")
         return True
-    
-    
+
     # def action_compute_risk_score_with_plan(self):
     #     """Manual action to compute risk score"""
     #     for record in self:
@@ -1074,7 +1071,7 @@ class Customer(models.Model):
 
     #         # Use direct SQL update to avoid triggering write()
     #         self.env.cr.execute(
-    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s 
+    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s
     #             WHERE id = %%s""" % self._table,
     #             (score, risk_level, record.id)
     #         )
@@ -1083,19 +1080,20 @@ class Customer(models.Model):
     #         record.invalidate_recordset(['risk_score', 'risk_level'])
 
     #     return True
+
     def action_compute_risk_score_with_plan(self):
         """Manual action to compute risk score using ORM for proper tracking"""
         for record in self:
             # Calculate the risk score and level
             score = record._get_risk_score_from_plan()
             risk_level = self.compute_customer_rating(score)
-            
+
             # Use ORM write method to update and track changes
             record.sudo().write({
                 'risk_score': score,
                 'risk_level': risk_level
             })
-        
+
         return True
 
     def _get_risk_score_from_plan(self):
