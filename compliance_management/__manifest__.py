@@ -32,7 +32,7 @@
         "data/settings/email_smtp.xml",
         "data/department.xml",
         "data/risk_assessment_control_data.xml",
-        "data/res.branch.csv",
+        # "data/res.branch.csv",
         "data/risk_assessment_mitigation.xml",
         "data/res_risk_implication.xml",
         "data/media_keywords.xml",
