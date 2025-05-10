@@ -95,6 +95,10 @@
       min-height: 45vh;
       overflow: auto;
       margin: auto;
+      scrollbar-width: none;  
+  }
+  .chart::-webkit-scrollbar{
+    display: none;
   }
   .row{
       margin-right: auto!important;

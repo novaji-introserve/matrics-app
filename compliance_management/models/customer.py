@@ -140,7 +140,7 @@ class Customer(models.Model):
     anti_money_laundering_file_name = fields.Char(
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
-        string='Accounts', compute='customer_total_accounts', store=True)
+        string='Accounts', compute='customer_total_accounts', store=False)
     global_pep_id = fields.Many2one(
         'res.pep', string='Related Global PEP', tracking=True)
 
@@ -175,6 +175,7 @@ class Customer(models.Model):
 
     likely_sanction = fields.Boolean()
     likely_pep = fields.Boolean()
+    branch_code = fields.Char(string="Branch Code")
     
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
@@ -626,6 +627,7 @@ class Customer(models.Model):
             e.total_accounts = len(e.res_partner_account_ids)
 
     def action_total_accounts(self):
+        print(self.id)
         return {
             'name': _('Accounts'),
             'type': 'ir.actions.act_window',
