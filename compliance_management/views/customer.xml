@@ -24,6 +24,16 @@
                 <field name="tier_id" optional="hide" />
             </xpath>
 
+            <!-- Hide the original phone field -->
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <!-- Add the formatted_phone field after hiding the original phone field -->
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="formatted_phone" optional="show" />
+            </xpath>
+
             <!-- Modify activity_ids field -->
             <xpath expr="//field[@name='activity_ids']" position="replace">
                 <field name="activity_ids" invisible="1" widget="list_activity" />
@@ -33,6 +43,10 @@
             <xpath expr="//field[@name='user_id']" position="replace">
                 <field name="user_id" optional="show" invisible="1" widget="many2one_avatar_user" domain="[('share', '=', False)]" />
             </xpath>
+
+            <!-- <xpath expr="//group" position="inside">
+                <field name="risk_score" type="measure" string="Average Risk Score" aggregate="avg"/>
+            </xpath> -->
 
             <!-- <xpath expr="//group" position="inside">
                 <field name="risk_score" type="measure" string="Average Risk Score" aggregate="avg"/>
@@ -81,7 +95,7 @@
                     <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Compute Risk Score" confirm="Compute Risk Score: Using your defined Risk Plan, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
 
                     <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
-                    <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Run Media Screening: Are you sure?" />
+                    <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?" />
                 </header>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
@@ -229,6 +243,7 @@
 
             <xpath expr="//field[@name='phone']" position="attributes">
                 <!-- <attribute name="readonly">1</attribute> -->
+                 
                 <attribute name="invisible">1</attribute>
             </xpath>
 
@@ -274,10 +289,13 @@
                     <field name="customer_id" filter_domain="[('customer_id', 'ilike', self)]"/>
                     <separator/>
                     <filter string="Customers" name="type_customer" domain="[('internal_category', '=', 'customer')]"/>
-                    <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
+                    <filter string="Without BVN" name="bvn" domain="['|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]"/>
+                    <filter string="Without Phone No." name="customer_phone" domain="[('customer_phone', '=', False)]"/>
+
+                    <!-- <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
                     <filter string="Partners" name="type_partner" domain="[('internal_category', '=', 'partner')]"/>
                     <filter string="Respondents" name="type_respondent" domain="[('internal_category', '=', 'respondent')]"/>
-                    <filter string="Correspondent" name="type_correspondent" domain="[('internal_category', '=', 'correspondent')]"/>
+                    <filter string="Correspondent" name="type_correspondent" domain="[('internal_category', '=', 'correspondent')]"/> -->
                     <separator/>
                     <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
                     <separator/>
@@ -428,6 +446,14 @@
         <field name="code">action = model.action_view_customer_pep()</field>
     </record>
 
+    <record id="action_view_customer_global_pep" model="ir.actions.server">
+        <field name="name">Customers Matching Global PEP</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.action_view_global_pep_customer()</field>
+    </record>
+
     <record id="action_view_likely_sanction_customer" model="ir.actions.server">
         <field name="name">Customers Likely On Sanction List</field>
         <field name="model_id" ref="model_res_partner" />
@@ -437,7 +463,7 @@
     </record>
 
     <menuitem id="menu_compliance_customer_pep" action="action_view_customer_pep" parent="menu_compliance_customer_heading" name="PEPs Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="50" />
-    <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanction" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" />
-    <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_pep" parent="menu_compliance_customer_heading" name="Likely PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="70" />
+    <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanctioned" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" />
+    <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_global_pep" parent="menu_compliance_customer_heading" name="Matching Global PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="70" />
 
 </odoo>

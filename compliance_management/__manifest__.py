@@ -32,7 +32,7 @@
         "data/settings/email_smtp.xml",
         "data/department.xml",
         "data/risk_assessment_control_data.xml",
-        "data/res.branch.csv",
+        # "data/res.branch.csv",
         "data/risk_assessment_mitigation.xml",
         "data/res_risk_implication.xml",
         "data/media_keywords.xml",
@@ -104,6 +104,7 @@
             'compliance_management/static/src/components/file_upload/js/main.js',
         
             'compliance_management/static/src/css/style.css',
+            'compliance_management/static/src/css/slider.css',
             'compliance_management/static/src/components/**/*.js',
             'compliance_management/static/src/components/**/*.xml',
             'compliance_management/static/src/components/**/*.css',

@@ -28,7 +28,7 @@ class RiskAssessmentLine(models.Model):
     residual_risk_probability = fields.Float(
         string='Residual Risk Probability', compute='_compute_risk_probability', store=True)
     residual_risk_impact = fields.Float(
-        string='Residual Risk Impact', required=True, tracking=True)
+        string='Residual Risk Impact', compute="_compute_residual_risk_impact", tracking=True, store=False, readonly="True")
     planned_mitigation = fields.Many2many("risk.assessment.mitigation", "res_risk_assessment_line_risk_assessment_mitigation_rel", tracking=True)
     department_id = fields.Many2one(
         comodel_name='hr.department', string='Department', required=True, help="Department Responsible")
@@ -100,6 +100,22 @@ class RiskAssessmentLine(models.Model):
             record.residual_risk_probability = probability
             record.residual_risk_score = score
 
+    @api.depends('control_effectiveness_score')
+    def _compute_residual_risk_impact(self):
+        for record in self:
+            control_effectiveness_score = record.control_effectiveness_score or 0  # Handle None/False values
+            max_score = self.env['ir.config_parameter'].sudo().get_param(
+                'risk_management.max_slider_score', '15')
+            max_score = float(max_score)
+            
+            _logger.info(f"The control score is {control_effectiveness_score}")
+            _logger.info(f"Max score is {max_score}")
+            
+            # Ensure we don't have negative values if control score > max
+            record.residual_risk_impact = max(0, max_score - control_effectiveness_score)
+            _logger.info(f"Risk impact score is {record.residual_risk_impact}")
+
+
     @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact','residual_risk_score','residual_risk_probability','residual_risk_score')
     def _compute_risk_probability(self):
         for record in self:
@@ -111,8 +127,10 @@ class RiskAssessmentLine(models.Model):
             record.residual_risk_score = score
     
     def get_control_effectiveness_max_score(self):
-        """Retrieves the maximum control effectiveness score from system parameters."""
-        return int(self.env['ir.config_parameter'].sudo().get_param('risk_management.control_effectiveness_max_score') or 25)
+        """Get the maximum score for control effectiveness from system parameters"""
+        return float(self.env['ir.config_parameter'].sudo().get_param(
+            'risk_management.max_slider_score', '15'))
+    
 
     def _compute_risk_probability(self, control_effectiveness_score):
         max_score = self.get_control_effectiveness_max_score()
