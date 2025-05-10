@@ -83,14 +83,14 @@ class Compliance(http.Controller):
 
         if not cco and has_branch_id:
             branch_ids = self.check_branches_id(branches_id)
-            
+
             additional_filters.append(("branch_id", "in", branch_ids))
             
 
         # Combine domain with additional filters
         if additional_filters:
             if domain:
-                print(domain)
+                
                 # Check if domain is complex (contains '|')
                 is_complex = any(op == '|' for op in domain if isinstance(op, str))
                 if is_complex:
@@ -431,7 +431,7 @@ class Compliance(http.Controller):
                     computed_results.append({
                         "name": result["name"],
                         "scope": result["scope"],
-                        "val": self.format_number(result_value),
+                        "val": self.format_number(result_value) if result_value is not None else 0.0,
                         "id": result["id"],
                         "scope_color": result["scope_color"],
                         "query": result['sql_query']
@@ -458,6 +458,8 @@ class Compliance(http.Controller):
             
             return result
         else:
+
+           
             # Define excluded tables
             excluded_tables = ["res_branch", "res_risk_universe"]
 
@@ -475,14 +477,18 @@ class Compliance(http.Controller):
             # Convert branches_id to a proper PostgreSQL array parameter
             branches_array = list(map(int, branches_id)) if branches_id else []
 
+            
+
             # Process each compliance stat and execute its SQL query with branch filtering
             computed_results = []
             for stat in stat_records:
                 original_query = stat['sql_query']
-                query = original_query.lower()  
+                query = original_query.lower() 
+ 
 
                 # Extract the main table from the query
                 main_table = self.extract_main_table(query)
+
 
                 # Skip if the main table is in excluded_tables
                 if main_table in excluded_tables :
@@ -490,6 +496,8 @@ class Compliance(http.Controller):
 
                 needs_modification = False
                 has_branch_id = False
+
+                 
 
                 # Check if the main table has a branch_id column
                 if main_table:
@@ -510,7 +518,6 @@ class Compliance(http.Controller):
                         """
                         request.env.cr.execute(check_query, (main_table,))
                         has_branch_id = bool(request.env.cr.fetchone())
-
                 
                 has_res_partner = re.search(r"\bres_partner\b", query, re.IGNORECASE) is not None
                 if has_res_partner or has_branch_id:
@@ -524,7 +531,7 @@ class Compliance(http.Controller):
                     conditions = []
                     # Add branch filter if branches are specified AND table has branch_id column
                     if branches_array and has_branch_id:
-                        conditions.append(f"branch_id IN {tuple(branches_array)}")
+                        conditions.append(f"branch_id IN {tuple(branches_array)}" if len(branches_array) > 1 else f"branch_id = {branches_array[0]}")
                     elif branches_array and not has_branch_id:
                         # Skip branch filtering for tables without branch_id column
                         pass
@@ -546,7 +553,7 @@ class Compliance(http.Controller):
                         for clause in clauses:
                             pos = query.find(' ' + clause + ' ')
                             if pos > -1:
-                                if clause_pos == -1 or pos < clause_pos:
+                                if clause_pos == -1 or pos < clause_pos: 
                                     clause_pos = pos
                         # Insert the condition at the appropriate position
                         if clause_pos > -1:
@@ -555,16 +562,16 @@ class Compliance(http.Controller):
                             original_query += condition_str
 
                 # Execute the query with or without parameters based on conditions
+                
                 try:
                     request.env.cr.execute(original_query)
                     result_row = request.env.cr.fetchone()
                     result_value = result_row[0] if result_row is not None else 0
-                    print(stat['name'])
-                    print(stat['val'])
+        
                     computed_results.append({
                         "name": stat["name"],
                         "scope": stat["scope"],
-                        "val": self.format_number(result_value),
+                        "val": self.format_number(result_value) if result_value is not None else 0.0,
                         "id": stat["id"],
                         "scope_color": stat["scope_color"],
                         "query": stat["sql_query"]
@@ -580,8 +587,7 @@ class Compliance(http.Controller):
                         "query": stat["sql_query"]
                     })
             
-            
-
+    
             result = {
                 "data": computed_results,
                 "total": len(computed_results)
