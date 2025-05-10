@@ -25,8 +25,9 @@
                        t-att-aria-label="'Risk score slider'"
                        t-att-aria-valuemin="state.minValue"
                        t-att-aria-valuemax="state.maxValue"
-                       t-att-aria-valuenow="state.value"/>
-                <t t-if="state.isDragging">
+                       t-att-aria-valuenow="state.value"
+                       t-att-disabled="state.readonly"/>
+                <t t-if="state.isDragging === true">
                     <span class="o_value_tooltip badge text-white position-absolute"
                           t-att-class="badgeClass"
                           t-att-style="'top: -32px; transform: translateX(-50%);'"
@@ -40,6 +41,15 @@
                   t-att-title="'Maximum slider value: ' + state.maxValue">
                 <t t-esc="state.maxValue"/>
             </span>
+
+            <!-- Current Value Display (if showValue is true and not dragging) -->
+            <t t-if="props.showValue and (state.isDragging === false)">
+                <span class="o_current_value badge text-white d-flex align-items-center justify-content-center"
+                      t-att-class="badgeClass"
+                      style="min-width: 48px; height: 28px; border-radius: 14px; font-size: 0.875rem;">
+                    <t t-esc="formattedValue"/>
+                </span>
+            </t>
         </div>
 
         <!-- Inline Styles -->
@@ -64,6 +74,10 @@
             .o_risk_range.dragging {
                 border: 2px solid #007bff;
                 box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+            }
+            .o_risk_range:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
             }
             .o_value_tooltip {
                 font-size: 0.75rem;

@@ -26,7 +26,7 @@
                             <field name="category_id"/>
                         </group>
                         <group>
-                            <field name="inherent_risk_score"  widget="risk_slider" options="{'step': 0.1, 'show_value': true, 'reverse_colors': false, 'readonly': false}" />
+                            <field name="inherent_risk_score"  widget="risk_slider" options="{'step': 1, 'show_value': true, 'reverse_colors': false, 'readonly': false}" />
                         </group>
                     </group>
                     <group>
@@ -41,10 +41,12 @@
                     </group>
                     <group>
                         <group>
-                            <field name="control_effectiveness_score"   widget="risk_slider" options="{'step': 0.1, 'show_value': true, 'reverse_colors': true, 'readonly': false}" />
+                            <field name="control_effectiveness_score" widget="risk_slider" />
+                            <!-- <field name="control_effectiveness_score" widget="risk_slider" options="{'reverseColors': true}" /> -->
                         </group>
                         <group>
-                          <field name="residual_risk_impact" widget="risk_slider" options="{'step': 0.1, 'show_value': true, 'reverse_colors': true, 'readonly': true}"/>
+                            
+                          <field name="residual_risk_impact" widget="risk_slider" options="{'readonly': true}"/>
                         </group>
                     </group>
                     <group>

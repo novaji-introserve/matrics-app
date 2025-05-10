@@ -7,12 +7,23 @@ const { Component, useState, onWillStart, onWillUpdateProps } = owl;
 
 export class RiskSliderField extends Component {
   setup() {
+    // Parse options from the view definition
     this.state = useState({
       value: this.props.record.data[this.props.name] || 0,
       minValue: 0,
       maxValue: 15,
       isDragging: false,
+      reverseColors: false,
+      readonly: false,
     });
+    
+    // Apply options
+    this.updateStateFromProps(this.props);
+
+    // Special handling for control_effectiveness_score field - always use reverse colors
+    if (this.props.name === 'control_effectiveness_score') {
+      this.state.reverseColors = true;
+    }
 
     this.orm = useService("orm");
     this.notification = useService("notification");
@@ -48,7 +59,44 @@ export class RiskSliderField extends Component {
       if (newValue !== undefined && newValue !== this.state.value) {
         this.state.value = parseFloat(newValue);
       }
+      
+      // Update options if they change
+      this.updateStateFromProps(nextProps);
+      
+      // Always ensure control_effectiveness_score has reverse colors
+      if (this.props.name === 'control_effectiveness_score') {
+        this.state.reverseColors = true;
+      }
     });
+  }
+  
+  /**
+   * Helper to update state from props and options
+   */
+  updateStateFromProps(props) {
+    // Check if we have options in props
+    const options = props.options || {};
+    
+    // Handle string values in JSON format (as they come from the view XML)
+    if (typeof options === 'string') {
+      try {
+        const parsedOptions = JSON.parse(options);
+        // Skip reverseColors setting for control_effectiveness_score as we'll handle it separately
+        if (props.name !== 'control_effectiveness_score') {
+          this.state.reverseColors = parsedOptions.reverseColors === true;
+        }
+        this.state.readonly = props.readonly || parsedOptions.readonly === true;
+      } catch (e) {
+        console.error("Error parsing options:", e);
+      }
+    } else {
+      // Handle direct object options
+      // Skip reverseColors setting for control_effectiveness_score as we'll handle it separately
+      if (props.name !== 'control_effectiveness_score') {
+        this.state.reverseColors = options.reverseColors === true;
+      }
+      this.state.readonly = props.readonly || options.readonly === true;
+    }
   }
 
   /**
@@ -58,7 +106,7 @@ export class RiskSliderField extends Component {
   onSliderInput(ev) {
     const value = parseFloat(ev.target.value);
     this.state.value = value;
-    if (!this.props.readonly) {
+    if (!this.state.readonly) {
       this.props.record.update({ [this.props.name]: value });
     }
 
@@ -79,7 +127,9 @@ export class RiskSliderField extends Component {
    * Handle drag start
    */
   onDragStart() {
-    this.state.isDragging = true;
+    if (!this.state.readonly) {
+      this.state.isDragging = true;
+    }
   }
 
   /**
@@ -90,14 +140,17 @@ export class RiskSliderField extends Component {
   }
 
   /**
-   * Get dynamic badge class based on value and reverseColors prop
+   * Get dynamic badge class based on value and reverseColors state
    */
   get badgeClass() {
     const range = this.state.maxValue - this.state.minValue;
     const lowThreshold = this.state.minValue + range * 0.33;
     const highThreshold = this.state.minValue + range * 0.66;
+    
+    // Determine if colors should be reversed (either by setting or field name)
+    const useReverseColors = this.state.reverseColors || this.props.name === 'control_effectiveness_score';
 
-    if (this.props.reverseColors) {
+    if (useReverseColors) {
       // Reversed: Low = red, medium = yellow, high = green
       if (this.state.value <= lowThreshold) {
         return 'bg-danger'; // Red for low
@@ -128,15 +181,13 @@ RiskSliderField.props = {
   ...standardFieldProps,
   step: { type: Number, optional: true },
   showValue: { type: Boolean, optional: true },
-  reverseColors: { type: Boolean, optional: true },
-  readonly: { type: Boolean, optional: true },
+  options: { type: Object, optional: true },
 };
 
 RiskSliderField.defaultProps = {
   step: 1,
   showValue: true,
-  reverseColors: false,
-  readonly: false,
+  options: {},
 };
 
 RiskSliderField.supportedTypes = ['float', 'integer'];
