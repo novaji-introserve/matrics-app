@@ -385,7 +385,7 @@ class DynamicChartController(http.Controller):
         unique_id = get_unique_client_identifier()
         
         # Generate cache key
-        cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}_{unique_id}"
+        cache_key = f"charts_data_{cco}_{branches_id}_{datepicked}_{unique_id}"
 
         _logger.info(f"This is the charts cache key: {cache_key}")
         
