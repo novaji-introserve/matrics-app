@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="owl.ComplianceDashboard" owl="1">
-        <div class="vh-100 overflow-auto bg-muted ">
-            <!-- Header section -->
+    <t t-name="compliance_management.DashboardTemplate" owl="1">
+        <div class="vh-100 overflow-auto bg-muted">
+            <!-- Header Section -->
             <div class="col-12">
                 <div class="col-12 m-0 p-0">
                     <div class="d-flex bg-white rounded shadow px-4 py-1 shadow-1 justify-content-between align-items-center">
+                        <!-- Logo -->
                         <div class="flex-grow-1 me-3">
                             <img t-att-src="'/compliance_management/static/src/img/logov.png'" alt="Dashboard Icon"
-                                class="img-fluid" style="width: 300; max-height: 70px; object-fit: contain; " />
+                                class="img-fluid" style="width: 300; max-height: 70px; object-fit: contain;" />
                         </div>
-                        <!-- <div class="ms-3">
+
+                        <!-- Date Filter -->
+                        <div class="ms-3">
                             <select class="form-select" t-model="state.datepicked" t-on-change="filterByDate">
                                 <option value="0">Today</option>
                                 <option value="7">Last 7 Days</option>
@@ -19,54 +22,65 @@
                                 <option value="60">2 Months</option>
                                 <option selected="selected" value="20000">ALL</option>
                             </select>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Debug section (only visible in debug mode) -->
-            <!-- <t t-if="state.debug">
-                <div t-if="state.debug.lastError" class="alert alert-danger m-3">
-                    <strong>Error:</strong> <span t-esc="state.debug.lastError"/>
-                </div>
-                <div class="alert alert-info m-3 small">
-                    <p>Debug Info:</p>
-                    <ul>
-                        <li>Data loaded: <t t-esc="state.debug.dataLoaded"/></li>
-                        <li>Cards should be visible: <t t-esc="state.debug.cardsVisible"/></li>
-                        <li>Stats count: <t t-esc="state.stats ? state.stats.length : 0"/></li>
-                        <li>Stats loading: <t t-esc="state.loadingStates.stats"/></li>
-                        <li>Last update: <t t-esc="state.debug.lastUpdate"/></li>
-                    </ul>
-                </div>
-            </t> -->
-
-            <!-- Main content -->
-            <div class="container-fluid" >
+            <!-- Main Dashboard Content -->
+            <div class="container-fluid" style="margin-bottom:7rem;">
+                <!-- Stats Cards Section -->
                 <div class="row second-section mb-4 pt-2 g-md-5 justify-content-between align-items-center">
                     <div class="position-relative card-container" t-ref="cardContainer">
-                        <!-- Loading indicator for stats -->
-                        <div t-if="state.loadingStates.stats" class="d-flex justify-content-center align-items-center p-5">
-                            <div class="spinner-border text-primary me-3" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                        <!-- Show loading spinner for initial load -->
+                        <t t-if="state.isInitialLoading">
+                            <div class="d-flex justify-content-center align-items-center w-100 py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading dashboard...</span>
+                                </div>
+                                <span class="ms-3 text-muted">Loading dashboard...</span>
                             </div>
-                            <span class="text-muted">Loading statistics...</span>
-                        </div>
+                        </t>
                         
-                        <t t-else="">
+                        <!-- Show stats when loaded -->
+                        <t t-elif="!state.loadingStates.stats">
                             <t t-if="state.stats and state.stats.length > 0">
                                 <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
-                                    <Card t-on-click="() => displayOdooView(stat.scope, stat.query, null, null, stat.name)" title="stat.name" scope="stat.scope" total="stat.val" bgcolor="stat.scope_color" />
+                                    <Card 
+                                        title="stat.name" 
+                                        scope="stat.scope" 
+                                        total="stat.val" 
+                                        bgcolor="stat.scope_color" 
+                                        loading="false"
+                                        t-on-click="() => this.onCardClick(stat)" />
                                 </t>
                             </t>
                             <t t-else="">
-                                <h4 class="" style="padding: 5rem; cursor:pointer;">No Data!! Please click on the configuration menu then statistic and start creating</h4>
+                                <h4 class="text-center py-5 cursor-pointer">No data available! Please click on the configuration menu, then statistics, and start creating.</h4>
                             </t>
+                        </t>
+                        
+                        <!-- Show loading state for cards -->
+                        <t t-else="">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <t t-foreach="[1, 2, 3, 4, 5, 6]" t-as="placeholderIndex" t-key="placeholderIndex">
+                                    <div class="card shadow-sm m-3 position-relative overflow-hidden" style="min-height: 180px; width: 300px;">
+                                        <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+                                            <div class="placeholder-glow w-100">
+                                                <div class="placeholder col-7 mb-3 mx-auto" style="height: 36px;"></div>
+                                                <div class="placeholder col-10 mb-2 mx-auto" style="height: 24px;"></div>
+                                                <div class="placeholder col-8 mx-auto" style="height: 18px;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="position-absolute bottom-0 start-0 w-100" style="height: 3px; background-color: #f0f0f0;"></div>
+                                    </div>
+                                </t>
+                            </div>
                         </t>
                     </div>
                 </div>
 
-                <!-- Scroll indicators -->
+                <!-- Scroll Indicators -->
                 <!-- <div class="position-relative">
                     <t t-if="state.stats and state.stats.length > 3 and !state.scrollRight">
                         <div class="overflow-indicator-right mt-1 fade-blink">&#x2192;</div>
