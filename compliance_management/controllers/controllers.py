@@ -19,11 +19,14 @@ class Compliance(http.Controller):
         is_superuser = user.has_group('base.group_system')
 
         group = any(group.name.lower() == 'chief compliance officer' for group in user.groups_id)
-        branch = [branch.id for branch in user.branches_id] 
+        branch = [branch.id for branch in user.branches_id]
+        
+        unique_id = get_unique_client_identifier() 
 
         result = {
             "group": group,
             "branch": branch,
+            "unique_id": unique_id,
         }
         return result
     

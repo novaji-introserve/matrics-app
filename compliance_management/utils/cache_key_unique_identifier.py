@@ -1,6 +1,7 @@
 from odoo import http
-import requests
 import logging
+import hashlib
+from datetime import datetime
 
 _logger = logging.getLogger(__name__)
 
@@ -13,11 +14,8 @@ def get_unique_client_identifier(request=None):
     
     user_agent = request.httprequest.headers.get('User-Agent', '')
     
-    from datetime import datetime
     day_part = datetime.now().strftime('%Y%m%d')
     
-    import hashlib
-    # Create a hash of these components
     unique_id = hashlib.md5(f"{session_id}:{user_agent}:{day_part}".encode()).hexdigest()
     
     return unique_id

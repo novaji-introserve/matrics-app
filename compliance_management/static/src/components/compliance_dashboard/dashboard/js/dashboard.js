@@ -224,6 +224,9 @@ export class ComplianceDashboard extends Component {
         logDebug('Got user data:', result);
         this.state.branches_id = result.branch;
         this.state.cco = result.group;
+
+        this.state.uniqueId = result.unique_id;
+        logDebug('Unique cache identifier:', this.state.uniqueId);
       }
       return result;
     } catch (error) {
@@ -248,7 +251,8 @@ export class ComplianceDashboard extends Component {
     logDebug('Getting all stats with params:', params);
     
     // Generate cache key
-    const cacheKey = `all_stats_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
+    // const cacheKey = `all_stats_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
+    const cacheKey = `all_stats_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}_${this.state.uniqueId}`;
     
     try {
       // Mark as loading
@@ -303,7 +307,8 @@ export class ComplianceDashboard extends Component {
     };
     
     // Generate cache key
-    const cacheKey = `stats_category_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${name}_${this.state.datepicked}`;
+    const cacheKey = `stats_category_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${name}_${this.state.datepicked}_${this.state.uniqueId}`;
+    // const cacheKey = `stats_category_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${name}_${this.state.datepicked}`;
     
     try {
       this.state.loadingStates.stats = true;
@@ -353,7 +358,8 @@ export class ComplianceDashboard extends Component {
     };
     
     // Generate cache key
-    const cacheKey = `dynamic_charts_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
+    const cacheKey = `dynamic_charts_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}_${this.state.uniqueId}`;
+    // const cacheKey = `dynamic_charts_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
     
     try {
       this.state.loadingStates.charts = true;
@@ -475,7 +481,8 @@ export class ComplianceDashboard extends Component {
   async displayOdooView(category, query, branch_filter, branch_field, title) {
     try {
       // Generate cache key for this query
-      const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}`;
+      const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}_${this.state.uniqueId}`;
+      // const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}`;
       
       // Try to get from cache
       let response = await this.serverCache.getCache(cacheKey);
