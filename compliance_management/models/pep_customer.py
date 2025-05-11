@@ -38,12 +38,24 @@ class PepCustomer(models.Model):
         """)
 
     def action_view_customer_pep(self):
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        # Set domain based on user group
+        if is_chief_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = []
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id])  ]
         return {
-            'name': _('Customers marked as PEP'),
+            'name': _('Customers In Pep List'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.pep',
             'view_mode': 'tree,form',
-            'domain': [],
+            'domain': domain,
             # 'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])],
             'context': {'search_default_group_branch': 1}
         }

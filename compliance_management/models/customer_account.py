@@ -58,6 +58,7 @@ class CustomerAccount(models.Model):
     account_type_id = fields.Many2one(comodel_name='res.partner.account.type', string='Account Type',index=True)
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
+    branch_code = fields.Char(string="Branch Code")
     
     # num_tran_last6m_credit = fields.Integer(string='Transactions - Last 6m')
     # avg_tran_last6m_credit = fields.Float(string='Avg. Transaction Amount - Last 6m', digits=(10,2))

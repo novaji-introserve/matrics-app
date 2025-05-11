@@ -40,6 +40,7 @@
         "data/schedules/adverse_media_cron.xml",
         # "data/schedules/send_assessment_notification_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
+        'data/schedules/clean_cache.xml',
 
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
@@ -57,6 +58,7 @@
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
         # "data/schedules/queue_job_config.xml",
+        "data/fcra_score.xml",    
         "data/data.xml",
         "views/risk_assessment.xml",
         # "views/open_sanctions.xml",
@@ -72,8 +74,7 @@
         "views/transaction_screening_rule.xml",
         # "data/charts.xml",
         # "data/res_partner.xml",
-        "data/fcra_score.xml",    
-        # "views/res_users.xml",
+        "views/res_users.xml",
     ],
     # only loaded in demonstration mode
     "demo": [
@@ -103,18 +104,22 @@
             'compliance_management/static/src/components/file_upload/js/main.js',
         
             'compliance_management/static/src/css/style.css',
+            'compliance_management/static/src/css/slider.css',
             'compliance_management/static/src/components/**/*.js',
             'compliance_management/static/src/components/**/*.xml',
             'compliance_management/static/src/components/**/*.css',
             
+            'compliance_management/static/src/components/**/**/js/*.js',
+            'compliance_management/static/src/components/**/**/xml/*.xml',
+            
             'compliance_management/static/src/js/pep_auto_refresh.js',
             'compliance_management/static/src/xml/pep_auto_refresh.xml',
-
+            'compliance_management/static/src/js/custom_title_service.js',
+            'compliance_management/static/src/js/cache_service.js',
 
             'compliance_management/static/src/img/logov.png',
             'compliance_management/static/img/alt_bank_logo.png',
             'compliance_management/static/img/alt_bank_logo_.png',
-            
 
         ]
     },

@@ -3,9 +3,11 @@ from odoo.http import request
 import json
 from datetime import datetime, timedelta
 import re
-class DynamicChartController(http.Controller):
+import logging
+from ..utils.cache_key_unique_identifier import get_unique_client_identifier
 
-    
+_logger = logging.getLogger(__name__)
+class DynamicChartController(http.Controller):
 
 
     def extract_where_clauses(self, sql_query):
@@ -129,13 +131,25 @@ class DynamicChartController(http.Controller):
         return value
 
     def sql_where_to_odoo_domain_no_dates(self, sql_query):
-        """Convert SQL WHERE conditions to Odoo domain format, excluding date-related fields."""
+        """Convert SQL WHERE conditions to Odoo domain format, excluding date-related fields.
+        Maps table-prefixed fields to appropriate Odoo field names."""
         clauses = self.extract_where_clauses(sql_query)
         if not clauses:
             return []
         
         domain = []
         date_related_keywords = ['date', 'date_created', 'date_create', 'create_date', 'write_date', 'time', 'datetime']
+        
+        # Extract table aliases from the SQL query
+        table_aliases = self._extract_table_aliases(sql_query)
+        
+        # Define field mappings based on table and field patterns
+        field_patterns = {
+            'branch': {  # This covers any alias for res_branch table
+                'id': 'branch_id'  # Map any_branch_alias.id to branch_id
+            },
+            # Add other tables as needed
+        }
         
         for clause in clauses:
             # Skip date-related fields - more thorough check
@@ -145,75 +159,130 @@ class DynamicChartController(http.Controller):
             # Handle different operators
             if ' = ' in clause:
                 field, value = clause.split(' = ', 1)
-                field = field.strip().split('.')[-1]  # Get only the field name, not table.field
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '=', value))
+                domain.append((field_name, '=', value))
             
             elif ' >= ' in clause:
                 field, value = clause.split(' >= ', 1)
-                field = field.strip().split('.')[-1]
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '>=', value))
+                domain.append((field_name, '>=', value))
             
             elif ' <= ' in clause:
                 field, value = clause.split(' <= ', 1)
-                field = field.strip().split('.')[-1]
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '<=', value))
+                domain.append((field_name, '<=', value))
             
             elif ' > ' in clause:
                 field, value = clause.split(' > ', 1)
-                field = field.strip().split('.')[-1]
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '>', value))
+                domain.append((field_name, '>', value))
             
             elif ' < ' in clause:
                 field, value = clause.split(' < ', 1)
-                field = field.strip().split('.')[-1]
+                field = field.strip()
+                field_name = self._map_field_name(field, table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
-                domain.append((field, '<', value))
+                domain.append((field_name, '<', value))
             
             elif ' LIKE ' in clause.upper():
                 field, value = clause.upper().split(' LIKE ', 1)
-                field = field.strip().split('.')[-1].lower()
+                field = field.strip()
+                field_name = self._map_field_name(field.lower(), table_aliases, field_patterns)
                 value = self._clean_sql_value(value)
                 # Convert SQL LIKE pattern to Odoo pattern
                 value = value.replace('%', '*')
-                domain.append((field, 'ilike', value))
+                domain.append((field_name, 'ilike', value))
             
             elif ' IN ' in clause.upper():
                 field, value_list = clause.upper().split(' IN ', 1)
-                field = field.strip().split('.')[-1].lower()
+                field = field.strip()
+                field_name = self._map_field_name(field.lower(), table_aliases, field_patterns)
                 # Extract values from IN clause: (val1, val2, ...)
                 if value_list.strip().startswith('(') and value_list.strip().endswith(')'):
                     value_list = value_list.strip()[1:-1]
                     values = [self._clean_sql_value(v.strip()) for v in value_list.split(',')]
-                    domain.append((field, 'in', values))
+                    domain.append((field_name, 'in', values))
             
             elif 'BETWEEN' in clause.upper() and ' AND ' in clause.upper():
                 # Parse BETWEEN clause (already filtered date-related fields)
                 parts = re.split(r'\bBETWEEN\b', clause, flags=re.IGNORECASE)
                 if len(parts) == 2:
-                    field = parts[0].strip().split('.')[-1]
+                    field = parts[0].strip()
+                    field_name = self._map_field_name(field, table_aliases, field_patterns)
                     between_parts = re.split(r'\bAND\b', parts[1], flags=re.IGNORECASE, maxsplit=1)
                     if len(between_parts) == 2:
                         start_val = self._clean_sql_value(between_parts[0])
                         end_val = self._clean_sql_value(between_parts[1])
                         domain.append('&')
-                        domain.append((field, '>=', start_val))
-                        domain.append((field, '<=', end_val))
+                        domain.append((field_name, '>=', start_val))
+                        domain.append((field_name, '<=', end_val))
             
             elif ' IS NULL' in clause.upper():
-                field = clause.upper().split(' IS NULL')[0].strip().split('.')[-1].lower()
-                domain.append((field, '=', False))
+                field = clause.upper().split(' IS NULL')[0].strip()
+                field_name = self._map_field_name(field.lower(), table_aliases, field_patterns)
+                domain.append((field_name, '=', False))
             
             elif ' IS NOT NULL' in clause.upper():
-                field = clause.upper().split(' IS NOT NULL')[0].strip().split('.')[-1].lower()
-                domain.append((field, '!=', False))
+                field = clause.upper().split(' IS NOT NULL')[0].strip()
+                field_name = self._map_field_name(field.lower(), table_aliases, field_patterns)
+                domain.append((field_name, '!=', False))
         
         return domain
 
-
+    def _extract_table_aliases(self, sql_query):
+        """Extract table aliases from SQL query.
+        Returns a dictionary mapping aliases to table names."""
+        aliases = {}
+        
+        # Normalize query and convert to lowercase for easier parsing
+        sql_query = ' '.join(sql_query.strip().split()).lower()
+        
+        # Extract FROM clause
+        from_match = re.search(r'\bfrom\b(.*?)(?:\bwhere\b|\bjoin\b|\bgroup by\b|\bhaving\b|\border by\b|\blimit\b|\boffset\b|$)', 
+                            sql_query, re.IGNORECASE | re.DOTALL)
+        if from_match:
+            from_clause = from_match.group(1).strip()
+            # Extract table name and alias
+            table_match = re.search(r'(\w+)(?:\s+as)?\s+(\w+)', from_clause, re.IGNORECASE)
+            if table_match:
+                table_name, alias = table_match.group(1), table_match.group(2)
+                aliases[alias] = table_name
+        
+        # Extract JOIN clauses
+        join_pattern = re.compile(r'\bjoin\b\s+(\w+)(?:\s+as)?\s+(\w+)', re.IGNORECASE)
+        for match in join_pattern.finditer(sql_query):
+            table_name, alias = match.group(1), match.group(2)
+            aliases[alias] = table_name
+        
+        return aliases
+    
+    def _map_field_name(self, field, table_aliases, field_patterns):
+        """Map a table-prefixed field to the appropriate Odoo field name."""
+        if '.' not in field:
+            return field  # No table prefix, return as is
+        
+        alias, field_name = field.split('.', 1)
+        
+        # If we have an alias match
+        if alias in table_aliases:
+            table_name = table_aliases[alias]
+            
+            # Look for table patterns (e.g., if table contains 'branch')
+            for pattern, field_mappings in field_patterns.items():
+                if pattern in table_name and field_name in field_mappings:
+                    return field_mappings[field_name]
+        
+        # Default fallback: return just the field part
+        return field_name
+    
     def _add_where_to_query(self, query, where_clause):
         
         if 'WHERE' in query.upper():
@@ -245,6 +314,7 @@ class DynamicChartController(http.Controller):
     def _process_query_results(self, chart, query):
        
         try:
+           
             request.env.cr.execute(query)
             results = request.env.cr.dictfetchall()
         except Exception as e:
@@ -308,6 +378,23 @@ class DynamicChartController(http.Controller):
     def get_chart_data(self, cco, branches_id, datepicked, **kw):
         """Get chart data in JSON format"""
         
+        # Get current user ID
+        user_id = request.env.user.id
+
+        # Get unique identifier 
+        unique_id = get_unique_client_identifier()
+        
+        # Generate cache key
+        cache_key = f"charts_data_{cco}_{branches_id}_{datepicked}_{unique_id}"
+
+        _logger.info(f"This is the charts cache key: {cache_key}")
+        
+        # Check if we have valid cache for this user
+        cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
+        if cache_data:
+            return cache_data
+        
+        # Continue with existing functionality
         charts = request.env['res.dashboard.charts'].search([('state', '=', 'active')])
 
         today = datetime.now().date()  # Get today's date
@@ -322,19 +409,12 @@ class DynamicChartController(http.Controller):
         chartsData = []
         
         for chart in charts:
-
-            
             
             chart = request.env['res.dashboard.charts'].browse(chart.id)
             if not chart.exists():
                 return {'error': 'Chart not found'}
             
             try:
-
-
-               
-
-
                 # Build where clause based on conditions
                 where_clause = f"{chart.date_field} >= '{odooPrevDate}'" if datepicked == 20000 else f"{chart.date_field} BETWEEN '{odooPrevDate}' AND '{odooCurrentDate}'"
                 
@@ -344,7 +424,7 @@ class DynamicChartController(http.Controller):
                     # where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
                     if len(branches_id) == 1: 
                         where_clause += f" AND {chart.branch_field} = {branches_id[0]}"
-                       
+                    
                     else:
                         where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
                 
@@ -360,6 +440,7 @@ class DynamicChartController(http.Controller):
                 # Execute query and process results
                 result = self._process_query_results(chart, query)
 
+            
                 if result['title'] == '' and result['type'] == '' and result['labels'] == []:
                     pass
                     
@@ -370,7 +451,81 @@ class DynamicChartController(http.Controller):
             except Exception as e:
                 return {'error': str(e)}
         
+        # Store in cache before returning
+        request.env['res.dashboard.cache'].set_cache(cache_key, chartsData, user_id)
+        
         return chartsData
+
+
+    # @http.route('/dashboard/dynamic_charts/', type='json', auth='user')
+    # def get_chart_data(self, cco, branches_id, datepicked, **kw):
+    #     """Get chart data in JSON format"""
+        
+    #     charts = request.env['res.dashboard.charts'].search([('state', '=', 'active')])
+
+    #     today = datetime.now().date()  # Get today's date
+    #     prevDate = today - timedelta(days=datepicked)  # Get previous date
+
+    #     TIME_00_00_00 = "00:00:00"
+    #     TIME_23_59_59 = "23:59:59"
+
+    #     odooCurrentDate = f"{today} {TIME_23_59_59}"
+    #     odooPrevDate = f"{prevDate} {TIME_00_00_00}"
+
+    #     chartsData = []
+        
+    #     for chart in charts:
+
+    
+            
+            
+    #         chart = request.env['res.dashboard.charts'].browse(chart.id)
+    #         if not chart.exists():
+    #             return {'error': 'Chart not found'}
+            
+    #         try:
+
+
+               
+
+
+    #             # Build where clause based on conditions
+    #             where_clause = f"{chart.date_field} >= '{odooPrevDate}'" if datepicked == 20000 else f"{chart.date_field} BETWEEN '{odooPrevDate}' AND '{odooCurrentDate}'"
+                
+    #             # Add branch filtering if needed
+    #             if not cco and chart.branch_filter and branches_id and len(branches_id) > 0:
+            
+    #                 # where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
+    #                 if len(branches_id) == 1: 
+    #                     where_clause += f" AND {chart.branch_field} = {branches_id[0]}"
+                       
+    #                 else:
+    #                     where_clause += f" AND {chart.branch_field} IN {tuple(branches_id)}"
+                
+                
+    #             elif not cco and chart.branch_filter and len(branches_id) == 0:
+    #                 where_clause += " AND 1 = 0"
+                
+
+    #             # Modify query to include WHERE clause
+    #             query = self._add_where_to_query(chart.query, where_clause)
+
+                
+    #             # Execute query and process results
+    #             result = self._process_query_results(chart, query)
+
+               
+    #             if result['title'] == '' and result['type'] == '' and result['labels'] == []:
+    #                 pass
+                    
+    #             else:
+    #                 chartsData.append(result)
+                    
+
+    #         except Exception as e:
+    #             return {'error': str(e)}
+        
+    #     return chartsData
 
               
     

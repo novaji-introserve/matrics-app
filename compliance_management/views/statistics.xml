@@ -8,8 +8,8 @@
             <form >
                 
                 <header>
-                    <!-- <button name="compute_stat" class="oe_highlight" type="object"
-                        string="Compute Statistics"
+                    <!-- <button name="Validate_expression" class="oe_highlight" type="object"
+                        string="Validate Expression"
                         groups="compliance_management.group_compliance_branch_compliance_officer" /> -->
                     
                 </header>

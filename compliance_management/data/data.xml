@@ -20,9 +20,11 @@
     <function model="ir.config_parameter" name="set_param"
         eval="('gemini_api_key', 'AIzaSyAvRsSTIahJWVT-iwPC1nPrSqUoK_fsBq4')" />
     <function model="ir.config_parameter" name="set_param"
-        eval="('opensanctions_api_key', '7d0ec3228b24f2c0bbb21e80c3ff8388')" />
+        eval="('opensanctions_api_key', '1731b7a13f6c63e6a9bbb550981e6a18')" />
      <function model="ir.config_parameter" name="set_param"
-            eval="('risk_management.control_effectiveness_max_score', '25')" />
+            eval="('risk_management.max_slider_score', '15')" />
+     <function model="ir.config_parameter" name="set_param"
+            eval="('risk_management.min_slider_score', '0')" />
     <!--  Gender -->
     <record id="res_partner_gender_male" model="res.partner.gender">
         <field name="name">Male</field>
@@ -63,7 +65,8 @@
         <field name="name">Customers without BVN</field>
         <field name="code">customers_no_bvn</field>
         <field name="scope">regulatory</field>
-        <field name="sql_query">select count(id) from res_partner where bvn is null </field>
+        <field name="sql_query">SELECT count(id) FROM res_partner WHERE (bvn IS NULL OR bvn LIKE 'NOBVN%')</field>
+        <!-- <field name="sql_query">select count(id) from res_partner where bvn is null </field> -->
     </record>
     <record id="res_compl_stat_4" model="res.compliance.stat">
         <field name="name">PEP Customers</field>
@@ -88,6 +91,12 @@
         <field name="code">global_pep</field>
         <field name="scope">regulatory</field>
         <field name="sql_query">select count(id) from res_pep</field>
+    </record>
+    <record id="res_compl_stat_8" model="res.compliance.stat">
+        <field name="name">WatchList</field>
+        <field name="code">watch_list</field>
+        <field name="scope">regulatory</field>
+        <field name="sql_query">select count(id) from res_partner_watchlist</field>
     </record>
 
     <!-- Risk Category -->
@@ -1690,7 +1699,7 @@
         <field name="name">Customers without BVN</field>
         <field name="risk_score">25</field>
         <field name="code">cust_no_bvn</field>
-        <field name="sql_query">select risk_score from res_partner where id=%s and bvn is null</field>
+        <field name="sql_query">SELECT risk_score FROM res_partner WHERE id = %s AND (bvn IS NULL OR bvn LIKE '%%[a-zA-Z]%%' OR bvn LIKE 'NOBVN%%')</field>
         <field name="priority">1</field>
         <field name="state">active</field>
         <field name="compute_score_from">static</field>
@@ -1816,5 +1825,3 @@
 
 
 </odoo>
-
-
