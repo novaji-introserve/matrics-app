@@ -397,14 +397,14 @@ class DynamicChartController(http.Controller):
         # Continue with existing functionality
         charts = request.env['res.dashboard.charts'].search([('state', '=', 'active')])
 
-        today = datetime.now().date()  # Get today's date
-        prevDate = today - timedelta(days=datepicked)  # Get previous date
+        # today = datetime.now().date()  # Get today's date
+        # prevDate = today - timedelta(days=datepicked)  # Get previous date
 
-        TIME_00_00_00 = "00:00:00"
-        TIME_23_59_59 = "23:59:59"
+        # TIME_00_00_00 = "00:00:00"
+        # TIME_23_59_59 = "23:59:59"
 
-        odooCurrentDate = f"{today} {TIME_23_59_59}"
-        odooPrevDate = f"{prevDate} {TIME_00_00_00}"
+        # odooCurrentDate = f"{today} {TIME_23_59_59}"
+        # odooPrevDate = f"{prevDate} {TIME_00_00_00}"
 
         chartsData = []
         
@@ -416,7 +416,8 @@ class DynamicChartController(http.Controller):
             
             try:
                 # Build where clause based on conditions
-                where_clause = f"{chart.date_field} >= '{odooPrevDate}'" if datepicked == 20000 else f"{chart.date_field} BETWEEN '{odooPrevDate}' AND '{odooCurrentDate}'"
+                # where_clause = f"{chart.date_field} >= '{odooPrevDate}'" if datepicked == 20000 else f"{chart.date_field} BETWEEN '{odooPrevDate}' AND '{odooCurrentDate}'"
+                where_clause = "1=1" 
                 
                 # Add branch filtering if needed
                 if not cco and chart.branch_filter and branches_id and len(branches_id) > 0:

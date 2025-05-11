@@ -480,60 +480,137 @@ export class ComplianceDashboard extends Component {
    */
   async displayOdooView(category, query, branch_filter, branch_field, title) {
     try {
-      // Generate cache key for this query
-      const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}_${this.state.uniqueId}`;
-      // const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}`;
-      
-      // Try to get from cache
-      let response = await this.serverCache.getCache(cacheKey);
-      
-      if (!response) {
-        // Cache miss, fetch from server
-        response = await this.rpc("/dashboard/dynamic_sql", { 
-          sql_query: query, 
-          branches_id: this.state.branches_id, 
-          cco: this.state.cco 
+        // Generate cache key for this query
+        const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}_${this.state.uniqueId}`;
+        
+        // Try to get from cache
+        let response = await this.serverCache.getCache(cacheKey);
+        
+        if (!response) {
+            // Cache miss, fetch from server
+            response = await this.rpc("/dashboard/dynamic_sql", { 
+                sql_query: query, 
+                branches_id: this.state.branches_id, 
+                cco: this.state.cco 
+            });
+            
+            // Cache the result
+            if (response) {
+                await this.serverCache.setCache(cacheKey, response);
+            }
+        }
+        
+        if (!response) {
+            console.error("Empty response from dynamic_sql");
+            if (this.state.debug) {
+                this.state.debug.lastError = "Empty SQL response";
+            }
+            return;
+        }
+
+        // Create a properly formatted title in sentence case
+        const displayTitle = title || (category ? 
+            category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
+            "Card Results");
+        
+        // Fix for date-related issues in domain
+        if (response.domain && Array.isArray(response.domain)) {
+            // Process the domain to handle date fields properly
+            response.domain = response.domain.map(item => {
+                // Check if we're dealing with a date comparison
+                if (Array.isArray(item) && item.length === 3) {
+                    const [field, operator, value] = item;
+                    
+                    // Check if field ends with _date or _datetime or is date/datetime
+                    const isDateField = field.endsWith('_date') || 
+                                       field.endsWith('_datetime') || 
+                                       field === 'date' || 
+                                       field === 'datetime';
+                    
+                    // If it's a date field and the value is problematic
+                    if (isDateField && (value === '0001-01-01' || value === false || value === null)) {
+                        // Replace with a safer condition for filtering
+                        return [field, '=', false];
+                    }
+                }
+                return item;
+            });
+        }
+
+        // Now navigate with the fixed domain
+        this.navigate.doAction({
+            type: "ir.actions.act_window",
+            res_model: response.table.replace(/_/g, "."),
+            name: displayTitle,
+            domain: response.domain,
+            views: [
+                [false, "tree"],
+                [false, "form"],
+            ],
         });
-        
-        // Cache the result
-        if (response) {
-          await this.serverCache.setCache(cacheKey, response);
-        }
-      }
-      
-      if (!response) {
-        console.error("Empty response from dynamic_sql");
-        if (this.state.debug) {
-          this.state.debug.lastError = "Empty SQL response";
-        }
-        return;
-      }
-
-      // Create a properly formatted title in sentence case
-      const displayTitle = title || (category ? 
-        category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
-        "Card Results");
-      
-        console.log(response.domain);
-        
-
-      this.navigate.doAction({
-        type: "ir.actions.act_window",
-        res_model: response.table.replace(/_/g, "."),
-        name: displayTitle,
-        domain: response.domain,
-        views: [
-          [false, "tree"],
-          [false, "form"],
-        ],
-      });
     } catch (error) {
-      console.error("Error in displayOdooView:", error);
-      if (this.state.debug) {
-        this.state.debug.lastError = "View error: " + error.message;
-      }
+        console.error("Error in displayOdooView:", error);
+        if (this.state.debug) {
+            this.state.debug.lastError = "View error: " + error.message;
+        }
     }
-  }
+}
+  // async displayOdooView(category, query, branch_filter, branch_field, title) {
+  //   try {
+  //     // Generate cache key for this query
+  //     const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}_${this.state.uniqueId}`;
+  //     // const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}`;
+      
+  //     // Try to get from cache
+  //     let response = await this.serverCache.getCache(cacheKey);
+      
+  //     if (!response) {
+  //       // Cache miss, fetch from server
+  //       response = await this.rpc("/dashboard/dynamic_sql", { 
+  //         sql_query: query, 
+  //         branches_id: this.state.branches_id, 
+  //         cco: this.state.cco 
+  //       });
+        
+  //       // Cache the result
+  //       if (response) {
+  //         await this.serverCache.setCache(cacheKey, response);
+  //       }
+  //     }
+      
+  //     if (!response) {
+  //       console.error("Empty response from dynamic_sql");
+  //       if (this.state.debug) {
+  //         this.state.debug.lastError = "Empty SQL response";
+  //       }
+  //       return;
+  //     }
+
+  //     // Create a properly formatted title in sentence case
+  //     const displayTitle = title || (category ? 
+  //       category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
+  //       "Card Results");
+      
+  //       console.log(response.domain);
+        
+
+  //     this.navigate.doAction({
+  //       type: "ir.actions.act_window",
+  //       res_model: response.table.replace(/_/g, "."),
+  //       name: displayTitle,
+  //       domain: response.domain,
+  //       views: [
+  //         [false, "tree"],
+  //         [false, "form"],
+  //       ],
+  //     });
+  //   } catch (error) {
+  //     console.error("Error in displayOdooView:", error);
+  //     if (this.state.debug) {
+  //       this.state.debug.lastError = "View error: " + error.message;
+  //     }
+  //   }
+  // }
 }
 
 ComplianceDashboard.template = "owl.ComplianceDashboard";
