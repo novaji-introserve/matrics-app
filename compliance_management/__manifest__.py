@@ -32,7 +32,7 @@
         "data/settings/email_smtp.xml",
         "data/department.xml",
         "data/risk_assessment_control_data.xml",
-        "data/res.branch.csv",
+        # "data/res.branch.csv",
         "data/risk_assessment_mitigation.xml",
         "data/res_risk_implication.xml",
         "data/media_keywords.xml",
@@ -72,8 +72,8 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-        "data/charts.xml",
-        "data/res_partner.xml",
+        # "data/charts.xml",
+        # "data/res_partner.xml",
         "views/res_users.xml",
     ],
     # only loaded in demonstration mode
@@ -109,15 +109,17 @@
             'compliance_management/static/src/components/**/*.xml',
             'compliance_management/static/src/components/**/*.css',
             
+            'compliance_management/static/src/components/**/**/js/*.js',
+            'compliance_management/static/src/components/**/**/xml/*.xml',
+            
             'compliance_management/static/src/js/pep_auto_refresh.js',
             'compliance_management/static/src/xml/pep_auto_refresh.xml',
             'compliance_management/static/src/js/custom_title_service.js',
-
+            'compliance_management/static/src/js/cache_service.js',
 
             'compliance_management/static/src/img/logov.png',
             'compliance_management/static/img/alt_bank_logo.png',
             'compliance_management/static/img/alt_bank_logo_.png',
-            
 
         ]
     },

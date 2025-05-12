@@ -24,23 +24,6 @@
                 </div>
             </div>
 
-            <!-- Debug section (only visible in debug mode) -->
-            <!-- <t t-if="state.debug">
-                <div t-if="state.debug.lastError" class="alert alert-danger m-3">
-                    <strong>Error:</strong> <span t-esc="state.debug.lastError"/>
-                </div>
-                <div class="alert alert-info m-3 small">
-                    <p>Debug Info:</p>
-                    <ul>
-                        <li>Data loaded: <t t-esc="state.debug.dataLoaded"/></li>
-                        <li>Cards should be visible: <t t-esc="state.debug.cardsVisible"/></li>
-                        <li>Stats count: <t t-esc="state.stats ? state.stats.length : 0"/></li>
-                        <li>Stats loading: <t t-esc="state.loadingStates.stats"/></li>
-                        <li>Last update: <t t-esc="state.debug.lastUpdate"/></li>
-                    </ul>
-                </div>
-            </t> -->
-
             <!-- Main content -->
             <div class="container-fluid" >
                 <div class="row second-section mb-4 pt-2 g-md-5 justify-content-between align-items-center">
