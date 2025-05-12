@@ -51,6 +51,12 @@ class Customer(models.Model):
          "Customer ID already exists. Value must be unique!"),
     ]
 
+    RISK_SCORE_MAPPING = {
+        'low': 1.5,
+        'medium': 4.55,
+        'high': 7.55
+    }
+
     customer_id = fields.Char(string="Customer ID",
                               index=True, tracking=True, readonly=True)
     bvn = fields.Char(string='BVN', tracking=True, readonly=True, index=True)
@@ -95,7 +101,7 @@ class Customer(models.Model):
     company_reg_date = fields.Date(
         string='Company Registration Date', tracking=True)
     risk_score = fields.Float(
-        string='Risk Score', digits=(10, 2), tracking=True, group_operator='avg')
+        string='Risk Score', digits=(10, 2), tracking=True)
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
@@ -186,6 +192,92 @@ class Customer(models.Model):
     #                 '^', ', ')
     #         else:
     #             record.formatted_phone = record.customer_phone
+
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if 'risk_score' not in fields:
+            return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+        # Fetch records matching the domain
+        records = self.search(domain)
+
+        if not records:
+            return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+        # Initialize result
+        result = []
+        groupby_field = groupby[0] if groupby else None
+
+        if groupby_field:
+            # Group records by the specified field (e.g., branch_id)
+            grouped_data = {}
+            for record in records:
+                # Get the group key (handle Many2one fields)
+                group_key = record[groupby_field]
+                # Use display_name for Many2one fields to ensure proper formatting
+                group_key_value = (
+                    group_key.display_name if isinstance(group_key, models.Model)
+                    else group_key
+                )
+                if group_key_value not in grouped_data:
+                    grouped_data[group_key_value] = []
+                grouped_data[group_key_value].append(record)
+
+            # Compute weighted average for each group
+            for key, group_records in grouped_data.items():
+                total_customers = len(group_records)
+                # Format the group key with count, e.g., "67 Marina(3)"
+                formatted_key = f"{key}({total_customers})" if total_customers > 0 else key
+
+                # Calculate weighted average
+                if total_customers == 0:
+                    weighted_avg = 0.0
+                else:
+                    risk_counts = {'low': 0, 'medium': 0, 'high': 0}
+                    for rec in group_records:
+                        risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
+                        risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
+                        
+                    weighted_sum = sum(
+                        risk_counts[level] * self.RISK_SCORE_MAPPING.get(level, 0.0)
+                        for level in risk_counts
+                    )
+                   
+                    weighted_avg = weighted_sum / total_customers if total_customers > 0 else 0.0
+
+                key_id = self.env['res.branch'].search([('name', '=', key)], limit=1).id
+                # Build group result
+                group_result = {
+                    groupby_field: key,  # Use original key for domain and filtering
+                    groupby_field + ':formatted': formatted_key,  # Store formatted name
+                    'risk_score': weighted_avg,
+                    '__count': total_customers,
+                    '__domain': [(groupby_field, '=', key_id)] + domain
+                }
+                result.append(group_result)
+        else:
+            # No grouping: compute weighted average for all records
+            total_customers = len(records)
+            if total_customers == 0:
+                weighted_avg = 0.0
+            else:
+                risk_counts = {'low': 0, 'medium': 0, 'high': 0}
+                for rec in records:
+                    risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
+                    risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
+                weighted_sum = sum(
+                    risk_counts[level] * self.RISK_SCORE_MAPPING.get(level, 0.0)
+                    for level in risk_counts
+                )
+                weighted_avg = weighted_sum / total_customers if total_customers > 0 else 0.0
+
+            result.append({
+                'risk_score': weighted_avg,
+                '__count': total_customers,
+                '__domain': domain
+            })
+        
+
+        return result
 
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):

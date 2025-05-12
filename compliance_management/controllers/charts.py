@@ -370,7 +370,7 @@ class DynamicChartController(http.Controller):
         }
 
     
-    @http.route('/dashboard/dynamic_charts/', type='json', auth='user')
+    @http.route('/dashboard/dynamic_charts/', type='http', auth='public', methods=['GET'], csrf=False)
     def get_chart_data(self, cco, branches_id, datepicked, **kw):
         """Get chart data in JSON format"""
         
