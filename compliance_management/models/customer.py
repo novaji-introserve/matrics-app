@@ -328,10 +328,10 @@ class Customer(models.Model):
         try:
             # Set the nextcall far in the future to prevent new runs starting
 
-            cron_record.write({
-                'nextcall': fields.Datetime.now() + timedelta(hours=24)
-            })
-            self.env.cr.commit()
+            # cron_record.write({
+            #     'nextcall': fields.Datetime.now() + timedelta(hours=24)
+            # })
+            # self.env.cr.commit()
 
             _logger.info("Starting scheduled risk assessment process")
             results = {'sanction_status': {}, 'risk_scores': 0}

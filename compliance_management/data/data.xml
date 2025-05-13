@@ -1731,7 +1731,7 @@
     </record>
 
     <record id="risk_plan_repeated_phone" model="res.compliance.risk.assessment.plan">
-        <field name="name">Customers with Repeated Phone Number Up To 3 Accounts and Aabove</field>
+        <field name="name">Customers with Repeated Phone Number Up To 3 Accounts and Above</field>
         <field name="risk_score">20</field>
         <field name="code">cust_repeated_phone</field>
         <field name="sql_query">SELECT risk_score
