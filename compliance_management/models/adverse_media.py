@@ -28,7 +28,7 @@ class AdverseMedia(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     partner_id = fields.Many2one(
-        'res.partner', string='Partner', tracking=True, required=True, index=True, ondelete='cascade')
+        'res.partner', string='Partner', tracking=True, required=True, index=True, ondelete='cascade',domain="[('origin', 'in', ['demo', 'test', 'prod'])]")
     partner_risk_score = fields.Float(
         related='partner_id.risk_score', tracking=True, string="Risk Score")
     partner_risk_level = fields.Char(
@@ -306,8 +306,8 @@ class AdverseMedia(models.Model):
                 else:
                     alert_risk_level = "high"
 
-                _logger.critical(
-                    f"Rendered html {rendered_html} /n .. Model name {self._description}.. /n Record id  {self.id}  ../n  new alert records to determine risk level {new_alerts}  ..highest risk score {highest_risk_score}  official risk level {alert_risk_level}")
+                # _logger.critical(
+                #     f"Rendered html {rendered_html} /n .. Model name {self._description}.. /n Record id  {self.id}  ../n  new alert records to determine risk level {new_alerts}  ..highest risk score {highest_risk_score}  official risk level {alert_risk_level}")
 
                 # Send email
                 email_result = template_id.send_mail(
@@ -324,7 +324,7 @@ class AdverseMedia(models.Model):
                 if mail.state == 'sent':
                     # insert into alert history table
                     self.env['alert.history'].sudo(flag=True).create({
-                        'alert_id': self.id,  # Or whatever ID you want to reference
+                        "ref_id": f"{self._name},{self.id}",
                         'html_body': rendered_html,
                         'attachment_data':  None,
                         'attachment_link':  None,

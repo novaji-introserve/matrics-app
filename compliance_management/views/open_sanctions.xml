@@ -305,7 +305,8 @@
         name="OpenSanctions Jobs"
         parent="menu_pep_configurations"
         action="action_opensanctions_job_queue"
-        sequence="20" />
+        sequence="20" 
+        groups="group_tech_support"/>
 
     <!-- Add OpenSanctions button to PEP list view -->
     <record id="view_pep_tree_opensanctions" model="ir.ui.view">

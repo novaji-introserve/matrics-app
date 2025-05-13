@@ -12,6 +12,7 @@ class RiskAssessment(models.Model):
          "Risk Assessment Name already exists. Value must be unique!")
     ]
     _order = "name"
+
     name = fields.Char(string="Name", required=True)
     user_id = fields.Many2one(comodel_name='res.users', string='User',
                               required=True, index=True, default=lambda self: self.env.user.id)
@@ -33,6 +34,9 @@ class RiskAssessment(models.Model):
         string='Total Risk Lines', _compute='_compute_total_risk_lines', store=True)
     internal_category = fields.Selection(string='Internal Category', selection=[('inst', 'Institutional'), ('cp', 'Counter Party')],default='inst')
     is_default = fields.Boolean(string='Is Default',tracking=True)
+    
+
+
 
     @api.model
     def create(self, vals):

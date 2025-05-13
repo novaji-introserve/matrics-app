@@ -30,9 +30,10 @@ class ResCharts(models.Model):
     color_scheme = fields.Selection([
         ('default', 'Default'),
         ('cool', 'Cool Colors'),
+        ('brown', 'Brown Colors'),
         ('warm', 'Warm Colors'),
         ('rainbow', 'Rainbow'),
-    ], string="Color Scheme", default='cool')
+    ], string="Color Scheme", default='brown')
     
     x_axis_field = fields.Char('X-Axis Field', help="Column name to use for X-axis labels", required=True)
     y_axis_field = fields.Char('Y-Axis Field', help="Column name to use for Y-axis values",required=True)
@@ -86,6 +87,7 @@ class ResCharts(models.Model):
     string='Domain Field Name',
     store=True
     )
+    domain_filter = fields.Char(string="Domain Filter", help="Domain filter for the action window")
 
    
 

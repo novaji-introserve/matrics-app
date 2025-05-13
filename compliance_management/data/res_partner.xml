@@ -3,7 +3,9 @@
     <data noupdate="0">
         <record id="demo_partner_1" model="res.partner">
             <field name="name">OKANLAWO ABDULRAMHAN</field>
-            <field name="phone">08021318413</field>
+            <field name="firstname">OKANLAWO</field>
+            <field name="lastname">ABDULRAMHAN</field>
+            <field name="customer_phone">08021318413</field>
             <field name="street">35 MUSTAPHA STREET OLODI APAPA</field>
             <field name="city">LAGOS</field>
             <field name="country_id" ref="base.ng"/>
@@ -12,14 +14,21 @@
             <field name="origin">demo</field>
             <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
-            
+
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">OKANLAWO.a@example.com</field>
+            <field name="customer_id">01901</field>
+
+
+
         </record>
 
         <record id="demo_partner_2" model="res.partner">
             <field name="name">OJEBODE MOSES</field>
-            <field name="phone">09058328864</field>
+            <field name="firstname">OJEBODE</field>
+            <field name="lastname">MOSES</field>
+            <field name="customer_phone">09058328864</field>
             <field name="street">NO 56 OLADELE PHASE NOT BY PWER BCJ</field>
             <field name="city">IBADAN</field>
             <field name="country_id" ref="base.ng"/>
@@ -29,13 +38,18 @@
             <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0020001"/>
             <!-- <field name="risk_level">low</field> -->
-             
+
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">moses.j@example.com</field>
+            <field name="customer_id">019</field>
         </record>
+
 
         <record id="demo_partner_3" model="res.partner">
             <field name="name">JAME HAPPINESS</field>
-            <field name="phone">08034310</field>
+            <field name="firstname">JAME</field>
+            <field name="lastname">HAPPINESS</field>
+            <field name="customer_phone">08034310</field>
             <field name="street">49 PIKE STREET HAWLEY BUS STOP</field>
             <field name="city"></field>
             <field name="country_id" ref="base.ng"/>
@@ -45,13 +59,16 @@
             <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <!-- <field name="risk_level">low</field> -->
-             
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">jame.h@example.com</field>
+            <field name="customer_id">0012</field>
         </record>
 
         <record id="demo_partner_4" model="res.partner">
             <field name="name">SALN GANIYU</field>
-            <field name="phone">081461795</field>
+            <field name="firstname">SALN</field>
+            <field name="lastname">GANIYU</field>
+            <field name="customer_phone">081461795</field>
             <field name="street">32 SALAMI STREET BOGIJE BUS STOP</field>
             <field name="city">LAGOS</field>
             <field name="country_id" ref="base.ng"/>
@@ -61,13 +78,17 @@
             <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <!-- <field name="risk_level">low</field> -->
-             
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">saln.g@example.com</field>
+            <field name="customer_id">0034</field>
+
         </record>
 
         <record id="demo_partner_5" model="res.partner">
             <field name="name">DANI NMERICHUKWU</field>
-            <field name="phone">08167260</field>
+            <field name="firstname">DANI</field>
+            <field name="lastname">NMERICHUKWU</field>
+            <field name="customer_phone">08167260</field>
             <field name="street">NO 2 OGUNBODE STREET IJEGUN</field>
             <field name="city">LAGOS</field>
             <field name="country_id" ref="base.ng"/>
@@ -77,13 +98,16 @@
             <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <!-- <field name="risk_level">low</field> -->
-             
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">dani.n@example.com</field>
+            <field name="customer_id">0050</field>
         </record>
 
         <record id="demo_partner_6" model="res.partner">
             <field name="name">OLO IMIEWARIN FRANCHESCA</field>
-            <field name="phone">08023058122</field>
+            <field name="firstname">OLO</field>
+            <field name="lastname">FRANCHESCA</field>
+            <field name="customer_phone">08023058122</field>
             <field name="street">1 SURA MOGAJI STREET OBANIKORO</field>
             <field name="city">LAGOS</field>
             <field name="country_id" ref="base.ng"/>
@@ -94,13 +118,20 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">olo.f@example.com</field>
+            <field name="customer_id">0505</field>
+
+
+
+
 
         </record>
 
         <record id="demo_partner_7" model="res.partner">
             <field name="name">AMUZAT ADE YUSUF</field>
-            <field name="phone">09039510227</field>
+            <field name="firstname">AMUZAT</field>
+            <field name="lastname">YUSUF</field>
+            <field name="customer_phone">09039510227</field>
             <field name="street">2, ILAYE ROUNDABOUT SAGAMU</field>
             <field name="city">SAGAMU</field>
             <field name="state_id" ref="compliance_management.state_ng_1"/>
@@ -112,13 +143,20 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
             <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">yusuf.a@example.com</field>
+            <field name="customer_id">0110</field>
+
+
+
+
 
         </record>
 
         <record id="demo_partner_8" model="res.partner">
             <field name="name">SALAMI ABIODIN</field>
-            <field name="phone">08169234961</field>
+            <field name="firstname">SALAMI</field>
+            <field name="lastname">ABIODIN</field>
+            <field name="customer_phone">08169234961</field>
             <field name="street">FALEGAN AREA ADO EKITI</field>
             <field name="city">ADO EKITI</field>
             <field name="state_id" ref="compliance_management.state_ng_11"/>
@@ -130,13 +168,20 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">salami.a@example.com</field>
+            <field name="customer_id">03003</field>
+
+
+
+
 
         </record>
 
         <record id="demo_partner_9" model="res.partner">
             <field name="name">EZE CHIDELA</field>
-            <field name="phone">09034583265</field>
+            <field name="firstname">EZE</field>
+            <field name="lastname">CHIDELA</field>
+            <field name="customer_phone">09034583265</field>
             <field name="street">NO. 4 BY TRANSFORMER ROAD KARIMO</field>
             <field name="city"></field>
             <field name="country_id" ref="base.ng"/>
@@ -147,13 +192,20 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
             <field name="bvn">88494944433</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">eze.c@example.com</field>
+            <field name="customer_id">02210</field>
+
+
+
+
 
         </record>
 
         <record id="demo_partner_10" model="res.partner">
             <field name="name">AMA CLEMENT</field>
-            <field name="phone">08136692210</field>
+            <field name="firstname">AMA</field>
+            <field name="lastname">CLEMENT</field>
+            <field name="customer_phone">08136692210</field>
             <field name="street">NO 27 IITA ONNE ELEME RIVERS STATE.</field>
             <field name="city"></field>
             <field name="state_id" ref="compliance_management.state_ng_13"/>
@@ -165,13 +217,20 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
             <field name="bvn">19494999393</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">ama.c@example.com</field>
+            <field name="customer_id">00101</field>
+
+
+
+
 
         </record>
 
         <record id="demo_partner_11" model="res.partner">
             <field name="name">GOZIE JOHN</field>
-            <field name="phone">08141166412</field>
+            <field name="firstname">GOZIE</field>
+            <field name="lastname">JOHN</field>
+            <field name="customer_phone">08141166412</field>
             <field name="street">1 COLLEGE ROAD 33 NKWELLE-EZUNAKO</field>
             <field name="city"></field>
             <field name="state_id" ref="compliance_management.state_ng_16"/>
@@ -183,13 +242,16 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <field name="bvn">994858858539</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
-            
-
+            <field name="email">gozie.j@example.com</field>
+            <field name="email">gozie.j@example.com</field>
+            <field name="customer_id">023</field>
         </record>
 
         <record id="demo_partner_12" model="res.partner">
             <field name="name">ADE TUNDE</field>
-            <field name="phone">08095114195</field>
+            <field name="firstname">ADE</field>
+            <field name="lastname">TUNDE</field>
+            <field name="customer_phone">08095114195</field>
             <field name="street">SW4109 ADEOYO RINGROAD IBADAN</field>
             <field name="city">IBADAN</field>
             <field name="state_id" ref="compliance_management.state_ng_16"/>
@@ -201,13 +263,16 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <field name="bvn">848590993933</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">ade.t@example.com</field>
+            <field name="customer_id">0102</field>
 
         </record>
 
         <record id="demo_partner_13" model="res.partner">
             <field name="name">OKUNOLA IDAYAT</field>
-            <field name="phone">08028881799</field>
+            <field name="firstname">OKUNOLA</field>
+            <field name="lastname">IDAYAT</field>
+            <field name="customer_phone">08028881799</field>
             <field name="street">10 BEACH ROADOWUTU AGRIC IKORODU</field>
             <field name="city">LAGOS</field>
             <field name="state_id" ref="compliance_management.state_ng_10"/>
@@ -219,13 +284,21 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <field name="bvn">2019928393</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">idayat.o@example.com</field>
+            <field name="customer_id">0290</field>
+
+
+
+
+
 
         </record>
 
         <record id="demo_partner_14" model="res.partner">
             <field name="name">GUOROCHI EEBENEZER</field>
-            <field name="phone">07032697753</field>
+            <field name="firstname">GUOROCHI</field>
+            <field name="lastname">EEBENEZER</field>
+            <field name="customer_phone">07032697753</field>
             <field name="street">32 ST PHILIP ROAD OMUMA ABAABIA</field>
             <field name="city"></field>
             <field name="state_id" ref="compliance_management.state_ng_10"/>
@@ -237,12 +310,20 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">EEBENEZER.g@example.com</field>
+            <field name="customer_id">0621</field>
+
+
+
+
+
 
         </record>
         <record id="demo_partner_15" model="res.partner">
             <field name="name">BIACHI EMMANUEL</field>
-            <field name="phone">08112446262</field>
+            <field name="firstname">BIACHI</field>
+            <field name="lastname">EMMANUEL</field>
+            <field name="customer_phone">08112446262</field>
             <field name="street">NEAR TIMBER MARKET JABI ZHULLU</field>
             <field name="city"></field>
             <field name="state_id" ref="compliance_management.state_ng_10"/>
@@ -254,13 +335,15 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
-
+            <field name="email">biachi.e@example.com</field>
+            <field name="customer_id">0120</field>
         </record>
 
         <record id="demo_partner_16" model="res.partner">
             <field name="name">OMOREGEE JONATHAN</field>
-            <field name="phone">08102768699</field>
+            <field name="firstname">OMOREGEE</field>
+            <field name="lastname">JONATHAN</field>
+            <field name="customer_phone">08102768699</field>
             <field name="street">3 OWOBU WAY, OFF 1ST UGBOR ROAD.</field>
             <field name="city">BENIN CITY</field>
             <field name="state_id" ref="compliance_management.state_ng_1"/>
@@ -272,13 +355,20 @@
             <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">jonathan.o@example.com</field>
+            <field name="customer_id">0308</field>
+
+
+
+
 
         </record>
 
         <record id="demo_data_17" model="res.partner">
             <field name="name">Olamide Fashola</field>
-            <field name="phone">09064567890</field>
+            <field name="firstname">Olamide</field>
+            <field name="lastname">Fashola</field>
+            <field name="customer_phone">09064567890</field>
             <field name="street">4 Fashola Gardens</field>
             <field name="city">Ikeja</field>
             <field name="country_id" ref="base.ng"/>
@@ -289,13 +379,16 @@
             <field name="branch_id" ref='compliance_management.res_branch_0020052'/>
             <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">fashola.o@example.com</field>
+            <field name="customer_id">0031</field>
 
         </record>
-        
+
         <record id="demo_data_18" model="res.partner">
             <field name="name">Rahima Belloo</field>
-            <field name="phone">08115678901</field>
+            <field name="firstname">Rahima</field>
+            <field name="lastname">Belloo</field>
+            <field name="customer_phone">08115678901</field>
             <field name="street">17 Bello Street</field>
             <field name="city">Zaria</field>
             <field name="country_id" ref="base.ng"/>
@@ -306,13 +399,20 @@
             <field name="branch_id" ref='compliance_management.res_branch_0020006'/>
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">bello.r@example.com</field>
+            <field name="customer_id">0080</field>
+
+
+
+
 
         </record>
 
         <record id="demo_data_19" model="res.partner">
             <field name="name">Chibuzo EzeE</field>
-            <field name="phone">07056789012</field>
+            <field name="firstname">Chibuzo</field>
+            <field name="lastname">EzeE</field>
+            <field name="customer_phone">07056789012</field>
             <field name="street">2 Eze Compound</field>
             <field name="city">Aba</field>
             <field name="country_id" ref="base.ng"/>
@@ -324,13 +424,20 @@
             <!-- <field name="risk_level">high</field> -->
             <field name="risk_score">25.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">ezee.c@example.com</field>
+            <field name="customer_id">0190</field>
+
+
+
+
 
         </record>
 
         <record id="demo_data_20" model="res.partner">
             <field name="name">Sadiya Garbar</field>
-            <field name="phone">08087890123</field>
+            <field name="firstname">Sadiya</field>
+            <field name="lastname">Garbar</field>
+            <field name="customer_phone">08087890123</field>
             <field name="street">20 Garba Road</field>
             <field name="city">Gombe</field>
             <field name="country_id" ref="base.ng"/>
@@ -342,13 +449,21 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">garbar.s@example.com</field>
+            <field name="customer_id">0900</field>
+
+
+
+
+
 
         </record>
 
         <record id="demo_data_21" model="res.partner">
             <field name="name">Tayo Ade</field>
-            <field name="phone">09018901234</field>
+            <field name="firstname">Tayo</field>
+            <field name="lastname">Ade</field>
+            <field name="customer_phone">09018901234</field>
             <field name="street">5 Adeyemi Street</field>
             <field name="city">Oshogbo</field>
             <field name="country_id" ref="base.ng"/>
@@ -360,13 +475,21 @@
             <!-- <field name="risk_level">medium</field> -->
             <field name="risk_score">14.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">tayo.a@example.com</field>
+            <field name="customer_id">0074</field>
+
+
+
+
 
         </record>
 
         <record id="demo_data_22" model="res.partner">
             <field name="name">Samiraa Yakubu</field>
-            <field name="phone">08159012345</field>
+            <field name="firstname">Samiraa</field>
+            <field name="lastname">Yakubu</field>
+
+            <field name="customer_phone">08159012345</field>
             <field name="street">13 Yakubu Lane</field>
             <field name="city">Yola</field>
             <field name="country_id" ref="base.ng"/>
@@ -378,31 +501,47 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">yakubu.s@example.com</field>
+            <field name="customer_id">0317</field>
+
+
+
+
+
 
         </record>
 
         <record id="demo_data_23" model="res.partner">
             <field name="name">Tochukwu Ibee</field>
-            <field name="phone">07090123456</field>
+            <field name="firstname">Tochukwu</field>
+            <field name="lastname">Ibee</field>
+            <field name="customer_phone">07090123456</field>
             <field name="street">7 Ibe Avenue</field>
             <field name="city">Nnewi</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">respondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <!-- <field name="risk_level">high</field> -->
             <field name="risk_score">25.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">ibee.t@example.com</field>
+            <field name="customer_id">00120</field>
+
+
+
+
 
         </record>
 
         <record id="demo_data_24" model="res.partner">
             <field name="name">Ummii Adamu</field>
-            <field name="phone">08041234567</field>
+            <field name="firstname">Ummii</field>
+            <field name="lastname">Adamu</field>
+
+            <field name="customer_phone">08041234567</field>
             <field name="street">24 Adamu Street</field>
             <field name="city">Damaturu</field>
             <field name="country_id" ref="base.ng"/>
@@ -414,13 +553,22 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">adamu.u@example.com</field>
+            <field name="customer_id">02010</field>
+
+
+
+
+
 
         </record>
 
         <record id="demo_data_25" model="res.partner">
-            <field name="name">Wale Soyinka o</field>
-            <field name="phone">09032345678</field>
+            <field name="name">Wale Soyinka owe</field>
+            <field name="firstname">Wale</field>
+            <field name="lastname">owe</field>
+
+            <field name="customer_phone">09032345678</field>
             <field name="street">9 Soyinka Drive</field>
             <field name="city">Abeokuta</field>
             <field name="country_id" ref="base.ng"/>
@@ -432,13 +580,22 @@
             <!-- <field name="risk_level">medium</field> -->
             <field name="risk_score">14.0</field>
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">wale.s@example.com</field>
+            <field name="customer_id">0101</field>
+
+
+
+
+
 
         </record>
 
         <record id="demo_data_26" model="res.partner">
             <field name="name">Adama Dialloo</field>
-            <field name="phone">08173456789</field>
+            <field name="firstname">Adama</field>
+            <field name="lastname">Dialloo</field>
+
+            <field name="customer_phone">08173456789</field>
             <field name="street">16 Diallo Close</field>
             <field name="city">Calabar</field>
             <field name="country_id" ref="base.ng"/>
@@ -450,31 +607,38 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">adama.d@example.com</field>
+            <field name="customer_id">01996</field>
 
         </record>
 
         <record id="demo_data_27" model="res.partner">
             <field name="name">Beni Okoye</field>
-            <field name="phone">07074567890</field>
+            <field name="firstname">Beni</field>
+            <field name="lastname">Okoye</field>
+
+            <field name="customer_phone">07074567890</field>
             <field name="street">3 Okoye Street</field>
             <field name="city">Awka</field>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_mister" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">vendor</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <!-- <field name="risk_level">high</field> -->
             <field name="risk_score">25</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">beni.o@example.com</field>
+            <field name="customer_id">01021</field>
 
         </record>
 
         <record id="demo_data_28" model="res.partner">
             <field name="name">Khadija Mani</field>
-            <field name="phone">08055678901</field>
+            <field name="firstname">Khadija</field>
+            <field name="lastname">Mani</field>
+            <field name="customer_phone">08000678901</field>
             <field name="street">10 Mai Road</field>
             <field name="city">Jalingo</field>
             <field name="country_id" ref="base.ng"/>
@@ -486,13 +650,15 @@
             <!-- <field name="risk_level">low</field> -->
             <field name="risk_score">8.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
-
+            <field name="email">mani.j@example.com</field>
+            <field name="customer_id">0220</field>
         </record>
 
         <record id="demo_data_29" model="res.partner">
-            <field name="name">Femi Akinsanya P</field>
-            <field name="phone">09026789012</field>
+            <field name="name">Femi Akinsanya Pola</field>
+            <field name="firstname">Femi</field>
+            <field name="lastname">Pola</field>
+            <field name="customer_phone">09026789012</field>
             <field name="street">8 Akinsanya Estate</field>
             <field name="city">Surulere</field>
             <field name="country_id" ref="base.ng"/>
@@ -504,13 +670,17 @@
             <!-- <field name="risk_level">medium</field> -->
             <field name="risk_score">14.0</field>
             <field name="create_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">femi.p@example.com</field>
+            <field name="customer_id">0330</field>
 
         </record>
 
         <record id="demo_data_30" model="res.partner">
             <field name="name">Safiya Balaa</field>
-            <field name="phone">08187890123</field>
+            <field name="firstname">Safiya</field>
+            <field name="lastname">Balaa</field>
+
+            <field name="customer_phone">08187890123</field>
             <field name="street">19 Bala Street</field>
             <field name="city">Sokoto</field>
             <field name="country_id" ref="base.ng"/>
@@ -521,13 +691,15 @@
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
-            
-
+            <field name="email">balaa.s@example.com</field>
+            <field name="customer_id">0440</field>
         </record>
 
         <record id="demo_data_31" model="res.partner">
             <field name="name">Ifeanyi Okeke G</field>
-            <field name="phone">07018901234</field>
+            <field name="firstname">Ifeanyi</field>
+            <field name="lastname">G</field>
+            <field name="customer_phone">07018901234</field>
             <field name="street">4 Okeke Plaza</field>
             <field name="city">Nsukka</field>
             <field name="country_id" ref="base.ng"/>
@@ -538,13 +710,16 @@
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <!-- <field name="risk_level">high</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
+            <field name="email">okeke.g@example.com</field>
+            <field name="customer_id">0550</field>
 
         </record>
 
         <record id="demo_data_32" model="res.partner">
             <field name="name">Jamila Isaa</field>
-            <field name="phone">08099012345</field>
+            <field name="firstname">Jamila</field>
+            <field name="lastname">Isaa</field>
+            <field name="customer_phone">08099012345</field>
             <field name="street">12 Isa Avenue</field>
             <field name="city">Katsina</field>
             <field name="country_id" ref="base.ng"/>
@@ -555,13 +730,17 @@
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
-
+            <field name="email">james.i@example.com</field>
+            <field name="customer_id">0660</field>
         </record>
 
         <record id="demo_data_33" model="res.partner">
             <field name="name">Segun Ogunleyee</field>
-            <field name="phone">09080123456</field>
+            <field name="firstname">Segun</field>
+            <field name="lastname">Ogunleyee</field>
+            <field name="email">Ogunleyee.o@example.com</field>
+            <field name="customer_id">0770</field>
+            <field name="customer_phone">09080123456</field>
             <field name="street">6 Ogunleye Street</field>
             <field name="city">Sagamu</field>
             <field name="country_id" ref="base.ng"/>
@@ -572,8 +751,556 @@
             <field name="branch_id" ref='compliance_management.res_branch_0020039' />
             <!-- <field name="risk_level">medium</field> -->
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
-            
 
+
+        </record>
+
+        <record id="demo_partner_34" model="res.partner">
+            <field name="name">ABAYOMI JOHNSON</field>
+            <field name="firstname">ABAYOMI</field>
+            <field name="lastname">JOHNSON</field>
+            <field name="customer_phone">08034582910^08034582910</field>
+            <field name="street">14 LAGOS STREET, IKEJA</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">abayomi.j@example.com</field>
+            <field name="customer_id">10001</field>
+        </record>
+        
+        <record id="demo_partner_35" model="res.partner">
+            <field name="name">CHINWE OKAFOR</field>
+            <field name="firstname">CHINWE</field>
+            <field name="lastname">OKAFOR</field>
+            <field name="customer_phone">07045321890</field>
+            <field name="street">27 ADMIRALTY WAY, LEKKI</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=22)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">chinwe.o@example.com</field>
+            <field name="customer_id">10002</field>
+        </record>
+        
+        <record id="demo_partner_36" model="res.partner">
+            <field name="name">OLUWASEUN ADELEKE</field>
+            <field name="firstname">OLUWASEUN</field>
+            <field name="lastname">ADELEKE</field>
+            <field name="customer_phone">09012345678</field>
+            <field name="street">5 ALLEN AVENUE, IKEJA</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=23)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">oluwaseun.a@example.com</field>
+            <field name="customer_id">10003</field>
+        </record>
+        
+        <record id="demo_partner_37" model="res.partner">
+            <field name="name">NGOZI OKORO</field>
+            <field name="firstname">NGOZI</field>
+            <field name="lastname">OKORO</field>
+            <field name="customer_phone">08056781234</field>
+            <field name="street">12 AWOLOWO ROAD, IKOYI</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=24)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">ngozi.o@example.com</field>
+            <field name="customer_id">10004</field>
+        </record>
+        
+        <record id="demo_partner_38" model="res.partner">
+            <field name="name">EMEKA OKONKWO</field>
+            <field name="firstname">EMEKA</field>
+            <field name="lastname">OKONKWO</field>
+            <field name="customer_phone">07089123456,</field>
+            <field name="street">8 PARK AVENUE, ENUGU</field>
+            <field name="city">ENUGU</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=25)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">emeka.o@example.com</field>
+            <field name="customer_id">10005</field>
+        </record>
+        
+        <record id="demo_partner_39" model="res.partner">
+            <field name="name">AISHA MOHAMMED</field>
+            <field name="firstname">AISHA</field>
+            <field name="lastname">MOHAMMED</field>
+            <field name="customer_phone">08034567890,08034582910</field>
+            <field name="street">15 KASHIM IBRAHIM WAY, KANO</field>
+            <field name="city">KANO</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=26)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">aisha.m@example.com</field>
+            <field name="customer_id">10006</field>
+        </record>
+        
+        <record id="demo_partner_40" model="res.partner">
+            <field name="name">CHIDI EKEZIE</field>
+            <field name="firstname">CHIDI</field>
+            <field name="lastname">EKEZIE</field>
+            <field name="customer_phone">09087654321</field>
+            <field name="street">21 ABA ROAD, PORT HARCOURT</field>
+            <field name="city">PORT HARCOURT</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=27)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">chidi.e@example.com</field>
+            <field name="customer_id">10007</field>
+        </record>
+        
+        <record id="demo_partner_41" model="res.partner">
+            <field name="name">FOLAKE ADEYEMI</field>
+            <field name="firstname">FOLAKE</field>
+            <field name="lastname">ADEYEMI</field>
+            <field name="customer_phone">0^8076543210</field>
+            <field name="street">7 IKORODU ROAD, MARYLAND</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=28)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">folake.a@example.com</field>
+            <field name="customer_id">10008</field>
+        </record>
+        
+        <record id="demo_partner_42" model="res.partner">
+            <field name="name">UCHE OBINNA</field>
+            <field name="firstname">UCHE</field>
+            <field name="lastname">OBINNA</field>
+            <field name="customer_phone">07098765432^08034582910,</field>
+            <field name="street">33 ZARIA ROAD, JOS</field>
+            <field name="city">JOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=29)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">uche.o@example.com</field>
+            <field name="customer_id">10009</field>
+        </record>
+        
+        <record id="demo_partner_43" model="res.partner">
+            <field name="name">BOLA TINUBU</field>
+            <field name="firstname">BOLA</field>
+            <field name="lastname">TINUBU</field>
+            <field name="customer_phone">08012345678</field>
+            <field name="street">10 MARKET STREET, IBADAN</field>
+            <field name="city">IBADAN</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">bola.t@example.com</field>
+            <field name="customer_id">10010</field>
+        </record>
+        
+        <record id="demo_partner_44" model="res.partner">
+            <field name="name">YUSUF IBRAHIM</field>
+            <field name="firstname">YUSUF</field>
+            <field name="lastname">IBRAHIM</field>
+            <field name="customer_phone">09023456789</field>
+            <field name="street">12 AHMADU BELLO WAY, KADUNA</field>
+            <field name="city">KADUNA</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=31)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">yusuf.i@example.com</field>
+            <field name="customer_id">10011</field>
+        </record>
+        
+        <record id="demo_partner_45" model="res.partner">
+            <field name="name">ADENIKE OGUNLESI</field>
+            <field name="firstname">ADENIKE</field>
+            <field name="lastname">OGUNLESI</field>
+            <field name="customer_phone">08034567891</field>
+            <field name="street">45 BROAD STREET, LAGOS ISLAND</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=32)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">adenike.o@example.com</field>
+            <field name="customer_id">10012</field>
+        </record>
+        
+        <record id="demo_partner_46" model="res.partner">
+            <field name="name">SEGUN AFOLABI</field>
+            <field name="firstname">SEGUN</field>
+            <field name="lastname">AFOLABI</field>
+            <field name="customer_phone">07045678912</field>
+            <field name="street">18 LIMPOPO CRESCENT, MAITAMA</field>
+            <field name="city">ABUJA</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=33)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">segun.a@example.com</field>
+            <field name="customer_id">10013</field>
+        </record>
+        
+        <record id="demo_partner_47" model="res.partner">
+            <field name="name">AMINA SULEIMAN</field>
+            <field name="firstname">AMINA</field>
+            <field name="lastname">SULEIMAN</field>
+            <field name="customer_phone">09056789123</field>
+            <field name="street">22 MOSQUE ROAD, KANO</field>
+            <field name="city">KANO</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=34)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">amina.s@example.com</field>
+            <field name="customer_id">10014</field>
+        </record>
+        
+        <record id="demo_partner_48" model="res.partner">
+            <field name="name">ADEOLA AJAYI</field>
+            <field name="firstname">ADEOLA</field>
+            <field name="lastname">AJAYI</field>
+            <field name="customer_phone">08067891234,08067891234</field>
+            <field name="street">56 ADETOKUNBO STREET, VICTORIA ISLAND</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=35)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">adeola.a@example.com</field>
+            <field name="customer_id">10015</field>
+        </record>
+        
+        <record id="demo_partner_49" model="res.partner">
+            <field name="name">TUNDE BAKARE</field>
+            <field name="firstname">TUNDE</field>
+            <field name="lastname">BAKARE</field>
+            <field name="customer_phone">07078912345</field>
+            <field name="street">30 AHMADU BELLO WAY, ABUJA</field>
+            <field name="city">ABUJA</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=36)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">tunde.b@example.com</field>
+            <field name="customer_id">10016</field>
+        </record>
+        
+        <record id="demo_partner_50" model="res.partner">
+            <field name="name">FATIMA ABDUL</field>
+            <field name="firstname">FATIMA</field>
+            <field name="lastname">ABDUL</field>
+            <field name="customer_phone">08089123456</field>
+            <field name="street">14 INDEPENDENCE AVENUE, SOKOTO</field>
+            <field name="city">SOKOTO</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=37)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">fatima.a@example.com</field>
+            <field name="customer_id">10017</field>
+        </record>
+        
+        <record id="demo_partner_51" model="res.partner">
+            <field name="name">OLADIPO JOHNSON</field>
+            <field name="firstname">OLADIPO</field>
+            <field name="lastname">JOHNSON</field>
+            <field name="customer_phone">09091234567</field>
+            <field name="street">25 HERBERT MACAULAY WAY, YABA</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=38)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">oladipo.j@example.com</field>
+            <field name="customer_id">10018</field>
+        </record>
+        
+        <record id="demo_partner_52" model="res.partner">
+            <field name="name">BLESSING OKORO</field>
+            <field name="firstname">BLESSING</field>
+            <field name="lastname">OKORO</field>
+            <field name="customer_phone">08023456789,08067891234,</field>
+            <field name="street">41 CREEK ROAD, CALABAR</field>
+            <field name="city">CALABAR</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=39)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">blessing.o@example.com</field>
+            <field name="customer_id">10019</field>
+        </record>
+        
+        <record id="demo_partner_53" model="res.partner">
+            <field name="name">YINKA ODUSOTE</field>
+            <field name="firstname">YINKA</field>
+            <field name="lastname">ODUSOTE</field>
+            <field name="customer_phone">07034567890</field>
+            <field name="street">19 OGUNLANA DRIVE, SURULERE</field>
+            <field name="city">LAGOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="bvn">0768091</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=40)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">yinka.o@example.com</field>
+            <field name="customer_id">10020</field>
+        </record>
+        
+        <record id="demo_partner_54" model="res.partner">
+            <field name="name">CHARLES OKONKWO</field>
+            <field name="firstname">CHARLES</field>
+            <field name="lastname">OKONKWO</field>
+            <field name="customer_phone">08045678901</field>
+            <field name="street">8 MARKET ROAD, ONITSHA</field>
+            <field name="city">ONITSHA</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="bvn">08456</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=41)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">charles.o@example.com</field>
+            <field name="customer_id">10021</field>
+        </record>
+        
+        <record id="demo_partner_55" model="res.partner">
+            <field name="name">HADIZA BELLO</field>
+            <field name="firstname">HADIZA</field>
+            <field name="lastname">BELLO</field>
+            <field name="customer_phone">09034567890</field>
+            <field name="street">24 YAKUBU GOWON WAY, JOS</field>
+            <field name="city">JOS</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="bvn">01237</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=42)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">hadiza.b@example.com</field>
+            <field name="customer_id">10022</field>
+        </record>
+        
+        <record id="demo_partner_56" model="res.partner">
+            <field name="name">KUNLE ADEBAYO</field>
+            <field name="firstname">KUNLE</field>
+            <field name="lastname">ADEBAYO</field>
+            <field name="customer_phone">08056789012</field>
+            <field name="street">33 RIVER ROAD, YENAGOA</field>
+            <field name="city">YENAGOA</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="bvn">08477</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=43)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">kunle.a@example.com</field>
+            <field name="customer_id">10023</field>
+        </record>
+        
+        <record id="demo_partner_57" model="res.partner">
+            <field name="name">IFEOMA NWOSU</field>
+            <field name="firstname">IFEOMA</field>
+            <field name="lastname">NWOSU</field>
+            <field name="customer_phone">07067890123, 07067890123</field>
+            <field name="street">17 OKIGWE ROAD, OWERRI</field>
+            <field name="city">OWERRI</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="bvn">090222</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=44)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">ifeoma.n@example.com</field>
+            <field name="customer_id">10024</field>
+        </record>
+        
+        <record id="demo_partner_58" model="res.partner">
+            <field name="name">GABRIEL IGWE</field>
+            <field name="firstname">GABRIEL</field>
+            <field name="lastname">IGWE</field>
+            <field name="customer_phone">08078901234</field>
+            <field name="street">9 ABAKALIKI ROAD, ENUGU</field>
+            <field name="city">ENUGU</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=45)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">gabriel.i@example.com</field>
+            <field name="customer_id">10025</field>
+        </record>
+        
+        <record id="demo_partner_59" model="res.partner">
+            <field name="name">ZAINAB IBRAHIM</field>
+            <field name="firstname">ZAINAB</field>
+            <field name="lastname">IBRAHIM</field>
+            <field name="customer_phone">09089012345,,^07067890123</field>
+            <field name="street">23 KANO ROAD, ZARIA</field>
+            <field name="city">ZARIA</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=46)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">zainab.i@example.com</field>
+            <field name="customer_id">10026</field>
+        </record>
+        
+        <record id="demo_partner_59" model="res.partner">
+            <field name="name">ROTIMI WILLIAMS</field>
+            <field name="firstname">ROTIMI</field>
+            <field name="lastname">WILLIAMS</field>
+            <field name="customer_phone">08090123456</field>
+            <field name="street">11 BODIJA ESTATE, IBADAN</field>
+            <field name="city">IBADAN</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=47)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">rotimi.w@example.com</field>
+            <field name="customer_id">10027</field>
+        </record>
+        
+        <record id="demo_partner_60" model="res.partner">
+            <field name="name">JOY OGBONNA</field>
+            <field name="firstname">JOY</field>
+            <field name="lastname">OGBONNA</field>
+            <field name="customer_phone">07001234567</field>
+            <field name="street">29 ADA GEORGE ROAD, PORT HARCOURT</field>
+            <field name="city">PORT HARCOURT</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="bvn">05553</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=48)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">joy.o@example.com</field>
+            <field name="customer_id">10028</field>
+        </record>
+        
+        <record id="demo_partner_61" model="res.partner">
+            <field name="name">SAMUEL OKOYE</field>
+            <field name="firstname">SAMUEL</field>
+            <field name="lastname">OKOYE</field>
+            <field name="customer_phone">08001234567</field>
+            <field name="street">40 STADIUM ROAD, UMUAHIA</field>
+            <field name="city">UMUAHIA</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="bvn">0191093</field>
+            <field name="internal_category">correspondent</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=49)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">samuel.o@example.com</field>
+            <field name="customer_id">10029</field>
+        </record>
+        
+        <record id="demo_partner_62" model="res.partner">
+            <field name="name">MARYAM ABUBAKAR</field>
+            <field name="firstname">MARYAM</field>
+            <field name="lastname">ABUBAKAR</field>
+            <field name="customer_phone">09012345678</field>
+            <field name="street">15 DEFENCE ACADEMY ROAD, KADUNA</field>
+            <field name="city">KADUNA</field>
+            <field name="country_id" ref="base.ng"/>
+            <field name="title" ref="base.res_partner_title_prof" />
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="bvn">192020</field>
+            <field name="internal_category">customer</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="create_date" eval="(datetime.now() - timedelta(days=50)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="email">maryam.a@example.com</field>
+            <field name="customer_id">10030</field>
         </record>
 
     </data>

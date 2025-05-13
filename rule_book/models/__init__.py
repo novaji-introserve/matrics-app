@@ -7,3 +7,4 @@ from . import users
 from . import rulebook_report
 from . import res_users
 from . import keyword_tracking
+from . import reg_alert

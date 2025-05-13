@@ -28,6 +28,7 @@
         "security/ir.model.access.csv",
 
         # "data/preloaded_data/rule_book_branch.xml",
+        "views/alert_dashboard.xml",
         "views/menu.xml",
         "views/rules/rule_theme.xml",
         "views/rules/rulebook_sources_views.xml",
@@ -44,6 +45,7 @@
         "data/email_templates/first_line_escalation.xml",
         "data/email_templates/share_document_template.xml",
         "data/email_templates/keyword_alert.xml",
+        'data/email_templates/regulatory_alert.xml',
 
         "data/schedules/rule_book.xml",
         # "views/dashboard.xml",
@@ -60,13 +62,14 @@
         "views/public/thank_you.xml",
         # "security/group_action.xml",
         "views/pdf_chat.xml",
-        "views/alert_report_rulebook.xml",
+        # "views/alert_report_rulebook.xml",
         "views/alert_dashboard.xml",
       
         'views/user_setting.xml',
         'views/keyword_tracking.xml',
         'data/sequence/keyword.xml',
         'views/keyword_logs.xml',
+        'views/reg_alert.xml',
 
 
     ],

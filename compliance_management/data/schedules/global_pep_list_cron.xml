@@ -12,7 +12,7 @@
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False" />
-            <field name="active" eval="True" />
+            <field name="active" eval="False" />
         </record>
 
         <!-- Scheduled Action for API Data Fetching -->
@@ -26,7 +26,7 @@
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False" />
-            <field name="active" eval="True" />
+            <field name="active" eval="False" />
         </record>
 
         <!-- Scheduled Action for Job Cleanup -->
@@ -40,7 +40,7 @@
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False" />
-            <field name="active" eval="True" />
+            <field name="active" eval="False" />
         </record>
 
         <!-- Scheduler for Automatic PEP List Update -->
