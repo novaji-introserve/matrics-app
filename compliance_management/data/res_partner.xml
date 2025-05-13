@@ -1108,6 +1108,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
+            <field name="bvn">0768091</field>
             <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=40)).strftime('%Y-%m-%d %H:%M:%S')" />
@@ -1126,6 +1127,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
+            <field name="bvn">08456</field>
             <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=41)).strftime('%Y-%m-%d %H:%M:%S')" />
@@ -1144,6 +1146,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
+            <field name="bvn">01237</field>
             <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=42)).strftime('%Y-%m-%d %H:%M:%S')" />
@@ -1162,6 +1165,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
+            <field name="bvn">08477</field>
             <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=43)).strftime('%Y-%m-%d %H:%M:%S')" />
@@ -1180,6 +1184,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
+            <field name="bvn">090222</field>
             <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=44)).strftime('%Y-%m-%d %H:%M:%S')" />
@@ -1252,6 +1257,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
+            <field name="bvn">05553</field>
             <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=48)).strftime('%Y-%m-%d %H:%M:%S')" />
@@ -1270,6 +1276,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
+            <field name="bvn">0191093</field>
             <field name="internal_category">correspondent</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=49)).strftime('%Y-%m-%d %H:%M:%S')" />
@@ -1288,6 +1295,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
+            <field name="bvn">192020</field>
             <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=50)).strftime('%Y-%m-%d %H:%M:%S')" />

@@ -6,12 +6,12 @@
             <field name="model_id" ref="base.model_res_partner"/>
             <field name="state">code</field>
             <field name="code">model.cron_run_risk_assessment()</field>
-            <field name="interval_number">5</field>
-            <field name="interval_type">minutes</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
             <field name="priority">5</field>
-            <field name="active" eval="False"/>
+            <field name="active" eval="True"/>
         </record>
     </data>
 </odoo>
