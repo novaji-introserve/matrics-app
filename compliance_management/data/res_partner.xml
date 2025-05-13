@@ -820,7 +820,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=24)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">ngozi.o@example.com</field>
@@ -838,7 +838,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=25)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">emeka.o@example.com</field>
@@ -856,7 +856,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=26)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">aisha.m@example.com</field>
@@ -874,7 +874,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=27)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">chidi.e@example.com</field>
@@ -892,7 +892,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=28)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">folake.a@example.com</field>
@@ -910,7 +910,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=29)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">uche.o@example.com</field>
@@ -928,7 +928,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">bola.t@example.com</field>
@@ -946,7 +946,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=31)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">yusuf.i@example.com</field>
@@ -964,7 +964,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=32)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">adenike.o@example.com</field>
@@ -1018,7 +1018,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=35)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">adeola.a@example.com</field>
@@ -1072,7 +1072,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=38)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">oladipo.j@example.com</field>
@@ -1126,7 +1126,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=41)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">charles.o@example.com</field>
@@ -1144,7 +1144,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=42)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">hadiza.b@example.com</field>
@@ -1162,7 +1162,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=43)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">kunle.a@example.com</field>
@@ -1180,7 +1180,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=44)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">ifeoma.n@example.com</field>
@@ -1288,7 +1288,7 @@
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
-            <field name="internal_category">correspondent</field>
+            <field name="internal_category">customer</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=50)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">maryam.a@example.com</field>
