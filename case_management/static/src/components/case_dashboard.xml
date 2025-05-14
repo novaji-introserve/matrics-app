@@ -32,19 +32,20 @@
                     <!-- KPI Cards Row -->
                     <div class="row g-1">
                         <t t-if="dashboardData.kpi_data">
-                            <KpiCard name="'All Cases'" t-props="dashboardData.kpi_data.all_cases"/>
+                            <KpiCard name="'All Cases'" t-props="dashboardData.kpi_data.all_cases" status="'all'" onClick.bind="onCardClick"/>
                             <KpiCard name="'Open Cases'" t-props="dashboardData.kpi_data.open_cases" status="'open'" onClick.bind="onCardClick"/>
                             <KpiCard name="'Closed Cases'" t-props="dashboardData.kpi_data.closed_cases" status="'closed'" onClick.bind="onCardClick"/>
                             <KpiCard name="'Overdue Cases'" t-props="dashboardData.kpi_data.overdue_cases" status="'overdue'" onClick.bind="onCardClick"/>
                         </t>
                     </div>
                     
-                    <!-- First Row of Charts: Cases by Severity and Cases by Status -->
-                    <div class="row g-1">
+                    <!-- Side-by-side Charts: Severity + Status -->
+                    <div class="row g-1 mt-4">
+                        <!-- Cases by Severity -->
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-1 p-2 bg-white">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <h3 class="text-primary fw-bold fs-6 mb-0">Cases By Severity</h3>
+                                    <h3 class="text-primary fw-bold fs-6 mb-0">Cases by Severity</h3>
                                     <div class="px-1 py-0 bg-primary cursor-pointer">
                                         <span class="fa fa-arrow-right text-white small"/>
                                     </div>
@@ -52,17 +53,21 @@
                                 <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
                                     <t t-if="dashboardData.chart_data.cases_by_severity">
                                         <ChartRenderer type="'line'"
-                                                    tags="dashboardData.chart_data.cases_by_severity.labels"
-                                                    label_1="'Low'"
-                                                    label_2="'Medium'"
-                                                    label_3="'High'"
-                                                    text="'Cases By Severity'"
-                                                    backGroundColor="dashboardData.chart_data.cases_by_severity.datasets[0].backgroundColor"
-                                                    data="dashboardData.chart_data.cases_by_severity.datasets[0].data"/>
+                                                       tags="dashboardData.chart_data.cases_by_severity.labels"
+                                                       label_1="'Low'"
+                                                       label_2="'Medium'"
+                                                       label_3="'High'"
+                                                       text="'Cases By Severity'"
+                                                       backGroundColor="dashboardData.chart_data.cases_by_severity.datasets[0].backgroundColor"
+                                                       data="dashboardData.chart_data.cases_by_severity.datasets[0].data"
+                                                       id="'severity_chart'"
+                                                       chartType="'severity'"/>
                                     </t>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Cases by Status -->
                         <div class="col-lg-6 m-0 p-0">
                             <div class="shadow-sm border m-1 p-2 bg-white">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
@@ -74,70 +79,21 @@
                                 <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
                                     <t t-if="dashboardData.chart_data.cases_by_status">
                                         <ChartRenderer type="'bar'"
-                                                    tags="dashboardData.chart_data.cases_by_status.labels"
-                                                    label_1="'Open'"
-                                                    label_3="'Close'"
-                                                    label_2="'Overdue'"
-                                                    backGroundColor="dashboardData.chart_data.cases_by_status.datasets[0].backgroundColor"
-                                                    data="dashboardData.chart_data.cases_by_status.datasets[0].data"/>
-                                        
+                                                       tags="dashboardData.chart_data.cases_by_status.labels"
+                                                       label_1="'Open'"
+                                                       label_2="'Closed'"
+                                                       label_3="'Overdue'"
+                                                       text="'Cases By Status'"
+                                                       backGroundColor="dashboardData.chart_data.cases_by_status.datasets[0].backgroundColor"
+                                                       data="dashboardData.chart_data.cases_by_status.datasets[0].data"/>
                                     </t>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Second Row of Charts: Cases by Category and Case Rate -->
-                    <div class="row g-1">
-                        <div class="col-lg-6 m-0 p-0">
-                            <div class="shadow-sm border m-1 p-2 bg-white">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <h3 class="text-primary fw-bold fs-6 mb-0">Cases By Category</h3>
-                                    <div class="px-1 py-0 bg-primary cursor-pointer">
-                                        <span class="fa fa-arrow-right text-white small"/>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
-                                    <t t-if="dashboardData.chart_data.cases_by_category">
-                                        <ChartRenderer type="'bar'"
-                                                    tags="dashboardData.chart_data.cases_by_category.process.map(item => item.label)"
-                                                    label_1="'Process Category'"
-                                                    backGroundColor="['rgb(255,99,132)', 'rgb(255,205,8)']"
-                                                    data="dashboardData.chart_data.cases_by_category.process.map(item => item.value)"/>
-                                    </t>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 m-0 p-0">
-                            <div class="shadow-sm border m-1 p-2 bg-white">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <h3 class="text-primary fw-bold fs-6 mb-0">Case Rate</h3>
-                                    <div class="px-1 py-0 bg-primary cursor-pointer">
-                                        <span class="fa fa-arrow-right text-white small"/>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
-                                    <t t-if="dashboardData.chart_data.case_rate">
-                                        <ChartRenderer type="'line'"
-                                                    tags="dashboardData.chart_data.case_rate.labels"
-                                                    label_1="'Open Rate'"
-                                                    label_2="'Close Rate'"
-                                                    label_3="'Overdue Rate'"
-                                                    text="'Cases Rate'"
-                                                    backGroundColor="dashboardData.chart_data.case_rate.datasets[0].backgroundColor"
-                                                    data="dashboardData.chart_data.case_rate.datasets[0].data"/>
-                                    </t>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>
     </t>
 </templates>
-
-
-
-
-

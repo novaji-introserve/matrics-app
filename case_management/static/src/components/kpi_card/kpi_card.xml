@@ -10,13 +10,16 @@
                     <span t-esc="props.name"/>
                 </div>
                 <div class="h3 mt-5">
-                    <span t-attf-class="text-#{ props.value > 10 ? 'success':'danger'}">
-                        <!-- <span t-attf-class="me-1 fa fa-arrow-#{ props.percentage > 10 ? 'up':'down' }"/> -->
+                    <!-- <span t-attf-class="text-#{ props.value > 10 ? 'success':'danger'}">
                         <span t-attf-class="me-1 fa fa-arrow-#{ (props.value * 0.01) > 10 ? 'up':'down' }"/>
+                        <span t-esc="props.percentage"/>% -->
+
+                        <!-- <span t-attf-class="me-1 fa fa-arrow-#{ props.percentage > 10 ? 'up':'down' }"/> -->
+                        <!-- <span t-attf-class="me-1 fa fa-arrow-#{ (props.value * 0.01) > 10 ? 'up':'down' }"/> -->
                         <!-- <span t-esc="props.percentage"/>% -->
-                        <span t-esc="Math.round(props.value * 0.01)"/>%
-                        <span> since last period</span>
-                    </span>
+                        <!-- <span t-esc="Math.round(props.value * 0.01)"/>% -->
+                        <!-- <span> since last period</span> -->
+                    <!-- </span> -->
                 </div>
             </div>
         </div>

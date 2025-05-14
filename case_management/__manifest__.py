@@ -6,7 +6,7 @@
     'author': 'Novaji',
     'website': 'https://novajii.com',
     'category': 'Custom',
-    'depends': ['base', 'web', 'mail'],
+    'depends': ['base', 'web', 'mail','compliance_management'],
     'data': [
         'data/email_templates.xml',
         'data/case_closure.xml',
@@ -14,20 +14,23 @@
         'security/security_two.xml',
         'security/security.xml',
         'security/ir.model.access.csv',
+        
+        'views/new_case.xml',        # Then load views and connect to menus
+        'views/case_form_inherit_disable_save_discard.xml', 
         'views/message_alert_views.xml',
-        'views/case_form_inherit_disable_save_discard.xml',
-        'views/all_open_case.xml',
+        #'views/case_form_inherit_disable_save_discard.xml',
+       # 'views/all_open_case.xml',
+        'views/all_cases_views.xml',
         'views/case_status.xml',
-        'views/all_treated_case_views.xml',
-        'views/close_case_wizard.xml',
-        'views/all_closed_case.xml',
-        'views/created_by_me_views.xml',
-        'views/assigned_to_me.xml',
-        'views/overdue_cases.xml',
+        #'views/all_treated_case_views.xml',
+       # 'views/close_case_wizard.xml',
+       # 'views/all_closed_case.xml',
+       # 'views/created_by_me_views.xml',
+       # 'views/assigned_to_me.xml',
+       # 'views/overdue_cases.xml',
+        'views/my_alerts_views.xml',
         'views/case_dashboard.xml',# Load menus first
         'views/case_form_inherit.xml',
-        'views/new_case.xml',        # Then load views and connect to menus
-        # 'views/all_open_case.xml',        # Then load views and connect to menus
         'data/cron.xml',
     ],
     'demo': [],
@@ -55,4 +58,5 @@
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
+    'icon': 'case_management/static/description/icon.png',
 }

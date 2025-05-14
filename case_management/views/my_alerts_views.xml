@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View for My Alerts -->
+    <record id="view_my_alert_history_tree" model="ir.ui.view">
+        <field name="name">my.alert.history.tree</field>
+        <field name="model">alert.history</field>
+        <field name="arch" type="xml">
+            <tree string="My Alerts" create="false" edit="false" delete="false">
+                <field name="alert_id" string="Alert Reference" />
+                <!-- <field name="risk_rating" /> -->
+                <field name="risk_rating" widget="badge" 
+                    decoration-success="risk_rating == 'Low'" 
+                    decoration-warning="risk_rating == 'Medium'" 
+                    decoration-danger="risk_rating == 'High'"/>
+                <field name="email" />
+                <field name="last_checked" string="Date" />
+                <field name="time" string="Time"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for My Alerts -->
+    <record id="view_my_alert_history_form" model="ir.ui.view">
+        <field name="name">my.alert.history.form</field>
+        <field name="model">alert.history</field>
+        <field name="arch" type="xml">
+            <form string="Alert Details" edit="false" delete="false">
+               <sheet>
+                <div class="oe_title">
+                    <label for="alert_id" class="oe_edit_only" />
+                    <h1>
+                        <field name="alert_id" string="Alert Reference" />
+                    </h1>
+                </div>
+                
+                <group string="RELATED INFORMATION">
+                    <group>
+                        <field name="risk_rating" string="Rating" />
+                    </group>
+                    <group>
+                        <field name="source" string="Source" colspan="3" />
+                    </group>
+                    
+                    <group attrs="{'invisible': [('process_id', '=', False)]}">
+                        <field name="process_id" string="Process"/>
+                    </group>
+                </group>
+
+                <group string="DATE INFORMATION">
+                    <group>
+                        <field name="last_checked" string="Last Checked" />
+                    </group>
+                    <group>
+                        <field name="date_created" string="Date Created" />
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Record">
+                        <div style="overflow-x: auto; max-width: 100%;">
+                            <field name="html_body" widget="html" style="max-height: 800px; overflow-y: auto;" />
+                        </div>
+                    </page>
+                </notebook>
+               </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open My Alerts -->
+    <record id="action_my_alert_history" model="ir.actions.act_window">
+        <field name="name">My Alerts</field>
+        <field name="res_model">alert.history</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('user_in_emails', '=', True)]</field>
+        <field name="view_ids" eval="[(5, 0, 0), 
+                                      (0, 0, {'view_mode': 'tree', 'view_id': ref('view_my_alert_history_tree')}),
+                                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_my_alert_history_form')})]"/>
+    </record>
+        <record id="access_alert_history_user" model="ir.model.access">
+        <field name="name">alert.history user access</field>
+        <field name="model_id" ref="alert_management.model_alert_history"/>
+        <field name="group_id" ref="base.group_user"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    <!-- Menu Item for My Alerts -->
+    <!-- <menuitem id="menu_my_alerts"
+        name="My Alerts"
+        action="action_my_alert_history"
+        parent="case_management.menu_case_management"
+        sequence="15"/> -->
+</odoo>

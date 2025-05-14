@@ -1,11 +1,21 @@
 <odoo>
-    <record id="ir_cron_check_overdue_cases" model="ir.cron">
-        <field name="name">Check Overdue Cases</field>
-        <field name="model_id" ref="model_case"/>
-        <field name="state">code</field>
-        <field name="code">model.cron_check_overdue_cases()</field>
-        <field name="interval_type">hours</field>
-        <field name="interval_number">1</field> <!-- Check every 1 hour -->
-        <field name="nextcall">2025-04-07 00:00:00</field> <!-- First run -->
+  <data noupdate="1">
+    <!-- Create the overdue status if it doesn't exist -->
+    <record id="case_status_overdue" model="case.status">
+      <field name="name">overdue</field>
+      <!-- If your model requires other fields, add them here -->
     </record>
+
+    <!-- Set up the cron job -->
+    <record id="ir_cron_check_overdue_cases" model="ir.cron">
+      <field name="name">Check Overdue Cases</field>
+      <field name="model_id" ref="case_management.model_case"/>  
+      <field name="state">code</field>
+      <field name="code">model.cron_check_overdue_cases()</field>
+      <field name="interval_number">1</field>
+      <field name="interval_type">hours</field>
+      <field name="numbercall">-1</field>
+      <field name="active" eval="True"/>
+    </record>
+  </data>
 </odoo>

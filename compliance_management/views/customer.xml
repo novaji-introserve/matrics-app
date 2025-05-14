@@ -141,6 +141,8 @@
                         string="Run Media Screening"
                         groups="compliance_management.group_compliance_branch_compliance_officer"
                         confirm="Run Media Screening: Are you sure?" />
+
+                    <button name="action_create_case" type="object" string="Create Case" class="btn-primary"/>
                 </header>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">

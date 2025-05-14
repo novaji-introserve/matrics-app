@@ -17,25 +17,25 @@ class CaseDashboard extends Component {
         // onWillUpdateProps(() => this.renderChart());
         this.chartRef = useRef("chart");
         this.rpc = useService("rpc");
-        this.action = useService("action"); // 👈 For navigation
+        this.action = useService("action"); //  For navigation
         this.dashboardData = useState({ kpi_data: {}, chart_data: {} });
         this.periodSelector = useRef("periodSelector");
 
         onWillStart(async () => {
-            console.log("📡 CaseDashboard is about to fetch data...");
+            console.log("CaseDashboard is about to fetch data...");
             try {
                 const data = await this.rpc("/case_dashboard/data");
                 Object.assign(this.dashboardData, data); // Preserve reactivity
                 //this.dashboardData = result;
-                console.log("✅ Dashboard data fetched:", this.dashboardData);
+                console.log("Dashboard data fetched:", this.dashboardData);
             } catch (error) {
-                console.error("❌ Error fetching dashboard data:", error);
+                console.error("Error fetching dashboard data:", error);
                 this.dashboardData.error = error.message || "Failed to load dashboard data.";
             }
         });
 
         onMounted(() => {
-            console.log("📊 CaseDashboard mounted with data:", JSON.stringify(this.dashboardData, null, 2));
+            console.log("CaseDashboard mounted with data:", JSON.stringify(this.dashboardData, null, 2));
 
             // Attach event listener to the period selector for handling period change
             // const periodSelectorElement = this.periodSelector.el; // Get reference to the DOM element
@@ -74,74 +74,89 @@ class CaseDashboard extends Component {
             
 
 
-            // const freshData = {
-            //     kpi_data: {...result.kpi_data},
-            //     chart_data: {...result.chart_data}
-            // };
             
-            // // Update state properties individually to trigger proper reactivity
-            // Object.keys(freshData.kpi_data).forEach(key => {
-            //     this.dashboardData.kpi_data[key] = freshData.kpi_data[key];
-            // });
-            
-            // Object.keys(freshData.chart_data).forEach(key => {
-            //     this.dashboardData.chart_data[key] = freshData.chart_data[key];
-            // });
-            // this.dashboardData.kpi_data = {...result.kpi_data};
-            // this.dashboardData.chart_data = {...result.chart_data};
-            // // this.dashboardData.kpi_data = result.kpi_data;
-            // // this.dashboardData.chart_data = result.chart_data;
             
             console.log("Success", result);
         } catch (error) {
-            console.error("❌ Error loading dashboard data:", error);
+            console.error("Error loading dashboard data:", error);
         }
     }
 
 
 
-    // async loadDashboardData(period) {
-    //     try {
-    //         const result = await this.rpc("/case_dashboard/data", { period });
-    //         // const result = await this.rpc({
-    //         //     route: "/case_dashboard/data", // This should match the controller route
-    //         //     params: { period },             // Send the period as parameter to filter data
-    //         // });
+    
 
-    //         // Handle the response (result) and update your dashboard state
-    //         Object.assign(this.dashboardData, result);  // Update the dashboard data
-    //         //this.render();  // Re-render the dashboard after data is loaded
-    //         console.log("Success", result)
-    //     } catch (error) {
-    //         console.error("❌ Error loading dashboard data:", error);
-    //     }
-    // }
 
-    goToView(status) {
-        if (status === "all") return;
-        this.action.doAction({
-            type: "ir.actions.act_window",
-            name: `${status.charAt(0).toUpperCase() + status.slice(1)} Cases`,
-            res_model: "case",
-            view_mode: "tree,form",
-            domain: [["status_id.name", "=", status]],
-            views: [[false, "tree"], [false, "form"]],
-        });
+
+
+
+
+        goToView(status) {
+            let action = {
+                type: "ir.actions.act_window",
+                res_model: "case",
+                view_mode: "tree,form",
+                views: [[false, "tree"], [false, "form"]],
+            };
+        
+            if (status && status !== "all") {
+                action.name = `${status.charAt(0).toUpperCase() + status.slice(1)} Cases`;
+                action.domain = [["status_id.name", "=", status]];
+            } else {
+                action.name = "All Cases";
+                // No domain — show all
+            }
+        
+            this.action.doAction(action);
+        }
+        
+        onChartClick(event, chartElements) {
+            const element = chartElements[0];
+            if (!element) return;
+        
+            // Determine which chart was clicked by checking the dataset label or other properties
+            // For case_rate chart
+            if (element._chart && element._chart.canvas.id.includes("case_rate")) {
+                const label = this.dashboardData.chart_data.case_rate.labels[element.index];
+                const status = label.toLowerCase();
+                this.goToView(status);
+            } 
+            // For cases_by_severity chart
+            else if (element._chart && element._chart.canvas.id.includes("severity")) {
+                const severityLabels = ["Low", "Medium", "High"];
+                const severity = severityLabels[element.index];
+                this.goToSeverityView(severity);
+            }
+        }
+        
+        goToSeverityView(severity) {
+            let action = {
+                type: "ir.actions.act_window",
+                res_model: "case",
+                view_mode: "tree,form",
+                views: [[false, "tree"], [false, "form"]],
+                name: `${severity} Severity Cases`,
+                domain: [["severity", "=", severity.toLowerCase()]]
+            };
+            
+            this.action.doAction(action);
+        }
+
+
+        // onChartClick(event, chartElements) {
+        //     const element = chartElements[0];
+        //     if (!element) return;
+        
+        //     const label = this.dashboardData.chart_data.case_rate.labels[element.index];
+        //     const status = label.toLowerCase();
+        //     this.goToView(status);  // Always call goToView
+        // }
+        
+        onCardClick(status) {
+            this.goToView(status);  // Always call goToView
+        }
+        
     }
-
-    onChartClick(event, chartElements) {
-        const element = chartElements[0];
-        if (!element) return;
-
-        const label = this.dashboardData.chart_data.case_rate.labels[element.index];
-        const status = label.toLowerCase();
-        if (status !== "all") this.goToView(status);
-    }
-
-    onCardClick(status) {
-        if (status !== "all") this.goToView(status);
-    }
-}
 
 CaseDashboard.template = "owl.CaseDashboard";
 CaseDashboard.components = { KpiCard, ChartRenderer };

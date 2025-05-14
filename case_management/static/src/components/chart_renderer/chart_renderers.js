@@ -40,6 +40,9 @@ class ChartRenderer extends Component {
             const dataset3 = this.props.data3 || [];
             const backgroundColor = this.props.backgroundColor || ['rgb(255, 205, 86)', 'rgb(54, 162, 235)', 'rgb(255, 99, 132)'];
 
+            // Set a custom ID for the canvas to identify which chart is being clicked
+            this.chartRef.el.id = this.props.chartType === 'severity' ? 'severity_chart' : 'case_rate_chart';
+
             this.chartInstance = new Chart(this.chartRef.el, {
                 type: this.props.type || 'doughnut',
                 data: {
@@ -82,46 +85,96 @@ class ChartRenderer extends Component {
         }
     }
 
-            onChartClick(event) {
-            if (!this.chartInstance) return;
+    onChartClick(event) {
+        if (!this.chartInstance) return;
 
-            const elements = this.chartInstance.getElementsAtEventForMode(
-                event,
-                'nearest',
-                { intersect: true },
-                true
-            );
+        const elements = this.chartInstance.getElementsAtEventForMode(
+            event,
+            'nearest',
+            { intersect: true },
+            true
+        );
 
-            if (elements.length > 0) {
-                const index = elements[0].index;
-                const label = this.chartInstance.data.labels[index];
-                const status = label.toLowerCase();
+        if (elements.length > 0) {
+            const element = elements[0];
+            const index = element.index;
+            const chartId = this.chartRef.el.id;
 
-                // Prevent navigation for non-status or "all" labels
+            // Add the chart instance to the element to match the expected format
+            // in the CaseDashboard.onChartClick method
+            element._chart = {
+                canvas: {
+                    id: chartId
+                }
+            };
+
+            // Dispatch the click event to the parent component
+            this.env.bus.trigger('chart-clicked', { event, elements, chartId });
+            
+            // For backward compatibility, also use the default behavior
+            if (this.props.chartType === 'severity') {
+                const severity = this.chartInstance.data.labels[index];
+                this.goToSeverityView(severity);
+            } else {
+                const status = this.chartInstance.data.labels[index].toLowerCase();
                 if (status && status !== 'all') {
                     this.goToView(status);
                 }
             }
         }
-
-        goToView(status) {
-            this.env.services.action.doAction({
-                type: 'ir.actions.act_window',
-                name: `${status.charAt(0).toUpperCase() + status.slice(1)} Cases`,
-                res_model: 'case',
-                view_mode: 'tree,form',
-                domain: [['status_id.name', '=', status]],
-                views: [[false, 'tree'], [false, 'form']],
-            });
-        }
     }
 
-    ChartRenderer.template = "owl.ChartRenderer";
-    registry.category("components").add("owl.ChartRenderer", ChartRenderer);
+    goToView(status) {
+        this.env.services.action.doAction({
+            type: 'ir.actions.act_window',
+            name: `${status.charAt(0).toUpperCase() + status.slice(1)} Cases`,
+            res_model: 'case',
+            view_mode: 'tree,form',
+            domain: [['status_id.name', '=', status]],
+            views: [[false, 'tree'], [false, 'form']],
+        });
+    }
 
-    export { ChartRenderer };
+    goToSeverityView(severity) {
+        const severityMap = {
+            'low': '1',
+            'medium': '2',
+            'high': '3',
+        };
+        const titleValue = severityMap[severity.toLowerCase()];
+    
+        if (!titleValue) {
+            console.warn(`Invalid severity: ${severity}`);
+            return;
+        }
+    
+        this.env.services.action.doAction({
+            type: 'ir.actions.act_window',
+            name: `${severity} Severity Cases`,
+            res_model: 'case',
+            view_mode: 'tree,form',
+            domain: [['title', '=', titleValue]],
+            views: [[false, 'tree'], [false, 'form']],
+        });
+    }
+    
 
+    // goToSeverityView(severity) {
+    //     this.env.services.action.doAction({
+    //         type: 'ir.actions.act_window',
+    //         name: `${severity} Severity Cases`,
+    //         res_model: 'case',
+    //         view_mode: 'tree,form',
+    //         domain: [['severity', '=', severity.toLowerCase()]],
+    //         views: [[false, 'tree'], [false, 'form']],
+    //     });
+    // }
+}
 
+ChartRenderer.template = "owl.ChartRenderer";
+registry.category("components").add("owl.ChartRenderer", ChartRenderer);
+
+export { ChartRenderer };
 
 
 

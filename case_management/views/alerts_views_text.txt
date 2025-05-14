@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View for My Alerts -->
+    <record id="view_my_alerts_tree" model="ir.ui.view">
+        <field name="name">case.alerts.tree</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree string="My Alerts" create="false">
+                <field name="create_date" string="Date" widget="date"/>
+                <field name="name" string="Case Title"/>
+                <field name="staff_id" string="Assigned To"/>
+                <field name="user_id" string="Requested By"/>
+                <field name="priority_rating" string="Priority"/>
+                <field name="state" string="Status"/>
+                <field name="exception_process" string="Process"/>
+                <field name="process_type" string="Process Type"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for My Alerts -->
+    <!-- We don't need to create a new form view as we can reuse the main case form view -->
+
+    <!-- Action for My Alerts -->
+    <record id="action_my_alerts" model="ir.actions.act_window">
+        <field name="name">My Alerts</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('staff_id.user_id', '=', uid)]</field>
+        <field name="context">{'search_default_my_cases': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No alerts found
+            </p>
+            <p>
+                This list shows cases that have been assigned to you.
+            </p>
+        </field>
+    </record>
+
+    <!-- Search View for My Alerts -->
+    <record id="view_my_alerts_search" model="ir.ui.view">
+        <field name="name">case.alerts.search</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <search string="Search Alerts">
+                <field name="name" string="Case Title"/>
+                <field name="user_id" string="Requested By"/>
+                <field name="staff_id" string="Assigned To"/>
+                <field name="description" string="Description"/>
+                <filter string="My Cases" name="my_cases" domain="[('staff_id.user_id', '=', uid)]"/>
+                <filter string="High Priority" name="high_priority" domain="[('priority_rating', 'in', ['high', 'critical'])]"/>
+                <filter string="Open Cases" name="open_cases" domain="[('state', 'in', ['open', 'in_progress'])]"/>
+                <filter string="This Month" name="this_month" domain="[('create_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="groupby_status" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Priority" name="groupby_priority" domain="[]" context="{'group_by': 'priority_rating'}"/>
+                    <filter string="Process" name="groupby_process" domain="[]" context="{'group_by': 'exception_process'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Menu Item for My Alerts -->
+    <!-- <menuitem id="menu_my_alerts"
+              name="My Alerts"
+              action="action_my_alerts"
+              parent="case_management.menu_case_management"
+              sequence="3"/> -->
+</odoo>

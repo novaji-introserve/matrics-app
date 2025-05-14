@@ -149,7 +149,35 @@ class Customer(models.Model):
         'test', 'Test Data'), ('prod', 'Production Data')], index=True)
     
     
-      
+    
+    def action_create_case(self):
+        """
+        Opens the case management form with the customer pre-filled
+        """
+        # Create the context with required values
+        context = {
+            'default_status_id': self.env.ref('case_management.case_status_open').id,
+            'case_created': True,
+            'show_creation_notification': True,
+        }
+        
+        # Since customer_id in the case model is a Many2one field referencing res.partner,
+        # and this model (Customer) inherits from res.partner,
+        # we need to pass the ID of the current record
+        context['default_customer_id'] = self.id
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'New Case',
+            'res_model': 'case',
+            'view_mode': 'form',
+            'view_id': self.env.ref('case_management.case_form_view').id,
+            'target': 'current',
+            'context': context
+        }
+        
+        
+        
     
     # is_branch_compliance = fields.Boolean(
     #     string="Is Branch Compliance Officer",

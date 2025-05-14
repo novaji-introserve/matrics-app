@@ -35,6 +35,34 @@ class Transaction(models.Model):
     state = fields.Selection(string='Status', selection=[(
         'new', 'To Review'), ('done', 'Done')], tracking=True, index=True, default='new')
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
+    
+    
+    def action_create_case(self):
+        """
+        Opens the case management form with the transaction reference pre-filled
+        """
+        # Create the context with required values
+        context = {
+            'default_status_id': self.env.ref('case_management.case_status_open').id,
+            'case_created': True,
+            'show_creation_notification': True,
+        }
+        
+        # Pre-fill the transaction reference
+        context['default_transaction_reference'] = self.name
+        
+        # Pre-fill the transaction_id field if it exists in the case model
+        context['default_transaction_id'] = self.id
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'New Case',
+            'res_model': 'case',
+            'view_mode': 'form',
+            'view_id': self.env.ref('case_management.case_form_view').id,
+            'target': 'current',
+            'context': context
+        }
 
     def get_risk_level(self):
         return self.risk_level

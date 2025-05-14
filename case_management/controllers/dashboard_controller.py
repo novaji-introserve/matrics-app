@@ -37,14 +37,66 @@ class CaseDashboardController(http.Controller):
 
         def count_by(severity):
             return len(all_cases.filtered(lambda c: c.title == severity))
+        
+        # Calculate the total number of cases
+        total_cases = len(all_cases)
+
+        
 
         dashboard_data = {
             'kpi_data': {
-                'all_cases': {'value': len(all_cases), 'percentage': 0},
-                'open_cases': {'value': len(open_cases), 'percentage': 0},
-                'closed_cases': {'value': len(closed_cases), 'percentage': 0},
-                'overdue_cases': {'value': len(overdue_cases), 'percentage': 0},
+                'all_cases': {'value': total_cases, 'percentage': 100 if total_cases else 0},
+                'open_cases': {
+                    'value': len(open_cases),
+                    'percentage': round((len(open_cases) / total_cases * 100)) if total_cases else 0
+                },
+                'closed_cases': {
+                    'value': len(closed_cases),
+                    'percentage': round((len(closed_cases) / total_cases * 100)) if total_cases else 0
+                },
+                'overdue_cases': {
+                    'value': len(overdue_cases),
+                    'percentage': round((len(overdue_cases) / total_cases * 100)) if total_cases else 0
+                },
             },
+        
+
+
+
+
+
+        # dashboard_data = {
+        #      'kpi_data': {
+        #         'all_cases': {'value': len(all_cases), 'percentage': 0},
+        #         'open_cases': {'value': len(open_cases), 'percentage': 0},
+        #         'closed_cases': {'value': len(closed_cases), 'percentage': 0},
+        #         'overdue_cases': {'value': len(overdue_cases), 'percentage': 0},
+        #     },
+                
+            
+            
+            
+            
+            
+        #                 'kpi_data': {
+        #             'all_cases': {
+        #                 'value': total_cases, 
+        #                 'percentage': 100
+        #             },
+        #             'open_cases': {
+        #                 'value': len(open_cases), 
+        #                 'percentage': round((len(open_cases) / total_cases * 100)) if total_cases else 0
+        #             },
+        #             'closed_cases': {
+        #                 'value': len(closed_cases), 
+        #                 'percentage': round((len(closed_cases) / total_cases * 100)) if total_cases else 0
+        #             },
+        #             'overdue_cases': {
+        #                 'value': len(overdue_cases), 
+        #                 'percentage': round((len(overdue_cases) / total_cases * 100)) if total_cases else 0
+        #             },
+        #                 },
+           
             'chart_data': {
                 'cases_by_category': {
                     'process': [{'label': data.get('process_category_id') and data['process_category_id'][1] or 'N/A',
