@@ -19,11 +19,14 @@ class Compliance(http.Controller):
         is_superuser = user.has_group('base.group_system')
 
         group = any(group.name.lower() == 'chief compliance officer' for group in user.groups_id)
-        branch = [branch.id for branch in user.branches_id] 
+        branch = [branch.id for branch in user.branches_id]
+        
+        unique_id = get_unique_client_identifier() 
 
         result = {
             "group": group,
             "branch": branch,
+            "unique_id": unique_id,
         }
         return result
     
@@ -118,96 +121,275 @@ class Compliance(http.Controller):
        
 
         return {'table': table, 'domain': domain}
-
-    def parse_condition_string(self, condition_string: str):
+    
+    def parse_condition_string(self, condition_string):
         """
-        Parse a condition string into Odoo domain format.
-        Handles AND/OR operators and respects parentheses and quoted strings.
+        Parse SQL WHERE conditions into Odoo domain format
+        with proper handling of AND, OR operators and parentheses
         """
-        # Split by AND operators
-        and_conditions = self._split_by_operator(condition_string, ' AND ')
-        
-        if len(and_conditions) == 1:
-            return self._parse_single_condition(and_conditions[0])
-        
-        domain = []
-        for i, cond in enumerate(and_conditions):
-            parsed_condition = self._parse_single_condition(cond)
-            if i < len(and_conditions) - 1:
-                domain.append('&')
-            domain.extend(parsed_condition)
+        if not condition_string:
+            return []
             
-        return domain
-
-    def _split_by_operator(self, condition_string: str, operator: str):
+        # Clean up the condition string
+        condition_string = condition_string.strip()
+        
+        # Track nesting of parentheses and operators
+        def parse_expression(expr, depth=0):
+            _logger.info(f"Parsing expression (depth {depth}): {expr}")
+            
+            # Handle empty expression
+            if not expr.strip():
+                return []
+                
+            # Split by OR at the current nesting level
+            or_parts = self._split_by_operator(expr, "OR")
+            
+            if len(or_parts) > 1:
+                # This is an OR expression
+                result = []
+                for i in range(len(or_parts) - 1):
+                    result.append('|')
+                for part in or_parts:
+                    result.extend(parse_expression(part, depth + 1))
+                return result
+                
+            # Split by AND at the current nesting level
+            and_parts = self._split_by_operator(expr, "AND")
+            
+            if len(and_parts) > 1:
+                # This is an AND expression
+                result = []
+                for part in and_parts[:-1]:
+                    result.append('&')
+                    result.extend(parse_expression(part, depth + 1))
+                result.extend(parse_expression(and_parts[-1], depth + 1))
+                return result
+                
+            # Handle parenthesized expression
+            if expr.strip().startswith('(') and expr.strip().endswith(')'):
+                inner_expr = expr.strip()[1:-1].strip()
+                return parse_expression(inner_expr, depth + 1)
+                
+            # Base case: single condition
+            return [self._parse_single_condition(expr)]
+            
+        # Parse the entire condition string
+        try:
+            domain = parse_expression(condition_string)
+            _logger.info(f"Parsed domain: {domain}")
+            return domain
+        except Exception as e:
+            _logger.error(f"Error parsing condition: {e}")
+            return []
+            
+    def _split_by_operator(self, expr, operator):
         """
-        Split a condition string by a specified operator,
-        respecting parentheses and quoted strings.
+        Split a SQL expression by an operator (AND/OR) while respecting parentheses
         """
-        conditions = []
-        current_condition = ""
+        operator = f" {operator} "  # Add spaces to match only the operator keyword
+        parts = []
+        current_part = ""
         paren_level = 0
-        in_quote = False
         quote_char = None
         
         i = 0
-        while i < len(condition_string):
-            c = condition_string[i]
+        while i < len(expr):
+            char = expr[i]
             
-            if c in ("'", '"') and (quote_char is None or c == quote_char):
-                in_quote = not in_quote
-                quote_char = c if in_quote else None
-                current_condition += c
-            elif c == '(' and not in_quote:
+            # Handle quotes
+            if char in ["'", '"'] and (i == 0 or expr[i-1] != '\\'):
+                if quote_char is None:
+                    quote_char = char
+                elif quote_char == char:
+                    quote_char = None
+                    
+            # Skip everything inside quotes
+            if quote_char is not None:
+                current_part += char
+                i += 1
+                continue
+                
+            # Handle parentheses
+            if char == '(':
                 paren_level += 1
-                current_condition += c
-            elif c == ')' and not in_quote:
+            elif char == ')':
                 paren_level -= 1
-                current_condition += c
-            elif (paren_level == 0 and not in_quote and 
-                  i + len(operator) <= len(condition_string) and
-                  condition_string[i:i+len(operator)].upper() == operator):
-                conditions.append(current_condition.strip())
-                current_condition = ""
-                i += len(operator) - 1
+                
+            # Check for operator at the current position
+            if (paren_level == 0 and 
+                i + len(operator) <= len(expr) and 
+                expr[i:i+len(operator)].upper() == operator):
+                # Found the operator at current level
+                parts.append(current_part.strip())
+                current_part = ""
+                i += len(operator)
             else:
-                current_condition += c
+                current_part += char
+                i += 1
+                
+        # Add the last part
+        if current_part:
+            parts.append(current_part.strip())
             
-            i += 1
+        return parts
         
-        if current_condition:
-            conditions.append(current_condition.strip())
+    def _parse_single_condition(self, condition):
+        """
+        Parse a single SQL condition into an Odoo domain tuple
+        """
+        condition = condition.strip()
         
-        return conditions
+        # Handle IS TRUE/FALSE conditions
+        is_true_match = re.search(r"(\w+)\s+is\s+true", condition.lower())
+        if is_true_match:
+            field = is_true_match.group(1).strip()
+            return (field, "=", True)
+        
+        is_false_match = re.search(r"(\w+)\s+is\s+false", condition.lower())
+        if is_false_match:
+            field = is_false_match.group(1).strip()
+            return (field, "=", False)
+        
+        # Handle IS NULL/NOT NULL (from our previous fix)
+        if " is null" in condition.lower():
+            field = condition.lower().split(" is null")[0].strip()
+            return (field, "=", False)
+            
+        if " is not null" in condition.lower():
+            field = condition.lower().split(" is not null")[0].strip()
+            return (field, "!=", False)
+            
+        # Handle LIKE operator
+        if " like " in condition.lower():
+            parts = condition.lower().split(" like ")
+            field = parts[0].strip()
+            value = parts[1].strip().strip("'\"")
+            # Convert SQL LIKE wildcards to Odoo's ilike
+            return (field, "ilike", value.replace('%', ''))
+            
+        # Handle standard operators
+        ops_map = {
+            "=": "=",
+            ">": ">",
+            ">=": ">=",
+            "<": "<",
+            "<=": "<=",
+            "!=": "!=",
+            "<>": "!="
+        }
+        
+        for op in ops_map.keys():
+            if f" {op} " in condition:
+                parts = condition.split(f" {op} ", 1)
+                field = parts[0].strip()
+                value = parts[1].strip().strip("'\"")
+                
+                # Handle boolean values
+                if value.lower() == 'true':
+                    value = True
+                elif value.lower() == 'false':
+                    value = False
+                # Handle numeric values
+                elif value.isdigit():
+                    value = int(value)
+                elif value.replace('.', '', 1).isdigit():
+                    value = float(value)
+                    
+                return (field, ops_map[op], value)
+                
+        # If we couldn't parse it, return as is
+        _logger.warning(f"Could not parse condition: {condition}")
+        return (condition, "=", True)
 
-    def _parse_single_condition(self, condition: str):
-        """
-        Parse a single condition which might contain OR operators.
-        Returns a list in Odoo domain format.
-        """
-        or_conditions = self._split_by_operator(condition, ' OR ')
+    # def parse_condition_string(self, condition_string: str):
+    #     """
+    #     Parse a condition string into Odoo domain format.
+    #     Handles AND/OR operators and respects parentheses and quoted strings.
+    #     """
+    #     # Split by AND operators
+    #     and_conditions = self._split_by_operator(condition_string, ' AND ')
         
-        if len(or_conditions) == 1:
-            condition = or_conditions[0].strip()
-            if condition.startswith('(') and condition.endswith(')'):
-                inner_condition = condition[1:-1].strip()
-                inner_or_conditions = self._split_by_operator(inner_condition, ' OR ')
-                if len(inner_or_conditions) > 1:
-                    or_conditions = inner_or_conditions
-                else:
-                    return self._convert_to_odoo_tuple(inner_condition)
-            else:
-                return self._convert_to_odoo_tuple(condition)
+    #     if len(and_conditions) == 1:
+    #         return self._parse_single_condition(and_conditions[0])
         
-        domain = []
-        for i in range(len(or_conditions) - 1):
-            domain.append('|')
-        
-        for cond in or_conditions:
-            parsed = self._convert_to_odoo_tuple(cond.strip())
-            domain.extend(parsed)
+    #     domain = []
+    #     for i, cond in enumerate(and_conditions):
+    #         parsed_condition = self._parse_single_condition(cond)
+    #         if i < len(and_conditions) - 1:
+    #             domain.append('&')
+    #         domain.extend(parsed_condition)
             
-        return domain
+    #     return domain
+
+    # def _split_by_operator(self, condition_string: str, operator: str):
+    #     """
+    #     Split a condition string by a specified operator,
+    #     respecting parentheses and quoted strings.
+    #     """
+    #     conditions = []
+    #     current_condition = ""
+    #     paren_level = 0
+    #     in_quote = False
+    #     quote_char = None
+        
+    #     i = 0
+    #     while i < len(condition_string):
+    #         c = condition_string[i]
+            
+    #         if c in ("'", '"') and (quote_char is None or c == quote_char):
+    #             in_quote = not in_quote
+    #             quote_char = c if in_quote else None
+    #             current_condition += c
+    #         elif c == '(' and not in_quote:
+    #             paren_level += 1
+    #             current_condition += c
+    #         elif c == ')' and not in_quote:
+    #             paren_level -= 1
+    #             current_condition += c
+    #         elif (paren_level == 0 and not in_quote and 
+    #               i + len(operator) <= len(condition_string) and
+    #               condition_string[i:i+len(operator)].upper() == operator):
+    #             conditions.append(current_condition.strip())
+    #             current_condition = ""
+    #             i += len(operator) - 1
+    #         else:
+    #             current_condition += c
+            
+    #         i += 1
+        
+    #     if current_condition:
+    #         conditions.append(current_condition.strip())
+        
+    #     return conditions
+
+    # def _parse_single_condition(self, condition: str):
+    #     """
+    #     Parse a single condition which might contain OR operators.
+    #     Returns a list in Odoo domain format.
+    #     """
+    #     or_conditions = self._split_by_operator(condition, ' OR ')
+        
+    #     if len(or_conditions) == 1:
+    #         condition = or_conditions[0].strip()
+    #         if condition.startswith('(') and condition.endswith(')'):
+    #             inner_condition = condition[1:-1].strip()
+    #             inner_or_conditions = self._split_by_operator(inner_condition, ' OR ')
+    #             if len(inner_or_conditions) > 1:
+    #                 or_conditions = inner_or_conditions
+    #             else:
+    #                 return self._convert_to_odoo_tuple(inner_condition)
+    #         else:
+    #             return self._convert_to_odoo_tuple(condition)
+        
+    #     domain = []
+    #     for i in range(len(or_conditions) - 1):
+    #         domain.append('|')
+        
+    #     for cond in or_conditions:
+    #         parsed = self._convert_to_odoo_tuple(cond.strip())
+    #         domain.extend(parsed)
+            
+    #     return domain
 
     def _convert_to_odoo_tuple(self, condition: str):
         """
@@ -467,6 +649,7 @@ class Compliance(http.Controller):
             query = """
                 SELECT rcs.*
                 FROM res_compliance_stat rcs
+                ORDER BY rcs.id
             """
             request.env.cr.execute(query)
 

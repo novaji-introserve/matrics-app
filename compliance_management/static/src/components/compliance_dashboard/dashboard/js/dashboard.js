@@ -2,7 +2,7 @@
 
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import {Card} from "../../card/js/card";
+import { Card } from "../../card/js/card";
 import { ChartRenderer } from "../../chart/js/chart";
 const { Component, useState, useEffect, useRef, onWillStart, onWillUnmount } = owl;
 
@@ -55,35 +55,23 @@ export class ComplianceDashboard extends Component {
     this.serverCache = useService("server_cache");
     this.user = useService("user");
     
-    // Get current user ID
-    this.userId = this.user.userId;
-    logDebug('Dashboard initializing for user ID:', this.userId);
-    
-    // Initialize state with loading indicators and debug info
+    // Initialize state with empty arrays (not null) and loading indicators
     this.state = useState({
       isCategorySortingEnabled: false,
       cco: false,
       branches_id: [],
-      stats: [],
+      stats: [], // Empty array, not null
       totalstat: 0,
       datepicked: 20000,
-      chartData: [],
-      screenedchart: [],
-      highriskchart: [],
-      topbranch: [],
-      dynamic_chart: [],
+      dynamic_chart: [], // Empty array, not null
       scrollLeft: true,
       scrollRight: false,
       loadingStates: {
         stats: true,
         charts: true
       },
-      debug: DEBUG ? {
-        lastError: null,
-        dataLoaded: false,
-        lastUpdate: new Date().toISOString(),
-        cardsVisible: false
-      } : null
+      useDynamicLoading: true, // Flag to enable progressive loading
+      pageSize: 50
     });
     
     // Models that should trigger a refresh
@@ -92,41 +80,37 @@ export class ComplianceDashboard extends Component {
     // Setup bus listener for refreshing the dashboard
     useBusListener('dashboard_refresh_channel', this.handleRefreshNotification.bind(this));
     
-    // Initialize component
+    // Initialize component with progressive loading
     onWillStart(async () => {
       try {
-        logDebug('Dashboard starting initialization');
+        // Hide Odoo's global loading spinner immediately
+        this._hideGlobalLoadingIndicator();
+        
+        // Get user info first (essential for everything else)
         await this.getCurrentUser();
-        await this.filterByDate();
-        if (this.state.debug) {
-          this.state.debug.dataLoaded = true;
-          this.state.debug.lastUpdate = new Date().toISOString();
-        }
-        logDebug('Data loaded successfully', this.state.stats);
+        
+        // Start loading data progressively without awaiting
+        this._loadDataProgressively();
+        
       } catch (error) {
         console.error("Error in component initialization:", error);
-        if (this.state.debug) {
-          this.state.debug.lastError = error.message;
-        }
+        // Clear loading states on error
         this.state.loadingStates.stats = false;
         this.state.loadingStates.charts = false;
       }
     });
     
     // Set up auto-refresh every 5 minutes
-    useEffect(() => {
-      const refreshTimer = setInterval(async () => {
-        logDebug("Auto-refreshing dashboard data...");
-        await this.filterByDate(true);
-        if (this.state.debug) {
-          this.state.debug.lastUpdate = new Date().toISOString();
-        }
-      }, 5 * 60 * 1000); // 5 minutes
+    // useEffect(() => {
+    //   const refreshTimer = setInterval(async () => {
+    //     logDebug("Auto-refreshing dashboard data...");
+    //     await this.filterByDate(true);
+    //   }, 5 * 60 * 1000); // 5 minutes
       
-      return () => {
-        clearInterval(refreshTimer);
-      };
-    }, () => []);
+    //   return () => {
+    //     clearInterval(refreshTimer);
+    //   };
+    // }, () => []);
     
     // Set up scroll event listener
     useEffect(() => {
@@ -141,23 +125,6 @@ export class ComplianceDashboard extends Component {
       };
     }, () => []);
     
-    // Debug effect to log state changes
-    if (DEBUG) {
-      useEffect(() => {
-        logDebug('State updated:', 
-          'stats length:', this.state.stats?.length,
-          'loading:', this.state.loadingStates.stats
-        );
-        // Check if cards should be visible
-        if (this.state.debug) {
-          this.state.debug.cardsVisible = 
-            this.state.stats && 
-            this.state.stats.length > 0 && 
-            !this.state.loadingStates.stats;
-        }
-      });
-    }
-    
     // Bind methods
     this.displayOdooView = this.displayOdooView.bind(this);
     this.displaybycategory = this.displaybycategory.bind(this);
@@ -167,7 +134,6 @@ export class ComplianceDashboard extends Component {
 
   /**
    * Handle notifications from the bus
-   * @param {Object} notification - The notification payload
    */
   async handleRefreshNotification(notification) {
     logDebug("Received notification:", notification);
@@ -179,16 +145,50 @@ export class ComplianceDashboard extends Component {
       // Reload the view
       try {
         await this.filterByDate(true); // Force refresh
-        if (this.state.debug) {
-          this.state.debug.lastUpdate = new Date().toISOString();
-        }
       } catch (error) {
         console.error("Error refreshing dashboard:", error);
-        if (this.state.debug) {
-          this.state.debug.lastError = error.message;
-        }
       }
     }
+  }
+
+  /**
+   * Hide Odoo's global loading spinner
+   */
+  _hideGlobalLoadingIndicator() {
+    const loader = document.querySelector('.o_loading');
+    if (loader) {
+      loader.style.display = 'none';
+    }
+  }
+
+  /**
+   * Load data progressively - cards first, then charts
+   */
+  _loadDataProgressively() {
+    // First load cards (don't await)
+    this.getAllStats().finally(() => {
+      // After cards are loaded, start loading charts with a timeout
+      // Adding a small delay allows the cards to render completely
+      setTimeout(() => {
+        // Set a timeout for chart loading
+        const chartPromise = this.fetchDashboardCharts();
+        
+        // Add a timeout of 60 seconds in case charts take too long
+        const timeoutPromise = new Promise((resolve) => {
+          setTimeout(() => {
+            // If charts are still loading after 60 seconds, mark as not loading
+            if (this.state.loadingStates.charts) {
+              this.state.loadingStates.charts = false;
+              console.warn("Chart loading timeout - please check server performance");
+            }
+            resolve(null);
+          }, 60000);
+        });
+        
+        // Race the chart loading and timeout
+        Promise.race([chartPromise, timeoutPromise]);
+      }, 100);
+    });
   }
 
   /**
@@ -224,13 +224,11 @@ export class ComplianceDashboard extends Component {
         logDebug('Got user data:', result);
         this.state.branches_id = result.branch;
         this.state.cco = result.group;
+        this.state.uniqueId = result.unique_id;
       }
       return result;
     } catch (error) {
       console.error("Error fetching current user:", error);
-      if (this.state.debug) {
-        this.state.debug.lastError = "Failed to fetch user: " + error.message;
-      }
       return null;
     }
   }
@@ -239,20 +237,12 @@ export class ComplianceDashboard extends Component {
    * Get all stats with caching
    */
   async getAllStats() {
-    const params = {
-      cco: this.state.cco,
-      branches_id: this.state.branches_id,
-      datepicked: Number(this.state.datepicked),
-    };
-    
-    logDebug('Getting all stats with params:', params);
-    
-    // Generate cache key
-    const cacheKey = `all_stats_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
-    
     try {
       // Mark as loading
       this.state.loadingStates.stats = true;
+      
+      // Generate cache key
+      const cacheKey = `all_stats_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}_${this.state.uniqueId}`;
       
       // Try to get from cache
       const cachedData = await this.serverCache.getCache(cacheKey);
@@ -267,7 +257,11 @@ export class ComplianceDashboard extends Component {
       
       // Not in cache, fetch from server
       logDebug('Fetching stats from server');
-      const result = await this.rpc(`/dashboard/stats`, params);
+      const result = await this.rpc(`/dashboard/stats`, {
+        cco: this.state.cco,
+        branches_id: this.state.branches_id,
+        datepicked: Number(this.state.datepicked),
+      });
       
       if (result) {
         logDebug('Got stats data:', result);
@@ -277,16 +271,15 @@ export class ComplianceDashboard extends Component {
         await this.serverCache.setCache(cacheKey, result);
       } else {
         logDebug('No stats data returned from API');
+        this.state.stats = []; // Ensure it's an empty array, not null
       }
       
       this.state.loadingStates.stats = false;
       return result;
     } catch (error) {
       console.error("Error fetching all stats:", error);
-      if (this.state.debug) {
-        this.state.debug.lastError = "Failed to fetch stats: " + error.message;
-      }
       this.state.loadingStates.stats = false;
+      this.state.stats = []; // Ensure it's an empty array on error
       return null;
     }
   }
@@ -295,18 +288,11 @@ export class ComplianceDashboard extends Component {
    * Get stats by category with caching
    */
   async getStatsByCategory(name) {
-    const params = {
-      cco: this.state.cco,
-      branches_id: this.state.branches_id,
-      category: name,
-      datepicked: Number(this.state.datepicked),
-    };
-    
-    // Generate cache key
-    const cacheKey = `stats_category_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${name}_${this.state.datepicked}`;
-    
     try {
       this.state.loadingStates.stats = true;
+      
+      // Generate cache key
+      const cacheKey = `stats_category_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${name}_${this.state.datepicked}_${this.state.uniqueId}`;
       
       // Try to get from cache
       const cachedData = await this.serverCache.getCache(cacheKey);
@@ -321,7 +307,12 @@ export class ComplianceDashboard extends Component {
       
       // Not in cache, fetch from server
       logDebug('Fetching category stats from server');
-      const result = await this.rpc(`/dashboard/statsbycategory`, params);
+      const result = await this.rpc(`/dashboard/statsbycategory`, {
+        cco: this.state.cco,
+        branches_id: this.state.branches_id,
+        category: name,
+        datepicked: Number(this.state.datepicked),
+      });
       
       if (result) {
         this.state.stats = result.data;
@@ -334,74 +325,240 @@ export class ComplianceDashboard extends Component {
       return result;
     } catch (error) {
       console.error("Error fetching stats by category:", error);
-      if (this.state.debug) {
-        this.state.debug.lastError = "Failed to fetch category stats: " + error.message;
-      }
       this.state.loadingStates.stats = false;
       return null;
     }
   }
 
+  // /**
+  //  * Fetch dashboard charts without any timeout - we'll handle progressive rendering
+  //  */
+  // async fetchDashboardCharts() {
+  //   try {
+  //     // Mark as loading
+  //     this.state.loadingStates.charts = true;
+      
+  //     // Generate cache key
+  //     const cacheKey = `dynamic_charts_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}_${this.state.uniqueId}`;
+      
+  //     // Try to get from cache
+  //     const cachedData = await this.serverCache.getCache(cacheKey);
+      
+  //     if (cachedData) {
+  //       logDebug('Using cached chart data');
+  //       this.state.dynamic_chart = cachedData;
+  //       this.state.loadingStates.charts = false;
+  //       return cachedData;
+  //     }
+      
+  //     // Not in cache, fetch from server
+  //     logDebug('Fetching chart data from server');
+  //     const response = await this.rpc(`/dashboard/dynamic_charts/`, {
+  //       cco: this.state.cco,
+  //       branches_id: this.state.branches_id,
+  //       datepicked: Number(this.state.datepicked),
+  //     });  
+      
+  //     if (response && response.error) {
+  //       console.error(`Error fetching dashboard charts: ${response.error}`);
+  //       this.state.dynamic_chart = [];
+  //     } else if (response) {
+  //       this.state.dynamic_chart = response;
+  //       // Cache the result
+  //       await this.serverCache.setCache(cacheKey, response);
+  //     } else {
+  //       console.error("Error: Empty response received while fetching dashboard charts.");
+  //       this.state.dynamic_chart = [];
+  //     }
+      
+  //     this.state.loadingStates.charts = false;
+  //     return response;
+  //   } catch (error) {
+  //     console.error("Error in fetchDashboardCharts:", error);
+  //     this.state.dynamic_chart = []; 
+  //     this.state.loadingStates.charts = false;
+  //     return null;
+  //   }
+  // }
+
+
   /**
-   * Fetch dashboard charts with caching
+   * Fetch dashboard charts metadata first, then load charts progressively
    */
-  async fetchDashboardCharts() {
-    const params = {
-      cco: this.state.cco,
-      branches_id: this.state.branches_id,
-      datepicked: Number(this.state.datepicked),
-    };
-    
-    // Generate cache key
-    const cacheKey = `dynamic_charts_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
-    
+  async fetchDashboardStats() {
     try {
-      this.state.loadingStates.charts = true;
+      // Mark as loading
+      this.state.loadingStates.stats = true;
       
-      // Try to get from cache
-      const cachedData = await this.serverCache.getCache(cacheKey);
+      // Generate cache key - using your existing format
+      const uniqueId = this.state.uniqueId; 
+      const cache_key = `all_stats_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}_${uniqueId}`;
       
-      if (cachedData) {
-        logDebug('Using cached chart data');
-        this.state.dynamic_chart = cachedData;
-        this.state.loadingStates.charts = false;
-        return cachedData;
+      console.log(`Checking cache for: ${cache_key}`);
+      
+      // Get from cache
+      let statsData = await this.serverCache.getCache(cache_key);
+      
+      if (!statsData) {
+        console.log(`Cache miss for ${cache_key}`);
+        // Nothing in cache, fetch fresh data
+        statsData = await this.rpc('/dashboard/all_stats/', {
+          cco: this.state.cco,
+          branches_id: this.state.branches_id,
+          datepicked: Number(this.state.datepicked),
+        });
+        
+        console.log("Got stats data: ", statsData);
+        
+        // Cache the results if valid - use 600 seconds (10 minutes) TTL
+        if (statsData && !statsData.error) {
+          console.log(`Cache set for ${cache_key}`);
+          await this.serverCache.setCache(cache_key, statsData);
+        }
+      } else {
+        console.log(`Cache hit for ${cache_key}`);
       }
       
-      // Not in cache, fetch from server
-      logDebug('Fetching chart data from server');
-      const response = await this.rpc(`/dashboard/dynamic_charts/`, params);  
-      
-      if (response && response.error) {
-        console.error(`Error fetching dashboard charts: ${response.error}`);
-        if (this.state.debug) {
-          this.state.debug.lastError = "Chart error: " + response.error;
-        }
-        this.state.dynamic_chart = [];
-      } else if (response) {
-        this.state.dynamic_chart = response;
-        // Cache the result
-        await this.serverCache.setCache(cacheKey, response);
+      // Update state with stats data
+      if (statsData && statsData.error) {
+        console.error(`Error fetching stats: ${statsData.error}`);
+        this.state.all_stats = {data: [], total: 0};
+      } else if (statsData) {
+        this.state.all_stats = statsData;
       } else {
-        console.error("Error: Empty response received while fetching dashboard charts.");
-        if (this.state.debug) {
-          this.state.debug.lastError = "Empty chart response";
+        console.error("Error: Empty response received while fetching stats.");
+        this.state.all_stats = {data: [], total: 0};
+      }
+      
+      this.state.loadingStates.stats = false;
+      return statsData;
+      
+    } catch (error) {
+      console.error("Error in fetchDashboardStats:", error);
+      this.state.all_stats = {data: [], total: 0};
+      this.state.loadingStates.stats = false;
+      return null;
+    }
+  }
+
+
+  /**
+   * Fetch dashboard charts with caching and performance optimizations
+   */
+  async fetchDashboardCharts() {
+    try {
+      // Mark as loading
+      this.state.loadingStates.charts = true;
+      
+      // Generate cache key - using your existing format
+      const uniqueId = this.state.uniqueId;
+      const cache_key = `charts_data_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}_${uniqueId}`;
+      
+      console.log(`Checking cache for: ${cache_key}`);
+      
+      // Check if we have valid cache for this user
+      let chartsData = await this.serverCache.getCache(cache_key);
+      
+      if (!chartsData) {
+        console.log(`Cache miss for ${cache_key}`);
+        // No cache, fetch fresh data
+        chartsData = await this.rpc('/dashboard/dynamic_charts/', {
+          cco: this.state.cco,
+          branches_id: this.state.branches_id,
+          datepicked: Number(this.state.datepicked),
+        });
+        
+        // Cache the results with 600 seconds (10 minutes) TTL
+        if (chartsData && !chartsData.error) {
+          console.log(`Cache set for ${cache_key}`);
+          await this.serverCache.setCache(cache_key, chartsData);
         }
+      } else {
+        console.log(`Cache hit for ${cache_key}`);
+      }
+      
+      // Update state with chart data
+      if (chartsData && chartsData.error) {
+        console.error(`Error fetching charts: ${chartsData.error}`);
+        this.state.dynamic_chart = [];
+      } else if (chartsData) {
+        this.state.dynamic_chart = chartsData;
+      } else {
+        console.error("Error: Empty response received while fetching charts.");
         this.state.dynamic_chart = [];
       }
       
       this.state.loadingStates.charts = false;
-      return response;
+      return chartsData;
+      
     } catch (error) {
       console.error("Error in fetchDashboardCharts:", error);
-      if (this.state.debug) {
-        this.state.debug.lastError = "Failed to fetch charts: " + error.message;
-      }
       this.state.dynamic_chart = [];
       this.state.loadingStates.charts = false;
       return null;
     }
   }
+  // async fetchDashboardCharts() {
+  //   try {
+  //     // Mark as loading
+  //     this.state.loadingStates.charts = true;
+      
+  //     // Generate cache key
+  //     const cacheKey = `dynamic_charts_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}_${this.state.uniqueId}`;
+      
+  //     // Try to get from cache
+  //     const cachedData = await this.serverCache.getCache(cacheKey);
+      
+  //     if (cachedData) {
+  //       logDebug('Using cached chart data');
+  //       this.state.dynamic_chart = cachedData;
+  //       this.state.loadingStates.charts = false;
+  //       return cachedData;
+  //     }
+      
+  //     // Not in cache, fetch from server with timeout
+  //     logDebug('Fetching chart data from server');
+      
+  //     // Create a timeout promise that rejects after 30 seconds
+  //     const timeout = new Promise((_, reject) => {
+  //       setTimeout(() => reject(new Error('Chart data fetch timeout')), 30000);
+  //     });
+      
+  //     // Race the fetch and timeout
+  //     const response = await Promise.race([
+  //       this.rpc(`/dashboard/dynamic_charts/`, {
+  //         cco: this.state.cco,
+  //         branches_id: this.state.branches_id,
+  //         datepicked: Number(this.state.datepicked),
+  //       }),
+  //       timeout
+  //     ]).catch(error => {
+  //       console.error("Chart data fetch error or timeout:", error);
+  //       // Return empty array on timeout
+  //       return [];
+  //     });
+      
+  //     if (response && response.error) {
+  //       console.error(`Error fetching dashboard charts: ${response.error}`);
+  //       this.state.dynamic_chart = [];
+  //     } else if (response) {
+  //       this.state.dynamic_chart = response;
+  //       // Cache the result
+  //       await this.serverCache.setCache(cacheKey, response);
+  //     } else {
+  //       console.error("Error: Empty response received while fetching dashboard charts.");
+  //       this.state.dynamic_chart = [];
+  //     }
+      
+  //     this.state.loadingStates.charts = false;
+  //     return response;
+  //   } catch (error) {
+  //     console.error("Error in fetchDashboardCharts:", error);
+  //     this.state.dynamic_chart = []; // Ensure it's an empty array on error
+  //     this.state.loadingStates.charts = false;
+  //     return null;
+  //   }
+  // }
 
   /**
    * Filter by date with parallel requests
@@ -422,19 +579,12 @@ export class ComplianceDashboard extends Component {
       // Using Promise.all for parallel execution
       await Promise.all([
         this.getAllStats(),
-        this.fetchDashboardCharts()
+        // this.fetchDashboardCharts()
       ]);
-      
-      if (this.state.debug) {
-        this.state.debug.lastUpdate = new Date().toISOString();
-      }
       
       return true;
     } catch (error) {
       console.error("Error in filterByDate:", error);
-      if (this.state.debug) {
-        this.state.debug.lastError = "Filter error: " + error.message;
-      }
       // Clear loading states on error
       this.state.loadingStates.stats = false;
       this.state.loadingStates.charts = false;
@@ -455,16 +605,9 @@ export class ComplianceDashboard extends Component {
         await this.getStatsByCategory(name);
       }
       
-      if (this.state.debug) {
-        this.state.debug.lastUpdate = new Date().toISOString();
-      }
-      
       return true;
     } catch (error) {
       console.error("Error in displayByCategory:", error);
-      if (this.state.debug) {
-        this.state.debug.lastError = "Category display error: " + error.message;
-      }
       return false;
     }
   }
@@ -475,7 +618,7 @@ export class ComplianceDashboard extends Component {
   async displayOdooView(category, query, branch_filter, branch_field, title) {
     try {
       // Generate cache key for this query
-      const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}`;
+      const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}_${this.state.uniqueId}`;
       
       // Try to get from cache
       let response = await this.serverCache.getCache(cacheKey);
@@ -496,9 +639,6 @@ export class ComplianceDashboard extends Component {
       
       if (!response) {
         console.error("Empty response from dynamic_sql");
-        if (this.state.debug) {
-          this.state.debug.lastError = "Empty SQL response";
-        }
         return;
       }
 
@@ -507,9 +647,31 @@ export class ComplianceDashboard extends Component {
         category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
         "Card Results");
       
-        console.log(response.domain);
-        
+      // Fix for date-related issues in domain
+      if (response.domain && Array.isArray(response.domain)) {
+        // Process the domain to handle date fields properly
+        response.domain = response.domain.map(item => {
+          // Check if we're dealing with a date comparison
+          if (Array.isArray(item) && item.length === 3) {
+            const [field, operator, value] = item;
+            
+            // Check if field ends with _date or _datetime or is date/datetime
+            const isDateField = field.endsWith('_date') || 
+                               field.endsWith('_datetime') || 
+                               field === 'date' || 
+                               field === 'datetime';
+            
+            // If it's a date field and the value is problematic
+            if (isDateField && (value === '0001-01-01' || value === false || value === null)) {
+              // Replace with a safer condition for filtering
+              return [field, '=', false];
+            }
+          }
+          return item;
+        });
+      }
 
+      // Now navigate with the fixed domain
       this.navigate.doAction({
         type: "ir.actions.act_window",
         res_model: response.table.replace(/_/g, "."),
@@ -522,9 +684,6 @@ export class ComplianceDashboard extends Component {
       });
     } catch (error) {
       console.error("Error in displayOdooView:", error);
-      if (this.state.debug) {
-        this.state.debug.lastError = "View error: " + error.message;
-      }
     }
   }
 }
@@ -533,6 +692,676 @@ ComplianceDashboard.template = "owl.ComplianceDashboard";
 ComplianceDashboard.components = { Card, ChartRenderer };
 
 registry.category("actions").add("owl.compliance_dashboard", ComplianceDashboard);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// /** @odoo-module */
+
+// import { registry } from "@web/core/registry";
+// import { useService } from "@web/core/utils/hooks";
+// import {Card} from "../../card/js/card";
+// import { ChartRenderer } from "../../chart/js/chart";
+// const { Component, useState, useEffect, useRef, onWillStart, onWillUnmount } = owl;
+
+// // Debug mode - set to false for production
+// const DEBUG = true;
+// function logDebug(...args) {
+//   if (DEBUG) console.log(...args);
+// }
+
+// /**
+//  * Custom hook for bus service notifications
+//  * @param {string} channelName - Channel to listen on
+//  * @param {Function} callback - Callback on notification
+//  */
+// export function useBusListener(channelName, callback) {
+//   const bus = useService("bus_service");
+  
+//   useEffect(
+//     () => {
+//       bus.addChannel(channelName);
+      
+//       const handler = (ev) => {
+//         const notifications = ev.detail;
+//         for (const notification of notifications) {
+//           if (Array.isArray(notification) && notification[0] === channelName) {
+//             callback(notification[2]);
+//           } else if (!Array.isArray(notification) && notification.payload && notification.payload.channelName === channelName) {
+//             callback(notification.payload);
+//           }
+//         }
+//       };
+    
+//       bus.addEventListener('notification', handler);
+     
+//       return () => {
+//         bus.removeEventListener('notification', handler);
+//         bus.deleteChannel(channelName);
+//       };
+//     },
+//     () => [bus, channelName, callback]
+//   );
+// }
+
+// export class ComplianceDashboard extends Component {
+//   setup() {
+//     this.left_indicator = useRef("left");
+//     this.api = useService("orm");
+//     this.rpc = useService("rpc");
+//     this.navigate = useService("action");
+//     this.serverCache = useService("server_cache");
+//     this.user = useService("user");
+    
+//     // Get current user ID
+//     this.userId = this.user.userId;
+//     logDebug('Dashboard initializing for user ID:', this.userId);
+    
+//     // Initialize state with loading indicators and debug info
+//     this.state = useState({
+//       isCategorySortingEnabled: false,
+//       cco: false,
+//       branches_id: [],
+//       stats: [],
+//       totalstat: 0,
+//       datepicked: 20000,
+//       chartData: [],
+//       screenedchart: [],
+//       highriskchart: [],
+//       topbranch: [],
+//       dynamic_chart: [],
+//       scrollLeft: true,
+//       scrollRight: false,
+//       loadingStates: {
+//         stats: true,
+//         charts: true
+//       },
+//       debug: DEBUG ? {
+//         lastError: null,
+//         dataLoaded: false,
+//         lastUpdate: new Date().toISOString(),
+//         cardsVisible: false
+//       } : null
+//     });
+    
+//     // Models that should trigger a refresh
+//     this.refreshModels = ['res.partner', 'res.branch'];
+
+//     // Setup bus listener for refreshing the dashboard
+//     useBusListener('dashboard_refresh_channel', this.handleRefreshNotification.bind(this));
+    
+//     // Initialize component
+//     onWillStart(async () => {
+//       try {
+//         logDebug('Dashboard starting initialization');
+//         await this.getCurrentUser();
+//         await this.filterByDate();
+//         if (this.state.debug) {
+//           this.state.debug.dataLoaded = true;
+//           this.state.debug.lastUpdate = new Date().toISOString();
+//         }
+//         logDebug('Data loaded successfully', this.state.stats);
+//       } catch (error) {
+//         console.error("Error in component initialization:", error);
+//         if (this.state.debug) {
+//           this.state.debug.lastError = error.message;
+//         }
+//         this.state.loadingStates.stats = false;
+//         this.state.loadingStates.charts = false;
+//       }
+//     });
+    
+//     // Set up auto-refresh every 5 minutes
+//     useEffect(() => {
+//       const refreshTimer = setInterval(async () => {
+//         logDebug("Auto-refreshing dashboard data...");
+//         await this.filterByDate(true);
+//         if (this.state.debug) {
+//           this.state.debug.lastUpdate = new Date().toISOString();
+//         }
+//       }, 5 * 60 * 1000); // 5 minutes
+      
+//       return () => {
+//         clearInterval(refreshTimer);
+//       };
+//     }, () => []);
+    
+//     // Set up scroll event listener
+//     useEffect(() => {
+//       let cardContainer = document.querySelector(".card-container");
+//       if (cardContainer) {
+//         cardContainer.addEventListener("scroll", this._onHorizontalScroll.bind(this));
+//       }
+//       return () => {
+//         if (cardContainer) {
+//           cardContainer.removeEventListener("scroll", this._onHorizontalScroll);
+//         }
+//       };
+//     }, () => []);
+    
+//     // Debug effect to log state changes
+//     if (DEBUG) {
+//       useEffect(() => {
+//         logDebug('State updated:', 
+//           'stats length:', this.state.stats?.length,
+//           'loading:', this.state.loadingStates.stats
+//         );
+//         // Check if cards should be visible
+//         if (this.state.debug) {
+//           this.state.debug.cardsVisible = 
+//             this.state.stats && 
+//             this.state.stats.length > 0 && 
+//             !this.state.loadingStates.stats;
+//         }
+//       });
+//     }
+    
+//     // Bind methods
+//     this.displayOdooView = this.displayOdooView.bind(this);
+//     this.displaybycategory = this.displaybycategory.bind(this);
+//     this.filterByDate = this.filterByDate.bind(this);
+//     this._onHorizontalScroll = this._onHorizontalScroll.bind(this);
+//   }
+
+//   /**
+//    * Handle notifications from the bus
+//    * @param {Object} notification - The notification payload
+//    */
+//   async handleRefreshNotification(notification) {
+//     logDebug("Received notification:", notification);
+
+//     if (notification.type === 'refresh' && this.refreshModels.includes(notification.model)) {
+//       // Invalidate cache
+//       await this.serverCache.invalidateCache();
+      
+//       // Reload the view
+//       try {
+//         await this.filterByDate(true); // Force refresh
+//         if (this.state.debug) {
+//           this.state.debug.lastUpdate = new Date().toISOString();
+//         }
+//       } catch (error) {
+//         console.error("Error refreshing dashboard:", error);
+//         if (this.state.debug) {
+//           this.state.debug.lastError = error.message;
+//         }
+//       }
+//     }
+//   }
+
+//   /**
+//    * Handle horizontal scroll events
+//    */
+//   _onHorizontalScroll(event) {
+//     const container = event.target || event.currentTarget;
+//     if (!container) return;
+
+//     const atRight = container.scrollLeft + container.clientWidth >= container.scrollWidth - 5;
+//     const atLeft = container.scrollLeft <= 5;
+    
+//     if (atRight) {
+//       this.state.scrollRight = true;
+//       this.state.scrollLeft = false;
+//     } else if (atLeft) {
+//       this.state.scrollLeft = true;
+//       this.state.scrollRight = false;
+//     } else {
+//       this.state.scrollLeft = false;
+//       this.state.scrollRight = false;
+//     }
+//   }
+
+//   /**
+//    * Get current user info
+//    */
+//   async getCurrentUser() {
+//     try {
+//       logDebug('Fetching current user');
+//       const result = await this.rpc("/dashboard/user");
+//       if (result) {
+//         logDebug('Got user data:', result);
+//         this.state.branches_id = result.branch;
+//         this.state.cco = result.group;
+
+//         this.state.uniqueId = result.unique_id;
+//         logDebug('Unique cache identifier:', this.state.uniqueId);
+//       }
+//       return result;
+//     } catch (error) {
+//       console.error("Error fetching current user:", error);
+//       if (this.state.debug) {
+//         this.state.debug.lastError = "Failed to fetch user: " + error.message;
+//       }
+//       return null;
+//     }
+//   }
+
+//   /**
+//    * Get all stats with caching
+//    */
+//   async getAllStats() {
+//     const params = {
+//       cco: this.state.cco,
+//       branches_id: this.state.branches_id,
+//       datepicked: Number(this.state.datepicked),
+//     };
+    
+//     logDebug('Getting all stats with params:', params);
+    
+//     // Generate cache key
+//     // const cacheKey = `all_stats_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
+//     const cacheKey = `all_stats_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}_${this.state.uniqueId}`;
+    
+//     try {
+//       // Mark as loading
+//       this.state.loadingStates.stats = true;
+      
+//       // Try to get from cache
+//       const cachedData = await this.serverCache.getCache(cacheKey);
+      
+//       if (cachedData) {
+//         logDebug('Using cached stats data');
+//         this.state.stats = [...cachedData.data];
+//         this.state.totalstat = cachedData.total;
+//         this.state.loadingStates.stats = false;
+//         return cachedData;
+//       }
+      
+//       // Not in cache, fetch from server
+//       logDebug('Fetching stats from server');
+//       const result = await this.rpc(`/dashboard/stats`, params);
+      
+//       if (result) {
+//         logDebug('Got stats data:', result);
+//         this.state.stats = [...result.data];
+//         this.state.totalstat = result.total;
+//         // Cache the result
+//         await this.serverCache.setCache(cacheKey, result);
+//       } else {
+//         logDebug('No stats data returned from API');
+//       }
+      
+//       this.state.loadingStates.stats = false;
+//       return result;
+//     } catch (error) {
+//       console.error("Error fetching all stats:", error);
+//       if (this.state.debug) {
+//         this.state.debug.lastError = "Failed to fetch stats: " + error.message;
+//       }
+//       this.state.loadingStates.stats = false;
+//       return null;
+//     }
+//   }
+
+//   /**
+//    * Get stats by category with caching
+//    */
+//   async getStatsByCategory(name) {
+//     const params = {
+//       cco: this.state.cco,
+//       branches_id: this.state.branches_id,
+//       category: name,
+//       datepicked: Number(this.state.datepicked),
+//     };
+    
+//     // Generate cache key
+//     const cacheKey = `stats_category_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${name}_${this.state.datepicked}_${this.state.uniqueId}`;
+//     // const cacheKey = `stats_category_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${name}_${this.state.datepicked}`;
+    
+//     try {
+//       this.state.loadingStates.stats = true;
+      
+//       // Try to get from cache
+//       const cachedData = await this.serverCache.getCache(cacheKey);
+      
+//       if (cachedData) {
+//         logDebug('Using cached category stats data');
+//         this.state.stats = cachedData.data;
+//         this.state.totalstat = cachedData.total;
+//         this.state.loadingStates.stats = false;
+//         return cachedData;
+//       }
+      
+//       // Not in cache, fetch from server
+//       logDebug('Fetching category stats from server');
+//       const result = await this.rpc(`/dashboard/statsbycategory`, params);
+      
+//       if (result) {
+//         this.state.stats = result.data;
+//         this.state.totalstat = result.total;
+//         // Cache the result
+//         await this.serverCache.setCache(cacheKey, result);
+//       }
+      
+//       this.state.loadingStates.stats = false;
+//       return result;
+//     } catch (error) {
+//       console.error("Error fetching stats by category:", error);
+//       if (this.state.debug) {
+//         this.state.debug.lastError = "Failed to fetch category stats: " + error.message;
+//       }
+//       this.state.loadingStates.stats = false;
+//       return null;
+//     }
+//   }
+
+//   /**
+//    * Fetch dashboard charts with caching
+//    */
+//   async fetchDashboardCharts() {
+//     const params = {
+//       cco: this.state.cco,
+//       branches_id: this.state.branches_id,
+//       datepicked: Number(this.state.datepicked),
+//     };
+    
+//     // Generate cache key
+//     const cacheKey = `dynamic_charts_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}_${this.state.uniqueId}`;
+//     // const cacheKey = `dynamic_charts_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${this.state.datepicked}`;
+    
+//     try {
+//       this.state.loadingStates.charts = true;
+      
+//       // Try to get from cache
+//       const cachedData = await this.serverCache.getCache(cacheKey);
+      
+//       if (cachedData) {
+//         logDebug('Using cached chart data');
+//         this.state.dynamic_chart = cachedData;
+//         this.state.loadingStates.charts = false;
+//         return cachedData;
+//       }
+      
+//       // Not in cache, fetch from server
+//       logDebug('Fetching chart data from server');
+//       const response = await this.rpc(`/dashboard/dynamic_charts/`, params);  
+      
+//       if (response && response.error) {
+//         console.error(`Error fetching dashboard charts: ${response.error}`);
+//         if (this.state.debug) {
+//           this.state.debug.lastError = "Chart error: " + response.error;
+//         }
+//         this.state.dynamic_chart = [];
+//       } else if (response) {
+//         this.state.dynamic_chart = response;
+//         // Cache the result
+//         await this.serverCache.setCache(cacheKey, response);
+//       } else {
+//         console.error("Error: Empty response received while fetching dashboard charts.");
+//         if (this.state.debug) {
+//           this.state.debug.lastError = "Empty chart response";
+//         }
+//         this.state.dynamic_chart = [];
+//       }
+      
+//       this.state.loadingStates.charts = false;
+//       return response;
+//     } catch (error) {
+//       console.error("Error in fetchDashboardCharts:", error);
+//       if (this.state.debug) {
+//         this.state.debug.lastError = "Failed to fetch charts: " + error.message;
+//       }
+//       this.state.dynamic_chart = [];
+//       this.state.loadingStates.charts = false;
+//       return null;
+//     }
+//   }
+
+//   /**
+//    * Filter by date with parallel requests
+//    */
+//   async filterByDate(forceRefresh = false) {
+//     try {
+//       // If forcing refresh, invalidate cache
+//       if (forceRefresh) {
+//         await this.serverCache.invalidateCache();
+//       }
+      
+//       // Reset loading states
+//       this.state.loadingStates = {
+//         stats: true,
+//         charts: true
+//       };
+      
+//       // Using Promise.all for parallel execution
+//       await Promise.all([
+//         this.getAllStats(),
+//         this.fetchDashboardCharts()
+//       ]);
+      
+//       if (this.state.debug) {
+//         this.state.debug.lastUpdate = new Date().toISOString();
+//       }
+      
+//       return true;
+//     } catch (error) {
+//       console.error("Error in filterByDate:", error);
+//       if (this.state.debug) {
+//         this.state.debug.lastError = "Filter error: " + error.message;
+//       }
+//       // Clear loading states on error
+//       this.state.loadingStates.stats = false;
+//       this.state.loadingStates.charts = false;
+//       return false;
+//     }
+//   }
+
+//   /**
+//    * Display by category with proper error handling
+//    */
+//   async displaybycategory(name) {
+//     try {
+//       this.state.isCategorySortingEnabled = name !== "all";
+      
+//       if (name === "all") {
+//         await this.getAllStats();
+//       } else {
+//         await this.getStatsByCategory(name);
+//       }
+      
+//       if (this.state.debug) {
+//         this.state.debug.lastUpdate = new Date().toISOString();
+//       }
+      
+//       return true;
+//     } catch (error) {
+//       console.error("Error in displayByCategory:", error);
+//       if (this.state.debug) {
+//         this.state.debug.lastError = "Category display error: " + error.message;
+//       }
+//       return false;
+//     }
+//   }
+
+//   /**
+//    * Display Odoo view based on query results with caching
+//    */
+//   async displayOdooView(category, query, branch_filter, branch_field, title) {
+//     try {
+//         // Generate cache key for this query
+//         const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}_${this.state.uniqueId}`;
+        
+//         // Try to get from cache
+//         let response = await this.serverCache.getCache(cacheKey);
+        
+//         if (!response) {
+//             // Cache miss, fetch from server
+//             response = await this.rpc("/dashboard/dynamic_sql", { 
+//                 sql_query: query, 
+//                 branches_id: this.state.branches_id, 
+//                 cco: this.state.cco 
+//             });
+            
+//             // Cache the result
+//             if (response) {
+//                 await this.serverCache.setCache(cacheKey, response);
+//             }
+//         }
+        
+//         if (!response) {
+//             console.error("Empty response from dynamic_sql");
+//             if (this.state.debug) {
+//                 this.state.debug.lastError = "Empty SQL response";
+//             }
+//             return;
+//         }
+
+//         // Create a properly formatted title in sentence case
+//         const displayTitle = title || (category ? 
+//             category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
+//             "Card Results");
+        
+//         // Fix for date-related issues in domain
+//         if (response.domain && Array.isArray(response.domain)) {
+//             // Process the domain to handle date fields properly
+//             response.domain = response.domain.map(item => {
+//                 // Check if we're dealing with a date comparison
+//                 if (Array.isArray(item) && item.length === 3) {
+//                     const [field, operator, value] = item;
+                    
+//                     // Check if field ends with _date or _datetime or is date/datetime
+//                     const isDateField = field.endsWith('_date') || 
+//                                        field.endsWith('_datetime') || 
+//                                        field === 'date' || 
+//                                        field === 'datetime';
+                    
+//                     // If it's a date field and the value is problematic
+//                     if (isDateField && (value === '0001-01-01' || value === false || value === null)) {
+//                         // Replace with a safer condition for filtering
+//                         return [field, '=', false];
+//                     }
+//                 }
+//                 return item;
+//             });
+//         }
+
+//         // Now navigate with the fixed domain
+//         this.navigate.doAction({
+//             type: "ir.actions.act_window",
+//             res_model: response.table.replace(/_/g, "."),
+//             name: displayTitle,
+//             domain: response.domain,
+//             views: [
+//                 [false, "tree"],
+//                 [false, "form"],
+//             ],
+//         });
+//     } catch (error) {
+//         console.error("Error in displayOdooView:", error);
+//         if (this.state.debug) {
+//             this.state.debug.lastError = "View error: " + error.message;
+//         }
+//     }
+// }
+//   // async displayOdooView(category, query, branch_filter, branch_field, title) {
+//   //   try {
+//   //     // Generate cache key for this query
+//   //     const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}_${this.state.uniqueId}`;
+//   //     // const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${query}`;
+      
+//   //     // Try to get from cache
+//   //     let response = await this.serverCache.getCache(cacheKey);
+      
+//   //     if (!response) {
+//   //       // Cache miss, fetch from server
+//   //       response = await this.rpc("/dashboard/dynamic_sql", { 
+//   //         sql_query: query, 
+//   //         branches_id: this.state.branches_id, 
+//   //         cco: this.state.cco 
+//   //       });
+        
+//   //       // Cache the result
+//   //       if (response) {
+//   //         await this.serverCache.setCache(cacheKey, response);
+//   //       }
+//   //     }
+      
+//   //     if (!response) {
+//   //       console.error("Empty response from dynamic_sql");
+//   //       if (this.state.debug) {
+//   //         this.state.debug.lastError = "Empty SQL response";
+//   //       }
+//   //       return;
+//   //     }
+
+//   //     // Create a properly formatted title in sentence case
+//   //     const displayTitle = title || (category ? 
+//   //       category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
+//   //       "Card Results");
+      
+//   //       console.log(response.domain);
+        
+
+//   //     this.navigate.doAction({
+//   //       type: "ir.actions.act_window",
+//   //       res_model: response.table.replace(/_/g, "."),
+//   //       name: displayTitle,
+//   //       domain: response.domain,
+//   //       views: [
+//   //         [false, "tree"],
+//   //         [false, "form"],
+//   //       ],
+//   //     });
+//   //   } catch (error) {
+//   //     console.error("Error in displayOdooView:", error);
+//   //     if (this.state.debug) {
+//   //       this.state.debug.lastError = "View error: " + error.message;
+//   //     }
+//   //   }
+//   // }
+// }
+
+// ComplianceDashboard.template = "owl.ComplianceDashboard";
+// ComplianceDashboard.components = { Card, ChartRenderer };
+
+// registry.category("actions").add("owl.compliance_dashboard", ComplianceDashboard);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // /** @odoo-module */

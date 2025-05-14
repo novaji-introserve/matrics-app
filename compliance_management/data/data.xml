@@ -1715,6 +1715,42 @@
         <field name="compute_score_from">static</field>
         <field name="narration">Customers without mobile phone are medium risk</field>
     </record>
+
+    <record id="risk_plan_inavlid_name" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers With Invalid Names</field>
+        <field name="risk_score">20</field>
+        <field name="code">cust_invalid_name</field>
+        <field name="sql_query">SELECT risk_score 
+            FROM res_partner 
+            WHERE id = %s
+            AND (trim(name) = '' OR trim(name) ~ '^[^a-zA-Z0-9]')</field>
+        <field name="priority">2</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers with empty or invalid names</field>
+    </record>
+
+    <record id="risk_plan_repeated_phone" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers with Repeated Phone Number Up To 3 Accounts and Above</field>
+        <field name="risk_score">20</field>
+        <field name="code">cust_repeated_phone</field>
+        <field name="sql_query">SELECT risk_score
+            FROM res_partner
+            WHERE id = %s
+            AND customer_phone IN (
+                SELECT customer_phone
+                FROM res_partner
+                WHERE customer_phone IS NOT NULL AND customer_phone != ''
+                GROUP BY customer_phone
+                HAVING COUNT(*) >= 3)
+            ORDER BY customer_phone </field>
+        <field name="priority">2</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Detects customers using the same phone number for three or more account openings, flagging potential fraud risks.
+        </field>
+    </record>
+
     <record id="risk_plan_3" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on Blacklist</field>
         <field name="risk_score">25</field>
