@@ -3,7 +3,7 @@
 from odoo import http
 from odoo.http import request, Response
 import json 
-from datetime import datetime
+from datetime import datetime, timedelta
 import base64
 import os
 from dotenv import load_dotenv
@@ -12,15 +12,50 @@ load_dotenv()
 import logging
 _logger = logging.getLogger(__name__)
 
+RATE_LIMIT =   {}
+
 
 API_KEY = os.getenv('API_KEY')
+MAX_REQUESTS = 10
+TIME_WINDOW = timedelta(minutes=1) # 5 minutes
+
 
 
 class RuleBookScraperAPI(http.Controller):
 
+    def rate_limit_exceeded(self, ip):
+        current_time = datetime.now()
+        requests_from_ip = RATE_LIMIT.get(ip, [])
+        requests_from_ip = [t for t in requests_from_ip if current_time - t < TIME_WINDOW]
+        RATE_LIMIT[ip] = requests_from_ip
+        is_exceeded = len(requests_from_ip) >= MAX_REQUESTS
+        _logger.info(f"[{current_time}] IP: {ip}, Requests: {len(requests_from_ip)}, Exceeded: {is_exceeded}")
+        return is_exceeded
+    
+    def record_request(self, ip):
+        current_time = datetime.now()
+        RATE_LIMIT.setdefault(ip, []).append(current_time)
+       
+
     # Route to get CBN rulebooks
     @http.route('/api/rulebooks/cbn', type='http', auth='none', methods=['GET'], csrf=False)
     def get_cbn_rulebooks(self, **kwrgs):
+        # Rate limiting
+        ip = request.httprequest.remote_addr
+
+        # Check if limit exceeded
+        if self.rate_limit_exceeded(ip):
+            _logger.warning(f"Rate limit exceeded for IP: {ip}")
+            return request.make_response(
+                json.dumps({'error': 'Rate limit exceeded. Try again later.'}),
+                headers=[('Content-Type', 'application/json')],
+                status=429
+            )
+
+        # Allow request
+        self.record_request(ip)
+        _logger.info(f"Request allowed from IP: {ip}")
+
         # Check API key
         if not self.check_api_key(request):
             return Response(
@@ -88,8 +123,23 @@ class RuleBookScraperAPI(http.Controller):
             )
         
     # Route to get NDIC rulebooks
-    @http.route('/api/rulebooks/ndic', type='http', auth='public', methods=['GET'], csrf=False)
+    @http.route('/api/rulebooks/ndic', type='http', auth='none', methods=['GET'], csrf=False)
     def get_ndic_rulebooks(self, **kwargs):
+        # Rate limiting
+        ip = request.httprequest.remote_addr
+
+        # Check if limit exceeded
+        if self.rate_limit_exceeded(ip):
+            _logger.warning(f"Rate limit exceeded for IP: {ip}")
+            return request.make_response(
+                json.dumps({'error': 'Rate limit exceeded. Try again later.'}),
+                headers=[('Content-Type', 'application/json')],
+                status=429
+            )
+
+        # Allow request
+        self.record_request(ip)
+        _logger.info(f"Request allowed from IP: {ip}")
         # Check API key
         if not self.check_api_key(request):
             return Response(
@@ -155,8 +205,23 @@ class RuleBookScraperAPI(http.Controller):
             )
 
     #Route to get  SEC rulebooks
-    @http.route('/api/rulebooks/sec', type='http', auth='public', methods=['GET'], csrf=False)
+    @http.route('/api/rulebooks/sec', type='http', auth='none', methods=['GET'], csrf=False)
     def get_sec_rulebooks(self, **kwargs):
+        # Rate limiting
+        ip = request.httprequest.remote_addr
+
+        # Check if limit exceeded
+        if self.rate_limit_exceeded(ip):
+            _logger.warning(f"Rate limit exceeded for IP: {ip}")
+            return request.make_response(
+                json.dumps({'error': 'Rate limit exceeded. Try again later.'}),
+                headers=[('Content-Type', 'application/json')],
+                status=429
+            )
+
+        # Allow request
+        self.record_request(ip)
+        _logger.info(f"Request allowed from IP: {ip}")
         # Check API key
         if not self.check_api_key(request):
             return Response(
@@ -221,8 +286,23 @@ class RuleBookScraperAPI(http.Controller):
                 status=500
             ) 
     # Route to get NFIU rulebooks
-    @http.route('/api/rulebooks/nfiu', type='http', auth='public', methods=['GET'], csrf=False)
+    @http.route('/api/rulebooks/nfiu', type='http', auth='none', methods=['GET'], csrf=False)
     def get_nfiu_rulebooks(self, **kwargs):
+        # Rate limiting
+        ip = request.httprequest.remote_addr
+
+        # Check if limit exceeded
+        if self.rate_limit_exceeded(ip):
+            _logger.warning(f"Rate limit exceeded for IP: {ip}")
+            return request.make_response(
+                json.dumps({'error': 'Rate limit exceeded. Try again later.'}),
+                headers=[('Content-Type', 'application/json')],
+                status=429
+            )
+
+        # Allow request
+        self.record_request(ip)
+        _logger.info(f"Request allowed from IP: {ip}")
         # Check API key
         if not self.check_api_key(request):
             return Response(
@@ -288,7 +368,7 @@ class RuleBookScraperAPI(http.Controller):
             )
 
 
-    @http.route('/api/rulebooks/<int:id>/download', type='http', auth='public',csrf=False)
+    @http.route('/api/rulebooks/<int:id>/download', type='http', auth='none',csrf=False)
     def download_rulebook(self, id, **kwargs):
         _logger.info(f"Download request for rulebook ID: {id}")
         # Check API key
@@ -346,7 +426,7 @@ class RuleBookScraperAPI(http.Controller):
                 status=500
             )
 
-    @http.route('/api/rulebooks/<int:id>/view', type='http', auth='public', methods=['GET'], csrf=False)
+    @http.route('/api/rulebooks/<int:id>/view', type='http', auth='none', methods=['GET'], csrf=False)
     def view_rulebook(self, id, **kwargs):
         _logger.info(f"View request for rulebook ID: {id}")
         # Check API key
@@ -404,7 +484,7 @@ class RuleBookScraperAPI(http.Controller):
                 status=500
             )
          
-    @http.route('/api/rulebooks/docs', auth='public', methods=['GET'], type='http')
+    @http.route('/api/rulebooks/docs', auth='none', methods=['GET'], type='http')
     def api_documentation(self, **kwargs):
         # Check API key
         if not self.check_api_key(request):
@@ -486,17 +566,3 @@ class RuleBookScraperAPI(http.Controller):
     def check_api_key(request):
         api_key =request.httprequest.headers.get('X-API-Key') or request.params.get('api_key') 
         return api_key == API_KEY
-    
-    @http.route('/<path:any>', auth='none')
-    def catch_all(self, any, **kwargs):
-        # This will catch all other routes and return a 404 error
-        _logger.info(f"Path hit: /{any}")
-        return Response(
-
-            json.dumps({
-                'status': 'error',
-                'message': 'Endpoint not found'
-            }),
-            content_type='application/json',
-            status=404
-        )

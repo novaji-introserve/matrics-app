@@ -1,0 +1,572 @@
+<odoo>
+    <data noupdate="0">
+          <!-- res_partners demo accounts -->
+        <record id="demo_account_1" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_9"/>
+            <field name="name">0020002000101</field>
+            <field name="account_name">EZE CHIDELA</field>
+            <field name="account_type">Savings</field>
+            <field name="account_status">Active</field>
+            <field name="state">Active</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="branch_code">0020002</field>
+            <field name="balance">145000.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">15</field>
+            <field name="avg_credit_last6m">25000.00</field>
+            <field name="max_credit_last6m">50000.00</field>
+            <field name="tot_credit_last6m">375000.00</field>
+            <field name="num_debit_last6m">12</field>
+            <field name="avg_debit_last6m">20000.00</field>
+            <field name="max_debit_last6m">35000.00</field>
+            <field name="tot_debit_last6m">240000.00</field>
+            <field name="max_debit_daily">35000.00</field>
+            <field name="customer">02210</field>
+        </record>
+
+        <record id="demo_account_2" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_9"/>
+            <field name="name">0020002000102</field>
+            <field name="account_name">EZE CHIDELA</field>
+            <field name="account_type">Current</field>
+            <field name="account_status">Active</field>
+            <field name="state">Active</field>
+            <field name="high_transactions_account">True</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=25)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="branch_code">0020002</field>
+            <field name="balance">750000.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">28</field>
+            <field name="avg_credit_last6m">75000.00</field>
+            <field name="max_credit_last6m">250000.00</field>
+            <field name="tot_credit_last6m">2100000.00</field>
+            <field name="num_debit_last6m">22</field>
+            <field name="avg_debit_last6m">65000.00</field>
+            <field name="max_debit_last6m">150000.00</field>
+            <field name="tot_debit_last6m">1430000.00</field>
+            <field name="max_debit_daily">150000.00</field>
+            <field name="overdraft_limit">100000.00</field>
+            <field name="customer">02210</field>
+        </record>
+
+        <record id="demo_account_3" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_10"/>
+            <field name="name">0020002000201</field>
+            <field name="account_name">AMA CLEMENT</field>
+            <field name="account_type">Savings</field>
+            <field name="account_status">Active</field>
+            <field name="state">Active</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="branch_code">0020002</field>
+            <field name="balance">78500.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">8</field>
+            <field name="avg_credit_last6m">15000.00</field>
+            <field name="max_credit_last6m">25000.00</field>
+            <field name="tot_credit_last6m">120000.00</field>
+            <field name="num_debit_last6m">5</field>
+            <field name="avg_debit_last6m">10000.00</field>
+            <field name="max_debit_last6m">15000.00</field>
+            <field name="tot_debit_last6m">50000.00</field>
+            <field name="max_debit_daily">15000.00</field>
+            <field name="customer">00101</field>
+        </record>
+
+        <record id="demo_account_4" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_11"/>
+            <field name="name">0020006000301</field>
+            <field name="account_name">GOZIE JOHN</field>
+            <field name="account_type">Fixed Deposit</field>
+            <field name="account_status">Active</field>
+            <field name="state">Active</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=45)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="branch_code">0020006</field>
+            <field name="balance">500000.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">1</field>
+            <field name="avg_credit_last6m">500000.00</field>
+            <field name="max_credit_last6m">500000.00</field>
+            <field name="tot_credit_last6m">500000.00</field>
+            <field name="num_debit_last6m">0</field>
+            <field name="avg_debit_last6m">0.00</field>
+            <field name="max_debit_last6m">0.00</field>
+            <field name="tot_debit_last6m">0.00</field>
+            <field name="customer">023</field>
+        </record>
+
+        <record id="demo_account_5" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_12"/>
+            <field name="name">0020006000401</field>
+            <field name="account_name">ADE TUNDE</field>
+            <field name="account_type">Savings</field>
+            <field name="account_status">Active</field>
+            <field name="state">Active</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=3)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="branch_code">0020006</field>
+            <field name="balance">25000.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">1</field>
+            <field name="avg_credit_last6m">25000.00</field>
+            <field name="max_credit_last6m">25000.00</field>
+            <field name="tot_credit_last6m">25000.00</field>
+            <field name="num_debit_last6m">0</field>
+            <field name="avg_debit_last6m">0.00</field>
+            <field name="max_debit_last6m">0.00</field>
+            <field name="tot_debit_last6m">0.00</field>
+            <field name="max_debit_daily">10000.00</field>
+            <field name="customer">0102</field>
+        </record>
+
+        <record id="demo_account_6" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_12"/>
+            <field name="name">0020006000402</field>
+            <field name="account_name">ADE TUNDE</field>
+            <field name="account_type">Current</field>
+            <field name="account_status">Active</field>
+            <field name="state">Active</field>
+            <field name="high_transactions_account">True</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="branch_code">0020006</field>
+            <field name="balance">250000.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">2</field>
+            <field name="avg_credit_last6m">150000.00</field>
+            <field name="max_credit_last6m">200000.00</field>
+            <field name="tot_credit_last6m">300000.00</field>
+            <field name="num_debit_last6m">1</field>
+            <field name="avg_debit_last6m">50000.00</field>
+            <field name="max_debit_last6m">50000.00</field>
+            <field name="tot_debit_last6m">50000.00</field>
+            <field name="max_debit_daily">100000.00</field>
+            <field name="overdraft_limit">50000.00</field>
+            <field name="customer">0102</field>
+        </record>
+
+        <record id="demo_account_7" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_10"/>
+            <field name="name">0020002000202</field>
+            <field name="account_name">AMA CLEMENT</field>
+            <field name="account_type">Fixed Deposit</field>
+            <field name="account_status">Active</field>
+            <field name="state">Active</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="branch_code">0020002</field>
+            <field name="balance">350000.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">1</field>
+            <field name="avg_credit_last6m">350000.00</field>
+            <field name="max_credit_last6m">350000.00</field>
+            <field name="tot_credit_last6m">350000.00</field>
+            <field name="num_debit_last6m">0</field>
+            <field name="avg_debit_last6m">0.00</field>
+            <field name="max_debit_last6m">0.00</field>
+            <field name="tot_debit_last6m">0.00</field>
+            <field name="customer">00101</field>
+        </record>
+
+        <record id="demo_account_8" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_11"/>
+            <field name="name">0020006000302</field>
+            <field name="account_name">GOZIE JOHN</field>
+            <field name="account_type">Current</field>
+            <field name="account_status">Dormant</field>
+            <field name="state">Dormant</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=200)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=300)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="branch_code">0020006</field>
+            <field name="balance">5000.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">0</field>
+            <field name="avg_credit_last6m">0.00</field>
+            <field name="max_credit_last6m">0.00</field>
+            <field name="tot_credit_last6m">0.00</field>
+            <field name="num_debit_last6m">0</field>
+            <field name="avg_debit_last6m">0.00</field>
+            <field name="max_debit_last6m">0.00</field>
+            <field name="tot_debit_last6m">0.00</field>
+            <field name="max_debit_daily">20000.00</field>
+            <field name="customer">023</field>
+        </record>
+        
+        <record id="demo_account_9" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_34"/>
+            <field name="name">00200060302</field>
+            <field name="account_name">ABAYOMI JOHNSON</field>
+            <field name="account_type">Current</field>
+            <field name="account_status">Dormant</field>
+            <field name="state">Dormant</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=200)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=300)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="branch_code">0020006</field>
+            <field name="balance">5000.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">0</field>
+            <field name="avg_credit_last6m">0.00</field>
+            <field name="max_credit_last6m">0.00</field>
+            <field name="tot_credit_last6m">0.00</field>
+            <field name="num_debit_last6m">0</field>
+            <field name="avg_debit_last6m">0.00</field>
+            <field name="max_debit_last6m">0.00</field>
+            <field name="tot_debit_last6m">0.00</field>
+            <field name="max_debit_daily">20000.00</field>
+            <field name="customer">023</field>
+        </record>
+
+        <record id="demo_account_10" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_34"/>
+            <field name="name">00200060303</field>
+            <field name="account_name">ABAYOMI JOHNSON</field>
+            <field name="account_type">Current</field>
+            <field name="account_status">Active</field>
+            <field name="state">Active</field>
+            <field name="high_transactions_account">True</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020006"/>
+            <field name="branch_code">0020006</field>
+            <field name="balance">250000.00</field>
+            <field name="currency">NGN</field>
+            <field name="is_joint_account">False</field>
+            <field name="closure_status">N</field>
+            <field name="num_credit_last6m">2</field>
+            <field name="avg_credit_last6m">150000.00</field>
+            <field name="max_credit_last6m">200000.00</field>
+            <field name="tot_credit_last6m">300000.00</field>
+            <field name="num_debit_last6m">1</field>
+            <field name="avg_debit_last6m">50000.00</field>
+            <field name="max_debit_last6m">50000.00</field>
+            <field name="tot_debit_last6m">50000.00</field>
+            <field name="max_debit_daily">100000.00</field>
+            <field name="overdraft_limit">50000.00</field>
+            <field name="customer">0102</field>
+        </record>
+
+        <record id="demo_account_11" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_1"/>
+            <field name="name">0100901901234</field>
+            <field name="account_name">OKANLAWO ABDULRAMHAN</field>
+            <field name="account_position">PRIMARY</field>
+            <field name="account_type">SAVINGS</field>
+            <field name="account_code">SAV</field>
+            <field name="account_status">ACTIVE</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=180)).strftime('%Y-%m-%d')"/>
+            <field name="currency">NGN</field>
+            <field name="category">RETAIL</field>
+            <field name="category_description">INDIVIDUAL SAVINGS</field>
+            <field name="is_joint_account">False</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(days=180)).strftime('%Y-%m-%d')"/>
+            <field name="closure_status">N</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
+            <field name="branch_code">0020002</field>
+            <field name="balance">245000.00</field>
+            <field name="state">Active</field>
+            <field name="customer">01901</field>
+            <field name="num_credit_last6m">28</field>
+            <field name="avg_credit_last6m">52000.00</field>
+            <field name="max_credit_last6m">150000.00</field>
+            <field name="tot_credit_last6m">1456000.00</field>
+            <field name="num_debit_last6m">34</field>
+            <field name="avg_debit_last6m">35000.00</field>
+            <field name="max_debit_last6m">100000.00</field>
+            <field name="tot_debit_last6m">1190000.00</field>
+            <field name="num_credit_last1y">62</field>
+            <field name="avg_credit_last1y">48500.00</field>
+            <field name="max_credit_last1y">150000.00</field>
+            <field name="tot_credit_last1y">3007000.00</field>
+            <field name="num_debit_last1y">75</field>
+            <field name="avg_debit_last1y">37800.00</field>
+            <field name="max_debit_last1y">120000.00</field>
+            <field name="tot_debit_last1y">2835000.00</field>
+        </record>
+
+        <record id="demo_account_12" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_2"/>
+            <field name="name">0100901900567</field>
+            <field name="account_name">OJEBODE MOSES</field>
+            <field name="account_position">PRIMARY</field>
+            <field name="account_type">CURRENT</field>
+            <field name="account_code">CUR</field>
+            <field name="account_status">ACTIVE</field>
+            <field name="high_transactions_account">True</field>
+            <field name="last_transaction_date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')"/>
+            <field name="currency">NGN</field>
+            <field name="category">RETAIL</field>
+            <field name="category_description">INDIVIDUAL CURRENT</field>
+            <field name="is_joint_account">False</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')"/>
+            <field name="closure_status">N</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0020001"/>
+            <field name="branch_code">0020001</field>
+            <field name="balance">1250000.00</field>
+            <field name="state">Active</field>
+            <field name="customer">019</field>
+            <field name="max_debit_daily">500000.00</field>
+            <field name="overdraft_limit">100000.00</field>
+            <field name="num_credit_last6m">45</field>
+            <field name="avg_credit_last6m">250000.00</field>
+            <field name="max_credit_last6m">800000.00</field>
+            <field name="tot_credit_last6m">11250000.00</field>
+            <field name="num_debit_last6m">38</field>
+            <field name="avg_debit_last6m">235000.00</field>
+            <field name="max_debit_last6m">500000.00</field>
+            <field name="tot_debit_last6m">8930000.00</field>
+            <field name="num_credit_last1y">98</field>
+            <field name="avg_credit_last1y">242500.00</field>
+            <field name="max_credit_last1y">800000.00</field>
+            <field name="tot_credit_last1y">23765000.00</field>
+            <field name="num_debit_last1y">87</field>
+            <field name="avg_debit_last1y">227500.00</field>
+            <field name="max_debit_last1y">500000.00</field>
+            <field name="tot_debit_last1y">19792500.00</field>
+        </record>
+
+        <record id="demo_account_13" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_3"/>
+            <field name="name">0100901200123</field>
+            <field name="account_name">JAME HAPPINESS</field>
+            <field name="account_position">PRIMARY</field>
+            <field name="account_type">SAVINGS</field>
+            <field name="account_code">SAV</field>
+            <field name="account_status">ACTIVE</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=45)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=210)).strftime('%Y-%m-%d')"/>
+            <field name="currency">NGN</field>
+            <field name="category">RETAIL</field>
+            <field name="category_description">INDIVIDUAL SAVINGS</field>
+            <field name="is_joint_account">False</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(days=210)).strftime('%Y-%m-%d')"/>
+            <field name="closure_status">N</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="branch_code">0010001</field>
+            <field name="balance">78500.00</field>
+            <field name="state">Dormant</field>
+            <field name="customer">0012</field>
+            <field name="num_credit_last6m">4</field>
+            <field name="avg_credit_last6m">25000.00</field>
+            <field name="max_credit_last6m">50000.00</field>
+            <field name="tot_credit_last6m">100000.00</field>
+            <field name="num_debit_last6m">2</field>
+            <field name="avg_debit_last6m">10750.00</field>
+            <field name="max_debit_last6m">15000.00</field>
+            <field name="tot_debit_last6m">21500.00</field>
+            <field name="num_credit_last1y">6</field>
+            <field name="avg_credit_last1y">22500.00</field>
+            <field name="max_credit_last1y">50000.00</field>
+            <field name="tot_credit_last1y">135000.00</field>
+            <field name="num_debit_last1y">8</field>
+            <field name="avg_debit_last1y">12250.00</field>
+            <field name="max_debit_last1y">25000.00</field>
+            <field name="tot_debit_last1y">98000.00</field>
+        </record>
+
+        <record id="demo_account_14" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_4"/>
+            <field name="name">0100903400789</field>
+            <field name="account_name">SALN GANIYU</field>
+            <field name="account_position">PRIMARY</field>
+            <field name="account_type">CURRENT</field>
+            <field name="account_code">CUR</field>
+            <field name="account_status">ACTIVE</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=400)).strftime('%Y-%m-%d')"/>
+            <field name="currency">NGN</field>
+            <field name="category">RETAIL</field>
+            <field name="category_description">INDIVIDUAL CURRENT</field>
+            <field name="is_joint_account">False</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(days=400)).strftime('%Y-%m-%d')"/>
+            <field name="closure_status">N</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="branch_code">0010001</field>
+            <field name="balance">325000.00</field>
+            <field name="state">Active</field>
+            <field name="customer">0034</field>
+            <field name="max_debit_daily">200000.00</field>
+            <field name="num_credit_last6m">18</field>
+            <field name="avg_credit_last6m">75000.00</field>
+            <field name="max_credit_last6m">250000.00</field>
+            <field name="tot_credit_last6m">1350000.00</field>
+            <field name="num_debit_last6m">22</field>
+            <field name="avg_debit_last6m">60000.00</field>
+            <field name="max_debit_last6m">200000.00</field>
+            <field name="tot_debit_last6m">1320000.00</field>
+            <field name="num_credit_last1y">42</field>
+            <field name="avg_credit_last1y">72500.00</field>
+            <field name="max_credit_last1y">250000.00</field>
+            <field name="tot_credit_last1y">3045000.00</field>
+            <field name="num_debit_last1y">48</field>
+            <field name="avg_debit_last1y">63500.00</field>
+            <field name="max_debit_last1y">200000.00</field>
+            <field name="tot_debit_last1y">3048000.00</field>
+        </record>
+
+        <!-- Create a joint account for demo_partner_4 -->
+        <record id="demo_account_15" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_4"/>
+            <field name="name">0100903400790</field>
+            <field name="account_name">SALN GANIYU AND SPOUSE</field>
+            <field name="account_position">SECONDARY</field>
+            <field name="account_type">SAVINGS</field>
+            <field name="account_code">SAV</field>
+            <field name="account_status">ACTIVE</field>
+            <field name="high_transactions_account">False</field>
+            <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=380)).strftime('%Y-%m-%d')"/>
+            <field name="currency">NGN</field>
+            <field name="category">RETAIL</field>
+            <field name="category_description">JOINT SAVINGS</field>
+            <field name="is_joint_account">True</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(days=380)).strftime('%Y-%m-%d')"/>
+            <field name="closure_status">N</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="branch_code">0010001</field>
+            <field name="balance">750000.00</field>
+            <field name="state">Active</field>
+            <field name="customer">0034</field>
+            <field name="num_credit_last6m">8</field>
+            <field name="avg_credit_last6m">120000.00</field>
+            <field name="max_credit_last6m">300000.00</field>
+            <field name="tot_credit_last6m">960000.00</field>
+            <field name="num_debit_last6m">6</field>
+            <field name="avg_debit_last6m">45000.00</field>
+            <field name="max_debit_last6m">100000.00</field>
+            <field name="tot_debit_last6m">270000.00</field>
+            <field name="num_credit_last1y">15</field>
+            <field name="avg_credit_last1y">125000.00</field>
+            <field name="max_credit_last1y">300000.00</field>
+            <field name="tot_credit_last1y">1875000.00</field>
+            <field name="num_debit_last1y">12</field>
+            <field name="avg_debit_last1y">52500.00</field>
+            <field name="max_debit_last1y">150000.00</field>
+            <field name="tot_debit_last1y">630000.00</field>
+        </record>
+
+        <record id="demo_account_16" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_5"/>
+            <field name="name">0100905000456</field>
+            <field name="account_name">DANI NMERICHUKWU</field>
+            <field name="account_position">PRIMARY</field>
+            <field name="account_type">SAVINGS</field>
+            <field name="account_code">SAV</field>
+            <field name="account_status">ACTIVE</field>
+            <field name="high_transactions_account">True</field>
+            <field name="last_transaction_date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=500)).strftime('%Y-%m-%d')"/>
+            <field name="currency">NGN</field>
+            <field name="category">RETAIL</field>
+            <field name="category_description">PREMIUM SAVINGS</field>
+            <field name="is_joint_account">False</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(days=500)).strftime('%Y-%m-%d')"/>
+            <field name="closure_status">N</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="branch_code">0010001</field>
+            <field name="balance">4750000.00</field>
+            <field name="state">Active</field>
+            <field name="customer">0050</field>
+            <field name="max_debit_daily">1000000.00</field>
+            <field name="num_credit_last6m">25</field>
+            <field name="avg_credit_last6m">450000.00</field>
+            <field name="max_credit_last6m">1500000.00</field>
+            <field name="tot_credit_last6m">11250000.00</field>
+            <field name="num_debit_last6m">18</field>
+            <field name="avg_debit_last6m">325000.00</field>
+            <field name="max_debit_last6m">1000000.00</field>
+            <field name="tot_debit_last6m">5850000.00</field>
+            <field name="num_credit_last1y">58</field>
+            <field name="avg_credit_last1y">475000.00</field>
+            <field name="max_credit_last1y">2000000.00</field>
+            <field name="tot_credit_last1y">27550000.00</field>
+            <field name="num_debit_last1y">42</field>
+            <field name="avg_debit_last1y">375000.00</field>
+            <field name="max_debit_last1y">1500000.00</field>
+            <field name="tot_debit_last1y">15750000.00</field>
+        </record>
+
+        <!-- Create a USD account for demo_partner_5 -->
+        <record id="demo_account_17" model="res.partner.account">
+            <field name="customer_id" ref="demo_partner_5"/>
+            <field name="name">0100905000457</field>
+            <field name="account_name">DANI NMERICHUKWU USD</field>
+            <field name="account_position">SECONDARY</field>
+            <field name="account_type">DOMICILIARY</field>
+            <field name="account_code">DOM</field>
+            <field name="account_status">ACTIVE</field>
+            <field name="high_transactions_account">True</field>
+            <field name="last_transaction_date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="opening_date" eval="(datetime.now() - timedelta(days=450)).strftime('%Y-%m-%d')"/>
+            <field name="currency">USD</field>
+            <field name="category">RETAIL</field>
+            <field name="category_description">DOMICILIARY ACCOUNT</field>
+            <field name="is_joint_account">False</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(days=450)).strftime('%Y-%m-%d')"/>
+            <field name="closure_status">N</field>
+            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="branch_code">0010001</field>
+            <field name="balance">15000.00</field>
+            <field name="state">Active</field>
+            <field name="customer">0050</field>
+            <field name="max_debit_daily">5000.00</field>
+            <field name="num_credit_last6m">6</field>
+            <field name="avg_credit_last6m">3500.00</field>
+            <field name="max_credit_last6m">8000.00</field>
+            <field name="tot_credit_last6m">21000.00</field>
+            <field name="num_debit_last6m">4</field>
+            <field name="avg_debit_last6m">1500.00</field>
+            <field name="max_debit_last6m">3000.00</field>
+            <field name="tot_debit_last6m">6000.00</field>
+            <field name="num_credit_last1y">12</field>
+            <field name="avg_credit_last1y">3000.00</field>
+            <field name="max_credit_last1y">8000.00</field>
+            <field name="tot_credit_last1y">36000.00</field>
+            <field name="num_debit_last1y">8</field>
+            <field name="avg_debit_last1y">1875.00</field>
+            <field name="max_debit_last1y">5000.00</field>
+            <field name="tot_debit_last1y">15000.00</field>
+        </record>
+    </data>    
+</odoo>

@@ -13,7 +13,7 @@
             <field name="active">True</field>
             <field name="origin">demo</field>
             <field name="internal_category">correspondent</field>
-            <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020002"/>
 
             <!-- <field name="risk_level">low</field> -->
             <field name="create_date" eval="time.strftime('%Y-%m-%d %H:%M:%S')" />
@@ -194,11 +194,6 @@
             <field name="create_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">eze.c@example.com</field>
             <field name="customer_id">02210</field>
-
-
-
-
-
         </record>
 
         <record id="demo_partner_10" model="res.partner">
@@ -1294,6 +1289,5 @@
             <field name="email">maryam.a@example.com</field>
             <field name="customer_id">10030</field>
         </record>
-
     </data>
 </odoo>
