@@ -22,7 +22,7 @@
     <function model="ir.config_parameter" name="set_param"
         eval="('opensanctions_api_key', '1731b7a13f6c63e6a9bbb550981e6a18')" />
      <function model="ir.config_parameter" name="set_param"
-            eval="('risk_management.max_slider_score', '15')" />
+            eval="('risk_management.max_slider_score', '9')" />
      <function model="ir.config_parameter" name="set_param"
             eval="('risk_management.min_slider_score', '0')" />
     <!--  Gender -->
@@ -181,7 +181,7 @@
         <field name="code">regulatory_breach</field>
     </record>
     <record id="compliance_inst_fc_risk_category_53" model="res.risk.category">
-        <field name="name">Sanction and Asset Freeze</field>
+        <field name="name">Sanction And Asset Freeze</field>
         <field name="code">sanction_and_asset_freeze</field>
     </record>
     <record id="compliance_inst_fc_risk_category_54" model="res.risk.category">
@@ -191,6 +191,10 @@
     <record id="compliance_inst_fc_risk_category_55" model="res.risk.category">
         <field name="name">Theft And Robbery</field>
         <field name="code">theft_and_robbery</field>
+    </record>
+    <record id="compliance_inst_fc_risk_category_56" model="res.risk.category">
+        <field name="name">Sanction Risk</field>
+        <field name="code">sanction_risk</field>
     </record>
     <!-- Risk Universe -->
     <record id="compliance_inst_fc_risk_univ_21" model="res.risk.universe">
@@ -231,11 +235,32 @@
         <field name="code">south_east</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
     </record>
+    <record id="compliance_inst_fc_risk_subject_ss23" model="res.risk.subject">
+        <field name="name">South South</field>
+        <field name="code">south_south</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_sw23" model="res.risk.subject">
+        <field name="name">South West</field>
+        <field name="code">south_west</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
     <record id="compliance_inst_fc_risk_subject_ne23" model="res.risk.subject">
         <field name="name">North East</field>
         <field name="code">north_east</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
     </record>
+    <record id="compliance_inst_fc_risk_subject_nc23" model="res.risk.subject">
+        <field name="name">North Central</field>
+        <field name="code">north_central</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_nw23" model="res.risk.subject">
+        <field name="name">North West</field>
+        <field name="code">north_west</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
     <record id="compliance_inst_fc_risk_subject_41" model="res.risk.subject">
         <field name="name">Construction</field>
         <field name="code">construction</field>
@@ -366,11 +391,6 @@
         <field name="code">state_and_private_agencies</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
     </record>
-    <record id="compliance_inst_fc_risk_subject_161" model="res.risk.subject">
-        <field name="name">South West</field>
-        <field name="code">south_west</field>
-        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
-    </record>
     <record id="compliance_inst_fc_risk_subject_162" model="res.risk.subject">
         <field name="name">Ghana</field>
         <field name="code">ghana</field>
@@ -418,17 +438,9 @@
     </record>
 
     <!-- Default Risk Assessment -->
-    <record id="res_risk_assessment_1" model="res.risk.assessment">
-        <field name="name">Customer Engaged In Human Trafficking in the North</field>
-        <field name="narration">Assessing the risks associated with onboarding customers associated
-            with human trafficking in the North East and its impact on the bank</field>
-        <field name="recommendation">Put customers on PND, Carry out EDD</field>
-        <field name="subject_id" ref="compliance_inst_fc_risk_subject_ne23" />
-        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
-        <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst" />
-        <field name="type_id" ref="compliance_inst_risk_type_3" />
-    </record>
-    <record id="res_risk_assessment_onboarding" model="res.risk.assessment">
+
+        <!-- Subject: Internet Banking Service -->
+     <record id="res_risk_assessment_onboarding" model="res.risk.assessment">
         <field name="name">Customer Onboarding</field>
         <field name="narration">Default Risk Assessment At Customer Onboarding</field>
         <field name="recommendation">Carry out KYC Excercise</field>
@@ -438,66 +450,81 @@
         <field name="type_id" ref="compliance_inst_risk_type_3" />
         <field name="is_default">True</field>
     </record>
-<!-- <record id="res_risk_assessment_line_1" model="res.risk.assessment.line">
-    <field name="name">Money Laundering</field>
-    <field name="implication">Regulatory Fine</field>
-    <field name="existing_controls" eval="[(6, 0, [ref('risk_control_fcra_permissible_purpose').id])]"/>
-    <field name="planned_mitigation" eval="[(6, 0, [ref('mitigation_1_demo').id])]"/>
-    <field name="category_id" ref="compliance_inst_fc_risk_category_1"/>
-    <field name="department_id" ref="hr_department_compliance"/>
-    <field name="risk_assessment_id" ref="res_risk_assessment_1"/>
-    <field name="inherent_risk_score">24</field>
-    <field name="control_effectiveness_score">9</field>
-    <field name="residual_risk_impact">24.00</field>
-    <field name="residual_risk_score">15.36</field>
-    <field name="residual_risk_probability">60</field>
-</record>
-    
-<record id="res_risk_assessment_line_onboarding" model="res.risk.assessment.line">
-    <field name="name">Customer Onboarding</field>
-    <field name="implication">To be deteremined</field>
-    <field name="existing_controls" eval="[(6, 0, [ref('risk_control_fcra_adverse_action').id])]"/>
-    <field name="planned_mitigation" eval="[(6,0, [ref('mitigation_2_demo').id])]"/>
-    <field name="category_id" ref="compliance_inst_fc_risk_category_52" />
-    <field name="department_id" ref="hr_department_compliance" />
-    <field name="risk_assessment_id" ref="res_risk_assessment_onboarding" />
-    <field name="inherent_risk_score">10</field>
-    <field name="control_effectiveness_score">12</field>
-    <field name="residual_risk_impact">12.00</field>
-    <field name="residual_risk_score">6.24</field>
-    <field name="residual_risk_probability">52</field>
-</record> -->
 
-<record id="res_risk_assessment_line_1" model="res.risk.assessment.line">
-    <field name="name">Money Laundering</field>
-    <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_financial_loss_loan_default'), ref('compliance_management.implication_reputational_damage_data_breach')])]" />
-    <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-    <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-    <field name="category_id" ref="compliance_inst_fc_risk_category_1"/>
-    <field name="department_id" ref="hr_department_compliance"/>
-    <field name="risk_assessment_id" ref="res_risk_assessment_1"/>
-    <field name="inherent_risk_score">24</field>
-    <field name="control_effectiveness_score">9</field>
-    <field name="residual_risk_impact">24.00</field>
-    <field name="residual_risk_score">15.36</field>
-    <field name="residual_risk_probability">60</field>
-</record>
+    <record id="res_risk_assessment_line_ib_ml" model="res.risk.assessment.line">
+        <field name="name">Money Laundering</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_1"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_onboarding"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">24.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
 
-<record id="res_risk_assessment_line_onboarding" model="res.risk.assessment.line">
-    <field name="name">Customer Onboarding</field>
-    <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_financial_loss_loan_default'), ref('compliance_management.implication_reputational_damage_data_breach')])]" />
-    <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_adverse_action')])]"/>
-    <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_2_demo')])]"/>
-    <field name="category_id" ref="compliance_inst_fc_risk_category_52"/>
-    <field name="department_id" ref="hr_department_compliance"/>
-    <field name="risk_assessment_id" ref="res_risk_assessment_onboarding"/>
-    <field name="inherent_risk_score">10</field>
-    <field name="control_effectiveness_score">12</field>
-    <field name="residual_risk_impact">12.00</field>
-    <field name="residual_risk_score">6.24</field>
-    <field name="residual_risk_probability">52</field>
-</record>
+    <record id="res_risk_assessment_line_ib_tf" model="res.risk.assessment.line">
+        <field name="name">Terrorism Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_2"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_onboarding"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">22.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
 
+    <record id="res_risk_assessment_line_ib_pf" model="res.risk.assessment.line">
+        <field name="name">Proliferation Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_3"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_onboarding"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">18.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_ib_sr" model="res.risk.assessment.line">
+        <field name="name">Sanction Risk</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_53"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_onboarding"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">21.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_ib_bc" model="res.risk.assessment.line">
+        <field name="name">Bribery And Corruption</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_42"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_onboarding"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">19.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
 
     <!-- Account Types -->
     <record id="res_partner_account_type_100" model="res.partner.account.type">

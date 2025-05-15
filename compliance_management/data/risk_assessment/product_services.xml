@@ -1,0 +1,92 @@
+<odoo>
+ <!-- Subject: Private Banking Service -->
+    <record id="res_risk_assessment_private_banking" model="res.risk.assessment">
+        <field name="name">Private Banking </field>
+        <field name="narration">Risk assessment for private banking services.</field>
+        <field name="recommendation">Enhance due diligence on high-net-worth clients.</field>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_21"/>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
+        <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst"/>
+        <field name="type_id" ref="compliance_inst_risk_type_3"/>
+    </record>
+
+    <record id="res_risk_assessment_line_pb_ml" model="res.risk.assessment.line">
+        <field name="name">Money Laundering</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_1"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_private_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">24.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_pb_tf" model="res.risk.assessment.line">
+        <field name="name">Terrorism Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_2"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_private_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">22.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_pb_pf" model="res.risk.assessment.line">
+        <field name="name">Proliferation Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_3"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_private_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">18.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_pb_sr" model="res.risk.assessment.line">
+        <field name="name">Sanction Risk</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_53"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_private_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">21.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_pb_bc" model="res.risk.assessment.line">
+        <field name="name">Bribery And Corruption</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_42"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_private_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">19.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+
+
+    
+
+</odoo>
