@@ -130,3 +130,6 @@ class KeywordAlertLog(models.Model):
                 raise ValueError(
                     "Sequence 'keyword.alert.log' is not configured correctly.")
         return super(KeywordAlertLog, self).create(vals)
+    
+    
+

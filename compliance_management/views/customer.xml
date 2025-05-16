@@ -11,22 +11,27 @@
                 <attribute name="create">false</attribute>
             </xpath>
 
- 
+
             <!-- Replace the phone field with custom fields -->
             <xpath expr="//field[@name='phone']" position="before">
                 <field name="customer_id" optional="show" />
                 <field name="firstname" optional="show" />
                 <field name="lastname" optional="show" />
-                <field name="risk_score" widget="badge" decoration-info="1" on_change="1" />
-                <field name="risk_level" 
-                    widget="badge"
-                    decoration-danger="risk_level == 'high'"
-                    decoration-warning="risk_level == 'medium'"
-                    decoration-success="risk_level =='low'"
-                />
+                <field name="risk_score" widget="badge" decoration-info="1" on_change="1" type="measure" />
+                <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level =='low'" />
                 <field name="branch_id" optional="hide" />
-                <field name="registration_date" optional="hide"  />
+                <field name="registration_date" optional="hide" />
                 <field name="tier_id" optional="hide" />
+            </xpath>
+
+            <!-- Hide the original phone field -->
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <!-- Add the formatted_phone field after hiding the original phone field -->
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="formatted_phone" optional="show" />
             </xpath>
 
             <!-- Modify activity_ids field -->
@@ -39,7 +44,15 @@
                 <field name="user_id" optional="show" invisible="1" widget="many2one_avatar_user" domain="[('share', '=', False)]" />
             </xpath>
 
-           
+            <!-- <xpath expr="//group" position="inside">
+                <field name="risk_score" type="measure" string="Average Risk Score" aggregate="avg"/>
+            </xpath> -->
+
+            <!-- <xpath expr="//group" position="inside">
+                <field name="risk_score" type="measure" string="Average Risk Score" aggregate="avg"/>
+            </xpath> -->
+
+
 
         </field>
     </record>
@@ -53,95 +66,37 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
                 <header>
-                    <button name="action_initiate_edd" class="oe_highlight" type="object"
-                        string="Initiate EDD"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="This will trigger a request to carry out EDD on this customer. Are you sure?" />
-                   
-                        <button name="action_add_pep" class="oe_highlight" type="object"
-                        string="Add to PEP List"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Add Customer to PEP List. Are you sure?"
-                        attrs="{'invisible': [('is_pep', '=',True)]}" />
-                    
-                        <button name="action_unmark_pep" class="oe_highlight" type="object"
-                        string="Delist from Global PEP"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Unlink this customer from Global PEP list. Are you sure?"
-                        attrs="{'invisible': [('global_pep', '=',False)]}" />
-                    
-                        <button name="action_remove_pep" type="object"
-                        string="Remove From PEP List"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Remove Customer from PEP List. Are you sure?"
-                        attrs="{'invisible': [('is_pep', '!=',True)]}" />
+                    <button name="action_initiate_edd" class="oe_highlight" type="object" string="Initiate EDD" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="This will trigger a request to carry out EDD on this customer. Are you sure?" />
 
-                    <!-- <button name="action_add_fep" class="oe_highlight" type="object"
-                        string="Add to FEP List"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Add Customer to FEP List. Are you sure?"
-                        attrs="{'invisible': [('is_fep', '=',True)]}" 
-                        style="display: none;"
-                        /> -->
+                    <button name="action_add_pep" class="oe_highlight" type="object" string="Add to PEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to PEP List. Are you sure?" attrs="{'invisible': [('is_pep', '=',True)]}" />
 
-                    <!-- <button name="action_remove_fep" type="object"
-                        string="Remove from FEP List"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Remove from FEP List. Are you sure?"
-                        attrs="{'invisible': [('is_fep', '!=',True)]}" 
-                        /> -->
+                    <button name="action_unmark_pep" class="oe_highlight" type="object" string="Delist from Global PEP" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Unlink this customer from Global PEP list. Are you sure?" attrs="{'invisible': [('global_pep', '=',False)]}" />
 
-                    <button name="action_blacklist" class="oe_highlight" type="object"
-                        string="Add to Blacklist"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Add Customer to Blacklist. Are you sure?"
-                        attrs="{'invisible': [('is_blacklist', '=',True)]}" />
-                    
-                        <button name="action_remove_blacklist" type="object"
-                        string="Remove from Blacklist"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Remove from Blacklist. Are you sure?"
-                        attrs="{'invisible': [('is_blacklist', '!=',True)]}" />
-                    
-                        <button name="action_watchlist" class="oe_highlight" type="object"
-                        string="Add to Watchlist"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Add Customer to Watchlist. Are you sure?"
-                        attrs="{'invisible': [('is_watchlist', '=',True)]}" />
-                    
-                        <button name="action_remove_watchlist" type="object"
-                        string="Remove from Watchlist"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Remove from Watchlist. Are you sure?"
-                        attrs="{'invisible': [('is_watchlist', '!=',True)]}" />
-                    
-                        <button name="action_greylist" class="oe_highlight" type="object"
-                        string="Add to Greylist"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Add Customer to Greylist. Are you sure?"
-                        attrs="{'invisible': [('is_greylist', '=',True)]}" />
-                    
-                        <button name="action_remove_greylist" type="object"
-                        string="Remove from Greylist"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Remove from Greylist. Are you sure?"
-                        attrs="{'invisible': [('is_greylist', '!=',True)]}" />
-                    
-                        <button name="action_conduct_risk_assessment" class="oe_highlight" type="object"
-                        string="Conduct Risk Assessment"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Conduct Risk Assessment. Are you sure?" />
-                    
-                        <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object"
-                        string="Compute Risk Score"
-                        confirm="Compute Risk Score: Using your defined Risk Plan, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
-                        
-                        <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
-                    <button name="scan_news_articles" class="oe_highlight" type="object"
-                        string="Run Media Screening"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Run Media Screening: Are you sure?" />
 
+                    <button name="action_remove_pep" type="object" string="Remove From PEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove Customer from PEP List. Are you sure?" attrs="{'invisible': [('is_pep', '!=',True)]}" />
+
+                    <!-- <button name="action_add_fep" class="oe_highlight" type="object" string="Add to FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '=',True)]}" style="display: none;" /> -->
+
+                    <!-- <button name="action_remove_fep" type="object" string="Remove from FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '!=',True)]}" /> -->
+
+                    <!-- <button name="action_blacklist" class="oe_highlight" type="object" string="Add to Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '=',True)]}" /> -->
+
+                    <!-- <button name="action_remove_blacklist" type="object" string="Remove from Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '!=',True)]}" /> -->
+
+                    <button name="action_watchlist" class="oe_highlight" type="object" string="Add to Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '=',True)]}" />
+
+                    <button name="action_remove_watchlist" type="object" string="Remove from Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '!=',True)]}" />
+
+                    <button name="action_greylist" class="oe_highlight" type="object" string="Add to Greylist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Greylist. Are you sure?" attrs="{'invisible': [('is_greylist', '=',True)]}" />
+
+                    <button name="action_remove_greylist" type="object" string="Remove from Greylist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Greylist. Are you sure?" attrs="{'invisible': [('is_greylist', '!=',True)]}" />
+
+                    <button name="action_conduct_risk_assessment" class="oe_highlight" type="object" string="Conduct Risk Assessment" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Conduct Risk Assessment. Are you sure?" />
+
+                    <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Compute Risk Score" confirm="Compute Risk Score: Using your defined Risk Plan, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
+
+                    <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
+                    <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?" />
                     <button name="action_create_case" type="object" string="Create Case" class="btn-primary"/>
                 </header>
             </xpath>
@@ -152,29 +107,23 @@
 
                 <!-- <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
                     <span>Risk 
-                    <field string="Risk Level" name="risk_level" widget="badge" 
-                    decoration-danger="risk_level in ('high')"
-                    decoration-warning="risk_level in ('medium')"
-                    decoration-success="risk_level in ('low')"/>
+                    <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level in ('high')" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')"/>
                     </span>                   
                 </button> -->
 
-                <button class="oe_stat_button"  icon="fa-thermometer-0">
+                <button class="oe_stat_button" icon="fa-thermometer-0">
                     <span>Risk
-                        <field string="Risk Level" name="risk_level" widget="badge" 
-                        decoration-danger="risk_level == 'high'" 
-                        decoration-warning="risk_level == 'medium'" 
-                        decoration-success="risk_level == 'low'"/>
+                        <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'low'"/>
                     </span>
                 </button>
 
                 <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
-                    <field string="Risk Score"  name="risk_score" widget="statinfo"/>
+                    <field string="Risk Score" name="risk_score" widget="statinfo"/>
                 </button>
             </xpath>
-         
+
             <xpath expr="//field[@name='website']" position="replace">
-                <field name="industry_id" invisible="0" />
+                <field name="industry_id" invisible="1" />
                 <!-- <attribute name="invisible">1</attribute> -->
             </xpath>
 
@@ -187,12 +136,12 @@
                 <field name="employment_status" invisible="0" />
                 <field name="active" invisible="1" />
             </xpath>
-          
+
 
             <xpath expr="//field[@name='mobile']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            
+
             <xpath expr="//field[@name='image_1920']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
@@ -208,7 +157,7 @@
             <xpath expr="//field[@name='company_reg_date']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-           
+
 
             <xpath expr="//form//field[@name='street2']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -225,7 +174,7 @@
             <xpath expr="//div[@class='o_row']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            
+
             <xpath expr="//span[@class='o_form_label o_td_label']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
@@ -238,7 +187,11 @@
                 <field name="street" invisible="0" readonly="1"/>
 
             </xpath>
-           
+
+            <xpath expr="//div[@class='o_address_format']" position="before">
+                <field name="first_risk_rating" invisible="0" readonly="1"/>
+            </xpath>
+
 
             <xpath expr="//field[@name='education_level_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -281,7 +234,8 @@
             <!--  -->
 
             <xpath expr="//field[@name='vat']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <!-- <attribute name="readonly">1</attribute> -->
+                <attribute name="invisible">1</attribute>
             </xpath>
 
 
@@ -290,7 +244,9 @@
             </xpath>
 
             <xpath expr="//field[@name='phone']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <!-- <attribute name="readonly">1</attribute> -->
+                 
+                <attribute name="invisible">1</attribute>
             </xpath>
 
             <xpath expr="//field[@name='email']" position="attributes">
@@ -298,8 +254,17 @@
             </xpath>
 
             <xpath expr="//field[@name='industry_id']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="invisible">1</attribute>
             </xpath>
+
+            <xpath expr="//field[@name='employment_status']" position="after">
+                <field name="formatted_phone" readonly="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='vat']" position="replace">
+                <field name="customer_industry_id" readonly="1"/>
+            </xpath>
+
 
             <xpath expr="//field[@name='title']" position="attributes">
                 <attribute name="readonly">1</attribute>
@@ -318,8 +283,7 @@
         <field name="arch" type="xml">
             <xpath expr="//search" position="replace">
                 <search string="Search Customer">
-                    <field name="name"
-                       filter_domain="['|', '|', '|', '|', ('display_name', 'ilike', self), ('ref', 'ilike', self), ('email', 'ilike', self), ('vat', 'ilike', self), ('company_registry', 'ilike', self)]"/>
+                    <field name="name" filter_domain="['|', '|', '|', '|', ('display_name', 'ilike', self), ('ref', 'ilike', self), ('email', 'ilike', self), ('vat', 'ilike', self), ('company_registry', 'ilike', self)]"/>
                     <field name="parent_id" domain="[('is_company', '=', True)]" operator="child_of"/>
                     <field name="email" filter_domain="[('email', 'ilike', self)]"/>
                     <field name="phone" filter_domain="['|', ('phone', 'ilike', self), ('mobile', 'ilike', self)]"/>
@@ -327,10 +291,13 @@
                     <field name="customer_id" filter_domain="[('customer_id', 'ilike', self)]"/>
                     <separator/>
                     <filter string="Customers" name="type_customer" domain="[('internal_category', '=', 'customer')]"/>
-                    <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
+                    <filter string="Without BVN" name="bvn" domain="['|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]"/>
+                    <filter string="Without Phone No." name="customer_phone" domain="[('customer_phone', '=', False)]"/>
+
+                    <!-- <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
                     <filter string="Partners" name="type_partner" domain="[('internal_category', '=', 'partner')]"/>
                     <filter string="Respondents" name="type_respondent" domain="[('internal_category', '=', 'respondent')]"/>
-                    <filter string="Correspondent" name="type_correspondent" domain="[('internal_category', '=', 'correspondent')]"/>
+                    <filter string="Correspondent" name="type_correspondent" domain="[('internal_category', '=', 'correspondent')]"/> -->
                     <separator/>
                     <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
                     <separator/>
@@ -384,7 +351,7 @@
         </field>
     </record>
 
-    <!-- Report on Settings -->
+    <!-- customers matching pep tree view -->
     <record id="compliance_pep_customers_tree" model="ir.ui.view">
         <field name="name">res_compliance_pep_customers_tree</field>
         <field name="model">res.customer.pep</field>
@@ -394,12 +361,50 @@
                 <field name="customer_id" />
                 <field name="firstname" />
                 <field name="lastname" />
-                <field name="unique_identifier" />
+                <!-- <field name="unique_identifier"/> -->
                 <field name="branch_id" />
                 <field name="pep_id" invisible="1"/>
             </tree>
         </field>
     </record>
+
+    <!-- customers matching pep form -->
+    <record id="view_form_res_customer_pep" model="ir.ui.view">
+        <field name="name">res.customer.pep.form</field>
+        <field name="model">res.customer.pep</field>
+        <field name="arch" type="xml">
+            <form string="PEP Match Detail" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="customer_id" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Personal Information">
+                            <field name="name" readonly="1"/>
+                            <field name="firstname" readonly="1"/>
+                            <field name="lastname" readonly="1"/>
+
+                        </group>
+
+                        <group string="Addtional Details">
+                            <field name="branch_id" readonly="1"/>
+                            <field name="internal_category" readonly="1"/>
+
+                        </group>
+
+                        <!-- <field name="pep_id" readonly="1"/> -->
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+
+
+
 
     <record id="view_customer_pep_search" model="ir.ui.view">
         <field name="name">Customer PEP Search Custom</field>
@@ -423,7 +428,7 @@
                     <filter name="group_internal_category" string="Category" context="{'group_by': 'internal_category'}"/>
                 </group>
             </search>
-          
+
         </field>
     </record>
 
@@ -443,12 +448,24 @@
         <field name="code">action = model.action_view_customer_pep()</field>
     </record>
 
-    <menuitem
-        id="menu_compliance_customer_pep"
-        action="action_view_customer_pep"
-        parent="menu_compliance_customer_heading"
-        name="Customers Matching PEPs"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="50" />
+    <record id="action_view_customer_global_pep" model="ir.actions.server">
+        <field name="name">Customers Matching Global PEP</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.action_view_global_pep_customer()</field>
+    </record>
+
+    <record id="action_view_likely_sanction_customer" model="ir.actions.server">
+        <field name="name">Customers Likely On Sanction List</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.action_view_likely_sanction_customer()</field>
+    </record>
+
+    <menuitem id="menu_compliance_customer_pep" action="action_view_customer_pep" parent="menu_compliance_customer_heading" name="PEPs Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="50" />
+    <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanctioned" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" />
+    <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_global_pep" parent="menu_compliance_customer_heading" name="Matching Global PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="70" />
 
 </odoo>

@@ -7,9 +7,12 @@ class FcraScore(models.Model):
     _description = 'FCRA Risk Score'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
-    name = fields.Char('Implication Name', required=True, tracking=True)
-    max_score = fields.Float(
-        string='Maximum Score', required=True, tracking=True)
-    min_score = fields.Integer(string='Minimum Score', default=1)  # Add this field
+    name = fields.Char(required=True)
+    inherent_risk_score_max = fields.Float(default=15, tracking=True)
+    inherent_risk_score_min = fields.Integer(default=1)  # Add this field
+    control_effectiveness_score_max = fields.Float(default=15, tracking=True)
+    control_effectiveness_score_min = fields.Integer(default=1)  # Add this field
+    residual_risk_score_max = fields.Float(default=15, tracking=True)
+    residual_risk_score_min = fields.Integer(default=1)  # Add this field
     
    

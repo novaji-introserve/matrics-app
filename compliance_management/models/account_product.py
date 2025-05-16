@@ -10,8 +10,8 @@ class AccountProduct(models.Model):
         # ('uniq_account_product_name', 'unique(name)',
         #  "Account Product already exists. Value must be unique!"),
 
-        # ('uniq_account_product_code', 'unique(code)',
-        #  "Account Product code already exists. Value must be unique!")
+        ('uniq_product_id', 'unique(product_id)',
+         "Account Product id already exists. Value must be unique!"),
         
         ('uniq_account_product_code', 'unique(customer_product_id)',
          "Account Product ID already exists. Value must be unique!")

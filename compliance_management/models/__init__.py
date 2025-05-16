@@ -47,3 +47,5 @@ from . import risk_assessment_control
 from . import risk_assesment_mitigation
 from . import res_risk_implication
 from . import fcra_score
+from . import dashboard_cache
+from . import aggregate_customer_score

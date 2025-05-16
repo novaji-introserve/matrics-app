@@ -654,7 +654,7 @@ class ImportLog(models.Model):
             
             # Import the CSV processor with improved error handling
             try:
-                from odoo.addons.compliance_management.services.csv_processor import CSVProcessor
+                from compliance_management.services.csv_processor import CSVProcessor
                 processor_class = CSVProcessor
             except ImportError as e:
                 _logger.error(f"Error importing CSVProcessor: {str(e)}")

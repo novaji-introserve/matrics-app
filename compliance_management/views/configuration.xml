@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data noupdate="0">
         <!-- Account Types Report -->
@@ -131,16 +132,26 @@
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only" />
                             <h1>
-                                <field name="name" />
+                                <field name="name" readonly="1"/>
                             </h1>
                         </div>
-                        <group>
-                            <group string="Details">
-                                <field name="code" />
+                        <group string="Details">
+
+                            <group >
+                                <field name="product_type" readonly="1" />
+                                <field name="product_category" readonly="1" />
                             </group>
-                            <group string="Risk Assessment">
-                                <field name="risk_assessment" />
+
+                            <group>
+                                <field name="code" string="Product Code" readonly="1" />
+                                <field name="description" readonly="1" />
                             </group>
+
+                        </group>
+
+
+                        <group string="Risk Assessment">
+                            <field name="risk_assessment" readonly="1" />
                         </group>
                     </sheet>
                 </form>
@@ -637,6 +648,10 @@
             </field>
         </record>
 
+        <record id="hr.menu_hr_root" model="ir.ui.menu">
+            <field name="groups_id" eval="[(6, 0, [ref('compliance_management.group_compliance_chief_compliance_officer')])]"/>
+        </record> 
+
         <!-- Menu Items -->
         <!-- <menuitem
             id="hr.menu_hr_root"
@@ -645,84 +660,80 @@
             web_icon="hr,static/description/icon.svg"
             sequence="500" /> -->
 
-            <menuitem 
-            id="menu_hr_root" 
+        <menuitem 
+            id="hr.menu_hr_root" 
             name="Employees" 
-            groups="compliance_management.group_compliance_chief_compliance_officer"
             web_icon="hr,static/description/icon.svg" 
-            sequence="500"/>
+            sequence="500"
+            groups="compliance_management.group_compliance_chief_compliance_officer"/>
+            
 
-
-            <menuitem 
+        <menuitem 
             id="menu_etl_root" 
             name="ETL Manager" 
             sequence="100" 
             web_icon="custom_etl,static/description/icon.png"
             groups="group_tech_support"/>
 
-            <menuitem 
+        <menuitem 
             id="link_tracker_menu_main" 
             name="Link Tracker" 
              groups="group_tech_support"/>
           
-            <menuitem 
+        <menuitem 
             name="Project" 
             id="menu_main_pm" 
             groups="group_tech_support" 
             web_icon="project,static/description/icon.svg" 
             />
 
-            <menuitem 
+        <menuitem 
             id="mass_mailing_sms_menu_root" 
             name="SMS Marketing" 
             web_icon="mass_mailing_sms,static/description/icon.svg" 
             groups="group_tech_support"/>
 
-            <menuitem name="Surveys" 
+        <menuitem name="Surveys" 
             id="menu_surveys" 
             groups="group_tech_support" 
             web_icon="survey,static/description/icon.svg"/>
 
-            <menuitem 
+        <menuitem 
             name="Contacts" 
             id="menu_contacts" 
             web_icon="contacts,static/description/icon.svg" 
             groups="group_tech_support"/>
 
-            <menuitem
+        <menuitem
              id="menu_queue_job_root" 
             name="Job Queue" 
             web_icon="queue_job,static/description/icon.png" 
             groups="group_tech_support" />
 
-
-
-            <menuitem 
+        <menuitem 
             id="menu_board_root" 
             name="Dashboards"
             web_icon="base,static/description/board.png" 
             groups="group_tech_support"/>
-
-
        
-            <menuitem name="Settings"
+        <menuitem name="Settings"
             id="base.menu_administration"
             web_icon="compliance_management,static/description/icon-settings.png"
             sequence="550"
             groups="compliance_management.group_compliance_chief_compliance_officer" />
         
-            <menuitem id="base.menu_management" name="Apps" sequence="500"
+        <menuitem id="base.menu_management" name="Apps" sequence="500"
             web_icon="compliance_management,static/description/icon-apps.png"
             groups="group_tech_support" />
        
-            <menuitem
+        <menuitem
             id="menu_compliance_root"
             name="Compliance"
             groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
             web_icon="compliance_management,static/description/icons-compliance.png"
             sequence="-1000" />
      
-            <menuitem
+        <menuitem
             id="menu_compliance_configuration"
             name="Configuration"
             groups="group_compliance_compliance_officer,base.group_system"
@@ -732,13 +743,13 @@
         <menuitem id="menu_accounts" name="Accounts"
             parent="menu_compliance_configuration" sequence="80" />
 
-        <menuitem
+        <!-- <menuitem
             id="menu_compliance_account_type"
             action="action_list_customer_account_type"
             parent="menu_accounts"
             name="Account Types"
             groups="group_compliance_compliance_officer"
-            sequence="1" />
+            sequence="1" /> -->
         <menuitem
             id="menu_compliance_account_product"
             action="action_list_account_product"
@@ -844,10 +855,5 @@
             sequence="10" 
             groups="group_compliance_compliance_officer"
         />
-
-    
-
-      
-
     </data>
 </odoo>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Settings form view -->
+    <record id="res_config_settings_view_form_inherit_sidebar" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sidebar</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <!-- <div id="companies" position="after">
+                <h2>Interface Layout</h2> -->
+                <!-- <div class="row mt16 o_settings_container"> -->
+                  <xpath expr="//div[@name='web_theme']" position="inside">
+                  <!-- <xpath expr="//div[contains(@class, 'o_setting_box')][.//span[contains(text(), 'Favicon')]]" position="after"> -->
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">Default Layout Preferences</span>
+                            <div class="text-muted">
+                                Set default sidebar layout for all users
+                                <!-- Set default sidebar and chatter layout for all users -->
+                            </div>
+                            <div class="content-group">
+                              <div class="mt16 row">
+                                  <label for="default_sidebar_type" string="Sidebar Type" class="col-3 o_light_label"/>
+                                  <field name="default_sidebar_type"/>
+                                  <div class="w-100 mt-1"></div>
+                                  <!-- <label for="default_chatter_position" string="Chatter Position" class="col-3 o_light_label"/>
+                                  <field name="default_chatter_position"/>
+                                  <div class="w-100 mt-1"></div> -->
+                                  <!-- <label for="apply_to_all_users" string="Apply to All Users" class="col-3 o_light_label"/>
+                                  <field name="apply_to_all_users"/> -->
+                              </div>
+                          </div>
+                        </div>
+                    </div>
+                  </xpath>
+                <!-- </div> -->
+            <!-- </div> -->
+        </field>
+    </record>
+
+    <!-- User preferences form view -->
+    <record id="res_users_form_view_inherit" model="ir.ui.view">
+        <field name="name">res.users.form.view.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='preferences']" position="inside">
+                <field name="sidebar_type"/>
+                <field name="chatter_position"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-
+import logging
 # CONTROL_EFFECTIVENESS_MAX_SCORE = 25
+
+_logger = logging.getLogger(__name__)
 
 
 class RiskAssessmentLine(models.Model):
@@ -26,7 +28,7 @@ class RiskAssessmentLine(models.Model):
     residual_risk_probability = fields.Float(
         string='Residual Risk Probability', compute='_compute_risk_probability', store=True)
     residual_risk_impact = fields.Float(
-        string='Residual Risk Impact', required=True, tracking=True)
+        string='Residual Risk Impact', compute="_compute_residual_risk_impact", tracking=True, store=False, readonly="True")
     planned_mitigation = fields.Many2many("risk.assessment.mitigation", "res_risk_assessment_line_risk_assessment_mitigation_rel", tracking=True)
     department_id = fields.Many2one(
         comodel_name='hr.department', string='Department', required=True, help="Department Responsible")
@@ -39,44 +41,40 @@ class RiskAssessmentLine(models.Model):
         ('60', '2 month'),
         ('90', '3 month'),
     ],string='Implementation Deadline',default="0", help="Recurring deadline for implementation")
+    
     residual_risk_score = fields.Float(
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
-
-    def _get_score_range(self, score_name):
-        """Get min/max values from res.fcra.score model"""
-        score_record = self.env['res.fcra.score'].search([('name', '=', score_name)], limit=1)
-        return score_record.min_score if score_record else 1, score_record.max_score if score_record else 25
     
-    @api.model
-    def fields_get(self, allfields=None, attributes=None):
-        res = super(RiskAssessmentLine, self).fields_get(allfields, attributes)
+    # inherent_max_val = fields.Float(
+    # string='Inherent Max', 
+    # default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_max or 0.0
+    # )
 
-        
-        # Get ranges from res.fcra.score
-        inherent_min, inherent_max = self._get_score_range('Inherent Score')
-        control_min, control_max = self._get_score_range('Control Effectiveness')
-        residual_min, residual_max = self._get_score_range('Residual Risk')
-        
-        # Update field attributes
-        if 'inherent_risk_score' in res:
-            res['inherent_risk_score']['min'] = inherent_min
-            res['inherent_risk_score']['max'] = inherent_max
-            print(inherent_max)
-            print("*********************")
-        
-        if 'control_effectiveness_score' in res:
-            res['control_effectiveness_score']['min'] = control_min
-            res['control_effectiveness_score']['max'] = control_max
-            print(control_max)
-            print("*********************")
-        
-        if 'residual_risk_impact' in res:
-            res['residual_risk_impact']['min'] = residual_min
-            res['residual_risk_impact']['max'] = residual_max
-            print(residual_min)
-            print("*********************")
-        
-        return res
+    # inherent_min_val = fields.Float(
+    #     string='Inherent Min', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_min or 0.0
+    # )
+
+    # control_max_val = fields.Float(
+    #     string='Control Max', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_max or 0.0
+    # )
+
+    # control_min_val = fields.Float(
+    #     string='Control Min', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_min or 0.0
+    # )
+
+    # residual_max_val = fields.Float(
+    #     string='Residual Max', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_max or 0.0
+    # )
+
+    # residual_min_val = fields.Float(
+    #     string='Residual Min', 
+    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_min or 0.0
+    # )
+
 
 
 
@@ -102,6 +100,22 @@ class RiskAssessmentLine(models.Model):
             record.residual_risk_probability = probability
             record.residual_risk_score = score
 
+    @api.depends('control_effectiveness_score')
+    def _compute_residual_risk_impact(self):
+        for record in self:
+            control_effectiveness_score = record.control_effectiveness_score or 0  # Handle None/False values
+            max_score = self.env['ir.config_parameter'].sudo().get_param(
+                'risk_management.max_slider_score', '15')
+            max_score = float(max_score)
+            
+            _logger.info(f"The control score is {control_effectiveness_score}")
+            _logger.info(f"Max score is {max_score}")
+            
+            # Ensure we don't have negative values if control score > max
+            record.residual_risk_impact = max(0, max_score - control_effectiveness_score)
+            _logger.info(f"Risk impact score is {record.residual_risk_impact}")
+
+
     @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact','residual_risk_score','residual_risk_probability','residual_risk_score')
     def _compute_risk_probability(self):
         for record in self:
@@ -113,8 +127,10 @@ class RiskAssessmentLine(models.Model):
             record.residual_risk_score = score
     
     def get_control_effectiveness_max_score(self):
-        """Retrieves the maximum control effectiveness score from system parameters."""
-        return int(self.env['ir.config_parameter'].sudo().get_param('risk_management.control_effectiveness_max_score') or 25)
+        """Get the maximum score for control effectiveness from system parameters"""
+        return float(self.env['ir.config_parameter'].sudo().get_param(
+            'risk_management.max_slider_score', '15'))
+    
 
     def _compute_risk_probability(self, control_effectiveness_score):
         max_score = self.get_control_effectiveness_max_score()

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+    
+        <record id="exception_frequency_1" model="exception.frequency">
+            <field name="name">minutes</field>
+            <field name="period">5</field>
+        </record>
+        <record id="exception_frequency_2" model="exception.frequency">
+            <field name="name">minutes</field>
+            <field name="period">30</field>
+        </record>
+        <record id="exception_frequency_3" model="exception.frequency">
+            <field name="name">hourly</field>
+            <field name="period">1</field>
+        </record>
+        <record id="exception_frequency_4" model="exception.frequency">
+            <field name="name">daily</field>
+            <field name="period">1</field>
+        </record>
+        <record id="sql_text_1" model="process.sql">
+            <field name="name">Retrieve User In The System For Test</field>
+            <field name="query">
+            select ru.login, ru.active from res_users ru left join res_branch_users_rel rub ON ru.id = rub.user_id ;
+            </field>
+        </record>
+        <record id="alert_rules_1" model="alert.rules">
+            <field name="name">Retrieve User In The System For Test</field>
+            <field name="sql_text" ref="alert_management.sql_text_1" />
+            <field name="frequency_id" ref="alert_management.exception_frequency_1" />
+        </record>
+    </data>
+</odoo>

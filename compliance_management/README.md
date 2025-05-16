@@ -145,6 +145,13 @@ sudo nano /usr/local/etc/nginx/sites-available/compliance_websocket.conf
 sudo mkdir -p /etc/nginx/sites-available
 sudo mkdir -p /etc/nginx/sites-enabled
 sudo nano /etc/nginx/sites-available/compliance_websocket.conf
+
+sudo mkdir -p /var/log/nginx/
+sudo chown www-data:www-data /var/log/nginx/
+
+sudo touch /var/log/nginx/websocket_access.log /var/log/nginx/websocket_error.log
+sudo chown www-data:www-data /var/log/nginx/websocket_*.log
+
 ```
 
 **For Windows:**

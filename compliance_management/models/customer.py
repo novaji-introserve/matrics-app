@@ -1,10 +1,15 @@
+
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
 from psycopg2 import ProgrammingError
 import logging
 from dotenv import load_dotenv
-import psycopg2, os
+import psycopg2
+import os
+from datetime import timedelta, datetime
+import pytz
+from dateutil.relativedelta import relativedelta
 
 
 load_dotenv()
@@ -29,12 +34,16 @@ class Shareholders(models.Model):
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Partner', ondelete="cascade")
 
+
 class PartnerRiskPlanLines(models.Model):
-    _name="res.partner.risk.plan.line"
-    _description="Partner Risk Plan Lines"
-    partner_id = fields.Many2one('res.partner', string='Partner', ondelete="cascade",index=True)
-    plan_line_id = fields.Many2one('res.compliance.risk.assessment.plan', string='Plan Line',index=True)
-    risk_score = fields.Float(string='Risk Score', digits=(10,2))
+    _name = "res.partner.risk.plan.line"
+    _description = "Partner Risk Plan Lines"
+    partner_id = fields.Many2one(
+        'res.partner', string='Partner', ondelete="cascade", index=True)
+    plan_line_id = fields.Many2one(
+        'res.compliance.risk.assessment.plan', string='Plan Line', index=True)
+    risk_score = fields.Float(string='Risk Score', digits=(10, 2))
+
 
 class Customer(models.Model):
     _inherit = 'res.partner'
@@ -43,8 +52,9 @@ class Customer(models.Model):
          "Customer ID already exists. Value must be unique!"),
     ]
 
-    customer_id = fields.Char(string="Customer ID", index=True, tracking=True, readonly=True)
-    bvn = fields.Char(string='BVN', tracking=True, readonly=True)
+    customer_id = fields.Char(string="Customer ID",
+                              index=True, tracking=True, readonly=True)
+    bvn = fields.Char(string='BVN', tracking=True, readonly=True, index=True)
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True, tracking=True, readonly=True)
     education_level_id = fields.Many2one(
@@ -66,12 +76,12 @@ class Customer(models.Model):
     region_id = fields.Many2one(
         comodel_name='res.partner.region', string='Region', tracking=True, readonly=True)
     sector_id = fields.Many2one(
-        
+
         comodel_name='res.partner.sector', string='Sector', index=True, tracking=True, readonly=True)
-    industry_id = fields.Many2one(
+
+    customer_industry_id = fields.Many2one(
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
-    
     sex_id = fields.Many2one(
         comodel_name='res.partner.gender', string='Sex', index=True, readonly=True)
     firstname = fields.Char(string='Firstname', readonly=True)
@@ -88,21 +98,27 @@ class Customer(models.Model):
     risk_score = fields.Float(
         string='Risk Score', digits=(10, 2), tracking=True)
     risk_level = fields.Char(
-        string='Risk Level', index=True, default='low', tracking=True, readonly=True)
+        string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
     risk_level_id = fields.Many2one(
         comodel_name='res.risk.level', string='Risk Level', index=True)
     account_ids = fields.One2many(
         comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts', readonly=True)
+
+    res_partner_account_ids = fields.One2many(
+        'res.partner.account', 'customer_id', string='Accounts', readonly=True)
+
     edd_ids = fields.One2many(
         comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
-    risk_plan_line_ids = fields.One2many(comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
+    risk_plan_line_ids = fields.One2many(
+        comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
     risk_assessment_ids = fields.One2many(
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
-    is_pep = fields.Boolean(string="Is PEP", default=False, tracking=True)
+    is_pep = fields.Boolean(
+        string="Is PEP", default=False, tracking=True, index=True)
     is_watchlist = fields.Boolean(
         string="Is Watchlist", default=False, tracking=True)
     is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
@@ -126,28 +142,42 @@ class Customer(models.Model):
     anti_money_laundering_file_name = fields.Char(
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
-        string='Accounts', compute='_total_accounts', store=True)
-    global_pep_id = fields.Many2one('res.pep', string='Related Global PEP',tracking=True)
-    
+        string='Accounts', compute='customer_total_accounts', store=False)
+    global_pep_id = fields.Many2one(
+        'res.pep', string='Related Global PEP', tracking=True)
+
     address = fields.Char(string="Address", required=False, readonly=True)
     customer_title = fields.Char(string="Title", required=False, readonly=True)
     gender = fields.Char(string="Gender", required=False, readonly=True)
     marital_status = fields.Char(
         string="Marital Status", required=False, readonly=True)
-    employment_status = fields.Char(string="Employment Status", required=False,readonly=True)
-    state_residence = fields.Char(string="Region", required=False, readonly=True)
+    employment_status = fields.Char(
+        string="Employment Status", required=False, readonly=True)
+    state_residence = fields.Char(
+        string="Region", required=False, readonly=True)
     nin = fields.Char(
         string="National Identification Number (NIN)", required=False, readonly=True)
     customer_rating = fields.Char(
         string="Customer Rating", required=False, readonly=True)
     active = fields.Boolean(default=True, readonly=True)
-    
+
     is_greylist = fields.Boolean(
-        string="Is Greylist", default=False, tracking=True)   
-    
+        string="Is Greylist", default=False, tracking=True)
+
     origin = fields.Selection(string='Data Origin', selection=[('demo', 'Demo Data'), (
         'test', 'Test Data'), ('prod', 'Production Data')], index=True)
-    
+
+    first_risk_rating = fields.Char(string='Bank Risk Rating', index=True)
+    pep = fields.Char(string='Bank Pep Customer', index=True)
+    customer_phone = fields.Char(string='Phone Number(s)', index=True)
+
+    # phone = fields.Char(string='Phone Number(s)', index=True)
+    formatted_phone = fields.Char(
+        string='Phone Number(s)', compute='_compute_formatted_phone')
+
+    likely_sanction = fields.Boolean()
+    likely_pep = fields.Boolean()
+    branch_code = fields.Char(string="Branch Code")
     
     
     def action_create_case(self):
@@ -178,75 +208,395 @@ class Customer(models.Model):
         
         
         
+
+    # @api.depends('customer_phone')
+    # def _compute_formatted_phone(self):
+    #     for record in self:
+    #         if record.customer_phone and '^' in record.customer_phone:
+    #             record.formatted_phone = record.customer_phone.replace(
+    #                 '^', ', ')
+    #         else:
+    #             record.formatted_phone = record.customer_phone
+
+    def _compute_risk_scores(self):
+        """Cron job to precompute and store weighted average risk scores."""
+        # Clear existing records
+        self.env['customer.agg.risk.score'].search([]).unlink()
+
+        # Group customers by branch_id
+        customers = self.search([['internal_category', '=', 'customer'], ['origin', 'in', ['demo', 'test', 'prod']]])
+
+        grouped_data = {}
+        for record in customers:
+            group_key = record.branch_id
+            group_key_value = group_key.display_name if group_key else 'No Branch'
+            if group_key_value not in grouped_data:
+                grouped_data[group_key_value] = []
+            grouped_data[group_key_value].append(record)
+
+        # Compute and store weighted averages
+        for key, group_records in grouped_data.items():
+            total_customers = len(group_records)
+            formatted_key = f"{key}({total_customers})" if total_customers > 0 else key
+
+            if total_customers == 0:
+                weighted_avg = 0.0
+                
+            else:
+                risk_counts = {'low': 0, 'medium': 0, 'high': 0}
+                risk_scores = {'low': 0, 'medium': 0, 'high': 0}
+                for rec in group_records:
+                    risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
+                    risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
+                    risk_scores[risk_level] += rec.risk_score or 0.0
+                _logger.info("start of each branch calculation")
+                _logger.info(f"the risk_count is {risk_counts}")
+                _logger.info(f"the risk_scores is {risk_scores}")
+                
+                # Compute mean average per risk level
+                mean_avg_low = risk_scores['low'] / risk_counts['low'] if risk_counts['low'] > 0 else 0.0
+                mean_avg_medium = risk_scores['medium'] / risk_counts['medium'] if risk_counts['medium'] > 0 else 0.0
+                mean_avg_high = risk_scores['high'] / risk_counts['high'] if risk_counts['high'] > 0 else 0.0
+
+                _logger.info(f"the mean avg is {mean_avg_low} | {mean_avg_medium} | {mean_avg_high}")
+                _logger.info(f"total customer is {total_customers}")
+
+                weighted_avg = ((risk_counts['low'] * mean_avg_low) + 
+                            (risk_counts['medium'] * mean_avg_medium) + 
+                            (risk_counts['high'] * mean_avg_high)) / total_customers if total_customers > 0 else 0.0
+
+                _logger.info(f"for low risk level customer is {risk_counts['low']} and avg = {mean_avg_low} sum up to  {(risk_counts['low'] * mean_avg_low)}")
+                _logger.info(f"for medium risk level customer is {risk_counts['medium']} and avg = {mean_avg_medium} sum up to {(risk_counts['medium'] * mean_avg_medium)}")
+                _logger.info(f"for high risk level customer is {risk_counts['high']} and avg = {mean_avg_high} sum up to {(risk_counts['high'] * mean_avg_high)}")
+                
+                _logger.info(f"the weighted avg is {weighted_avg}")
+                _logger.info("end of each branch calculation")
+
+            # Store in customer.risk.score
+            branch = self.env['res.branch'].search([('name', '=', key)], limit=1)
+            self.env['customer.agg.risk.score'].create({
+                'branch_id': branch.id if branch else False,
+                'weighted_avg_risk_score': weighted_avg,
+                'total_customers': total_customers,
+                'formatted_name': formatted_key
+            })
+
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if not any(f in fields for f in ['risk_score']):
+            return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+        result = []
+        groupby_field = groupby[0] if groupby else None
+
+        if groupby_field == 'branch_id':
+            # Parse the orderby parameter to determine sorting
+            order_field = 'branch_id'  # Default order field
+            order_direction = 'ASC'    # Default direction
+            
+            if orderby:
+                # Handle multiple orderby fields separated by comma
+                orderby_parts = orderby.split(',')
+                for part in orderby_parts:
+                    part = part.strip()
+                    if 'risk_score' in part:
+                        order_field = 'weighted_avg_risk_score'
+                        order_direction = 'DESC' if 'DESC' in part.upper() else 'ASC'
+                        break
+                    elif 'branch_id' in part:
+                        order_field = 'branch_id'
+                        order_direction = 'DESC' if 'DESC' in part.upper() else 'ASC'
+                        break
+            
+            # Build the order string for the search
+            order_str = f"{order_field} {order_direction}"
+            
+            # Fetch precomputed data with pagination
+            risk_scores = self.env['customer.agg.risk.score'].search(
+                [], order=order_str, offset=offset, limit=limit
+            )
+            
+            # Get total count for pagination info
+            total_count = self.env['customer.agg.risk.score'].search_count([])
+            
+            for risk_score in risk_scores:
+                group_result = {
+                    'branch_id': risk_score.branch_id.display_name if risk_score.branch_id else False,
+                    'branch_id_count': risk_score.total_customers,
+                    'branch_id:formatted': risk_score.formatted_name,
+                    'risk_score': risk_score.weighted_avg_risk_score,
+                    '__count': risk_score.total_customers,
+                    '__domain': [('branch_id', '=', risk_score.branch_id.id if risk_score.branch_id else False)] + domain
+                }
+                # Only include requested fields
+                result.append(group_result)
+                
+            # Add pagination metadata if needed
+            if hasattr(result, '__dict__'):
+                result.__dict__['total_count'] = total_count
+                
+            return result
+        else:
+            # Fallback to super if grouping by a different field
+            return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+
+
+    # def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+    #     if 'risk_score' not in fields:
+    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+    #     # Fetch records matching the domain
+    #     records = self.search(domain)
+
+    #     if not records:
+    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+    #     # Initialize result
+    #     result = []
+    #     groupby_field = groupby[0] if groupby else None
+
+    #     if groupby_field:
+    #         # Group records by the specified field (e.g., branch_id)
+    #         grouped_data = {}
+    #         for record in records:
+    #             # Get the group key (handle Many2one fields)
+    #             group_key = record[groupby_field]
+    #             # Use display_name for Many2one fields to ensure proper formatting
+    #             group_key_value = (
+    #                 group_key.display_name if isinstance(group_key, models.Model)
+    #                 else group_key
+    #             )
+    #             if group_key_value not in grouped_data:
+    #                 grouped_data[group_key_value] = []
+    #             grouped_data[group_key_value].append(record)
+
+    #         # Compute weighted average for each group
+    #         for key, group_records in grouped_data.items():
+    #             total_customers = len(group_records)
+    #             # Format the group key with count, e.g., "67 Marina(3)"
+    #             formatted_key = f"{key}({total_customers})" if total_customers > 0 else key
+
+    #             # Calculate weighted average
+    #             if total_customers == 0:
+    #                 weighted_avg = 0.0
+    #             else:
+    #                 risk_counts = {'low': 0, 'medium': 0, 'high': 0}
+    #                 for rec in group_records:
+    #                     risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
+    #                     risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
+                        
+    #                 weighted_sum = sum(
+    #                     risk_counts[level] * self.RISK_SCORE_MAPPING.get(level, 0.0)
+    #                     for level in risk_counts
+    #                 )
+                   
+    #                 weighted_avg = weighted_sum / total_customers if total_customers > 0 else 0.0
+
+    #             key_id = self.env['res.branch'].search([('name', '=', key)], limit=1).id
+    #             # Build group result
+    #             group_result = {
+    #                 groupby_field: key,  # Use original key for domain and filtering
+    #                 groupby_field + ':formatted': formatted_key,  # Store formatted name
+    #                 'risk_score': weighted_avg,
+    #                 '__count': total_customers,
+    #                 '__domain': [(groupby_field, '=', key_id)] + domain
+    #             }
+    #             result.append(group_result)
+    #     else:
+    #         # No grouping: compute weighted average for all records
+    #         total_customers = len(records)
+    #         if total_customers == 0:
+    #             weighted_avg = 0.0
+    #         else:
+    #             risk_counts = {'low': 0, 'medium': 0, 'high': 0}
+    #             for rec in records:
+    #                 risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
+    #                 risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
+    #             weighted_sum = sum(
+    #                 risk_counts[level] * self.RISK_SCORE_MAPPING.get(level, 0.0)
+    #                 for level in risk_counts
+    #             )
+    #             weighted_avg = weighted_sum / total_customers if total_customers > 0 else 0.0
+
+    #         result.append({
+    #             'risk_score': weighted_avg,
+    #             '__count': total_customers,
+    #             '__domain': domain
+    #         })
+        
+
+    #     return result
+
+    @api.depends('customer_phone')
+    def _compute_formatted_phone(self):
+        for record in self:
+            if not record.customer_phone:
+                record.formatted_phone = False
+                continue
+                
+            # Get the original phone number
+            phone = record.customer_phone
+            
+            # Step 1: Strip any trailing or leading commas
+            phone = phone.strip(',')
+            
+            # Step 2: Replace ^ with comma
+            phone = phone.replace('^', ',')
+            
+            # Step 3: Split by comma, clean each part, and rejoin with proper formatting
+            parts = [part.strip() for part in phone.split(',')]
+            
+            # Step 4: Filter out empty parts
+            parts = [part for part in parts if part]
+            
+            # Step 5: Join with comma+space
+            formatted = ', '.join(parts)
+            
+            record.formatted_phone = formatted
+
     
-    # is_branch_compliance = fields.Boolean(
-    #     string="Is Branch Compliance Officer",
-    #     compute="_compute_is_branch_compliance"
-    # )
-     
 
-
+    @api.model
     def cron_run_risk_assessment(self):
-        self.update_sanction_status()
-        self.compute_risk_score_for_all_users()
+        """
+        Main entry point for risk assessment cron job with protection against
+        concurrent execution.
+        """
+        # Get a timestamp to use as a unique identifier
+        cron_name = "risk_assessment_cron"
+        cron_record = self.env.ref(
+            'compliance_management.ir_cron_run_risk_assessment')
 
+        # Check if the cron is already running
+        if cron_record.nextcall and fields.Datetime.from_string(cron_record.nextcall) > fields.Datetime.now():
+            _logger.info(
+                "Risk assessment job already running or scheduled, skipping this run")
+            return False
+
+        try:
+            # Set the nextcall far in the future to prevent new runs starting
+
+            # cron_record.write({
+            #     'nextcall': fields.Datetime.now() + timedelta(hours=24)
+            # })
+            # self.env.cr.commit()
+
+            _logger.info("Starting scheduled risk assessment process")
+            results = {'sanction_status': {}, 'risk_scores': 0}
+
+            try:
+                results['sanction_status'] = self.update_sanction_status()
+                _logger.info("Sanction status update completed successfully")
+            except Exception as e:
+                _logger.error(
+                    f"Error in update_sanction_status: {str(e)}", exc_info=True)
+
+            try:
+                results['risk_scores'] = self.compute_risk_score_for_all_users()
+                _logger.info("Risk score computation completed successfully")
+            except Exception as e:
+                _logger.error(
+                    f"Error in compute_risk_score_for_all_users: {str(e)}", exc_info=True)
+
+            _logger.info(f"Completed full risk assessment process: {results}")
+            return results
+
+        finally:
+            # Reset the nextcall to 5 minutes from now
+            next_run = fields.Datetime.now() + timedelta(minutes=5)
+            cron_record.write({
+                'nextcall': next_run
+            })
+            self.env.cr.commit()
 
     def update_sanction_status(self):
-        _logger.info("Starting PEP status check using SQL query.")
+        _logger.info("Starting PEP status check using Odoo ORM for tracking.")
 
-        # Fetch first and last names from res_partner
-        query_fetch = """
-            SELECT id, firstname, lastname 
-            FROM res_partner
-            WHERE firstname IS NOT NULL AND lastname IS NOT NULL
-        """
-        self.env.cr.execute(query_fetch)
-        partners = self.env.cr.fetchall()
+        # Process in batches to avoid memory issues
+        batch_size = 1000
+        processed = 0
 
-        if not partners:
-            _logger.info("No customers found in res_partner.")
-            return
+        # Step 1: Find matches using SQL but let ORM handle the writes
 
-        # Prepare a set of unique full names
-        full_names = list(set(f"{first} {last}" for _, first, last in partners))
-        _logger.info(f"Unique customer full names: {full_names}")
+        # Update global_pep from res_pep
+        self.env.cr.execute("""
+            SELECT rp.id 
+            FROM res_partner rp
+            JOIN res_pep pep ON LOWER(TRIM(rp.firstname)) || ' ' || LOWER(TRIM(rp.lastname)) = LOWER(TRIM(pep.name))
+            WHERE rp.firstname IS NOT NULL AND rp.lastname IS NOT NULL
+        """)
+        global_pep_ids = [r[0] for r in self.env.cr.fetchall()]
 
-        #  DB Update
+        # Process global_pep matches in batches
+        total_pep = len(global_pep_ids)
+        _logger.info(f"Found {total_pep} partners matching PEP records")
 
-    #   Update global_pep from res_pep
-        query_update_pep = """
-            UPDATE res_partner
-            SET global_pep = True
-            FROM res_pep
-            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = LOWER(TRIM(res_pep.name))
-        """
-        self.env.cr.execute(query_update_pep)
+        for i in range(0, total_pep, batch_size):
+            batch = global_pep_ids[i:i+batch_size]
+            partners = self.env['res.partner'].browse(batch)
+            partners.write({'global_pep': True})
+            self.env.cr.commit()  # Commit each batch
+            processed += len(batch)
+            _logger.info(
+                f"Updated global_pep for {processed}/{total_pep} partners")
 
-        #  Update is_blacklist from res_partner_blacklist
-        query_update_blacklist = """
-            UPDATE res_partner
-            SET is_blacklist = TRUE
-            FROM res_partner_blacklist
-            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) = 
-            LOWER(TRIM(res_partner_blacklist.first_name)) || ' ' || LOWER(TRIM(res_partner_blacklist.surname))
-        """
-        self.env.cr.execute(query_update_blacklist)
+        # Update is_blacklist from res_partner_blacklist
+        self.env.cr.execute("""
+            SELECT rp.id 
+            FROM res_partner rp
+            JOIN res_partner_blacklist bl ON LOWER(TRIM(rp.firstname)) || ' ' || LOWER(TRIM(rp.lastname)) = 
+                                            LOWER(TRIM(bl.first_name)) || ' ' || LOWER(TRIM(bl.surname))
+            WHERE rp.firstname IS NOT NULL AND rp.lastname IS NOT NULL
+        """)
+        blacklist_ids = [r[0] for r in self.env.cr.fetchall()]
+
+        # Process blacklist matches in batches
+        total_blacklist = len(blacklist_ids)
+        processed = 0
+        _logger.info(
+            f"Found {total_blacklist} partners matching blacklist records")
+
+        for i in range(0, total_blacklist, batch_size):
+            batch = blacklist_ids[i:i+batch_size]
+            partners = self.env['res.partner'].browse(batch)
+            partners.write({'is_blacklist': True})
+            self.env.cr.commit()  # Commit each batch
+            processed += len(batch)
+            _logger.info(
+                f"Updated is_blacklist for {processed}/{total_blacklist} partners")
 
         # Update is_watchlist from res_partner_watchlist
-        query_update_watchlist = """
-            UPDATE res_partner
-            SET is_watchlist = TRUE
-            FROM res_partner_watchlist
-            WHERE LOWER(TRIM(res_partner.firstname)) || ' ' || LOWER(TRIM(res_partner.lastname)) =
-            LOWER(TRIM(res_partner_watchlist.first_name)) || ' ' || LOWER(TRIM(res_partner_watchlist.surname))
-        """
-        self.env.cr.execute(query_update_watchlist)
+        self.env.cr.execute("""
+            SELECT rp.id 
+            FROM res_partner rp
+            JOIN res_partner_watchlist wl ON LOWER(TRIM(rp.firstname)) || ' ' || LOWER(TRIM(rp.lastname)) = 
+                                            LOWER(TRIM(wl.first_name)) || ' ' || LOWER(TRIM(wl.surname))
+            WHERE rp.firstname IS NOT NULL AND rp.lastname IS NOT NULL
+        """)
+        watchlist_ids = [r[0] for r in self.env.cr.fetchall()]
 
-        self.env.cr.commit()
-        _logger.info("Sanction status update completed for global_pep, blacklist, and watchlist.")
+        # Process watchlist matches in batches
+        total_watchlist = len(watchlist_ids)
+        processed = 0
+        _logger.info(
+            f"Found {total_watchlist} partners matching watchlist records")
 
+        for i in range(0, total_watchlist, batch_size):
+            batch = watchlist_ids[i:i+batch_size]
+            partners = self.env['res.partner'].browse(batch)
+            partners.write({'is_watchlist': True})
+            self.env.cr.commit()  # Commit each batch
+            processed += len(batch)
+            _logger.info(
+                f"Updated is_watchlist for {processed}/{total_watchlist} partners")
 
-    # industry =
+        _logger.info(
+            "Sanction status update completed for global_pep, blacklist, and watchlist.")
+        return {
+            'global_pep_updated': len(global_pep_ids),
+            'blacklist_updated': len(blacklist_ids),
+            'watchlist_updated': len(watchlist_ids)
+        }
 
     def init(self):
         # Drop the trigger if it exists
@@ -254,7 +604,6 @@ class Customer(models.Model):
             "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
-
 
         # Create the trigger
         self.env.cr.execute("""
@@ -354,7 +703,7 @@ class Customer(models.Model):
             FOR EACH ROW
             EXECUTE FUNCTION set_partner_defaults_func();
         """)
-        
+
         # Create AFTER INSERT trigger for commercial_partner_id
         self.env.cr.execute("""
             CREATE OR REPLACE FUNCTION set_partner_defaults_after_func()
@@ -373,12 +722,20 @@ class Customer(models.Model):
             FOR EACH ROW
             EXECUTE FUNCTION set_partner_defaults_after_func();
         """)
-        
-    
+
     @api.model_create_multi
     def create(self, vals_list):
         # Create records
         records = super(Customer, self).create(vals_list)
+
+        # Trigger notification for UI refresh
+        self.env['bus.bus']._sendmany([
+            ('dashboard_refresh_channel', 'refresh', {
+                'type': 'refresh',
+                'channelName': 'dashboard_refresh_channel',
+                'model': self._name
+            })
+        ])
 
         # Create a context to prevent recursion
         new_ctx = dict(self.env.context, computing_risk=True)
@@ -405,6 +762,15 @@ class Customer(models.Model):
         # Apply updates from vals
         result = super(Customer, self).write(vals)
 
+        # Trigger notification for UI refresh
+        self.env['bus.bus']._sendmany([
+            ('dashboard_refresh_channel', 'refresh', {
+                'type': 'refresh',
+                'channelName': 'dashboard_refresh_channel',
+                'model': self._name
+            })
+        ])
+
         # Only update risk scores if we're not already in a risk score update
         # This prevents recursion
         if not self.env.context.get('computing_risk', False):
@@ -412,30 +778,30 @@ class Customer(models.Model):
             new_ctx = dict(self.env.context, computing_risk=True)
             self = self.with_context(new_ctx)
 
-            # Update risk score and level for all records
-            for record in self:
-                score = record._get_risk_score_from_plan()
-                risk_level = record.compute_risk_level()
+            # # Update risk score and level for all records
+            # for record in self:
+            #     score = record._get_risk_score_from_plan()
+            #     risk_level = record.compute_risk_level()
 
-                # Use direct SQL update to avoid triggering write() again
-                self.env.cr.execute(
-                    """UPDATE %s SET risk_score = %%s, risk_level = %%s 
-                    WHERE id = %%s""" % self._table,
-                    (score, risk_level, record.id)
-                )
+            #     # Use direct SQL update to avoid triggering write() again
+            #     self.env.cr.execute(
+            #         """UPDATE %s SET risk_score = %%s, risk_level = %%s
+            #         WHERE id = %%s""" % self._table,
+            #         (score, risk_level, record.id)
+            #     )
 
-                # Invalidate cache for these fields
-                record.invalidate_recordset(['risk_score', 'risk_level'])
-                # record.invalidate_cache(['risk_score', 'risk_level'])
+            #     # Invalidate cache for these fields
+            #     record.invalidate_recordset(['risk_score', 'risk_level'])
+            # record.invalidate_cache(['risk_score', 'risk_level'])
 
         return result
-        
+
     def scan_news_articles(self):
         """Trigger news scanning via adverse.media"""
         self.ensure_one()  # Ensure we're working with a single record
         # adverse_media = self.adverse_media_id
         # if not adverse_media:
-            # Create or find an adverse.media record if no direct link exists
+        # Create or find an adverse.media record if no direct link exists
         adverse_media = self.env['adverse.media'].search(
             [('partner_id', '=', self.id)], limit=1)
         if not adverse_media:
@@ -447,13 +813,20 @@ class Customer(models.Model):
 
         # Call the original method from adverse.media
         return adverse_media.scan_news_articles()
-    
-    @api.depends('account_ids')
-    def _total_accounts(self):
+
+    # @api.depends('account_ids')
+    # def _total_accounts(self):
+    #     for e in self:
+    #         e.total_accounts = len(e.account_ids)
+
+    @api.depends('res_partner_account_ids')
+    def customer_total_accounts(self):
         for e in self:
-            e.total_accounts = len(e.account_ids)
+            e.total_accounts = len(e.res_partner_account_ids)
 
     def action_total_accounts(self):
+        print(self.id)
+        print(self.id)
         return {
             'name': _('Accounts'),
             'type': 'ir.actions.act_window',
@@ -462,7 +835,7 @@ class Customer(models.Model):
             'domain': [('customer_id.id', 'in', [self.id])],
             'context': {'search_default_group_branch': 1}
         }
-        
+
     def action_risk_level(self):
         return {
             'type': 'ir.actions.client',
@@ -482,9 +855,22 @@ class Customer(models.Model):
                     return 'high'
             except:
                 return 'low'
-    
+
+    def compute_customer_rating(self, score):
+        try:
+            if score is None:
+                return 'low'
+            if score <= LOW_RISK_THRESHOLD:
+                return 'low'
+            if score <= MEDIUM_RISK_THRESHOLD:
+                return 'medium'
+            if score <= HIGH_RISK_THRESHOLD:
+                return 'high'
+        except:
+            return 'low'
+
     @api.model
-    def _get_risk_level_from_score(self,risk_score):
+    def _get_risk_level_from_score(self, risk_score):
         try:
             if risk_score is None:
                 return 'low'
@@ -496,7 +882,7 @@ class Customer(models.Model):
                 return 'high'
         except:
             return 'low'
-        
+
     @api.model
     def update_partner_risk_levels(self):
         """
@@ -507,10 +893,10 @@ class Customer(models.Model):
         for partner in partners:
             risk_score = partner.risk_score  # Assuming risk_score is a field on res.partner
             risk_level = self._get_risk_level_from_score(risk_score)
-            partner.write({'risk_level': risk_level})  # Assuming risk_level is a field on res.partner
-        
+            # Assuming risk_level is a field on res.partner
+            partner.write({'risk_level': risk_level})
+
         return True
-    
 
     def _get_current_branch(self):
         for record in self:
@@ -524,10 +910,10 @@ class Customer(models.Model):
             'view_mode': 'form',
             'context': {"default_customer_id": self.id},
         }
-    
+
     def action_unmark_pep(self):
         for e in self:
-            e.write({'is_pep':False,'global_pep':False,'global_pep_id': None})
+            e.write({'is_pep': False, 'global_pep': False, 'global_pep_id': None})
             e.action_compute_risk_score_with_plan()
 
     def action_add_pep(self):
@@ -585,22 +971,10 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
+            'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]), ('internal_category', '=', 'customer')],
             'context': {'search_default_group_branch': 1}
         }
 
-    # @api.model
-    # def open_customers(self):
-    #     return {
-    #         'name': _('Customers'),
-    #         'type': 'ir.actions.act_window',
-    #         'res_model': 'res.partner',
-    #         'view_mode': 'tree,form',
-    #         'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),('internal_category','=','customer')],
-    #         # 'domain': [('internal_category','=','customer')],
-    #         'context': {'search_default_group_branch': 1}
-    #     }
-        
     @api.model
     def open_customers(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -610,13 +984,16 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'customer')]
+            domain = [('internal_category', '=', 'customer'),
+                      ('origin', 'in', ['demo', 'test', 'prod'])]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
-                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'customer')
-                
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id]),
+                ('internal_category', '=', 'customer'),
+                ('origin', 'in', ['demo', 'test', 'prod'])
+
 
             ]
 
@@ -628,7 +1005,7 @@ class Customer(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-        
+
     @api.model
     def open_vendors(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -638,14 +1015,16 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'vendor')]
+            domain = [('internal_category', '=', 'vendor'),
+                      ('origin', 'in', ['demo', 'test', 'prod'])]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'vendor')
-              
+                ('internal_category', '=', 'vendor'), ('origin',
+                                                       'in', ['demo', 'test', 'prod'])
+
             ]
 
         return {
@@ -657,8 +1036,6 @@ class Customer(models.Model):
             'context': {'search_default_group_branch': 1}
         }
 
-      
-    
     @api.model
     def open_partners(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -674,7 +1051,8 @@ class Customer(models.Model):
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'partner')
+                ('internal_category', '=', 'partner'), ('origin',
+                                                        'in', ['demo', 'test', 'prod'])
             ]
 
         return {
@@ -685,8 +1063,7 @@ class Customer(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-       
-    
+
     @api.model
     def open_correspondents(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -696,13 +1073,14 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'correspondent')]
+            domain = [('internal_category', '=', 'correspondent'),
+                      ('origin', 'in', ['demo', 'test', 'prod'])]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'correspondent')]
+                ('internal_category', '=', 'correspondent'), ('origin', 'in', ['demo', 'test', 'prod'])]
 
         return {
             'name': _('Correspondents'),
@@ -712,8 +1090,7 @@ class Customer(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-       
-    
+
     @api.model
     def open_respondents(self):
         # Check if the current user belongs to the Chief Compliance Officer group
@@ -723,13 +1100,15 @@ class Customer(models.Model):
         # Set domain based on user group
         if is_chief_compliance_officer:
             # Chief Compliance Officers see all customers
-            domain = [('internal_category', '=', 'respondent')]
+            domain = [('internal_category', '=', 'respondent'),
+                      ('origin', 'in', ['demo', 'test', 'prod'])]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
                  e.id for e in self.env.user.branches_id]),
-                ('internal_category', '=', 'respondent')
+                ('internal_category', '=', 'respondent'),
+                ('origin', 'in', ['demo', 'test', 'prod'])
 
             ]
 
@@ -741,14 +1120,59 @@ class Customer(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-        
+
+    @api.model
+    def action_view_likely_sanction_customer(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        domain = [('origin', 'in', ['demo', 'test', 'prod']),
+                  ('likely_sanction', '=', True)]
+
+        # Set domain based on user group
+        if not is_chief_compliance_officer:
+            domain.append(('branch_id.id', 'in', [
+                e.id for e in self.env.user.branches_id]))
+
+        return {
+            'name': _('Customers on the Santions List'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {'search_default_group_branch': 1}
+        }
+
+    @api.model
+    def action_view_global_pep_customer(self):
+        # Check if the current user belongs to the Chief Compliance Officer group
+        is_chief_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
+        domain = [('origin', 'in', ['demo', 'test', 'prod']),
+                  ('likely_pep', '=', True)]
+
+        # Set domain based on user group
+        if not is_chief_compliance_officer:
+            domain.append(('branch_id.id', 'in', [
+                e.id for e in self.env.user.branches_id]))
+
+        return {
+            'name': _('Customers on the Global PEP List'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {'search_default_group_branch': 1}
+        }
 
     def get_risk_score(self):
         return self.risk_score
 
     def get_risk_level(self):
         return self.risk_level
-    
+
     @api.depends('risk_score')
     def _compute_risk_level(self):
         for record in self:
@@ -758,10 +1182,7 @@ class Customer(models.Model):
                 record.risk_level = "medium"
             else:
                 record.risk_level = "high"
-    
-                
-                
-                
+
     @api.onchange('risk_score')
     def _onchange_risk_score(self):
         if self.risk_score <= LOW_RISK_THRESHOLD:
@@ -771,55 +1192,112 @@ class Customer(models.Model):
         else:
             self.risk_level = "high"
 
-
-
     def get_risk_level_name(self):
         return '%s risk' % (self.risk_level)
 
-   
-
     # logic to commpute total risk sore of all users
+
+    # @api.model
+    # def compute_risk_score_for_all_users(self):
+    #     records = self.search([])
+    #     for record in records:
+    #         score = record._get_risk_score_from_plan()
+    #         risk_level = record.compute_risk_level()
+
+    #         # Use direct SQL update to avoid triggering write()
+    #         self.env.cr.execute(
+    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s
+    #             WHERE id = %%s""" % self._table,
+    #             (score, risk_level, record.id)
+    #         )
+
+    #         # Invalidate cache for these fields
+    #         # record.invalidate_cache(['risk_score', 'risk_level'])
+    #         record.invalidate_recordset(['risk_score', 'risk_level'])
+
+    #     return True
+
     @api.model
     def compute_risk_score_for_all_users(self):
-        records = self.search([])
-        for record in records:
-            score = record._get_risk_score_from_plan()
-            risk_level = record.compute_risk_level()
-            
+        _logger.info(
+            "Starting risk score computation for all users with ORM tracking")
 
-            # Use direct SQL update to avoid triggering write()
-            self.env.cr.execute(
-                """UPDATE %s SET risk_score = %%s, risk_level = %%s 
-                WHERE id = %%s""" % self._table,
-                (score, risk_level, record.id)
-            )
+        # Configuration
+        batch_size = 500  # Smaller batch size since ORM operations are heavier
+        total_processed = 0
+        total_records = self.search_count([])
 
-            # Invalidate cache for these fields
-            # record.invalidate_cache(['risk_score', 'risk_level'])
-            record.invalidate_recordset(['risk_score', 'risk_level'])
+        # Process in batches to reduce memory usage
+        offset = 0
+        while offset < total_records:
+            # Get batch of records
+            batch = self.search([], limit=batch_size, offset=offset)
 
+            # Group records by risk score and level for bulk processing
+            groups = {}
+            for record in batch:
+                score = record._get_risk_score_from_plan()
+                risk_level = self.compute_customer_rating(score)
+                key = (score, risk_level)
+                if key not in groups:
+                    groups[key] = self.env[self._name]
+                groups[key] |= record
+
+            # Use ORM write for each group of records with same values
+            for (score, risk_level), records in groups.items():
+                records.write({
+                    'risk_score': score,
+                    'risk_level': risk_level
+                })
+
+            # Commit transaction to free memory
+            self.env.cr.commit()
+
+            # Update progress
+            total_processed += len(batch)
+            _logger.info(
+                f"Processed risk scores: {total_processed}/{total_records}")
+
+            # Move to next batch
+            offset += batch_size
+
+        _logger.info(
+            f"Completed risk score computation for {total_processed} users")
         return True
-    
+
+    # def action_compute_risk_score_with_plan(self):
+    #     """Manual action to compute risk score"""
+    #     for record in self:
+    #         score = record._get_risk_score_from_plan()
+    #         risk_level = record.compute_risk_level()
+
+    #         # Use direct SQL update to avoid triggering write()
+    #         self.env.cr.execute(
+    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s
+    #             WHERE id = %%s""" % self._table,
+    #             (score, risk_level, record.id)
+    #         )
+
+    #         # Invalidate cache for these fields
+    #         record.invalidate_recordset(['risk_score', 'risk_level'])
+
+    #     return True
+
     def action_compute_risk_score_with_plan(self):
-        """Manual action to compute risk score"""
+        """Manual action to compute risk score using ORM for proper tracking"""
         for record in self:
+            # Calculate the risk score and level
             score = record._get_risk_score_from_plan()
-            risk_level = record.compute_risk_level()
+            risk_level = self.compute_customer_rating(score)
 
-            # Use direct SQL update to avoid triggering write()
-            self.env.cr.execute(
-                """UPDATE %s SET risk_score = %%s, risk_level = %%s 
-                WHERE id = %%s""" % self._table,
-                (score, risk_level, record.id)
-            )
-
-            # Invalidate cache for these fields
-            record.invalidate_recordset(['risk_score', 'risk_level'])
+            # Use ORM write method to update and track changes
+            record.sudo().write({
+                'risk_score': score,
+                'risk_level': risk_level
+            })
 
         return True
-        
-        
-    
+
     def _get_risk_score_from_plan(self):
         setting = self.env['res.compliance.settings'].search(
             [('code', '=', 'risk_plan_computation')], limit=1)
@@ -893,5 +1371,4 @@ class Customer(models.Model):
     #     # Set domain based on user group
     #     for record in self:
     #         record.is_branch_compliance = is_branch_compliance_officer
-            
-        
+
