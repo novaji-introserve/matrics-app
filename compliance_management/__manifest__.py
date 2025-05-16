@@ -75,9 +75,22 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-        # "data/charts.xml",
+        "data/charts.xml",
         "views/res_users.xml",
-        "data/aggregate_score.xml"
+        "data/aggregate_score.xml",
+        # demo data
+        'data/gender.xml',
+        'data/identification_type.xml',
+        'data/compliance_stats.xml',
+        'data/settings.xml',
+        'data/risk_plan.xml',
+        'data/customer_product.xml',
+        'data/sectors.xml',
+        'data/education_level.xml',
+        'data/account_types.xml',
+        'data/risk_category.xml'
+
+
     ],
     # only loaded in demonstration mode
     "demo": [

@@ -39,9 +39,9 @@
                             <field name="auth_username" attrs="{'invisible': [('auth_type', '!=', 'basic')], 'required': [('auth_type', '=', 'basic')]}"/>
                             <field name="auth_password" attrs="{'invisible': [('auth_type', '!=', 'basic')], 'required': [('auth_type', '=', 'basic')]}"/>
                             <field name="auth_token" attrs="{'invisible': [('auth_type', '!=', 'bearer')], 'required': [('auth_type', '=', 'bearer')]}"/>
-                            <field name="auth_key_name" attrs="{'invisible': [('auth_type', '!=', 'api_key')], 'required': [('auth_type', '=', 'api_key')]}"/>
-                            <field name="auth_key_value" attrs="{'invisible': [('auth_type', '!=', 'api_key')], 'required': [('auth_type', '=', 'api_key')]}"/>
-                            <field name="auth_key_in" attrs="{'invisible': [('auth_type', '!=', 'api_key')], 'required': [('auth_type', '=', 'api_key')]}"/>
+                            <field name="auth_api_key" attrs="{'invisible': [('auth_type', '!=', 'api_key')], 'required': [('auth_type', '=', 'api_key')]}"/>
+                            <!-- <field name="auth_key_value" attrs="{'invisible': [('auth_type', '!=', 'api_key')], 'required': [('auth_type', '=', 'api_key')]}"/> -->
+                            <!-- <field name="auth_key_in" attrs="{'invisible': [('auth_type', '!=', 'api_key')], 'required': [('auth_type', '=', 'api_key')]}"/> -->
                         </group>
                     </group>
                     <notebook>

@@ -53,12 +53,7 @@ class ApiRequest(models.Model):
     auth_username = fields.Char(string='Username')
     auth_password = fields.Char(string='Password')
     auth_token = fields.Char(string='Token')
-    auth_key_name = fields.Char(string='Key Name')
-    auth_key_value = fields.Char(string='Key Value')
-    auth_key_in = fields.Selection([
-        ('header', 'Header'),
-        ('query', 'Query Parameter'),
-    ], string='Key In', default='header')
+    auth_api_key = fields.Char(string='API Key')
     
     attachment_ids = fields.Many2many('ir.attachment', string='Attachments')
 
@@ -85,8 +80,9 @@ class ApiRequest(models.Model):
             headers['Authorization'] = f"Basic {base64.b64encode(auth_string.encode()).decode()}"
         elif self.auth_type == 'bearer':
             headers['Authorization'] = f"Bearer {self.auth_token}"
-        elif self.auth_type == 'api_key' and self.auth_key_in == 'header':
-            headers[self.auth_key_name] = self.auth_key_value
+        elif self.auth_type == 'api_key':
+            headers['x-api-key'] = self.auth_api_key
+    
 
         # Prepare parameters
         params = {}
@@ -97,8 +93,8 @@ class ApiRequest(models.Model):
                 raise UserError(_("Invalid JSON format in parameters"))
         
         # Add API key auth if it's in query params
-        if self.auth_type == 'api_key' and self.auth_key_in == 'query':
-            params[self.auth_key_name] = self.auth_key_value
+        if self.auth_type == 'api_key':
+            params['api_key'] = self.auth_api_key
 
 
         # Prepare request body

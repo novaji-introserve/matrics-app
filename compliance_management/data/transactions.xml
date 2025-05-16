@@ -717,5 +717,49 @@
             <field name="inputter">SYSTEM</field>
             <field name="authorizer">SYSTEM</field>
         </record> 
+
+        <record id="demo_transaction_39" model="res.customer.transaction">
+            <field name="name">TXN0220009012-001</field>
+            <field name="account_id" ref="demo_account_37"/>
+            <!-- <field name="currency">NGN</field> -->
+            <field name="date_created" eval="(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
+            <field name="customer_id" ref="demo_data_28"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020039"/>
+            <field name="amount">45000.00</field>
+            <!-- <field name="tran_type" ref="res_transaction_type_credit"/> Assuming this exists -->
+            <field name="narration">Salary payment</field>
+            <field name="transaction_type">C</field>
+            <field name="branch_code">0020039</field>
+            <field name="state">done</field>
+        </record>
+
+        <record id="demo_transaction_40" model="res.customer.transaction">
+            <field name="name">TXN0220009012-002</field>
+            <field name="account_id" ref="demo_account_37"/>
+            <field name="currency">NGN</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')"/>
+            <field name="customer_id" ref="demo_data_28"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020039"/>
+            <field name="amount">30000.00</field>
+            <!-- <field name="tran_type" ref="res_transaction_type_debit"/> Assuming this exists -->
+            <field name="narration">ATM withdrawal</field>
+            <field name="transaction_type">D</field>
+            <field name="branch_code">0020039</field>
+            <field name="state">done</field>
+        </record>
+
+        <record id="demo_transaction_41" model="res.customer.transaction">
+            <field name="name">TXN0330000123-001</field>
+            <field name="account_id" ref="demo_account_38"/>
+            <field name="currency">NGN</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(days=3)).strftime('%Y-%m-%d')"/>
+            <field name="customer_id" ref="demo_data_29"/>
+            <field name="branch_id" ref="compliance_management.res_branch_0020039"/>
+            <field name="amount">75000.00</field>
+            <!-- <field name="tran_type" ref="res_transaction_type_credit"/> -->
+            <field name="narration">Business payment</field>
+            <field name="transaction_type">C</field>
+            <field name="branch_code">0020039</field>
+        </record>
     </data>
 </odoo>

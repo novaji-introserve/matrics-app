@@ -579,10 +579,6 @@
             <field name="customer_id">0101</field>
 
 
-
-
-
-
         </record>
 
         <record id="demo_data_26" model="res.partner">
