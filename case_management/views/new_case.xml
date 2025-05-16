@@ -27,7 +27,8 @@
                         <field name="user_id" invisible="1"/>
                         <field name="created_at" string="Case Creation Date" invisible="1"/>
                         <field name="event_date"/>
-                        <field name="transaction_reference"/>
+                        <field name="transaction_id"/>
+                        <!-- <field name="transaction_reference" readonly="1"/> -->
                         <field name="cases_description" widget="html"/>
                         <field name="data_source" invisible="1"/>
                     </group>

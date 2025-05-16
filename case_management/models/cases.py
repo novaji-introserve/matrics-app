@@ -125,20 +125,21 @@ class Cases(models.Model):
 
     # Basic Info
     name = fields.Char(string="Name", compute='_compute_name', store=True, tracking=True)
-    # Reference to Transaction model from compliance_management module
+   # Reference to Transaction model with ondelete parameter
     transaction_id = fields.Many2one(
-        comodel_name='res.customer.transaction',  # This is the _name of the Transaction model
-        string='Related Transaction',
-        index=True
+        comodel_name='res.customer.transaction',
+        string='Transaction Reference',
+        index=True,
+        ondelete='restrict'
     )
     
-    # Related field to access transaction name
-    transaction_reference = fields.Char(
-        string='Transaction Reference Number',
-        related='transaction_id.name',
-        store=True,  # Optional: store the value in database
-        readonly=False
-    )
+    # transaction_reference = fields.Char(
+    #     string='Transaction Reference Number',
+    #     related='transaction_id.name',
+    #     store=True,
+    #     readonly=True
+    # )
+    
     #transaction_reference = fields.Char(string='Transaction Reference')
     #transaction_reference = fields.Many2one('res.customer.transaction', string='Transaction Reference', required=False)
    #cases_description = fields.Text(string='Narration', compute='_compute_description', store=True)
@@ -238,7 +239,13 @@ class Cases(models.Model):
 
     
     
-        
+    # @api.depends('transaction_id')
+    # def _compute_name(self):
+    #     for record in self:
+    #         if record.transaction_id:
+    #             record.name = f"Case for {record.transaction_id.name or 'Unknown Transaction'}"
+    #         else:
+    #             record.name = f"Case {record.id}" if record.id else "New Case"
         
     
     # is_creator = fields.Boolean(compute='_compute_user_roles', store=True)

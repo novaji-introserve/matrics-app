@@ -9,8 +9,8 @@
         <field name="arch" type="xml">
             <tree create="false" edit="false" delete="false">
                 <field name="name" invisible='1'/>
-                <field name="transaction_id" invisible='1'/>
-                <field name="transaction_reference" invisible="1"/>
+                <field name="transaction_id" invisible="1" />
+                <!-- <field name="transaction_reference" invisible="1"/> -->
                 <field name="customer_id" invisible="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
                 <field name="title_html" string= "Severity" readonly="1" widget="html"/>
@@ -40,7 +40,7 @@
             <tree create="false" edit="false" delete="false">
                 <field name="name" invisible='1'/>
                 <field name="transaction_id" invisible='1'/>
-                <field name="transaction_reference" invisible='1'/>
+                <!-- <field name="transaction_reference" invisible='1'/> -->
                 <field name="customer_id" invisible="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
                 <field name="title_html" string= "Severity" readonly="1" widget="html"/>
@@ -64,7 +64,7 @@
         <field name="arch" type="xml">
             <tree create="false" edit="false" delete="false">
                 <field name="name" invisible='1'/>
-                <field name="transaction_reference" invisible="1"/>
+                <!-- <field name="transaction_reference" invisible="1"/> -->
                 <field name="transaction_id" invisible="1"/>
                 <field name="customer_id" invisible="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
@@ -110,8 +110,8 @@
                             <field name="event_date_formatted_datetime" widget="text"/>
                             <field name="branch_id" readonly="1"/>
                             <field name="team_id" readonly="1"/>
-                            <field name="transaction_id" invisible='1'/>
-                            <field name="transaction_reference" attrs="{'invisible': [('transaction_id', '=', False)]}" readonly='1'/>
+                            <!-- <field name="transaction_id" invisible='1'/> -->
+                            <field name="transaction_id" attrs="{'invisible': [('transaction_id', '=', False)]}" readonly='1'/>
                             <field name="data_source" readonly="1" invisible="1"/>
                             <field name="cases_action" string="Recommended Action" readonly="1"/>
                             <field name="title" string="Severity" invisible="1" readonly="1" />
@@ -329,7 +329,7 @@
                             <field name="branch_id" readonly="1"/>
                             <field name="team_id" readonly="1"/>
                             <field name="transaction_id" invisible='1'/>
-                            <field name="transaction_reference" attrs="{'invisible': [('transaction_id', '=', False)]}" readonly='1'/>
+                            <field name="transaction_id" attrs="{'invisible': [('transaction_id', '=', False)]}" readonly='1'/>
                             <field name="data_source" readonly="1" invisible="1"/>
                             <field name="cases_action" string="Recommended Action" readonly="1" widget="html"/>
                         </group>
@@ -438,7 +438,7 @@
             <field name="branch_id" position="attributes">
                 <attribute name="string">Branch</attribute>
             </field>
-            <field name="transaction_reference" position="attributes">
+            <field name="transaction_id" position="attributes">
                 <attribute name="string">Transaction Reference</attribute>
             </field>
             <notebook position="replace">
