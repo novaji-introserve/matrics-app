@@ -88,7 +88,9 @@
         'data/sectors.xml',
         'data/education_level.xml',
         'data/account_types.xml',
-        'data/risk_category.xml'
+        'data/risk_category.xml',
+        'data/watchlist.xml',
+        'data/blacklist.xml',
 
 
     ],
