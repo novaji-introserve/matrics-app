@@ -202,8 +202,28 @@ class Cases(models.Model):
     supervisor_two_id = fields.Many2one('res.users', string='Supervisor Two')
     supervisor_three_id = fields.Many2one('res.users', string='Supervisor Three')
     alert_id = fields.Many2one('alert', string='Alert')
-    process_category_id = fields.Many2one('exception.category', string='Process Category')
-    process_id = fields.Many2one('exception.process', string='Process')
+    
+    
+    new_process_category_id = fields.Many2one('exception.process.type', string='Exception Process Type')
+    new_process_id = fields.Many2one('exception.process', string='Exception Process')
+    
+#     new_process_category_id = fields.Many2one('exception.process.type', 
+#                                              string='Exception Process Type')
+#     new_process_id = fields.Many2one('exception.process', 
+#                                     string='Exception Process',
+#                                     domain="[('type_id', '=', new_process_category_id.num_id)]")
+#     new_process_category_num_id = fields.Float(
+#     related='new_process_category_id.num_id',
+#     store=True
+# )
+
+
+    # new_process_category_id = fields.Many2one('exception.process.type', string='Exception Process Type')
+    # new_process_id = fields.Many2one('exception.process', string='Exception Process')
+    # new_process_id = fields.Many2one('exception.process', string='Exception Process')
+    # new_process_category_id = fields.Many2one('exception.process.type', string='Exception Process Type')
+    process_category_id = fields.Many2one('exception.category', string='Exception Process Type')
+    process_id = fields.Many2one('exception.process', string='Exception Process')
     root_category_id = fields.Many2one('exception.process.type', string='Root Category')
     root_category_process_id = fields.Many2one('exception.process.type', string='Root Category Process')
 
@@ -499,6 +519,46 @@ class Cases(models.Model):
 
 
     # ------------------- ONCHANGES -------------------
+    
+    
+    @api.onchange('new_process_category_id')
+    def _onchange_process_category_id(self):
+        if self.new_process_category_id:
+            domain = [('type_id', '=', self.new_process_category_id.id)]
+            return {'domain': {'new_process_id': domain}}
+        return {'domain': {'new_process_id': []}}
+    
+    # @api.onchange('new_process_category_id')
+    # def _onchange_process_category_id(self):
+    #     """When process type changes, reset the process selection"""
+    #     self.new_process_id = False
+    
+    # @api.onchange('new_process_id')
+    # def _onchange_process_id(self):
+    #     """When process is selected, ensure the process type matches"""
+    #     if self.new_process_id and self.new_process_id.type_id:
+    #         matching_type = self.env['exception.process.type'].search(
+    #             [('num_id', '=', self.new_process_id.type_id)], limit=1)
+    #         if matching_type:
+    #             self.new_process_category_id = matching_type.id
+
+    
+    # @api.onchange('new_process_category_id')
+    # def _onchange_process_category_id(self):
+    #     if self.new_process_category_id:
+    #         related_processes = self.env['exception.process'].search([
+    #             ('type_id', '=', self.new_process_category_id.num_id)
+    #         ])
+    #         return {'domain': {'new_process_id': [('id', 'in', related_processes.ids)]}}
+
+    # @api.onchange('new_process_id')
+    # def _onchange_process_id(self):
+    #     if self.new_process_id:
+    #         related_type = self.env['exception.process.type'].search([
+    #             ('num_id', '=', self.new_process_id.type_id)
+    #         ], limit=1)
+    #         self.new_process_category_id = related_type
+
 
     @api.onchange('title')
     def _onchange_title_set_rating(self):
@@ -1092,10 +1152,11 @@ class Cases(models.Model):
             attachment = rec.attachment
             rating_name = rec.rating_id.name if rec.rating_id else ''
             staff_dept = rec.team_id.name if rec.team_id else ''
-            status_name = rec.status_name
-            exception_process = rec.process_id.name if rec.process_id else ''
-            process_type = rec.root_category_id.name if rec.root_category_id else ''
-            process_category = rec.process_category_id.name if rec.process_category_id else ''
+            status_name = rec.status_name.capitalize()
+            exception_process = rec.new_process_id.name if rec.new_process_id else ''
+           # process_type = rec.root_category_id.name if rec.root_category_id else ''
+            process_type = rec.new_process_id.name if rec.new_process_id else ''
+            process_category = rec.new_process_category_id.name if rec.new_process_category_id else ''
             case_action = rec.cases_action
             description = rec.further_description
             response_link = f'/web#id={rec.id}&model=case&view_type=form'
@@ -1259,10 +1320,11 @@ class Cases(models.Model):
             title = rec.cases_description
             rating_name = rec.rating_id.name if rec.rating_id else ''
             staff_dept = rec.team_id.name if rec.team_id else ''
-            status_name = rec.status_name
-            exception_process = rec.process_id.name if rec.process_id else ''
-            process_type = rec.root_category_id.name if rec.root_category_id else ''
-            process_category = rec.process_category_id.name if rec.process_category_id else ''
+            status_name = rec.status_name.capitalize()
+            exception_process = rec.new_process_id.name if rec.new_process_id else ''
+           # process_type = rec.root_category_id.name if rec.root_category_id else ''
+            process_type = rec.new_process_id.name if rec.new_process_id else ''
+            process_category = rec.new_process_category_id.name if rec.new_process_category_id else ''
             case_action = rec.cases_action
             response_text = response.response
             user_name = rec.user_id.name if rec.user_id else ''
@@ -1445,10 +1507,11 @@ class Cases(models.Model):
                     title = rec.cases_description
                     rating_name = rec.rating_id.name if rec.rating_id else ''
                     staff_dept = rec.team_id.name if rec.team_id else ''
-                    status_name = rec.status_name
-                    exception_process = rec.process_id.name if rec.process_id else ''
-                    process_type = rec.root_category_id.name if rec.root_category_id else ''
-                    process_category = rec.process_category_id.name if rec.process_category_id else ''
+                    status_name = rec.status_name.capitalize()
+                    exception_process = rec.new_process_id.name if rec.new_process_id else ''
+                   # process_type = rec.root_category_id.name if rec.root_category_id else ''
+                    process_type = rec.new_process_id.name if rec.new_process_id else ''
+                    process_category = rec.new_process_category_id.name if rec.new_process_category_id else ''
                     case_action = rec.cases_action
                     close_remarks = "Case closed successfully"
                     user_name = rec.user_id.name if rec.user_id else ''

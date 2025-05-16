@@ -1,0 +1,21 @@
+<!-- data/exception_process_type_data.xml -->
+<odoo>
+    <data noupdate="0">
+        <record id="process_type_561" model="exception.process.type">
+            <field name="num_id">561</field>
+            <field name="name">BCCMO</field>
+        </record>
+        <record id="process_type_261" model="exception.process.type">
+            <field name="num_id">261</field>
+            <field name="name">INWARD CLEARING</field>
+        </record>
+        <record id="process_type_262" model="exception.process.type">
+            <field name="num_id">262</field>
+            <field name="name">AUDIT ENQUIRY CHARGES</field>
+        </record>
+        <record id="process_type_307" model="exception.process.type">
+            <field name="num_id">307</field>
+            <field name="name">CUSTOMER ONBOARDING</field>
+        </record>
+    </data>
+</odoo>

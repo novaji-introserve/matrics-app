@@ -32,10 +32,22 @@
                         <field name="data_source" invisible="1"/>
                     </group>
                     <group string="Status and Others">
-                        <field name="process_category_id"/>
-                        <field name="process_id"/>
-                        <field name="root_category_id"/>
-                        <field name="root_category_process_id"/>
+                        <field name="new_process_category_id"/>
+                        <field name="new_process_id"/>
+                        <!-- <field name="new_process_category_id" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="new_process_category_num_id" invisible="1"/>
+                        <field name="new_process_id" domain="[('type_id', '=', new_process_category_id)]"/> -->
+
+                        <!-- <field name="new_process_id" options="{'no_create': True, 'no_open': True}" 
+                                   domain="[('type_id', '=', new_process_category_id.num_id)]"/> -->
+                        <!-- <field name="new_process_category_id" widget="selection" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="new_process_id" widget="selection" options="{'no_create': True, 'no_open': True}" context="{'default_process_type_id': new_process_category_id}"/> -->
+                        <!-- <field name="new_process_category_id" widget="many2one" options="{'no_create': True}"/>
+                        <field name="new_process_id" widget="many2one" options="{'no_create': True}"/> -->
+                                                <!-- <field name="process_category_id"/>
+                        <field name="process_id"/> -->
+                        <field name="root_category_id" invisible='1'/>
+                        <field name="root_category_process_id" invisible='1'/>
                         <field name="customer_id" />
                     </group>
                 </group>

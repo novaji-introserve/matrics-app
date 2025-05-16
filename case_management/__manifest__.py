@@ -8,6 +8,8 @@
     'category': 'Custom',
     'depends': ['base', 'web', 'mail','compliance_management'],
     'data': [
+        'data/exception_process_type_data.xml',
+        'data/exception_process_data.xml',
         'data/email_templates.xml',
         'data/case_closure.xml',
         'security/case_access_rule.xml',
@@ -32,6 +34,8 @@
         'views/case_dashboard.xml',# Load menus first
         'views/case_form_inherit.xml',
         'data/cron.xml',
+        'data/exception.process.type.csv',
+        'data/exception.process.csv',
     ],
     'demo': [],
     'assets': {
@@ -51,12 +55,14 @@
             'case_management/static/src/components/chart_renderer/chart_renderers.xml', # ADD THIS
             'case_management/static/src/components/case_dashboard.xml',
             'case_management/static/src/css/case_form.css',
+           # 'views/wizard_load_exception_data.xml',
             
 
         ],
     },
     'installable': True,
     'application': True,
+    'post_init_hook': 'load_exception_data',
     'license': 'LGPL-3',
     'icon': 'case_management/static/description/icon.png',
 }

@@ -1,6 +1,5 @@
 from . import alert_frequency
 from . import alert_group
-from . import alert_frequency
 from . import alert
 from . import app_approvers
 from . import branch
@@ -15,3 +14,4 @@ from . import rule_list
 from . import staff
 from . import team
 from . import close_case_wizard
+from . import wizard_load_exception_data
