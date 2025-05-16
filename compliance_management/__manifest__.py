@@ -75,6 +75,7 @@
         # "data/charts.xml",
         # "data/res_partner.xml",
         "views/res_users.xml",
+        "data/aggregate_score.xml"
     ],
     # only loaded in demonstration mode
     "demo": [
