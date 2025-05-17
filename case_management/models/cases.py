@@ -192,7 +192,7 @@ class Cases(models.Model):
 
 
     # Relations
-    branch_id = fields.Many2one('branch', string='Branch')
+    branch_id = fields.Many2one('branch', string='Branch', ondelete='restrict')
     staff_id = fields.Many2one('res.users', string='Staff', required=True)
     team_id = fields.Many2one('hr.department', string='Team / Department')
     team_id = fields.Many2one('hr.department', string='Department', compute='_compute_team_id', store=True)
@@ -205,8 +205,8 @@ class Cases(models.Model):
     alert_id = fields.Many2one('alert', string='Alert')
     
     
-    new_process_category_id = fields.Many2one('exception.process.type', string='Exception Process Type')
-    new_process_id = fields.Many2one('exception.process', string='Exception Process')
+    new_process_category_id = fields.Many2one('exception.process.type', string='Exception Process Type', required=True)
+    new_process_id = fields.Many2one('exception.process', string='Exception Process', required=True)
     
 #     new_process_category_id = fields.Many2one('exception.process.type', 
 #                                              string='Exception Process Type')
@@ -238,6 +238,19 @@ class Cases(models.Model):
     response_text = fields.Text(string="Response", compute="_compute_latest_response", store=False)
 
     
+    def write(self, vals):
+        for record in self:
+            # Prevent attachment deletion
+            if 'attachment' in vals and not vals['attachment'] and record.attachment:
+                # Remove the attachment field from vals to prevent deletion
+                vals.pop('attachment')
+                # Also remove filename if it's being updated along with attachment
+                if 'filename' in vals:
+                    vals.pop('filename')
+                _logger.info('Prevented deletion of attachment on record %s', record.id)
+        
+        return super(Cases, self).write(vals)
+
     
     # @api.depends('transaction_id')
     # def _compute_name(self):
@@ -1245,7 +1258,8 @@ class Cases(models.Model):
                         #'attachment_data': attachment_rec and str(attachment_rec) or None,
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
-                        'ref_id': f"{self._name},{self.id}",  # Reference to the case model
+                        'ref_id': self.id,  
+                        # 'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
                         'name': alert_name,
@@ -1406,11 +1420,12 @@ class Cases(models.Model):
                     model_description = self._description
                     # Register the alert in alert_history
                     self.env['alert.history'].sudo(flag=True).create({
-                        'alert_id': alert_id,
+                       # 'alert_id': alert_id,
                         #'attachment_data': attachment_rec and str(attachment_rec) or None,
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
-                        'ref_id': f'case,{self.id}',  # Reference to the case model
+                        'ref_id': self.id,  
+                        # 'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
                         'name': alert_name,
@@ -1603,11 +1618,12 @@ class Cases(models.Model):
                         model_description = self._description
                         # Register the alert in alert_history
                         self.env['alert.history'].sudo(flag=True).create({
-                            'alert_id': alert_id,
+                            # 'alert_id': alert_id,
                             #'attachment_data': attachment_rec and str(attachment_rec) or None,
                             #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                             'html_body': rendered_html,
-                            'ref_id': f'case,{self.id}',  # Reference to the case model
+                            'ref_id': self.id,    # Reference to the case model
+                            # 'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                             'risk_rating': severity_level or 'Low',
                             'process_id': exception_process or None,
                             'name': alert_name,

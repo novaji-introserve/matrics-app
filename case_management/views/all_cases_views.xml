@@ -232,7 +232,7 @@
                     </page>
                     <page string="Attachments" attrs="{'invisible': [('is_supervisor', '=', True)]}">
                         <group>
-                            <field name="attachment" widget="binary" filename="filename" attrs="{'readonly': [('is_supervisor', '=', True)]}" delete="false"/>
+                            <field name="attachment" widget="binary" filename="filename" attrs="{'readonly': ['|',('is_supervisor', '=', True),('attachment', '!=', False)]}" options="{'no_delete': True}" />
                             <field name="filename" invisible="1"/>
                         </group>
                     </page>
@@ -255,7 +255,7 @@
                             string="Close Case" 
                             type="object" 
                             class="btn-primary" 
-                            attrs="{'invisible': ['|', '|', ('is_creator', '=', False), ('has_responses', '=', False), ('is_supervisor', '=', True)]}"/>
+                            attrs="{'invisible': ['|', '|', '|', ('is_creator', '=', False), ('has_responses', '=', False), ('is_supervisor', '=', True), ('status_code', '=', 'closed')]}"/>
                     <field name="status_id" widget="statusbar" readonly="1"/>
                 </header>
             </header>
@@ -289,7 +289,8 @@
                     <page string="Attachments">
                         <field name="attachment"
                             filename="filename"
-                            attrs="{'readonly': [('is_creator', '=', False)]}" />
+                            attrs="{'readonly': ['|',('is_creator', '=', False),('attachment', '!=', False)]}"
+                            options="{'no_delete': True}"  />
                         <field name="filename" invisible="1"/>
                     </page>
 
@@ -408,7 +409,8 @@
                         <page string="Attachments">
                             <field name="attachment"
                                 filename="filename"
-                                attrs="{'readonly': [('is_creator', '=', False)]}" delete="false"/>
+                                attrs="{'readonly': ['|', ('is_creator', '=', False),('attachment', '!=', False)]}" 
+                                options="{'no_delete': True}"  />
                             <field name="filename" invisible="1"/>
                         </page>
 
@@ -468,7 +470,8 @@
                     <page string="Attachments">
                         <field name="attachment"
                             filename="filename"
-                            attrs="{'readonly': [('is_creator', '=', False)]}" delete="false" />
+                            attrs="{'readonly': ['|',('is_creator', '=', False),('attachment', '!=', False)]}" 
+                            options="{'no_delete': True}"  />
                         <field name="filename" invisible="1"/>
                     </page>
 
