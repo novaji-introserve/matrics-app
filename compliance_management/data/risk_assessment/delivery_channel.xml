@@ -1,0 +1,260 @@
+<odoo>
+    <!-- Subject: Social Media Banking -->
+    <record id="res_risk_assessment_social_media_banking" model="res.risk.assessment">
+        <field name="name">Social Media Banking</field>
+        <field name="narration">Risk assessment for social media banking delivery channel.</field>
+        <field name="recommendation">Implement strict transaction monitoring and KYC verification.</field>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_22"/>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23"/>
+        <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst"/>
+        <field name="type_id" ref="compliance_inst_risk_type_3"/>
+    </record>
+
+    <record id="res_risk_assessment_line_sm_ml" model="res.risk.assessment.line">
+        <field name="name">Money Laundering</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_1"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_social_media_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">24.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_sm_tf" model="res.risk.assessment.line">
+        <field name="name">Terrorism Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_2"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_social_media_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">22.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_sm_pf" model="res.risk.assessment.line">
+        <field name="name">Proliferation Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_3"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_social_media_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">18.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_sm_sr" model="res.risk.assessment.line">
+        <field name="name">Sanction Risk</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_53"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_social_media_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">21.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_sm_bc" model="res.risk.assessment.line">
+        <field name="name">Bribery And Corruption</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_42"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_social_media_banking"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">19.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <!-- Subject: Automated Teller Machine (ATM) -->
+    <record id="res_risk_assessment_atm" model="res.risk.assessment">
+        <field name="name">Automated Teller Machine</field>
+        <field name="narration">Risk assessment for ATM-based transactions and access points.</field>
+        <field name="recommendation">Ensure secure access and monitor high-volume withdrawal patterns.</field>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_61"/>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23"/>
+        <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst"/>
+        <field name="type_id" ref="compliance_inst_risk_type_3"/>
+    </record>
+
+    <record id="res_risk_assessment_line_atm_ml" model="res.risk.assessment.line">
+        <field name="name">Money Laundering</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_1"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_atm"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">24.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_atm_tf" model="res.risk.assessment.line">
+        <field name="name">Terrorism Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_2"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_atm"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">22.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_atm_pf" model="res.risk.assessment.line">
+        <field name="name">Proliferation Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_3"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_atm"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">18.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_atm_sr" model="res.risk.assessment.line">
+        <field name="name">Sanction Risk</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_53"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_atm"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">21.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_atm_bc" model="res.risk.assessment.line">
+        <field name="name">Bribery And Corruption</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_42"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_atm"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">19.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <!-- Subject: POS Terminals -->
+    <record id="res_risk_assessment_pos_terminals" model="res.risk.assessment">
+        <field name="name">POS Terminal</field>
+        <field name="narration">Risk assessment for Point-of-Sale terminal usage.</field>
+        <field name="recommendation">Monitor merchant activity and apply transaction limits.</field>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_181"/>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23"/>
+        <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst"/>
+        <field name="type_id" ref="compliance_inst_risk_type_3"/>
+    </record>
+
+    <record id="res_risk_assessment_line_pos_ml" model="res.risk.assessment.line">
+        <field name="name">Money Laundering</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_1"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_pos_terminals"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">24.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_pos_tf" model="res.risk.assessment.line">
+        <field name="name">Terrorism Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_2"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_pos_terminals"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">22.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_pos_pf" model="res.risk.assessment.line">
+        <field name="name">Proliferation Financing</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_3"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_pos_terminals"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">18.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_pos_sr" model="res.risk.assessment.line">
+        <field name="name">Sanction Risk</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_53"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_pos_terminals"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">21.00</field>
+        <field name="residual_risk_score">6</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+    <record id="res_risk_assessment_line_pos_bc" model="res.risk.assessment.line">
+        <field name="name">Bribery And Corruption</field>
+        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
+        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
+        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
+        <field name="category_id" ref="compliance_inst_fc_risk_category_42"/>
+        <field name="department_id" ref="hr_department_compliance"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_pos_terminals"/>
+        <field name="inherent_risk_score">9</field>
+        <field name="control_effectiveness_score">8</field>
+        <field name="residual_risk_impact">19.00</field>
+        <field name="residual_risk_score">4</field>
+        <field name="residual_risk_probability">75</field>
+    </record>
+
+</odoo>

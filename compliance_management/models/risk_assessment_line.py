@@ -10,10 +10,10 @@ _logger = logging.getLogger(__name__)
 class RiskAssessmentLine(models.Model):
     _name = 'res.risk.assessment.line'
     _description = 'Risk Assessment Line'
-    _sql_constraints = [
-        ('uniq_risk_assessment_line_name', 'unique(name)',
-         "Risk Assessment Name already exists. Value must be unique!")
-    ]
+    # _sql_constraints = [
+    #     ('uniq_risk_assessment_line_name', 'unique(name)',
+    #      "Risk Assessment Name already exists. Value must be unique!")
+    # ]
     name = fields.Text(string="Description", required=True)
     category_id = fields.Many2one(
         comodel_name='res.risk.category', string='Category', required=True)
