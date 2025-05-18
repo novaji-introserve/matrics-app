@@ -310,116 +310,119 @@
     <record id="view_case_form_response_only" model="ir.ui.view">
         <field name="name">case.form.response.only</field>
         <field name="model">case</field>
-        <field name="inherit_id" ref="view_case_form_base"/>
-        <field name="mode">primary</field>
         <field name="arch" type="xml">
-            <!-- Enhancing header with decorations -->
-            <field name="status_id" position="attributes">
-                <attribute name="decoration-danger">status_id == 'overdue'</attribute>
-                <attribute name="decoration-success">status_id == 'closed'</attribute>
-            </field>
-            
-            <!-- Replacing first group to match original structure -->
-            <xpath expr="//sheet//group[1]" position="replace">
-                <group>
+            <form string="Case" create="false" delete="false">
+                <header>
+                    <field name="status_id" widget="statusbar" readonly="1" 
+                        decoration-danger="status_id == 'overdue'" 
+                        decoration-success="status_id == 'closed'" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
                     <group>
-                        <field name="created_at" readonly="1" invisible="1"/>
-                        <field name="created_at_formatted_datetime" widget="text"/>
-                        <field name="event_date" readonly="1" invisible="1"/>
-                        <field name="event_date_formatted_datetime" widget="text"/>
-                        <field name="title" string="Severity" readonly="1" invisible="1" />
-                        <field name="branch_id" readonly="1"/>
-                        <field name="team_id" readonly="1"/>
-                        <field name="transaction_id" invisible='1'/>
-                        <field name="transaction_id" attrs="{'invisible': [('transaction_id', '=', False)]}" readonly='1'/>
-                        <field name="customer_id" attrs="{'invisible': [('customer_id', '=', False)]}" readonly="1"/>
-                        <field name="data_source" readonly="1" invisible="1"/>
-                        <field name="cases_action" string="Recommended Action" readonly="1" widget="html"/>
-                    </group>
-                    <group>
-                        <field name="staff_id" string="Staff Responsible" readonly="1"/>
-                        <field name="supervisor_one_id" readonly="1"/>
-                        
-                        <!-- Supervisor 2 shown only for medium risk rating -->
-                        <field name="supervisor_two_id" 
-                            readonly="1"
-                            attrs="{'invisible': [('title', '!=', '2')]}" 
-                            />
-
-                        <!-- Another Supervisor 2 instance shown only for high risk rating -->
-                        <field name="supervisor_two_id" 
-                            readonly="1"
-                            attrs="{'invisible': [('title', '!=', '3')]}" 
-                            />
-
-                        <!-- Supervisor 3 shown only for high risk rating -->
-                        <field name="supervisor_three_id" 
-                            readonly="1"
-                            attrs="{'invisible': [('title', '!=', '3')]}" 
-                            />
-
-                        <field name="is_supervisor" invisible="1"/>
-                        
-                        <field name="user_id" readonly="1"/>
-                        <field name="severity_level" invisible="1"/>
-                        <field name="is_creator" invisible="1"/>
-                        <field name="is_assigned_staff" invisible="1"/>
-                        <field name="has_responses" invisible="1"/>
-                        <field name="new_process_category_id" string="Process Category" readonly="1"/>
-                        <field name="new_process_id" string="Process" readonly="1"/>
-                        <field name="status_code" invisible="1"/>
-                        <field name="quick_response" string="Respond to Case"
-                        attrs="{'invisible': ['|',
-                        ('is_assigned_staff', '=', False),
-                        ('status_code', '=', 'closed')
-                        ]}"/>
-                    </group>
-                </group>
-            </xpath>
-            
-            <!-- Replacing notebook to match original implementation exactly -->
-            <notebook position="replace">
-                <notebook>
-                    <page string="Description">
                         <group>
-                            <field name="cases_description" readonly="1" widget="html"/>
-                            <field name="further_description" readonly="1" widget="html"/>
+                            <field name="created_at" readonly="1" invisible="1"/>
+                            <field name="created_at_formatted_datetime" widget="text"/>
+                            <field name="event_date" readonly="1" invisible="1"/>
+                            <field name="event_date_formatted_datetime" widget="text"/>
+                            <field name="title" string="Severity" readonly="1" invisible="1" />
+                            <field name="branch_id" readonly="1"/>
+                            <field name="team_id" readonly="1"/>
+                            <field name="transaction_id" invisible='1'/>
+                            <field name="transaction_id" attrs="{'invisible': [('transaction_id', '=', False)]}" readonly='1'/>
+                            <field name="customer_id" attrs="{'invisible': [('customer_id', '=', False)]}" readonly="1"/>
+                            <field name="data_source" readonly="1" invisible="1"/>
+                            <field name="cases_action" string="Recommended Action" readonly="1" widget="html"/>
                         </group>
-                    </page>
-                    <page string="Responses">
-                        <field name="response_ids" context="{'default_case_id': id}" readonly="1" nolabel="1">
-                            <tree string="Responses">
-                                <field name="create_date" readonly="1"/>
-                                <field name="create_uid" string="Responder" options="{'no_open': True, 'no_create': True}"/>
-                                <field name="response" required="1"/>
-                                <field name="case_id" invisible="1"/>
-                            </tree>
-                            <form>
-                                <group>
-                                    <field name="create_uid" readonly="1"/>
+                        <group>
+                            <field name="staff_id" string="Staff Responsible" readonly="1"/>
+                            <field name="supervisor_one_id" readonly="1"/>
+                            
+                             <!-- Supervisor 2 shown only for medium risk rating -->
+                            <field name="supervisor_two_id" 
+                                readonly="1"
+                                attrs="{'invisible': [('title', '!=', '2')]}" 
+                                />
+
+                            <!-- Another Supervisor 2 instance shown only for high risk rating -->
+                            <field name="supervisor_two_id" 
+                                readonly="1"
+                                attrs="{'invisible': [('title', '!=', '3')]}" 
+                                />
+
+                            <!-- Supervisor 3 shown only for high risk rating -->
+                            <field name="supervisor_three_id" 
+                                readonly="1"
+                                attrs="{'invisible': [('title', '!=', '3')]}" 
+                                />
+
+                            <field name="is_supervisor" invisible="1"/>
+                            
+                            <field name="user_id" readonly="1"/>
+                            <field name="severity_level" invisible="1"/>
+                            <field name="is_creator" invisible="1"/>
+                            <field name="is_assigned_staff" invisible="1"/>
+                            <field name="has_responses" invisible="1"/>
+                            <field name="new_process_category_id" string="Process Category" readonly="1"/>
+                            <field name="new_process_id" string="Process" readonly="1"/>
+                            <field name="status_code" invisible="1"/>
+                            <!-- <field name="customer_id" attrs="{'invisible': [('customer_id', '=', False)]}" readonly="1"/> -->
+                            <field name="quick_response" string="Respond to Case"
+                            attrs="{'invisible': ['|',
+                             ('is_assigned_staff', '=', False),
+                             ('status_code', '=', 'closed')
+                            ]}"/>
+
+                            <!-- <field name="quick_response" string="Respond to Case" 
+                                        attrs="{'readonly': ['|', '|', ('is_assigned_staff', '=', False), ('is_supervisor', '=', True), ('status_id', '=', 'closed')], 
+                                                'invisible': [('status_id', '=', 'closed')]}"  /> -->
+                            <!-- <field name="quick_response" string="Respond to Case" attrs="{'readonly': ['|', ('is_assigned_staff', '=', False), ('is_supervisor', '=', True)]}"  /> -->
+                        </group>
+                    </group>
+
+                    <!-- Responses Tab -->
+                    <notebook>
+                        <page string="Description">
+                            <group>
+                                <field name="cases_description" readonly="1" widget="html"/>
+                                <field name="further_description" readonly="1" widget="html"/>
+                            </group>
+                        </page>
+                        <page string="Responses">
+                            <!-- <field name="response_ids" nolabel="1"> -->
+                            <field name="response_ids" context="{'default_case_id': id}" readonly="1" nolabel="1">
+                                <tree string="Responses">
                                     <field name="create_date" readonly="1"/>
-                                    <field name="response" readonly="1"/>
-                                </group>
-                            </form>
-                        </field>
-                    </page>
-                    <page string="Attachments">
-                        <field name="attachment"
-                            filename="filename"
-                            attrs="{'readonly': ['|', ('is_creator', '=', False),('attachment', '!=', False)]}" 
-                            options="{'no_delete': True}"  />
-                        <field name="filename" invisible="1"/>
-                    </page>
-                </notebook>
-            </notebook>
-            
-            <!-- Making chatter match exactly -->
-            <div class="oe_chatter" position="replace">
+                                    <field name="create_uid" string="Responder" options="{'no_open': True, 'no_create': True}"/>
+                                    <field name="response" required="1"/>
+                                    <field name="case_id" invisible="1"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="create_uid" readonly="1"/>
+                                        <field name="create_date" readonly="1"/>
+                                        <field name="response" readonly="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Attachments">
+                            <field name="attachment"
+                                filename="filename"
+                                attrs="{'readonly': ['|', ('is_creator', '=', False),('attachment', '!=', False)]}" 
+                                options="{'no_delete': True}"  />
+                            <field name="filename" invisible="1"/>
+                        </page>
+
+                    </notebook>
+                </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
                     <field name="message_ids" widget="mail_thread"/>
                 </div>
-            </div>
+            </form>
         </field>
     </record>
 
