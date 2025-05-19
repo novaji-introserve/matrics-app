@@ -7,10 +7,10 @@ class RiskAssessment(models.Model):
     _name = 'res.risk.assessment'
     _description = 'Risk Assessment'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _sql_constraints = [
-        ('uniq_risk_assessment_name', 'unique(name)',
-         "Risk Assessment Name already exists. Value must be unique!")
-    ]
+    # _sql_constraints = [
+    #     ('uniq_risk_assessment_name', 'unique(name)',
+    #      "Risk Assessment Name already exists. Value must be unique!")
+    # ]
     _order = "name"
 
     name = fields.Char(string="Name", required=True)
@@ -35,7 +35,6 @@ class RiskAssessment(models.Model):
     internal_category = fields.Selection(string='Internal Category', selection=[('inst', 'Institutional'), ('cp', 'Counter Party')],default='inst')
     is_default = fields.Boolean(string='Is Default',tracking=True)
     
-
 
 
     @api.model
