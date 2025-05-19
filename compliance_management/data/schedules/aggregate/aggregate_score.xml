@@ -8,6 +8,7 @@
         <field name="interval_number">12</field>
         <field name="interval_type">hours</field>
         <field name="numbercall">-1</field>
+        <field name="active">False</field>
         <field name="doall">True</field>
     </record>
 </odoo>
