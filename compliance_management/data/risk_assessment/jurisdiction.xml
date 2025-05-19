@@ -91,7 +91,7 @@
         <field name="name">South West</field>
         <field name="narration">Assessing ML/TF risks in the South res_risk_assessment_south_west region.</field>
         <field name="recommendation">Apply enhanced due diligence on new accounts.</field>
-        <field name="subject_id" ref="compliance_inst_fc_risk_subject_sw23"/>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_161"/>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_21"/>
         <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst"/>
         <field name="type_id" ref="compliance_inst_risk_type_3"/>
@@ -177,7 +177,7 @@
         <field name="name">South South</field>
         <field name="narration">Assessing ML/TF risks in the South res_risk_assessment_south_south region.</field>
         <field name="recommendation">Apply enhanced due diligence on new accounts.</field>
-        <field name="subject_id" ref="compliance_inst_fc_risk_subject_ss23"/>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_south_south"/>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_21"/>
         <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst"/>
         <field name="type_id" ref="compliance_inst_risk_type_3"/>
@@ -349,7 +349,7 @@
         <field name="name">North West</field>
         <field name="narration">Risk assessment for customers or activities in the North west region.</field>
         <field name="recommendation">Apply Enhanced Due Diligence (EDD).</field>
-        <field name="subject_id" ref="compliance_inst_fc_risk_subject_nw23"/>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_nw"/>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_21"/>
         <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst"/>
         <field name="type_id" ref="compliance_inst_risk_type_3"/>
@@ -435,7 +435,7 @@
         <field name="name">North Central</field>
         <field name="narration">Risk assessment for customers or activities in the North Central region.</field>
         <field name="recommendation">Apply Enhanced Due Diligence (EDD).</field>
-        <field name="subject_id" ref="compliance_inst_fc_risk_subject_nw23"/>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_nc"/>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_21"/>
         <field name="assessment_type_id" ref="compliance_inst_assessment_type_inst"/>
         <field name="type_id" ref="compliance_inst_risk_type_3"/>
