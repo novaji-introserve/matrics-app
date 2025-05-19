@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- cron jobs to stagger execution and use lower isolation level -->
+        <record id="ir_cron_refresh_dashboard_chart_views" model="ir.cron">
+            <field name="name">Refresh Dashboard Chart Materialized Views</field>
+            <field name="model_id" ref="model_dashboard_chart_view_refresher"/>
+            <field name="state">code</field>
+            <field name="code">model.refresh_chart_views(low_priority=True)</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active" eval="True"/>
+            <!-- Add a small delay to avoid exact hourly overlap with cache cleaning -->
+            <field name="nextcall" eval="(datetime.now() + timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        </record>
+    </data>
+</odoo>

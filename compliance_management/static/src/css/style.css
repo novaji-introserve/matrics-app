@@ -130,3 +130,12 @@
           position: relative!important;
       }
   }
+
+.d-flex.flex-nowrap.overflow-auto {
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.d-flex.flex-nowrap.overflow-auto::-webkit-scrollbar {
+    display: none;
+}

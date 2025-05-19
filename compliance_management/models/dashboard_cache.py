@@ -261,7 +261,6 @@ class DashboardCache(models.Model):
         finally:
             THREAD_REGISTRY.unregister(key)
     
-    # The rest of your methods unchanged
     @api.model
     def _refresh_charts_data(self, key, user_id):
         """Refresh charts data based on parameters encoded in the key"""
@@ -279,19 +278,28 @@ class DashboardCache(models.Model):
             except:
                 branches_id = []
             
-            # Call the controller method with a smaller timeout
-            from ..controllers.charts import DynamicChartController
-            controller = DynamicChartController()
-            return controller.get_chart_data_internal(cco, branches_id)
-        
+            # Import the context manager
+            from ..utils.request_context import RequestContextManager
+            
+            # Create a request context
+            with RequestContextManager(self.env) as request:
+                # Set the user ID for this request
+                request.uid = user_id
+                
+                # Now we can safely call the controller
+                from ..controllers.charts import DynamicChartController
+                controller = DynamicChartController()
+                return controller.get_chart_data(cco, branches_id)
+            
         return None
-    
+
     @api.model
     def _refresh_stats_data(self, key, user_id):
         """Refresh stats data based on parameters encoded in the key"""
         # Extract parameters for stats
         # Format: all_stats_{cco}_{branches_id}_{unique_id}
         parts = key.split('_')
+        datepicked = 20000
         if len(parts) >= 4:
             cco_part = parts[2]
             cco = cco_part.lower() == 'true'
@@ -303,12 +311,69 @@ class DashboardCache(models.Model):
             except:
                 branches_id = []
             
-            # Call the controller method
-            from ..controllers.controllers import Compliance
-            stats_controller = Compliance()
-            return stats_controller.get_all_stats_internal(cco, branches_id)
-        
+            # Import the context manager
+            from ..utils.request_context import RequestContextManager
+            
+            # Create a request context
+            with RequestContextManager(self.env) as request:
+                # Set the user ID for this request
+                request.uid = user_id
+                
+                # Call the controller method
+                from ..controllers.controllers import Compliance
+                stats_controller = Compliance()
+                return stats_controller.getAllstats(cco, branches_id, datepicked)
+            
         return None
+
+    # @api.model
+    # def _refresh_charts_data(self, key, user_id):
+    #     """Refresh charts data based on parameters encoded in the key"""
+    #     # Extract parameters from the key
+    #     # Format: charts_data_{cco}_{branches_id}_{unique_id}
+    #     parts = key.split('_')
+    #     if len(parts) >= 4:
+    #         cco_part = parts[2]
+    #         cco = cco_part.lower() == 'true'
+            
+    #         # Extract branches_id (might be a JSON string of an array)
+    #         branches_str = parts[3]
+    #         try:
+    #             branches_id = json.loads(branches_str)
+    #         except:
+    #             branches_id = []
+            
+    #         # Call the controller method with a smaller timeout
+    #         from ..controllers.charts import DynamicChartController
+    #         controller = DynamicChartController()
+    #         return controller.get_chart_data_internal(cco, branches_id)
+        
+    #     return None
+    
+    # @api.model
+    # def _refresh_stats_data(self, key, user_id):
+    #     """Refresh stats data based on parameters encoded in the key"""
+    #     # Extract parameters for stats
+    #     # Format: all_stats_{cco}_{branches_id}_{unique_id}
+    #     parts = key.split('_')
+    #     datepicked = 20000
+    #     if len(parts) >= 4:
+    #         cco_part = parts[2]
+    #         cco = cco_part.lower() == 'true'
+            
+    #         # Extract branches_id
+    #         branches_str = parts[3]
+    #         try:
+    #             branches_id = json.loads(branches_str)
+    #         except:
+    #             branches_id = []
+            
+    #         # Call the controller method
+    #         from ..controllers.controllers import Compliance
+    #         stats_controller = Compliance()
+    #         return stats_controller.get_all_stats_internal(cco, branches_id)
+        
+    #     return None
     
     @api.model
     def clear_expired_cache(self):

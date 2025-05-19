@@ -41,6 +41,7 @@
         # "data/schedules/send_assessment_notification_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
         'data/schedules/clean_cache.xml',
+        'data/schedules/refresh_charts_materialized_views.xml',
 
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
@@ -75,7 +76,7 @@
         # "data/charts.xml",
         # "data/res_partner.xml",
         "views/res_users.xml",
-        "data/aggregate_score.xml"
+        "data/aggregate_score.xml",
     ],
     # only loaded in demonstration mode
     "demo": [

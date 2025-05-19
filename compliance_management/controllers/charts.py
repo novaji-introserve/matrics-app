@@ -1,27 +1,231 @@
-from odoo import http
+# from odoo import http
+# from odoo.http import request
+# import json
+# import logging
+# import re
+# from datetime import datetime, timedelta
+
+# _logger = logging.getLogger(__name__)
+
+# class DynamicChartController(http.Controller):
+#     """Controller for handling dynamic chart requests with improved performance"""
+    
+#     def __init__(self):
+#         super(DynamicChartController, self).__init__()
+#         # Import here to avoid circular imports
+#         from ..services.chart_data_service import ChartDataService
+#         from ..utils.cache_key_unique_identifier import get_unique_client_identifier
+        
+#         self.chart_data_service = ChartDataService()
+#         self.get_unique_client_identifier = get_unique_client_identifier
+    
+#     @http.route('/web/dynamic_charts/preview', type='json', auth='user')
+#     def preview_chart(self, chart_type, query, x_axis_field=None, y_axis_field=None, color_scheme='default'):
+#         """Preview chart without saving - with query safety checks"""
+#         try:
+#             # Apply query limit for safety
+#             if not self._is_safe_query(query):
+#                 return {'error': 'Query contains unsafe operations'}
+                
+#             # Create a temporary chart for preview
+#             chart = request.env['res.dashboard.charts'].new({
+#                 'chart_type': chart_type,
+#                 'query': query,
+#                 'x_axis_field': x_axis_field,
+#                 'y_axis_field': y_axis_field,
+#                 'color_scheme': color_scheme
+#             })
+            
+#             # Run validation manually since it's a new record
+#             chart._check_query_safety()
+            
+#             # Process query in isolated transaction
+#             with request.env.registry.cursor() as new_cr:
+#                 # Execute with timeout
+#                 new_cr.execute("SET LOCAL statement_timeout = 10000;")  # 10 seconds
+#                 new_cr.execute(query)
+#                 results = new_cr.dictfetchall()
+                
+#                 return self.chart_data_service._extract_chart_data(chart, results, query)
+#         except Exception as e:
+#             _logger.error(f"Error in preview_chart: {e}")
+#             return {'error': str(e)}
+        
+#     @http.route('/dashboard/dynamic_chart_page/', type='json', auth='user')
+#     def get_chart_page(self, chart_id, page=0, page_size=50, cco=False, branches_id=None, **kw):
+#         """Get paginated chart data for a single chart with improved performance"""
+#         if branches_id is None:
+#             branches_id = []
+        
+#         # Validate inputs
+#         try:
+#             chart_id = int(chart_id)
+#             page = max(0, int(page))
+#             page_size = min(100, max(1, int(page_size)))
+#         except (ValueError, TypeError):
+#             return {'error': 'Invalid parameters'}
+        
+#         # Get current user ID
+#         user_id = request.env.user.id
+#         datepicked = 20000
+        
+#         # Generate cache key for this specific page
+#         unique_id = self.get_unique_client_identifier()
+#         cache_key = f"chart_page_{chart_id}_{page}_{page_size}_{cco}_{branches_id}_{datepicked}_{unique_id}"
+        
+#         # Check cache first
+#         cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
+#         if cache_data:
+#             return cache_data
+        
+#         try:
+#             # Get the chart
+#             chart = request.env['res.dashboard.charts'].browse(chart_id)
+#             if not chart.exists():
+#                 return {'error': 'Chart not found'}
+            
+#             # Execute count query in isolated transaction
+#             with request.env.registry.cursor() as cr:
+#                 # Simple count query with timeout
+#                 cr.execute("SET LOCAL statement_timeout = 5000;")  # 5 seconds
+#                 cr.execute(f"""
+#                     SELECT COUNT(*) as total 
+#                     FROM ({chart.query.replace(';', '')}) AS count_query
+#                 """)
+#                 count_result = cr.dictfetchone()
+#                 total_count = count_result['total'] if count_result else 0
+            
+#             # Process the results with temporary table optimization
+#             result = self.chart_data_service.process_paginated_results(
+#                 chart, 
+#                 chart.query, 
+#                 total_count, 
+#                 page, 
+#                 page_size
+#             )
+            
+#             # Store in cache before returning
+#             request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id, ttl=300)
+#             return result
+        
+#         except Exception as e:
+#             _logger.error(f"Error in get_chart_page: {e}")
+#             return {'error': str(e)}
+
+#     @http.route('/dashboard/dynamic_charts/', type='json', auth='user')
+#     def get_chart_data(self, cco, branches_id, **kw):
+#         """Get chart data in JSON format for all charts with improved performance"""
+#         try:
+#             # Input validation and sanitization
+#             if not isinstance(cco, bool):
+#                 cco = str(cco).lower() == 'true'
+                
+#             if not isinstance(branches_id, list):
+#                 try:
+#                     branches_id = json.loads(branches_id) if branches_id else []
+#                 except (ValueError, TypeError):
+#                     branches_id = []
+            
+#             # Get current user ID
+#             user_id = request.env.user.id
+            
+#             datepicked = 20000
+    
+#             # Generate cache key
+#             unique_id = self.get_unique_client_identifier()
+#             branches_str = json.dumps(branches_id) if branches_id else '[]'
+#             # cache_key = f"charts_data_{cco}_{branches_str}_{unique_id}"
+#             cache_key = f"charts_data_{cco}_{branches_str}_{datepicked}_{unique_id}"
+            
+#             # Check if we have valid cache for this user
+#             cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
+#             if cache_data:
+#                 return cache_data
+            
+#             # If no cache, generate the data
+#             result = self.get_chart_data_internal(cco, branches_id)
+            
+#             # Return even if empty to avoid repeating slow queries
+#             if not result:
+#                 result = []
+                
+#             # Store in cache before returning
+#             request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id)
+            
+#             return result
+#         except Exception as e:
+#             _logger.error(f"Error in get_chart_data: {e}")
+#             # Return empty result in case of errors to prevent further requests
+#             return []
+    
+#     def get_chart_data_internal(self, cco, branches_id):
+#         """Internal method for getting chart data with temporary table optimization"""
+#         # Get all active charts
+#         charts = request.env['res.dashboard.charts'].search([('state', '=', 'active')])
+        
+#         # No charts, return empty list
+#         if not charts:
+#             return []
+        
+#         # Process all charts in a batch with temporary table optimization
+#         return self.chart_data_service.process_multiple_charts(charts, cco, branches_id)
+    
+#     def _is_safe_query(self, query):
+#         """Check if a query is safe to execute"""
+#         if not query:
+#             return False
+            
+#         # Prevent multiple statements
+#         if ';' in query and not query.strip().endswith(';'):
+#             return False
+            
+#         # Block dangerous SQL commands
+#         unsafe_commands = [
+#             'UPDATE', 'DELETE', 'INSERT', 'ALTER', 'DROP', 'TRUNCATE', 
+#             'CREATE', 'GRANT', 'REVOKE', 'SET ROLE'
+#         ]
+        
+#         for cmd in unsafe_commands:
+#             if re.search(r'\b' + cmd + r'\b', query, re.IGNORECASE):
+#                 return False
+                
+#         return True
+
+
+
+import psycopg2
+from odoo import api, http
 from odoo.http import request
 import json
 import logging
 import re
-from datetime import datetime, timedelta
+import time
 
 _logger = logging.getLogger(__name__)
 
 class DynamicChartController(http.Controller):
-    """Controller for handling dynamic chart requests with improved performance"""
+    """Controller for handling dynamic chart requests with security and performance"""
     
     def __init__(self):
         super(DynamicChartController, self).__init__()
         # Import here to avoid circular imports
-        from ..services.chart_data_service import ChartDataService
-        from ..utils.cache_key_unique_identifier import get_unique_client_identifier
+        from ..services.branch_security import ChartSecurityService
+        from ..utils.cache_key_unique_identifier import generate_cache_key
         
-        self.chart_data_service = ChartDataService()
-        self.get_unique_client_identifier = get_unique_client_identifier
+        self.security_service = ChartSecurityService()
+        self.generate_cache_key = generate_cache_key
+        
+        # Enable debug logging for chart issues
+        self.debug_mode = True
+        
+    def _debug_log(self, message):
+        """Log debug messages if debug mode is enabled"""
+        if self.debug_mode:
+            _logger.info(f"CHART DEBUG: {message}")
     
     @http.route('/web/dynamic_charts/preview', type='json', auth='user')
     def preview_chart(self, chart_type, query, x_axis_field=None, y_axis_field=None, color_scheme='default'):
-        """Preview chart without saving - with query safety checks"""
+        """Preview chart without saving - with query safety checks and security"""
         try:
             # Apply query limit for safety
             if not self._is_safe_query(query):
@@ -33,27 +237,46 @@ class DynamicChartController(http.Controller):
                 'query': query,
                 'x_axis_field': x_axis_field,
                 'y_axis_field': y_axis_field,
-                'color_scheme': color_scheme
+                'color_scheme': color_scheme,
+                # Add default branch field for security
+                'branch_field': 'branch_id',
+                'branch_filter': True,
+                'date_field': 'create_date'  # Default date field
             })
             
             # Run validation manually since it's a new record
-            chart._check_query_safety()
+            if hasattr(chart, '_check_query_safety'):
+                chart._check_query_safety()
+            
+            # Apply security filters to the query
+            secured_query = self.security_service.secure_chart_query(chart, False, [])
             
             # Process query in isolated transaction
             with request.env.registry.cursor() as new_cr:
                 # Execute with timeout
                 new_cr.execute("SET LOCAL statement_timeout = 10000;")  # 10 seconds
-                new_cr.execute(query)
+                
+                start_time = time.time()
+                new_cr.execute(secured_query)
+                execution_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+                
                 results = new_cr.dictfetchall()
                 
-                return self.chart_data_service._extract_chart_data(chart, results, query)
+                # Extract chart data
+                chart_data = self._extract_chart_data(chart, results, secured_query)
+                
+                # Add execution time info
+                chart_data['execution_time_ms'] = round(execution_time, 2)
+                
+                return chart_data
+                
         except Exception as e:
             _logger.error(f"Error in preview_chart: {e}")
             return {'error': str(e)}
-        
+    
     @http.route('/dashboard/dynamic_chart_page/', type='json', auth='user')
     def get_chart_page(self, chart_id, page=0, page_size=50, cco=False, branches_id=None, **kw):
-        """Get paginated chart data for a single chart with improved performance"""
+        """Get paginated chart data for a single chart with robust error handling"""
         if branches_id is None:
             branches_id = []
         
@@ -65,77 +288,930 @@ class DynamicChartController(http.Controller):
         except (ValueError, TypeError):
             return {'error': 'Invalid parameters'}
         
+        # Normalize cco parameter
+        if not isinstance(cco, bool):
+            cco = str(cco).lower() == 'true'
+        
+        # Normalize branches_id parameter
+        if not isinstance(branches_id, list):
+            try:
+                branches_id = json.loads(branches_id) if branches_id else []
+            except (ValueError, TypeError):
+                branches_id = []
+        
         # Get current user ID
         user_id = request.env.user.id
-        datepicked = 20000
+        datepicked = kw.get('datepicked', 20000)
         
-        # Generate cache key for this specific page
-        unique_id = self.get_unique_client_identifier()
-        cache_key = f"chart_page_{chart_id}_{page}_{page_size}_{cco}_{branches_id}_{datepicked}_{unique_id}"
+        # Generate cache key
+        cache_params = {
+            'chart_id': chart_id,
+            'page': page,
+            'page_size': page_size,
+            'cco': cco,
+            'branches_id': branches_id,
+            'datepicked': datepicked,
+            'user_branches': self.security_service.get_user_branch_ids()
+        }
+        
+        cache_key = self.generate_cache_key('chart_page', cache_params)
         
         # Check cache first
         cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
         if cache_data:
             return cache_data
         
+        # Use the robust retry handler
+        return self.get_chart_with_retries(chart_id, page, page_size, cco, branches_id, cache_key, user_id)
+
+
+    # @http.route('/dashboard/dynamic_chart_page/', type='json', auth='user')
+    # def get_chart_page(self, chart_id, page=0, page_size=50, cco=False, branches_id=None, **kw):
+    #     """Get paginated chart data for a single chart with security"""
+    #     if branches_id is None:
+    #         branches_id = []
+        
+    #     # Validate inputs
+    #     try:
+    #         chart_id = int(chart_id)
+    #         page = max(0, int(page))
+    #         page_size = min(100, max(1, int(page_size)))
+    #     except (ValueError, TypeError):
+    #         return {'error': 'Invalid parameters'}
+        
+    #     # Normalize cco parameter
+    #     if not isinstance(cco, bool):
+    #         cco = str(cco).lower() == 'true'
+        
+    #     # Normalize branches_id parameter
+    #     if not isinstance(branches_id, list):
+    #         try:
+    #             branches_id = json.loads(branches_id) if branches_id else []
+    #         except (ValueError, TypeError):
+    #             branches_id = []
+        
+    #     # Get current user ID
+    #     user_id = request.env.user.id
+    #     datepicked = kw.get('datepicked', 20000)
+        
+    #     # Generate cache key for this specific page with user branch context
+    #     cache_params = {
+    #         'chart_id': chart_id,
+    #         'page': page,
+    #         'page_size': page_size,
+    #         'cco': cco,
+    #         'branches_id': branches_id,
+    #         'datepicked': datepicked,
+    #         'user_branches': self.security_service.get_user_branch_ids()
+    #     }
+        
+    #     cache_key = self.generate_cache_key('chart_page', cache_params)
+        
+    #     # Check cache first
+    #     cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
+    #     if cache_data:
+    #         return cache_data
+        
+    #     try:
+    #         # Get the chart
+    #         chart = request.env['res.dashboard.charts'].browse(chart_id)
+    #         if not chart.exists():
+    #             return {'error': 'Chart not found'}
+            
+    #         # Check if chart uses materialized view
+    #         return self._get_chart_from_materialized_view(chart, page, page_size, cco, branches_id, cache_key, user_id)
+    #         # if chart.use_materialized_view:
+    #         #     return self._get_chart_from_materialized_view(chart, page, page_size, cco, branches_id, cache_key, user_id)
+    #         # else:
+    #         #     return self._get_chart_from_direct_query(chart, page, page_size, cco, branches_id, cache_key, user_id)
+            
+    #     except Exception as e:
+    #         _logger.error(f"Error in get_chart_page: {e}")
+    #         return {'error': str(e)}
+        
+    def _safe_execute_query(self, cr, query, params=None):
+        """Execute a query with proper error handling to avoid transaction blocks"""
         try:
-            # Get the chart
-            chart = request.env['res.dashboard.charts'].browse(chart_id)
-            if not chart.exists():
-                return {'error': 'Chart not found'}
+            # Set a timeout for safety
+            cr.execute("SET LOCAL statement_timeout = 15000;")  # 15 seconds
             
-            # Execute count query in isolated transaction
+            # Execute the actual query
+            if params:
+                cr.execute(query, params)
+            else:
+                cr.execute(query)
+                
+            return True, cr.fetchall()
+            
+        except Exception as e:
+            # Make sure to roll back on error
+            cr.rollback()
+            _logger.error(f"Query execution error: {e}")
+            return False, str(e)
+        
+    def get_chart_with_retries(self, chart_id, page, page_size, cco, branches_id, cache_key, user_id):
+        """Get chart data with robust retry handling for serialization failures"""
+        max_retries = 5
+        retry_count = 0
+        
+        while retry_count < max_retries:
+            try:
+                # Get the chart
+                chart = request.env['res.dashboard.charts'].browse(chart_id)
+                if not chart.exists():
+                    return {'error': 'Chart not found'}
+                
+                # Always use materialized view
+                return self._get_chart_from_materialized_view(chart, page, page_size, cco, branches_id, cache_key, user_id)
+                
+            except psycopg2.errors.SerializationFailure as e:
+                retry_count += 1
+                if retry_count >= max_retries:
+                    _logger.error(f"Maximum retries reached for chart {chart_id}: {e}")
+                    return {'error': 'Database serialization failure, please try again'}
+                
+                # Exponential backoff
+                wait_time = 2 ** (retry_count - 1)
+                _logger.info(f"Serialization failure for chart {chart_id}, retry {retry_count} in {wait_time}s")
+                time.sleep(wait_time)
+                
+            except Exception as e:
+                _logger.error(f"Error in get_chart_with_retries: {e}")
+                return {'error': str(e)}
+                
+        return {'error': 'Failed after multiple retries'}
+    
+    def _get_chart_from_materialized_view(self, chart, page, page_size, cco, branches_id, cache_key, user_id):
+        """Get chart data from materialized view with pagination and improved transaction handling"""
+        try:
+            view_name = f"dashboard_chart_view_{chart.id}"
+            
+            # First, check if the view actually exists
+            with request.env.registry.cursor() as check_cr:
+                # Set less strict isolation level
+                check_cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
+                
+                check_cr.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM pg_catalog.pg_class c
+                        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+                        WHERE c.relname = %s AND c.relkind = 'm'
+                    )
+                """, (view_name,))
+                
+                view_exists = check_cr.fetchone()[0]
+                
+                if not view_exists:
+                    _logger.warning(f"Materialized view {view_name} does not exist!")
+                    # Try to create it on-demand using retry logic
+                    refresher = request.env['dashboard.chart.view.refresher'].sudo()
+                    if hasattr(refresher, 'create_materialized_view_with_retry'):
+                        refresher.create_materialized_view_with_retry(chart.id)
+                    else:
+                        refresher.create_materialized_view_for_chart(chart.id)
+                    
+                    # Recheck if it exists now
+                    check_cr.execute("""
+                        SELECT EXISTS (
+                            SELECT FROM pg_catalog.pg_class c
+                            JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+                            WHERE c.relname = %s AND c.relkind = 'm'
+                        )
+                    """, (view_name,))
+                    
+                    view_exists = check_cr.fetchone()[0]
+                    
+                    if not view_exists:
+                        _logger.error(f"Failed to create materialized view {view_name}")
+                        return self._get_chart_from_direct_query(chart, page, page_size, cco, branches_id, cache_key, user_id)
+            
+            # Now check columns and execute query
             with request.env.registry.cursor() as cr:
-                # Simple count query with timeout
-                cr.execute("SET LOCAL statement_timeout = 5000;")  # 5 seconds
+                # Set less strict isolation level
+                cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
+                
+                # Get all columns
                 cr.execute(f"""
-                    SELECT COUNT(*) as total 
-                    FROM ({chart.query.replace(';', '')}) AS count_query
-                """)
-                count_result = cr.dictfetchone()
-                total_count = count_result['total'] if count_result else 0
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name = %s
+                """, (view_name,))
+                
+                columns = [row[0] for row in cr.fetchall()]
+                
+                if not columns:
+                    _logger.warning(f"No columns found in materialized view {view_name}")
+                    
+                    # Direct SQL approach - bypass ORM completely
+                    with request.env.registry.cursor() as direct_cr:
+                        try:
+                            direct_cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
+                            
+                            # Get the chart query directly
+                            direct_cr.execute("""
+                                SELECT query FROM res_dashboard_charts WHERE id = %s
+                            """, (chart.id,))
+                            
+                            chart_query = direct_cr.fetchone()[0]
+                            
+                            # Drop and recreate
+                            direct_cr.execute(f"DROP MATERIALIZED VIEW IF EXISTS {view_name}")
+                            
+                            original_query = chart_query.strip()
+                            if original_query.endswith(';'):
+                                original_query = original_query[:-1]
+                                
+                            create_view_query = f"""
+                                CREATE MATERIALIZED VIEW {view_name} AS
+                                {original_query}
+                                WITH DATA
+                            """
+                            
+                            _logger.info(f"Directly creating view with query: {create_view_query}")
+                            direct_cr.execute(create_view_query)
+                            direct_cr.commit()
+                            
+                            _logger.info(f"Direct SQL recreation of view {view_name} complete")
+                        except Exception as direct_error:
+                            direct_cr.rollback()
+                            _logger.error(f"Direct SQL recreation failed: {direct_error}")
+                            return self._get_chart_from_direct_query(chart, page, page_size, cco, branches_id, cache_key, user_id)
+                
+                # Find the proper column for branch filtering
+                branch_col = None
+                if chart.branch_field:
+                    branch_field = chart.branch_field.split('.')[-1] if '.' in chart.branch_field else chart.branch_field
+                    
+                    # First, try exact match
+                    if branch_field in columns:
+                        branch_col = branch_field
+                    else:
+                        # Try all column detection methods
+                        branch_candidates = ['branch_id', 'id', 'branch', 'partner_branch_id']
+                        for candidate in branch_candidates:
+                            if candidate in columns:
+                                branch_col = candidate
+                                break
+                        
+                        # If still not found, try columns containing 'branch'
+                        if not branch_col:
+                            for col in columns:
+                                if 'branch' in col.lower():
+                                    branch_col = col
+                                    break
+                
+                # Build query against the materialized view
+                query = f"SELECT * FROM {view_name}"
+                
+                # Apply security filters with proper column name
+                where_clause_added = False
+                if chart.branch_field and not cco and not self.security_service.is_cco_user():
+                    user_branches = self.security_service.get_user_branch_ids()
+                    effective_branches = []
+                    
+                    if branches_id:
+                        # If branches specified in UI, intersect with user's branches
+                        if user_branches:
+                            effective_branches = [b for b in branches_id if b in user_branches]
+                        else:
+                            effective_branches = branches_id
+                    elif user_branches:
+                        effective_branches = user_branches
+                    
+                    # Build WHERE clause using the correct column name (not table alias)
+                    if effective_branches and branch_col:
+                        if len(effective_branches) == 1:
+                            query += f" WHERE {branch_col} = {effective_branches[0]}"
+                        else:
+                            query += f" WHERE {branch_col} IN {tuple(effective_branches)}"
+                        where_clause_added = True
+                    elif branch_col:
+                        # No branches specified, but we have a branch column - return no results
+                        query += " WHERE 1=0"
+                        where_clause_added = True
+                
+                # Find column for sorting
+                sort_col = None
+                if chart.y_axis_field:
+                    y_field = chart.y_axis_field.split('.')[-1] if '.' in chart.y_axis_field else chart.y_axis_field
+                    if y_field in columns:
+                        sort_col = y_field
+                    else:
+                        # Look for numeric column names
+                        candidates = ['count', 'customer_count', 'high_risk_customers', 'value', 'amount', 'total']
+                        for candidate in candidates:
+                            if candidate in columns:
+                                sort_col = candidate
+                                break
+                
+                # Get total count for pagination
+                count_query = f"SELECT COUNT(*) as total FROM ({query}) AS count_query"
+                try:
+                    cr.execute(count_query)
+                    count_result = cr.fetchone()
+                    total_count = count_result[0] if count_result else 0
+                except Exception as e:
+                    _logger.error(f"Error running count query: {e}")
+                    total_count = 0
+                
+                # Add ORDER BY if we found a suitable column
+                if sort_col:
+                    query += f" ORDER BY {sort_col} DESC"
+                
+                # Add pagination
+                query += f" LIMIT {page_size} OFFSET {page * page_size}"
+                
+                # Execute query with a timeout
+                cr.execute("SET LOCAL statement_timeout = 30000;")  # 30 seconds
+                try:
+                    cr.execute(query)
+                    results = cr.dictfetchall()
+                    
+                    # Extract chart data
+                    chart_data = self._extract_chart_data(chart, results, query)
+                    
+                    # Add pagination information
+                    chart_data['pagination'] = {
+                        'total': total_count,
+                        'page': page,
+                        'page_size': page_size,
+                        'pages': (total_count + page_size - 1) // page_size if page_size > 0 else 0
+                    }
+                    
+                    # Store in cache
+                    request.env['res.dashboard.cache'].set_cache(cache_key, chart_data, user_id)
+                    
+                    return chart_data
+                except Exception as query_err:
+                    _logger.error(f"Error executing materialized view query: {query_err}")
+                    # Fall back to direct query
+                    return self._get_chart_from_direct_query(chart, page, page_size, cco, branches_id, cache_key, user_id)
+        except Exception as e:
+            _logger.error(f"Error getting chart from materialized view: {e}")
+            # Fall back to direct query
+            return self._get_chart_from_direct_query(chart, page, page_size, cco, branches_id, cache_key, user_id)
+    
+    # def _get_chart_from_materialized_view(self, chart, page, page_size, cco, branches_id, cache_key, user_id):
+    #     """Get chart data from materialized view with pagination and detailed debugging"""
+    #     try:
+    #         view_name = f"dashboard_chart_view_{chart.id}"
             
-            # Process the results with temporary table optimization
-            result = self.chart_data_service.process_paginated_results(
-                chart, 
-                chart.query, 
-                total_count, 
-                page, 
-                page_size
+    #         # First, check if the view actually exists
+    #         with request.env.registry.cursor() as check_cr:
+    #             check_cr.execute("""
+    #                 SELECT EXISTS (
+    #                     SELECT FROM pg_catalog.pg_class c
+    #                     JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+    #                     WHERE c.relname = %s AND c.relkind = 'm'
+    #                 )
+    #             """, (view_name,))
+                
+    #             view_exists = check_cr.fetchone()[0]
+                
+    #             if not view_exists:
+    #                 _logger.warning(f"Materialized view {view_name} does not exist!")
+    #                 # Try to create it on-demand
+    #                 request.env['dashboard.chart.view.refresher'].create_materialized_view_for_chart(chart.id)
+                    
+    #                 # Recheck if it exists now
+    #                 check_cr.execute("""
+    #                     SELECT EXISTS (
+    #                         SELECT FROM pg_catalog.pg_class c
+    #                         JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+    #                         WHERE c.relname = %s AND c.relkind = 'm'
+    #                     )
+    #                 """, (view_name,))
+                    
+    #                 view_exists = check_cr.fetchone()[0]
+                    
+    #                 if not view_exists:
+    #                     _logger.error(f"Failed to create materialized view {view_name}")
+    #                     # return self._get_chart_from_direct_query(chart, page, page_size, cco, branches_id, cache_key, user_id)
+            
+    #         # Now get the columns from the materialized view
+    #         with request.env.registry.cursor() as cr:
+    #             cr.execute(f"""
+    #                 SELECT column_name 
+    #                 FROM information_schema.columns 
+    #                 WHERE table_name = %s
+    #             """, (view_name,))
+                
+    #             columns = [row[0] for row in cr.fetchall()]
+                
+    #             if not columns:
+    #                 _logger.warning(f"No columns found in materialized view {view_name}")
+                    
+    #                 # Try to diagnose the issue
+    #                 refresher = request.env['dashboard.chart.view.refresher']
+    #                 diagnosis = refresher.diagnose_materialized_view(chart.id)
+    #                 _logger.warning(f"Materialized view diagnosis: {diagnosis}")
+                    
+    #                 # Attempt to recreate the view
+    #                 _logger.info(f"Attempting to recreate materialized view for chart {chart.id}")
+    #                 refresher.create_materialized_view_for_chart(chart.id)
+                    
+    #                 # Check again for columns
+    #                 cr.execute(f"""
+    #                     SELECT column_name 
+    #                     FROM information_schema.columns 
+    #                     WHERE table_name = %s
+    #                 """, (view_name,))
+                    
+    #                 columns = [row[0] for row in cr.fetchall()]
+                    
+    #                 if not columns:
+    #                     _logger.error(f"Still no columns found after recreation - falling back to direct query")
+    #                     return self._get_chart_from_direct_query(chart, page, page_size, cco, branches_id, cache_key, user_id)
+                
+    #             # Log all columns for debugging
+    #             _logger.info(f"Columns in view {view_name}: {columns}")
+                
+    #             # Find the proper column for branch filtering
+    #             branch_col = None
+    #             if chart.branch_field:
+    #                 branch_field = chart.branch_field.split('.')[-1] if '.' in chart.branch_field else chart.branch_field
+                    
+    #                 # First, try exact match
+    #                 if branch_field in columns:
+    #                     branch_col = branch_field
+    #                     _logger.debug(f"Found exact branch column match: {branch_col}")
+    #                 else:
+    #                     # Try all column detection methods
+    #                     branch_candidates = ['branch_id', 'id', 'branch', 'partner_branch_id']
+    #                     for candidate in branch_candidates:
+    #                         if candidate in columns:
+    #                             branch_col = candidate
+    #                             _logger.debug(f"Found branch column from candidates: {branch_col}")
+    #                             break
+                        
+    #                     # If still not found, try columns containing 'branch'
+    #                     if not branch_col:
+    #                         for col in columns:
+    #                             if 'branch' in col.lower():
+    #                                 branch_col = col
+    #                                 _logger.debug(f"Found branch column by partial match: {branch_col}")
+    #                                 break
+                
+    #             # Build query against the materialized view
+    #             query = f"SELECT * FROM {view_name}"
+                
+    #             # Apply security filters with proper column name
+    #             where_clause_added = False
+    #             if chart.branch_field and not cco and not self.security_service.is_cco_user():
+    #                 user_branches = self.security_service.get_user_branch_ids()
+    #                 effective_branches = []
+                    
+    #                 if branches_id:
+    #                     # If branches specified in UI, intersect with user's branches
+    #                     if user_branches:
+    #                         effective_branches = [b for b in branches_id if b in user_branches]
+    #                     else:
+    #                         effective_branches = branches_id
+    #                 elif user_branches:
+    #                     # Otherwise use user's branches
+    #                     effective_branches = user_branches
+                    
+    #                 # Build WHERE clause using the correct column name (not table alias)
+    #                 if effective_branches and branch_col:
+    #                     if len(effective_branches) == 1:
+    #                         query += f" WHERE {branch_col} = {effective_branches[0]}"
+    #                     else:
+    #                         query += f" WHERE {branch_col} IN {tuple(effective_branches)}"
+    #                     where_clause_added = True
+    #                 elif branch_col:
+    #                     # No branches specified, but we have a branch column - return no results
+    #                     query += " WHERE 1=0"
+    #                     where_clause_added = True
+                
+    #             # Add high-risk filter if needed (branch_id should be part of the effective_branches list)
+    #             high_risk_filter = request.httprequest.cookies.get('high_risk_filter')
+    #             if high_risk_filter == 'on':
+    #                 _logger.info("High risk filter is enabled")
+    #                 # Look for risk_level column
+    #                 risk_column = None
+    #                 risk_candidates = ['risk_level', 'partner_risk_level', 'customer_risk_level']
+                    
+    #                 for candidate in risk_candidates:
+    #                     if candidate in columns:
+    #                         risk_column = candidate
+    #                         break
+                    
+    #                 if risk_column:
+    #                     if where_clause_added:
+    #                         query += f" AND {risk_column} = 'high'"
+    #                     else:
+    #                         query += f" WHERE {risk_column} = 'high'"
+    #                         where_clause_added = True
+                
+    #             # Log the query for debugging
+    #             _logger.info(f"Built materialized view query: {query}")
+                
+    #             # Get total count for pagination
+    #             count_query = f"SELECT COUNT(*) as total FROM ({query}) AS count_query"
+    #             try:
+    #                 cr.execute(count_query)
+    #                 count_result = cr.fetchone()
+    #                 total_count = count_result[0] if count_result else 0
+    #             except Exception as e:
+    #                 _logger.error(f"Error running count query: {e}")
+    #                 total_count = 0
+                
+    #             # Find a column for sorting
+    #             sort_col = None
+    #             if chart.y_axis_field:
+    #                 y_field = chart.y_axis_field.split('.')[-1] if '.' in chart.y_axis_field else chart.y_axis_field
+    #                 if y_field in columns:
+    #                     sort_col = y_field
+    #                 else:
+    #                     # Look for numeric column names
+    #                     candidates = ['count', 'customer_count', 'high_risk_customers', 'value', 'amount', 'total']
+    #                     for candidate in candidates:
+    #                         if candidate in columns:
+    #                             sort_col = candidate
+    #                             break
+                
+    #             # Add ORDER BY if we found a suitable column
+    #             if sort_col:
+    #                 query += f" ORDER BY {sort_col} DESC"
+                
+    #             # Add pagination
+    #             query += f" LIMIT {page_size} OFFSET {page * page_size}"
+                
+    #             # Execute query with a timeout
+    #             cr.execute("SET LOCAL statement_timeout = 30000;")  # 30 seconds
+    #             try:
+    #                 cr.execute(query)
+    #                 results = cr.dictfetchall()
+                    
+    #                 # Log result count for debugging
+    #                 _logger.info(f"Query returned {len(results)} rows")
+                    
+    #                 # Extract chart data
+    #                 chart_data = self._extract_chart_data(chart, results, query)
+                    
+    #                 # Add pagination information
+    #                 chart_data['pagination'] = {
+    #                     'total': total_count,
+    #                     'page': page,
+    #                     'page_size': page_size,
+    #                     'pages': (total_count + page_size - 1) // page_size if page_size > 0 else 0
+    #                 }
+                    
+    #                 # Store in cache
+    #                 request.env['res.dashboard.cache'].set_cache(cache_key, chart_data, user_id)
+                    
+    #                 return chart_data
+    #             except Exception as query_err:
+    #                 _logger.error(f"Error executing materialized view query: {query_err}")
+    #                 # Fall back to direct query
+    #                 return self._get_chart_from_direct_query(chart, page, page_size, cco, branches_id, cache_key, user_id)
+    #     except Exception as e:
+    #         _logger.error(f"Error getting chart from materialized view: {e}")
+    #         # Fall back to direct query
+    #         return self._get_chart_from_direct_query(chart, page, page_size, cco, branches_id, cache_key, user_id)
+
+
+        
+    def get_chart_data_from_direct_query(self, chart, cco, branches_id):
+        """Get chart data directly from the database with thorough error prevention"""
+        # Apply security to the query
+        try:
+            secured_query = self.security_service.secure_chart_query(chart, cco, branches_id)
+            
+            # Validate query syntax before execution
+            is_valid, validation_message = self.validate_query_syntax(secured_query)
+            if not is_valid:
+                _logger.error(f"Invalid query for chart {chart.id}: {validation_message}")
+                
+                # For diagnosis, log the problematic parts
+                _logger.error(f"Original query: {chart.query}")
+                _logger.error(f"Secured query: {secured_query}")
+                
+                return {
+                    'id': chart.id,
+                    'title': chart.name,
+                    'type': chart.chart_type,
+                    'error': f"Query syntax error: {validation_message}",
+                    'labels': [],
+                    'datasets': [{'data': [], 'backgroundColor': []}]
+                }
+            
+            # Create a new cursor for isolation
+            with request.env.registry.cursor() as cr:
+                try:
+                    # Execute with timeout
+                    cr.execute("SET LOCAL statement_timeout = 15000;")  # 15 seconds
+                    
+                    # Start timing
+                    start_time = time.time()
+                    
+                    # Execute query with proper error handling
+                    cr.execute(secured_query)
+                    execution_time = (time.time() - start_time) * 1000  # ms
+                    
+                    # Fetch results
+                    results = cr.dictfetchall()
+                    
+                    # Extract chart data
+                    chart_data = self._extract_chart_data(chart, results, secured_query)
+                    
+                    # Add execution time for monitoring
+                    chart_data['execution_time_ms'] = round(execution_time, 2)
+                    
+                    # Record statistics
+                    self._record_execution_stats(chart.id, execution_time, 'success')
+                    
+                    return chart_data
+                    
+                except psycopg2.Error as sql_error:
+                    # Explicit rollback
+                    cr.rollback()
+                    error_msg = str(sql_error)
+                    _logger.error(f"SQL error for chart {chart.id}: {error_msg}")
+                    
+                    # Record the error
+                    self._record_execution_stats(chart.id, 0, 'error', error_msg)
+                    
+                    # Provide user-friendly error
+                    friendly_msg = self._get_friendly_error_message(error_msg)
+                    return {
+                        'id': chart.id,
+                        'title': chart.name,
+                        'type': chart.chart_type,
+                        'error': friendly_msg,
+                        'labels': [],
+                        'datasets': [{'data': [], 'backgroundColor': []}]
+                    }
+                    
+                except Exception as e:
+                    # Handle any other errors
+                    cr.rollback()
+                    _logger.error(f"Error executing chart {chart.id}: {str(e)}")
+                    
+                    # Record the error
+                    self._record_execution_stats(chart.id, 0, 'error', str(e))
+                    
+                    return {
+                        'id': chart.id,
+                        'title': chart.name,
+                        'type': chart.chart_type,
+                        'error': str(e),
+                        'labels': [],
+                        'datasets': [{'data': [], 'backgroundColor': []}]
+                    }
+                    
+        except Exception as e:
+            _logger.error(f"Error preparing chart query: {str(e)}")
+            return {
+                'id': chart.id,
+                'title': chart.name,
+                'type': chart.chart_type,
+                'error': f"Error preparing query: {str(e)}",
+                'labels': [],
+                'datasets': [{'data': [], 'backgroundColor': []}]
+            }
+
+    def _get_friendly_error_message(self, error_msg):
+        """Convert technical SQL errors to user-friendly messages"""
+        if 'syntax error' in error_msg.lower():
+            return "SQL syntax error. Please check your query format."
+        elif 'timeout' in error_msg.lower():
+            return "Query timed out. Please simplify your query or enable the materialized view option."
+        elif 'does not exist' in error_msg.lower():
+            if 'column' in error_msg.lower():
+                column = re.search(r'column\s+"([^"]+)"', error_msg)
+                if column:
+                    return f"Column '{column.group(1)}' does not exist. Please check field names."
+            elif 'relation' in error_msg.lower():
+                table = re.search(r'relation\s+"([^"]+)"', error_msg)
+                if table:
+                    return f"Table '{table.group(1)}' does not exist. Please check table names."
+            return "Referenced column or table does not exist. Please check your query."
+        else:
+            return f"Database error: {error_msg}"
+
+    def validate_query_syntax(self, query):
+        """Thoroughly validate SQL query syntax before execution"""
+        try:
+            # Remove comments
+            query = re.sub(r'--.*?$', '', query, flags=re.MULTILINE)
+            query = re.sub(r'/\*.*?\*/', '', query, flags=re.DOTALL)
+            
+            # Check for common SQL syntax errors
+            error_patterns = [
+                (r'WHERE\s+WHERE', 'Duplicate WHERE clause'),
+                (r'AND\s+WHERE', 'Invalid AND WHERE sequence'),
+                (r'\(\s*WHERE', 'WHERE inside parentheses without SELECT/FROM'),
+                (r'WHERE\s*\)', 'WHERE followed directly by closing parenthesis'),
+                (r'WHERE\s+OR\b', 'WHERE followed directly by OR'),
+                (r'WHERE\s+ORDER', 'WHERE followed directly by ORDER'),
+                (r'WHERE\s+GROUP', 'WHERE followed directly by GROUP'),
+                (r'WHERE\s+HAVING', 'WHERE followed directly by HAVING'),
+                (r'AND\s+OR\b', 'Mixed AND OR without parentheses'),
+                (r'OR\s+AND\b', 'Mixed OR AND without parentheses'),
+                (r'WHERE\s*$', 'WHERE at end of query without conditions'),
+                (r'WHERE\s+SELECT', 'WHERE followed by SELECT without comparison'),
+                (r'SELECT\s+FROM\s+WHERE', 'FROM followed directly by WHERE'),
+                (r'FROM\s+WHERE\s+\w+', 'FROM WHERE sequence (missing table)'),
+                (r'\.\s*IN\s*\(', 'Potential syntax error with IN clause'),
+                (r'\.\s*WHERE', 'Table.WHERE syntax error')
+            ]
+            
+            for pattern, error in error_patterns:
+                match = re.search(pattern, query, re.IGNORECASE)
+                if match:
+                    return False, f"SQL syntax error: {error} at '{match.group(0)}'"
+            
+            # Check for balanced parentheses
+            if query.count('(') != query.count(')'):
+                return False, "Unbalanced parentheses in query"
+            
+            # Check for common subquery errors
+            subquery_pattern = r'\(\s*SELECT.*?FROM.*?\)'
+            subqueries = re.finditer(subquery_pattern, query, re.IGNORECASE | re.DOTALL)
+            
+            for match in subqueries:
+                subquery = match.group(0)
+                # Validate subquery
+                for pattern, error in error_patterns:
+                    submatch = re.search(pattern, subquery, re.IGNORECASE)
+                    if submatch:
+                        return False, f"Subquery syntax error: {error} at '{submatch.group(0)}'"
+            
+            return True, "Query syntax appears valid"
+            
+        except Exception as e:
+            return False, f"Query validation error: {str(e)}"
+            
+    def _handle_sql_error(self, sql_error, chart, query):
+        """Handle specific SQL errors with better context and recovery options"""
+        error_msg = str(sql_error)
+        error_data = {
+            'id': chart.id,
+            'title': chart.name,
+            'type': chart.chart_type,
+            'error': error_msg,
+            'labels': [],
+            'datasets': [{'data': [], 'backgroundColor': []}]
+        }
+        
+        # Record the error
+        self._record_execution_stats(chart.id, 0, 'error', error_msg)
+        
+        if 'statement timeout' in error_msg.lower():
+            # Query timeout error - offer solution
+            _logger.error(f"Query timeout for chart {chart.id} - suggesting materialized view")
+            
+            error_data['error'] = (
+                "Query timed out. This chart query is too complex for direct execution. "
+                "Enable the 'Use Materialized View' option in chart settings for better performance."
             )
             
-            # Store in cache before returning
-            request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id, ttl=300)
-            return result
+            # Try to automatically enable materialized view if it's not already enabled
+            if not chart.use_materialized_view:
+                try:
+                    registry = request.env.registry
+                    with registry.cursor() as cr:
+                        env = api.Environment(cr, request.env.uid, request.env.context.copy())
+                        isolated_chart = env['res.dashboard.charts'].browse(chart.id)
+                        
+                        if isolated_chart.exists():
+                            isolated_chart.write({
+                                'use_materialized_view': True,
+                                'materialized_view_refresh_interval': 60,  # Default to hourly refresh
+                                'last_error_message': 'Auto-enabling materialized view due to timeout'
+                            })
+                            cr.commit()
+                            
+                            # Try to create the view
+                            env['dashboard.chart.view.refresher'].create_materialized_view_for_chart(chart.id)
+                            
+                            error_data['materialized_view_enabled'] = True
+                            error_data['error'] += " (Materialized view has been automatically enabled)"
+                except Exception as e:
+                    _logger.error(f"Failed to auto-enable materialized view: {e}")
         
+        elif 'column' in error_msg.lower() and 'does not exist' in error_msg.lower():
+            # Column not found error
+            column_match = re.search(r'column\s+"([^"]+)"\s+does not exist', error_msg, re.IGNORECASE)
+            if column_match:
+                missing_column = column_match.group(1)
+                error_data['error'] = f"Column '{missing_column}' does not exist. Please check the query."
+        
+        elif 'relation' in error_msg.lower() and 'does not exist' in error_msg.lower():
+            # Table not found error
+            table_match = re.search(r'relation\s+"([^"]+)"\s+does not exist', error_msg, re.IGNORECASE)
+            if table_match:
+                missing_table = table_match.group(1)
+                error_data['error'] = f"Table '{missing_table}' does not exist. Please check the query."
+        
+        return error_data
+            
+    def _record_execution_stats(self, chart_id, execution_time, status, error_message=None):
+        """Record execution statistics for a chart with error isolation"""
+        try:
+            # Use a separate cursor to prevent transaction issues
+            registry = request.env.registry
+            with registry.cursor() as cr:
+                env = api.Environment(cr, request.env.uid, request.env.context.copy())
+                chart = env['res.dashboard.charts'].browse(chart_id)
+                
+                if chart.exists():
+                    values = {
+                        'last_execution_time': execution_time,
+                        'last_execution_status': status,
+                    }
+                    
+                    if error_message:
+                        values['last_error_message'] = error_message
+                    else:
+                        values['last_error_message'] = False
+                    
+                    chart.write(values)
+                    cr.commit()
         except Exception as e:
-            _logger.error(f"Error in get_chart_page: {e}")
-            return {'error': str(e)}
-
+            _logger.error(f"Failed to record execution statistics: {e}")
+    
+    def _check_view_exists(self, view_name):
+        """Check if a materialized view exists with proper error handling"""
+        try:
+            with self.env.registry.cursor() as cr:
+                cr.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM pg_catalog.pg_class c
+                        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+                        WHERE c.relname = %s AND c.relkind = 'm'
+                    )
+                """, (view_name,))
+                return cr.fetchone()[0]
+        except Exception as e:
+            _logger.error(f"Error checking if view exists: {e}")
+            return False
+            
+    def _add_pagination_to_query(self, query, page, page_size):
+        """Add pagination to a query, handling existing LIMIT clauses"""
+        # Check if the query already has a LIMIT clause
+        limit_match = re.search(r'\bLIMIT\b\s+\d+', query, re.IGNORECASE)
+        
+        if limit_match:
+            # Create a subquery with the original query including its LIMIT
+            # Then apply our pagination to that subquery
+            return f"""
+                WITH original_query AS ({query}) 
+                SELECT * FROM original_query 
+                OFFSET {page * page_size} 
+                LIMIT {page_size}
+            """
+        else:
+            # No LIMIT in the original query, add pagination directly
+            if not query.strip().endswith(';'):
+                query = query.strip() + " LIMIT " + str(page_size) + " OFFSET " + str(page * page_size)
+            else:
+                query = query.strip()[:-1] + " LIMIT " + str(page_size) + " OFFSET " + str(page * page_size) + ";"
+            return query
+    
     @http.route('/dashboard/dynamic_charts/', type='json', auth='user')
-    def get_chart_data(self, cco, branches_id, **kw):
-        """Get chart data in JSON format for all charts with improved performance"""
+    def get_chart_data(self, cco=False, branches_id=None, **kw):
+        """Get chart data in JSON format for all charts with improved branch handling"""
         try:
             # Input validation and sanitization
             if not isinstance(cco, bool):
                 cco = str(cco).lower() == 'true'
-                
+                    
             if not isinstance(branches_id, list):
                 try:
                     branches_id = json.loads(branches_id) if branches_id else []
                 except (ValueError, TypeError):
                     branches_id = []
+                
+            # # Get current user ID
+            # user_id = request.env.user.id
+            # Get current user ID - support both regular request and background operation
+            try:
+                # Regular request
+                user_id = request.env.user.id
+            except (NameError, AttributeError):
+                # Background operation - the request context manager would have set this
+                user_id = self.env.user.id if hasattr(self, 'env') else None
+                if not user_id:
+                    # Last resort fallback
+                    _logger.warning("Could not determine user_id in get_chart_data")
+                    return []
             
-            # Get current user ID
-            user_id = request.env.user.id
+            datepicked = kw.get('datepicked', 20000)
             
-            datepicked = 20000
-    
-            # Generate cache key
-            unique_id = self.get_unique_client_identifier()
-            branches_str = json.dumps(branches_id) if branches_id else '[]'
-            # cache_key = f"charts_data_{cco}_{branches_str}_{unique_id}"
-            cache_key = f"charts_data_{cco}_{branches_str}_{datepicked}_{unique_id}"
+            # Log parameters for debugging
+            _logger.debug(f"Chart data requested with cco={cco}, branches_id={branches_id}")
+        
+            # Generate cache key that includes user branch context for security
+            cache_params = {
+                'cco': cco,
+                'branches_id': branches_id,
+                'datepicked': datepicked,
+                'user_branches': self.security_service.get_user_branch_ids()
+            }
+            
+            cache_key = self.generate_cache_key('charts_data', cache_params)
             
             # Check if we have valid cache for this user
             cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
@@ -143,32 +1219,489 @@ class DynamicChartController(http.Controller):
                 return cache_data
             
             # If no cache, generate the data
-            result = self.get_chart_data_internal(cco, branches_id)
+            charts = request.env['res.dashboard.charts'].search([('state', '=', 'active')])
             
-            # Return even if empty to avoid repeating slow queries
-            if not result:
-                result = []
-                
+            # Process charts
+            results = []
+            for chart in charts:
+                try:
+                    # Get user branch restriction status
+                    user_has_branch_access = True
+                    if not cco and chart.branch_filter:
+                        # Check if user has access to any branches
+                        user_branches = self.security_service.get_user_branch_ids()
+                        
+                        # Determine effective branches
+                        effective_branches = []
+                        if branches_id:
+                            # If branches specified in UI, intersect with user's branches
+                            if user_branches:
+                                effective_branches = [b for b in branches_id if b in user_branches]
+                            else:
+                                effective_branches = branches_id
+                        elif user_branches:
+                            effective_branches = user_branches
+                        
+                        # Skip chart if user has no access to any branches
+                        if not effective_branches:
+                            user_has_branch_access = False
+                    
+                    if user_has_branch_access:
+                        # Process chart with materialized view or direct query
+                        if chart.use_materialized_view:
+                            chart_data = self._get_chart_data_from_materialized_view(chart, cco, branches_id)
+                        else:
+                            chart_data = self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                        
+                        if chart_data:
+                            results.append(chart_data)
+                except Exception as e:
+                    _logger.error(f"Error processing chart {chart.id}: {e}")
+                    # Skip this chart and continue with others
+            
             # Store in cache before returning
-            request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id)
+            request.env['res.dashboard.cache'].set_cache(cache_key, results, user_id)
             
-            return result
+            return results
         except Exception as e:
             _logger.error(f"Error in get_chart_data: {e}")
-            # Return empty result in case of errors to prevent further requests
+            # Return empty result in case of errors
             return []
+        
+    # def _get_chart_data_from_materialized_view(self, chart, cco, branches_id):
+    #     """Get chart data from materialized view"""
+    #     try:
+    #         # Ensure the view exists and is refreshed if needed
+    #         refresher = request.env['dashboard.chart.view.refresher'].search([('chart_id', '=', chart.id)], limit=1)
+    #         if not refresher:
+    #             # If no refresher record, create the view first
+    #             success = request.env['dashboard.chart.view.refresher'].create_materialized_view_for_chart(chart.id)
+    #             if not success:
+    #                 # Fall back to direct query if view creation fails
+    #                 return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+    #             refresher = request.env['dashboard.chart.view.refresher'].search([('chart_id', '=', chart.id)], limit=1)
+            
+    #         view_name = refresher.view_name
+            
+    #         # Build query against the materialized view
+    #         query = f"SELECT * FROM {view_name}"
+            
+    #         # Apply security filters
+    #         if chart.branch_field and not cco and not self.security_service.is_cco_user():
+    #             user_branches = self.security_service.get_user_branch_ids()
+    #             effective_branches = []
+                
+    #             if branches_id:
+    #                 # If branches specified in UI, intersect with user's branches
+    #                 if user_branches:
+    #                     effective_branches = [b for b in branches_id if b in user_branches]
+    #                 else:
+    #                     effective_branches = branches_id
+    #             elif user_branches:
+    #                 # Otherwise use user's branches
+    #                 effective_branches = user_branches
+                
+    #             # Build WHERE clause
+    #             if effective_branches:
+    #                 if len(effective_branches) == 1:
+    #                     query += f" WHERE {chart.branch_field} = {effective_branches[0]}"
+    #                 else:
+    #                     query += f" WHERE {chart.branch_field} IN {tuple(effective_branches)}"
+    #             else:
+    #                 query += " WHERE 1=0"  # No branches, return empty result
+            
+    #         # Add ORDER BY if available
+    #         if chart.y_axis_field:
+    #             query += f" ORDER BY {chart.y_axis_field} DESC"
+            
+    #         # Add LIMIT
+    #         query += " LIMIT 100"  # Reasonable default limit
+            
+    #         # Execute query
+    #         request.env.cr.execute(query)
+    #         results = request.env.cr.dictfetchall()
+            
+    #         # Extract chart data
+    #         return self._extract_chart_data(chart, results, query)
+            
+    #     except Exception as e:
+    #         _logger.error(f"Error getting chart from materialized view: {e}")
+    #         # Fall back to direct query
+    #         return self._get_chart_data_from_direct_query(chart, cco, branches_id)
     
-    def get_chart_data_internal(self, cco, branches_id):
-        """Internal method for getting chart data with temporary table optimization"""
-        # Get all active charts
-        charts = request.env['res.dashboard.charts'].search([('state', '=', 'active')])
+    def _get_chart_data_from_materialized_view(self, chart, cco, branches_id):
+        """Get chart data from materialized view"""
+        try:
+            # Ensure the view exists and is refreshed if needed
+            refresher = request.env['dashboard.chart.view.refresher'].search([('chart_id', '=', chart.id)], limit=1)
+            if not refresher:
+                # If no refresher record, create the view first
+                success = request.env['dashboard.chart.view.refresher'].create_materialized_view_for_chart(chart.id)
+                if not success:
+                    # Fall back to direct query if view creation fails
+                    return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                refresher = request.env['dashboard.chart.view.refresher'].search([('chart_id', '=', chart.id)], limit=1)
+            
+            view_name = refresher.view_name
+            
+            # Check what columns actually exist in the materialized view
+            with request.env.registry.cursor() as cr:
+                cr.execute(f"""
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name = %s
+                """, (view_name,))
+                columns = [row[0] for row in cr.fetchall()]
+                
+                if not columns:
+                    # View exists but has no columns, or doesn't exist
+                    _logger.warning(f"No columns found in materialized view {view_name}")
+                    return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                
+                # Log columns for debugging
+                _logger.debug(f"Columns in view {view_name}: {columns}")
+                
+                # Find the proper column for branch filtering
+                branch_col = None
+                if chart.branch_field:
+                    # Try direct match first (without table alias)
+                    branch_field = chart.branch_field.split('.')[-1] if '.' in chart.branch_field else chart.branch_field
+                    if branch_field in columns:
+                        branch_col = branch_field
+                    else:
+                        # Try to find any column containing 'id' or 'branch'
+                        for col in columns:
+                            if col == 'id' or 'branch' in col.lower():
+                                branch_col = col
+                                break
+                
+                # Build query against the materialized view
+                query = f"SELECT * FROM {view_name}"
+                
+                # Apply security filters with proper column name
+                if chart.branch_field and not cco and not self.security_service.is_cco_user():
+                    user_branches = self.security_service.get_user_branch_ids()
+                    effective_branches = []
+                    
+                    if branches_id:
+                        # If branches specified in UI, intersect with user's branches
+                        if user_branches:
+                            effective_branches = [b for b in branches_id if b in user_branches]
+                        else:
+                            effective_branches = branches_id
+                    elif user_branches:
+                        effective_branches = user_branches
+                    
+                    # Build WHERE clause using the correct column name (not table alias)
+                    if effective_branches and branch_col:
+                        if len(effective_branches) == 1:
+                            query += f" WHERE {branch_col} = {effective_branches[0]}"
+                        else:
+                            query += f" WHERE {branch_col} IN {tuple(effective_branches)}"
+                    elif branch_col:
+                        # No branches specified, but we have a branch column - return no results
+                        query += " WHERE 1=0"
+                
+                # Find column for sorting
+                sort_col = None
+                if chart.y_axis_field:
+                    y_field = chart.y_axis_field.split('.')[-1] if '.' in chart.y_axis_field else chart.y_axis_field
+                    if y_field in columns:
+                        sort_col = y_field
+                    else:
+                        # Look for numeric column names
+                        candidates = ['count', 'customer_count', 'high_risk_customers', 'value', 'amount', 'total']
+                        for candidate in candidates:
+                            if candidate in columns:
+                                sort_col = candidate
+                                break
+                
+                # Log the query for debugging
+                _logger.debug(f"Built materialized view query: {query}")
+                
+                # Add ORDER BY if we found a suitable column
+                if sort_col:
+                    query += f" ORDER BY {sort_col} DESC"
+                
+                # Add LIMIT
+                query += " LIMIT 100"  # Reasonable default limit
+                
+                # Execute query with a timeout
+                cr.execute("SET LOCAL statement_timeout = 30000;")  # 30 seconds
+                cr.execute(query)
+                results = cr.dictfetchall()
+                
+                # Log result count for debugging
+                _logger.debug(f"Query returned {len(results)} rows")
+                
+                # Extract chart data
+                return self._extract_chart_data(chart, results, query)
+                
+        except Exception as e:
+            _logger.error(f"Error getting chart from materialized view: {e}")
+            # Fall back to direct query
+            return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+
+
+    
+    def _get_chart_data_from_direct_query(self, chart, cco, branches_id):
+        """Get chart data directly from the database with robust error handling and query optimization"""
+        # Apply security to the query
+        secured_query = self.security_service.secure_chart_query(chart, cco, branches_id)
         
-        # No charts, return empty list
-        if not charts:
-            return []
+        # Optimize query - add statement timeout and index hints
+        if "SELECT" in secured_query:
+            optimized_query = secured_query.replace('SELECT', 'SELECT /*+ PARALLEL(2) ROWS(1000) */', 1)
+        else:
+            optimized_query = secured_query
         
-        # Process all charts in a batch with temporary table optimization
-        return self.chart_data_service.process_multiple_charts(charts, cco, branches_id)
+        try:
+            # Execute with isolated cursor and longer timeout for complex queries
+            with request.env.registry.cursor() as cr:
+                try:
+                    # Set a longer timeout for expensive queries
+                    if 'JOIN' in optimized_query and 'GROUP BY' in optimized_query:
+                        # Complex query - set higher timeout
+                        cr.execute("SET LOCAL statement_timeout = 30000;")  # 30 seconds
+                    else:
+                        # Simple query - set normal timeout
+                        cr.execute("SET LOCAL statement_timeout = 15000;")  # 15 seconds
+                    
+                    # Log query for debugging
+                    _logger.debug(f"Executing query for chart {chart.id}: {optimized_query}")
+                    
+                    # Execute the optimized query
+                    cr.execute(optimized_query)
+                    
+                    # Fetch results
+                    results = cr.dictfetchall()
+                    
+                    # Extract chart data
+                    return self._extract_chart_data(chart, results, optimized_query)
+                    
+                except Exception as query_error:
+                    # Rollback to avoid transaction block
+                    cr.rollback()
+                    
+                    # Handle statement timeout errors
+                    if "statement timeout" in str(query_error):
+                        _logger.warning(f"Query timeout for chart {chart.id} - enabling materialized view")
+                        
+                        # Try to auto-enable materialized view for this chart
+                        self._auto_enable_materialized_view(chart.id)
+                    
+                    # Return error data
+                    return {
+                        'id': chart.id,
+                        'title': chart.name,
+                        'type': chart.chart_type,
+                        'error': str(query_error),
+                        'labels': [],
+                        'datasets': [{'data': [], 'backgroundColor': []}]
+                    }
+                    
+        except Exception as e:
+            _logger.error(f"Error executing chart query: {e}")
+            
+            # Return basic error information
+            return {
+                'id': chart.id,
+                'title': chart.name,
+                'type': chart.chart_type,
+                'error': str(e),
+                'labels': [],
+                'datasets': [{'data': [], 'backgroundColor': []}]
+            }
+            
+    def _auto_enable_materialized_view(self, chart_id):
+        """Auto-enable materialized view for queries that timeout"""
+        try:
+            # Use a separate transaction
+            with request.env.registry.cursor() as cr:
+                # Check if chart exists and isn't already using materialized view
+                cr.execute("""
+                    SELECT id, use_materialized_view 
+                    FROM res_dashboard_charts 
+                    WHERE id = %s
+                """, (chart_id,))
+                chart_data = cr.fetchone()
+                
+                if not chart_data or chart_data[1]:
+                    # Chart doesn't exist or already using materialized view
+                    return False
+                
+                # Enable materialized view
+                cr.execute("""
+                    UPDATE res_dashboard_charts
+                    SET use_materialized_view = TRUE,
+                        materialized_view_refresh_interval = 60,
+                        last_error_message = 'Auto-enabled materialized view due to query timeout'
+                    WHERE id = %s
+                """, (chart_id,))
+                
+                # Create the materialized view
+                cr.commit()
+                
+                # Start view creation in background
+                self.env['dashboard.chart.view.refresher'].create_materialized_view_for_chart(chart_id)
+                
+                return True
+                
+        except Exception as e:
+            _logger.error(f"Error auto-enabling materialized view: {e}")
+            return False
+    
+    def _extract_chart_data(self, chart, results, query):
+        """Extract chart data from query results"""
+        if not results:
+            return {
+                'id': chart.id,
+                'title': chart.name,
+                'type': chart.chart_type,
+                'labels': [],
+                'datasets': [{'data': [], 'backgroundColor': []}]
+            }
+            
+        # Extract labels and values
+        x_field = chart.x_axis_field or 'name'
+        if x_field not in results[0]:
+            x_field = next(iter(results[0]))
+            
+        y_field = chart.y_axis_field
+        if not y_field or y_field not in results[0]:
+            # Try finding a numeric field that might be a good y-axis
+            for field in results[0].keys():
+                if field != x_field and field != 'id' and isinstance(results[0][field], (int, float)):
+                    y_field = field
+                    break
+            
+            # If still not found, use the next field that's not x_field or id
+            if not y_field:
+                y_field = next((k for k in results[0].keys() if k != x_field and k != 'id'), None)
+        
+        # Try to find an ID field
+        id_field = 'id'
+        if id_field not in results[0]:
+            id_field = next((k for k in results[0].keys() if k.endswith('_id')), None)
+
+        # Extract the IDs if found
+        ids = [r.get(id_field) for r in results] if id_field and id_field in results[0] else []
+        
+        if not y_field:
+            _logger.error(f"Cannot determine Y-axis field for chart {chart.id}")
+            return {
+                'id': chart.id,
+                'title': chart.name,
+                'type': chart.chart_type,
+                'error': 'Cannot determine Y-axis field from query results',
+                'labels': [],
+                'datasets': [{'data': [], 'backgroundColor': []}]
+            }
+        
+        # Extract labels and values with safety checks
+        labels = [str(r.get(x_field, '')) for r in results]
+        
+        # Convert values to float with safety checks
+        values = []
+        for r in results:
+            val = r.get(y_field)
+            try:
+                values.append(float(val) if val is not None else 0)
+            except (ValueError, TypeError):
+                values.append(0)
+                
+        # Extract domain filters from the query automatically
+        additional_domain = []
+        
+        # Parse conditions from the original query to build the domain
+        if chart.query:
+            # Get original query conditions
+            original_query = chart.query.upper()
+            where_clause = ""
+            
+            # Extract the WHERE clause
+            if "WHERE" in original_query:
+                where_start = original_query.find("WHERE") + 5
+                where_end = -1
+                
+                for clause in ["GROUP BY", "ORDER BY", "LIMIT"]:
+                    clause_pos = original_query.find(clause, where_start)
+                    if clause_pos > -1 and (where_end == -1 or clause_pos < where_end):
+                        where_end = clause_pos
+                
+                where_clause = original_query[where_start:where_end if where_end > -1 else None].strip()
+                
+                # Extract conditions from WHERE clause
+                if where_clause:
+                    conditions = where_clause.split("AND")
+                    for condition in conditions:
+                        condition = condition.strip()
+                        
+                        # Look for field = value patterns
+                        if "=" in condition and "." in condition:
+                            parts = condition.split("=")
+                            field_part = parts[0].strip()
+                            value_part = parts[1].strip()
+                            
+                            # Extract field name without table prefix
+                            if "." in field_part:
+                                table, field = field_part.split(".")
+                                
+                                # Handle different value types
+                                if "'" in value_part:  # String value
+                                    value = value_part.replace("'", "").lower()
+                                    additional_domain.append((field.lower(), '=', value))
+                                elif value_part.isdigit():  # Numeric value
+                                    value = int(value_part)
+                                    additional_domain.append((field.lower(), '=', value))
+        
+        # Generate colors based on selected scheme
+        colors = self._generate_colors(chart.color_scheme, len(results))
+        
+        return {
+            'id': chart.id,
+            'title': chart.name,
+            'type': chart.chart_type,
+            'model_name': chart.target_model,
+            'filter': chart.domain_field,
+            'column': chart.column,
+            'labels': labels,
+            'ids': ids,
+            'datefield': chart.date_field,
+            'additional_domain': additional_domain, 
+            'datasets': [{
+                'data': values,
+                'backgroundColor': colors,
+                'borderColor': colors if chart.chart_type in ['line', 'radar'] else [],
+                'borderWidth': 1
+            }]
+        }
+    
+    def _generate_colors(self, color_scheme, count):
+        """Generate colors based on the selected color scheme"""
+        color_schemes = {
+            'cool': ['#3366cc', '#66ccff', '#6666ff', '#3333cc', '#000099'],
+            'warm': ['#ff6600', '#ff9933', '#ffcc66', '#ff0000', '#cc0000'],
+            'rainbow': ['#ff0000', '#ff9900', '#ffff00', '#00ff00', '#0099ff', '#6633ff'],
+            'brown': [
+                '#483E1D', '#F2D473', '#564B2B', '#ECDFA4', '#83733F',
+                '#ECE1A2', '#5F5330', '#B78C00', '#6A5D36', '#C4AA55'
+            ],
+            'default': [
+                '#483E1D', '#F2D473', '#564B2B', '#ECDFA4', '#83733F',
+                '#ECE1A2', '#5F5330', '#B78C00', '#6A5D36', '#C4AA55'
+            ]
+        }
+        
+        # Get the color scheme or use default if not found
+        base_colors = color_schemes.get(color_scheme, color_schemes['default'])
+        
+        # For small counts, return immediately without list comprehension
+        if count <= len(base_colors):
+            return base_colors[:count]
+        
+        # For larger counts, use list comprehension but with modulo for cycling
+        return [base_colors[i % len(base_colors)] for i in range(count)]
     
     def _is_safe_query(self, query):
         """Check if a query is safe to execute"""
@@ -191,6 +1724,31 @@ class DynamicChartController(http.Controller):
                 
         return True
 
+    @http.route('/dashboard/chart_view_refresh/', type='json', auth='user')
+    def refresh_chart_views(self, **kw):
+        """Manually refresh chart materialized views - admin only"""
+        if not request.env.user.has_group('base.group_system'):
+            return {'error': 'Only administrators can refresh chart views'}
+            
+        try:
+            # Get all active charts with materialized views enabled
+            charts = request.env['res.dashboard.charts'].search([
+                ('state', '=', 'active'),
+                ('use_materialized_view', '=', True)
+            ])
+            
+            refreshed_count = 0
+            for chart in charts:
+                if request.env['dashboard.chart.view.refresher'].refresh_chart_view(chart.id):
+                    refreshed_count += 1
+                    
+            return {
+                'success': True,
+                'message': f'Successfully refreshed {refreshed_count} chart views'
+            }
+        except Exception as e:
+            _logger.error(f"Error refreshing chart views: {e}")
+            return {'error': str(e)}
 
 
 

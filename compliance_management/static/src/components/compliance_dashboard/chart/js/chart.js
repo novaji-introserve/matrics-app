@@ -235,7 +235,7 @@ export class ChartRenderer extends Component {
               position: 'top'
             },
             title: {
-              display: true,
+              display: false,
               text: sourceData.title || this.props.title || '',
               position: 'bottom'
             },
@@ -243,7 +243,7 @@ export class ChartRenderer extends Component {
               enabled: true
             },
             subtitle: {
-              display: true,
+              display: false,
               text: initialCount < sourceData.labels.length ? 
                     `Loading chart elements...` : 
                     `Loaded ${initialCount} items`,
@@ -370,64 +370,113 @@ export class ChartRenderer extends Component {
     const clickedIndex = elements[0].index;
     const chartData = this.props.data;
     
-    // Get the data needed for domain construction
+    console.log("Chart click:", {chartData, clickedIndex});
+    
+    // Extract data
     const modelName = chartData.model_name;
     const filterColumn = chartData.filter;
     const filterID = chartData.ids?.[clickedIndex];
     
     if (!modelName || !filterColumn || filterID === undefined) {
-      console.warn("Missing data for chart click action");
-      return;
+        console.warn("Missing data for chart click action");
+        return;
     }
     
-    let dateField = "";
-    const splitDateField = chartData.datefield?.split(".") || [];
+    // Build domain
+    let domain = [[filterColumn, "=", filterID]];
+    
+    // Add additional filters - preserve case exactly as received
+    if (chartData.additional_domain && Array.isArray(chartData.additional_domain)) {
+        console.log("Adding conditions:", chartData.additional_domain);
+        
+        chartData.additional_domain.forEach(condition => {
+            if (Array.isArray(condition) && condition.length >= 3) {
+                // Apply condition with exact case preserved
+                domain.push(condition);
+            }
+        });
+    }
+    
+    console.log("Navigating with action:", {
+        type: "ir.actions.act_window",
+        name: `${chartData.title} - ${chartData.labels[clickedIndex] || "Unknown"}`,
+        res_model: modelName,
+        domain,
+        views: [[false, "tree"], [false, "form"]]
+    });
+    
+    this.navigate.doAction({
+        type: "ir.actions.act_window",
+        name: `${chartData.title} - ${chartData.labels[clickedIndex] || "Unknown"}`,
+        res_model: modelName,
+        domain,
+        views: [[false, "tree"], [false, "form"]]
+    });
+}
+  // handleChartClick(event, elements) {
+  //   if (!elements || elements.length === 0 || !this.props.data) return;
+    
+  //   const clickedIndex = elements[0].index;
+  //   const chartData = this.props.data;
+    
+  //   // Get the data needed for domain construction
+  //   const modelName = chartData.model_name;
+  //   const filterColumn = chartData.filter;
+  //   const filterID = chartData.ids?.[clickedIndex];
+    
+  //   if (!modelName || !filterColumn || filterID === undefined) {
+  //     console.warn("Missing data for chart click action");
+  //     return;
+  //   }
+    
+  //   let dateField = "";
+  //   const splitDateField = chartData.datefield?.split(".") || [];
 
-    if(splitDateField.length > 1) {
-      dateField = splitDateField[1];
-    } else {
-      dateField = chartData.datefield || '';
-    }
+  //   if(splitDateField.length > 1) {
+  //     dateField = splitDateField[1];
+  //   } else {
+  //     dateField = chartData.datefield || '';
+  //   }
     
-    let domain = [[filterColumn, "=", filterID], ...(chartData.domain_filter || [])];
+  //   let domain = [[filterColumn, "=", filterID], ...(chartData.domain_filter || [])];
     
-    if (this.props.date > 0) {
-      const today = new Date();
-      const prevDate = new Date();
-      prevDate.setDate(today.getDate() - this.props.date);
+  //   if (this.props.date > 0) {
+  //     const today = new Date();
+  //     const prevDate = new Date();
+  //     prevDate.setDate(today.getDate() - this.props.date);
       
-      const formatDate = date => {
-        return date.toISOString().split('T')[0];
-      };
+  //     const formatDate = date => {
+  //       return date.toISOString().split('T')[0];
+  //     };
       
-      const odooPrevDate = `${formatDate(prevDate)} 00:00:00`;
-      const odooCurrentDate = `${formatDate(today)} 23:59:59`;
+  //     const odooPrevDate = `${formatDate(prevDate)} 00:00:00`;
+  //     const odooCurrentDate = `${formatDate(today)} 23:59:59`;
       
-      domain.push([dateField, ">=", odooPrevDate]);
-      domain.push([dateField, "<=", odooCurrentDate]);
-    }
+  //     domain.push([dateField, ">=", odooPrevDate]);
+  //     domain.push([dateField, "<=", odooCurrentDate]);
+  //   }
 
-    const selectedLabel = chartData.labels[clickedIndex] || "Unknown";
+  //   const selectedLabel = chartData.labels[clickedIndex] || "Unknown";
     
-    const chartTitle = chartData.title ? 
-      chartData.title.charAt(0).toUpperCase() + chartData.title.slice(1).toLowerCase() : 
-      "Chart results";
+  //   const chartTitle = chartData.title ? 
+  //     chartData.title.charAt(0).toUpperCase() + chartData.title.slice(1).toLowerCase() : 
+  //     "Chart results";
       
-    const displayTitle = `${chartTitle} - ${selectedLabel}`;
+  //   const displayTitle = `${chartTitle} - ${selectedLabel}`;
      
-    let action = {
-      type: "ir.actions.act_window",
-      name: displayTitle,
-      res_model: modelName,
-      domain: domain,
-      views: [
-        [false, "tree"],
-        [false, "form"],
-      ],
-    };
+  //   let action = {
+  //     type: "ir.actions.act_window",
+  //     name: displayTitle,
+  //     res_model: modelName,
+  //     domain: domain,
+  //     views: [
+  //       [false, "tree"],
+  //       [false, "form"],
+  //     ],
+  //   };
 
-    this.navigate.doAction(action);
-  }
+  //   this.navigate.doAction(action);
+  // }
   
   /**
    * Destroy existing chart instance

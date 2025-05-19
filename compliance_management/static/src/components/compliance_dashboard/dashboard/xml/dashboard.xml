@@ -73,7 +73,7 @@
                 </div>
 
                 <!-- Chart section with progressive loading -->
-                <div class="row g-md-2 mt-5" style="margin-bottom:10rem;">
+                <div class="row g-md-2 mt-4" style="margin-bottom:10rem;">
                     <t t-if="state.loadingStates.charts">
                         <t t-foreach="[1,2]" t-as="placeholder" t-key="placeholder">
                             <div class="col-md-6 mb-4">
