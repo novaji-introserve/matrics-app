@@ -82,11 +82,11 @@ class Customer(models.Model):
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
     sex_id = fields.Many2one(
-        comodel_name='res.partner.gender', string='Sex', index=True, readonly=True)
+        comodel_name='res.partner.gender', string='Sex', readonly=True)
     firstname = fields.Char(string='Firstname', readonly=True)
     # fullname = fields.Char(string='Fullname')
     short_name = fields.Char(string='Short name', readonly=True)
-    lastname = fields.Char(string='Lastname', readonly=True)
+    lastname = fields.Char(string='Lastname', index=True, readonly=True)
     middlename = fields.Char(string='Middle Name', readonly=True)
     othername = fields.Char(string='Other Name', readonly=True)
     town = fields.Char(string='Town', readonly=True)
@@ -95,21 +95,21 @@ class Customer(models.Model):
     company_reg_date = fields.Date(
         string='Company Registration Date', tracking=True)
     risk_score = fields.Float(
-        string='Risk Score', digits=(10, 2), tracking=True)
+        string='Risk Score', digits=(10, 2), index=True, tracking=True)
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
     risk_level_id = fields.Many2one(
-        comodel_name='res.risk.level', string='Risk Level', index=True)
+        comodel_name='res.risk.level', string='Risk Level')
     account_ids = fields.One2many(
-        comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts', readonly=True)
+        comodel_name='res.partner.account', index=True, inverse_name='customer_id', string='Accounts', readonly=True)
 
     res_partner_account_ids = fields.One2many(
         'res.partner.account', 'customer_id', string='Accounts', readonly=True)
 
     edd_ids = fields.One2many(
-        comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
+        comodel_name='res.partner.edd', index=True, inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
     risk_plan_line_ids = fields.One2many(
@@ -123,7 +123,8 @@ class Customer(models.Model):
     is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
     is_blacklist = fields.Boolean(
         string="Is Blacklist", default=False, tracking=True)
-    global_pep = fields.Boolean(string="Global PEP", default=False)
+    global_pep = fields.Boolean(
+        string="Global PEP",  index=True, default=False)
     current_branch_id = fields.Integer(
         string='Current Branch', compute='_get_current_branch')
     internal_category = fields.Selection(string='Internal Category', selection=[('customer', 'Customer'), (
@@ -141,7 +142,7 @@ class Customer(models.Model):
     anti_money_laundering_file_name = fields.Char(
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
-        string='Accounts', compute='customer_total_accounts', store=False)
+        string='Accounts', compute='customer_total_accounts', index=True, store=False)
     global_pep_id = fields.Many2one(
         'res.pep', string='Related Global PEP', tracking=True)
 
@@ -155,9 +156,9 @@ class Customer(models.Model):
     state_residence = fields.Char(
         string="Region", required=False, readonly=True)
     nin = fields.Char(
-        string="National Identification Number (NIN)", required=False, readonly=True)
+        string="National Identification Number (NIN)", index=True, required=False, readonly=True)
     customer_rating = fields.Char(
-        string="Customer Rating", required=False, readonly=True)
+        string="Customer Rating", required=False, index=True, readonly=True)
     active = fields.Boolean(default=True, readonly=True)
 
     is_greylist = fields.Boolean(
@@ -172,11 +173,11 @@ class Customer(models.Model):
 
     # phone = fields.Char(string='Phone Number(s)', index=True)
     formatted_phone = fields.Char(
-        string='Phone Number(s)', compute='_compute_formatted_phone')
+        string='Phone Number(s)', index=True, compute='_compute_formatted_phone')
 
     likely_sanction = fields.Boolean()
     likely_pep = fields.Boolean()
-    branch_code = fields.Char(string="Branch Code")
+    branch_code = fields.Char(string="Branch Code", index=True)
 
     # @api.depends('customer_phone')
     # def _compute_formatted_phone(self):
@@ -487,6 +488,21 @@ class Customer(models.Model):
             "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
+        
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")        
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")        
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_customer_transaction_id_idx ON res_customer_transaction (id)")
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_pep_id_idx ON res_pep (id)")
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_watchlist_id_idx ON res_partner_watchlist (id)")
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_dashboard_charts_id_idx ON res_dashboard_charts (id)")
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_dashboard_cache_id_idx ON res_dashboard_cache (id)")
 
         # Create the trigger
         self.env.cr.execute("""
