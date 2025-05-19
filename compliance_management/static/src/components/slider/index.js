@@ -38,7 +38,7 @@ export class RiskSliderField extends Component {
         const maxValue = await this.orm.call(
           'ir.config_parameter',
           'get_param',
-          ['risk_management.max_slider_score', '15']
+          ['risk_management.max_slider_score', '9']
         );
 
         this.state.minValue = parseFloat(minValue);
@@ -172,7 +172,7 @@ export class RiskSliderField extends Component {
   }
 
   get formattedValue() {
-    return this.state.value.toFixed(2);
+    return this.state.value.toFixed(1);
   }
 }
 
@@ -185,7 +185,7 @@ RiskSliderField.props = {
 };
 
 RiskSliderField.defaultProps = {
-  step: 1,
+  step: 0.1,
   showValue: true,
   options: {},
 };
