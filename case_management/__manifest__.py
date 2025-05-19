@@ -6,7 +6,7 @@
     'author': 'Novaji',
     'website': 'https://novajii.com',
     'category': 'Custom',
-    'depends': ['base', 'web', 'mail','compliance_management'],
+    'depends': ['base', 'web', 'mail'],
     'data': [
         'data/exception_processes/exception_process_type_data.xml',
         'data/exception_processes/exception_process_data.xml',
@@ -34,8 +34,8 @@
         'views/case_dashboard.xml',# Load menus first
         'views/case_form_inherit.xml',
         'data/overdue_cronJob/cron.xml',
-        'data/exception.process.type.csv',
-        'data/exception.process.csv',
+        # 'data/exception.process.type.csv',
+        # 'data/exception.process.csv',
     ],
     'demo': [],
     'assets': {
@@ -62,7 +62,6 @@
     },
     'installable': True,
     'application': True,
-    'post_init_hook': 'load_exception_data',
     'license': 'LGPL-3',
     'icon': 'case_management/static/description/icon.png',
 }

@@ -8,10 +8,11 @@
           <xpath expr="//notebook" position="inside">
               <page string="Branch Access">
                   <group>
-                      <field name="branches_id" widget="many2many_tags"/>
-                      <field name="default_branch_id"/>
+                      <field name="branches_id" string="Branches" widget="many2many_tags"/>
+                      <field name="default_branch_id" string="Default Branch"/>
                   </group>
               </page>
+
           </xpath>
       </field>
     </record>
