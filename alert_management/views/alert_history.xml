@@ -45,7 +45,7 @@
                         <field name="risk_rating" string="Rating" />
                     </group>
                     <group>
-                        <field name="source" string="Source" colspan="3" />
+                        <field name="source" string="Source" />
                     </group>
                     
                     <group attrs="{'invisible': [('process_id', '=', False)]}">
@@ -53,6 +53,7 @@
                     </group>
                     <group>
                         <field name="email" string="Email"/>
+                        <field name="email_cc" string="Email CC"/>
                     </group>
                     
                 </group>

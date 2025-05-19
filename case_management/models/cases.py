@@ -1258,15 +1258,16 @@ class Cases(models.Model):
                         #'attachment_data': attachment_rec and str(attachment_rec) or None,
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
-                        'ref_id': self.id,  
-                        # 'ref_id': f"{self._name},{self.id}",  # Reference to the case model
+                        # 'ref_id': self.id,  
+                        'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
                         'name': alert_name,
                         'date_created': fields.Datetime.now(),
                         'narration': title,
                         'email': mail_values.get('email_to', ''),
-                        'email_cc': mail_values.get('email_cc', ''),
+                        #'email_cc': mail_values.get('email_cc', ''),
+                        'email_cc': ', '.join(mail_values.get('email_cc', '').split(',')) if mail_values.get('email_cc') else '',
                         'source': model_description,
                         'last_checked': fields.Datetime.now()
                     })
@@ -1424,15 +1425,16 @@ class Cases(models.Model):
                         #'attachment_data': attachment_rec and str(attachment_rec) or None,
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
-                        'ref_id': self.id,  
-                        # 'ref_id': f"{self._name},{self.id}",  # Reference to the case model
+                        #'ref_id': self.id,  
+                        'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
                         'name': alert_name,
                         'date_created': fields.Datetime.now(),
                         'narration': title,
                         'email': mail_values.get('email_to', ''),
-                        'email_cc': mail_values.get('email_cc', ''),
+                        #'email_cc': mail_values.get('email_cc', ''),
+                        'email_cc': ', '.join(mail_values.get('email_cc', '').split(',')) if mail_values.get('email_cc') else '',
                         'source': model_description,
                         'last_checked': fields.Datetime.now()
                     })
@@ -1622,15 +1624,16 @@ class Cases(models.Model):
                             #'attachment_data': attachment_rec and str(attachment_rec) or None,
                             #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                             'html_body': rendered_html,
-                            'ref_id': self.id,    # Reference to the case model
-                            # 'ref_id': f"{self._name},{self.id}",  # Reference to the case model
+                            #'ref_id': self.id,    # Reference to the case model
+                            'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                             'risk_rating': severity_level or 'Low',
                             'process_id': exception_process or None,
                             'name': alert_name,
                             'date_created': fields.Datetime.now(),
                             'narration': title,
                             'email': mail_values.get('email_to', ''),
-                            'email_cc': mail_values.get('email_cc', ''),
+                            # 'email_cc': mail_values.get('email_cc', ''),
+                            'email_cc': ', '.join(mail_values.get('email_cc', '').split(',')) if mail_values.get('email_cc') else '',
                             'source': model_description,
                             'last_checked': fields.Datetime.now()
                         })
