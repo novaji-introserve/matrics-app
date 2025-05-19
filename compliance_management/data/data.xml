@@ -213,6 +213,18 @@
         <field name="name">Customer Types</field>
         <field name="code">customer_types</field>
     </record>
+    <record id="compliance_inst_fc_risk_univ_25" model="res.risk.universe">
+        <field name="name">Transaction Behavior</field>
+        <field name="code">transaction_behavior</field>
+    </record>
+    <record id="compliance_inst_fc_risk_univ_26" model="res.risk.universe">
+        <field name="name">Compliance History</field>
+        <field name="code">compliance_history</field>
+    </record>
+    <record id="compliance_inst_fc_risk_univ_27" model="res.risk.universe">
+        <field name="name">Data Quality</field>
+        <field name="code">data_quality</field>
+    </record>
 
     <!-- Risk Subject -->
     <record id="compliance_inst_fc_risk_subject_21" model="res.risk.subject">
@@ -401,6 +413,73 @@
         <field name="code">pos_terminals</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
     </record>
+
+     <record id="compliance_inst_fc_risk_subj_107" model="res.risk.subject">
+        <field name="name">Trade Transactions</field>
+        <field name="code">trade_transactions</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_25"/>
+    </record>
+    <record id="compliance_inst_fc_risk_subj_108" model="res.risk.subject">
+        <field name="name">Account Activity</field>
+        <field name="code">account_activity</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_25"/>
+    </record>
+     <record id="compliance_inst_fc_risk_subj_109" model="res.risk.subject">
+        <field name="name">Payment Transactions</field>
+        <field name="code">payment_transactions</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_25"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_110" model="res.risk.subject">
+        <field name="name">Regulatory Violations</field>
+        <field name="code">regulatory_violations</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_26"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_111" model="res.risk.subject">
+        <field name="name">Internal Audit Findings</field>
+        <field name="code">internal_audit_findings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_26"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_112" model="res.risk.subject">
+        <field name="name">Customer Complaints</field>
+        <field name="code">customer_complaints</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_26"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_113" model="res.risk.subject">
+        <field name="name">Sanctions List Matches</field>
+        <field name="code">sanctions_list_matches</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_26"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_114" model="res.risk.subject">
+        <field name="name">Incomplete Records</field>
+        <field name="code">incomplete_records</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_27"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_115" model="res.risk.subject">
+        <field name="name">Duplicate Entries</field>
+        <field name="code">duplicate_entries</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_27"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_116" model="res.risk.subject">
+        <field name="name">Outdated Information</field>
+        <field name="code">outdated_information</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_27"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_117" model="res.risk.subject">
+        <field name="name">System Integration Errors</field>
+        <field name="code">system_integration_errors</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_27"/>
+    </record>
+
+
+   
     <!--Assessment Type -->
     <record id="compliance_inst_assessment_type_inst" model="res.risk.assessment.type">
         <field name="name">Institutional</field>
