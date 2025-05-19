@@ -87,9 +87,12 @@ class Transaction(models.Model):
     def open_transactions(self):
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('state', '=', 'new')]
         else:
@@ -112,9 +115,12 @@ class Transaction(models.Model):
     def open_transactions_done(self):
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('state', '=', 'done')]
         else:
@@ -136,9 +142,12 @@ class Transaction(models.Model):
     def open_transactions_all(self):
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = []
         else:

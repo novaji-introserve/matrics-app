@@ -208,9 +208,12 @@ class CustomerAccount(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = []
         else:
