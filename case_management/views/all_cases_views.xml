@@ -560,7 +560,7 @@
                                       (0, 0, {'view_mode': 'form', 'view_id': ref('view_case_form_readonly')})]"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                No cases created by you yet.
+                No case has been created by you yet.
             </p>
         </field>
     </record>
