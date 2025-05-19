@@ -10,10 +10,10 @@ _logger = logging.getLogger(__name__)
 class RiskAssessmentLine(models.Model):
     _name = 'res.risk.assessment.line'
     _description = 'Risk Assessment Line'
-    _sql_constraints = [
-        ('uniq_risk_assessment_line_name', 'unique(name)',
-         "Risk Assessment Name already exists. Value must be unique!")
-    ]
+    # _sql_constraints = [
+    #     ('uniq_risk_assessment_line_name', 'unique(name)',
+    #      "Risk Assessment Name already exists. Value must be unique!")
+    # ]
     name = fields.Text(string="Description", required=True)
     category_id = fields.Many2one(
         comodel_name='res.risk.category', string='Category', required=True)
@@ -45,39 +45,6 @@ class RiskAssessmentLine(models.Model):
     residual_risk_score = fields.Float(
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
     
-    # inherent_max_val = fields.Float(
-    # string='Inherent Max', 
-    # default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_max or 0.0
-    # )
-
-    # inherent_min_val = fields.Float(
-    #     string='Inherent Min', 
-    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).inherent_risk_score_min or 0.0
-    # )
-
-    # control_max_val = fields.Float(
-    #     string='Control Max', 
-    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_max or 0.0
-    # )
-
-    # control_min_val = fields.Float(
-    #     string='Control Min', 
-    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).control_effectiveness_score_min or 0.0
-    # )
-
-    # residual_max_val = fields.Float(
-    #     string='Residual Max', 
-    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_max or 0.0
-    # )
-
-    # residual_min_val = fields.Float(
-    #     string='Residual Min', 
-    #     default=lambda self: self.env['res.fcra.score'].search([], limit=1).residual_risk_score_min or 0.0
-    # )
-
-
-
-
 
     @api.model
     def create(self, vals):
@@ -104,15 +71,16 @@ class RiskAssessmentLine(models.Model):
     def _compute_residual_risk_impact(self):
         for record in self:
             control_effectiveness_score = record.control_effectiveness_score or 0  # Handle None/False values
+            inherent_score = record.inherent_risk_score or 0  # Handle None/False values
             max_score = self.env['ir.config_parameter'].sudo().get_param(
-                'risk_management.max_slider_score', '15')
+                'risk_management.max_slider_score', '9')
             max_score = float(max_score)
             
             _logger.info(f"The control score is {control_effectiveness_score}")
             _logger.info(f"Max score is {max_score}")
             
             # Ensure we don't have negative values if control score > max
-            record.residual_risk_impact = max(0, max_score - control_effectiveness_score)
+            record.residual_risk_impact = max(0, inherent_score - control_effectiveness_score)
             _logger.info(f"Risk impact score is {record.residual_risk_impact}")
 
 

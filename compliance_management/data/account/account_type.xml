@@ -1,0 +1,84 @@
+<odoo>
+
+ <!-- Account Types -->
+    <record id="res_partner_account_type_100" model="res.partner.account.type">
+        <field name="name">Internal Account</field>
+        <field name="code">100</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_110" model="res.partner.account.type">
+        <field name="name">Public Treasury</field>
+        <field name="code">110</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_111" model="res.partner.account.type">
+        <field name="name">Post Office Cheques</field>
+        <field name="code">111</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_112" model="res.partner.account.type">
+        <field name="name">Banks And Correspondents</field>
+        <field name="code">112</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_113" model="res.partner.account.type">
+        <field name="name">Financial Institutions</field>
+        <field name="code">113</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_114" model="res.partner.account.type">
+        <field name="name">International Financial Instit</field>
+        <field name="code">114</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_200" model="res.partner.account.type">
+        <field name="name">Current Account Individuals</field>
+        <field name="code">200</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_201" model="res.partner.account.type">
+        <field name="name">Current Account Sole Proprieto</field>
+        <field name="code">201</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_202" model="res.partner.account.type">
+        <field name="name">Current Account Sme</field>
+        <field name="code">202</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_203" model="res.partner.account.type">
+        <field name="name">Current Account Large Company</field>
+        <field name="code">203</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_204" model="res.partner.account.type">
+        <field name="name">Current Account State Corporat</field>
+        <field name="code">204</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_205" model="res.partner.account.type">
+        <field name="name">Current Account Ngo Institutio</field>
+        <field name="code">205</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_206" model="res.partner.account.type">
+        <field name="name">Current Account Cooperatives A</field>
+        <field name="code">206</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_207" model="res.partner.account.type">
+        <field name="name">Current Account Other Economic</field>
+        <field name="code">207</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_300" model="res.partner.account.type">
+        <field name="name">Savings Accounts</field>
+        <field name="code">300</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="res_partner_account_type_310" model="res.partner.account.type">
+        <field name="name">Special Savings Accounts</field>
+        <field name="code">310</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+</odoo>

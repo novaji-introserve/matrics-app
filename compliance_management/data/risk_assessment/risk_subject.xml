@@ -1,0 +1,243 @@
+<odoo>
+
+ <!-- Risk Subject -->
+    <record id="compliance_inst_fc_risk_subject_21" model="res.risk.subject">
+        <field name="name">Private Banking Service</field>
+        <field name="code">private_banking_service</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_internet_banking" model="res.risk.subject">
+        <field name="name">Internet Banking Service</field>
+        <field name="code">internet_banking_service</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_22" model="res.risk.subject">
+        <field name="name">Social Media Banking</field>
+        <field name="code">social_media_banking</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_23" model="res.risk.subject">
+        <field name="name">South East</field>
+        <field name="code">south_east</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+     <record id="compliance_inst_fc_risk_subject_south_south" model="res.risk.subject">
+        <field name="name">South South</field>
+        <field name="code">south_south</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+     <record id="compliance_inst_fc_risk_subject_161" model="res.risk.subject">
+        <field name="name">South West</field>
+        <field name="code">south_west</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+ 
+    <record id="compliance_inst_fc_risk_subject_162" model="res.risk.subject">
+        <field name="name">Ghana</field>
+        <field name="code">ghana</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_ne23" model="res.risk.subject">
+        <field name="name">North East</field>
+        <field name="code">north_east</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_nw" model="res.risk.subject">
+        <field name="name">North West</field>
+        <field name="code">north_west</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_nc" model="res.risk.subject">
+        <field name="name">North Central</field>
+        <field name="code">north_central</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_41" model="res.risk.subject">
+        <field name="name">Construction</field>
+        <field name="code">construction</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_61" model="res.risk.subject">
+        <field name="name">Automated Teller Machine</field>
+        <field name="code">automated_teller_machine</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_81" model="res.risk.subject">
+        <field name="name">Agriculture</field>
+        <field name="code">agriculture</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_82" model="res.risk.subject">
+        <field name="name">Admin And Support Service Act.</field>
+        <field name="code">admin_and_support_service_act.</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_83" model="res.risk.subject">
+        <field name="name">Oil And Gas</field>
+        <field name="code">oil_and_gas</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_84" model="res.risk.subject">
+        <field name="name">Arts Entertainment And Recreation</field>
+        <field name="code">arts_entertainment_and_recreation</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_85" model="res.risk.subject">
+        <field name="name">Prof Scientific And Tech Act.</field>
+        <field name="code">prof_scientific_and_tech_act.</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_86" model="res.risk.subject">
+        <field name="name">General</field>
+        <field name="code">general</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_87" model="res.risk.subject">
+        <field name="name">Finance And Insurance</field>
+        <field name="code">finance_and_insurance</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_88" model="res.risk.subject">
+        <field name="name">Government</field>
+        <field name="code">government</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_89" model="res.risk.subject">
+        <field name="name">Public Utilities</field>
+        <field name="code">public_utilities</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_90" model="res.risk.subject">
+        <field name="name">Oneforce Family</field>
+        <field name="code">oneforce_family</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_91" model="res.risk.subject">
+        <field name="name">General Commerce</field>
+        <field name="code">general_commerce</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_92" model="res.risk.subject">
+        <field name="name">Health</field>
+        <field name="code">health</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_93" model="res.risk.subject">
+        <field name="name">Not For Profit</field>
+        <field name="code">not_for_profit</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_94" model="res.risk.subject">
+        <field name="name">Renewable Energy</field>
+        <field name="code">renewable_energy</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_95" model="res.risk.subject">
+        <field name="name">Real Estate</field>
+        <field name="code">real_estate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_96" model="res.risk.subject">
+        <field name="name">Cooperative Cluster</field>
+        <field name="code">cooperative_cluster</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_97" model="res.risk.subject">
+        <field name="name">Human Health And Social Work Act.</field>
+        <field name="code">human_health_and_social_work_act.</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_98" model="res.risk.subject">
+        <field name="name">Education</field>
+        <field name="code">education</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_101" model="res.risk.subject">
+        <field name="name">Manufacturing</field>
+        <field name="code">manufacturing</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_102" model="res.risk.subject">
+        <field name="name">Transportation And Storage</field>
+        <field name="code">transportation_and_storage</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_103" model="res.risk.subject">
+        <field name="name">Power And Energy</field>
+        <field name="code">power_and_energy</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_104" model="res.risk.subject">
+        <field name="name">Capital Market</field>
+        <field name="code">capital_market</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_105" model="res.risk.subject">
+        <field name="name">Information And Communication</field>
+        <field name="code">information_and_communication</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_106" model="res.risk.subject">
+        <field name="name">State And Private Agencies</field>
+        <field name="code">state_and_private_agencies</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_24" />
+    </record>
+   
+    <record id="compliance_inst_fc_risk_subject_181" model="res.risk.subject">
+        <field name="name">Pos Terminals</field>
+        <field name="code">pos_terminals</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_114" model="res.risk.subject">
+        <field name="name">Incomplete Records</field>
+        <field name="code">incomplete_records</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_27"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_115" model="res.risk.subject">
+        <field name="name">Duplicate Entries</field>
+        <field name="code">duplicate_entries</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_27"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_116" model="res.risk.subject">
+        <field name="name">Outdated Information</field>
+        <field name="code">outdated_information</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_27"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_117" model="res.risk.subject">
+        <field name="name">System Integration Errors</field>
+        <field name="code">system_integration_errors</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_27"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_110" model="res.risk.subject">
+        <field name="name">Regulatory Violations</field>
+        <field name="code">regulatory_violations</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_26"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_111" model="res.risk.subject">
+        <field name="name">Internal Audit Findings</field>
+        <field name="code">internal_audit_findings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_26"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_112" model="res.risk.subject">
+        <field name="name">Customer Complaints</field>
+        <field name="code">customer_complaints</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_26"/>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_113" model="res.risk.subject">
+        <field name="name">Sanctions List Matches</field>
+        <field name="code">sanctions_list_matches</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_26"/>
+    </record>
+
+
+
+
+</odoo>
