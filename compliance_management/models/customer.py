@@ -491,19 +491,7 @@ class Customer(models.Model):
         
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")        
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")        
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_customer_transaction_id_idx ON res_customer_transaction (id)")
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_pep_id_idx ON res_pep (id)")
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_watchlist_id_idx ON res_partner_watchlist (id)")
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_dashboard_charts_id_idx ON res_dashboard_charts (id)")
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_dashboard_cache_id_idx ON res_dashboard_cache (id)")
-
+    
         # Create the trigger
         self.env.cr.execute("""
             CREATE OR REPLACE FUNCTION set_partner_defaults_func()

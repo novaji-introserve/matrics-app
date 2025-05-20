@@ -160,6 +160,9 @@ class CustomerAccount(models.Model):
         # Drop existing trigger if it exists
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS update_customer_id_field ON res_partner_account;")
+        
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")   
 
         # Create new trigger
         self.env.cr.execute("""

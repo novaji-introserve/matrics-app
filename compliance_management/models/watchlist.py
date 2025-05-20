@@ -20,3 +20,8 @@ class Watchlist(models.Model):
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', required=False, index=True)
     bvn = fields.Char(string='BVN', tracking=True, index=True)
+
+
+    def init(self):
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_watchlist_id_idx ON res_partner_watchlist (id)")
