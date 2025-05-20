@@ -1,6 +1,108 @@
 <odoo>
+
    
 
+
+    <!-- Settings-->
+    <record id="res_compl_settings_risk_plan_computation" model="res.compliance.settings">
+        <field name="name">Risk Plan Computation</field>
+        <field name="code">risk_plan_computation</field>
+        <field name="val">max</field>
+        <field name="narration">Deteremines the policy for computin the risk assessment from the set
+            of plan
+            Values:
+            avg: use the average
+            max: use the maximum. Default
+        </field>
+    </record>
+    <record id="res_compl_settings_default_risk_score" model="res.compliance.settings">
+        <field name="name">Default Risk Score</field>
+        <field name="code">default_risk_score</field>
+        <field name="val">7.5</field>
+        <field name="narration">Default Risk Score</field>
+    </record>
+    <function model="ir.config_parameter" name="set_param"
+        eval="('gemini_api_key', 'AIzaSyAvRsSTIahJWVT-iwPC1nPrSqUoK_fsBq4')" />
+    <function model="ir.config_parameter" name="set_param"
+        eval="('opensanctions_api_key', '1731b7a13f6c63e6a9bbb550981e6a18')" />
+     <function model="ir.config_parameter" name="set_param"
+            eval="('risk_management.max_slider_score', '9')" />
+     <function model="ir.config_parameter" name="set_param"
+            eval="('risk_management.min_slider_score', '0')" />
+    <!--  Gender -->
+    <record id="res_partner_gender_male" model="res.partner.gender">
+        <field name="name">Male</field>
+    </record>
+    <record id="res_partner_gender_female" model="res.partner.gender">
+        <field name="name">Female</field>
+    </record>
+    <record id="res_partner_gender_trans" model="res.partner.gender">
+        <field name="name">Trans Gender</field>
+    </record>
+    <record id="res_partner_gender_other" model="res.partner.gender">
+        <field name="name">Other</field>
+    </record>
+    <!-- Maritak Status-->
+    <record id="res_partner_marital_single" model="res.marital.status">
+        <field name="name">Single</field>
+    </record>
+    <record id="res_partner_marital_married" model="res.marital.status">
+        <field name="name">Married</field>
+    </record>
+    <record id="res_partner_marital_divorced" model="res.marital.status">
+        <field name="name">Divorced</field>
+    </record>
+    <!-- Compliance Stats  -->
+    <record id="res_compl_stat_1" model="res.compliance.stat">
+        <field name="name">Avg. Customer Risk Score</field>
+        <field name="code">avg_cust_risk_score</field>
+        <field name="scope">bank</field>
+        <field name="sql_query">select round(avg(risk_score),2) from res_partner</field>
+    </record>
+    <record id="res_compl_stat_2" model="res.compliance.stat">
+        <field name="name">Total Customers</field>
+        <field name="code">total_cust</field>
+        <field name="scope">bank</field>
+        <field name="sql_query">select count(id) from res_partner</field>
+    </record>
+    <record id="res_compl_stat_3" model="res.compliance.stat">
+        <field name="name">Customers without BVN</field>
+        <field name="code">customers_no_bvn</field>
+        <field name="scope">regulatory</field>
+        <field name="sql_query">SELECT count(id) FROM res_partner WHERE (bvn IS NULL OR bvn LIKE 'NOBVN%')</field>
+        <!-- <field name="sql_query">select count(id) from res_partner where bvn is null </field> -->
+    </record>
+    <record id="res_compl_stat_4" model="res.compliance.stat">
+        <field name="name">PEP Customers</field>
+        <field name="code">pep_customers</field>
+        <field name="scope">regulatory</field>
+        <field name="sql_query">select count(id) from res_partner where is_pep is true </field>
+    </record>
+    <record id="res_compl_stat_5" model="res.compliance.stat">
+        <field name="name">Branches</field>
+        <field name="code">branch_tot</field>
+        <field name="scope">branch</field>
+        <field name="sql_query">select count(id) from res_branch</field>
+    </record>
+    <record id="res_compl_stat_6" model="res.compliance.stat">
+        <field name="name">Risk Universe</field>
+        <field name="code">risk_univ_cnt</field>
+        <field name="scope">risk</field>
+        <field name="sql_query">select count(id) from res_risk_universe</field>
+    </record>
+    <record id="res_compl_stat_7" model="res.compliance.stat">
+        <field name="name">Global PEP List</field>
+        <field name="code">global_pep</field>
+        <field name="scope">regulatory</field>
+        <field name="sql_query">select count(id) from res_pep</field>
+    </record>
+    <record id="res_compl_stat_8" model="res.compliance.stat">
+        <field name="name">WatchList</field>
+        <field name="code">watch_list</field>
+        <field name="scope">regulatory</field>
+        <field name="sql_query">select count(id) from res_partner_watchlist</field>
+    </record>
+   
     <!--  KYC Limit -->
 
     <record id="res_partner_kyc_limit_1" model="res.partner.kyc.limit">
@@ -32,26 +134,239 @@
         <field name="name">Above 5m</field>
         <field name="code">above_5m</field>
     </record>
-    <!--  Customer Tier -->
 
-    <record id="res_partner_tier_1" model="res.partner.tier">
-        <field name="name">Tier 1 - Individual</field>
-        <field name="code">tier_1</field>
-        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    
+    <!-- Identification Type-->
+
+    <record id="res_partner_iden_type_1" model="res.identification.type">
+        <field name="name">Voters Id</field>
+        <field name="code">voters_id</field>
+        
     </record>
 
 
-    <record id="res_partner_tier_2" model="res.partner.tier">
-        <field name="name">Tier 2 - Corporate</field>
-        <field name="code">tier_2</field>
-        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    <record id="res_partner_iden_type_2" model="res.identification.type">
+        <field name="name">International Passport</field>
+        <field name="code">international_passport</field>
     </record>
 
 
-    <record id="res_partner_tier_3" model="res.partner.tier">
-        <field name="name">Tier 3 - Corporate</field>
-        <field name="code">tier_3</field>
-        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    <record id="res_partner_iden_type_5" model="res.identification.type">
+        <field name="name">Driving License</field>
+        <field name="code">driving_license</field>
     </record>
-   
+
+
+    <record id="res_partner_iden_type_6" model="res.identification.type">
+        <field name="name">Military Card</field>
+        <field name="code">military_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_12" model="res.identification.type">
+        <field name="name">Juridicary Card</field>
+        <field name="code">juridicary_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_99" model="res.identification.type">
+        <field name="name">Permit For Permanent Residence</field>
+        <field name="code">permit_for_permanent_residence</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_13" model="res.identification.type">
+        <field name="name">Nysc Id/Call Up Letter</field>
+        <field name="code">nysc_id/call_up_letter</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_8" model="res.identification.type">
+        <field name="name">Office Id Card</field>
+        <field name="code">office_id_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_9" model="res.identification.type">
+        <field name="name">Military Id Card</field>
+        <field name="code">military_id_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_10" model="res.identification.type">
+        <field name="name">Foreign Id Card</field>
+        <field name="code">foreign_id_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_7" model="res.identification.type">
+        <field name="name">Nimc</field>
+        <field name="code">nimc</field>
+    </record>
+
+    <record id="risk_plan_1" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers without BVN</field>
+        <field name="risk_score">25</field>
+        <field name="code">cust_no_bvn</field>
+        <field name="sql_query">SELECT risk_score FROM res_partner WHERE id = %s AND (bvn IS NULL OR bvn LIKE '%%[a-zA-Z]%%' OR bvn LIKE 'NOBVN%%')</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers without BVN are high risk</field>
+    </record>
+    <record id="risk_plan_2" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers without Phone</field>
+        <field name="risk_score">17</field>
+        <field name="code">cust_no_phone</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and mobile is null and phone is null</field>
+        <field name="priority">2</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers without mobile phone are medium risk</field>
+    </record>
+
+    <record id="risk_plan_inavlid_name" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers With Invalid Names</field>
+        <field name="risk_score">20</field>
+        <field name="code">cust_invalid_name</field>
+        <field name="sql_query">SELECT risk_score 
+            FROM res_partner 
+            WHERE id = %s
+            AND (trim(name) = '' OR trim(name) ~ '^[^a-zA-Z0-9]')</field>
+        <field name="priority">2</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers with empty or invalid names</field>
+    </record>
+
+    <record id="risk_plan_repeated_phone" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers with Repeated Phone Number Up To 3 Accounts and Above</field>
+        <field name="risk_score">20</field>
+        <field name="code">cust_repeated_phone</field>
+        <field name="sql_query">SELECT risk_score
+            FROM res_partner
+            WHERE id = %s
+            AND customer_phone IN (
+                SELECT customer_phone
+                FROM res_partner
+                WHERE customer_phone IS NOT NULL AND customer_phone != ''
+                GROUP BY customer_phone
+                HAVING COUNT(*) >= 3)
+            ORDER BY customer_phone </field>
+        <field name="priority">2</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Detects customers using the same phone number for three or more account openings, flagging potential fraud risks.
+        </field>
+    </record>
+
+    <record id="risk_plan_3" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers on Blacklist</field>
+        <field name="risk_score">25</field>
+        <field name="code">cust_blacklist</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and is_blacklist=true</field>
+        <field name="priority">3</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers on blacklist are significantly high risk</field>
+    </record>
+    <record id="risk_plan_pep" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers on PEPlist</field>
+        <field name="risk_score">20</field>
+        <field name="code">cust_pep</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and is_pep=true</field>
+        <field name="priority">4</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers on PEPlist are significantly high risk</field>
+    </record>
+    <!-- <record id="risk_plan_fep" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers on FEPlist</field>
+        <field name="risk_score">20</field>
+        <field name="code">cust_fep</field>
+        <field name="sql_query">select 20 from res_partner where id=%s and is_fep=true</field>
+        <field name="priority">5</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">dynamic</field>
+        <field name="narration">Customers on FEPlist are significantly high risk</field>
+    </record> -->
+    <record id="risk_plan_watchlist" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers on Watchlist</field>
+        <field name="risk_score">20</field>
+        <field name="code">cust_watchlist</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and is_watchlist=true</field>
+        <field name="priority">6</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers on Watchlist are significantly high risk</field>
+    </record>
+    <record id="risk_plan_default" model="res.compliance.risk.assessment.plan">
+        <field name="name">Default Risk Score</field>
+        <field name="risk_score">8</field>
+        <field name="code">default_plan</field>
+        <field name="sql_query">select risk_rating from res_risk_assessment where is_default=true limit 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Default Plan for risk rating</field>
+    </record>
+
+
+
+
+   <!-- Sample Watchlist Records -->
+    <record id="watchlist_demo_1" model="res.partner.watchlist">
+        <field name="surname">Okonkwo</field>
+        <field name="first_name">Chinedu</field>
+        <field name="middle_name">Ifeanyi</field>
+        <field name="name">Chinedu Ifeanyi Okonkwo</field>
+        <field name="bvn">8041365792</field>
+    </record>
+
+    <record id="watchlist_demo_2" model="res.partner.watchlist">
+        <field name="surname">Abubakar</field>
+        <field name="first_name">Fatima</field>
+        <field name="middle_name">Zainab</field>
+        <field name="name">Fatima Zainab Abubakar</field>
+        <field name="bvn">6729451083</field>
+    </record>
+
+    <record id="watchlist_demo_3" model="res.partner.watchlist">
+        <field name="surname">Johnson</field>
+        <field name="first_name">David</field>
+        <field name="middle_name">Michael</field>
+        <field name="name">David Michael Johnson</field>
+        <field name="bvn">9024351083</field>
+    </record>
+
+
+
+
+    <!-- Sample Blacklist Records with New Names -->
+<record id="blacklist_demo_1" model="res.partner.blacklist">
+    <field name="surname">Smith</field>
+    <field name="first_name">John</field>
+    <field name="middle_name">Alexander</field>
+    <field name="name">John Alexander Smith</field>
+    <field name="bvn">5298431026</field>
+</record>
+
+<record id="blacklist_demo_2" model="res.partner.blacklist">
+    <field name="surname">Taylor</field>
+    <field name="first_name">Emma</field>
+    <field name="middle_name">Rose</field>
+    <field name="name">Emma Rose Taylor</field>
+    <field name="bvn">7610954832</field>
+</record>
+
+<record id="blacklist_demo_3" model="res.partner.blacklist">
+    <field name="surname">Williams</field>
+    <field name="first_name">Michael</field>
+    <field name="middle_name">James</field>
+    <field name="name">Michael James Williams</field>
+    <field name="bvn">3942087651</field>
+    
+</record>
+
+
 </odoo>

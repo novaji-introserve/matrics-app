@@ -15,9 +15,9 @@ load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
-LOW_RISK_THRESHOLD = 10
-MEDIUM_RISK_THRESHOLD = 15
-HIGH_RISK_THRESHOLD = 25
+LOW_RISK_THRESHOLD = 3
+MEDIUM_RISK_THRESHOLD = 6
+HIGH_RISK_THRESHOLD = 9
 
 
 class Shareholders(models.Model):
@@ -82,11 +82,11 @@ class Customer(models.Model):
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
     sex_id = fields.Many2one(
-        comodel_name='res.partner.gender', string='Sex', index=True, readonly=True)
+        comodel_name='res.partner.gender', string='Sex', readonly=True)
     firstname = fields.Char(string='Firstname', readonly=True)
     # fullname = fields.Char(string='Fullname')
     short_name = fields.Char(string='Short name', readonly=True)
-    lastname = fields.Char(string='Lastname', readonly=True)
+    lastname = fields.Char(string='Lastname', index=True, readonly=True)
     middlename = fields.Char(string='Middle Name', readonly=True)
     othername = fields.Char(string='Other Name', readonly=True)
     town = fields.Char(string='Town', readonly=True)
@@ -95,21 +95,21 @@ class Customer(models.Model):
     company_reg_date = fields.Date(
         string='Company Registration Date', tracking=True)
     risk_score = fields.Float(
-        string='Risk Score', digits=(10, 2), tracking=True)
+        string='Risk Score', digits=(10, 2), index=True, tracking=True)
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
     risk_level_id = fields.Many2one(
-        comodel_name='res.risk.level', string='Risk Level', index=True)
+        comodel_name='res.risk.level', string='Risk Level')
     account_ids = fields.One2many(
-        comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts', readonly=True)
+        comodel_name='res.partner.account', index=True, inverse_name='customer_id', string='Accounts', readonly=True)
 
     res_partner_account_ids = fields.One2many(
         'res.partner.account', 'customer_id', string='Accounts', readonly=True)
 
     edd_ids = fields.One2many(
-        comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
+        comodel_name='res.partner.edd', index=True, inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
     risk_plan_line_ids = fields.One2many(
@@ -123,7 +123,8 @@ class Customer(models.Model):
     is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
     is_blacklist = fields.Boolean(
         string="Is Blacklist", default=False, tracking=True)
-    global_pep = fields.Boolean(string="Global PEP", default=False)
+    global_pep = fields.Boolean(
+        string="Global PEP",  index=True, default=False)
     current_branch_id = fields.Integer(
         string='Current Branch', compute='_get_current_branch')
     internal_category = fields.Selection(string='Internal Category', selection=[('customer', 'Customer'), (
@@ -141,7 +142,7 @@ class Customer(models.Model):
     anti_money_laundering_file_name = fields.Char(
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
-        string='Accounts', compute='customer_total_accounts', store=False)
+        string='Accounts', compute='customer_total_accounts', index=True, store=False)
     global_pep_id = fields.Many2one(
         'res.pep', string='Related Global PEP', tracking=True)
 
@@ -155,9 +156,9 @@ class Customer(models.Model):
     state_residence = fields.Char(
         string="Region", required=False, readonly=True)
     nin = fields.Char(
-        string="National Identification Number (NIN)", required=False, readonly=True)
+        string="National Identification Number (NIN)", index=True, required=False, readonly=True)
     customer_rating = fields.Char(
-        string="Customer Rating", required=False, readonly=True)
+        string="Customer Rating", required=False, index=True, readonly=True)
     active = fields.Boolean(default=True, readonly=True)
 
     is_greylist = fields.Boolean(
@@ -172,11 +173,11 @@ class Customer(models.Model):
 
     # phone = fields.Char(string='Phone Number(s)', index=True)
     formatted_phone = fields.Char(
-        string='Phone Number(s)', compute='_compute_formatted_phone')
+        string='Phone Number(s)', index=True, compute='_compute_formatted_phone')
 
     likely_sanction = fields.Boolean()
     likely_pep = fields.Boolean()
-    branch_code = fields.Char(string="Branch Code")
+    branch_code = fields.Char(string="Branch Code", index=True)
 
     # @api.depends('customer_phone')
     # def _compute_formatted_phone(self):
@@ -309,92 +310,6 @@ class Customer(models.Model):
             return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
 
 
-
-    # def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-    #     if 'risk_score' not in fields:
-    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-
-    #     # Fetch records matching the domain
-    #     records = self.search(domain)
-
-    #     if not records:
-    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-
-    #     # Initialize result
-    #     result = []
-    #     groupby_field = groupby[0] if groupby else None
-
-    #     if groupby_field:
-    #         # Group records by the specified field (e.g., branch_id)
-    #         grouped_data = {}
-    #         for record in records:
-    #             # Get the group key (handle Many2one fields)
-    #             group_key = record[groupby_field]
-    #             # Use display_name for Many2one fields to ensure proper formatting
-    #             group_key_value = (
-    #                 group_key.display_name if isinstance(group_key, models.Model)
-    #                 else group_key
-    #             )
-    #             if group_key_value not in grouped_data:
-    #                 grouped_data[group_key_value] = []
-    #             grouped_data[group_key_value].append(record)
-
-    #         # Compute weighted average for each group
-    #         for key, group_records in grouped_data.items():
-    #             total_customers = len(group_records)
-    #             # Format the group key with count, e.g., "67 Marina(3)"
-    #             formatted_key = f"{key}({total_customers})" if total_customers > 0 else key
-
-    #             # Calculate weighted average
-    #             if total_customers == 0:
-    #                 weighted_avg = 0.0
-    #             else:
-    #                 risk_counts = {'low': 0, 'medium': 0, 'high': 0}
-    #                 for rec in group_records:
-    #                     risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
-    #                     risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
-                        
-    #                 weighted_sum = sum(
-    #                     risk_counts[level] * self.RISK_SCORE_MAPPING.get(level, 0.0)
-    #                     for level in risk_counts
-    #                 )
-                   
-    #                 weighted_avg = weighted_sum / total_customers if total_customers > 0 else 0.0
-
-    #             key_id = self.env['res.branch'].search([('name', '=', key)], limit=1).id
-    #             # Build group result
-    #             group_result = {
-    #                 groupby_field: key,  # Use original key for domain and filtering
-    #                 groupby_field + ':formatted': formatted_key,  # Store formatted name
-    #                 'risk_score': weighted_avg,
-    #                 '__count': total_customers,
-    #                 '__domain': [(groupby_field, '=', key_id)] + domain
-    #             }
-    #             result.append(group_result)
-    #     else:
-    #         # No grouping: compute weighted average for all records
-    #         total_customers = len(records)
-    #         if total_customers == 0:
-    #             weighted_avg = 0.0
-    #         else:
-    #             risk_counts = {'low': 0, 'medium': 0, 'high': 0}
-    #             for rec in records:
-    #                 risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
-    #                 risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
-    #             weighted_sum = sum(
-    #                 risk_counts[level] * self.RISK_SCORE_MAPPING.get(level, 0.0)
-    #                 for level in risk_counts
-    #             )
-    #             weighted_avg = weighted_sum / total_customers if total_customers > 0 else 0.0
-
-    #         result.append({
-    #             'risk_score': weighted_avg,
-    #             '__count': total_customers,
-    #             '__domain': domain
-    #         })
-        
-
-    #     return result
 
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
@@ -573,6 +488,21 @@ class Customer(models.Model):
             "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
+        
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")        
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")        
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_customer_transaction_id_idx ON res_customer_transaction (id)")
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_pep_id_idx ON res_pep (id)")
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_watchlist_id_idx ON res_partner_watchlist (id)")
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_dashboard_charts_id_idx ON res_dashboard_charts (id)")
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_dashboard_cache_id_idx ON res_dashboard_cache (id)")
 
         # Create the trigger
         self.env.cr.execute("""
