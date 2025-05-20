@@ -1,9 +1,11 @@
 import time
 
 from requests import request
+from ..controllers.charts import DynamicChartController
 from odoo import models, fields, api
 import logging
 from datetime import timedelta
+from ..services.chart_data_service import ChartDataService
 
 _logger = logging.getLogger(__name__)
 
@@ -24,40 +26,6 @@ class DashboardChartViewRefresher(models.Model):
     _sql_constraints = [
         ('unique_chart', 'unique(chart_id)', 'Only one materialized view per chart is allowed.')
     ]
-    
-    # @api.model
-    # def refresh_chart_views(self, low_priority=False):
-    #     """Refresh all chart materialized views"""
-    #     try:
-    #         # Apply session-specific database settings
-    #         self.initialize_database_settings()
-        
-    #         # When running in low_priority mode (from cron), use a lower transaction isolation level
-    #         if low_priority:
-    #             self.env.cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
-                
-    #         # Get all charts with materialized views enabled
-    #         charts = self.env['res.dashboard.charts'].search([
-    #             ('state', '=', 'active'),
-    #             ('use_materialized_view', '=', True)
-    #         ])
-            
-    #         refreshed = 0
-    #         for chart in charts:
-    #             if self.refresh_chart_view(chart.id):
-    #                 refreshed += 1
-            
-    #         # Update last run time
-    #         refresher = self.search([], limit=1)
-    #         if refresher:
-    #             refresher.write({'last_run': fields.Datetime.now()})
-            
-    #         _logger.info(f"Refreshed {refreshed} dashboard chart views")
-    #         return True
-    #     except Exception as e:
-    #         _logger.error(f"Error refreshing dashboard chart views: {e}")
-    #         return False
-    
     
     @api.model
     def refresh_chart_views(self, low_priority=False):
@@ -149,47 +117,7 @@ class DashboardChartViewRefresher(models.Model):
         except Exception as e:
             _logger.error(f"Error in refresh_chart_views main process: {e}")
             return False
-    
-    # @api.model
-    # def refresh_chart_views(self, low_priority=False):
-    #     """Refresh all chart materialized views"""
-    #     try:
-    #         # Create a new cursor to ensure we're not in an aborted transaction
-    #         with self.env.registry.cursor() as cr:
-    #             env = api.Environment(cr, self.env.uid, self.env.context)
-    #             refresher = env['dashboard.chart.view.refresher']
-                
-    #             # Apply session-specific database settings
-    #             refresher.initialize_database_settings()
-            
-    #             # When running in low_priority mode (from cron), use a lower transaction isolation level
-    #             if low_priority:
-    #                 cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
-                    
-    #             # Get all charts with materialized views enabled
-    #             charts = env['res.dashboard.charts'].search([
-    #                 ('state', '=', 'active'),
-    #                 ('use_materialized_view', '=', True)
-    #             ])
-                
-    #             refreshed = 0
-    #             for chart in charts:
-    #                 if refresher.refresh_chart_view(chart.id):
-    #                     refreshed += 1
-                
-    #             # Update last run time
-    #             refresher_record = refresher.search([], limit=1)
-    #             if refresher_record:
-    #                 refresher_record.write({'last_run': fields.Datetime.now()})
-                    
-    #             cr.commit()
-                
-    #             _logger.info(f"Refreshed {refreshed} dashboard chart views")
-    #             return True
-    #     except Exception as e:
-    #         _logger.error(f"Error refreshing dashboard chart views: {e}")
-    #         return False
-    
+
     @api.model
     def refresh_chart_view(self, chart_id, low_priority=False):
         """Refresh a materialized view for a chart with robust error handling and concurrency control"""
@@ -322,225 +250,6 @@ class DashboardChartViewRefresher(models.Model):
         except Exception as e:
             _logger.error(f"Error refreshing materialized view for chart {chart_id}: {e}")
             return False
-    
-    # def create_materialized_view_for_chart(self, chart_id):
-    #     """Create or update a materialized view for a chart with more robust error handling"""
-    #     try:
-    #         # Use a simplified approach to check for existing locks
-    #         registry = self.env.registry
-    #         with registry.cursor() as check_cr:
-    #             # Check if view exists first
-    #             check_cr.execute("""
-    #                 SELECT EXISTS (
-    #                     SELECT FROM pg_catalog.pg_class c
-    #                     JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-    #                     WHERE c.relname = %s AND c.relkind = 'm'
-    #                 )
-    #             """, (f"dashboard_chart_view_{chart_id}",))
-    #             view_exists = check_cr.fetchone()[0]
-                
-    #             # Skip if another process is already working on this chart
-    #             check_cr.execute("""
-    #                 SELECT EXISTS (
-    #                     SELECT 1 FROM res_dashboard_charts_update_log
-    #                     WHERE chart_id = %s 
-    #                     AND update_time > (NOW() - INTERVAL '5 minutes')
-    #                     AND status = 'in_progress'
-    #                 )
-    #             """, (chart_id,))
-    #             in_progress = check_cr.fetchone()[0]
-                
-    #             if in_progress:
-    #                 _logger.info(f"View creation already in progress for chart {chart_id}, skipping")
-    #                 return False
-                
-    #             # Record that we're starting the process
-    #             check_cr.execute("""
-    #                 INSERT INTO res_dashboard_charts_update_log 
-    #                 (chart_id, update_time, status, message) 
-    #                 VALUES (%s, NOW(), 'in_progress', 'Starting view creation')
-    #                 ON CONFLICT (chart_id) DO UPDATE
-    #                 SET update_time = NOW(),
-    #                     status = 'in_progress',
-    #                     message = 'Starting view creation'
-    #             """, (chart_id,))
-    #             check_cr.commit()
-            
-    #         # Use a separate transaction for view creation
-    #         with registry.cursor() as cr:
-    #             try:
-    #                 # Get the chart data
-    #                 cr.execute("""
-    #                     SELECT id, query, materialized_view_refresh_interval,
-    #                         x_axis_field, y_axis_field, date_field, branch_field,
-    #                         name
-    #                     FROM res_dashboard_charts 
-    #                     WHERE id = %s
-    #                 """, (chart_id,))
-    #                 chart_data = cr.dictfetchone()
-                    
-    #                 if not chart_data:
-    #                     _logger.error(f"Chart {chart_id} not found")
-    #                     return False
-                    
-    #                 chart_query = chart_data['query']
-    #                 chart_name = chart_data['name']
-    #                 view_name = f"dashboard_chart_view_{chart_id}"
-                    
-    #                 # Remove any trailing semicolons from the query
-    #                 original_query = chart_query.strip()
-    #                 if original_query.endswith(';'):
-    #                     original_query = original_query[:-1]
-                    
-    #                 # Drop existing view if it exists
-    #                 if view_exists:
-    #                     cr.execute(f"DROP MATERIALIZED VIEW IF EXISTS {view_name}")
-                    
-    #                 # Create the view with a proper timeout
-    #                 cr.execute("SET LOCAL statement_timeout = 120000;")
-    #                 create_view_query = f"""
-    #                     CREATE MATERIALIZED VIEW {view_name} AS
-    #                     {original_query}
-    #                     WITH DATA
-    #                 """
-                    
-    #                 _logger.info(f"Creating materialized view for chart {chart_id}: {view_name}")
-    #                 cr.execute(create_view_query)
-                    
-    #                 # Get a sample row to identify the actual column names in the view
-    #                 cr.execute(f"SELECT * FROM {view_name} LIMIT 1")
-    #                 result = cr.dictfetchone()
-                    
-    #                 if result:
-    #                     # Create indexes using the actual column names from the view
-    #                     column_names = list(result.keys())
-                        
-    #                     _logger.info(f"Found columns in materialized view: {column_names}")
-                        
-    #                     # X-axis index
-    #                     if chart_data['x_axis_field']:
-    #                         x_col = self._find_column_in_view(chart_data['x_axis_field'], column_names)
-    #                         if x_col:
-    #                             _logger.info(f"Creating x-axis index on column: {x_col}")
-    #                             cr.execute(f"CREATE INDEX IF NOT EXISTS {view_name}_x_idx ON {view_name} ({x_col})")
-                        
-    #                     # Y-axis index
-    #                     if chart_data['y_axis_field']:
-    #                         y_col = self._find_column_in_view(chart_data['y_axis_field'], column_names)
-    #                         if y_col:
-    #                             _logger.info(f"Creating y-axis index on column: {y_col}")
-    #                             cr.execute(f"CREATE INDEX IF NOT EXISTS {view_name}_y_idx ON {view_name} ({y_col})")
-                        
-    #                     # Date index
-    #                     if chart_data['date_field']:
-    #                         date_col = self._find_column_in_view(chart_data['date_field'], column_names)
-    #                         if date_col:
-    #                             _logger.info(f"Creating date index on column: {date_col}")
-    #                             cr.execute(f"CREATE INDEX IF NOT EXISTS {view_name}_date_idx ON {view_name} ({date_col})")
-                        
-    #                     # Branch index
-    #                     if chart_data['branch_field']:
-    #                         branch_col = self._find_column_in_view(chart_data['branch_field'], column_names)
-    #                         if branch_col:
-    #                             _logger.info(f"Creating branch index on column: {branch_col}")
-    #                             cr.execute(f"CREATE INDEX IF NOT EXISTS {view_name}_branch_idx ON {view_name} ({branch_col})")
-                    
-    #                 # First, ensure the update log table exists
-    #                 cr.execute("""
-    #                     CREATE TABLE IF NOT EXISTS res_dashboard_charts_update_log (
-    #                         chart_id INTEGER PRIMARY KEY,
-    #                         update_time TIMESTAMP NOT NULL,
-    #                         status VARCHAR(20) NOT NULL,
-    #                         message TEXT
-    #                     )
-    #                 """)
-                    
-    #                 # Record successful creation in the log
-    #                 cr.execute("""
-    #                     INSERT INTO res_dashboard_charts_update_log 
-    #                     (chart_id, update_time, status, message) 
-    #                     VALUES (%s, NOW(), 'success', 'View created successfully')
-    #                     ON CONFLICT (chart_id) DO UPDATE
-    #                     SET update_time = NOW(),
-    #                         status = 'success',
-    #                         message = 'View created successfully'
-    #                 """, (chart_id,))
-                    
-    #                 # Record the view in refresher model
-    #                 refresher = self.search([('chart_id', '=', chart_id)], limit=1)
-    #                 if refresher:
-    #                     refresher.write({
-    #                         'view_name': view_name,
-    #                         'last_refresh': fields.Datetime.now(),
-    #                         'refresh_interval': chart_data['materialized_view_refresh_interval'] or 60
-    #                     })
-    #                 else:
-    #                     self.create({
-    #                         'name': f"Refresher for {chart_name}",
-    #                         'chart_id': chart_id,
-    #                         'view_name': view_name,
-    #                         'last_refresh': fields.Datetime.now(),
-    #                         'refresh_interval': chart_data['materialized_view_refresh_interval'] or 60
-    #                     })
-                    
-    #                 # Update chart's last refresh time
-    #                 now = fields.Datetime.now()
-    #                 charts_model = self.env['res.dashboard.charts']
-    #                 chart = charts_model.browse(chart_id)
-    #                 if chart.exists():
-    #                     # Try direct write with isolation
-    #                     try:
-    #                         chart.write({
-    #                             'materialized_view_last_refresh': now,
-    #                             'last_execution_status': 'success',
-    #                             'last_error_message': False
-    #                         })
-    #                     except Exception as chart_write_error:
-    #                         _logger.warning(f"Could not update chart record: {str(chart_write_error)}")
-    #                         # Use direct SQL as fallback
-    #                         cr.execute("""
-    #                             UPDATE res_dashboard_charts
-    #                             SET materialized_view_last_refresh = NOW(),
-    #                                 last_execution_status = 'success',
-    #                                 last_error_message = NULL
-    #                             WHERE id = %s
-    #                         """, (chart_id,))
-                    
-    #                 # Commit the transaction
-    #                 cr.commit()
-                    
-    #                 _logger.info(f"Successfully created materialized view {view_name} for chart {chart_id}")
-    #                 return True
-                    
-    #             except Exception as e:
-    #                 # Rollback in case of error
-    #                 cr.rollback()
-    #                 _logger.error(f"Error creating materialized view for chart {chart_id}: {e}")
-                    
-    #                 # Record error in a separate transaction
-    #                 with registry.cursor() as err_cr:
-    #                     try:
-    #                         err_cr.execute("""
-    #                             INSERT INTO res_dashboard_charts_update_log 
-    #                             (chart_id, update_time, status, message) 
-    #                             VALUES (%s, NOW(), 'error', %s)
-    #                             ON CONFLICT (chart_id) DO UPDATE
-    #                             SET update_time = NOW(),
-    #                                 status = 'error',
-    #                                 message = %s
-    #                         """, (chart_id, str(e), str(e)))
-    #                         err_cr.commit()
-    #                     except Exception as log_error:
-    #                         _logger.error(f"Failed to log error: {str(log_error)}")
-                    
-    #                 return False
-            
-    #     except Exception as e:
-    #         _logger.error(f"Fatal error creating materialized view for chart {chart_id}: {e}")
-    #         return False
-    
-    # Enhanced Materialized View Creation and Column Detection
-
 
     def diagnose_materialized_view(self, chart_id):
         """Diagnose issues with a materialized view for a chart - improved column detection"""
@@ -648,85 +357,6 @@ class DashboardChartViewRefresher(models.Model):
             _logger.error(f"Diagnostic error for view {chart_id}: {e}")
             return {'error': str(e), 'view_exists': False, 'has_columns': False}
         
-        
-    # def diagnose_materialized_view(self, chart_id):
-    #     """Diagnose issues with a materialized view for a chart"""
-    #     try:
-    #         view_name = f"dashboard_chart_view_{chart_id}"
-    #         registry = self.env.registry
-            
-    #         with registry.cursor() as cr:
-    #             # Check if view exists
-    #             cr.execute("""
-    #                 SELECT EXISTS (
-    #                     SELECT FROM pg_catalog.pg_class c
-    #                     JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-    #                     WHERE c.relname = %s
-    #                     AND c.relkind = 'm'
-    #                 )
-    #             """, (view_name,))
-                
-    #             view_exists = cr.fetchone()[0]
-                
-    #             if not view_exists:
-    #                 _logger.error(f"Materialized view {view_name} does not exist!")
-    #                 return {'view_exists': False}
-                
-    #             # Check if view has columns
-    #             cr.execute(f"""
-    #                 SELECT column_name, data_type 
-    #                 FROM information_schema.columns 
-    #                 WHERE table_name = %s
-    #             """, (view_name,))
-                
-    #             columns = cr.fetchall()
-    #             column_info = [{'name': col[0], 'type': col[1]} for col in columns]
-                
-    #             # Check if view has data
-    #             try:
-    #                 cr.execute(f"SELECT COUNT(*) FROM {view_name}")
-    #                 row_count = cr.fetchone()[0]
-    #             except Exception as e:
-    #                 _logger.error(f"Error counting rows in {view_name}: {e}")
-    #                 row_count = -1
-                
-    #             # Check original query
-    #             cr.execute("""
-    #                 SELECT query 
-    #                 FROM res_dashboard_charts
-    #                 WHERE id = %s
-    #             """, (chart_id,))
-                
-    #             query_result = cr.fetchone()
-    #             original_query = query_result[0] if query_result else None
-                
-    #             # Try executing the original query
-    #             query_works = False
-    #             if original_query:
-    #                 try:
-    #                     clean_query = original_query.strip()
-    #                     if clean_query.endswith(';'):
-    #                         clean_query = clean_query[:-1]
-                        
-    #                     cr.execute("SET statement_timeout = 10000")  # 10 seconds
-    #                     cr.execute(clean_query)
-    #                     query_works = True
-    #                 except Exception as query_error:
-    #                     _logger.error(f"Original query error: {query_error}")
-                
-    #             return {
-    #                 'view_exists': True,
-    #                 'column_count': len(column_info),
-    #                 'columns': column_info,
-    #                 'row_count': row_count,
-    #                 'original_query_works': query_works
-    #             }
-                
-    #     except Exception as e:
-    #         _logger.error(f"Diagnostic error for view {chart_id}: {e}")
-    #         return {'error': str(e)}
-        
-    
     def create_materialized_view_for_chart(self, chart_id):
         """Create or update a materialized view for a chart with robust transaction handling"""
         _logger.info(f"Creating materialized view for chart {chart_id}")
@@ -908,6 +538,7 @@ class DashboardChartViewRefresher(models.Model):
                 """, (view_name,))
                 
                 view_exists = cr.fetchone()[0]
+                direct_query = DynamicChartController()
                 
                 if not view_exists:
                     _logger.warning(f"Materialized view {view_name} does not exist - creating it")
@@ -915,7 +546,7 @@ class DashboardChartViewRefresher(models.Model):
                     success = request.env['dashboard.chart.view.refresher'].sudo().create_materialized_view_for_chart(chart.id)
                     if not success:
                         _logger.error(f"Failed to create materialized view for chart {chart.id}")
-                        return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                        return direct_query._get_chart_data_from_direct_query(chart, cco, branches_id)
                 
                 # DIRECT QUERY APPROACH: Get columns directly from the view
                 # This bypasses information_schema completely which can be stale
@@ -954,8 +585,9 @@ class DashboardChartViewRefresher(models.Model):
                 
                 # If still no columns, fall back to direct query - we don't recreate if it exists
                 if not columns:
+                    direct_query = DynamicChartController()
                     _logger.warning(f"No columns found in materialized view {view_name} - using direct query")
-                    return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                    return direct_query._get_chart_data_from_direct_query(chart, cco, branches_id)
                 
                 # We have columns! Now build and execute the query
                 
@@ -1027,212 +659,14 @@ class DashboardChartViewRefresher(models.Model):
                 results = cr.dictfetchall()
                 
                 # Process and return results
-                return self._extract_chart_data(chart, results, query)
+                chart_data_service = ChartDataService()
+                direct_query = DynamicChartController()
+                return chart_data_service._extract_chart_data(chart, results, query)
                 
         except Exception as e:
             _logger.error(f"Error getting chart from materialized view: {e}")
             # Fall back to direct query
-            return self._get_chart_data_from_direct_query(chart, cco, branches_id)
-    
-    
-    
-    # def _get_chart_data_from_materialized_view(self, chart, cco, branches_id):
-    #     """Get chart data from materialized view with enhanced error handling"""
-    #     try:
-    #         view_name = f"dashboard_chart_view_{chart.id}"
-            
-    #         # First, check if the view actually exists
-    #         with request.env.registry.cursor() as check_cr:
-    #             check_cr.execute("""
-    #                 SELECT EXISTS (
-    #                     SELECT FROM pg_catalog.pg_class c
-    #                     JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-    #                     WHERE c.relname = %s AND c.relkind = 'm'
-    #                 )
-    #             """, (view_name,))
-                
-    #             view_exists = check_cr.fetchone()[0]
-                
-    #             if not view_exists:
-    #                 _logger.warning(f"Materialized view {view_name} does not exist!")
-    #                 # Try to create it on-demand
-    #                 request.env['dashboard.chart.view.refresher'].create_materialized_view_for_chart(chart.id)
-                    
-    #                 # Recheck if it exists now
-    #                 check_cr.execute("""
-    #                     SELECT EXISTS (
-    #                         SELECT FROM pg_catalog.pg_class c
-    #                         JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-    #                         WHERE c.relname = %s AND c.relkind = 'm'
-    #                     )
-    #                 """, (view_name,))
-                    
-    #                 view_exists = check_cr.fetchone()[0]
-                    
-    #                 if not view_exists:
-    #                     _logger.error(f"Failed to create materialized view {view_name}")
-    #                     return self._get_chart_data_from_direct_query(chart, cco, branches_id)
-            
-    #         # Now check columns and execute query
-    #         with request.env.registry.cursor() as cr:
-    #             # Get all columns
-    #             cr.execute(f"""
-    #                 SELECT column_name 
-    #                 FROM information_schema.columns 
-    #                 WHERE table_name = %s
-    #             """, (view_name,))
-                
-    #             columns = [row[0] for row in cr.fetchall()]
-                
-    #             if not columns:
-    #                 _logger.warning(f"No columns found in materialized view {view_name}")
-                    
-    #                 # Try to diagnose the issue
-    #                 refresher = request.env['dashboard.chart.view.refresher']
-    #                 diagnosis = refresher.diagnose_materialized_view(chart.id)
-    #                 _logger.warning(f"Materialized view diagnosis: {diagnosis}")
-                    
-    #                 # Attempt to recreate the view
-    #                 _logger.info(f"Attempting to recreate materialized view for chart {chart.id}")
-    #                 refresher.create_materialized_view_for_chart(chart.id)
-                    
-    #                 # Check again for columns
-    #                 cr.execute(f"""
-    #                     SELECT column_name 
-    #                     FROM information_schema.columns 
-    #                     WHERE table_name = %s
-    #                 """, (view_name,))
-                    
-    #                 columns = [row[0] for row in cr.fetchall()]
-                    
-    #                 if not columns:
-    #                     _logger.error(f"Still no columns after recreation - falling back to direct query")
-    #                     return self._get_chart_data_from_direct_query(chart, cco, branches_id)
-                
-    #             # Log columns for debugging
-    #             _logger.info(f"Columns in view {view_name}: {columns}")
-                
-    #             # Find the proper column for branch filtering
-    #             branch_col = None
-    #             if chart.branch_field:
-    #                 branch_field = chart.branch_field.split('.')[-1] if '.' in chart.branch_field else chart.branch_field
-                    
-    #                 # First, try exact match
-    #                 if branch_field in columns:
-    #                     branch_col = branch_field
-    #                     _logger.debug(f"Found exact branch column match: {branch_col}")
-    #                 else:
-    #                     # Try all column detection methods
-    #                     branch_candidates = ['branch_id', 'id', 'branch', 'partner_branch_id']
-    #                     for candidate in branch_candidates:
-    #                         if candidate in columns:
-    #                             branch_col = candidate
-    #                             _logger.debug(f"Found branch column from candidates: {branch_col}")
-    #                             break
-                        
-    #                     # If still not found, try columns containing 'branch'
-    #                     if not branch_col:
-    #                         for col in columns:
-    #                             if 'branch' in col.lower():
-    #                                 branch_col = col
-    #                                 _logger.debug(f"Found branch column by partial match: {branch_col}")
-    #                                 break
-                
-    #             # Build query against the materialized view
-    #             query = f"SELECT * FROM {view_name}"
-                
-    #             # Apply security filters with proper column name
-    #             where_clause_added = False
-    #             if chart.branch_field and not cco and not self.security_service.is_cco_user():
-    #                 user_branches = self.security_service.get_user_branch_ids()
-    #                 effective_branches = []
-                    
-    #                 if branches_id:
-    #                     # If branches specified in UI, intersect with user's branches
-    #                     if user_branches:
-    #                         effective_branches = [b for b in branches_id if b in user_branches]
-    #                     else:
-    #                         effective_branches = branches_id
-    #                 elif user_branches:
-    #                     effective_branches = user_branches
-                    
-    #                 # Build WHERE clause using the correct column name (not table alias)
-    #                 if effective_branches and branch_col:
-    #                     if len(effective_branches) == 1:
-    #                         query += f" WHERE {branch_col} = {effective_branches[0]}"
-    #                     else:
-    #                         query += f" WHERE {branch_col} IN {tuple(effective_branches)}"
-    #                     where_clause_added = True
-    #                 elif branch_col:
-    #                     # No branches specified, but we have a branch column - return no results
-    #                     query += " WHERE 1=0"
-    #                     where_clause_added = True
-                
-    #             # Add high-risk filter if needed
-    #             high_risk_filter = request.httprequest.cookies.get('high_risk_filter')
-    #             if high_risk_filter == 'on':
-    #                 _logger.info("High risk filter is enabled")
-    #                 # Look for risk_level column
-    #                 risk_column = None
-    #                 risk_candidates = ['risk_level', 'partner_risk_level', 'customer_risk_level']
-                    
-    #                 for candidate in risk_candidates:
-    #                     if candidate in columns:
-    #                         risk_column = candidate
-    #                         break
-                    
-    #                 if risk_column:
-    #                     if where_clause_added:
-    #                         query += f" AND {risk_column} = 'high'"
-    #                     else:
-    #                         query += f" WHERE {risk_column} = 'high'"
-    #                         where_clause_added = True
-                
-    #             # Find column for sorting
-    #             sort_col = None
-    #             if chart.y_axis_field:
-    #                 y_field = chart.y_axis_field.split('.')[-1] if '.' in chart.y_axis_field else chart.y_axis_field
-    #                 if y_field in columns:
-    #                     sort_col = y_field
-    #                 else:
-    #                     # Look for numeric column names
-    #                     candidates = ['count', 'customer_count', 'high_risk_customers', 'value', 'amount', 'total']
-    #                     for candidate in candidates:
-    #                         if candidate in columns:
-    #                             sort_col = candidate
-    #                             break
-                
-    #             # Add ORDER BY if we found a suitable column
-    #             if sort_col:
-    #                 query += f" ORDER BY {sort_col} DESC"
-                
-    #             # Add LIMIT
-    #             query += " LIMIT 100"  # Reasonable default limit
-                
-    #             # Log the query for debugging
-    #             _logger.info(f"Executing materialized view query: {query}")
-                
-    #             # Execute query with a timeout
-    #             cr.execute("SET LOCAL statement_timeout = 30000;")  # 30 seconds
-    #             try:
-    #                 cr.execute(query)
-    #                 results = cr.dictfetchall()
-                    
-    #                 # Log result count for debugging
-    #                 _logger.info(f"Query returned {len(results)} rows")
-                    
-    #                 # Extract chart data
-    #                 return self._extract_chart_data(chart, results, query)
-    #             except Exception as query_err:
-    #                 _logger.error(f"Error executing materialized view query: {query_err}")
-    #                 # Fall back to direct query
-    #                 return self._get_chart_data_from_direct_query(chart, cco, branches_id)
-                
-    #     except Exception as e:
-    #         _logger.error(f"Error getting chart from materialized view: {e}")
-    #         # Fall back to direct query
-    #         return self._get_chart_data_from_direct_query(chart, cco, branches_id)
-
+            return direct_query._get_chart_data_from_direct_query(chart, cco, branches_id)
         
     def _find_branch_column_in_view(self, chart, columns):
         """Find the appropriate branch column in materialized view"""
@@ -1423,38 +857,6 @@ class DashboardChartViewRefresher(models.Model):
         except Exception as e:
             _logger.error(f"Error diagnosing chart issues: {e}")
             return {'error': str(e)}
-
-    # @api.model
-    # def _find_column_in_view(self, field_name, column_names):
-    #     """Find the most appropriate column name in the materialized view"""
-    #     # Strip table aliases if present (e.g., 'rb.name' -> 'name')
-    #     if '.' in field_name:
-    #         _, field_name = field_name.split('.', 1)
-        
-    #     # First check for exact match
-    #     if field_name in column_names:
-    #         return field_name
-        
-    #     # Try lowercase match
-    #     field_lower = field_name.lower()
-    #     for col in column_names:
-    #         if col.lower() == field_lower:
-    #             return col
-        
-    #     # Try partial matches
-    #     for col in column_names:
-    #         if field_lower in col.lower():
-    #             return col
-        
-    #     # Try matching field name without the 'id' suffix 
-    #     # (e.g., 'branch_id' might be stored as 'branch')
-    #     if field_lower.endswith('_id'):
-    #         base_name = field_lower[:-3]
-    #         for col in column_names:
-    #             if col.lower() == base_name or col.lower().startswith(base_name):
-    #                 return col
-        
-    #     return None
     
     @api.model
     def _find_column_in_view(self, field_name, column_names):
@@ -1704,120 +1106,6 @@ class DashboardChartViewRefresher(models.Model):
             
             return False
     
-        
-    # @api.model
-    # def refresh_chart_view(self, chart_id, low_priority=False):
-    #     """Refresh a materialized view for a chart with robust error handling"""
-    #     try:
-    #         refresher = self.search([('chart_id', '=', chart_id)], limit=1)
-    #         if not refresher:
-    #             # If no refresher record, try to create the view first
-    #             return self.create_materialized_view_for_chart(chart_id)
-            
-    #         # Get the chart
-    #         chart = refresher.chart_id
-            
-    #         # Check if we need to refresh based on interval - only when not explicitly requested
-    #         if not low_priority and refresher.last_refresh and refresher.refresh_interval:
-    #             now = fields.Datetime.now()
-    #             if refresher.last_refresh + timedelta(minutes=refresher.refresh_interval) > now:
-    #                 # Not time to refresh yet
-    #                 _logger.debug(f"Skipping refresh for chart {chart_id}, not time yet")
-    #                 return True
-            
-    #         # Use a new cursor to isolate this operation
-    #         registry = self.env.registry
-    #         with registry.cursor() as cr:
-    #             try:
-    #                 # Set transaction isolation level if low_priority is True
-    #                 if low_priority:
-    #                     cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
-                    
-    #                 # Set a higher timeout (2 minutes)
-    #                 cr.execute("SET LOCAL statement_timeout = 120000;")
-                    
-    #                 # Check if the view exists
-    #                 cr.execute(f"""
-    #                     SELECT EXISTS (
-    #                         SELECT FROM pg_catalog.pg_class c
-    #                         JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-    #                         WHERE c.relname = %s
-    #                         AND c.relkind = 'm'
-    #                     )
-    #                 """, (refresher.view_name,))
-                    
-    #                 view_exists = cr.fetchone()[0]
-                    
-    #                 if not view_exists:
-    #                     # View doesn't exist, create it
-    #                     cr.rollback()  # Clean up this cursor
-    #                     return self.create_materialized_view_for_chart(chart_id)
-                    
-    #                 # Refresh the view with a higher timeout
-    #                 try:
-    #                     # Try with CONCURRENTLY for less locking, but requires unique index
-    #                     cr.execute(f"REFRESH MATERIALIZED VIEW CONCURRENTLY {refresher.view_name}")
-    #                 except Exception as e:
-    #                     # Fall back to regular refresh if CONCURRENTLY fails
-    #                     _logger.info(f"CONCURRENTLY refresh failed, using regular refresh: {e}")
-    #                     cr.execute(f"REFRESH MATERIALIZED VIEW {refresher.view_name}")
-                    
-    #                 # Commit the transaction explicitly
-    #                 cr.commit()
-                    
-    #                 # Update timestamps in separate transactions to avoid conflicts
-    #                 now = fields.Datetime.now()
-                    
-    #                 # Update refresher last_refresh time
-    #                 with registry.cursor() as write_cr:
-    #                     env = api.Environment(write_cr, self.env.uid, self.env.context)
-    #                     refresher_to_update = env['dashboard.chart.view.refresher'].browse(refresher.id)
-    #                     if refresher_to_update.exists():
-    #                         refresher_to_update.write({
-    #                             'last_refresh': now
-    #                         })
-    #                         write_cr.commit()
-                    
-    #                 # Update chart's last refresh time 
-    #                 with registry.cursor() as write_cr:
-    #                     env = api.Environment(write_cr, self.env.uid, self.env.context)
-    #                     chart_to_update = env['res.dashboard.charts'].browse(chart.id)
-    #                     if chart_to_update.exists():
-    #                         chart_to_update.write({
-    #                             'materialized_view_last_refresh': now,
-    #                             'last_execution_status': 'success',
-    #                             'last_error_message': False
-    #                         })
-    #                         write_cr.commit()
-                    
-    #                 _logger.info(f"Refreshed materialized view {refresher.view_name} for chart {chart_id}")
-    #                 return True
-                    
-    #             except Exception as e:
-    #                 # Rollback in case of error
-    #                 cr.rollback()
-    #                 _logger.error(f"Error refreshing materialized view for chart {chart_id}: {e}")
-                    
-    #                 # Update the chart with the error using a new cursor
-    #                 try:
-    #                     with registry.cursor() as write_cr:
-    #                         env = api.Environment(write_cr, self.env.uid, self.env.context)
-    #                         chart_to_update = env['res.dashboard.charts'].browse(chart.id)
-    #                         if chart_to_update.exists():
-    #                             chart_to_update.write({
-    #                                 'last_execution_status': 'error',
-    #                                 'last_error_message': str(e)
-    #                             })
-    #                             write_cr.commit()
-    #                 except Exception as write_err:
-    #                     _logger.error(f"Failed to update chart error status: {str(write_err)}")
-                    
-    #                 return False
-            
-    #     except Exception as e:
-    #         _logger.error(f"Error refreshing materialized view for chart {chart_id}: {e}")
-    #         return False
-    
     @api.model
     def ensure_all_views_exist(self):
         """Ensure all materialized views exist and are properly created - called at startup"""
@@ -1875,54 +1163,7 @@ class DashboardChartViewRefresher(models.Model):
         except Exception as e:
             _logger.error(f"Error ensuring materialized views exist: {e}")
             return False
-    
-    # @api.model
-    # def ensure_all_views_exist(self):
-    #     """Ensure all materialized views exist and are properly created - called at startup"""
-    #     _logger.info("Ensuring all materialized views exist and are correctly created")
-        
-    #     try:
-    #         # Get all charts that should have materialized views
-    #         charts = self.env['res.dashboard.charts'].search([
-    #             ('state', '=', 'active'),
-    #             ('use_materialized_view', '=', True)
-    #         ])
-            
-    #         if not charts:
-    #             _logger.info("No charts with materialized views found")
-    #             return True
-                
-    #         _logger.info(f"Found {len(charts)} charts with materialized views")
-            
-    #         # Process each chart
-    #         created = 0
-    #         errors = 0
-            
-    #         for chart in charts:
-    #             # Check if view exists and has columns
-    #             diagnosis = self.diagnose_materialized_view(chart.id)
-                
-    #             if not diagnosis.get('exists') or not diagnosis.get('has_columns'):
-    #                 _logger.info(f"View for chart {chart.id} needs creation or repair")
-                    
-    #                 # Force create the view
-    #                 # success = self.force_create_materialized_view(chart.id)
-    #                 success = self.create_materialized_view_for_chart(chart.id)
-                    
-    #                 if success:
-    #                     created += 1
-    #                     _logger.info(f"Successfully created materialized view for chart {chart.id}")
-    #                 else:
-    #                     errors += 1
-    #                     _logger.error(f"Failed to create materialized view for chart {chart.id}")
-            
-    #         _logger.info(f"Materialized view initialization complete: {created} created, {errors} errors")
-    #         return True
-            
-    #     except Exception as e:
-    #         _logger.error(f"Error ensuring materialized views exist: {e}")
-    #         return False
-    
+   
     @api.model
     def init(self):
         """Ensure a refresher record exists"""
