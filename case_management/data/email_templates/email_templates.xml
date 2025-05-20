@@ -68,12 +68,12 @@
                         </tr>
                         <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process Category:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('exception_category')" /> </td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('process_category')" /> </td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process:</td>
                             <!-- <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('process_type')" /></td> -->
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('process_process')" /></td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('exception_process')" /></td>
                         </tr>
                         <!-- <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process Category:</td>
@@ -165,12 +165,12 @@
                         </tr>
                         <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process Category:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('exception_category')"/></td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('process_category')"/></td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process:</td>
                             <!-- <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('process_type')"/></td> -->
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('process_process')"/></td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('exception_process')"/></td>
                         </tr>
                         <!-- <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process Category:</td>
@@ -268,12 +268,12 @@
                         </tr>
                         <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process Category:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('exception_category')"/></td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('process_category')"/></td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process:</td>
                             <!-- <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('process_type')"/></td> -->
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('process_process')"/></td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('exception_process')"/></td>
                         </tr>
                         <!-- <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process Category:</td>

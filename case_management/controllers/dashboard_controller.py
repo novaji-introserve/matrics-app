@@ -34,6 +34,10 @@ class CaseDashboardController(http.Controller):
         open_cases = all_cases.filtered(lambda c: c.status_id.name == 'open')
         closed_cases = all_cases.filtered(lambda c: c.status_id.name == 'closed')
         overdue_cases = all_cases.filtered(lambda c: c.status_id.name == 'overdue')
+        # all_cases = Case.search(domain)
+        # open_cases = all_cases.filtered(lambda c: c.status_id.name == 'open')
+        # closed_cases = all_cases.filtered(lambda c: c.status_id.name == 'closed')
+        # overdue_cases = all_cases.filtered(lambda c: c.status_id.name == 'overdue')
 
         def count_by(severity):
             return len(all_cases.filtered(lambda c: c.title == severity))
@@ -99,9 +103,13 @@ class CaseDashboardController(http.Controller):
            
             'chart_data': {
                 'cases_by_category': {
-                    'process': [{'label': data.get('process_category_id') and data['process_category_id'][1] or 'N/A',
-                                 'value': data['process_category_id_count']}
-                                for data in Case.read_group(domain, ['process_category_id'], ['process_category_id'])],
+                    'process': [{'label': data.get('new_process_category_id') and data['new_process_category_id'][1] or 'N/A',
+                    'value': data['new_process_category_id_count']}
+                    for data in Case.read_group(domain, ['new_process_category_id'], ['new_process_category_id'])],
+
+                    # 'process': [{'label': data.get('process_category_id') and data['process_category_id'][1] or 'N/A',
+                    #              'value': data['process_category_id_count']}
+                    #             for data in Case.read_group(domain, ['new_process_category_id'], ['new_process_category_id'])],
                     'root': [{'label': data.get('root_category_id') and data['root_category_id'][1] or 'N/A',
                               'value': data['root_category_id_count']}
                              for data in Case.read_group(domain, ['root_category_id'], ['root_category_id'])],
