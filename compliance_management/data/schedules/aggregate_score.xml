@@ -9,5 +9,7 @@
         <field name="interval_type">hours</field>
         <field name="numbercall">-1</field>
         <field name="doall">True</field>
+        <field name="active" eval="False"/>
+
     </record>
 </odoo>
