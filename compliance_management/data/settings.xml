@@ -1,0 +1,30 @@
+<odoo>
+ <!-- Settings-->
+    <record id="res_compl_settings_risk_plan_computation" model="res.compliance.settings">
+        <field name="name">Risk Plan Computation</field>
+        <field name="code">risk_plan_computation</field>
+        <field name="val">max</field>
+        <field name="narration">Deteremines the policy for computin the risk assessment from the set
+            of plan
+            Values:
+            avg: use the average
+            max: use the maximum. Default
+        </field>
+    </record>
+    <record id="res_compl_settings_default_risk_score" model="res.compliance.settings">
+        <field name="name">Default Risk Score</field>
+        <field name="code">default_risk_score</field>
+        <field name="val">7.5</field>
+        <field name="narration">Default Risk Score</field>
+    </record>
+    <function model="ir.config_parameter" name="set_param"
+        eval="('gemini_api_key', 'AIzaSyAvRsSTIahJWVT-iwPC1nPrSqUoK_fsBq4')" />
+    <function model="ir.config_parameter" name="set_param"
+        eval="('opensanctions_api_key', '1731b7a13f6c63e6a9bbb550981e6a18')" />
+     <function model="ir.config_parameter" name="set_param"
+            eval="('risk_management.max_slider_score', '15')" />
+     <function model="ir.config_parameter" name="set_param"
+            eval="('risk_management.min_slider_score', '0')" />
+
+
+</odoo>
