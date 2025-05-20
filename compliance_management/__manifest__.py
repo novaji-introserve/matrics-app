@@ -38,7 +38,7 @@
         "data/demo_data/keyword/media_keywords.xml",
         "security/security.xml",
         "data/schedules/adverse_media_cron.xml",
-        # "data/schedules/send_assessment_notification_cron.xml",
+        "data/schedules/send_assessment_notification_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
         'data/schedules/clean_cache.xml',
 
@@ -60,7 +60,7 @@
         # "data/schedules/queue_job_config.xml",
         "data/demo_data/score/fcra_score.xml",    
         "data/data.xml",
-        "data/demo_data/risk_assessment/category.xml",
+        # "data/demo_data/risk_assessment/category.xml",
         "data/demo_data/risk_assessment/risk_universe.xml",
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",

@@ -1,13 +1,8 @@
 <odoo>
     <data noupdate="1">
      <record id="fcra_score" model="res.fcra.score">
-        <field name="name">FCRA Score</field>
-        <field name="inherent_risk_score_max">25</field>
-        <field name="inherent_risk_score_min">1</field>
-        <field name="control_effectiveness_score_max">25</field>
-        <field name="control_effectiveness_score_min">1</field>
-        <field name="residual_risk_score_max">25</field>
-        <field name="residual_risk_score_min">1</field>
+        <field name="max_score">9</field>
+        <field name="min_score">0</field>
     </record>
     
     </data>
