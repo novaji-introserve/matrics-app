@@ -32,7 +32,9 @@
         "data/settings/email_smtp.xml",
         "data/department.xml",
         "data/risk_assessment_control_data.xml",
-        # "data/res.branch.csv",
+        "data/res.branch.csv",
+        "data/res_partner.xml",
+        "data/res_partner_accounts.xml",
         "data/risk_assessment_mitigation.xml",
         "data/res_risk_implication.xml",
         "data/media_keywords.xml",
@@ -60,6 +62,7 @@
         # "data/schedules/queue_job_config.xml",
         "data/fcra_score.xml",    
         "data/data.xml",
+        "data/transactions.xml",
         "data/risk_assessment/category.xml",
         "data/risk_assessment/risk_universe.xml",
         "data/risk_assessment/risk_type.xml",         
@@ -90,10 +93,24 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-        # "data/charts.xml",
-        # "data/res_partner.xml",
+        "data/charts.xml",
         "views/res_users.xml",
-        "data/aggregate_score.xml"
+        "data/aggregate_score.xml",
+        # demo data
+        'data/gender.xml',
+        'data/identification_type.xml',
+        'data/compliance_stats.xml',
+        'data/settings.xml',
+        'data/risk_plan.xml',
+        'data/customer_product.xml',
+        'data/sectors.xml',
+        'data/education_level.xml',
+        'data/account_types.xml',
+        'data/risk_category.xml',
+        'data/watchlist.xml',
+        'data/blacklist.xml',
+
+
     ],
     # only loaded in demonstration mode
     "demo": [
