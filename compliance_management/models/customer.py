@@ -879,9 +879,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'customer'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -910,9 +913,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'vendor'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -940,9 +946,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'partner')]
         else:
@@ -968,9 +977,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'correspondent'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -995,9 +1007,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'respondent'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
