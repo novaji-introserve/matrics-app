@@ -60,7 +60,7 @@
         # "data/schedules/queue_job_config.xml",
         "data/demo_data/score/fcra_score.xml",    
         "data/data.xml",
-        # "data/demo_data/risk_assessment/category.xml",
+        "data/demo_data/risk_assessment/category.xml",
         "data/demo_data/risk_assessment/risk_universe.xml",
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
@@ -93,7 +93,15 @@
         # "data/demo_data/chart/charts.xml",
         # "data/demo_data/partner/res_partner.xml",
         "views/res_users.xml",
-        "data/schedules/aggregate/aggregate_score.xml"
+        'data/gender.xml',
+        'data/identification_type.xml',
+        'data/demo_data/stat/compliance_stats.xml',
+        'data/settings.xml',
+        'data/demo_data/plan/risk_plan.xml',
+        'data/demo_data/account/customer_product.xml',
+        'data/demo_data/partner/sectors.xml',
+        'data/watchlist.xml',
+        'data/blacklist.xml',
     ],
     # only loaded in demonstration mode
     "demo": [

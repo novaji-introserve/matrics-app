@@ -89,7 +89,10 @@ class ResCharts(models.Model):
     )
     domain_filter = fields.Char(string="Domain Filter", help="Domain filter for the action window")
 
-   
+    
+    def init(self):
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_dashboard_charts_id_idx ON res_dashboard_charts (id)")
 
     @api.constrains('query')
     def _check_query_safety(self):
