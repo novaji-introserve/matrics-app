@@ -1827,8 +1827,66 @@ class DashboardChartViewRefresher(models.Model):
     #         return False
     
     @api.model
+    def ensure_all_views_exist(self):
+        """Ensure all materialized views exist and are properly created - called at startup"""
+        _logger.info("Ensuring all materialized views exist and are correctly created")
+        
+        try:
+            # Get all charts that should have materialized views
+            charts = self.env['res.dashboard.charts'].search([
+                ('state', '=', 'active'),
+                ('use_materialized_view', '=', True)
+            ])
+            
+            if not charts:
+                _logger.info("No charts with materialized views found")
+                return True
+                
+            _logger.info(f"Found {len(charts)} charts with materialized views")
+            
+            # Process each chart
+            created = 0
+            errors = 0
+            
+            for chart in charts:
+                # Check if view exists and has columns
+                diagnosis = self.diagnose_materialized_view(chart.id)
+                
+                if not diagnosis.get('exists') or not diagnosis.get('has_columns'):
+                    _logger.info(f"View for chart {chart.id} needs creation or repair")
+                    
+                    # Force create the view
+                    # success = self.force_create_materialized_view(chart.id)
+                    success = self.create_materialized_view_for_chart(chart.id)
+                    
+                    if success:
+                        created += 1
+                        _logger.info(f"Successfully created materialized view for chart {chart.id}")
+                    else:
+                        errors += 1
+                        _logger.error(f"Failed to create materialized view for chart {chart.id}")
+            
+            _logger.info(f"Materialized view initialization complete: {created} created, {errors} errors")
+            return True
+            
+        except Exception as e:
+            _logger.error(f"Error ensuring materialized views exist: {e}")
+            return False
+    
+    @api.model
     def init(self):
         """Ensure a refresher record exists"""
+        super(DashboardChartViewRefresher, self).init()
+        
+        # Delay the initialization to allow the server to fully start
+        # This will be executed after all models are loaded
+        self.env.cr.commit()  # Commit any pending changes first
+        
+        try:
+            # Schedule the view initialization to run soon after startup
+            self.ensure_all_views_exist()
+        except Exception as e:
+            _logger.error(f"Error in init for DashboardChartViewRefresher: {e}")
         # Set up dashboard tables
         try:
             if not self.setup_dashboard_tables():
