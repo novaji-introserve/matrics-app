@@ -133,6 +133,13 @@ class Cases(models.Model):
         ondelete='restrict'
     )
     
+    # transaction_id = fields.Many2one(
+    #     comodel_name='res.customer.transaction',
+    #     string='Transaction Reference',
+    #     index=True,
+    #     ondelete='restrict'
+    # )
+    
     
     # transaction_reference = fields.Char(
     #     string='Transaction Reference Number',
@@ -195,7 +202,7 @@ class Cases(models.Model):
     # Relations
     branch_id = fields.Many2one('branch', string='Branch', ondelete='restrict')
     staff_id = fields.Many2one('res.users', string='Staff', required=True)
-    team_id = fields.Many2one('hr.department', string='Team / Department')
+    #team_id = fields.Many2one('hr.department', string='Team / Department')
     team_id = fields.Many2one('hr.department', string='Department', compute='_compute_team_id', store=True)
     branch_id = fields.Many2one('res.branch', string='Branch', ondelete='set null')
     staff_user_id = fields.Many2one('res.users', string='Staff User', related='staff_id.user_id', store=True, readonly=True)

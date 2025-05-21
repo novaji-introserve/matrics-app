@@ -39,6 +39,9 @@ class ThreadRegistry:
             for key in list(self._threads.keys()):
                 if not self._threads[key]['thread'].is_alive() or time.time() - self._threads[key]['timestamp'] > 300:
                     del self._threads[key]
+    def init(self):
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_dashboard_cache_id_idx ON res_dashboard_cache (id)")
 
 # Global thread registry instance
 THREAD_REGISTRY = ThreadRegistry()

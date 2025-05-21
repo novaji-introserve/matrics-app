@@ -106,6 +106,11 @@ class Pep(models.Model):
     sanctions_added = fields.Boolean(string="Sanctions Added", default=False,
                                 help="Indicates if sanctions data was successfully retrieved")
 
+
+    def init(self):
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_pep_id_idx ON res_pep (id)")
+
     @api.model
     def create(self, vals):
         if "first_name" in vals and "surname" in vals:

@@ -7,7 +7,7 @@
         <field name="name">cases.tree</field>
         <field name="model">case</field>
         <field name="arch" type="xml">
-            <tree create="false" edit="false" delete="true">
+            <tree create="false" edit="false" delete="false">
                 <field name="name" invisible='1'/>
                 <field name="transaction_id" invisible="1" />
                 <!-- <field name="transaction_reference" invisible="1"/> -->
@@ -20,7 +20,7 @@
                 <field name="staff_id" string="Staff Responsible"/>
                 <field name="data_source" readonly="1" invisible="1"/>
                 <field name="cases_action" string="Recommended Action" readonly="1"/>
-                <field name="status_name" invisible="1"/>
+                <field name="status_code" invisible="1"/>
                 <field name="team_id" readonly='1'/>
                 <field name="status_html" widget="html"/>
                 <field name="severity_level" invisible="1"/>
@@ -142,13 +142,13 @@
                             <field name="is_assigned_staff" invisible="1"/>
                             <field name="has_responses" invisible="1"/>
                             <field name="new_process_category_id" string="Process Category" readonly="1"/>
-                            <field name="status_name" invisible="1"/>
+                            <field name="status_code" invisible="1"/>
                             <field name="new_process_id" string="Process" readonly="1"/>
                             <!-- <field name="customer_id" attrs="{'invisible': [('customer_id', '=', False)]}" readonly="1"/> -->
                             <field name="quick_response" string="Respond to Case"
                             attrs="{'invisible': ['|',
                              ('is_assigned_staff', '=', False),
-                             ('status_name', '=', 'closed')
+                             ('status_code', '=', 'closed')
                             ]}"/>
 
                             <!-- <field name="quick_response" string="Respond to Case" 
@@ -256,7 +256,7 @@
                             string="Close Case" 
                             type="object" 
                             class="btn-primary" 
-                            attrs="{'invisible': ['|', '|', '|', ('is_creator', '=', False), ('has_responses', '=', False), ('is_supervisor', '=', True), ('status_name', '=', 'closed')]}"/>
+                            attrs="{'invisible': ['|', '|', '|', ('is_creator', '=', False), ('has_responses', '=', False), ('is_supervisor', '=', True), ('status_code', '=', 'closed')]}"/>
                     <field name="status_id" widget="statusbar" readonly="1"/>
                 </header>
             </header>
@@ -367,11 +367,11 @@
                         <field name="has_responses" invisible="1"/>
                         <field name="new_process_category_id" string="Process Category" readonly="1"/>
                         <field name="new_process_id" string="Process" readonly="1"/>
-                        <field name="status_name" invisible="1"/>
+                        <field name="status_code" invisible="1"/>
                         <field name="quick_response" string="Respond to Case"
                         attrs="{'invisible': ['|',
                         ('is_assigned_staff', '=', False),
-                        ('status_name', '=', 'closed')
+                        ('status_code', '=', 'closed')
                         ]}"/>
                     </group>
                 </group>

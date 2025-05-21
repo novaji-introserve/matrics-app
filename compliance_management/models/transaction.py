@@ -102,6 +102,9 @@ class Transaction(models.Model):
     branch_code = fields.Char(string="Branch Code")
 
 
+    def init(self):
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_customer_transaction_id_idx ON res_customer_transaction (id)")
 
     def get_risk_level(self):
         return self.risk_level

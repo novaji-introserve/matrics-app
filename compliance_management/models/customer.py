@@ -520,24 +520,8 @@ class Customer(models.Model):
         
         # Create index on res_partner which we know exists
         self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
-            
-        # Check if tables exist before creating indexes
-        tables = ['res_partner_account', 'res_customer_transaction', 'res_pep', 
-                'res_partner_watchlist', 'res_dashboard_charts', 'res_dashboard_cache']
-                
-        for table in tables:
-            self.env.cr.execute(f"""
-                SELECT EXISTS (
-                    SELECT FROM information_schema.tables 
-                    WHERE table_name = '{table}'
-                )
-            """)
-            if self.env.cr.fetchone()[0]:
-                self.env.cr.execute(f"""
-                    CREATE INDEX IF NOT EXISTS {table}_id_idx ON {table} (id)
-                """)
-
+            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")        
+    
         # Create the trigger
         self.env.cr.execute("""
             CREATE OR REPLACE FUNCTION set_partner_defaults_func()

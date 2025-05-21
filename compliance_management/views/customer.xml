@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="compl_cust_tree_inherit_res_partner" model="ir.ui.view" create="true">
+    <record id="compl_cust_tree_inherit_res_partner" model="ir.ui.view">
         <field name="name">model_res_partner_tree_inherit</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_tree" />
@@ -8,7 +8,7 @@
             <!-- Update the tree attributes instead of replacing the entire tree -->
             <xpath expr="//tree" position="attributes">
                 <attribute name="sample"/>
-                <!-- <attribute name="create">false</attribute> -->
+                <attribute name="create">false</attribute>
             </xpath>
 
 
@@ -275,7 +275,7 @@
 
         </field>
     </record>
-    <record id="view_customer_search" model="ir.ui.view" create="true">
+    <record id="view_customer_search" model="ir.ui.view">
         <field name="name">Customer Search Custom</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_res_partner_filter"/>
@@ -334,7 +334,7 @@
         <field name="inherit_id" ref="base.view_partner_tree"/>
         <field name="arch" type="xml">
             <tree position="attributes">
-                <!-- <attribute name="create">false</attribute> -->
+                <attribute name="create">false</attribute>
             </tree>
         </field>
     </record>
@@ -346,7 +346,7 @@
         <field name="inherit_id" ref="base.res_partner_kanban_view"/>
         <field name="arch" type="xml">
             <kanban position="attributes">
-                <!-- <attribute name="create">false</attribute> -->
+                <attribute name="create">false</attribute>
             </kanban>
         </field>
     </record>
