@@ -174,11 +174,11 @@ class Cases(models.Model):
 
     # # Status
     # Status
-    case_status = fields.Selection([
-        ('open', 'open'),
-        ('close', 'closed'),
-        ('overdue', 'overdue')
-    ], default='open')
+    # case_status = fields.Selection([
+    #     ('open', 'open'),
+    #     ('close', 'closed'),
+    #     ('overdue', 'overdue')
+    # ], default='open')
     status_id = fields.Many2one('case.status', string='Status')
     #status_id = fields.Many2one('case.status', string='Status', required=False, default=lambda self: self._default_status())
     status_name = fields.Selection(related='status_id.name', store=True, string='Status Name')
