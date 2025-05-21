@@ -5,7 +5,7 @@
     'description': """This module helps in managing cases.""",
     'author': 'Novaji',
     'website': 'https://novajii.com',
-    'category': 'Custom',
+    "category": "iComply",
     'depends': ['base', 'web', 'mail', 'alert_management', 'compliance_management'],
     'data': [
         'data/exception_processes/exception_process_type_data.xml',
