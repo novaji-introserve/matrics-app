@@ -6,7 +6,7 @@
     'author': 'Novaji',
     'website': 'https://novajii.com',
     'category': 'Custom',
-    'depends': ['base', 'web', 'mail'],
+    'depends': ['base', 'web', 'mail', 'compliance_management', 'alert_management'],
     'data': [
         'data/exception_processes/exception_process_type_data.xml',
         'data/exception_processes/exception_process_data.xml',

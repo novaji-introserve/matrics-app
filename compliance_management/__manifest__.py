@@ -22,7 +22,7 @@
         'utm',
         'contacts',
         'mail',
-        'survey', 'case_management' ],
+        'survey'],
 
     # always loaded
     'data': [
@@ -33,7 +33,7 @@
         "data/department.xml",
         "data/risk_assessment_control_data.xml",
 
-        "data/res.branch.csv",
+       # "data/res.branch.csv",
 
         # "data/res.branch.csv",
         # "data/res_partner.xml",

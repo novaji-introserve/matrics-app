@@ -234,36 +234,57 @@ class ExceptionProcessType(models.Model):
     _name = 'exception.process.type'
     _description = 'Exception Process Type'
 
-    num_id = fields.Float(string='ID', required=True)
+    num_id = fields.Integer(string='ID', required=True)
     name = fields.Char(string='Name', required=True)
     
     def name_get(self):
         return [(record.id, f"{record.name}") for record in self]
-
+    
+    
 class ExceptionProcess(models.Model):
     _name = 'exception.process'
     _description = 'Exception Process'
-
+    
     name = fields.Char(string='Name', required=True)
-    # type_id = fields.Float(string='Type ID', required=True)
     type_id = fields.Many2one('exception.process.type', string='Process Type', required=True)
     
-    # Add this related field for easier domain filtering
+    # This computed field is unnecessary if type_id is already a Many2one
+    # If you need it for specific reasons, here's a safer implementation:
     process_type_id = fields.Many2one('exception.process.type', string='Process Type',
                                       compute='_compute_process_type_id', store=True)
     
-    
     @api.depends('type_id')
     def _compute_process_type_id(self):
-        """Map the type_id to an actual process_type record"""
         for record in self:
-            process_type = self.env['exception.process.type'].search([('num_id', '=', record.type_id.num_id)], limit=1)
-
-           # process_type = self.env['exception.process.type'].search([('num_id', '=', record.type_id)], limit=1)
-            record.process_type_id = process_type.id if process_type else False
+            record.process_type_id = record.type_id.id if record.type_id else False
     
     def name_get(self):
         return [(record.id, f"{record.name}") for record in self]
+
+# class ExceptionProcess(models.Model):
+#     _name = 'exception.process'
+#     _description = 'Exception Process'
+
+#     name = fields.Char(string='Name', required=True)
+#     # type_id = fields.Float(string='Type ID', required=True)
+#     type_id = fields.Many2one('exception.process.type', string='Process Type', required=True)
+    
+#     # Add this related field for easier domain filtering
+#     process_type_id = fields.Many2one('exception.process.type', string='Process Type',
+#                                       compute='_compute_process_type_id', store=True)
+    
+    
+#     @api.depends('type_id')
+#     def _compute_process_type_id(self):
+#         """Map the type_id to an actual process_type record"""
+#         for record in self:
+#             process_type = self.env['exception.process.type'].search([('num_id', '=', record.type_id.num_id)], limit=1)
+
+#            # process_type = self.env['exception.process.type'].search([('num_id', '=', record.type_id)], limit=1)
+#             record.process_type_id = process_type.id if process_type else False
+    
+#     def name_get(self):
+#         return [(record.id, f"{record.name}") for record in self]
 
 
 

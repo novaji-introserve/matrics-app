@@ -7,7 +7,7 @@
         <field name="name">cases.tree</field>
         <field name="model">case</field>
         <field name="arch" type="xml">
-            <tree create="false" edit="false" delete="false">
+            <tree create="false" edit="false" delete="true">
                 <field name="name" invisible='1'/>
                 <field name="transaction_id" invisible="1" />
                 <!-- <field name="transaction_reference" invisible="1"/> -->

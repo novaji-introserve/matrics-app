@@ -37,23 +37,18 @@ class Transaction(models.Model):
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
     
 
-    
     def action_create_case(self):
         """
         Opens the case management form with the transaction reference pre-filled
         """
-        # Create the context with required values
         context = {
             'default_status_id': self.env.ref('case_management.case_status_open').id,
             'case_created': True,
             'show_creation_notification': True,
+            #'default_transaction_reference': self.name,
+            'default_transaction_reference': self.id,
+            # Don't set default_transaction_id here since it will be computed
         }
-        
-        # Pre-fill the transaction reference
-        context['default_transaction_reference'] = self.name
-        
-        # Pre-fill the transaction_id field if it exists in the case model
-        context['default_transaction_id'] = self.id
         
         return {
             'type': 'ir.actions.act_window',
@@ -64,6 +59,36 @@ class Transaction(models.Model):
             'target': 'current',
             'context': context
         }
+        
+        
+    
+    
+    # def action_create_case(self):
+    #     """
+    #     Opens the case management form with the transaction reference pre-filled
+    #     """
+    #     # Create the context with required values
+    #     context = {
+    #         'default_status_id': self.env.ref('case_management.case_status_open').id,
+    #         'case_created': True,
+    #         'show_creation_notification': True,
+    #     }
+        
+    #     # Pre-fill the transaction reference
+    #     context['default_transaction_reference'] = self.name
+        
+    #     # Pre-fill the transaction_id field if it exists in the case model
+    #     context['default_transaction_id'] = self.id
+        
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'New Case',
+    #         'res_model': 'case',
+    #         'view_mode': 'form',
+    #         'view_id': self.env.ref('case_management.case_form_view').id,
+    #         'target': 'current',
+    #         'context': context
+    #     }
 
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)

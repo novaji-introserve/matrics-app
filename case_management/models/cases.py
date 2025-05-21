@@ -133,6 +133,7 @@ class Cases(models.Model):
         ondelete='restrict'
     )
     
+    
     # transaction_reference = fields.Char(
     #     string='Transaction Reference Number',
     #     related='transaction_id.name',
@@ -172,28 +173,12 @@ class Cases(models.Model):
     severity_level = fields.Integer(string="Severity Level", compute="_compute_severity_level", store=True)
     
 
-    # # Status
     # Status
-    # case_status = fields.Selection([
-    #     ('open', 'open'),
-    #     ('close', 'closed'),
-    #     ('overdue', 'overdue')
-    # ], default='open')
-    status_id = fields.Many2one('case.status', string='Status')
-    #status_id = fields.Many2one('case.status', string='Status', required=False, default=lambda self: self._default_status())
-    status_name = fields.Selection(related='status_id.name', store=True, string='Status Name')
-    #status_name = fields.Char(related='status_id.name', store=True, string='Status Name')
-    # status_id = fields.Many2one('case.status', string='Status', required=False, default=lambda self: self._default_status())
-    #status_name = fields.Char(string="Status Name", compute="_compute_status_name", store=True)
-    statuses = fields.Selection(related='status_id.name', string='Status Name', store=True)
+    status_id = fields.Many2one('case.status', string='Status', required=False, default=lambda self: self._default_status())
+    status_name = fields.Char(string="Status Name", compute="_compute_status_name", store=True)
+    statuses = fields.Selection(related='status_id.name', string='Status Name', store=True) # for a modification in created by me
     status_html = fields.Html(compute='_compute_status_html', string='Status')
-    #status_code = fields.Selection(related='status_id.name', store=True, string='Status Code')
-
-    # status_id = fields.Many2one('case.status', string='Status', required=False, default=lambda self: self._default_status())
-    # status_name = fields.Char(string="Status Name", compute="_compute_status_name", store=True)
-    # statuses = fields.Selection(related='status_id.name', string='Status Name', store=True) # for a modification in created by me
-    # status_html = fields.Html(compute='_compute_status_html', string='Status')
-    # status_code = fields.Selection(related='status_id.name', store=True, string='Status Code')
+    status_code = fields.Selection(related='status_id.name', store=True, string='Status Code')
 
 
     # Dates
@@ -239,8 +224,8 @@ class Cases(models.Model):
     # new_process_id = fields.Many2one('exception.process', string='Exception Process')
     # new_process_id = fields.Many2one('exception.process', string='Exception Process')
     # new_process_category_id = fields.Many2one('exception.process.type', string='Exception Process Type')
-    # process_category_id = fields.Many2one('exception.category', string='Exception Process Type')
-    # process_id = fields.Many2one('exception.process', string='Exception Process')
+    process_category_id = fields.Many2one('exception.category', string='Exception Process Type')
+    process_id = fields.Many2one('exception.process', string='Exception Process')
     root_category_id = fields.Many2one('exception.process.type', string='Root Category')
     root_category_process_id = fields.Many2one('exception.process.type', string='Root Category Process')
 
@@ -252,13 +237,6 @@ class Cases(models.Model):
     is_assigned_staff = fields.Boolean(compute='_compute_user_roles', compute_sudo=False)
     is_supervisor = fields.Boolean(compute='_compute_is_supervisor', store=False)
     response_text = fields.Text(string="Response", compute="_compute_latest_response", store=False)
-    
-    
-    
-    # @api.onchange('new_process_category_id')
-    # def _onchange_process_category(self):
-    #     """When changing process category, clear the process field to prevent invalid references"""
-    #     self.new_process_id = False
 
     
     def write(self, vals):
@@ -427,7 +405,7 @@ class Cases(models.Model):
     @api.depends('status_id')
     def _compute_status_name(self):
         for rec in self:
-            rec.status_name = rec.status_id.name if rec.status_id else None
+            rec.status_name = rec.status_id.name if rec.status_id else ''
             print(rec.status_name)
             print(rec.status_id.name)
             
@@ -440,7 +418,7 @@ class Cases(models.Model):
                 'closed': 'success',
                 'open': 'primary',
             }.get(rec.status_id.name, 'warning')
-            status = rec.status_id.name.capitalize() if rec.status_id else None
+            status = rec.status_id.name.capitalize() if rec.status_id else 'Unknown'
             rec.status_html = f'<span class="badge bg-{color}" style="color: white; font-weight: bold;">{status}</span>'
             
     @api.depends('title')
@@ -564,12 +542,12 @@ class Cases(models.Model):
     # ------------------- ONCHANGES -------------------
     
     
-    # @api.onchange('new_process_category_id')
-    # def _onchange_process_category_id(self):
-    #     if self.new_process_category_id:
-    #         domain = [('type_id', '=', self.new_process_category_id.id)]
-    #         return {'domain': {'new_process_id': domain}}
-    #     return {'domain': {'new_process_id': []}}
+    @api.onchange('new_process_category_id')
+    def _onchange_process_category_id(self):
+        if self.new_process_category_id:
+            domain = [('type_id', '=', self.new_process_category_id.id)]
+            return {'domain': {'new_process_id': domain}}
+        return {'domain': {'new_process_id': []}}
     
     # @api.onchange('new_process_category_id')
     # def _onchange_process_category_id(self):
@@ -602,33 +580,29 @@ class Cases(models.Model):
     #         ], limit=1)
     #         self.new_process_category_id = related_type
 
-    #fix
-    # @api.onchange('title')
-    # def _onchange_title_set_rating(self):
-    #     if self.title:
-    #         rating = self.env['case.rating'].search([('ref', '=', int(self.title))], limit=1)
-    #         self.rating_id = rating.id if rating else False
-    #     else:
-    #         self.rating_id = False
 
-    #     # Reset supervisors
-    #     self.supervisor_one_id = False
-    #     self.supervisor_two_id = False
-    #     self.supervisor_three_id = False
+    @api.onchange('title')
+    def _onchange_title_set_rating(self):
+        if self.title:
+            rating = self.env['case.rating'].search([('ref', '=', int(self.title))], limit=1)
+            self.rating_id = rating
+        else:
+            self.rating_id = False
+
+        # Reset supervisors
+        self.supervisor_one_id = False
+        self.supervisor_two_id = False
+        self.supervisor_three_id = False
         
-    # @api.onchange('user_id')
-    # def _onchange_user_id(self):
-    #     self._compute_user_roles()
-    
-    #fix
-#    # Staff & Department auto-population
-#     @api.onchange('staff_id')
-#     def _onchange_staff_id(self):
-#         self._compute_user_roles()
-#         self._compute_team_id()
+    @api.onchange('user_id')
+    def _onchange_user_id(self):
+        self._compute_user_roles()
 
-
-#stop
+   # Staff & Department auto-population
+    @api.onchange('staff_id')
+    def _onchange_staff_id(self):
+        self._compute_user_roles()
+        self._compute_team_id()
         # for rec in self:
         #     # Fetch the employee linked to the selected user (staff)
         #     employee = self.env['hr.employee'].search([('user_id', '=', rec.staff_id.id)], limit=1)
@@ -656,30 +630,9 @@ class Cases(models.Model):
 
     # ------------------- DEFAULT -------------------
 
-    # @api.model
-    # def _default_status(self):
-    #     return self.env['case.status'].search([('name', '=', 'open')], limit=1).id
-    
-    #fix
-    # def _default_status(self):
-    #     try:
-    #         # First try to get via ref
-    #         status = self.env.ref('case_management.case_status_open', False)
-    #         if status and status.exists():
-    #             return status
-            
-    #         # If that fails, search by name
-    #         status = self.env['case.status'].search([('name', '=', 'open')], limit=1)
-    #         if status:
-    #             return status
-                
-    #         # If nothing found, create it (cache it for future)
-    #         if not status:
-    #             status = self.env['case.status'].create({'name': 'open'})
-    #             return status
-    #     except Exception:
-    #         # Last resort: return False
-    #         return False
+    @api.model
+    def _default_status(self):
+        return self.env['case.status'].search([('name', '=', 'open')], limit=1).id
 
     # ------------------- ACTIONS -------------------
     
@@ -1228,10 +1181,6 @@ class Cases(models.Model):
             case_action = rec.cases_action
             description = rec.further_description
             response_link = f'/web#id={rec.id}&model=case&view_type=form'
-            
-            print(exception_process)
-            print(process_category)
-            print(process_type)
             
         # Context for email template
             ctx = {
