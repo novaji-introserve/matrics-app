@@ -357,8 +357,170 @@ class DashboardChartViewRefresher(models.Model):
             _logger.error(f"Diagnostic error for view {chart_id}: {e}")
             return {'error': str(e), 'view_exists': False, 'has_columns': False}
         
+    # def create_materialized_view_for_chart(self, chart_id):
+    #     """Create or update a materialized view for a chart with robust transaction handling"""
+    #     _logger.info(f"Creating materialized view for chart {chart_id}")
+        
+    #     # Define view name - consistent naming pattern
+    #     view_name = f"dashboard_chart_view_{chart_id}"
+        
+    #     try:
+    #         # Get chart data first - we need this outside the transaction
+    #         chart = self.env['res.dashboard.charts'].browse(chart_id)
+    #         if not chart.exists():
+    #             _logger.error(f"Chart {chart_id} not found")
+    #             return False
+                
+    #         chart_query = chart.query
+    #         chart_name = chart.name
+            
+    #         if not chart_query:
+    #             _logger.error(f"Chart {chart_id} has no query defined")
+    #             return False
+                
+    #         # Clean the original query
+    #         original_query = chart_query.strip()
+    #         if original_query.endswith(';'):
+    #             original_query = original_query[:-1]
+                
+    #         # Use a transaction for the create operation
+    #         registry = self.env.registry
+    #         with registry.cursor() as cr:
+    #             try:
+    #                 # First, attempt to drop the view if it exists - makes this operation idempotent
+    #                 _logger.info(f"Attempting to drop existing view {view_name}")
+    #                 cr.execute(f"DROP MATERIALIZED VIEW IF EXISTS {view_name}")
+                    
+    #                 # Set a longer timeout for complex queries
+    #                 cr.execute("SET LOCAL statement_timeout = 120000;")  # 2 minutes
+                    
+    #                 # Log the query for debugging
+    #                 sanitized_query = original_query.replace('\n', ' ').replace('\r', '')
+    #                 _logger.info(f"Creating materialized view with query: {sanitized_query[:200]}...")
+                    
+    #                 # Create the view - This is the critical part
+    #                 create_view_query = f"""
+    #                     CREATE MATERIALIZED VIEW {view_name} AS
+    #                     {original_query}
+    #                     WITH DATA
+    #                 """
+                    
+    #                 # Execute creation query
+    #                 cr.execute(create_view_query)
+                    
+    #                 # IMPORTANT FIX: Directly check for columns using a SELECT query
+    #                 # instead of information_schema, which may not be immediately updated
+    #                 cr.execute(f"SELECT * FROM {view_name} LIMIT 0")
+                    
+    #                 # Get columns from cursor description
+    #                 columns = [desc[0] for desc in cr.description]
+                    
+    #                 if not columns:
+    #                     _logger.error(f"View created but has no columns: {view_name}. This indicates a query issue.")
+    #                     raise Exception("View created with no columns")
+                    
+    #                 # Log success - we have columns!
+    #                 _logger.info(f"Successfully created materialized view with {len(columns)} columns: {columns}")
+                    
+    #                 # Now create indexes for the view
+    #                 # First, try to create a unique index if possible (for CONCURRENTLY refresh)
+    #                 primary_candidates = ['id', 'record_id', 'row_id', 'row_number']
+    #                 unique_col = None
+                    
+    #                 for col in primary_candidates:
+    #                     if col in columns:
+    #                         unique_col = col
+    #                         break
+                    
+    #                 if unique_col:
+    #                     _logger.info(f"Creating unique index on column: {unique_col}")
+    #                     cr.execute(f"CREATE UNIQUE INDEX {view_name}_unique_idx ON {view_name} ({unique_col})")
+                    
+    #                 # Create indexes for common search/filter fields
+    #                 # X-axis field
+    #                 if chart.x_axis_field:
+    #                     x_col = self._find_column_in_view(chart.x_axis_field, columns)
+    #                     if x_col:
+    #                         _logger.info(f"Creating x-axis index on column: {x_col}")
+    #                         idx_name = f"{view_name}_x_idx"
+    #                         cr.execute(f"CREATE INDEX {idx_name} ON {view_name} ({x_col})")
+                    
+    #                 # Y-axis field (often used for sorting)
+    #                 if chart.y_axis_field:
+    #                     y_col = self._find_column_in_view(chart.y_axis_field, columns)
+    #                     if y_col:
+    #                         _logger.info(f"Creating y-axis index on column: {y_col}")
+    #                         idx_name = f"{view_name}_y_idx"
+    #                         cr.execute(f"CREATE INDEX {idx_name} ON {view_name} ({y_col})")
+                    
+    #                 # Date field (frequently used in filters)
+    #                 if chart.date_field:
+    #                     date_col = self._find_column_in_view(chart.date_field, columns)
+    #                     if date_col:
+    #                         _logger.info(f"Creating date index on column: {date_col}")
+    #                         idx_name = f"{view_name}_date_idx"
+    #                         cr.execute(f"CREATE INDEX {idx_name} ON {view_name} ({date_col})")
+                    
+    #                 # Branch field (critical for security filtering)
+    #                 if chart.branch_field:
+    #                     branch_col = self._find_column_in_view(chart.branch_field, columns)
+    #                     if branch_col:
+    #                         _logger.info(f"Creating branch index on column: {branch_col}")
+    #                         idx_name = f"{view_name}_branch_idx"
+    #                         cr.execute(f"CREATE INDEX {idx_name} ON {view_name} ({branch_col})")
+                    
+    #                 # Record the creation in refresher model
+    #                 refresher = self.search([('chart_id', '=', chart_id)], limit=1)
+    #                 now = fields.Datetime.now()
+                    
+    #                 if refresher:
+    #                     # Update existing record
+    #                     refresher.write({
+    #                         'view_name': view_name,
+    #                         'last_refresh': now,
+    #                         'refresh_interval': chart.materialized_view_refresh_interval or 60
+    #                     })
+    #                 else:
+    #                     # Create new refresher record
+    #                     self.create({
+    #                         'name': f"Refresher for {chart_name}",
+    #                         'chart_id': chart_id,
+    #                         'view_name': view_name,
+    #                         'last_refresh': now,
+    #                         'refresh_interval': chart.materialized_view_refresh_interval or 60
+    #                     })
+                    
+    #                 # Update the chart record with success info
+    #                 chart.write({
+    #                     'materialized_view_last_refresh': now,
+    #                     'last_execution_status': 'success',
+    #                     'last_error_message': False
+    #                 })
+                    
+    #                 # Commit everything at once
+    #                 cr.commit()
+                    
+    #                 _logger.info(f"Materialized view {view_name} created successfully")
+    #                 return True
+                    
+    #             except Exception as e:
+    #                 # Make sure to rollback on any error
+    #                 cr.rollback()
+    #                 _logger.error(f"Failed to create materialized view for chart {chart_id}: {e}")
+                    
+    #                 # Update the chart with error status
+    #                 chart.write({
+    #                     'last_execution_status': 'error',
+    #                     'last_error_message': str(e)
+    #                 })
+    #                 return False
+        
+    #     except Exception as e:
+    #         _logger.error(f"Fatal error creating materialized view for chart {chart_id}: {e}")
+    #         return False
+    
     def create_materialized_view_for_chart(self, chart_id):
-        """Create or update a materialized view for a chart with robust transaction handling"""
+        """Create or update a materialized view for a chart with robust transaction handling and smart branch coverage"""
         _logger.info(f"Creating materialized view for chart {chart_id}")
         
         # Define view name - consistent naming pattern
@@ -382,6 +544,9 @@ class DashboardChartViewRefresher(models.Model):
             original_query = chart_query.strip()
             if original_query.endswith(';'):
                 original_query = original_query[:-1]
+
+            # SMART ENHANCEMENT: Create enhanced query for better branch coverage
+            enhanced_query = self._create_enhanced_query_for_branch_coverage(original_query, chart)
                 
             # Use a transaction for the create operation
             registry = self.env.registry
@@ -395,13 +560,13 @@ class DashboardChartViewRefresher(models.Model):
                     cr.execute("SET LOCAL statement_timeout = 120000;")  # 2 minutes
                     
                     # Log the query for debugging
-                    sanitized_query = original_query.replace('\n', ' ').replace('\r', '')
-                    _logger.info(f"Creating materialized view with query: {sanitized_query[:200]}...")
+                    sanitized_query = enhanced_query.replace('\n', ' ').replace('\r', '')
+                    _logger.info(f"Creating materialized view with enhanced query: {sanitized_query[:200]}...")
                     
-                    # Create the view - This is the critical part
+                    # Create the view - This is the critical part with ENHANCED QUERY
                     create_view_query = f"""
                         CREATE MATERIALIZED VIEW {view_name} AS
-                        {original_query}
+                        {enhanced_query}
                         WITH DATA
                     """
                     
@@ -420,7 +585,12 @@ class DashboardChartViewRefresher(models.Model):
                         raise Exception("View created with no columns")
                     
                     # Log success - we have columns!
-                    _logger.info(f"Successfully created materialized view with {len(columns)} columns: {columns}")
+                    _logger.info(f"Successfully created enhanced materialized view with {len(columns)} columns: {columns}")
+                    
+                    # Log data count for verification
+                    cr.execute(f"SELECT COUNT(*) FROM {view_name}")
+                    row_count = cr.fetchone()[0]
+                    _logger.info(f"Enhanced materialized view contains {row_count} rows")
                     
                     # Now create indexes for the view
                     # First, try to create a unique index if possible (for CONCURRENTLY refresh)
@@ -432,9 +602,25 @@ class DashboardChartViewRefresher(models.Model):
                             unique_col = col
                             break
                     
+                    # If no standard unique column found, try to create one
+                    if not unique_col:
+                        try:
+                            # Check if 'id' column is unique enough
+                            if 'id' in columns:
+                                cr.execute(f"SELECT COUNT(*), COUNT(DISTINCT id) FROM {view_name}")
+                                total_count, distinct_count = cr.fetchone()
+                                if total_count == distinct_count:
+                                    unique_col = 'id'
+                                    _logger.info(f"'id' column is unique, using it for unique index")
+                        except Exception as e:
+                            _logger.debug(f"Could not determine uniqueness: {e}")
+                    
                     if unique_col:
-                        _logger.info(f"Creating unique index on column: {unique_col}")
-                        cr.execute(f"CREATE UNIQUE INDEX {view_name}_unique_idx ON {view_name} ({unique_col})")
+                        try:
+                            _logger.info(f"Creating unique index on column: {unique_col}")
+                            cr.execute(f"CREATE UNIQUE INDEX {view_name}_unique_idx ON {view_name} ({unique_col})")
+                        except Exception as e:
+                            _logger.warning(f"Could not create unique index: {e}")
                     
                     # Create indexes for common search/filter fields
                     # X-axis field
@@ -500,13 +686,13 @@ class DashboardChartViewRefresher(models.Model):
                     # Commit everything at once
                     cr.commit()
                     
-                    _logger.info(f"Materialized view {view_name} created successfully")
+                    _logger.info(f"Enhanced materialized view {view_name} created successfully with {row_count} rows")
                     return True
                     
                 except Exception as e:
                     # Make sure to rollback on any error
                     cr.rollback()
-                    _logger.error(f"Failed to create materialized view for chart {chart_id}: {e}")
+                    _logger.error(f"Failed to create enhanced materialized view for chart {chart_id}: {e}")
                     
                     # Update the chart with error status
                     chart.write({
@@ -516,8 +702,57 @@ class DashboardChartViewRefresher(models.Model):
                     return False
         
         except Exception as e:
-            _logger.error(f"Fatal error creating materialized view for chart {chart_id}: {e}")
+            _logger.error(f"Fatal error creating enhanced materialized view for chart {chart_id}: {e}")
             return False
+
+    def _create_enhanced_query_for_branch_coverage(self, original_query, chart):
+        """Create enhanced query that ensures ALL branches are included by converting INNER to LEFT JOINs"""
+        import re
+        
+        # Check if this query needs enhancement
+        has_branch_field = bool(chart.branch_field)
+        
+        if not has_branch_field:
+            _logger.info(f"Query doesn't need enhancement - no branch field")
+            return original_query
+        
+        _logger.info(f"Enhancing query to include ALL branches using LEFT JOINs")
+        _logger.info(f"Original query: {original_query}")
+        
+        try:
+            # The core issue: INNER JOINs exclude branches with no matching data
+            # Solution: Convert to LEFT JOINs so ALL branches appear
+            enhanced_query = self._convert_inner_joins_to_left_joins(original_query)
+            
+            if enhanced_query != original_query:
+                _logger.info(f"Enhanced query: {enhanced_query}")
+                return enhanced_query
+            else:
+                _logger.info(f"No JOIN conversion needed, using original query")
+                return original_query
+                
+        except Exception as e:
+            _logger.warning(f"Could not enhance query: {e}")
+            return original_query
+
+    def _convert_inner_joins_to_left_joins(self, query):
+        """Convert INNER JOINs to LEFT JOINs to include ALL branches dynamically"""
+        import re
+        
+        # Make a copy to work with
+        enhanced_query = query
+        
+        # Convert all INNER JOINs to LEFT JOINs
+        # This ensures ALL branches appear in results, even those with zero counts
+        enhanced_query = re.sub(
+            r'\bJOIN\b', 
+            'LEFT JOIN', 
+            enhanced_query, 
+            flags=re.IGNORECASE
+        )
+        
+        _logger.info(f"Converted INNER JOINs to LEFT JOINs for inclusive branch coverage")
+        return enhanced_query
     
     def _get_chart_data_from_materialized_view(self, chart, cco, branches_id):
         """Get chart data from materialized view with improved column detection - no unnecessary recreations"""

@@ -1547,530 +1547,293 @@ class Compliance(http.Controller):
     
 
     @http.route('/dashboard/stats', auth='public', type='json')
-
     def getAllstats(self, cco, branches_id, datepicked, **kw):
-
         # Get current user ID
-
         user_id = request.env.user.id
 
-
-
         # Get unique identifier
-
         unique_id = get_unique_client_identifier()
-
         
-
         # Generate cache key
-
         cache_key = f"all_stats_{cco}_{branches_id}_{datepicked}_{unique_id}"
 
-
-
         _logger.info(f"This is the cache key: {cache_key}")
-
         
-
         # Check if we have valid cache for this user
-
         cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
-
         if cache_data:
-
             return cache_data
 
-
-
         # Define excluded tables
-
         excluded_tables = ["res_branch", "res_risk_universe"]
 
-
-
         # Make sure branches_id is a proper list for non-CCO users
-
         if not cco:
-
             branches_array = self.check_branches_id(branches_id)
-
             # If non-CCO user with no branches, they should see nothing
-
             if not branches_array:
-
                 return {"data": [], "total": 0}
-
         
-
         # First get all compliance stats
-
         query = """
-
             SELECT rcs.*
-
             FROM res_compliance_stat rcs
-
             WHERE rcs.state = 'active'
-
             ORDER BY rcs.id
-
         """
-
         request.env.cr.execute(query)
 
-
-
         # Get column names and results
-
         columns = [desc[0] for desc in request.env.cr.description]
-
         stat_records = [dict(zip(columns, row)) for row in request.env.cr.fetchall()]
 
-
-
         computed_results = []
-
         
-
         # Process each statistic in its own transaction for resilience
-
         for stat in stat_records:
-
             # Create a new cursor for each statistic to avoid transaction aborts affecting others
-
             with request.env.registry.cursor() as cr:
-
                 try:
-
                     stat_id = stat['id']
-
                     view_name = f"stat_view_{stat_id}"
-
                     result_value = None
-
                     
-
                     # Try to get value from materialized view first
-
                     use_view = stat.get('use_materialized_view', False)
-
                     
-
                     if use_view:
-
                         # Check if view exists
-
                         cr.execute("""
-
                             SELECT EXISTS (
-
                                 SELECT FROM pg_catalog.pg_class c
-
                                 WHERE c.relname = %s AND c.relkind = 'm'
-
                             )
-
                         """, (view_name,))
-
                         
-
                         view_exists = cr.fetchone()[0]
-
                         
-
                         if view_exists:
-
-                            # First, dynamically detect columns in the view
-
+                            # **CRITICAL FIX: Dynamic column detection**
+                            # First, get ALL columns from the view dynamically
                             cr.execute(f"SELECT * FROM {view_name} LIMIT 0")
-
-                            columns = [desc[0] for desc in cr.description]
-
+                            view_columns = [desc[0] for desc in cr.description]
                             
-
                             # Start with basic query
-
                             filter_query = f"SELECT * FROM {view_name}"
-
                             
-
                             # For non-CCO users, apply branch filtering dynamically
-
                             if not cco and branches_id:
-
-                                # Check if the original query references a table with branch_id
-
+                                # Extract the main table from original query
                                 original_query = stat['sql_query'].lower()
-
                                 main_table = self.extract_main_table(original_query)
-
                                 
-
                                 # Skip excluded tables
-
                                 if main_table in excluded_tables:
-
                                     continue
-
                                 
-
-                                # Check if the table has branch_id or equivalent
-
-                                if main_table:
-
-                                    # Find columns that might represent branch_id
-
-                                    branch_column = None
-
-                                    branch_candidates = ['branch_id', 'branch', 'partner_branch_id']
-
-                                    
-
-                                    # Check for each candidate in the materialized view columns
-
-                                    for candidate in branch_candidates:
-
-                                        if candidate in columns:
-
-                                            branch_column = candidate
-
-                                            break
-
-                                    
-
-                                    # If no exact match, try columns containing 'branch'
-
-                                    if not branch_column:
-
-                                        for col in columns:
-
-                                            if 'branch' in col.lower():
-
-                                                branch_column = col
-
-                                                break
-
-                                    
-
-                                    # Apply branch filtering if we found a suitable column
-
-                                    if branch_column:
-
-                                        branches_array = list(map(int, branches_id))
-
-                                        if branches_array:
-
-                                            if len(branches_array) == 1:
-
-                                                filter_query += f" WHERE {branch_column} = {branches_array[0]}"
-
-                                            else:
-
-                                                filter_query += f" WHERE {branch_column} IN {tuple(branches_array)}"
-
-                            
-
-                            # Query the view with the proper filters
-
-                            try:
-
-                                cr.execute(f"{filter_query} LIMIT 1")
-
-                                result_row = cr.fetchone()
-
-                                if result_row:
-
-                                    result_value = result_row[0] if result_row else 0
-
-                            except Exception as view_error:
-
-                                _logger.warning(f"Error querying view for stat {stat_id}: {view_error}")
-
-                    
-
-                    # If materialized view approach didn't work, fall back to direct SQL
-
-                    if result_value is None:
-
-                        original_query = stat['sql_query']
-
-                        query = original_query.lower()
-
-                        
-
-                        # Extract the main table from the query
-
-                        main_table = self.extract_main_table(query)
-
-                        
-
-                        # Skip if the main table is in excluded_tables
-
-                        if main_table in excluded_tables:
-
-                            continue
-
-                        
-
-                        # Check if the main table has a branch_id column - dynamically
-
-                        if main_table:
-
-                            # First, check if we need to modify the query
-
-                            needs_modification = False
-
-                            has_branch_id = False
-
-                            has_res_partner = re.search(r"\bres_partner\b", query, re.IGNORECASE) is not None
-
-                            
-
-                            # Check for branch_id column
-
-                            if '.' in main_table:
-
-                                schema, table = main_table.split('.')
-
-                                check_query = """
-
-                                    SELECT column_name FROM information_schema.columns
-
-                                    WHERE table_schema = %s AND table_name = %s 
-
-                                    AND column_name IN ('branch_id', 'branch', 'partner_branch_id')
-
-                                    OR column_name LIKE %s
-
-                                """
-
-                                cr.execute(check_query, (schema, table, '%branch%'))
-
-                                branch_columns = [row[0] for row in cr.fetchall()]
-
-                                has_branch_id = bool(branch_columns)
-
-                            else:
-
-                                # Check in public schema
-
-                                check_query = """
-
-                                    SELECT column_name FROM information_schema.columns
-
-                                    WHERE table_schema = 'public' AND table_name = %s 
-
-                                    AND (column_name IN ('branch_id', 'branch', 'partner_branch_id')
-
-                                    OR column_name LIKE %s)
-
-                                """
-
-                                cr.execute(check_query, (main_table, '%branch%'))
-
-                                branch_columns = [row[0] for row in cr.fetchall()]
-
-                                has_branch_id = bool(branch_columns)
-
-                            
-
-                            # Get the branch column name
-
-                            branch_column = branch_columns[0] if branch_columns else None
-
-                            
-
-                            if has_res_partner or has_branch_id:
-
-                                needs_modification = True
-
-                                # Remove trailing semicolon if present
-
-                                if query.endswith(";"):
-
-                                    query = query[:-1]
-
-                                    original_query = original_query[:-1]
-
-                                has_where = bool(re.search(r'\bwhere\b', query))
-
+                                # **DYNAMIC BRANCH COLUMN DETECTION**
+                                branch_column = self._find_branch_column_dynamically(cr, view_columns, main_table)
                                 
-
-                                # Prepare conditions to add
-
-                                conditions = []
-
-                                
-
-                                # Add branch filter if branches are specified AND table has branch_id column
-
-                                if not cco and has_branch_id and branch_column:
-
-                                    branches_array = list(map(int, branches_id)) if branches_id else []
-
+                                # Apply branch filtering if we found a suitable column
+                                if branch_column:
+                                    branches_array = list(map(int, branches_id))
                                     if branches_array:
-
                                         if len(branches_array) == 1:
-
-                                            conditions.append(f"{branch_column} = {branches_array[0]}")
-
+                                            filter_query += f" WHERE {branch_column} = {branches_array[0]}"
                                         else:
-
-                                            conditions.append(f"{branch_column} IN {tuple(branches_array)}")
-
+                                            filter_query += f" WHERE {branch_column} IN {tuple(branches_array)}"
                                     else:
-
-                                        # If no branches and table has branch_id, add a condition that returns no results
-
-                                        conditions.append("1=0")
-
-                                
-
-                                # Add origin filter for partner tables
-
-                                if has_res_partner:
-
-                                    conditions.append("origin IN ('demo','test','prod')")
-
-                                
-
-                                # Build the final condition string
-
-                                if conditions:
-
-                                    if has_where:
-
-                                        condition_str = " AND " + " AND ".join(conditions)
-
-                                    else:
-
-                                        condition_str = " WHERE " + " AND ".join(conditions)
-
-                                    
-
-                                    # Find the position to insert the condition (before any clause)
-
-                                    clauses = ['group by', 'order by', 'limit', 'offset', 'having']
-
-                                    clause_pos = -1
-
-                                    for clause in clauses:
-
-                                        pos = query.find(' ' + clause + ' ')
-
-                                        if pos > -1:
-
-                                            if clause_pos == -1 or pos < clause_pos:
-
-                                                clause_pos = pos
-
-                                    
-
-                                    # Insert the condition at the appropriate position
-
-                                    if clause_pos > -1:
-
-                                        original_query = original_query[:clause_pos] + condition_str + original_query[clause_pos:]
-
-                                    else:
-
-                                        original_query += condition_str
-
-                        
-
-                        # Execute the query
-
-                        try:
-
-                            cr.execute(original_query)
-
-                            result_row = cr.fetchone()
-
-                            result_value = result_row[0] if result_row is not None else 0
-
-                        except Exception as e:
-
-                            _logger.error(f"Error executing SQL query for stat {stat['name']}: {str(e)}")
-
-                            computed_results.append({
-
-                                "name": stat["name"],
-
-                                "scope": stat["scope"],
-
-                                "val": "Error",
-
-                                "id": stat["id"],
-
-                                "scope_color": stat["scope_color"],
-
-                                "query": stat["sql_query"]
-
-                            })
-
-                            continue
-
+                                        # No branches for non-CCO user
+                                        continue
+                            
+                            # Query the view with the proper filters
+                            try:
+                                cr.execute(f"{filter_query} LIMIT 1")
+                                result_row = cr.fetchone()
+                                if result_row:
+                                    result_value = result_row[0] if result_row else 0
+                            except Exception as view_error:
+                                _logger.warning(f"Error querying view for stat {stat_id}: {view_error}")
                     
-
-                    # Add the result
-
-                    computed_results.append({
-
-                        "name": stat["name"],
-
-                        "scope": stat["scope"],
-
-                        "val": self.format_number(result_value) if result_value is not None else 0.0,
-
-                        "id": stat["id"],
-
-                        "scope_color": stat["scope_color"],
-
-                        "query": stat["sql_query"]
-
-                    })
-
+                    # If materialized view approach didn't work, fall back to direct SQL
+                    if result_value is None:
+                        original_query = stat['sql_query']
+                        query = original_query.lower()
                         
-
-                except Exception as e:
-
-                    _logger.error(f"Error processing stat {stat.get('name', 'Unknown')}: {str(e)}")
-
+                        # Extract the main table from the query
+                        main_table = self.extract_main_table(query)
+                        
+                        # Skip if the main table is in excluded_tables
+                        if main_table in excluded_tables:
+                            continue
+                        
+                        # **DYNAMIC BRANCH COLUMN DETECTION FOR DIRECT QUERY**
+                        needs_modification = False
+                        has_branch_id = False
+                        branch_column_name = None
+                        has_res_partner = re.search(r"\bres_partner\b", query, re.IGNORECASE) is not None
+                        
+                        # Dynamically check for branch columns
+                        if main_table:
+                            branch_column_name = self._check_table_for_branch_column(cr, main_table)
+                            has_branch_id = bool(branch_column_name)
+                        
+                        if has_res_partner or has_branch_id:
+                            needs_modification = True
+                            # Remove trailing semicolon if present
+                            if query.endswith(";"):
+                                query = query[:-1]
+                                original_query = original_query[:-1]
+                            has_where = bool(re.search(r'\bwhere\b', query))
+                            
+                            # Prepare conditions to add
+                            conditions = []
+                            
+                            # Add branch filter if branches are specified AND table has branch column
+                            if not cco and has_branch_id and branch_column_name:
+                                branches_array = list(map(int, branches_id)) if branches_id else []
+                                if branches_array:
+                                    if len(branches_array) == 1:
+                                        conditions.append(f"{branch_column_name} = {branches_array[0]}")
+                                    else:
+                                        conditions.append(f"{branch_column_name} IN {tuple(branches_array)}")
+                                else:
+                                    # If no branches and table has branch_id, add a condition that returns no results
+                                    conditions.append("1=0")
+                            
+                            # Add origin filter for partner tables
+                            if has_res_partner:
+                                conditions.append("origin IN ('demo','test','prod')")
+                            
+                            # Build the final condition string
+                            if conditions:
+                                if has_where:
+                                    condition_str = " AND " + " AND ".join(conditions)
+                                else:
+                                    condition_str = " WHERE " + " AND ".join(conditions)
+                                
+                                # Find the position to insert the condition (before any clause)
+                                clauses = ['group by', 'order by', 'limit', 'offset', 'having']
+                                clause_pos = -1
+                                for clause in clauses:
+                                    pos = query.find(' ' + clause + ' ')
+                                    if pos > -1:
+                                        if clause_pos == -1 or pos < clause_pos:
+                                            clause_pos = pos
+                                
+                                # Insert the condition at the appropriate position
+                                if clause_pos > -1:
+                                    original_query = original_query[:clause_pos] + condition_str + original_query[clause_pos:]
+                                else:
+                                    original_query += condition_str
+                        
+                        # Execute the query
+                        try:
+                            cr.execute(original_query)
+                            result_row = cr.fetchone()
+                            result_value = result_row[0] if result_row is not None else 0
+                        except Exception as e:
+                            _logger.error(f"Error executing SQL query for stat {stat['name']}: {str(e)}")
+                            computed_results.append({
+                                "name": stat["name"],
+                                "scope": stat["scope"],
+                                "val": "Error",
+                                "id": stat["id"],
+                                "scope_color": stat["scope_color"],
+                                "query": stat["sql_query"]
+                            })
+                            continue
+                    
+                    # Add the result
                     computed_results.append({
-
-                        "name": stat.get("name", "Unknown"),
-
-                        "scope": stat.get("scope", "Unknown"),
-
-                        "val": "Error",
-
-                        "id": stat.get("id", 0),
-
-                        "scope_color": stat.get("scope_color", ""),
-
-                        "query": stat.get("sql_query", "")
-
+                        "name": stat["name"],
+                        "scope": stat["scope"],
+                        "val": self.format_number(result_value) if result_value is not None else 0.0,
+                        "id": stat["id"],
+                        "scope_color": stat["scope_color"],
+                        "query": stat["sql_query"]
                     })
-
+                        
+                except Exception as e:
+                    _logger.error(f"Error processing stat {stat.get('name', 'Unknown')}: {str(e)}")
+                    computed_results.append({
+                        "name": stat.get("name", "Unknown"),
+                        "scope": stat.get("scope", "Unknown"),
+                        "val": "Error",
+                        "id": stat.get("id", 0),
+                        "scope_color": stat.get("scope_color", ""),
+                        "query": stat.get("sql_query", "")
+                    })
         
-
         result = {
-
             "data": computed_results,
-
             "total": len(computed_results)
-
         }
-
         
-
         # Store in cache before returning
-
         request.env['res.dashboard.cache'].set_cache(cache_key, result, user_id)
-
         
-
         return result
+    
+    def _find_branch_column_dynamically(self, cr, columns, table_name=None):
+        """
+        Find branch column from a list of columns using the configured field or intelligent detection
+        """
+        # First, check if branch_id exists (most common case)
+        if 'branch_id' in columns:
+            return 'branch_id'
+        
+        # If not, check the database for foreign key relationships
+        if table_name:
+            cr.execute("""
+                SELECT column_name 
+                FROM information_schema.columns
+                WHERE table_name = %s 
+                AND column_name IN %s
+                AND (column_name LIKE '%%branch%%' OR column_name LIKE '%%_id')
+                ORDER BY 
+                    CASE 
+                        WHEN column_name = 'branch_id' THEN 1
+                        WHEN column_name LIKE '%%branch%%' THEN 2
+                        ELSE 3
+                    END
+                LIMIT 1
+            """, (table_name, tuple(columns)))
+            
+            result = cr.fetchone()
+            if result:
+                return result[0]
+        
+        return None
+
+    def _check_table_for_branch_column(self, cr, table_name):
+        """
+        Check if a table has a branch-related column
+        """
+        if '.' in table_name:
+            schema, table = table_name.split('.')
+            query = """
+                SELECT column_name 
+                FROM information_schema.columns
+                WHERE table_schema = %s AND table_name = %s 
+                AND (column_name = 'branch_id' OR column_name LIKE '%%branch%%')
+                ORDER BY CASE WHEN column_name = 'branch_id' THEN 1 ELSE 2 END
+                LIMIT 1
+            """
+            cr.execute(query, (schema, table))
+        else:
+            query = """
+                SELECT column_name 
+                FROM information_schema.columns
+                WHERE table_schema = 'public' AND table_name = %s 
+                AND (column_name = 'branch_id' OR column_name LIKE '%%branch%%')
+                ORDER BY CASE WHEN column_name = 'branch_id' THEN 1 ELSE 2 END
+                LIMIT 1
+            """
+            cr.execute(query, (table_name,))
+        
+        result = cr.fetchone()
+        return result[0] if result else None
 
 
 
