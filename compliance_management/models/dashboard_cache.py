@@ -210,7 +210,7 @@ class DashboardCache(models.Model):
                     cache.refresh_in_progress = False
             except:
                 pass
-    
+            
     @staticmethod
     def _refresh_cache_background_thread(dbname, uid, key, user_id, thread_id):
         """Background thread to refresh cache data"""
@@ -232,10 +232,12 @@ class DashboardCache(models.Model):
                 ], limit=1)
                 
                 if not cache:
+                    _logger.warning(f"Cache key {key} no longer valid for refresh")
                     return
                 
-                # Refresh the data
+                # Refresh the data with proper error handling
                 try:
+                    # Determine what type of data to refresh
                     result = None
                     
                     if 'charts_data_' in key:
@@ -243,23 +245,78 @@ class DashboardCache(models.Model):
                     elif 'all_stats_' in key:
                         result = env['res.dashboard.cache']._refresh_stats_data(key, user_id)
                     
+                    # Only set cache if we got a result
                     if result:
                         env['res.dashboard.cache'].set_cache(key, result, user_id)
+                        _logger.info(f"Successfully refreshed cache for {key}")
+                    else:
+                        _logger.warning(f"No result data for refreshing {key}")
                 except Exception as e:
                     _logger.error(f"Error in refresh operation: {str(e)}")
-                
-                # Reset refresh flag
-                try:
-                    if cache.exists():
-                        cache.refresh_in_progress = False
-                        cr.commit()
-                except Exception as e:
-                    _logger.error(f"Error resetting refresh flag: {str(e)}")
+                finally:
+                    # ALWAYS reset the refresh flag, even on error
+                    try:
+                        if cache.exists():
+                            cache.refresh_in_progress = False
+                            cr.commit()
+                    except Exception as e:
+                        _logger.error(f"Error resetting refresh flag: {str(e)}")
             
         except Exception as e:
             _logger.error(f"Fatal error in background refresh thread: {str(e)}")
         finally:
+            # Always clean up thread registry
             THREAD_REGISTRY.unregister(key)
+        
+    # @staticmethod
+    # def _refresh_cache_background_thread(dbname, uid, key, user_id, thread_id):
+    #     """Background thread to refresh cache data"""
+    #     try:
+    #         # Small delay to prevent race conditions
+    #         time.sleep(0.25)
+            
+    #         _logger.debug(f"Starting background refresh for key: {key}")
+            
+    #         # Create a new environment for this thread
+    #         with odoo_registry(dbname).cursor() as cr:
+    #             env = api.Environment(cr, uid, {})
+                
+    #             # Check that the key is still valid
+    #             cache = env['res.dashboard.cache'].search([
+    #                 ('name', '=', key), 
+    #                 ('user_id', '=', user_id),
+    #                 ('refresh_in_progress', '=', True)
+    #             ], limit=1)
+                
+    #             if not cache:
+    #                 return
+                
+    #             # Refresh the data
+    #             try:
+    #                 result = None
+                    
+    #                 if 'charts_data_' in key:
+    #                     result = env['res.dashboard.cache']._refresh_charts_data(key, user_id)
+    #                 elif 'all_stats_' in key:
+    #                     result = env['res.dashboard.cache']._refresh_stats_data(key, user_id)
+                    
+    #                 if result:
+    #                     env['res.dashboard.cache'].set_cache(key, result, user_id)
+    #             except Exception as e:
+    #                 _logger.error(f"Error in refresh operation: {str(e)}")
+                
+    #             # Reset refresh flag
+    #             try:
+    #                 if cache.exists():
+    #                     cache.refresh_in_progress = False
+    #                     cr.commit()
+    #             except Exception as e:
+    #                 _logger.error(f"Error resetting refresh flag: {str(e)}")
+            
+    #     except Exception as e:
+    #         _logger.error(f"Fatal error in background refresh thread: {str(e)}")
+    #     finally:
+    #         THREAD_REGISTRY.unregister(key)
     
     @api.model
     def _refresh_charts_data(self, key, user_id):

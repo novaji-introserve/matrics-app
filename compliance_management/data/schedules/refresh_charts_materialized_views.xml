@@ -3,10 +3,10 @@
     <data>
         <!-- cron jobs to stagger execution and use lower isolation level -->
         <record id="ir_cron_refresh_dashboard_chart_views" model="ir.cron">
-            <field name="name">Refresh Dashboard Chart Materialized Views</field>
-            <field name="model_id" ref="model_dashboard_chart_view_refresher"/>
+            <field name="name">Refresh Dashboard Materialized Views</field>
+            <field name="model_id" ref="model_res_materialized_views"/>
             <field name="state">code</field>
-            <field name="code">model.refresh_chart_views(low_priority=True)</field>
+            <field name="code">model.run_all_materialized_views_cron_tasks(low_priority=True)</field>
             <field name="user_id" ref="base.user_root"/>
             <field name="interval_number">1</field>
             <field name="interval_type">hours</field>
