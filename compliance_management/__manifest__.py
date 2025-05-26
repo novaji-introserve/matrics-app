@@ -17,6 +17,7 @@
     "category": "iComply",
     "version": "0.3",
     # any module necessary for this one to work correctly
+    
     'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification', 'alert_management', 'project',
         'mass_mailing',
         'utm',
@@ -32,7 +33,7 @@
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
-        # "data/demo_data/branch/res.branch.csv", #BRANCH
+        "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "data/demo_data/keyword/media_keywords.xml",
@@ -47,6 +48,7 @@
 
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
+        "data/schedules/count-weight-avg.xml",
         "views/dynamic_charts.xml",
         "views/fcra_score.xml",
         "views/configuration.xml",
@@ -89,8 +91,8 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-        # "data/demo_data/chart/charts.xml", #CHARTS
-        # "data/demo_data/partner/res_partner.xml", #RES_PARTNER/CUSTOMER 
+        "data/demo_data/chart/charts.xml", #CHARTS
+        "data/demo_data/partner/res_partner.xml", #RES_PARTNER/CUSTOMER 
         "views/res_users.xml",
         'data/gender.xml',
         'data/identification_type.xml',
@@ -101,8 +103,8 @@
         'data/demo_data/partner/sectors.xml',
         'data/watchlist.xml',
         'data/blacklist.xml',
-        # 'data/demo_data/account/res_partner_accounts.xml', #ACCOUNTS
-        # 'data/transactions.xml',  #TRANSACTIONS
+        'data/demo_data/account/res_partner_accounts.xml', #ACCOUNTS
+        'data/transactions.xml',  #TRANSACTIONS
         'data/schedules/aggregate_score.xml',
     ],
     # only loaded in demonstration mode

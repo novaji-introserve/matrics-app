@@ -49,3 +49,4 @@ from . import res_risk_implication
 from . import fcra_score
 from . import dashboard_cache
 from . import aggregate_customer_score
+from . import account_aggregate
