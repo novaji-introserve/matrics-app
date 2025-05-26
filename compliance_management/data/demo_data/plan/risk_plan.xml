@@ -1,7 +1,7 @@
 <odoo>
  <record id="risk_plan_1" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers without BVN</field>
-        <field name="risk_score">25</field>
+        <field name="risk_score">9</field>
         <field name="code">cust_no_bvn</field>
         <field name="sql_query">SELECT risk_score FROM res_partner WHERE id = %s AND (bvn IS NULL OR bvn LIKE '%%[a-zA-Z]%%' OR bvn LIKE 'NOBVN%%')</field>
         <field name="priority">1</field>
@@ -11,7 +11,7 @@
     </record>
     <record id="risk_plan_2" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers without Phone</field>
-        <field name="risk_score">17</field>
+        <field name="risk_score">8</field>
         <field name="code">cust_no_phone</field>
         <field name="sql_query">select risk_score from res_partner where id=%s and mobile is null and phone is null</field>
         <field name="priority">2</field>
@@ -22,7 +22,7 @@
 
     <record id="risk_plan_inavlid_name" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers With Invalid Names</field>
-        <field name="risk_score">20</field>
+        <field name="risk_score">7</field>
         <field name="code">cust_invalid_name</field>
         <field name="sql_query">SELECT risk_score 
             FROM res_partner 
@@ -36,7 +36,7 @@
 
     <record id="risk_plan_repeated_phone" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers with Repeated Phone Number Up To 3 Accounts and Above</field>
-        <field name="risk_score">20</field>
+        <field name="risk_score">7</field>
         <field name="code">cust_repeated_phone</field>
         <field name="sql_query">SELECT risk_score
             FROM res_partner
@@ -57,7 +57,7 @@
 
     <record id="risk_plan_3" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on Blacklist</field>
-        <field name="risk_score">25</field>
+        <field name="risk_score">9</field>
         <field name="code">cust_blacklist</field>
         <field name="sql_query">select risk_score from res_partner where id=%s and is_blacklist=true</field>
         <field name="priority">3</field>
@@ -67,7 +67,7 @@
     </record>
     <record id="risk_plan_pep" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on PEPlist</field>
-        <field name="risk_score">20</field>
+        <field name="risk_score">9</field>
         <field name="code">cust_pep</field>
         <field name="sql_query">select risk_score from res_partner where id=%s and is_pep=true</field>
         <field name="priority">4</field>
@@ -87,7 +87,7 @@
     </record> -->
     <record id="risk_plan_watchlist" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on Watchlist</field>
-        <field name="risk_score">20</field>
+        <field name="risk_score">7</field>
         <field name="code">cust_watchlist</field>
         <field name="sql_query">select risk_score from res_partner where id=%s and is_watchlist=true</field>
         <field name="priority">6</field>
@@ -97,7 +97,7 @@
     </record>
     <record id="risk_plan_default" model="res.compliance.risk.assessment.plan">
         <field name="name">Default Risk Score</field>
-        <field name="risk_score">8</field>
+        <field name="risk_score">3</field>
         <field name="code">default_plan</field>
         <field name="sql_query">select risk_rating from res_risk_assessment where is_default=true limit 1</field>
         <field name="priority">1</field>
