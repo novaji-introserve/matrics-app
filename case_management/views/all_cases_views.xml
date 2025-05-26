@@ -122,14 +122,26 @@
                             <field name="supervisor_one_id" readonly="1"/>
                             
                             <!-- Supervisor 2 shown only for medium risk rating -->
+
                             <field name="supervisor_two_id" 
                                 readonly="1"
-                                attrs="{'invisible': [('title', '!=', '2')]}" />
+                                attrs="{'invisible': [('title', 'not in', ['2', '3'])]}" 
+                            />
+
+                            <!-- <field name="supervisor_two_id" 
+                                readonly="1"
+                                attrs="{'invisible': ['|', ('title', '!=', '2'), ('title', '!=', '3')]}" 
+                            /> -->
+
+
+                            <!-- <field name="supervisor_two_id" 
+                                readonly="1"
+                                attrs="{'invisible': [('title', '!=', '2')]}" /> -->
 
                             <!-- Another Supervisor 2 instance shown only for high risk rating -->
-                            <field name="supervisor_two_id" 
+                            <!-- <field name="supervisor_two_id" 
                                 readonly="1"
-                                attrs="{'invisible': [('title', '!=', '3')]}" />
+                                attrs="{'invisible': [('title', '!=', '3')]}" /> -->
 
                             <!-- Supervisor 3 shown only for high risk rating -->
                             <field name="supervisor_three_id" 

@@ -26,12 +26,3 @@ export { KpiCard };  //  Make sure it's exported
 
 
 
-// /** @odoo-module */
-
-// import { registry } from "@web/core/registry";
-// import { Component, xml } from "@odoo/owl";
-
-
-// class KpiCard extends Component {};
-
-// KpiCard.template = "owl.KpiCard"

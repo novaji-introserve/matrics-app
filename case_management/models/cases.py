@@ -133,30 +133,12 @@ class Cases(models.Model):
         ondelete='restrict'
     )
     
-    # transaction_id = fields.Many2one(
-    #     comodel_name='res.customer.transaction',
-    #     string='Transaction Reference',
-    #     index=True,
-    #     ondelete='restrict'
-    # )
     
-    
-    # transaction_reference = fields.Char(
-    #     string='Transaction Reference Number',
-    #     related='transaction_id.name',
-    #     store=True,
-    #     readonly=True
-    # )
-    
-    #transaction_reference = fields.Char(string='Transaction Reference')
-    #transaction_reference = fields.Many2one('res.customer.transaction', string='Transaction Reference', required=False)
-   #cases_description = fields.Text(string='Narration', compute='_compute_description', store=True)
     cases_description = fields.Text(string='Narration', required = False)
     further_description = fields.Html(string='Further Description')
     data_source = fields.Text(string="Data Source", required=False)
     customer_id = fields.Many2one('res.partner', string='Customer', required=False)
-    # attachment_ids = fields.Many2many('ir.attachment', string='Attachments')
-    # attachment_ids = fields.Binary(string="Attachment", required=False)
+
     attachment = fields.Binary(string="Attachment")
     filename = fields.Char(string="Filename")
 
@@ -216,21 +198,7 @@ class Cases(models.Model):
     new_process_category_id = fields.Many2one('exception.process.type', string='Exception Process Type', required=True)
     new_process_id = fields.Many2one('exception.process', string='Exception Process', required=True)
     
-#     new_process_category_id = fields.Many2one('exception.process.type', 
-#                                              string='Exception Process Type')
-#     new_process_id = fields.Many2one('exception.process', 
-#                                     string='Exception Process',
-#                                     domain="[('type_id', '=', new_process_category_id.num_id)]")
-#     new_process_category_num_id = fields.Float(
-#     related='new_process_category_id.num_id',
-#     store=True
-# )
 
-
-    # new_process_category_id = fields.Many2one('exception.process.type', string='Exception Process Type')
-    # new_process_id = fields.Many2one('exception.process', string='Exception Process')
-    # new_process_id = fields.Many2one('exception.process', string='Exception Process')
-    # new_process_category_id = fields.Many2one('exception.process.type', string='Exception Process Type')
     process_category_id = fields.Many2one('exception.category', string='Exception Process Type')
     process_id = fields.Many2one('exception.process', string='Exception Process')
     root_category_id = fields.Many2one('exception.process.type', string='Root Category')
@@ -260,17 +228,7 @@ class Cases(models.Model):
         return super(Cases, self).write(vals)
 
     
-    # @api.depends('transaction_id')
-    # def _compute_name(self):
-    #     for record in self:
-    #         if record.transaction_id:
-    #             record.name = f"Case for {record.transaction_id.name or 'Unknown Transaction'}"
-    #         else:
-    #             record.name = f"Case {record.id}" if record.id else "New Case"
-        
     
-    # is_creator = fields.Boolean(compute='_compute_user_roles', store=True)
-    # is_assigned_staff = fields.Boolean(compute='_compute_user_roles', store=True)
     
     
     def _create_quick_response(self, note):
@@ -442,16 +400,7 @@ class Cases(models.Model):
                 f'<span class="badge bg-{color}" '
                 f'style="color: white; font-weight: bold;">{title_label}</span>'
             )
-    # @api.depends('status_id')
-    # def _compute_status_html(self):
-    #     for rec in self:
-    #         color = {
-    #             'overdue': 'danger',
-    #             'closed': 'success',
-    #             'open': 'primary',
-    #         }.get(rec.status_id.name, 'warning')
-    #         status = rec.status_id.name.capitalize() if rec.status_id else 'Unknown'
-    #         rec.status_html = f'<span class="badge bg-{color}">{status}</span>'
+    
 
     @api.depends('created_at')
     def _compute_start_date(self):
@@ -508,29 +457,7 @@ class Cases(models.Model):
         
     
     
-    # @api.depends('response_ids')
-    # def _compute_has_responses(self):
-    #     for rec in self:
-    #         responses_count = self.env['case.response'].search_count([('case_id', '=', rec.id)])
-    #         rec.has_responses = responses_count > 0
-    #         _logger.info(f"Case {rec.id}: Computing has_responses = {rec.has_responses} (responses count: {responses_count})")
     
-    
-    
-        
-    # @api.depends('response_ids')
-    # def _compute_has_responses(self):
-    #     for rec in self:
-    #         _logger.info(f"HAS RESPONSES CHECK: {rec.name} has {len(rec.response_ids)} responses")
-    #         rec.has_responses = bool(rec.response_ids)
-    
-    
-    # @api.depends('user_id', 'staff_id')
-    # def _compute_user_roles(self):
-    #     current_user_id = self.env.user.id
-    #     for rec in self:
-    #         rec.is_creator = current_user_id == rec.user_id.id  # Compare IDs
-    #         rec.is_assigned_staff = current_user_id == rec.staff_id.id  # Compare IDs
     
     
     @api.depends('user_id', 'staff_id')
@@ -556,36 +483,7 @@ class Cases(models.Model):
             return {'domain': {'new_process_id': domain}}
         return {'domain': {'new_process_id': []}}
     
-    # @api.onchange('new_process_category_id')
-    # def _onchange_process_category_id(self):
-    #     """When process type changes, reset the process selection"""
-    #     self.new_process_id = False
     
-    # @api.onchange('new_process_id')
-    # def _onchange_process_id(self):
-    #     """When process is selected, ensure the process type matches"""
-    #     if self.new_process_id and self.new_process_id.type_id:
-    #         matching_type = self.env['exception.process.type'].search(
-    #             [('num_id', '=', self.new_process_id.type_id)], limit=1)
-    #         if matching_type:
-    #             self.new_process_category_id = matching_type.id
-
-    
-    # @api.onchange('new_process_category_id')
-    # def _onchange_process_category_id(self):
-    #     if self.new_process_category_id:
-    #         related_processes = self.env['exception.process'].search([
-    #             ('type_id', '=', self.new_process_category_id.num_id)
-    #         ])
-    #         return {'domain': {'new_process_id': [('id', 'in', related_processes.ids)]}}
-
-    # @api.onchange('new_process_id')
-    # def _onchange_process_id(self):
-    #     if self.new_process_id:
-    #         related_type = self.env['exception.process.type'].search([
-    #             ('num_id', '=', self.new_process_id.type_id)
-    #         ], limit=1)
-    #         self.new_process_category_id = related_type
 
 
     @api.onchange('title')
@@ -610,31 +508,7 @@ class Cases(models.Model):
     def _onchange_staff_id(self):
         self._compute_user_roles()
         self._compute_team_id()
-        # for rec in self:
-        #     # Fetch the employee linked to the selected user (staff)
-        #     employee = self.env['hr.employee'].search([('user_id', '=', rec.staff_id.id)], limit=1)
-            
-        #     # Auto-populate team (department) only if employee found
-        #     if employee:
-        #         rec.team_id = employee.department_id.id if employee.department_id else False
-        #     else:
-        #         # Reset the team if no employee is found (in case of incorrect staff selection)
-        #         rec.team_id = False
-
-    # @api.onchange('staff_id')
-    # def _onchange_staff_id(self):
-    #     for record in self:
-    #         employee = self.env['hr.employee'].search([('user_id', '=', record.staff_id.id)], limit=1)
-    #         record.team_id = employee.department_id.id if employee else False
-    # @api.onchange('staff_id')
-    # def _onchange_staff_id(self):
-    #     for rec in self:
-    #         employee = self.env['hr.employee'].search([
-    #             ('user_id', '=', rec.staff_id.id)
-    #         ], limit=1)
-    #         rec.team_id = employee.department_id.id if employee and employee.department_id else False
-    
-
+        
     # ------------------- DEFAULT -------------------
 
     @api.model
@@ -803,40 +677,7 @@ class Cases(models.Model):
 
 
 
-    # def action_close_case(self):
-    #     """Closes the case - only available to the creator and when responses exist"""
-    #     self.ensure_one()
-        
-    #     if self.env.user.id != self.user_id.id: 
-    #         raise UserError("Only the case creator can close this case.")
-            
-    #     if not self.has_responses:
-    #         _logger.info(f"Case {self.id} cannot be closed because the assigned staff has not responded.")
-    #         raise UserError("This case cannot be closed until it has at least one response.")
-        
-    #     _logger.info(f"Case {self.id} can be closed because the assigned staff has responded.")
-            
-    #     closed_status = self.env['case.status'].search([('name', '=', 'closed')], limit=1)
-    #     if not closed_status:
-    #         raise UserError("Required case status 'closed' not found.")
-            
-    #     self.status_id = closed_status.id
-    #     self.message_post(body="<p>Case has been closed.</p>", subtype_xmlid='mail.mt_note')
-        
-    #     # Send email alert
-    #     try:
-    #         self._send_case_closure_alert()
-    #     except Exception as e:
-    #         _logger.error(f"Error sending case closure alert: {str(e)}")
-        
-        
-    #     return {
-    #     'type': 'ir.actions.act_window',
-    #     'res_model': 'case',
-    #     'res_id': self.id,
-    #     'view_mode': 'form',
-    #     'target': 'current',
-    # }
+    
         
         
     def action_add_response(self):
@@ -857,16 +698,7 @@ class Cases(models.Model):
                     
                     # Try to send email alert - THIS IS THE KEY PART
                     _logger.info(f"About to call _send_case_response_alert for case {rec.id}")
-                    # try:
-                    #     alert_sent = rec._send_case_response_alert(new_response)
-                    #     if alert_sent:
-                    #         _logger.info(f"Response alert sent successfully for case {rec.id}")
-                    #     else:
-                    #         _logger.warning(f"Failed to send response alert for case {rec.id}")
-                    # except Exception as e:
-                    #     _logger.error(f"Error sending response alert for case {rec.id}: {str(e)}")
-                    #     import traceback
-                    #     _logger.error(f"Traceback: {traceback.format_exc()}")
+                    
                     
                     # Log in chatter
                     rec.message_post(
@@ -937,16 +769,7 @@ class Cases(models.Model):
         
     
     
-    # @api.model
-    # def cron_check_overdue_cases(self):
-    #     overdue_status = self.env['case.status'].search([('name', '=', 'overdue')], limit=1)
-    #     if not overdue_status:
-    #         _logger.warning("Overdue status not found!")
-    #         return
-
-    #     deadline = fields.Datetime.now() - timedelta(hours=1)
-    #     open_cases = self.search([('status_id.name', '=', 'open'), ('created_at', '<=', deadline)])
-    #     open_cases.write({'status_id': overdue_status.id})
+    
 
     # ------------------- OVERRIDES -------------------
     
@@ -1049,16 +872,7 @@ class Cases(models.Model):
         return result
 
 
-    # def write(self, values):
-    #     # Log changes for attachment field
-    #     if 'attachment' in values:
-    #         for case in self:
-    #             # Check if the attachment has changed
-    #             old_attachment = case.attachment
-    #             new_attachment = values.get('attachment')
-    #             if old_attachment != new_attachment:
-    #                 case._log_attachment_change(case, 'Updated')
-    #     return super(Cases, self).write(values)
+    
     
     
     
@@ -1600,16 +1414,7 @@ class Cases(models.Model):
                     _logger.info(f"Preparing to send email for case {rec.id}")
                     
                     
-                    # Log the alert history in alert_management module
-                    # rec._log_alert_history(
-                    #     email_to=mail_values['email_to'],
-                    #     email_cc=mail_values['email_cc'],
-                    #     alert_id=ctx['alert_id'],
-                    #     html_body=rendered_html,
-                    #     source='case_creation',
-                    #     name=rec.name,
-                    #     user_name=creator_user.name if creator_user else 'Unknown'
-                    # )
+                    
 
                     
                     # Send the email
@@ -1703,31 +1508,6 @@ class Cases(models.Model):
         }
 
     
-    
-    # def action_view_email_template(self):
-    #     """Show the email template for this case alert"""
-    #     self.ensure_one()
-        
-    #     # Determine which template to show based on case status
-    #     if not self.has_responses:
-    #         template = self.env.ref('case_management.case_creation_alert_template')
-    #     elif self.statuses == 'closed':
-    #         template = self.env.ref('case_management.case_closure_alert_template')
-    #     else:
-    #         template = self.env.ref('case_management.case_response_alert_template')
-        
-    #     if not template:
-    #         raise UserError(("Email template not found"))
-        
-    #     # Open the email template in form view
-    #     return {
-    #         'name': 'Email Template',
-    #         'type': 'ir.actions.act_window',
-    #         'res_model': 'mail.template',
-    #         'res_id': template.id,
-    #         'view_mode': 'form',
-    #         'target': 'new',
-    #     }
     
     
     def _log_alert_history(self, email_to, alert_id, email_cc, html_body, source, name, user_name):
