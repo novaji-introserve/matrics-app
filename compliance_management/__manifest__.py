@@ -23,7 +23,7 @@
         'utm',
         'contacts',
         'mail',
-        'survey', ],
+        'survey'],
 
     # always loaded
     'data': [

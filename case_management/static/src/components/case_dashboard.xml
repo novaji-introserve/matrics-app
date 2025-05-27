@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="owl.CaseDashboard" owl="1">
+        <div class="vh-100 overflow-auto bg-muted">
+            <div class="row m-2">
+                <div class="col-lg-12">
+                    <!-- Header Section -->
+                    <div class="row">
+                        <div class="col m-0 p-0">
+                            <div class="shadow-sm border m-1 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h1 class="text-primary fw-bold fs-4 mb-0">Case Overview</h1>
+                                    <div>
+                                        <select class="form-select form-select-sm" style="max-width: 150px;" t-on-change="onPeriodChange"
+                                            t-ref="periodSelector">
+                                            <option value="0">Select Period</option>
+                                            <option value="00">Today</option>
+                                            <option value="1">Yesterday</option>
+                                            <option value="3">Last 3 Days</option>
+                                            <option value="5">Last 5 Days</option>
+                                            <option value="7">Last 7 Days</option>
+                                            <option value="30">Last 30 Days</option>
+                                            <option value="90">Last 90 Days</option>
+                                            <option value="365">Last 365 Days</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- KPI Cards Row -->
+                    <div class="row g-1">
+                        <t t-if="dashboardData.kpi_data">
+                            <KpiCard name="'All Cases'" t-props="dashboardData.kpi_data.all_cases" status="'all'" onClick.bind="onCardClick"/>
+                            <KpiCard name="'Open Cases'" t-props="dashboardData.kpi_data.open_cases" status="'open'" onClick.bind="onCardClick"/>
+                            <KpiCard name="'Closed Cases'" t-props="dashboardData.kpi_data.closed_cases" status="'closed'" onClick.bind="onCardClick"/>
+                            <KpiCard name="'Overdue Cases'" t-props="dashboardData.kpi_data.overdue_cases" status="'overdue'" onClick.bind="onCardClick"/>
+                        </t>
+                    </div>
+                    
+                    <!-- Side-by-side Charts: Severity + Status -->
+                    <div class="row g-1 mt-4">
+                        <!-- Cases by Severity -->
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-1 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <h3 class="text-primary fw-bold fs-6 mb-0">Cases by Severity</h3>
+                                    <div class="px-1 py-0 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white small"/>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+                                    <t t-if="dashboardData.chart_data.cases_by_severity">
+                                        <ChartRenderer type="'line'"
+                                                       tags="dashboardData.chart_data.cases_by_severity.labels"
+                                                       label_1="'Low'"
+                                                       label_2="'Medium'"
+                                                       label_3="'High'"
+                                                       text="'Cases By Severity'"
+                                                       backGroundColor="dashboardData.chart_data.cases_by_severity.datasets[0].backgroundColor"
+                                                       data="dashboardData.chart_data.cases_by_severity.datasets[0].data"
+                                                       id="'severity_chart'"
+                                                       chartType="'severity'"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cases by Status -->
+                        <div class="col-lg-6 m-0 p-0">
+                            <div class="shadow-sm border m-1 p-2 bg-white">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <h3 class="text-primary fw-bold fs-6 mb-0">Cases By Status</h3>
+                                    <div class="px-1 py-0 bg-primary cursor-pointer">
+                                        <span class="fa fa-arrow-right text-white small"/>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+                                    <t t-if="dashboardData.chart_data.cases_by_status">
+                                        <ChartRenderer type="'bar'"
+                                                       tags="dashboardData.chart_data.cases_by_status.labels"
+                                                       label_1="'Open'"
+                                                       label_2="'Closed'"
+                                                       label_3="'Overdue'"
+                                                       text="'Cases By Status'"
+                                                       backGroundColor="dashboardData.chart_data.cases_by_status.datasets[0].backgroundColor"
+                                                       data="dashboardData.chart_data.cases_by_status.datasets[0].data"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

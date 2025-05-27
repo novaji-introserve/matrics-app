@@ -1,0 +1,118 @@
+<odoo>
+    <!-- Access Control Rights for Case model -->
+    <!-- Note: Remove duplicate access_case_user from CSV after adding this -->
+    <record id="access_case_user" model="ir.model.access">
+        <field name="name">case.user</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="group_id" ref="base.group_user"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    
+    <record id="access_case_manager" model="ir.model.access">
+        <field name="name">Case Manager Access</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="group_id" ref="base.group_erp_manager"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+    
+    <record id="access_case_system" model="ir.model.access">
+        <field name="name">Case System Access</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="group_id" ref="base.group_system"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+    
+    <!-- Record Rules -->
+    <!-- Rule for regular users - can see cases they created or are assigned to -->
+    <!-- <record id="rule_case_user" model="ir.rule">
+        <field name="name">User can see own cases and assigned cases</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="domain_force">['|', ('user_id', '=', user.id), ('staff_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record> -->
+
+
+    <!-- Add a new comprehensive rule for regular users -->
+    <record id="rule_case_user_comprehensive" model="ir.rule">
+        <field name="name">Users can see own cases and assigned cases</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="domain_force">['|', ('user_id', '=', user.id), ('staff_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    
+    <!-- Rule for managers - can see all cases -->
+    <record id="rule_case_manager" model="ir.rule">
+        <field name="name">Managers can see all cases</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_erp_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+    
+    <!-- Access Control for Case Responses -->
+    <record id="access_case_response_user" model="ir.model.access">
+        <field name="name">Case Response User</field>
+        <field name="model_id" ref="model_case_response"/>
+        <field name="group_id" ref="base.group_user"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    
+    <!-- Rule for case responses - users can only create responses for cases assigned to them -->
+    <record id="rule_case_response_staff_only_write" model="ir.rule">
+        <field name="name">Case Response: Only Assigned Staff Can Write</field>
+        <field name="model_id" ref="model_case_response"/>
+        <field name="domain_force">[('case_id.staff_id.id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="0"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    
+    <!-- Everyone can read responses -->
+    <record id="rule_case_response_read_all" model="ir.rule">
+        <field name="name">Case Response: All Users Can Read</field>
+        <field name="model_id" ref="model_case_response"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+
+    <!-- <record id="rule_case_temporary_access" model="ir.rule">
+        <field name="name">Temporary: All users can access all cases</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record> -->
+</odoo>

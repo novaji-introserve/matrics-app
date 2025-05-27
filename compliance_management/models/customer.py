@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
@@ -178,6 +179,34 @@ class Customer(models.Model):
     likely_sanction = fields.Boolean()
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code", index=True)
+    
+    
+    def action_create_case(self):
+        """
+        Opens the case management form with the customer pre-filled
+        """
+        # Create the context with required values
+        context = {
+            'default_status_id': self.env.ref('case_management.case_status_open').id,
+            'case_created': True,
+            'show_creation_notification': True,
+        }
+        
+        # Since customer_id in the case model is a Many2one field referencing res.partner,
+        # and this model (Customer) inherits from res.partner,
+        # we need to pass the ID of the current record
+        context['default_customer_id'] = self.id
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'New Case',
+            'res_model': 'case',
+            'view_mode': 'form',
+            'view_id': self.env.ref('case_management.case_form_view').id,
+            'target': 'current',
+            'context': context
+        }
+        
 
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
@@ -484,7 +513,7 @@ class Customer(models.Model):
             'blacklist_updated': len(blacklist_ids),
             'watchlist_updated': len(watchlist_ids)
         }
-
+    
     def init(self):
         # Drop the trigger if it exists
         self.env.cr.execute(
@@ -492,6 +521,7 @@ class Customer(models.Model):
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
         
+        # Create index on res_partner which we know exists
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")        
     
@@ -1278,3 +1308,4 @@ class Customer(models.Model):
     #     # Set domain based on user group
     #     for record in self:
     #         record.is_branch_compliance = is_branch_compliance_officer
+

@@ -5,9 +5,12 @@
         <field name="name">res_cust_transaction_tree</field>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <tree string="Transactions" create="false">
+            <tree string="Transactions">
                 <header>
+
+
                     <button name="done" class="oe_highlight" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" />
+                    
                 </header>
                 <field name="name" string="Reference Number" />
                 <field name="customer_id" optional="show" />
@@ -29,11 +32,15 @@
         <field name="name">Transaction Form</field>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <form create="false">
+            <form>
                 <header>
+
                     <button name="action_screen" class="oe_highlight" type="object" string="Run Transaction Screening" groups="compliance_management.group_compliance_compliance_risk_manager" confirm="Run screening rules. All transaction screening rules will be applied. The first exception found will flagged. Are you sure?" />
                     <button name="done" class="oe_highlight" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" attrs="{'invisible': [('state', 'not in',['new'])]}" />
+                    <button name="action_create_case" type="object" string="Create Case" class="btn-primary"/>
+
                     <field name="state" widget="statusbar" statusbar_visible="new,done" clickable="True" />
+
 
                 </header>
                 <sheet string="Transaction">
@@ -47,13 +54,13 @@
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" />
                         <h1>
-                            <field name="name" readonly="1" />
+                            <field name="name" readonly="0" />
                         </h1>
                     </div>
                     <div class="oe_title">
                         <label for="amount" class="oe_edit_only" />
                         <h1>
-                            <field name="amount" readonly="1" />
+                            <field name="amount" readonly="0" />
                         </h1>
                     </div>
 
@@ -61,6 +68,7 @@
                         <page name='details' string="Transaction Details" autofocus="autofocus">
                             <group>
                                 <group>
+
                                     <field name="customer_id" readonly="1" />
                                     <field name="account_id" readonly="1" />
                                     <field name="active" invisible="1" />
@@ -75,11 +83,12 @@
                                 <group>
                                     <field name="transaction_type" readonly="1" />
                                     <field name="date_created" string="Transaction Date" readonly="1" />
+
                                 </group>
                             </group>
                         </page>
                         <page name='internal_notes' string="Narration">
-                            <field name="narration" readonly="1" />
+                            <field name="narration" readonly="0" />
                         </page>
                     </notebook>
                 </sheet>

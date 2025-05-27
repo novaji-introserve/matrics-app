@@ -1,0 +1,9 @@
+<odoo>
+    <!-- <data inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/case_management/static/src/js/success_message.js"/>
+            <script type="text/javascript" src="/case_management/static/src/js/case_form_action.js"/>
+        </xpath>
+    </data> -->
+
+</odoo>
