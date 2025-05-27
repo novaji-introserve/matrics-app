@@ -371,56 +371,59 @@ class Customer(models.Model):
 
     @api.model
     def cron_run_risk_assessment(self):
-        """
-        Main entry point for risk assessment cron job with protection against
-        concurrent execution.
-        """
-        # Get a timestamp to use as a unique identifier
-        cron_name = "risk_assessment_cron"
-        cron_record = self.env.ref(
-            'compliance_management.ir_cron_run_risk_assessment')
+        customer_counts = self.search_count([])
 
-        # Check if the cron is already running
-        if cron_record.nextcall and fields.Datetime.from_string(cron_record.nextcall) > fields.Datetime.now():
-            _logger.info(
-                "Risk assessment job already running or scheduled, skipping this run")
-            return False
+        if customer_counts <= 200:
+            """
+            Main entry point for risk assessment cron job with protection against
+            concurrent execution.
+            """
+            # Get a timestamp to use as a unique identifier
+            cron_name = "risk_assessment_cron"
+            cron_record = self.env.ref(
+                'compliance_management.ir_cron_run_risk_assessment')
 
-        try:
-            # Set the nextcall far in the future to prevent new runs starting
-
-            # cron_record.write({
-            #     'nextcall': fields.Datetime.now() + timedelta(hours=24)
-            # })
-            # self.env.cr.commit()
-
-            _logger.info("Starting scheduled risk assessment process")
-            results = {'sanction_status': {}, 'risk_scores': 0}
+            # Check if the cron is already running
+            if cron_record.nextcall and fields.Datetime.from_string(cron_record.nextcall) > fields.Datetime.now():
+                _logger.info(
+                    "Risk assessment job already running or scheduled, skipping this run")
+                return False
 
             try:
-                results['sanction_status'] = self.update_sanction_status()
-                _logger.info("Sanction status update completed successfully")
-            except Exception as e:
-                _logger.error(
-                    f"Error in update_sanction_status: {str(e)}", exc_info=True)
+                # Set the nextcall far in the future to prevent new runs starting
 
-            try:
-                results['risk_scores'] = self.compute_risk_score_for_all_users()
-                _logger.info("Risk score computation completed successfully")
-            except Exception as e:
-                _logger.error(
-                    f"Error in compute_risk_score_for_all_users: {str(e)}", exc_info=True)
+                # cron_record.write({
+                #     'nextcall': fields.Datetime.now() + timedelta(hours=24)
+                # })
+                # self.env.cr.commit()
 
-            _logger.info(f"Completed full risk assessment process: {results}")
-            return results
+                _logger.info("Starting scheduled risk assessment process")
+                results = {'sanction_status': {}, 'risk_scores': 0}
 
-        finally:
-            # Reset the nextcall to 5 minutes from now
-            next_run = fields.Datetime.now() + timedelta(minutes=5)
-            cron_record.write({
-                'nextcall': next_run
-            })
-            self.env.cr.commit()
+                try:
+                    results['sanction_status'] = self.update_sanction_status()
+                    _logger.info("Sanction status update completed successfully")
+                except Exception as e:
+                    _logger.error(
+                        f"Error in update_sanction_status: {str(e)}", exc_info=True)
+
+                try:
+                    results['risk_scores'] = self.compute_risk_score_for_all_users()
+                    _logger.info("Risk score computation completed successfully")
+                except Exception as e:
+                    _logger.error(
+                        f"Error in compute_risk_score_for_all_users: {str(e)}", exc_info=True)
+
+                _logger.info(f"Completed full risk assessment process: {results}")
+                return results
+
+            finally:
+                # Reset the nextcall to 5 minutes from now
+                next_run = fields.Datetime.now() + timedelta(minutes=5)
+                cron_record.write({
+                    'nextcall': next_run
+                })
+                self.env.cr.commit()
 
     def update_sanction_status(self):
         _logger.info("Starting PEP status check using Odoo ORM for tracking.")
@@ -640,145 +643,7 @@ class Customer(models.Model):
             EXECUTE FUNCTION set_partner_defaults_after_func();
         """)
 
-    # def init(self):
-    #     # Drop the trigger if it exists
-    #     self.env.cr.execute(
-    #         "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
-    #     self.env.cr.execute(
-    #         "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
-        
-    #     self.env.cr.execute(
-    #         "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")        
-    #     self.env.cr.execute(
-    #         "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")        
-    #     self.env.cr.execute(
-    #         "CREATE INDEX IF NOT EXISTS res_customer_transaction_id_idx ON res_customer_transaction (id)")
-    #     self.env.cr.execute(
-    #         "CREATE INDEX IF NOT EXISTS res_pep_id_idx ON res_pep (id)")
-    #     self.env.cr.execute(
-    #         "CREATE INDEX IF NOT EXISTS res_partner_watchlist_id_idx ON res_partner_watchlist (id)")
-    #     self.env.cr.execute(
-    #         "CREATE INDEX IF NOT EXISTS res_dashboard_charts_id_idx ON res_dashboard_charts (id)")
-    #     self.env.cr.execute(
-    #         "CREATE INDEX IF NOT EXISTS res_dashboard_cache_id_idx ON res_dashboard_cache (id)")
-
-    #     # Create the trigger
-    #     self.env.cr.execute("""
-    #         CREATE OR REPLACE FUNCTION set_partner_defaults_func()
-    #         RETURNS TRIGGER AS $$
-    #         BEGIN
-
-    #             -- Check if this is demo data (origin = 'demo')
-    #             IF NEW.origin = 'demo' THEN
-    #                 -- For demo data: Set defaults but preserve certain fields like risk_level
-    #                 -- Save the original risk_level value if it exists
-    #                 DECLARE original_risk_level VARCHAR;
-    #                 BEGIN
-    #                     original_risk_level := NEW.risk_level;
-                        
-    #                     -- Set basic defaults
-    #                     NEW.create_uid = 1;
-    #                     NEW.write_uid = 1;
-    #                     NEW.type = 'contact';
-    #                     NEW.lang = 'en_US';
-    #                     NEW.color = 0;
-    #                     NEW.tz = 'Africa/Lagos';
-                        
-                        
-                        
-    #                     -- Restore the original risk_level if it was set
-    #                     IF original_risk_level IS NOT NULL THEN
-    #                         NEW.risk_level := original_risk_level;
-    #                     END IF;
-                        
-    #                     RETURN NEW;
-    #                 END;
-    #             END IF;
-
-    #             IF NEW.active IS NULL THEN
-    #                 NEW.active = TRUE;
-    #             END IF;
-                
-    #             IF NEW.type IS NULL THEN
-    #                 NEW.type = 'contact';
-    #             END IF;
-                
-    #             IF NEW.lang IS NULL THEN
-    #                 NEW.lang = 'en_US';
-    #             END IF;
-                
-    #             IF NEW.create_uid IS NULL THEN
-    #                 NEW.create_uid = 1;
-    #             END IF;
-                
-    #             IF NEW.write_uid IS NULL THEN
-    #                 NEW.write_uid = 1;
-    #             END IF;
-                    
-    #             IF NEW.color IS NULL THEN
-    #                 NEW.color = 0;
-    #             END IF;
-                
-    #             IF NEW.create_date IS NULL THEN
-    #                 NEW.create_date = NOW();
-    #             END IF;
-                
-    #             IF NEW.tz IS NULL THEN
-    #                 NEW.tz = 'Africa/Lagos';
-    #             END IF;
-                
-    #             IF NEW.write_date IS NULL THEN
-    #                 NEW.write_date = NOW();
-    #             END IF;
-                
-    #             IF NEW.internal_category IS NULL THEN
-    #                 NEW.internal_category = 'customer';
-    #             END IF;
-                
-    #             IF NEW.commercial_partner_id IS NULL THEN
-    #                 NEW.commercial_partner_id = NEW.id;
-    #             END IF;
-
-    #             IF (NEW.display_name IS NULL OR TRIM(NEW.display_name) = '') AND NEW.name IS NOT NULL THEN
-    #                 NEW.display_name = NEW.name;
-    #             END IF;
-                
-    #             -- Set commercial_partner_id to the record's ID after insert
-    #             -- This requires a BEFORE INSERT trigger to work properly
-    #             IF NEW.commercial_partner_id IS NULL THEN
-    #                 -- Using NEW.id directly in a BEFORE INSERT trigger
-    #                 -- This will work since the record already has an ID before the trigger
-    #                 NEW.commercial_partner_id = NEW.id;
-    #             END IF;
-                
-    #             RETURN NEW;
-    #         END;
-    #         $$ LANGUAGE plpgsql;
-            
-    #         CREATE TRIGGER set_partner_defaults
-    #         BEFORE INSERT ON res_partner
-    #         FOR EACH ROW
-    #         EXECUTE FUNCTION set_partner_defaults_func();
-    #     """)
-
-    #     # Create AFTER INSERT trigger for commercial_partner_id
-    #     self.env.cr.execute("""
-    #         CREATE OR REPLACE FUNCTION set_partner_defaults_after_func()
-    #         RETURNS TRIGGER AS $$
-    #         BEGIN
-    #             IF NEW.commercial_partner_id IS NULL THEN
-    #                 UPDATE res_partner SET commercial_partner_id = NEW.id WHERE id = NEW.id;
-    #             END IF;
-                
-    #             RETURN NEW;
-    #         END;
-    #         $$ LANGUAGE plpgsql;
-            
-    #         CREATE TRIGGER set_partner_defaults_after
-    #         AFTER INSERT ON res_partner
-    #         FOR EACH ROW
-    #         EXECUTE FUNCTION set_partner_defaults_after_func();
-    #     """)
+        self.cron_run_risk_assessment()
 
     @api.model_create_multi
     def create(self, vals_list):

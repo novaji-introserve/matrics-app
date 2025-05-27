@@ -72,7 +72,6 @@
 
                     <button name="action_unmark_pep" class="oe_highlight" type="object" string="Delist from Global PEP" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Unlink this customer from Global PEP list. Are you sure?" attrs="{'invisible': [('global_pep', '=',False)]}" />
 
-
                     <button name="action_remove_pep" type="object" string="Remove From PEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove Customer from PEP List. Are you sure?" attrs="{'invisible': [('is_pep', '!=',True)]}" />
 
                     <!-- <button name="action_add_fep" class="oe_highlight" type="object" string="Add to FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '=',True)]}" style="display: none;" /> -->
@@ -97,7 +96,6 @@
 
                     <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
                     <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?" />
-                    <button name="action_create_case" type="object" string="Create Case" class="btn-primary"/>
                 </header>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
