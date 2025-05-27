@@ -31,12 +31,26 @@
                  <!-- <button name="open_reference_record" string="View Source Record" type="object" 
                         class="oe_highlight float-right" attrs="{'invisible': [('ref_id', '=', False)]}"/> -->
                <sheet>
-                <div class="oe_title">
-                    <label for="ref_id" class="oe_edit_only" />
-                    <h1>
-                        <field name="ref_id" string="Alert Reference" widget="reference" />
-                    </h1>
-                </div>
+                    <div class="oe_title">
+                        
+                        <field name="case_ref" invisible="1"/>
+                        
+                        
+                        <div attrs="{'invisible': [('case_ref', '!=', False)]}">
+                            <label for="ref_id" string="Alert Reference" />
+                            <h1>
+                                <field name="ref_id" string="Alert Reference" widget="reference" />
+                            </h1>
+                        </div>
+                        
+                        
+                        <div attrs="{'invisible': [('case_ref', '=', False)]}">
+                            <label for="case_ref_display" string="Case Reference" />
+                            <h1>
+                                <field name="case_ref_display" widget="html" nolabel="1"/>
+                            </h1>
+                        </div>
+                    </div>
                 
         
                 <group string="RELATED INFORMATION">
@@ -45,7 +59,7 @@
                         <field name="risk_rating" string="Rating" />
                     </group>
                     <group>
-                        <field name="source" string="Source" colspan="3" />
+                        <field name="source" string="Source" />
                     </group>
                     
                     <group attrs="{'invisible': [('process_id', '=', False)]}">
@@ -53,6 +67,7 @@
                     </group>
                     <group>
                         <field name="email" string="Email"/>
+                        <field name="email_cc" string="Email CC"/>
                     </group>
                     
                 </group>

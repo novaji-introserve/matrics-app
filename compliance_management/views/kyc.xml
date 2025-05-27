@@ -137,6 +137,7 @@
                                 <button name="action_archive" class="oe_highlight" type="object" string="Archive" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'not in', ['cancelled', 'approved']), ('is_cco', '=', False)]}" />
 
                                 <button name="action_send_back" class="oe_highlight" type="object" string="Send Back" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'in', ['draft', 'approved']), ('is_current_user_approving_officer', '=', False)]}" />
+                                
 
                                 <field name="status" widget="statusbar" statusbar_visible="draft,completed,approved,cancelled,deleted,archived"/>
                             </header>

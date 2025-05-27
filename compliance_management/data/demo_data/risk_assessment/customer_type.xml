@@ -1,4 +1,5 @@
 <odoo>
+    <data noupdate="1">
     <!-- Subject: Agriculture -->
     <record id="res_risk_assessment_agriculture" model="res.risk.assessment">
         <field name="name">Agriculture Sector</field>
@@ -2063,5 +2064,6 @@
         <field name="residual_risk_probability">75</field>
     </record>
 
+    </data>
 
 </odoo>

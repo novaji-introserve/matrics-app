@@ -1,0 +1,186 @@
+<odoo>
+    <!-- Tree View: Readonly and Non-clickable -->
+    <record id="view_case_tree_readonly" model="ir.ui.view">
+        <field name="name">case.tree.readonly</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false" delete="false">
+                <field name="name" invisible='1'/>
+                <field name="transaction_reference"/>
+                <field name="title" string="Severity" readonly="1" invisible="1" />
+                <field name="title_html" string= "Severity" readonly="1" widget="html"/>
+                <field name="created_at" string="Case Creation Date"/>
+                <field name="user_id" string="Created By"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="data_source" readonly="1" invisible="1"/>
+                <field name="cases_action" string="Recommended Action" readonly="1"/>
+                <field name="team_id"/>
+                <field name="status_html" widget="html"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View: Readonly, Show Responses + Close Button -->
+    <record id="view_case_form_readonly" model="ir.ui.view">
+        <field name="name">case.form.readonly</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <form string="Case" create="false" delete="false">
+                <header>
+                    <!-- Close button only for creator and only if there are responses -->
+                    <button name="action_close_case" 
+                            string="Close Case" 
+                            type="object" 
+                            class="btn-primary" 
+                            attrs="{'invisible': ['|', '|', ('is_creator', '=', False), ('has_responses', '=', False), ('is_supervisor', '=', True)]}"/>
+                    <field name="status_id" widget="statusbar" readonly="1"/>
+                </header>
+                <!-- <header> -->
+                    <!-- Close button in header (standard location for Odoo actions) -->
+                    <!-- <button name="action_close_case"
+                            string="Close Case"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': ['|', '|', 
+                                                ('has_responses', '=', False), 
+                                                ('is_creator', '=', False),
+                                                ('statuses', '=', 'closed')]}"/>
+                            
+                    <field name="status_id" widget="statusbar" readonly="1" 
+                        decoration-danger="status_id == 'overdue'" 
+                        decoration-success="status_id == 'closed'" />
+                </header> -->
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="created_at" readonly="1" invisible="1"/>
+                            <field name="created_at_formatted_datetime" widget="text"/>
+                            <field name="event_date" readonly="1" invisible="1"/>
+                            <field name="event_date_formatted_datetime" widget="text"/>
+                            <field name="title" string="Severity" readonly="1" invisible="1" />
+                            <field name="branch_id" readonly="1"/>
+                            <field name="team_id" readonly="1"/>
+                            <field name="transaction_reference" readonly="1"/>
+                            <field name="data_source" readonly="1" invisible="1"/>
+                            <field name="cases_action" string="Recommended Action" readonly="1"/>
+                            <!-- <field name="created_at" string="Start Date" readonly="1" invisible="1"/>
+                            <field name="created_at_formatted_datetime" widget="text"/>
+                            <field name="end_date" readonly="1" invisible="True"/> -->
+                            <!-- <field name="data_source" readonly="1"/> -->
+                            <!-- <field name="event_date" readonly="1" invisible="1"/>
+                            <field name="event_date_formatted_datetime" widget="text"/> -->
+                            <!-- <field name="branch_id" readonly="1"/>
+                            <field name="team_id" readonly="1"/>
+                            <field name="transaction_reference" readonly="1"/> -->
+                            <!-- <field name="title" string="Severity" readonly="1"/> -->
+                            <!-- <field name="data_source" readonly="1"/>
+                            <field name="cases_action" string="Recommended Action" readonly="1"/> -->
+                        </group>
+                        <group>
+                            <field name="staff_id" string="Staff Responsible" readonly="1"/>
+                            <field name="supervisor_one_id" readonly="1"/>
+                            
+
+                             <!-- Supervisor 2 shown only for medium risk rating -->
+                            <field name="supervisor_two_id" 
+                                readonly="1"
+                                attrs="{'invisible': [('title', '!=', '2')]}" 
+                                />
+
+                            <!-- Another Supervisor 2 instance shown only for high risk rating -->
+                            <field name="supervisor_two_id" 
+                                readonly="1"
+                                attrs="{'invisible': [('title', '!=', '3')]}" 
+                                />
+
+                            <!-- Supervisor 3 shown only for high risk rating -->
+                            <field name="supervisor_three_id" 
+                                readonly="1"
+                                attrs="{'invisible': [('title', '!=', '3')]}" 
+                                />
+
+
+                            <field name="is_supervisor" invisible="1"/>
+                            
+                            <field name="user_id" readonly="1"/>
+                            <field name="severity_level" invisible="1"/>
+                            <field name="statuses" invisible="1"/>
+                            <field name="is_creator" invisible="1"/>
+                            <field name="is_assigned_staff" invisible="1"/>
+                            <field name="has_responses" invisible="1"/>
+                            <field name="process_category_id" string="Process Category" readonly="1"/>
+                            <field name="process_id" string="Process" readonly="1"/>
+                            <!-- <field name="user_id" readonly="1"/>
+                            <field name="staff_id" string="Staff Responsible" readonly="1"/>
+                            <field name="event_date" readonly="1" invisible="1"/>
+                            <field name="event_date_formatted_datetime" widget="text"/>
+                            <field name="process_category_id" readonly="1"/>
+                            <field name="process_id" readonly="1"/> -->
+                            <!-- <field name="cases_action" string="Action" readonly="1"/> -->
+                            <!-- <field name="title" string="Severity" readonly="1"/> -->
+
+                            <!-- Required computed fields -->
+                            <!-- <field name="statuses" invisible="1"/> -->
+                            <!-- <field name="is_assigned_staff" invisible="1"/> -->
+                            <!-- <field name="is_creator" invisible="1"/>
+                            <field name="has_responses" invisible="1"/> -->
+                        </group>
+                    </group>
+
+                    <!-- Responses Tab -->
+                    <notebook>
+                        <page string="Description">
+                            <group>
+                                <field name="cases_description" readonly="1"/>
+                                <field name="further_description" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Responses">
+                            <field name="response_ids" readonly="1" nolabel="1">
+                                <tree>
+                                    <field name="create_uid" string="Responder"/>
+                                    <field name="create_date" string="Date" widget="datetime"/>
+                                    <field name="response" string="Response"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="create_uid" readonly="1"/>
+                                        <field name="create_date" readonly="1"/>
+                                        <field name="response" readonly="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Attachments">
+                            <!-- <field name="attachment_ids" widget="many2many_binary" readonly="1"/> -->
+                            <field name="attachment" filename="filename" readonly="1"/>
+                            <field name="filename" invisible="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <!-- <field name="activity_ids"/> -->
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action with domain to only show cases created by current user -->
+    <record id="action_case_created_by_me" model="ir.actions.act_window">
+        <field name="name">Created by Me</field>
+        <field name="res_model">case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('user_id', '=', uid)]</field>
+        <field name="context">{'create': False, 'search_default_order': 'create_date desc'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No cases created by you yet.
+            </p>
+        </field>
+    </record>
+</odoo>

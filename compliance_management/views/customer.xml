@@ -300,7 +300,7 @@
                     <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
                     <separator/>
                     <group expand="0" name="group_by" string="Group By">
-                        <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" />
+                        <!-- <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" /> -->
                         <filter name="group_tier" string="Tier" context="{'group_by': 'tier_id'}"/>
                         <filter name="group_risk_level" string="Risk Level" context="{'group_by': 'risk_level'}"/>
                         <filter name="group_internal_category" string="Category" context="{'group_by': 'internal_category'}"/>
