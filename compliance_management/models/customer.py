@@ -523,7 +523,10 @@ class Customer(models.Model):
         
         # Create index on res_partner which we know exists
         self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")        
+            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)") 
+               
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx ON customer_digital_product (id)")
     
         # Create the trigger
         self.env.cr.execute("""
@@ -1308,4 +1311,31 @@ class Customer(models.Model):
     #     # Set domain based on user group
     #     for record in self:
     #         record.is_branch_compliance = is_branch_compliance_officer
+
+
+class CustomerDigitalProduct(models.Model):
+    _name = 'customer.digital.product'
+    
+    
+    customer_id = fields.Text(string='Customer ID',index=True) #customer,
+    customer_name = fields.Char(string='Name', tracking=True, readonly=True)
+    customer_segment = fields.Char(string='Customer Segment', tracking=True, readonly=True)
+    ussd = fields.Char(string='Uses USSD',index=True)
+    onebank = fields.Char(string='Uses One Bank', index=True)
+    carded_customer = fields.Char(string='Has A Card',index=True)
+    alt_bank = fields.Char(string='Is On Alt Bank')
+    sterling_pro = fields.Char(string='Has Sterling Pro')
+    banca = fields.Char(string='Has Banca')
+    doubble = fields.Char(string='Has Doubble')
+    specta = fields.Char(string='Has Specta')
+    switch = fields.Char(string='Has Switch')
+    
+    def init(self):
+        # Drop the trigger if it exists
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx ON customer_digital_product (id)")
+
+    
+
+
 
