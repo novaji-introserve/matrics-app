@@ -1,28 +1,53 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+
         <record id="action_owl_case_dashboard" model="ir.actions.client">
             <field name="name">Case Dashboard</field>
             <field name="tag">owl.case_dashboard</field>
         </record>
 
-        
-        <menuitem web_icon="case_management,static/description/icon.png" name="Case Management" id="menu_case_mgt" sequence="10">
-            <menuitem name="Dashboard" id="menu_case_dashboard" sequence="10" action="action_owl_case_dashboard" />
-            <menuitem name="" id="menu_case" sequence="11" />
-        
-        
+        <menuitem id="menu_case_mgt" name="Case Management" sequence="10"
+                  web_icon="case_management,static/description/icon.png"/>
 
-            <!-- sub menues of Case -->
-            <menuitem id="new_case" name="New Case" action="open_case_manager_form_action"  sequence="12"/>
-            <menuitem name="All Open Cases" id= "all_open_cases" sequence="12" action="case_action"/>
-            <!-- <menuitem id="treated_case_menu" name="Treated Cases" parent="menu_case" action="treated_case_action" sequence="12"/> -->
-            <menuitem name="All Closed Cases" id= "all_closed_cases" sequence="12" action="closed_case_action"/>
-            <menuitem name="Created By Me" id= "created_by_me" sequence="12" action="action_case_created_by_me"/>
-            <menuitem name="Assigned To Me" id= "assigned_to_me" sequence="12" action="action_case_assigned_to_me"/>
-            <!-- <menuitem name="My Alerts" id="my_alerts" sequence="12" action="action_case_alerts"/> -->
-            <menuitem name="My Alerts" id= "my_alerts" sequence="12" action="action_my_alert_history"/> 
-            <menuitem name="Overdue Cases" id= "overdue_cases" sequence="12" action="overdue_case_action"/>
-        </menuitem>
+        <menuitem id="menu_case_dashboard" name="Case Management"
+                  parent="menu_case_mgt" sequence="10"
+                  action="action_owl_case_dashboard" />
+
+        <menuitem id="menu_case" name="Cases"
+                  parent="menu_case_mgt" sequence="11" />
+
+        <menuitem id="new_case" name="New Case"
+                  parent="menu_case_dashboard" sequence="12"
+                  action="open_case_manager_form_action" />
+
+        <menuitem id="all_open_cases" name="All Open Cases"
+                  parent="menu_case_dashboard" sequence="12"
+                  action="case_action" />
+
+        <!-- <menuitem id="treated_case_menu" name="Treated Cases"
+                  parent="menu_case" sequence="12"
+                  action="treated_case_action"/> -->
+
+        <menuitem id="all_closed_cases" name="All Closed Cases"
+                  parent="menu_case_dashboard" sequence="12"
+                  action="closed_case_action" />
+
+        <menuitem id="created_by_me" name="Created By Me"
+                  parent="menu_case_dashboard" sequence="12"
+                  action="action_case_created_by_me" />
+
+        <menuitem id="assigned_to_me" name="Assigned To Me"
+                  parent="menu_case_dashboard" sequence="12"
+                  action="action_case_assigned_to_me" />
+
+        <menuitem id="my_alerts" name="My Alerts"
+                  parent="menu_case_dashboard" sequence="12"
+                  action="action_my_alert_history" />
+
+        <menuitem id="overdue_cases" name="Overdue Cases"
+                  parent="menu_case_dashboard" sequence="12"
+                  action="overdue_case_action" />
+
     </data>
 </odoo>

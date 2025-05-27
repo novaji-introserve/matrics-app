@@ -1016,7 +1016,7 @@ class Cases(models.Model):
                 'event_date': event_date,
                 'alert_id' : alert_id,
                 'attachment':attachment,
-                'alert_name': alert_name,
+                #'alert_name': alert_name,
                 'case_ref':case_ref,
                 'severity_level':severity_level,
                 'title': title,
@@ -1095,7 +1095,7 @@ class Cases(models.Model):
                         'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
-                        'name': alert_name,
+                       # 'name': alert_name,
                         'date_created': fields.Datetime.now(),
                         'narration': title,
                         'email': mail_values.get('email_to', ''),
@@ -1195,7 +1195,7 @@ class Cases(models.Model):
             ctx = {
                 'event_date': event_date,
                 'alert_id': alert_id,
-                'alert_name': alert_name,
+                #'alert_name': alert_name,
                # 'case_ref': case_ref,
                 'severity_level':severity_level,
                 'title': title,
@@ -1265,7 +1265,7 @@ class Cases(models.Model):
                         'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
-                        'name': alert_name,
+                       # 'name': alert_name,
                         'date_created': fields.Datetime.now(),
                         'narration': title,
                         'email': mail_values.get('email_to', ''),
@@ -1384,7 +1384,7 @@ class Cases(models.Model):
                 # Context for email template - use direct variable names, not nested dictionary
                 ctx = {
                     'event_date': event_date,
-                    'alert_name': alert_name,
+                   # 'alert_name': alert_name,
                     'alert_id': alert_id,
                     'severity_level':severity_level,
                     'title': title,
@@ -1456,7 +1456,7 @@ class Cases(models.Model):
                             'case_ref': response_link, 
                             'risk_rating': severity_level or 'Low',
                             'process_id': exception_process or None,
-                            'name': alert_name,
+                            #'name': alert_name,
                             'date_created': fields.Datetime.now(),
                             'narration': title,
                             'email': mail_values.get('email_to', ''),
