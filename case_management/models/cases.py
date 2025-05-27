@@ -122,6 +122,12 @@ class Cases(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
     _order = 'created_at desc'
+    
+    
+    def _generate_case_ref(self):
+        """Generate a Unique case REF using uuid"""
+        
+        return 'CASE-'+str(uuid.uuid4())
 
     # Basic Info
     name = fields.Char(string="Name", compute='_compute_name', store=True, tracking=True)
@@ -160,6 +166,7 @@ class Cases(models.Model):
     title_html = fields.Html(string='Severity Badge', compute='_compute_rating_html', sanitize=False)
     rating_id = fields.Many2one('case.rating', string='Severity Rating', readonly=True)
     severity_level = fields.Integer(string="Severity Level", compute="_compute_severity_level", store=True)
+    case_ref = fields.Char(string="Case Reference", default=_generate_case_ref, readonly=True, copy=False)
     
 
     # Status
@@ -979,6 +986,7 @@ class Cases(models.Model):
             event_date = rec.event_date
             alert_id = alert_id
             alert_name = rec.name
+            case_ref = rec.case_ref
             
             # Extract just the severity level (Low, Medium, or High) from alert_name
             severity_level = ''
@@ -1007,8 +1015,9 @@ class Cases(models.Model):
             ctx = {
                 'event_date': event_date,
                 'alert_id' : alert_id,
-                'attachement':attachment,
+                'attachment':attachment,
                 'alert_name': alert_name,
+                'case_ref':case_ref,
                 'severity_level':severity_level,
                 'title': title,
                 'rating_name': rating_name,
@@ -1081,6 +1090,8 @@ class Cases(models.Model):
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
                         # 'ref_id': self.id,  
+                        'case_ref': response_link,  
+                        #'ref_id': case_ref,
                         'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
@@ -1150,7 +1161,8 @@ class Cases(models.Model):
             event_date = rec.event_date
             alert_id = alert_id
             alert_name = rec.name
-            
+           # case_ref = rec._generate_case_response_and_close_ref()
+           # case_ref = case_ref
             # Extract just the severity level (Low, Medium, or High) from alert_name
             severity_level = ''
             if alert_name:
@@ -1184,6 +1196,7 @@ class Cases(models.Model):
                 'event_date': event_date,
                 'alert_id': alert_id,
                 'alert_name': alert_name,
+               # 'case_ref': case_ref,
                 'severity_level':severity_level,
                 'title': title,
                 'rating_name': rating_name,
@@ -1248,6 +1261,7 @@ class Cases(models.Model):
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
                         #'ref_id': self.id,  
+                        'case_ref': response_link,  
                         'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
@@ -1439,6 +1453,7 @@ class Cases(models.Model):
                             'html_body': rendered_html,
                             #'ref_id': self.id,    # Reference to the case model
                             'ref_id': f"{self._name},{self.id}",  # Reference to the case model
+                            'case_ref': response_link, 
                             'risk_rating': severity_level or 'Low',
                             'process_id': exception_process or None,
                             'name': alert_name,
@@ -1535,4 +1550,7 @@ class Cases(models.Model):
     
 
 
- 
+    # def _generate_case_response_and_close_ref(self):
+    #     """Generate a Unique case REF for case response and case closure using uuid"""
+        
+    #     return 'CASE-'+str(uuid.uuid4())

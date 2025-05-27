@@ -24,6 +24,8 @@
                 <field name="team_id" readonly='1'/>
                 <field name="status_html" widget="html"/>
                 <field name="severity_level" invisible="1"/>
+                <!-- <field name="title_html" string= "Case Severity" readonly="1" widget="html"/> -->
+                <field name="case_ref" string="Case Reference" readonly="1"/>
                 <field name="has_responses" invisible="1"/>
                 <field name="is_creator" invisible="1"/>
                 <field name="is_assigned_staff" invisible="1"/>
@@ -43,7 +45,7 @@
                 <!-- <field name="transaction_reference" invisible='1'/> -->
                 <field name="customer_id" invisible="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
-                <field name="title_html" string= "Severity" readonly="1" widget="html"/>
+                <field name="title_html" string= "Case Severity" readonly="1" widget="html"/>
                 <!-- <field name="created_at" string="Case Creation Date"/> -->
                 <field name="created_at" readonly="1" invisible="1"/>
                 <field name="created_at_formatted_datetime" string="Created Date" widget="text"/>
@@ -53,6 +55,7 @@
                 <field name="cases_action" string="Recommended Action" readonly="1"/>
                 <field name="team_id"/>
                 <field name="status_html" widget="html"/>
+                <field name="case_ref" string="Case Reference" readonly="1"/>
             </tree>
         </field>
     </record>
@@ -68,7 +71,7 @@
                 <field name="transaction_id" invisible="1"/>
                 <field name="customer_id" invisible="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
-                <field name="title_html" string= "Severity" readonly="1" widget="html"/>
+                <field name="title_html" string= "Case Severity" readonly="1" widget="html"/>
                 <!-- <field name="created_at" string="Start Date"/> -->
                 <field name="created_at" readonly="1" invisible="1"/>
                 <field name="created_at_formatted_datetime" string="Created Date" widget="text"/>
@@ -78,6 +81,7 @@
                 <field name="cases_action" string="Recommended Action" readonly="1"/>
                 <field name="team_id"/>
                 <field name="status_html" widget="html"/>
+                <field name="case_ref" string="Case Reference" readonly="1"/>
             </tree>
         </field>
     </record>
@@ -99,7 +103,7 @@
                     <field name="is_supervisor" invisible="1"/>
                     <div class="oe_title">
                         <h1>
-                            <field name="name" readonly="1"/>
+                            <field name="case_ref" readonly="1"/>
                         </h1>
                     </div>
                     <group col="2">
@@ -116,6 +120,7 @@
                             <field name="data_source" readonly="1" invisible="1"/>
                             <field name="cases_action" string="Recommended Action" readonly="1"/>
                             <field name="title" string="Severity" invisible="1" readonly="1" />
+                            <field name="title_html" string= "Case Severity" readonly="1" widget="html"/>
                         </group>
                         <group>
                             <field name="staff_id" string="Staff Responsible" readonly="1"/>
@@ -340,6 +345,7 @@
                         <field name="event_date" readonly="1" invisible="1"/>
                         <field name="event_date_formatted_datetime" widget="text"/>
                         <field name="title" string="Severity" readonly="1" invisible="1" />
+                        <field name="title_html" string= "Case Severity" readonly="1" widget="html"/>
                         <field name="branch_id" readonly="1"/>
                         <field name="team_id" readonly="1"/>
                         <field name="transaction_id" invisible='1'/>
@@ -379,6 +385,7 @@
                         <field name="has_responses" invisible="1"/>
                         <field name="new_process_category_id" string="Process Category" readonly="1"/>
                         <field name="new_process_id" string="Process" readonly="1"/>
+                        <field name="case_ref" string="Case Reference" readonly="1"/>
                         <field name="status_code" invisible="1"/>
                         <field name="quick_response" string="Respond to Case"
                         attrs="{'invisible': ['|',

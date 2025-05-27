@@ -59,7 +59,7 @@
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"> <t t-esc="ctx.get('staff_dept')" /> </td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Priority Rating:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Severity:</td>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"> <t t-esc="ctx.get('severity_level')" /> </td>
                         </tr>
                         <tr>
@@ -152,7 +152,7 @@
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('event_date')"/></td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Rating:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Severity:</td>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('severity_level')"/></td>
                         </tr>
                         <tr>
@@ -255,7 +255,7 @@
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('event_date')"/></td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Rating:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Severity:</td>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;"><t t-esc="ctx.get('severity_level')"/></td>
                         </tr>
                         <tr>

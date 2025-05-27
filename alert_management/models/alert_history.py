@@ -25,6 +25,8 @@ class alert_history(models.Model):
     last_checked = fields.Char()
     risk_rating = fields.Char()
     process_id = fields.Char()
+    case_ref = fields.Char()
+    case_ref_display = fields.Html('Case Reference', compute='_compute_case_ref_display', sanitize=False)
     name = fields.Char()
     date_created = fields.Char()
     narration = fields.Char()
@@ -34,6 +36,44 @@ class alert_history(models.Model):
     source = fields.Char(required=True)
     
     user_in_emails = fields.Boolean(compute='_compute_user_in_emails', search='_search_user_in_emails')
+    
+    @api.depends('case_ref')
+    def _compute_case_ref_display(self):
+        for record in self:
+            if record.case_ref:
+                record.case_ref_display = f'<a href="{record.case_ref}" target="_self" style="color: #875A7B; font-weight: bold; text-decoration: none; font-size: 18px;">View Case</a>'
+            else:
+                record.case_ref_display = ''
+
+    
+    
+    # @api.depends('case_ref')
+    # def _compute_case_ref_display_action(self):
+    #     for record in self:
+    #         if record.case_ref:
+    #             # For Odoo actions (model views, reports, etc.)
+    #             record.case_ref_display = f'''
+    #             <button type="object" name="open_case_ref" 
+    #                     style="background: none; border: none; color: #875A7B; font-weight: bold; text-decoration: underline; font-size: 18px; cursor: pointer;">
+    #                 View Case
+    #             </button>'''
+    #         else:
+    #             record.case_ref_display = ''
+
+    def open_case_ref(self):
+        # This method would handle the navigation within Odoo
+        return {
+            'type': 'ir.actions.act_url',
+            'url': self.case_ref,
+            'target': 'self',  # This keeps it in the same window
+        }
+    # @api.depends('case_ref')
+    # def _compute_case_ref_display(self):
+    #     for record in self:
+    #         if record.case_ref:
+    #             record.case_ref_display = f'<a href="{record.case_ref}" target="_self" style="color: #875A7B; font-weight: bold; text-decoration: none; font-size: 18px;">View Case</a>'
+    #         else:
+    #             record.case_ref_display = ''
 
     @api.model
     def _generate_alert_id(self):
