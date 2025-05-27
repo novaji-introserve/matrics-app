@@ -17,6 +17,7 @@
     "category": "iComply",
     "version": "0.3",
     # any module necessary for this one to work correctly
+    
     'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification', 'alert_management', 'project',
         'mass_mailing',
         'utm',
@@ -47,6 +48,7 @@
 
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
+        "data/schedules/count-weight-avg.xml",
         "views/dynamic_charts.xml",
         "views/fcra_score.xml",
         "views/configuration.xml",
@@ -102,7 +104,7 @@
         'data/watchlist.xml',
         'data/blacklist.xml',
         # 'data/demo_data/account/res_partner_accounts.xml', #ACCOUNTS
-        # 'data/transactions.xml',  #TRANSACTIONS
+        'data/transactions.xml',  #TRANSACTIONS
         'data/schedules/aggregate_score.xml',
     ],
     # only loaded in demonstration mode

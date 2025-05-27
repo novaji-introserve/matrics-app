@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-
+import logging
+from collections import defaultdict
+_logger = logging.getLogger(__name__)
 
 class CustomerAccount(models.Model):
     _name = 'res.partner.account'
@@ -153,7 +155,6 @@ class CustomerAccount(models.Model):
     amount_last_credit_customer = fields.Char(string='Amount Last Credit Customer')
     date_last_debit_customer = fields.Char(string='Date Last Dedit Customer')
     
-
     
     def init(self):
         """Initialize database triggers when module is installed/updated"""
@@ -245,7 +246,308 @@ class CustomerAccount(models.Model):
     def get_risk_level(self):
         return self.risk_level
 
+    
+    def compute_aggregate_risk_scores(self):
+        """
+        Compute aggregate risk scores grouped by branch, product, currency, account type, and state.
+        Includes high/medium/low account counts and computes a count-weighted average risk score.
+        Only runs if total customer accounts is 200 or less.
+        """
+        try:
+            total_accounts = self.search_count([])
 
+            if total_accounts <= 200:
+                self.env.cr.execute("DELETE FROM account_agg_risk_score;")
+
+                self.env.cr.execute("""
+                    INSERT INTO account_agg_risk_score (
+                        branch_id,
+                        product_id,
+                        currency_id,
+                        account_type_id,
+                        state,
+                        weighted_avg_risk_score,
+                        total_accounts,
+                        high_count,
+                        medium_count,
+                        low_count
+                    )
+                    SELECT
+                        rpa.branch_id,
+                        rpa.product_id,
+                        rpa.currency_id,
+                        rpa.account_type_id,
+                        rpa.state,
+
+                        ROUND(
+                            (
+                                SUM(CASE WHEN rp.risk_level = 'high' THEN rp.risk_score ELSE 0 END) +
+                                SUM(CASE WHEN rp.risk_level = 'medium' THEN rp.risk_score ELSE 0 END) +
+                                SUM(CASE WHEN rp.risk_level = 'low' THEN rp.risk_score ELSE 0 END)
+                            ) / NULLIF(COUNT(rp.id), 0),
+                            2
+                        ) AS weighted_avg_risk_score,
+
+                        COUNT(rp.id) AS total_accounts,
+
+                        COUNT(CASE WHEN rp.risk_level = 'high' THEN rp.id ELSE NULL END) AS high_count,
+                        COUNT(CASE WHEN rp.risk_level = 'medium' THEN rp.id ELSE NULL END) AS medium_count,
+                        COUNT(CASE WHEN rp.risk_level = 'low' THEN rp.id ELSE NULL END) AS low_count
+
+                    FROM res_partner_account rpa
+                    LEFT JOIN res_partner rp ON rpa.customer_id = rp.id
+                    WHERE rp.risk_level IN ('high', 'medium', 'low') 
+
+                    GROUP BY
+                        rpa.branch_id,
+                        rpa.product_id,
+                        rpa.currency_id,
+                        rpa.account_type_id,
+                        rpa.state;
+                """)
+
+                self.env.cr.commit()
+                _logger.info(f"Aggregate risk scores computed for {total_accounts} accounts")
+
+            else:
+                _logger.info(f"Skipped: {total_accounts} accounts exceeds 200 limit")
+
+        except Exception as e:
+            self.env.cr.rollback()
+            _logger.error(f"Error computing aggregate risk scores: {str(e)}")
+            raise
+    
+
+
+    @api.model
+    def cron_compute_aggregate_risk_scores(self):
+        """
+        Cron job wrapper method to compute aggregate risk scores.
+        This method should be called by the scheduled action.
+        """
+        try:
+            # Just call the method on the model - no need to fetch records
+            # The count check is already handled inside compute_aggregate_risk_scores
+            self.compute_aggregate_risk_scores()
+                
+        except Exception as e:
+            _logger.error(f"Cron job failed for aggregate risk scores: {str(e)}")
+            # Don't raise the exception to prevent cron job from failing completely
+            return False
+        
+        return True
+
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        print(fields)
+        print(domain)
+        """
+        Enhanced read_group method using pre-aggregated data from account.agg.risk.score.
+        Falls back to standard read_group if no aggregated data is available.
+        """
+    
+        if not groupby:
+            return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+        # Extract groupby field name without optional modifiers like :day
+        groupby_field = groupby[0].split(':')[0]
+        
+
+        # Fields that have pre-aggregated data
+        aggregated_fields = ['branch_id', 'currency_id', 'product_id', 'account_type_id', 'state']
+
+        # Check if we should use aggregated data
+        should_use_aggregated = (
+            groupby_field in aggregated_fields and 
+            'risk_score' in fields
+        )
+
+       
+        if should_use_aggregated:
+            return self._read_group_from_aggregated_data(domain, fields, groupby_field, offset, limit, orderby)
+        else:
+            return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+    def _read_group_from_aggregated_data(self, domain, fields, groupby_field, offset=0, limit=None, orderby=False):
+        """
+        Read group data from account.agg.risk.score table instead of calculating on-the-fly.
+        """
+        try:
+            # Get aggregated data
+            agg_model = self.env['account.agg.risk.score']
+            
+            # Convert domain to match aggregated table structure
+            agg_domain = self._convert_domain_for_aggregated_data(domain)
+            
+            # Read aggregated records
+            agg_records = agg_model.search(agg_domain)
+            
+            if not agg_records:
+                # Fallback to standard read_group if no aggregated data
+                _logger.warning("No aggregated data found, falling back to standard read_group")
+                return super().read_group(domain, [groupby_field], [groupby_field], offset, limit, orderby, True)
+            
+            # Group the aggregated data by the requested field
+            grouped_data = self._group_aggregated_records(agg_records, groupby_field)
+            
+            # Format results
+            formatted_results = self._format_aggregated_results(grouped_data, groupby_field, domain)
+            
+            # Apply ordering
+            if orderby:
+                formatted_results = self._apply_ordering(formatted_results, orderby, groupby_field)
+            
+            # Apply pagination
+            if offset or limit:
+                end_index = (offset + limit) if limit else None
+                formatted_results = formatted_results[offset:end_index]
+            
+            return formatted_results
+            
+        except Exception as e:
+            _logger.error(f"Error reading aggregated data for {groupby_field}: {str(e)}")
+            # Fallback to standard read_group
+            return super().read_group(domain, [groupby_field], [groupby_field], offset, limit, orderby, True)
+
+    def _convert_domain_for_aggregated_data(self, domain):
+        """
+        Convert the original domain to work with account.agg.risk.score fields.
+        """
+        if not domain:
+            return []
+        
+        converted_domain = []
+        
+        for condition in domain:
+            if isinstance(condition, (list, tuple)) and len(condition) == 3:
+                field, operator, value = condition
+                
+                # Map fields that exist in both models
+                field_mapping = {
+                    'branch_id': 'branch_id',
+                    'product_id': 'product_id', 
+                    'currency_id': 'currency_id',
+                    'account_type_id': 'account_type_id',
+                    'state': 'state'
+                }
+                
+                if field in field_mapping:
+                    converted_domain.append([field_mapping[field], operator, value])
+                # Skip fields that don't exist in aggregated table
+                
+            else:
+                # Keep logical operators (AND, OR, NOT)
+                converted_domain.append(condition)
+        
+        return converted_domain
+
+    def _group_aggregated_records(self, agg_records, groupby_field):
+        """
+        Group aggregated records by the specified field.
+        """
+        grouped = {}
+        
+        for record in agg_records:
+            group_key = getattr(record, groupby_field)
+            
+            # Handle Many2one fields
+            if hasattr(group_key, 'id'):
+                key = group_key.id
+            else:
+                key = group_key
+            
+            if key not in grouped:
+                grouped[key] = {
+                    'records': [],
+                    'total_accounts': 0,
+                    'weighted_sum': 0.0,
+                    'group_value': group_key
+                }
+            
+            grouped[key]['records'].append(record)
+            grouped[key]['total_accounts'] += record.total_accounts
+            # Calculate weighted sum: risk_score * customer_count
+            grouped[key]['weighted_sum'] += (record.weighted_avg_risk_score * record.total_accounts)
+        
+        return grouped
+
+    def _format_aggregated_results(self, grouped_data, groupby_field, original_domain):
+        """
+        Format grouped aggregated data into Odoo's expected read_group format.
+        """
+        formatted_results = []
+        
+        for group_key, group_data in grouped_data.items():
+            total_accounts = group_data['total_accounts']
+            
+            # Calculate overall weighted average for this group
+            if total_accounts > 0:
+                weighted_avg_risk_score = group_data['weighted_sum'] / total_accounts
+            else:
+                weighted_avg_risk_score = 0.0
+            
+            # Format the group key based on field type
+            if groupby_field == 'state':
+                display_key = group_key or 'Unknown'
+                group_result = {
+                    groupby_field: display_key,
+                    f'{groupby_field}_count': total_accounts,
+                    '__count': total_accounts,
+                    '__domain': [(groupby_field, '=', group_key)] + original_domain
+                }
+            else:
+                # For Many2one fields
+                group_value = group_data['group_value']
+                if hasattr(group_value, 'name_get'):
+                    display_name = group_value.name_get()[0][1] if group_value else f'No {groupby_field.replace("_", " ").title()}'
+                    display_key = (group_key, display_name)
+                else:
+                    display_key = group_key
+                    
+                group_result = {
+                    groupby_field: display_key,
+                    f'{groupby_field}_count': total_accounts,
+                    '__count': total_accounts,
+                    '__domain': [(groupby_field, '=', group_key)] + original_domain
+                }
+            
+            # Add risk score
+            group_result['risk_score'] = round(weighted_avg_risk_score, 2)
+            
+            formatted_results.append(group_result)
+        
+        return formatted_results
+
+    def _apply_ordering(self, results, orderby, groupby_field):
+        """
+        Apply ordering to the results.
+        """
+        if not orderby:
+            return results
+        
+        # Parse orderby
+        order_parts = [part.strip() for part in orderby.split(',')]
+        
+        for part in order_parts:
+            part_lower = part.lower()
+            reverse = 'desc' in part_lower
+            
+            if 'risk_score' in part_lower:
+                results.sort(key=lambda x: x.get('risk_score', 0), reverse=reverse)
+                break
+            elif groupby_field in part_lower:
+                if groupby_field == 'state':
+                    results.sort(key=lambda x: x.get(groupby_field, ''), reverse=reverse)
+                else:
+                    # For Many2one fields, sort by display name
+                    results.sort(key=lambda x: x.get(groupby_field, (0, ''))[1] if isinstance(x.get(groupby_field), tuple) else str(x.get(groupby_field, '')), reverse=reverse)
+                break
+            else:
+                # Default to count
+                results.sort(key=lambda x: x.get('__count', 0), reverse=reverse)
+                break
+        
+        return results
+    
 class CustomerAccountOfficer(models.Model):
     _name = 'account.officers'
     _description = 'Account Officer'
@@ -257,3 +559,5 @@ class CustomerAccountOfficer(models.Model):
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string="Code", required=True)
     area = fields.Char(string="Area", required=True)
+
+    

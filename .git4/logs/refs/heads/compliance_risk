@@ -1,0 +1,13 @@
+0000000000000000000000000000000000000000 367a75dc86c30e49c9535d237e5d20323b239ff5 Hanson <hansoneyuren@gmail.com.com> 1728962579 +0100	branch: Created from HEAD
+367a75dc86c30e49c9535d237e5d20323b239ff5 140ffbb5c5360103a4732eb67b926d52982d9b8a Hanson <hansoneyuren@gmail.com.com> 1728982062 +0100	commit: added Account products
+140ffbb5c5360103a4732eb67b926d52982d9b8a 986e1c682d7f40ac75bc158e97d58b9a82f299fe Hanson <hansoneyuren@gmail.com.com> 1728982864 +0100	commit: added Education Levels
+986e1c682d7f40ac75bc158e97d58b9a82f299fe 3e1c8f3f2e3c47b3b8fcd02054120eb80523bc77 Hanson <hansoneyuren@gmail.com.com> 1728985276 +0100	commit: added Customer Tiers
+3e1c8f3f2e3c47b3b8fcd02054120eb80523bc77 078f66dad1a7b18bd0ab7330d3981d5b031e9f49 Hanson <hansoneyuren@gmail.com.com> 1728986095 +0100	commit: added Customer Region
+078f66dad1a7b18bd0ab7330d3981d5b031e9f49 f6c9ea5cf6c62311e56dcb06f094b883550d89c4 Hanson <hansoneyuren@gmail.com.com> 1728987711 +0100	commit: added Risk Categories
+f6c9ea5cf6c62311e56dcb06f094b883550d89c4 db06219ee3c40e62d2aebf6e8a495699c693e778 Hanson <hansoneyuren@gmail.com.com> 1728987985 +0100	commit: added Risk Universe
+db06219ee3c40e62d2aebf6e8a495699c693e778 bbd1c2b8ec4978de237c6eac97853ce4570897db Hanson <hansoneyuren@gmail.com.com> 1728988991 +0100	commit: added Risk Risk Subjects
+bbd1c2b8ec4978de237c6eac97853ce4570897db e42ca54f2b2ce843ec4f37987328bdeb29666754 Hanson <hansoneyuren@gmail.com.com> 1728989187 +0100	commit: added Risk Types
+e42ca54f2b2ce843ec4f37987328bdeb29666754 c8f8b58b58b8a059ed1c8d07f74f4300d0dc0266 Hanson <hansoneyuren@gmail.com.com> 1729066107 +0100	commit: making sure there is no uncommited chnages
+c8f8b58b58b8a059ed1c8d07f74f4300d0dc0266 8c025e728ec1d963f6034978c6a3d8030480e9e5 Hanson <hansoneyuren@gmail.com.com> 1729107504 +0100	pull origin main: Merge made by the 'ort' strategy.
+8c025e728ec1d963f6034978c6a3d8030480e9e5 82f902540cc3418cbb85845d7715c44565aa8ac4 Hanson <hansoneyuren@gmail.com.com> 1729107540 +0100	reset: moving to origin/main
+82f902540cc3418cbb85845d7715c44565aa8ac4 82f902540cc3418cbb85845d7715c44565aa8ac4 Hanson <hansoneyuren@gmail.com.com> 1729118737 +0100	Branch: renamed refs/heads/hanson_dev to refs/heads/compliance_risk
