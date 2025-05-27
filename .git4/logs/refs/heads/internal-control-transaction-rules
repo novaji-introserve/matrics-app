@@ -1,0 +1,113 @@
+0000000000000000000000000000000000000000 6a9f1b32381aa62b4678e9c62e164f01e2659171 Hanson <hanson.e@novajii.com> 1732179221 +0100	branch: Created from HEAD
+6a9f1b32381aa62b4678e9c62e164f01e2659171 d281464bc8e1586858437acb36cfa8dd8bc100d0 Hanson <hanson.e@novajii.com> 1732250693 +0100	commit: working on internal control menu
+d281464bc8e1586858437acb36cfa8dd8bc100d0 19e998480498123b031365ba967f955e1802ebc9 Hanson <hanson.e@novajii.com> 1732251965 +0100	merge main: Merge made by the 'ort' strategy.
+19e998480498123b031365ba967f955e1802ebc9 1c082ab91bd674fbe35e635972521925d92fa657 Hanson <hanson.e@novajii.com> 1732252114 +0100	merge main: Fast-forward
+1c082ab91bd674fbe35e635972521925d92fa657 f650634eed4461dbf8804f346b2acbac7a694ba3 Hanson <hanson.e@novajii.com> 1732252650 +0100	commit: added menu
+f650634eed4461dbf8804f346b2acbac7a694ba3 5c414e442d0ebc0b8596ccb7fbbd8f13e024daf9 Hanson <hanson.e@novajii.com> 1732256658 +0100	commit: working on internal control menu
+5c414e442d0ebc0b8596ccb7fbbd8f13e024daf9 4aa02eea258c89df055a3cff7387181d37ae92b8 Hanson <hanson.e@novajii.com> 1732257002 +0100	commit: added a fix
+4aa02eea258c89df055a3cff7387181d37ae92b8 3dd6b4e53e05c388fc482cdf71a4f5395e6db7f7 Hanson <hanson.e@novajii.com> 1732286243 +0100	merge main: Fast-forward
+3dd6b4e53e05c388fc482cdf71a4f5395e6db7f7 3dd6b4e53e05c388fc482cdf71a4f5395e6db7f7 Hanson <hanson.e@novajii.com> 1732478815 +0100	Branch: renamed refs/heads/internal-control-hanson-novaji to refs/heads/internal-control-transaction-rules
+3dd6b4e53e05c388fc482cdf71a4f5395e6db7f7 a9756fe407b9f0829bc4b48898134078ab9c181d Hanson <hanson.e@novajii.com> 1732478972 +0100	commit: working on internal control transaction rules
+a9756fe407b9f0829bc4b48898134078ab9c181d 2144992a7ee2d0bf81a5153123b4e5e74adf8679 Hanson <hanson.e@novajii.com> 1732479088 +0100	merge main: Merge made by the 'ort' strategy.
+2144992a7ee2d0bf81a5153123b4e5e74adf8679 f021f14f02c88780deeb9d51fe6c35e1a7275021 Hanson <hanson.e@novajii.com> 1732496683 +0100	merge main: Fast-forward
+f021f14f02c88780deeb9d51fe6c35e1a7275021 6cb6422b1ab12ef51b70b875d9cb7f8de344efa5 Hanson <hanson.e@novajii.com> 1732569437 +0100	merge main: Fast-forward
+6cb6422b1ab12ef51b70b875d9cb7f8de344efa5 bf338893ac0fe09a0943b9f174f9910c9c6d8410 Hanson <hanson.e@novajii.com> 1732571994 +0100	commit: fixed conflicts
+bf338893ac0fe09a0943b9f174f9910c9c6d8410 d0c5073867cddf8b907e3d6c6f4a187ac4cd21aa Hanson <hanson.e@novajii.com> 1732596602 +0100	commit: working on transaction rules fix
+d0c5073867cddf8b907e3d6c6f4a187ac4cd21aa d9c5fa720f05b4719a80533be0c70b43fb73d29b Hanson <hanson.e@novajii.com> 1732597604 +0100	merge main: Fast-forward
+d9c5fa720f05b4719a80533be0c70b43fb73d29b 4c17af2171877c5bd4dd86c8584c19c0e0f4eaec Hanson <hanson.e@novajii.com> 1732597742 +0100	pull origin main: Fast-forward
+4c17af2171877c5bd4dd86c8584c19c0e0f4eaec f7099c399ca7e63bc5c01351e092b0fbdee97cb9 Hanson <hanson.e@novajii.com> 1732610310 +0100	pull origin main: Fast-forward
+f7099c399ca7e63bc5c01351e092b0fbdee97cb9 c6b5c26f70653f266afd972232b603796f3f6efe Hanson <hanson.e@novajii.com> 1732612914 +0100	pull origin main: Fast-forward
+c6b5c26f70653f266afd972232b603796f3f6efe efac54cbfc45b264e06bd5acbb9505a639ee33ad Hanson <hanson.e@novajii.com> 1732628531 +0100	reset: moving to origin/main
+efac54cbfc45b264e06bd5acbb9505a639ee33ad 48225b6103fffeb7cd60a9eba10372edd9b6230e Hanson <hanson.e@novajii.com> 1732888626 +0100	merge main: Fast-forward
+48225b6103fffeb7cd60a9eba10372edd9b6230e f49ba91cbdd562c33fa4bb33f6481c0ae896e285 Hanson <hanson.e@novajii.com> 1732890380 +0100	merge main: Fast-forward
+f49ba91cbdd562c33fa4bb33f6481c0ae896e285 ba318c0efd28f176e58525a1b4bdba25146b8daf Hanson <hanson.e@novajii.com> 1733126799 +0100	merge main: Fast-forward
+ba318c0efd28f176e58525a1b4bdba25146b8daf b60dd54026f179993d8a8ad89702cfdbfaa1dd7a Hanson <hanson.e@novajii.com> 1734504081 +0100	reset: moving to origin/main
+b60dd54026f179993d8a8ad89702cfdbfaa1dd7a d025f2e37787c0c57ba09aeadf14f3adb5022113 Hanson <hanson.e@novajii.com> 1734510038 +0100	commit: added exception report title
+d025f2e37787c0c57ba09aeadf14f3adb5022113 3445b1876fae62bdc66054acbe947d22791cd05e Hanson <hanson.e@novajii.com> 1734535682 +0100	commit: fixed department model
+3445b1876fae62bdc66054acbe947d22791cd05e e28c0f8e1b551f6240851b997cc0b97c50d2cdd8 Hanson <hanson.e@novajii.com> 1734535827 +0100	merge main: Merge made by the 'ort' strategy.
+e28c0f8e1b551f6240851b997cc0b97c50d2cdd8 ca3937568bb461564a272df6b3ef95f01a7057c4 Hanson <hanson.e@novajii.com> 1734536120 +0100	commit: menu fix
+ca3937568bb461564a272df6b3ef95f01a7057c4 69bc6efa60a867376790c49b2d7f05fe2f129d71 Hanson <hanson.e@novajii.com> 1734586565 +0100	merge main: Fast-forward
+69bc6efa60a867376790c49b2d7f05fe2f129d71 1184c0abedfee4c01550aca801aa1cf268fbb9f6 Hanson <hanson.e@novajii.com> 1734592782 +0100	commit: added the psql query execute addon
+1184c0abedfee4c01550aca801aa1cf268fbb9f6 adf608f2287a91452d9f9fa27be47addbaa70b48 Hanson <hanson.e@novajii.com> 1736157122 +0100	commit: jan 6th push
+adf608f2287a91452d9f9fa27be47addbaa70b48 3bc2c4a74ba4643023a831b708d84bbe0673f262 Hanson <hanson.e@novajii.com> 1736157314 +0100	merge main: Merge made by the 'ort' strategy.
+3bc2c4a74ba4643023a831b708d84bbe0673f262 927597210d1a8004acb7ad81cae79f57af312f28 Hanson <hanson.e@novajii.com> 1736181820 +0100	merge main: Fast-forward
+927597210d1a8004acb7ad81cae79f57af312f28 2df4f17b8382499a0a5862e1103a72d8635b0124 Hanson <hanson.e@novajii.com> 1736277314 +0100	merge main: Fast-forward
+2df4f17b8382499a0a5862e1103a72d8635b0124 75eaf7601c2b951eefc3372b0222f5c79dbd212c Hanson <hanson.e@novajii.com> 1736283016 +0100	commit: made control officer editable tree view
+75eaf7601c2b951eefc3372b0222f5c79dbd212c 46b945dafee12eba1a86d75c71ef9692d2968303 Hanson <hanson.e@novajii.com> 1736283165 +0100	merge main: Fast-forward
+46b945dafee12eba1a86d75c71ef9692d2968303 5c494a581acfcb5c8a681329d85c20c4f64fcffc Hanson <hanson.e@novajii.com> 1736652944 +0100	merge main: Fast-forward
+5c494a581acfcb5c8a681329d85c20c4f64fcffc d9e1698bc9d0ef437a848130e1d3ba3a3911a4f7 Hanson <hanson.e@novajii.com> 1736858505 +0100	commit: added sychronization script
+d9e1698bc9d0ef437a848130e1d3ba3a3911a4f7 bb15abc5b23cf7910754cf6ad4bc2c996416752a Hanson <hanson.e@novajii.com> 1736860806 +0100	merge main: Fast-forward
+bb15abc5b23cf7910754cf6ad4bc2c996416752a 2566434991e79fe78694597c497b6aaf3b0ed920 Hanson <hanson.e@novajii.com> 1736915490 +0100	commit: fixed sync script
+2566434991e79fe78694597c497b6aaf3b0ed920 0d864082554429442b255895400b6e8b6096adff Hanson <hanson.e@novajii.com> 1736915879 +0100	merge main: Fast-forward
+0d864082554429442b255895400b6e8b6096adff 79d54b0bdaf25b72c0a8da7f3f38b98c5446dfea Hanson <hanson.e@novajii.com> 1737031848 +0100	commit: fixed transactions not showing
+79d54b0bdaf25b72c0a8da7f3f38b98c5446dfea d23c7de7df6a77278438e5fc39118403daab4114 Hanson <hanson.e@novajii.com> 1737032213 +0100	merge main: Fast-forward
+d23c7de7df6a77278438e5fc39118403daab4114 b11d8d649ed38babf56b665868cd8a7a36a35e92 Hanson <hanson.e@novajii.com> 1737279177 +0100	commit: added all remaining models
+b11d8d649ed38babf56b665868cd8a7a36a35e92 f61cd47179ec57811211e523cbc0f6220de6daad Hanson <hanson.e@novajii.com> 1737279549 +0100	commit (merge): Merge branch 'main' into internal-control-transaction-rules
+f61cd47179ec57811211e523cbc0f6220de6daad 37d194538993f6df17abe1b108114a0f9b62237b Hanson <hanson.e@novajii.com> 1737279675 +0100	commit: added all remaining models
+37d194538993f6df17abe1b108114a0f9b62237b 30e39daa2a42bac73b4c6e144663897f410523e7 Hanson <hanson.e@novajii.com> 1737279818 +0100	merge main: Fast-forward
+30e39daa2a42bac73b4c6e144663897f410523e7 091eceac51785bb8c68d7056cefd1bfaadcd5471 Hanson <hanson.e@novajii.com> 1737280181 +0100	commit: created ETL Spooling script
+091eceac51785bb8c68d7056cefd1bfaadcd5471 6ec7884362f9e91583c8ee2521be67f38eda92eb Hanson <hanson.e@novajii.com> 1737314430 +0100	commit: fixed transaction, account, customer models, trees and forms
+6ec7884362f9e91583c8ee2521be67f38eda92eb ea765a41ce0421b11a5bfaebd6ca7eefc92f5bbd Hanson <hanson.e@novajii.com> 1737314617 +0100	merge main: Fast-forward
+ea765a41ce0421b11a5bfaebd6ca7eefc92f5bbd 5a5290cfbe1ca872e341520ac4d47212469c6a90 Hanson <hanson.e@novajii.com> 1737321608 +0100	commit: isolated db config for script
+5a5290cfbe1ca872e341520ac4d47212469c6a90 3e1716ee0b64ebce1bdca4b78c3566677c2ab3eb Hanson <hanson.e@novajii.com> 1737325959 +0100	commit: Stop tracking sensitive config files
+3e1716ee0b64ebce1bdca4b78c3566677c2ab3eb 874bd4f6173a14915d298460f93a0914b49f6490 Hanson <hanson.e@novajii.com> 1737328239 +0100	merge main: Fast-forward
+874bd4f6173a14915d298460f93a0914b49f6490 772dc83a9d700b27e0879cc135aaebe8d1813220 Hanson <hanson.e@novajii.com> 1737334561 +0100	commit: fix spooling
+772dc83a9d700b27e0879cc135aaebe8d1813220 703b15d5a9a38021ea0766686b810b011c7872fe Hanson <hanson.e@novajii.com> 1737337427 +0100	commit: fix customer type model
+703b15d5a9a38021ea0766686b810b011c7872fe d54a6e528ede858d51a2390761b40f493071b4f7 Hanson <hanson.e@novajii.com> 1737343542 +0100	commit: fix account officer model
+d54a6e528ede858d51a2390761b40f493071b4f7 79866036b24f36d0c208cfbcc8759e69a7450a3d Hanson <hanson.e@novajii.com> 1737347652 +0100	commit: fix spooling
+79866036b24f36d0c208cfbcc8759e69a7450a3d b2f38baacbc5dcfa8fcd38258061d76972b4281a Hanson <hanson.e@novajii.com> 1737353336 +0100	commit: fix spooling
+b2f38baacbc5dcfa8fcd38258061d76972b4281a 4574d838e103e05d38905a0ee2f4927e96dde370 Hanson <hanson.e@novajii.com> 1737356371 +0100	commit: Account Spooled fixed
+4574d838e103e05d38905a0ee2f4927e96dde370 42ed6ce52eca31e94b216317c1f977472afb2335 Hanson <hanson.e@novajii.com> 1737357743 +0100	commit: working on account view
+42ed6ce52eca31e94b216317c1f977472afb2335 aa17ee619ca9ddfa083daa8f64c3ec6d22a73b83 Hanson <hanson.e@novajii.com> 1737374629 +0100	commit: fix transaction spooling
+aa17ee619ca9ddfa083daa8f64c3ec6d22a73b83 19896782b3353682a3ca48a3e3bce054fb7cd8e8 Hanson <hanson.e@novajii.com> 1737467458 +0100	commit: working on transaction spooling
+19896782b3353682a3ca48a3e3bce054fb7cd8e8 41b80c6998742d72f00c55dd2aa6a980fb2c583b Hanson <hanson.e@novajii.com> 1737554469 +0100	commit: fixing transaction repprt
+41b80c6998742d72f00c55dd2aa6a980fb2c583b 9ee2754a028496bb523214720030bed16c5d8158 Hanson <hanson.e@novajii.com> 1737555851 +0100	commit (merge): fix
+9ee2754a028496bb523214720030bed16c5d8158 1d04415eb629167feb04b650463cc2d1dfb51958 Hanson <hanson.e@novajii.com> 1737576784 +0100	merge main: Fast-forward
+1d04415eb629167feb04b650463cc2d1dfb51958 6d307d126cae20c060b34d76becb3d0f01fdd04e Hanson <hanson.e@novajii.com> 1737610421 +0100	commit: added icomply banner to dashboard
+6d307d126cae20c060b34d76becb3d0f01fdd04e cab52879a3dfc9797fb73e02f428f5baf527e01b Hanson <hanson.e@novajii.com> 1737610592 +0100	merge main: Merge made by the 'ort' strategy.
+cab52879a3dfc9797fb73e02f428f5baf527e01b 180c35851d2dc2f043e8b3b31844da3573341913 Hanson <hanson.e@novajii.com> 1737641062 +0100	commit: rec number fix on model
+180c35851d2dc2f043e8b3b31844da3573341913 6779a647a7f73c0c2beca959896d3fd54e3f9089 Hanson <hanson.e@novajii.com> 1737641138 +0100	merge main: Merge made by the 'ort' strategy.
+6779a647a7f73c0c2beca959896d3fd54e3f9089 3a137f7a941976fbcc5f0578f7c30334a5eb3526 Hanson <hanson.e@novajii.com> 1737641894 +0100	commit: rec number fix on model
+3a137f7a941976fbcc5f0578f7c30334a5eb3526 a73800f45b506cf04f1bddeba5e7ad52486ad28c Hanson <hanson.e@novajii.com> 1737677015 +0100	merge main: Fast-forward
+a73800f45b506cf04f1bddeba5e7ad52486ad28c 9757e88ca6da23a03c56537fa01ac386cc39bc38 Hanson <hanson.e@novajii.com> 1737718232 +0100	commit: added access right
+9757e88ca6da23a03c56537fa01ac386cc39bc38 86bb1570ee981c5db68e0a4d167388942fc53536 Hanson <hanson.e@novajii.com> 1737718408 +0100	merge main: Merge made by the 'ort' strategy.
+86bb1570ee981c5db68e0a4d167388942fc53536 b04608f5cfc5148d151dabb63f282b95c1f2bbad Hanson <hanson.e@novajii.com> 1737963583 +0100	commit: Added filters and reports clean up
+b04608f5cfc5148d151dabb63f282b95c1f2bbad 4b8ad3145a3553b00cf197e4e59c9ad1aad1b8eb Hanson <hanson.e@novajii.com> 1737963871 +0100	merge main: Merge made by the 'ort' strategy.
+4b8ad3145a3553b00cf197e4e59c9ad1aad1b8eb d85fc5533846049397e448c5cb33afff758a2f84 Hanson <hanson.e@novajii.com> 1737974838 +0100	commit: cleaning customer report
+d85fc5533846049397e448c5cb33afff758a2f84 3603e266750ac6a42cf8e20a0ef03ca7a5c0494e Hanson <hanson.e@novajii.com> 1738033083 +0100	commit: working on customer account
+3603e266750ac6a42cf8e20a0ef03ca7a5c0494e 99d47d4a8988bdd7d9d0ba1f721aad6772ce6f8d Hanson <hanson.e@novajii.com> 1738034513 +0100	commit: working on customer account
+99d47d4a8988bdd7d9d0ba1f721aad6772ce6f8d ba3204418fbb0487fd267adc6b8e9f3e45136d48 Hanson <hanson.e@novajii.com> 1738036571 +0100	commit: added menus in account by tier
+ba3204418fbb0487fd267adc6b8e9f3e45136d48 201eba2bd37c66a301769cd9b6e4d169f420ff6f Hanson <hanson.e@novajii.com> 1738043613 +0100	commit: fixed account menu by Tier
+201eba2bd37c66a301769cd9b6e4d169f420ff6f 054bf03fa29fb6d1a88dc0df7fe1d1a73f71ff3c Hanson <hanson.e@novajii.com> 1738117638 +0100	merge main: Fast-forward
+054bf03fa29fb6d1a88dc0df7fe1d1a73f71ff3c d28662d83aefe6ff10615ac5b3349b2383026d30 Hanson <hanson.e@novajii.com> 1738124781 +0100	commit: restructured transaction monitoring menu
+d28662d83aefe6ff10615ac5b3349b2383026d30 82daac75e932eade1d94b34bab37fc97f19942e1 Hanson <hanson.e@novajii.com> 1738130855 +0100	commit: fixing sql panel
+82daac75e932eade1d94b34bab37fc97f19942e1 1f99c923b68215b59098c3441c57069d5548bb4f Hanson <hanson.e@novajii.com> 1738131116 +0100	commit: fixing sql panel
+1f99c923b68215b59098c3441c57069d5548bb4f 6f28451a6452614a60e347e0b9418013802e7f29 Hanson <hanson.e@novajii.com> 1738133403 +0100	commit: fixing sql panel
+6f28451a6452614a60e347e0b9418013802e7f29 63bcafb057084876152d5564b0949d0584fcd7c5 Hanson <hanson.e@novajii.com> 1738136125 +0100	commit: restructuring customer view
+63bcafb057084876152d5564b0949d0584fcd7c5 38795a420d9c57242c1f645acf2d36b46c0c1bb9 Hanson <hanson.e@novajii.com> 1738155428 +0100	commit: fixes
+38795a420d9c57242c1f645acf2d36b46c0c1bb9 2979766b5fcd4cf377712f2be2cdb2b30feef178 Hanson <hanson.e@novajii.com> 1738580052 +0100	commit: add transaction profile function, function for updating branch for customers
+2979766b5fcd4cf377712f2be2cdb2b30feef178 84f24fafce77dde78bf8cefbc42a7048500fcd7f Hanson <hanson.e@novajii.com> 1738580125 +0100	merge main: Merge made by the 'ort' strategy.
+84f24fafce77dde78bf8cefbc42a7048500fcd7f 7c71abf390e385183ee68e7ef0098d8e12cfaa34 Hanson <hanson.e@novajii.com> 1738581791 +0100	merge main: Fast-forward
+7c71abf390e385183ee68e7ef0098d8e12cfaa34 1cffa6d13c3855e7838375683f88f3b422b9382b Hanson <hanson.e@novajii.com> 1738586530 +0100	commit: fix name field in customer form
+1cffa6d13c3855e7838375683f88f3b422b9382b ecde8b66fc9852ab2c9b89b74729e317efba2575 Hanson <hanson.e@novajii.com> 1738634487 +0100	commit: fixed account form
+ecde8b66fc9852ab2c9b89b74729e317efba2575 dfb209c4c0f4f1bbca03907cfd5fcab5bd337c79 Hanson <hanson.e@novajii.com> 1739478341 +0100	merge main: Fast-forward
+dfb209c4c0f4f1bbca03907cfd5fcab5bd337c79 593ded48aab7452e928694fe6591a807c6745b34 Hanson <hanson.e@novajii.com> 1740041100 +0100	merge main: Fast-forward
+593ded48aab7452e928694fe6591a807c6745b34 1d4399819bf3335e3c9916f38759b7294836bf7d Hanson <hanson.e@novajii.com> 1740145859 +0100	commit: restructing Transaction monitoring menu list
+1d4399819bf3335e3c9916f38759b7294836bf7d 86826ee7cadd42787ace234d536aa85cc6417a06 Hanson <hanson.e@novajii.com> 1740178746 +0100	commit: worked on transanction model
+86826ee7cadd42787ace234d536aa85cc6417a06 6e9942c627c7eff986f79f42183049ca8a8b709d Hanson <hanson.e@novajii.com> 1740384080 +0100	commit: fix transaction model
+6e9942c627c7eff986f79f42183049ca8a8b709d b6fa0db3265c033733d7743a744f4b0993af1bc3 Hanson <hanson.e@novajii.com> 1740384285 +0100	merge main: Merge made by the 'ort' strategy.
+b6fa0db3265c033733d7743a744f4b0993af1bc3 a6a930a714ae8eb601022d919b956e8ae898f37b Hanson <hanson.e@novajii.com> 1740521501 +0100	merge main: Fast-forward
+a6a930a714ae8eb601022d919b956e8ae898f37b 1902b5f0858dffe05eae478cb7102724343338c0 Hanson <hanson.e@novajii.com> 1740565732 +0100	merge main: Fast-forward
+1902b5f0858dffe05eae478cb7102724343338c0 132662f8e33d18133d06305b85fba27eb67acb9e Hanson <hanson.e@novajii.com> 1740574892 +0100	commit: iComply ETL module
+132662f8e33d18133d06305b85fba27eb67acb9e 5b4b6745f7b19df630c4a8ccdf8474987a3b8361 Hanson <hanson.e@novajii.com> 1740637364 +0100	commit: added code to branch type
+5b4b6745f7b19df630c4a8ccdf8474987a3b8361 09c01957179254291ba46c5f55c0b96b1c54680b Hanson <hanson.e@novajii.com> 1740637439 +0100	merge main: Merge made by the 'ort' strategy.
+09c01957179254291ba46c5f55c0b96b1c54680b 05a310743375936a5225dc832c874dc73eddaa0a Hanson <hanson.e@novajii.com> 1740638233 +0100	commit: added unique to subbranch
+05a310743375936a5225dc832c874dc73eddaa0a 22be56e09809baec1ec5e6474b4877098bece5fe Hanson <hanson.e@novajii.com> 1740638686 +0100	commit: fix subbranch
+22be56e09809baec1ec5e6474b4877098bece5fe 114bd7935808f0c729165004fd91a1a699dc3f8c Hanson <hanson.e@novajii.com> 1740642892 +0100	commit: change unique key in transaction
+114bd7935808f0c729165004fd91a1a699dc3f8c f455bb8586fd8867ec04717d5fb4d5112619519c Hanson <hanson.e@novajii.com> 1741009764 +0100	merge main: Fast-forward
+f455bb8586fd8867ec04717d5fb4d5112619519c 134bcdb814054fd7350d93d2ce20f53102e5352e Hanson <hanson.e@novajii.com> 1741009948 +0100	commit: added info to config
+134bcdb814054fd7350d93d2ce20f53102e5352e 5f406548a04469b46a8ee48dc710be4a69bca21e Hanson <hanson.e@novajii.com> 1741671444 +0100	merge main: Fast-forward
+5f406548a04469b46a8ee48dc710be4a69bca21e 8df83123581b70ecdc0a1a01e2b0d44ab4f67c55 Hanson <hanson.e@novajii.com> 1741988113 +0100	merge main: Fast-forward
+8df83123581b70ecdc0a1a01e2b0d44ab4f67c55 944540c21f780cc941dcc686fd0075b737cf11ec Hanson <hanson.e@novajii.com> 1742547868 +0100	commit: latest fixes
+944540c21f780cc941dcc686fd0075b737cf11ec cb1d2b1abfb2acc0ad56c3f1db44b85466229f6f Hanson <hanson.e@novajii.com> 1742548674 +0100	commit (merge): latest fixes
+cb1d2b1abfb2acc0ad56c3f1db44b85466229f6f 969a278b46ba2ab187495526463b83cedbcf3872 Hanson <hanson.e@novajii.com> 1745435705 +0100	reset: moving to origin/internal-control-main
