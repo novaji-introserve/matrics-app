@@ -31,24 +31,26 @@
                  <!-- <button name="open_reference_record" string="View Source Record" type="object" 
                         class="oe_highlight float-right" attrs="{'invisible': [('ref_id', '=', False)]}"/> -->
                <sheet>
-                <div class="oe_title">
-                    <!-- <label for="ref_id" class="oe_edit_only" />
-                    <h1>
-                        <field name="ref_id" string="Alert Reference" widget="reference" />
-                    </h1> -->
-                    <label for="case_ref" string="Case Reference" />
-                    <h1>
-                        <!-- <field name="case_ref" string="Alert Reference" widget="reference" /> -->
-                        <!-- <field name="case_ref" string="View Case" widget="url"/> -->
-                        <!-- <field name="case_ref" invisible="1"/>  
-                        <field name="case_ref_display" widget="html" nolabel="1" 
-                            attrs="{'invisible': [('case_ref', '=', False)]}"/> -->
-                            
+                    <div class="oe_title">
+                        
                         <field name="case_ref" invisible="1"/>
-                        <field name="case_ref_display" widget="html" nolabel="1"/>
-                    </h1>           
-                    
-                </div>
+                        
+                        
+                        <div attrs="{'invisible': [('case_ref', '!=', False)]}">
+                            <label for="ref_id" string="Alert Reference" />
+                            <h1>
+                                <field name="ref_id" string="Alert Reference" widget="reference" />
+                            </h1>
+                        </div>
+                        
+                        
+                        <div attrs="{'invisible': [('case_ref', '=', False)]}">
+                            <label for="case_ref_display" string="Case Reference" />
+                            <h1>
+                                <field name="case_ref_display" widget="html" nolabel="1"/>
+                            </h1>
+                        </div>
+                    </div>
                 
         
                 <group string="RELATED INFORMATION">
