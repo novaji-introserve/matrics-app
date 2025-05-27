@@ -342,56 +342,59 @@ class Customer(models.Model):
 
     @api.model
     def cron_run_risk_assessment(self):
-        """
-        Main entry point for risk assessment cron job with protection against
-        concurrent execution.
-        """
-        # Get a timestamp to use as a unique identifier
-        cron_name = "risk_assessment_cron"
-        cron_record = self.env.ref(
-            'compliance_management.ir_cron_run_risk_assessment')
+        customer_counts = self.search_count([])
 
-        # Check if the cron is already running
-        if cron_record.nextcall and fields.Datetime.from_string(cron_record.nextcall) > fields.Datetime.now():
-            _logger.info(
-                "Risk assessment job already running or scheduled, skipping this run")
-            return False
+        if customer_counts <= 200:
+            """
+            Main entry point for risk assessment cron job with protection against
+            concurrent execution.
+            """
+            # Get a timestamp to use as a unique identifier
+            cron_name = "risk_assessment_cron"
+            cron_record = self.env.ref(
+                'compliance_management.ir_cron_run_risk_assessment')
 
-        try:
-            # Set the nextcall far in the future to prevent new runs starting
-
-            # cron_record.write({
-            #     'nextcall': fields.Datetime.now() + timedelta(hours=24)
-            # })
-            # self.env.cr.commit()
-
-            _logger.info("Starting scheduled risk assessment process")
-            results = {'sanction_status': {}, 'risk_scores': 0}
+            # Check if the cron is already running
+            if cron_record.nextcall and fields.Datetime.from_string(cron_record.nextcall) > fields.Datetime.now():
+                _logger.info(
+                    "Risk assessment job already running or scheduled, skipping this run")
+                return False
 
             try:
-                results['sanction_status'] = self.update_sanction_status()
-                _logger.info("Sanction status update completed successfully")
-            except Exception as e:
-                _logger.error(
-                    f"Error in update_sanction_status: {str(e)}", exc_info=True)
+                # Set the nextcall far in the future to prevent new runs starting
 
-            try:
-                results['risk_scores'] = self.compute_risk_score_for_all_users()
-                _logger.info("Risk score computation completed successfully")
-            except Exception as e:
-                _logger.error(
-                    f"Error in compute_risk_score_for_all_users: {str(e)}", exc_info=True)
+                # cron_record.write({
+                #     'nextcall': fields.Datetime.now() + timedelta(hours=24)
+                # })
+                # self.env.cr.commit()
 
-            _logger.info(f"Completed full risk assessment process: {results}")
-            return results
+                _logger.info("Starting scheduled risk assessment process")
+                results = {'sanction_status': {}, 'risk_scores': 0}
 
-        finally:
-            # Reset the nextcall to 5 minutes from now
-            next_run = fields.Datetime.now() + timedelta(minutes=5)
-            cron_record.write({
-                'nextcall': next_run
-            })
-            self.env.cr.commit()
+                try:
+                    results['sanction_status'] = self.update_sanction_status()
+                    _logger.info("Sanction status update completed successfully")
+                except Exception as e:
+                    _logger.error(
+                        f"Error in update_sanction_status: {str(e)}", exc_info=True)
+
+                try:
+                    results['risk_scores'] = self.compute_risk_score_for_all_users()
+                    _logger.info("Risk score computation completed successfully")
+                except Exception as e:
+                    _logger.error(
+                        f"Error in compute_risk_score_for_all_users: {str(e)}", exc_info=True)
+
+                _logger.info(f"Completed full risk assessment process: {results}")
+                return results
+
+            finally:
+                # Reset the nextcall to 5 minutes from now
+                next_run = fields.Datetime.now() + timedelta(minutes=5)
+                cron_record.write({
+                    'nextcall': next_run
+                })
+                self.env.cr.commit()
 
     def update_sanction_status(self):
         _logger.info("Starting PEP status check using Odoo ORM for tracking.")
@@ -609,6 +612,8 @@ class Customer(models.Model):
             FOR EACH ROW
             EXECUTE FUNCTION set_partner_defaults_after_func();
         """)
+
+        self.cron_run_risk_assessment()
 
     @api.model_create_multi
     def create(self, vals_list):
