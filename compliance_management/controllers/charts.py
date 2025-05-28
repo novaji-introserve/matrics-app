@@ -34,15 +34,16 @@ class DynamicChartController(http.Controller):
 
         from ..services.branch_security import ChartSecurityService
 
-        from ..utils.cache_key_unique_identifier import generate_cache_key
+        # from ..utils.cache_key_unique_identifier import generate_cache_key
+        from ..utils.cache_key_unique_identifier import get_unique_client_identifier, normalize_cache_key_components\
 
         
 
         self.security_service = ChartSecurityService()
 
-        self.generate_cache_key = generate_cache_key
-
-        
+        # self.generate_cache_key = generate_cache_key
+        self.get_unique_client_identifier = get_unique_client_identifier
+        self.normalize_cache_key_components = normalize_cache_key_components
 
         # Enable debug logging for chart issues
 
@@ -51,208 +52,118 @@ class DynamicChartController(http.Controller):
         
 
     @http.route('/web/dynamic_charts/preview', type='json', auth='user')
-
     def preview_chart(self, chart_type, query, x_axis_field=None, y_axis_field=None, color_scheme='default'):
-
         """Preview chart without saving - with query safety checks and security"""
-
         try:
-
             chart_data_service = ChartDataService()
-
             # Apply query limit for safety
-
             if not chart_data_service._is_safe_query(query):
-
                 return {'error': 'Query contains unsafe operations'}
-
                 
-
             # Create a temporary chart for preview
-
             chart = request.env['res.dashboard.charts'].new({
-
                 'chart_type': chart_type,
-
                 'query': query,
-
                 'x_axis_field': x_axis_field,
-
                 'y_axis_field': y_axis_field,
-
                 'color_scheme': color_scheme,
-
                 # Add default branch field for security
-
                 'branch_field': 'branch_id',
-
                 'branch_filter': True,
-
                 'date_field': 'create_date'  # Default date field
-
             })
-
             
-
             # Run validation manually since it's a new record
-
             if hasattr(chart, '_check_query_safety'):
-
                 chart._check_query_safety()
-
             
-
+            # Check if user is CO or CCO to bypass branch restrictions
+            cco = self.security_service.is_cco_user() or self.security_service.is_co_user()
+            
             # Apply security filters to the query
-
-            secured_query = self.security_service.secure_chart_query(chart, False, [])
-
+            secured_query = self.security_service.secure_chart_query(chart, cco, [])
             
-
             # Process query in isolated transaction
-
             with request.env.registry.cursor() as new_cr:
-
                 # Execute with timeout
-
                 new_cr.execute("SET LOCAL statement_timeout = 10000;")  # 10 seconds
-
                 
-
                 start_time = time.time()
-
                 new_cr.execute(secured_query)
-
                 execution_time = (time.time() - start_time) * 1000  # Convert to milliseconds
-
                 
-
                 results = new_cr.dictfetchall()
-
                 
-
                 chart_data_service = ChartDataService()
-
                 # Extract chart data
-
                 chart_data = chart_data_service._extract_chart_data(chart, results, secured_query)
-
                 
-
                 # Add execution time info
-
                 chart_data['execution_time_ms'] = round(execution_time, 2)
-
                 
-
                 return chart_data
-
                 
-
         except Exception as e:
-
             _logger.error(f"Error in preview_chart: {e}")
-
             return {'error': str(e)}
 
     
 
     @http.route('/dashboard/dynamic_chart_page/', type='json', auth='user')
-
     def get_chart_page(self, chart_id, page=0, page_size=50, cco=False, branches_id=None, **kw):
-
         """Get paginated chart data for a single chart with robust error handling"""
-
         if branches_id is None:
-
             branches_id = []
-
         
-
         # Validate inputs
-
         try:
-
             chart_id = int(chart_id)
-
             page = max(0, int(page))
-
             page_size = min(100, max(1, int(page_size)))
-
         except (ValueError, TypeError):
-
             return {'error': 'Invalid parameters'}
-
         
-
         # Normalize cco parameter
-
         if not isinstance(cco, bool):
-
             cco = str(cco).lower() == 'true'
-
         
-
+        # Check if user is CO, allow them to bypass branch restrictions too
+        if self.security_service.is_co_user():
+            cco = True
+        
         # Normalize branches_id parameter
-
         if not isinstance(branches_id, list):
-
             try:
-
                 branches_id = json.loads(branches_id) if branches_id else []
-
             except (ValueError, TypeError):
-
                 branches_id = []
-
         
-
         # Get current user ID
-
         user_id = request.env.user.id
-
         datepicked = kw.get('datepicked', 20000)
-
         
-
         # Generate cache key
-
         cache_params = {
-
             'chart_id': chart_id,
-
             'page': page,
-
             'page_size': page_size,
-
             'cco': cco,
-
             'branches_id': branches_id,
-
             'datepicked': datepicked,
-
-            'user_branches': self.security_service.get_user_branch_ids()
-
+            # 'user_branches': self.security_service.get_user_branch_ids(),
+            # 'is_co': self.security_service.is_co_user()
         }
-
         
-
         cache_key = self.generate_cache_key('chart_page', cache_params)
-
         
-
         # Check cache first
-
         cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
-
         if cache_data:
-
             return cache_data
-
         
-
         # Use the robust retry handler
-
         return self.get_chart_with_retries(chart_id, page, page_size, cco, branches_id, cache_key, user_id)
+
 
 
 
@@ -1134,7 +1045,7 @@ class DynamicChartController(http.Controller):
 
     @http.route('/dashboard/dynamic_charts/', type='json', auth='user')
     def get_chart_data(self, cco=False, branches_id=None, **kw):
-        """Get chart data in JSON format for all charts with improved branch handling"""
+        """Get chart data in JSON format for all charts with strict branch security"""
         try:
             # Input validation and sanitization
             if not isinstance(cco, bool):
@@ -1145,30 +1056,60 @@ class DynamicChartController(http.Controller):
                     branches_id = json.loads(branches_id) if branches_id else []
                 except (ValueError, TypeError):
                     branches_id = []
-                
-            # Get current user ID
-            try:
-                user_id = request.env.user.id
-            except (NameError, AttributeError):
-                user_id = self.env.user.id if hasattr(self, 'env') else None
-                if not user_id:
-                    _logger.warning("Could not determine user_id in get_chart_data")
-                    return []
             
+            # Ensure branches_id contains only integers
+            if branches_id:
+                branches_id = [int(b) for b in branches_id if str(b).isdigit()]
+            
+            # Get current user ID
+            user_id = request.env.user.id
             datepicked = kw.get('datepicked', 20000)
             
-            # Log parameters for debugging
-            _logger.info(f"Chart data requested - cco={cco}, branches_id={branches_id}, user_id={user_id}")
-        
-            # Generate cache key that includes user branch context for security
-            cache_params = {
-                'cco': cco,
-                'branches_id': branches_id,
-                'datepicked': datepicked,
-                'user_branches': self.security_service.get_user_branch_ids()
-            }
+            # SECURITY: Verify CCO parameter matches actual user permissions
+            actual_is_cco = self.security_service.is_cco_user()
+            actual_is_co = self.security_service.is_co_user()
             
-            cache_key = self.generate_cache_key('charts_data', cache_params)
+            # If user is CO but not CCO, allow them to see everything too
+            if actual_is_co:
+                _logger.info(f"CO user {user_id} accessing charts")
+                # We'll set cco=True to bypass branch security, but log it appropriately
+                cco = False
+            elif not actual_is_cco and cco:
+                _logger.warning(f"Non-CCO/CO user {user_id} attempted to use CCO parameter")
+                cco = False  # Force to False for security
+            
+            # Log parameters for debugging
+            _logger.info(f"Chart data requested - cco={cco}, branches_id={branches_id}, user_id={user_id}, actual_is_cco={actual_is_cco}, actual_is_co={actual_is_co}")
+
+            unique_id = self.get_unique_client_identifier()
+            
+            # branches_str = json.dumps(branches_id)
+            # Generate consistent cache key components
+            cco_str, branches_str, datepicked_str, unique_id = self.normalize_cache_key_components(
+                cco, branches_id, datepicked, unique_id
+            )
+            
+            # Generate cache key
+            cache_key = f"charts_data_{cco_str}_{branches_str}_{datepicked_str}_{unique_id}"
+        
+            
+            # Generate cache key that includes CCO/CO status
+            # cache_key = f"charts_data_{str(cco).lower()}_{branches_str}_{datepicked}_{unique_id}"
+
+            
+            _logger.info(f"This is the charts cache key: {cache_key}")
+            # Generate cache key that includes user branch context for security
+            # cache_params = {
+            #     'cco': cco,
+            #     'branches_id': branches_id,
+            #     'datepicked': datepicked,
+            #     'unique_id': unique_id,
+            #     # 'user_branches': self.security_service.get_user_branch_ids(),
+            #     # 'actual_is_cco': actual_is_cco,
+            #     # 'actual_is_co': actual_is_co
+            # }
+            
+            # cache_key = ('charts_data', cache_params)
             
             # Check if we have valid cache for this user
             cache_data = request.env['res.dashboard.cache'].get_cache(cache_key, user_id)
@@ -1182,7 +1123,6 @@ class DynamicChartController(http.Controller):
             results = []
             for chart in charts:
                 try:
-                    # IMPORTANT: Don't skip charts here - let the query handle filtering
                     _logger.info(f"Processing chart {chart.id}: {chart.name}")
                     
                     # Process chart with materialized view or direct query
@@ -1376,7 +1316,7 @@ class DynamicChartController(http.Controller):
 
 
     def _get_chart_data_from_materialized_view(self, chart, cco, branches_id):
-        """Get chart data from materialized view with intelligent branch handling"""
+        """Get chart data from materialized view with strict branch security enforcement"""
         try:
             view_name = f"dashboard_chart_view_{chart.id}"
             
@@ -1413,81 +1353,87 @@ class DynamicChartController(http.Controller):
                 if not columns:
                     return self._get_chart_data_from_direct_query(chart, cco, branches_id)
                 
-                # Find branch column dynamically
-                branch_col = None
-                if chart.branch_field and chart.branch_filter:
-                    branch_col = self._find_branch_column_in_view(columns, chart.branch_field)
-                    _logger.info(f"Chart {chart.id} branch field: {chart.branch_field}, found column: {branch_col}")
-                    
-                    # CRITICAL: Check if user's branches exist in the materialized view
-                    if branch_col:
-                        try:
-                            # Get all available branch IDs from the view
-                            cr.execute(f"SELECT DISTINCT {branch_col} FROM {view_name} ORDER BY {branch_col}")
-                            available_branch_ids = [row[0] for row in cr.fetchall()]
-                            _logger.info(f"Available branch IDs in view: {available_branch_ids}")
-                            
-                            # Get user's branches
-                            user_branches = self.security_service.get_user_branch_ids() if not cco else []
-                            _logger.info(f"User branches: {user_branches}")
-                            
-                            # Check if ANY user branches exist in the materialized view
-                            if user_branches and not cco:
-                                effective_branches = []
-                                if branches_id:
-                                    # UI filter: intersect requested branches with user's branches
-                                    effective_branches = [b for b in branches_id if b in user_branches]
-                                else:
-                                    # No UI filter: use all user's branches
-                                    effective_branches = user_branches
-                                
-                                _logger.info(f"Effective branches for filtering: {effective_branches}")
-                                
-                                # Check if any effective branches exist in the view data
-                                matching_branches = [b for b in effective_branches if b in available_branch_ids]
-                                _logger.info(f"Branches that exist in view data: {matching_branches}")
-                                
-                                # CRITICAL DECISION: If no user branches exist in the view, fall back to direct query
-                                if not matching_branches and effective_branches:
-                                    _logger.warning(f"NONE of user's branches {effective_branches} exist in materialized view data {available_branch_ids}")
-                                    _logger.warning(f"This is likely due to LIMIT clause in original query excluding user's branches")
-                                    _logger.warning(f"Falling back to direct query to get user-specific data")
-                                    return self._get_chart_data_from_direct_query(chart, cco, branches_id)
-                            
-                        except Exception as e:
-                            _logger.error(f"Error checking branch availability: {e}")
-                            # If we can't check, fall back to direct query to be safe
-                            return self._get_chart_data_from_direct_query(chart, cco, branches_id)
-                
-                # Build query for materialized view
-                query = f"SELECT * FROM {view_name}"
-                
-                # Apply branch filtering for non-CCO users
-                if chart.branch_filter and not cco and not self.security_service.is_cco_user():
+                # CRITICAL SECURITY CHECK - Always enforce branch security for non-CCO/CO users
+                if not cco and not self.security_service.is_cco_user() and not self.security_service.is_co_user():
+                    # Get user's accessible branches
                     user_branches = self.security_service.get_user_branch_ids()
                     
+                    # Determine effective branches to filter by
                     effective_branches = []
-                    if branches_id:
-                        # UI filter: intersect with user's branches
+                    
+                    if branches_id and isinstance(branches_id, list) and len(branches_id) > 0:
+                        # UI filter specified - intersect with user's branches
                         if user_branches:
+                            # User has branch restrictions - only allow branches they have access to
                             effective_branches = [b for b in branches_id if b in user_branches]
+                            _logger.info(f"UI branches {branches_id} intersected with user branches {user_branches} = {effective_branches}")
                         else:
+                            # User has no specific branch restrictions (but is not CCO)
+                            # This might be a special user - use UI filter
                             effective_branches = branches_id
                     elif user_branches:
-                        # No UI filter: use user's branches
+                        # No UI filter - use all user's accessible branches
                         effective_branches = user_branches
+                        _logger.info(f"No UI filter, using user branches: {effective_branches}")
+                    else:
+                        # Non-CCO/CO user with no branches - should see no data
+                        _logger.warning(f"Non-CCO/CO user with no branch access attempting to view chart {chart.id}")
+                        return {
+                            'id': chart.id,
+                            'title': chart.name,
+                            'type': chart.chart_type,
+                            'labels': [],
+                            'datasets': [{'data': [], 'backgroundColor': []}],
+                            'error': 'No branch access'
+                        }
                     
-                    _logger.info(f"Final effective branches for query: {effective_branches}")
+                    # SECURITY ENFORCEMENT: If no effective branches, return empty data
+                    if not effective_branches:
+                        _logger.warning(f"No effective branches for user on chart {chart.id}")
+                        return {
+                            'id': chart.id,
+                            'title': chart.name,
+                            'type': chart.chart_type,
+                            'labels': [],
+                            'datasets': [{'data': [], 'backgroundColor': []}]
+                        }
                     
-                    # Apply filter only if we have a branch column and branches
-                    if branch_col and effective_branches:
+                    # Find branch column dynamically
+                    branch_col = None
+                    if chart.branch_field and chart.branch_filter:
+                        branch_col = self._find_branch_column_in_view(columns, chart.branch_field)
+                        _logger.info(f"Chart {chart.id} branch field: {chart.branch_field}, found column: {branch_col}")
+                    
+                    # If no branch column found but branch filtering is enabled, use direct query for safety
+                    if chart.branch_filter and not branch_col:
+                        _logger.warning(f"Branch filtering enabled but no branch column found in view for chart {chart.id}")
+                        return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                    
+                    # Build secure query with branch filtering
+                    query = f"SELECT * FROM {view_name}"
+                    
+                    # ALWAYS apply branch filter for non-CCO/CO users when branch column exists
+                    if branch_col:
                         if len(effective_branches) == 1:
                             query += f" WHERE {branch_col} = {effective_branches[0]}"
                         else:
                             query += f" WHERE {branch_col} IN {tuple(effective_branches)}"
-                    elif branch_col and not effective_branches:
-                        # No branches for user, return empty
-                        query += " WHERE 1=0"
+                        
+                        _logger.info(f"Applying branch security filter: {effective_branches}")
+                    
+                else:
+                    # CCO or CO user - build query without branch filter but may apply UI filter
+                    query = f"SELECT * FROM {view_name}"
+                    
+                    # Even for CCO/CO, respect UI branch filter if provided
+                    if branches_id and isinstance(branches_id, list) and len(branches_id) > 0:
+                        branch_col = self._find_branch_column_in_view(columns, chart.branch_field) if chart.branch_field else None
+                        if branch_col:
+                            if len(branches_id) == 1:
+                                query += f" WHERE {branch_col} = {branches_id[0]}"
+                            else:
+                                query += f" WHERE {branch_col} IN {tuple(branches_id)}"
+                            _logger.info(f"CCO/CO with UI filter: {branches_id}")
                 
                 # Add sorting dynamically
                 sort_col = self._find_sort_column_in_view(columns, chart.y_axis_field)
@@ -1496,22 +1442,177 @@ class DynamicChartController(http.Controller):
                 
                 query += " LIMIT 100"
                 
-                _logger.info(f"Executing materialized view query for chart {chart.id}: {query}")
+                _logger.info(f"Executing secure materialized view query for chart {chart.id}: {query}")
                 
-                # Execute query
-                cr.execute("SET LOCAL statement_timeout = 30000")
+                # Execute query with timeout protection
+                cr.execute("SET LOCAL statement_timeout = 30000")  # 30 seconds
                 cr.execute(query)
                 results = cr.dictfetchall()
                 
                 _logger.info(f"Materialized view query returned {len(results)} rows for chart {chart.id}")
                 
-                # Process results
+                # Final security check - ensure no data leakage
+                if not cco and not self.security_service.is_cco_user() and not self.security_service.is_co_user() and results:
+                    # Verify all results are within allowed branches
+                    if branch_col and effective_branches:
+                        filtered_results = []
+                        for row in results:
+                            if branch_col in row and row[branch_col] in effective_branches:
+                                filtered_results.append(row)
+                            else:
+                                _logger.error(f"Security violation: Row with branch {row.get(branch_col)} found for user with branches {effective_branches}")
+                        
+                        if len(filtered_results) != len(results):
+                            _logger.error(f"Security filter removed {len(results) - len(filtered_results)} unauthorized rows")
+                        
+                        results = filtered_results
+                
+                # Process and return results
                 chart_data_service = ChartDataService()
                 return chart_data_service._extract_chart_data(chart, results, query)
                 
         except Exception as e:
             _logger.error(f"Error getting chart from materialized view: {e}")
             return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+    
+    
+    # def _get_chart_data_from_materialized_view(self, chart, cco, branches_id):
+    #     """Get chart data from materialized view with intelligent branch handling"""
+    #     try:
+    #         view_name = f"dashboard_chart_view_{chart.id}"
+            
+    #         # Create a dedicated cursor with appropriate transaction isolation
+    #         with request.env.registry.cursor() as cr:
+    #             cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
+                
+    #             # Check if view exists first
+    #             cr.execute("""
+    #                 SELECT EXISTS (
+    #                     SELECT FROM pg_catalog.pg_class c
+    #                     WHERE c.relname = %s AND c.relkind = 'm'
+    #                 )
+    #             """, (view_name,))
+                
+    #             view_exists = cr.fetchone()[0]
+                
+    #             if not view_exists:
+    #                 _logger.warning(f"Materialized view {view_name} does not exist!")
+    #                 success = request.env['dashboard.chart.view.refresher'].sudo().create_materialized_view_for_chart(chart.id)
+    #                 if not success:
+    #                     return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                
+    #             # Get columns from the view
+    #             cr.execute(f"SELECT * FROM {view_name} LIMIT 0")
+    #             columns = [desc[0] for desc in cr.description]
+                
+    #             if not columns:
+    #                 cr.execute(f"SELECT * FROM {view_name} LIMIT 1")
+    #                 columns = [desc[0] for desc in cr.description]
+                
+    #             _logger.info(f"View {view_name} columns: {columns}")
+                
+    #             if not columns:
+    #                 return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                
+    #             # Find branch column dynamically
+    #             branch_col = None
+    #             if chart.branch_field and chart.branch_filter:
+    #                 branch_col = self._find_branch_column_in_view(columns, chart.branch_field)
+    #                 _logger.info(f"Chart {chart.id} branch field: {chart.branch_field}, found column: {branch_col}")
+                    
+    #                 # CRITICAL: Check if user's branches exist in the materialized view
+    #                 if branch_col:
+    #                     try:
+    #                         # Get all available branch IDs from the view
+    #                         cr.execute(f"SELECT DISTINCT {branch_col} FROM {view_name} ORDER BY {branch_col}")
+    #                         available_branch_ids = [row[0] for row in cr.fetchall()]
+    #                         _logger.info(f"Available branch IDs in view: {available_branch_ids}")
+                            
+    #                         # Get user's branches
+    #                         user_branches = self.security_service.get_user_branch_ids() if not cco else []
+    #                         _logger.info(f"User branches: {user_branches}")
+                            
+    #                         # Check if ANY user branches exist in the materialized view
+    #                         if user_branches and not cco:
+    #                             effective_branches = []
+    #                             if branches_id:
+    #                                 # UI filter: intersect requested branches with user's branches
+    #                                 effective_branches = [b for b in branches_id if b in user_branches]
+    #                             else:
+    #                                 # No UI filter: use all user's branches
+    #                                 effective_branches = user_branches
+                                
+    #                             _logger.info(f"Effective branches for filtering: {effective_branches}")
+                                
+    #                             # Check if any effective branches exist in the view data
+    #                             matching_branches = [b for b in effective_branches if b in available_branch_ids]
+    #                             _logger.info(f"Branches that exist in view data: {matching_branches}")
+                                
+    #                             # CRITICAL DECISION: If no user branches exist in the view, fall back to direct query
+    #                             if not matching_branches and effective_branches:
+    #                                 _logger.warning(f"NONE of user's branches {effective_branches} exist in materialized view data {available_branch_ids}")
+    #                                 _logger.warning(f"This is likely due to LIMIT clause in original query excluding user's branches")
+    #                                 _logger.warning(f"Falling back to direct query to get user-specific data")
+    #                                 return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                            
+    #                     except Exception as e:
+    #                         _logger.error(f"Error checking branch availability: {e}")
+    #                         # If we can't check, fall back to direct query to be safe
+    #                         return self._get_chart_data_from_direct_query(chart, cco, branches_id)
+                
+    #             # Build query for materialized view
+    #             query = f"SELECT * FROM {view_name}"
+                
+    #             # Apply branch filtering for non-CCO users
+    #             if chart.branch_filter and not cco and not self.security_service.is_cco_user():
+    #                 user_branches = self.security_service.get_user_branch_ids()
+                    
+    #                 effective_branches = []
+    #                 if branches_id:
+    #                     # UI filter: intersect with user's branches
+    #                     if user_branches:
+    #                         effective_branches = [b for b in branches_id if b in user_branches]
+    #                     else:
+    #                         effective_branches = branches_id
+    #                 elif user_branches:
+    #                     # No UI filter: use user's branches
+    #                     effective_branches = user_branches
+                    
+    #                 _logger.info(f"Final effective branches for query: {effective_branches}")
+                    
+    #                 # Apply filter only if we have a branch column and branches
+    #                 if branch_col and effective_branches:
+    #                     if len(effective_branches) == 1:
+    #                         query += f" WHERE {branch_col} = {effective_branches[0]}"
+    #                     else:
+    #                         query += f" WHERE {branch_col} IN {tuple(effective_branches)}"
+    #                 elif branch_col and not effective_branches:
+    #                     # No branches for user, return empty
+    #                     query += " WHERE 1=0"
+                
+    #             # Add sorting dynamically
+    #             sort_col = self._find_sort_column_in_view(columns, chart.y_axis_field)
+    #             if sort_col:
+    #                 query += f" ORDER BY {sort_col} DESC"
+                
+    #             query += " LIMIT 100"
+                
+    #             _logger.info(f"Executing materialized view query for chart {chart.id}: {query}")
+                
+    #             # Execute query
+    #             cr.execute("SET LOCAL statement_timeout = 30000")
+    #             cr.execute(query)
+    #             results = cr.dictfetchall()
+                
+    #             _logger.info(f"Materialized view query returned {len(results)} rows for chart {chart.id}")
+                
+    #             # Process results
+    #             chart_data_service = ChartDataService()
+    #             return chart_data_service._extract_chart_data(chart, results, query)
+                
+    #     except Exception as e:
+    #         _logger.error(f"Error getting chart from materialized view: {e}")
+    #         return self._get_chart_data_from_direct_query(chart, cco, branches_id)
 
     def _find_branch_column_in_view(self, columns, preferred_field=None):
         """
@@ -1936,6 +2037,10 @@ class DynamicChartController(http.Controller):
     def _get_chart_data_from_direct_query(self, chart, cco, branches_id):
         """Get chart data directly from the database with proper branch handling"""
         try:
+            # If user is CO, ensure cco flag is set for proper access
+            if self.security_service.is_co_user():
+                cco = True
+                
             # Get the secured query
             secured_query = self.security_service.secure_chart_query(chart, cco, branches_id)
             
@@ -1983,7 +2088,6 @@ class DynamicChartController(http.Controller):
                 'labels': [],
                 'datasets': [{'data': [], 'backgroundColor': []}]
             }
-
             
 
     def _auto_enable_materialized_view(self, chart_id):

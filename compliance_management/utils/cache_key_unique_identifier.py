@@ -48,6 +48,27 @@ def generate_cache_key(prefix, params):
         # Fallback to a basic key with timestamp to prevent cache collision
         import time
         return f"{prefix}_fallback_{int(time.time())}"
+    
+def normalize_cache_key_components(cco, branches_id, datepicked, unique_id):
+    """
+    Create normalized components for cache keys to ensure client/server consistency
+    """
+    # Boolean normalization - ensure lowercase string
+    cco_str = str(cco).lower()
+    
+    # Branch normalization - convert to sorted tuple string with spaces
+    if isinstance(branches_id, list) and branches_id:
+        # Sort the branches for consistency
+        sorted_branches = sorted(int(b) for b in branches_id if str(b).isdigit())
+        # Format with spaces between elements
+        branches_str = str(sorted_branches).replace(',', ', ')
+    else:
+        branches_str = "[]"
+    
+    # Ensure datepicked is a string
+    datepicked_str = str(datepicked)
+    
+    return cco_str, branches_str, datepicked_str, unique_id
 
 
 # from odoo import http

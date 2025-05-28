@@ -54,10 +54,20 @@ class ChartSecurityService:
         
         # Check if user belongs to CCO group
         return any(group.name.lower() == 'chief compliance officer' for group in user.groups_id)
-    
+
+    @staticmethod
+    def is_co_user():
+        """Check if current user is a Compliance Officer"""
+        if not request or not request.env:
+            return False
+            
+        user = request.env.user
+        
+        return any(group.name.lower() == 'compliance officer' for group in user.groups_id)
+
     # @staticmethod
     # def apply_branch_security_filter(query, branch_field, cco=False, branches_id=None):
-    #     """Apply branch security filter to query based on user access"""
+    #     """Apply branch security filter to query with improved subquery handling"""
     #     if not query or not branch_field:
     #         return query
                 
@@ -71,8 +81,12 @@ class ChartSecurityService:
     #     # If user has no branch restrictions, only apply filters passed from UI
     #     if not user_branches:
     #         if branches_id and len(branches_id) > 0:
-    #             # Apply branch filter specified in the UI parameters
-    #             return ChartSecurityService._add_branch_filter_to_query(query, branch_field, branches_id)
+    #             # Check for subqueries to determine approach
+    #             has_subqueries = '(' in query and 'SELECT' in query.upper() and 'FROM' in query.upper()
+    #             if has_subqueries:
+    #                 return ChartSecurityService._apply_branch_filter_with_laterals(query, branch_field, branches_id)
+    #             else:
+    #                 return ChartSecurityService._add_branch_filter_to_query(query, branch_field, branches_id)
     #         return query
         
     #     # User has branch restrictions, ensure only authorized branches are accessible
@@ -92,54 +106,52 @@ class ChartSecurityService:
     #         return ChartSecurityService._add_condition_to_query(query, "1 = 0")
         
     #     # Apply branch filter with effective branches
-    #     return ChartSecurityService._add_branch_filter_to_query(query, branch_field, effective_branches)
+    #     has_subqueries = '(' in query and 'SELECT' in query.upper() and 'FROM' in query.upper()
+    #     if has_subqueries:
+    #         return ChartSecurityService._apply_branch_filter_with_laterals(query, branch_field, effective_branches)
+    #     else:
+    #         return ChartSecurityService._add_branch_filter_to_query(query, branch_field, effective_branches)
     
     @staticmethod
-    def apply_branch_security_filter(query, branch_field, cco=False, branches_id=None):
-        """Apply branch security filter to query with improved subquery handling"""
+    def apply_branch_security_filter(self, query, branch_field, cco=False, branches_id=None):
+        """Apply branch security filter using only configuration, no hardcoding"""
         if not query or not branch_field:
             return query
                 
-        # If CCO, no filtering needed
-        if cco or ChartSecurityService.is_cco_user():
+        # Skip filtering for CCO or CO users
+        if cco or self.is_cco_user() or self.is_co_user():
             return query
                 
         # Get user's accessible branches
-        user_branches = ChartSecurityService.get_user_branch_ids()
+        user_branches = self.get_user_branch_ids()
+        
+        _logger.info(f"Applying branch security filter with field: {branch_field}")
+        _logger.info(f"User branches: {user_branches}, UI branches: {branches_id}")
         
         # If user has no branch restrictions, only apply filters passed from UI
         if not user_branches:
             if branches_id and len(branches_id) > 0:
-                # Check for subqueries to determine approach
-                has_subqueries = '(' in query and 'SELECT' in query.upper() and 'FROM' in query.upper()
-                if has_subqueries:
-                    return ChartSecurityService._apply_branch_filter_with_laterals(query, branch_field, branches_id)
-                else:
-                    return ChartSecurityService._add_branch_filter_to_query(query, branch_field, branches_id)
+                return self._add_branch_filter_to_query(query, branch_field, branches_id)
             return query
         
-        # User has branch restrictions, ensure only authorized branches are accessible
+        # User has branch restrictions, determine effective branches
         effective_branches = []
         
         if branches_id and len(branches_id) > 0:
-            # If branches specified in UI, only use those that user can access
-            for branch_id in branches_id:
-                if branch_id in user_branches:
-                    effective_branches.append(branch_id)
+            # If branches specified in UI, intersect with user's branches
+            effective_branches = [b for b in branches_id if b in user_branches]
         else:
-            # Otherwise use all branches user has access to
+            # Otherwise use all user's accessible branches
             effective_branches = user_branches
         
-        # If no effective branches (intersection is empty), return empty result query
+        _logger.info(f"Effective branches: {effective_branches}")
+        
+        # If no effective branches, return empty result
         if not effective_branches:
-            return ChartSecurityService._add_condition_to_query(query, "1 = 0")
+            return self._add_condition_to_query(query, "1 = 0")
         
         # Apply branch filter with effective branches
-        has_subqueries = '(' in query and 'SELECT' in query.upper() and 'FROM' in query.upper()
-        if has_subqueries:
-            return ChartSecurityService._apply_branch_filter_with_laterals(query, branch_field, effective_branches)
-        else:
-            return ChartSecurityService._add_branch_filter_to_query(query, branch_field, effective_branches)
+        return self._add_branch_filter_to_query(query, branch_field, effective_branches)
     
     @staticmethod
     def _add_branch_filter_to_query(query, branch_field, branches_id):
