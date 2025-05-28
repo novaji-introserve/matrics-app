@@ -10,12 +10,17 @@
         <menuitem id="menu_case_mgt" name="Case Management" sequence="10"
                   web_icon="case_management,static/description/icon.png"/>
 
-        <menuitem id="menu_case_dashboard" name="Case Management"
-                  parent="menu_case_mgt" sequence="10"
-                  action="action_owl_case_dashboard" />
+        <menuitem id="case_dashboard" name="Dashboard" sequence="5"
+                parent="menu_case_mgt"  action="action_owl_case_dashboard" />
 
-        <menuitem id="menu_case" name="Cases"
-                  parent="menu_case_mgt" sequence="11" />
+        <!-- <menuitem id="menu_case_dashboard" name="Case"
+                  parent="menu_case_mgt" sequence="10"
+                  action="action_owl_case_dashboard" /> -->
+        <menuitem id="menu_case_dashboard" name="Case"
+                  parent="menu_case_mgt" sequence="10" />
+
+        <!-- <menuitem id="menu_case" name="Cases"
+                  parent="menu_case_mgt" sequence="11" /> -->
 
         <menuitem id="new_case" name="New Case"
                   parent="menu_case_dashboard" sequence="12"
