@@ -525,8 +525,6 @@ class Customer(models.Model):
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)") 
                
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx ON customer_digital_product (id)")
     
         # Create the trigger
         self.env.cr.execute("""
@@ -1332,8 +1330,22 @@ class CustomerDigitalProduct(models.Model):
     
     def init(self):
         # Drop the trigger if it exists
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx ON customer_digital_product (id)")
+        self.env.cr.execute("""
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.tables
+            WHERE table_name = 'customer_digital_product'
+        )
+    """)
+        table_exists = self.env.cr.fetchone()[0]
+
+        if table_exists:
+            # Create the index if it doesn't exist
+            self.env.cr.execute("""
+                CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx
+                ON customer_digital_product (id)
+            """)
+       
 
     
 

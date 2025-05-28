@@ -601,8 +601,8 @@ class CustomerEDD(models.Model):
             try:
                 value = float(record.risk_score)
                 # Cap the value at 25
-                if value > 25:
-                    record.risk_score = 25.0
+                if value > 9:
+                    record.risk_score = 9.0
                 # Ensure it's not below minimum
                 elif value < 0.5:
                     record.risk_score = 0.5
