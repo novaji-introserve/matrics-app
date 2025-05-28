@@ -13,10 +13,8 @@ class RequestContextManager:
         self.local = None
     
     def __enter__(self):
-        # Store original thread-local storage
         self.local = threading.current_thread().__dict__.get('werkzeug.local', None)
         
-        # Create a new local for this thread
         local = Local()
         threading.current_thread().__dict__['werkzeug.local'] = local
         
@@ -32,15 +30,12 @@ class RequestContextManager:
             'base_url': 'http://localhost',
         })()
         
-        # Attach the request to the thread-local storage
         local.request = request
         self.request = request
         
-        # Return the mock request
         return request
     
     def __exit__(self, exc_type, exc_val, exc_tb):
-        # Restore original thread-local storage
         if self.local is None:
             threading.current_thread().__dict__.pop('werkzeug.local', None)
         else:

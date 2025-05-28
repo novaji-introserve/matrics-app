@@ -19,7 +19,6 @@ def get_client_ip(request=None):
     if not request:
         request = http.request
     
-    # Try headers first
     for header in ['X-Forwarded-For', 'X-Real-IP', 'CF-Connecting-IP']:
         if request.httprequest.headers.get(header):
             ip = request.httprequest.headers.get(header).split(',')[0].strip()
