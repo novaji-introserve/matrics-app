@@ -11,7 +11,7 @@
                                 <div class="d-flex align-items-center justify-content-between">
                                     <h1 class="text-primary fw-bold fs-4 mb-0">Case Overview</h1>
                                     <div>
-                                        <select class="form-select form-select-sm" style="max-width: 150px;" t-on-change="onPeriodChange"
+                                        <!-- <select class="form-select form-select-sm" style="max-width: 150px;" t-on-change="onPeriodChange"
                                             t-ref="periodSelector">
                                             <option value="0">Select Period</option>
                                             <option value="00">Today</option>
@@ -22,7 +22,7 @@
                                             <option value="30">Last 30 Days</option>
                                             <option value="90">Last 90 Days</option>
                                             <option value="365">Last 365 Days</option>
-                                        </select>
+                                        </select> -->
                                     </div>
                                 </div>
                             </div>
