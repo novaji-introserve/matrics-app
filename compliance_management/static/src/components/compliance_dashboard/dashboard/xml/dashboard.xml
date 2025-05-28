@@ -95,25 +95,31 @@
                         </t>
                     </t>
                     
-                    <t t-foreach="state.dynamic_chart" t-as="chart" t-key="chart_index">
-                        <div t-attf-class="col-md-{{ chart.column || 6 }}">
-                            <div class="d-flex bg-white shadow shadow-1 p-3 rounded justify-content-between p-2 align-items-center">
-                                <h6 class="fw-bold text-capitalize text-dark">
-                                    <t t-out="chart.title"/>
-                                </h6>
+                    <div class="row g-md-2 mt-md-0">
+                    <!-- <div class="row g-md-2 mt-md-3 mt-5 "> -->
+
+                        <t t-foreach="state.dynamic_chart" t-as="chart" t-key="chart_index">
+                        <!-- <h1 t-out="chart.column"/> -->
+                            <div t-attf-class="col-md-{{ chart.column || 6 }}">
+                            <!-- <div t-attf-class="col-md-{{ chart.column ? parseInt(chart.column) : 6 }}"> -->
+                                <div class="d-flex bg-white shadow shadow-1 p-3 rounded justify-content-between p-2 align-items-center">
+                                    <h6 class="fw-bold text-capitalize text-dark">
+                                        <t t-out="chart.title"/>
+                                    </h6>
+                                </div>
+                                <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
+                                    <ChartRenderer 
+                                        data="chart" 
+                                        admin="state.cco" 
+                                        branches_id="state.branches_id" 
+                                        date="state.datepicked" 
+                                        isLoading="state.loadingStates.charts"
+                                        dynamic="state.useDynamicLoading" 
+                                        />
+                                </div>
                             </div>
-                            <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
-                                <ChartRenderer 
-                                    data="chart" 
-                                    admin="state.cco" 
-                                    branches_id="state.branches_id" 
-                                    date="state.datepicked" 
-                                    isLoading="state.loadingStates.charts"
-                                    dynamic="state.useDynamicLoading" 
-                                    />
-                            </div>
-                        </div>
-                    </t>
+                        </t>
+                    </div>
                 </div>
             </div>
         </div>

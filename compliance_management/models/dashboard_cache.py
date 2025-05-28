@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from odoo import models, fields, api
 import json
 import base64
@@ -7,25 +9,53 @@ import random
 import time
 import threading
 from odoo import registry as odoo_registry
+from ..utils.request_context import RequestContextManager
+from ..controllers.charts import DynamicChartController
+from ..controllers.controllers import Compliance
 
 _logger = logging.getLogger(__name__)
 
-
 class ThreadRegistry:
+    """Registry for managing threads with safety and cleanup functionality."""
+    
     def __init__(self):
+        """
+        Initialize the ThreadRegistry.
+
+        This sets up a reentrant lock and a dictionary to hold thread information.
+        """
         self._lock = threading.RLock()
         self._threads = {}
 
     def register(self, key, thread):
+        """Register a new thread with a unique key.
+
+        Args:
+            key (str): The unique key to associate with the thread.
+            thread (threading.Thread): The thread to register.
+        """
         with self._lock:
             self._threads[key] = {"thread": thread, "timestamp": time.time()}
 
     def unregister(self, key):
+        """Unregister a thread using its unique key.
+
+        Args:
+            key (str): The unique key associated with the thread to unregister.
+        """
         with self._lock:
             if key in self._threads:
                 del self._threads[key]
 
     def is_active(self, key):
+        """Check if a thread is active and within its allowed time limit.
+
+        Args:
+            key (str): The unique key associated with the thread.
+
+        Returns:
+            bool: True if the thread is active, False otherwise.
+        """
         with self._lock:
             return (
                 key in self._threads
@@ -34,6 +64,7 @@ class ThreadRegistry:
             )
 
     def cleanup_stale(self):
+        """Remove threads that are no longer active or have exceeded their time limit."""
         with self._lock:
             for key in list(self._threads.keys()):
                 if (
@@ -49,6 +80,7 @@ THREAD_REGISTRY = ThreadRegistry()
 class DashboardCache(models.Model):
     _name = "res.dashboard.cache"
     _description = "Dashboard Cache Storage"
+    
     name = fields.Char(string="Cache Key", required=True, index=True)
     user_id = fields.Many2one("res.users", string="User", required=True, index=True)
     cache_data = fields.Binary(string="Cache Data", attachment=True)
@@ -83,7 +115,17 @@ class DashboardCache(models.Model):
 
     @api.model
     def set_cache(self, key, data, user_id=None, ttl=600):
-        """Store data in cache using ORM methods instead of direct SQL"""
+        """Store data in cache using ORM methods instead of direct SQL.
+
+        Args:
+            key (str): The cache key under which to store the data.
+            data (any): The data to be cached.
+            user_id (int, optional): The ID of the user associated with the cache.
+            ttl (int, optional): Time-to-live for the cache entry in seconds.
+
+        Returns:
+            bool: True if the cache was successfully set, False otherwise.
+        """
         if user_id is None:
             user_id = self.env.user.id
         json_data = json.dumps(data)
@@ -137,7 +179,15 @@ class DashboardCache(models.Model):
 
     @api.model
     def get_cache(self, key, user_id=None):
-        """Retrieve data from cache using ORM instead of direct SQL"""
+        """Retrieve data from cache using ORM instead of direct SQL.
+
+        Args:
+            key (str): The cache key from which to retrieve data.
+            user_id (int, optional): The ID of the user associated with the cache.
+
+        Returns:
+            any: The cached data or None if not found or expired.
+        """
         if user_id is None:
             user_id = self.env.user.id
         cache = self.search(
@@ -166,7 +216,12 @@ class DashboardCache(models.Model):
 
     @api.model
     def _trigger_background_refresh(self, key, user_id):
-        """Trigger background refresh using ORM methods"""
+        """Trigger background refresh using ORM methods.
+
+        Args:
+            key (str): The cache key to refresh.
+            user_id (int): The ID of the user associated with the cache.
+        """
         try:
             if THREAD_REGISTRY.is_active(key):
                 return
@@ -202,7 +257,15 @@ class DashboardCache(models.Model):
 
     @staticmethod
     def _refresh_cache_background_thread(dbname, uid, key, user_id, thread_id):
-        """Background thread to refresh cache data"""
+        """Background thread to refresh cache data.
+
+        Args:
+            dbname (str): The name of the database.
+            uid (int): The user ID for the operation.
+            key (str): The cache key to refresh.
+            user_id (int): The ID of the user associated with the cache.
+            thread_id (str): The unique ID for the thread.
+        """
         try:
             time.sleep(0.25)
             _logger.debug(f"Starting background refresh for key: {key}")
@@ -250,7 +313,15 @@ class DashboardCache(models.Model):
 
     @api.model
     def _refresh_charts_data(self, key, user_id):
-        """Refresh charts data based on parameters encoded in the key"""
+        """Refresh charts data based on parameters encoded in the key.
+
+        Args:
+            key (str): The cache key containing parameters for refresh.
+            user_id (int): The ID of the user requesting the refresh.
+
+        Returns:
+            any: The refreshed chart data or None if not applicable.
+        """
         parts = key.split("_")
         if len(parts) >= 4:
             cco_part = parts[2]
@@ -260,11 +331,9 @@ class DashboardCache(models.Model):
                 branches_id = json.loads(branches_str)
             except:
                 branches_id = []
-            from ..utils.request_context import RequestContextManager
 
             with RequestContextManager(self.env) as request:
                 request.uid = user_id
-                from ..controllers.charts import DynamicChartController
 
                 controller = DynamicChartController()
                 return controller.get_chart_data(cco, branches_id)
@@ -272,7 +341,15 @@ class DashboardCache(models.Model):
 
     @api.model
     def _refresh_stats_data(self, key, user_id):
-        """Refresh stats data based on parameters encoded in the key"""
+        """Refresh stats data based on parameters encoded in the key.
+
+        Args:
+            key (str): The cache key containing parameters for refresh.
+            user_id (int): The ID of the user requesting the refresh.
+
+        Returns:
+            any: The refreshed stats data or None if not applicable.
+        """
         parts = key.split("_")
         datepicked = 20000
         if len(parts) >= 4:
@@ -283,11 +360,9 @@ class DashboardCache(models.Model):
                 branches_id = json.loads(branches_str)
             except:
                 branches_id = []
-            from ..utils.request_context import RequestContextManager
 
             with RequestContextManager(self.env) as request:
                 request.uid = user_id
-                from ..controllers.controllers import Compliance
 
                 stats_controller = Compliance()
                 return stats_controller.getAllstats(cco, branches_id, datepicked)
@@ -295,7 +370,11 @@ class DashboardCache(models.Model):
 
     @api.model
     def clear_expired_cache(self):
-        """Clear all expired cache entries and stale refresh flags - called by cron job"""
+        """Clear all expired cache entries and stale refresh flags - called by cron job.
+
+        Returns:
+            bool: True if the cleanup was successful.
+        """
         expired = self.search([("expiry_time", "<", fields.Datetime.now())])
         if expired:
             _logger.info(f"Clearing {len(expired)} expired cache entries")

@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+Module for managing various aspects of customer data, risk assessment, and dashboard functionalities.
+
+This module includes models that handle customer-related information, risk management,
+and dashboard components necessary for the application.
+"""
 
 from . import branch
 from . import education_level

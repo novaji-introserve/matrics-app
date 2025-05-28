@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+Cache Controller
+================
+This controller handles cache operations for the dashboard, allowing users to 
+get, set, invalidate, and check the status of cached entries. It provides 
+endpoints to manage user-specific cache data efficiently.
+"""
+
 from odoo import http
 from odoo.http import request
 import logging
@@ -10,7 +19,14 @@ class CacheController(http.Controller):
 
     @http.route("/dashboard/cache/get", type="json", auth="user")
     def get_cache(self, key, **kw):
-        """Get data from cache for the current user"""
+        """Get data from cache for the current user.
+
+        Args:
+            key (str): The cache key to retrieve data for.
+
+        Returns:
+            dict: A response indicating success or failure, along with the cached data if available.
+        """
         try:
             user_id = request.env.user.id
             _logger.debug(f"Cache GET for key: {key}")
@@ -28,7 +44,16 @@ class CacheController(http.Controller):
 
     @http.route("/dashboard/cache/set", type="json", auth="user")
     def set_cache(self, key, data, **kw):
-        """Set data in cache for the current user with explicit TTL"""
+        """Set data in cache for the current user with explicit TTL.
+
+        Args:
+            key (str): The cache key to store data under.
+            data (any): The data to be cached.
+            kw (dict): Additional parameters, including TTL.
+
+        Returns:
+            dict: A response indicating success or failure of the cache set operation.
+        """
         try:
             user_id = request.env.user.id
             ttl = kw.get("ttl", 600)
@@ -50,7 +75,14 @@ class CacheController(http.Controller):
 
     @http.route("/dashboard/cache/invalidate", type="json", auth="user")
     def invalidate_cache(self, key=None, **kw):
-        """Invalidate cache entries for the current user"""
+        """Invalidate cache entries for the current user.
+
+        Args:
+            key (str, optional): The specific cache key to invalidate. If not provided, all cache entries are invalidated.
+
+        Returns:
+            dict: A response indicating success or failure, along with a message.
+        """
         try:
             user_id = request.env.user.id
 
@@ -86,7 +118,14 @@ class CacheController(http.Controller):
 
     @http.route("/dashboard/cache/status", type="json", auth="user")
     def get_cache_status(self, key=None, **kw):
-        """Get cache status information for debugging"""
+        """Get cache status information for debugging.
+
+        Args:
+            key (str, optional): The specific cache key to check. If not provided, status of all user cache entries is returned.
+
+        Returns:
+            dict: A response with cache status details, including total entries, active and expired entries, and specific key information if provided.
+        """
         try:
             user_id = request.env.user.id
 

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from odoo import http
 from odoo.http import request
 from datetime import datetime, timedelta
@@ -526,7 +528,8 @@ class Compliance(http.Controller):
                             if not cco and branches_id:
                                 original_query = stat["sql_query"].lower()
                                 main_table = self.extract_main_table(original_query)
-                                if main_table in excluded_tables:
+                                # if main_table in excluded_tables:
+                                if not cco and main_table in excluded_tables:
                                     continue
                                 branch_column = self._find_branch_column_dynamically(
                                     cr, view_columns, main_table
@@ -553,7 +556,8 @@ class Compliance(http.Controller):
                         original_query = stat["sql_query"]
                         query = original_query.lower()
                         main_table = self.extract_main_table(query)
-                        if main_table in excluded_tables:
+                        # if main_table in excluded_tables:
+                        if not cco and main_table in excluded_tables:
                             continue
                         needs_modification = False
                         has_branch_id = False
