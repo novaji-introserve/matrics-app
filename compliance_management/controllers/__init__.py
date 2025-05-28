@@ -6,3 +6,4 @@ from . import websocket
 from . import websocket_test
 from . import charts
 from . import cache_controller
+from . import report_controller
