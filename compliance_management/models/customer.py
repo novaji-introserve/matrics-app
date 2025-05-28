@@ -1313,6 +1313,10 @@ class Customer(models.Model):
 
 class CustomerDigitalProduct(models.Model):
     _name = 'customer.digital.product'
+    _sql_constraints = [
+        ('uniq_customer_id', 'unique(customer_id)',
+         "Customer already exists. Customer must be unique!"),
+    ]
     
     
     customer_id = fields.Text(string='Customer ID',index=True) #customer,
