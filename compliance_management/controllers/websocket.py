@@ -5,6 +5,7 @@ WebSocket Controller
 HTTP endpoints for WebSocket configuration and integration with existing clients.
 """
 
+from datetime import datetime
 import logging
 from odoo import http, fields
 from odoo.http import request, Response

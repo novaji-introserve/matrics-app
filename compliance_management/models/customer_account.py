@@ -207,7 +207,7 @@ class CustomerAccount(models.Model):
             WHERE active IS NULL;
         """)
 
-        self.compute_aggregate_risk_scores()
+        # self.compute_aggregate_risk_scores()
 
     @api.model
     def open_accounts(self):
@@ -563,3 +563,40 @@ class CustomerAccountOfficer(models.Model):
     area = fields.Char(string="Area", required=True)
 
     
+class CustomerAccountDetails(models.Model):
+    _name = 'customer.account.details'
+    _description = 'Account Details'
+    
+    _sql_constraints = [
+        ('uniq_account_number', 'unique(account_number)',
+         "Account Number already exists. Account Number must be unique!"),
+    ]
+    # is_office_account = fields.Boolean(string="Is Office Account")
+    # enable_sms_alert = fields.Boolean(string="Enabled Sms alert")
+    # last_transaction_date = fields.Date(string="Last Transaction Date")
+    account_name = fields.Char(string="Account Name", required=True)
+    account_number = fields.Char(string="Account Number", index=True)
+    account_status = fields.Integer(string="Account Status")
+    cleared_balance = fields.Float(string="Cleared Balance")
+    has_breach = fields.Boolean(string="Has Breach")
+    last_transaction_time = fields.Date(string="Last Transaction Time")
+    is_collection_account = fields.Boolean(string="Is Collection Account")
+    high_transaction_account = fields.Boolean(string="Is High Transaction Account")
+    
+    def init(self):
+
+        self.env.cr.execute("""
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.tables
+            WHERE table_name = 'customer_account_details'
+        )
+    """)
+        table_exists = self.env.cr.fetchone()[0]
+
+        if table_exists:
+
+            self.env.cr.execute("""
+                CREATE INDEX IF NOT EXISTS customer_account_details_id_idx
+                ON customer_account_details (id)
+            """)

@@ -1,5 +1,8 @@
 from odoo import http, fields
 from odoo.http import request, content_disposition
+import odoo
+import os
+from odoo.modules import get_module_path
 from PyPDF2 import PdfFileReader
 from pdf2image import convert_from_bytes
 from reportlab.lib.pagesizes import letter
@@ -54,7 +57,8 @@ class PDFController(http.Controller):
 
     @http.route('/compliance/pdf_report/<int:record_id>', type='http', auth="user")
     def generate_pdf_report(self, record_id, **kwargs):
-        LOGO_PATH = "custom_addons/icomply_odoo/compliance_management/static/img/alt_bank_logo_.png"
+        module_path = get_module_path('compliance_management') 
+        LOGO_PATH = os.path.join(module_path, 'static', 'img', 'alt_bank_logo_.png')
         record = request.env['res.partner.edd'].browse(record_id)
         if not record.exists():
             return request.not_found()
@@ -94,7 +98,11 @@ class PDFController(http.Controller):
                 story.append(logo)
                 story.append(Spacer(1, 8)) 
             except:
-                pass  
+                pass
+        else:
+            # Fallback if logo not found
+            story.append(Paragraph("Logo", styles['BankTitle']))
+            story.append(Spacer(1, 8))
         
         # Bank Name and Report Title
         story.append(Paragraph("DUE DILIGENCE REPORT", styles['BankTitle']))
@@ -277,6 +285,8 @@ class PDFController(http.Controller):
             # Financial Details
             story.append(Paragraph("Financial Details", styles['SectionHeader']))
             financial_fields = [
+                ('expected_monthly_income', "What is the expected monthly income/inflow of the customer?"),
+                ('estimated_net_worth', "What is the estimated total net worth of the customer?"),
                 ('high_risk_industries', "Does the customer have any direct or indirect link to high-risk industries (e.g. Crypto, Financial Services, DNFBPs)?"),
                 ('inflow_purpose', "What would be the purpose of the inflows routed into the customer's account?"),
                 ('inflow_document', "Provide supporting documents if applicable?"),
@@ -285,7 +295,10 @@ class PDFController(http.Controller):
             ]
             for field, question in financial_fields:
                 story.append(Paragraph(question, styles['Question']))
-                if field == 'high_risk_industries':
+                if field in ['expected_monthly_income', 'estimated_net_worth']:
+                    value = self.safe_str(getattr(record, field, None))
+                    story.append(Paragraph(value, styles['Answer']))
+                elif field == 'high_risk_industries':
                     value = getattr(record, field, None)
                     if isinstance(value, bool):
                         formatted_value = format_yes_no_with_checkboxes(value, question)
