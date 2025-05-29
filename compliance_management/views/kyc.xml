@@ -66,6 +66,27 @@
                 <page name='accounts' string="Accounts">
                     <field name="account_ids" context="{'default_customer_id': active_id}" />
                 </page>
+             
+                <page name="name" string="Digital Products" >
+                    <group name="digital_products" attrs="{'invisible': [('customer_id', '=', False)]}">
+                            <group>
+                                <field name="customer_segment" readonly="1"/>
+                                <field name="ussd" readonly="1"/>
+                                <field name="onebank" readonly="1"/>
+                                <field name="carded_customer" readonly="1"/>
+                                <field name="alt_bank" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="sterling_pro" readonly="1"/>
+                                <field name="banca" readonly="1"/>
+                                <field name="doubble" readonly="1"/>
+                                <field name="specta" readonly="1"/>
+                                <field name="switch" readonly="1"/>
+                            </group>
+                        </group>
+                </page>
+
+                    
                 <page name='plans' string="Risk Plan">
                     <field name="risk_plan_line_ids" context="{'default_partner_id': active_id}" />
                 </page>
