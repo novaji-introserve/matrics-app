@@ -131,6 +131,7 @@ pyexcel-io
 Pygments
 PyJWT
 pylev
+PyMuPDF
 PyNaCl
 pyOpenSSL
 pyparsing
