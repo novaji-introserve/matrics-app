@@ -41,6 +41,7 @@
         "data/schedules/adverse_media_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
         'data/schedules/clean_cache.xml',
+        'data/schedules/refresh_charts_materialized_views.xml',
 
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
@@ -91,11 +92,12 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-        # "data/demo_data/chart/charts.xml", #CHARTS
-        "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
+        "data/demo_data/chart/charts.xml", #CHARTS
+        # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
         # "data/demo_data/account/res_partner_accounts.xml" # CUSTOMER ACCOUNT
         # "data/transactions.xml" # TRANSACTION
         "views/res_users.xml",
+        "views/peplist.xml",
         'data/gender.xml',
         'data/identification_type.xml',
         'data/demo_data/stat/compliance_stats.xml',

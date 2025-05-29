@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+Module for managing various aspects of customer data, risk assessment, and dashboard functionalities.
+
+This module includes models that handle customer-related information, risk management,
+and dashboard components necessary for the application.
+"""
 
 from . import branch
 from . import education_level
@@ -49,4 +55,9 @@ from . import res_risk_implication
 from . import fcra_score
 from . import dashboard_cache
 from . import aggregate_customer_score
+from . import dashboard_chart_view_refresher
+from . import dashboard_stats_view_refresher
+from . import res_materialized_views    
+from . import peplist    
+
 from . import account_aggregate
