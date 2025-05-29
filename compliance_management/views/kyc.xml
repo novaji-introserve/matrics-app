@@ -66,6 +66,27 @@
                 <page name='accounts' string="Accounts">
                     <field name="account_ids" context="{'default_customer_id': active_id}" />
                 </page>
+             
+                <page name="name" string="Digital Products" >
+                    <group name="digital_products" attrs="{'invisible': [('customer_id', '=', False)]}">
+                            <group>
+                                <field name="customer_segment" readonly="1"/>
+                                <field name="ussd" readonly="1"/>
+                                <field name="onebank" readonly="1"/>
+                                <field name="carded_customer" readonly="1"/>
+                                <field name="alt_bank" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="sterling_pro" readonly="1"/>
+                                <field name="banca" readonly="1"/>
+                                <field name="doubble" readonly="1"/>
+                                <field name="specta" readonly="1"/>
+                                <field name="switch" readonly="1"/>
+                            </group>
+                        </group>
+                </page>
+
+                    
                 <page name='plans' string="Risk Plan">
                     <field name="risk_plan_line_ids" context="{'default_partner_id': active_id}" />
                 </page>
@@ -137,6 +158,7 @@
                                 <button name="action_archive" class="oe_highlight" type="object" string="Archive" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'not in', ['cancelled', 'approved']), ('is_cco', '=', False)]}" />
 
                                 <button name="action_send_back" class="oe_highlight" type="object" string="Send Back" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'in', ['draft', 'approved']), ('is_current_user_approving_officer', '=', False)]}" />
+                                
 
                                 <field name="status" widget="statusbar" statusbar_visible="draft,completed,approved,cancelled,deleted,archived"/>
                             </header>
@@ -300,6 +322,8 @@
     <menuitem id="menu_compliance_paerner_dd" action="open_partners" parent="menu_compliance_dd" name="Partners" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
     <menuitem id="menu_compliance_respondents_dd" action="open_respondents" parent="menu_compliance_dd" name="Respondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="40" />
     <menuitem id="menu_compliance_correspondents_dd" action="open_correspondents" parent="menu_compliance_dd" name="Correspondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="50" />
-    <menuitem id="menu_compliance_enhanced_due_deligence" action="action_res_partner_edd" parent="menu_compliance_kyc" name="Enhanced Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="100" />
+     
+    <menuitem id="menu_compliance_edd" action="action_res_partner_edd" parent="menu_compliance_kyc" name="Enhanced Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="100" />
+
 
 </odoo>

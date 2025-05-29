@@ -1,3 +1,9 @@
+# Python packages to install
+fitz
+frontend
+
+pip install fitz frontend
+
 # CSV Import System Setup Guide
 
 ## Overview

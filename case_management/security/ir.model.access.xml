@@ -1,0 +1,19 @@
+<record id="case_restrict_write_delete" model="ir.rule">
+    <field name="name">Restrict Write/Delete Open Cases (Non-Staff)</field>
+    <field name="model_id" ref="model_case"/>
+    <field name="domain_force">[('status_name', '=', 'open'), ('staff_user_id', '!=', user.id)]</field>
+    <field name="perm_read" eval="True"/>
+    <field name="perm_write" eval="False"/>
+    <field name="perm_create" eval="True"/>
+    <field name="perm_unlink" eval="False"/>
+</record>
+
+<record id="case_allow_staff_write" model="ir.rule">
+    <field name="name">Allow Staff Write Open Assigned Cases</field>
+    <field name="model_id" ref="model_case"/>
+    <field name="domain_force">[('status_name', '=', 'open'), ('staff_user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="True"/>
+    <field name="perm_write" eval="True"/>
+    <field name="perm_create" eval="True"/>
+    <field name="perm_unlink" eval="False"/>
+</record>

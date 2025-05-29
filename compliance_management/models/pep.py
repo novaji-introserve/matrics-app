@@ -42,7 +42,7 @@ class Pep(models.Model):
     residential_address = fields.Char(string="Residential Address")
     state_of_origin = fields.Char(string="State Of Origin")
     spouse = fields.Char(string="Spouse")
-    children = fields.Char(string="Children")
+    children = fields.Char(string="Children", index=True)
     sibling = fields.Char(string="Sibling")
     parents = fields.Char(string="Parents")
     mothers_maden_name = fields.Char(string="Mothers Maiden Name")
@@ -53,9 +53,9 @@ class Pep(models.Model):
     press_report = fields.Text(string="Press Report")
     date_report = fields.Char(string="Date Report")
     additional_info = fields.Html(string="Additional Info")
-    email = fields.Char(string="Email")
+    email = fields.Char(string="Email", index=True)
     remarks = fields.Char(string="Remarks")
-    name = fields.Char(string="Name")
+    name = fields.Char(string="Name", index=True)
     status = fields.Char(string="Status")
     business_interest = fields.Char(string="Business Interest")
     age = fields.Char(string="Age")
@@ -105,6 +105,11 @@ class Pep(models.Model):
                                help="Indicates if biography data was successfully retrieved")
     sanctions_added = fields.Boolean(string="Sanctions Added", default=False,
                                 help="Indicates if sanctions data was successfully retrieved")
+
+
+    def init(self):
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_pep_id_idx ON res_pep (id)")
 
     @api.model
     def create(self, vals):

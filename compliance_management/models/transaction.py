@@ -36,6 +36,60 @@ class Transaction(models.Model):
         'new', 'To Review'), ('done', 'Done')], tracking=True, index=True, default='new')
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
     
+
+    def action_create_case(self):
+        """
+        Opens the case management form with the transaction reference pre-filled
+        """
+        context = {
+            'default_status_id': self.env.ref('case_management.case_status_open').id,
+            'case_created': True,
+            'show_creation_notification': True,
+            #'default_transaction_reference': self.name,
+            'default_transaction_reference': self.id,
+            # Don't set default_transaction_id here since it will be computed
+        }
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'New Case',
+            'res_model': 'case',
+            'view_mode': 'form',
+            'view_id': self.env.ref('case_management.case_form_view').id,
+            'target': 'current',
+            'context': context
+        }
+        
+        
+    
+    
+    def action_create_case(self):
+        """
+        Opens the case management form with the transaction reference pre-filled
+        """
+        # Create the context with required values
+        context = {
+            'default_status_id': self.env.ref('case_management.case_status_open').id,
+            'case_created': True,
+            'show_creation_notification': True,
+        }
+        
+        # Pre-fill the transaction reference
+        context['default_transaction_reference'] = self.name
+        
+        # Pre-fill the transaction_id field if it exists in the case model
+        context['default_transaction_id'] = self.id
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'New Case',
+            'res_model': 'case',
+            'view_mode': 'form',
+            'view_id': self.env.ref('case_management.case_form_view').id,
+            'target': 'current',
+            'context': context
+        }
+
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
     trans_code = fields.Char(string='Transaction Code')
@@ -47,6 +101,10 @@ class Transaction(models.Model):
     active = fields.Boolean(default=True, readonly=True)
     branch_code = fields.Char(string="Branch Code")
 
+
+    def init(self):
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_customer_transaction_id_idx ON res_customer_transaction (id)")
 
     def get_risk_level(self):
         return self.risk_level
@@ -87,9 +145,12 @@ class Transaction(models.Model):
     def open_transactions(self):
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('state', '=', 'new')]
         else:
@@ -112,9 +173,12 @@ class Transaction(models.Model):
     def open_transactions_done(self):
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('state', '=', 'done')]
         else:
@@ -136,9 +200,12 @@ class Transaction(models.Model):
     def open_transactions_all(self):
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = []
         else:

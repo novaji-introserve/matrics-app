@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
@@ -15,9 +16,9 @@ load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
-LOW_RISK_THRESHOLD = 10
-MEDIUM_RISK_THRESHOLD = 15
-HIGH_RISK_THRESHOLD = 25
+LOW_RISK_THRESHOLD = 3
+MEDIUM_RISK_THRESHOLD = 6
+HIGH_RISK_THRESHOLD = 9
 
 
 class Shareholders(models.Model):
@@ -84,11 +85,11 @@ class Customer(models.Model):
         comodel_name='customer.industry', string='Industry', index=True, tracking=True)
 
     sex_id = fields.Many2one(
-        comodel_name='res.partner.gender', string='Sex', index=True, readonly=True)
+        comodel_name='res.partner.gender', string='Sex', readonly=True)
     firstname = fields.Char(string='Firstname', readonly=True)
     # fullname = fields.Char(string='Fullname')
     short_name = fields.Char(string='Short name', readonly=True)
-    lastname = fields.Char(string='Lastname', readonly=True)
+    lastname = fields.Char(string='Lastname', index=True, readonly=True)
     middlename = fields.Char(string='Middle Name', readonly=True)
     othername = fields.Char(string='Other Name', readonly=True)
     town = fields.Char(string='Town', readonly=True)
@@ -97,21 +98,21 @@ class Customer(models.Model):
     company_reg_date = fields.Date(
         string='Company Registration Date', tracking=True)
     risk_score = fields.Float(
-        string='Risk Score', digits=(10, 2), tracking=True)
+        string='Risk Score', digits=(10, 2), index=True, tracking=True)
     risk_level = fields.Char(
         string='Risk Level', index=True, default='low', tracking=True)
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
     risk_level_id = fields.Many2one(
-        comodel_name='res.risk.level', string='Risk Level', index=True)
+        comodel_name='res.risk.level', string='Risk Level')
     account_ids = fields.One2many(
-        comodel_name='res.partner.account', inverse_name='customer_id', string='Accounts', readonly=True)
+        comodel_name='res.partner.account', index=True, inverse_name='customer_id', string='Accounts', readonly=True)
 
     res_partner_account_ids = fields.One2many(
         'res.partner.account', 'customer_id', string='Accounts', readonly=True)
 
     edd_ids = fields.One2many(
-        comodel_name='res.partner.edd', inverse_name='customer_id', string='EDD Lines', tracking=True)
+        comodel_name='res.partner.edd', index=True, inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
     risk_plan_line_ids = fields.One2many(
@@ -125,7 +126,8 @@ class Customer(models.Model):
     is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
     is_blacklist = fields.Boolean(
         string="Is Blacklist", default=False, tracking=True)
-    global_pep = fields.Boolean(string="Global PEP", default=False)
+    global_pep = fields.Boolean(
+        string="Global PEP",  index=True, default=False)
     current_branch_id = fields.Integer(
         string='Current Branch', compute='_get_current_branch')
     internal_category = fields.Selection(string='Internal Category', selection=[('customer', 'Customer'), (
@@ -143,7 +145,7 @@ class Customer(models.Model):
     anti_money_laundering_file_name = fields.Char(
         string='Anti-Money Laundering & Terrorism Financing Doc')
     total_accounts = fields.Integer(
-        string='Accounts', compute='customer_total_accounts', store=False)
+        string='Accounts', compute='customer_total_accounts', index=True, store=False)
     global_pep_id = fields.Many2one(
         'res.pep', string='Related Global PEP', tracking=True)
 
@@ -157,10 +159,10 @@ class Customer(models.Model):
     state_residence = fields.Char(
         string="Region", required=False, readonly=True)
     nin = fields.Char(
-        string="National Identification Number (NIN)", required=False, readonly=True)
+        string="National Identification Number (NIN)", index=True, required=False, readonly=True)
     customer_rating = fields.Char(
-        string="Customer Rating", required=False, readonly=True)
-    active = fields.Boolean(default=True, readonly=True, index=True)
+        string="Customer Rating", required=False, index=True, readonly=True)
+    active = fields.Boolean(default=True, readonly=True)
 
     is_greylist = fields.Boolean(
         string="Is Greylist", default=False, tracking=True)
@@ -174,315 +176,63 @@ class Customer(models.Model):
 
     # phone = fields.Char(string='Phone Number(s)', index=True)
     formatted_phone = fields.Char(
-        string='Phone Number(s)', compute='_compute_formatted_phone')
+        string='Phone Number(s)', index=True, compute='_compute_formatted_phone')
 
     likely_sanction = fields.Boolean()
     likely_pep = fields.Boolean()
-    branch_code = fields.Char(string="Branch Code")
+    branch_code = fields.Char(string="Branch Code", index=True)
+    
+    ussd = fields.Char(string='Uses USSD',
+                       compute='_compute_digital_products',index=True)
+    onebank = fields.Char(string='Uses One Bank',
+                          compute='_compute_digital_products')
+    carded_customer = fields.Char(
+        string='Has A Card', compute='_compute_digital_products')
+    alt_bank = fields.Char(string='Is On Alt Bank',
+                           compute='_compute_digital_products')
+    sterling_pro = fields.Char(
+        string='Has Sterling Pro', compute='_compute_digital_products')
+    banca = fields.Char(string='Has Banca',
+                        compute='_compute_digital_products')
+    doubble = fields.Char(string='Has Doubble',
+                          compute='_compute_digital_products')
+    specta = fields.Char(string='Has Specta',
+                         compute='_compute_digital_products')
+    switch = fields.Char(string='Has Switch',
+                         compute='_compute_digital_products')
+    customer_segment = fields.Char(
+        string='Customer Segment', compute='_compute_digital_products')
 
-    # @api.depends('account_ids')
-    # def _compute_branch(self):
-    #     for customer in self:
-    #         # Priority rule: first try to find an active account with a branch
-    #         active_account = self.env['res.partner.account'].search([
-    #             ('customer_id', '=', customer.id),
-    #             ('state', '=', 'Active'),
-    #             ('branch_id', '!=', False)
-    #         ], limit=1)
-            
-    #         if active_account:
-    #             customer.branch_id = active_account.branch_id
-    #         else:
-    #             # Fallback to any account with a branch
-    #             any_account = self.env['account.model'].search([
-    #                 ('customer_id', '=', customer.id),
-    #                 ('branch_id', '!=', False)
-    #             ], limit=1)
-                
-    #             customer.branch_id = any_account.branch_id if any_account else False
-
-    # def _compute_risk_scores(self):
-    #     """Cron job to precompute and store weighted average risk scores."""
-    #     # Clear existing records
-    #     self.env['customer.agg.risk.score'].search([]).unlink()
-
-    #     # Group customers by branch_id
-    #     customers = self.search([['internal_category', '=', 'customer'], ['origin', 'in', ['demo', 'test', 'prod']]])
-
+    
+    
+    def action_create_case(self):
+        """
+        Opens the case management form with the customer pre-filled
+        """
+        # Create the context with required values
+        context = {
+            'default_status_id': self.env.ref('case_management.case_status_open').id,
+            'case_created': True,
+            'show_creation_notification': True,
+        }
         
-    #     grouped_data = {}
-    #     for record in customers:
-    #         group_key = record.branch_id
-    #         group_key_value = group_key.display_name if group_key else 'No Branch'
-    #         if group_key_value not in grouped_data:
-    #             grouped_data[group_key_value] = []
-    #         grouped_data[group_key_value].append(record)
-
-    #     # Compute and store weighted averages
-    #     for key, group_records in grouped_data.items():
-    #         total_customers = len(group_records)
-    #         formatted_key = f"{key}({total_customers})" if total_customers > 0 else key
-
-    #         if total_customers == 0:
-    #             weighted_avg = 0.0
-                
-    #         else:
-    #             risk_counts = {'low': 0, 'medium': 0, 'high': 0}
-    #             risk_scores = {'low': 0, 'medium': 0, 'high': 0}
-    #             for rec in group_records:
-    #                 risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
-    #                 risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
-    #                 risk_scores[risk_level] += rec.risk_score or 0.0
-                    
-                
-    #             _logger.info(f"risk_level is {risk_level}")
-    #             _logger.info(f"risk_score_asccumnulated is {risk_scores}")
-                
-    #             # Compute mena average per risk level
-    #             mean_avg_low = risk_scores['low'] / risk_counts['low'] if risk_counts['low'] > 0 else 0.0
-    #             mean_avg_medium = risk_scores['medium'] / risk_counts['medium'] if risk_counts['medium'] > 0 else 0.0
-    #             mean_avg_high = risk_scores['high'] / risk_counts['high'] if risk_counts['high'] > 0 else 0.0
-
-    #             weighted_avg = ((risk_counts['low'] * mean_avg_low) + (risk_counts['medium'] * mean_avg_medium ) + (risk_counts['high'] *  mean_avg_high )) / total_customers if total_customers > 0 else 0.0
-
-    #         # Store in customer.risk.score
-    #         branch = self.env['res.branch'].search([('name', '=', key)], limit=1)
-    #         self.env['customer.agg.risk.score'].create({
-    #             'branch_id': branch.id if branch else False,
-    #             'weighted_avg_risk_score': weighted_avg,
-    #             'total_customers': total_customers,
-    #             'formatted_name': formatted_key
-    #         })
-    
-    # def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-    #     if not any(f in fields for f in ['risk_score']):
-    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-
-    #     result = []
-    #     groupby_field = groupby[0] if groupby else None
-
-    #     if groupby_field == 'branch_id':
-    #         # Fetch precomputed data
-    #         risk_scores = self.env['customer.agg.risk.score'].search([])
-    #         for risk_score in risk_scores:
-    #             print(risk_score.formatted_name)
-    #             group_result = {
-    #                 'branch_id': risk_score.branch_id.display_name if risk_score.branch_id else False,
-    #                 'branch_id:formatted': risk_score.formatted_name,
-    #                 'risk_score': risk_score.weighted_avg_risk_score,
-    #                 '__count': risk_score.total_customers,
-    #                 '__domain': [('branch_id', '=', risk_score.branch_id.id if risk_score.branch_id else False)] + domain
-    #             }
-    #             # Only include requested fields
-    #             result.append(group_result)
-    #         return result
-    #     else:
-    #         # Fallback to super if grouping by a different field
-    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-    
-    def _compute_risk_scores(self):
-        """Cron job to precompute and store weighted average risk scores."""
-        # Clear existing records
-        self.env['customer.agg.risk.score'].search([]).unlink()
-        # Group customers by branch_id
-        customers = self.search([['internal_category', '=', 'customer'], ['origin', 'in', ['demo', 'test', 'prod']]])
-
-        grouped_data = {}
-        for record in customers:
-            group_key = record.branch_id
-            group_key_value = group_key.display_name if group_key else 'No Branch'
-            if group_key_value not in grouped_data:
-                grouped_data[group_key_value] = []
-            grouped_data[group_key_value].append(record)
-        # Compute and store weighted averages
-        for key, group_records in grouped_data.items():
-            total_customers = len(group_records)
-            formatted_key = f"{key}({total_customers})" if total_customers > 0 else key
-            if total_customers == 0:
-                weighted_avg = 0.0
-            else:
-                risk_counts = {'low': 0, 'medium': 0, 'high': 0}
-                risk_scores = {'low': 0, 'medium': 0, 'high': 0}
-                for rec in group_records:
-                    risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
-                    risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
-                    risk_scores[risk_level] += rec.risk_score or 0.0
-                _logger.info("start of each branch calculation")
-                _logger.info(f"the risk_count is {risk_counts}")
-                _logger.info(f"the risk_scores is {risk_scores}")
-                
-                # Compute mean average per risk level
-                mean_avg_low = risk_scores['low'] / risk_counts['low'] if risk_counts['low'] > 0 else 0.0
-                mean_avg_medium = risk_scores['medium'] / risk_counts['medium'] if risk_counts['medium'] > 0 else 0.0
-                mean_avg_high = risk_scores['high'] / risk_counts['high'] if risk_counts['high'] > 0 else 0.0
-
-                _logger.info(f"the mean avg is {mean_avg_low} | {mean_avg_medium} | {mean_avg_high}")
-                _logger.info(f"total customer is {total_customers}")
-
-                weighted_avg = ((risk_counts['low'] * mean_avg_low) + 
-                            (risk_counts['medium'] * mean_avg_medium) + 
-                            (risk_counts['high'] * mean_avg_high)) / total_customers if total_customers > 0 else 0.0
-
-                _logger.info(f"for low risk level customer is {risk_counts['low']} and avg = {mean_avg_low} sum up to  {(risk_counts['low'] * mean_avg_low)}")
-                _logger.info(f"for medium risk level customer is {risk_counts['medium']} and avg = {mean_avg_medium} sum up to {(risk_counts['medium'] * mean_avg_medium)}")
-                _logger.info(f"for high risk level customer is {risk_counts['high']} and avg = {mean_avg_high} sum up to {(risk_counts['high'] * mean_avg_high)}")
-                
-                _logger.info(f"the weighted avg is {weighted_avg}")
-                _logger.info("end of each branch calculation")
-
-            # Store in customer.risk.score
-            branch = self.env['res.branch'].search([('name', '=', key)], limit=1)
-            self.env['customer.agg.risk.score'].create({
-                'branch_id': branch.id if branch else False,
-                'weighted_avg_risk_score': weighted_avg,
-                'total_customers': total_customers,
-                'formatted_name': formatted_key
-            })
-
-    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        if not any(f in fields for f in ['risk_score']):
-            return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-        result = []
-        groupby_field = groupby[0] if groupby else None
-        if groupby_field == 'branch_id':
-            # Parse the orderby parameter to determine sorting
-            order_field = 'branch_id'  # Default order field
-            order_direction = 'ASC'    # Default direction
-            
-            if orderby:
-                # Handle multiple orderby fields separated by comma
-                orderby_parts = orderby.split(',')
-                for part in orderby_parts:
-                    part = part.strip()
-                    if 'risk_score' in part:
-                        order_field = 'weighted_avg_risk_score'
-                        order_direction = 'DESC' if 'DESC' in part.upper() else 'ASC'
-                        break
-                    elif 'branch_id' in part:
-                        order_field = 'branch_id'
-                        order_direction = 'DESC' if 'DESC' in part.upper() else 'ASC'
-                        break
-            
-            # Build the order string for the search
-            order_str = f"{order_field} {order_direction}"
-            
-            # Fetch precomputed data with pagination
-            risk_scores = self.env['customer.agg.risk.score'].search(
-                [], order=order_str, offset=offset, limit=limit
-            )
-            
-            # Get total count for pagination info
-            total_count = self.env['customer.agg.risk.score'].search_count([])
-            
-            for risk_score in risk_scores:
-                group_result = {
-                    'branch_id': risk_score.branch_id.display_name if risk_score.branch_id else False,
-                    'branch_id_count': risk_score.total_customers,
-                    'branch_id_count': risk_score.total_customers,
-                    'branch_id:formatted': risk_score.formatted_name,
-                    'risk_score': risk_score.weighted_avg_risk_score,
-                    '__count': risk_score.total_customers,
-                    '__domain': [('branch_id', '=', risk_score.branch_id.id if risk_score.branch_id else False)] + domain
-                }
-                # Only include requested fields
-                result.append(group_result)
-                
-            # Add pagination metadata if needed
-            if hasattr(result, '__dict__'):
-                result.__dict__['total_count'] = total_count
-                
-            return result
-        else:
-            # Fallback to super if grouping by a different field
-            return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-
-
-
-    # def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-    #     if 'risk_score' not in fields:
-    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-
-    #     # Fetch records matching the domain
-    #     records = self.search(domain)
-
-    #     if not records:
-    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-
-    #     # Initialize result
-    #     result = []
-    #     groupby_field = groupby[0] if groupby else None
-
-    #     if groupby_field:
-    #         # Group records by the specified field (e.g., branch_id)
-    #         grouped_data = {}
-    #         for record in records:
-    #             # Get the group key (handle Many2one fields)
-    #             group_key = record[groupby_field]
-    #             # Use display_name for Many2one fields to ensure proper formatting
-    #             group_key_value = (
-    #                 group_key.display_name if isinstance(group_key, models.Model)
-    #                 else group_key
-    #             )
-    #             if group_key_value not in grouped_data:
-    #                 grouped_data[group_key_value] = []
-    #             grouped_data[group_key_value].append(record)
-
-    #         # Compute weighted average for each group
-    #         for key, group_records in grouped_data.items():
-    #             total_customers = len(group_records)
-    #             # Format the group key with count, e.g., "67 Marina(3)"
-    #             formatted_key = f"{key}({total_customers})" if total_customers > 0 else key
-
-    #             # Calculate weighted average
-    #             if total_customers == 0:
-    #                 weighted_avg = 0.0
-    #             else:
-    #                 risk_counts = {'low': 0, 'medium': 0, 'high': 0}
-    #                 for rec in group_records:
-    #                     risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
-    #                     risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
-                        
-    #                 weighted_sum = sum(
-    #                     risk_counts[level] * self.RISK_SCORE_MAPPING.get(level, 0.0)
-    #                     for level in risk_counts
-    #                 )
-                   
-    #                 weighted_avg = weighted_sum / total_customers if total_customers > 0 else 0.0
-
-    #             key_id = self.env['res.branch'].search([('name', '=', key)], limit=1).id
-    #             # Build group result
-    #             group_result = {
-    #                 groupby_field: key,  # Use original key for domain and filtering
-    #                 groupby_field + ':formatted': formatted_key,  # Store formatted name
-    #                 'risk_score': weighted_avg,
-    #                 '__count': total_customers,
-    #                 '__domain': [(groupby_field, '=', key_id)] + domain
-    #             }
-    #             result.append(group_result)
-    #     else:
-    #         # No grouping: compute weighted average for all records
-    #         total_customers = len(records)
-    #         if total_customers == 0:
-    #             weighted_avg = 0.0
-    #         else:
-    #             risk_counts = {'low': 0, 'medium': 0, 'high': 0}
-    #             for rec in records:
-    #                 risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
-    #                 risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
-    #             weighted_sum = sum(
-    #                 risk_counts[level] * self.RISK_SCORE_MAPPING.get(level, 0.0)
-    #                 for level in risk_counts
-    #             )
-    #             weighted_avg = weighted_sum / total_customers if total_customers > 0 else 0.0
-
-    #         result.append({
-    #             'risk_score': weighted_avg,
-    #             '__count': total_customers,
-    #             '__domain': domain
-    #         })
+        # Since customer_id in the case model is a Many2one field referencing res.partner,
+        # and this model (Customer) inherits from res.partner,
+        # we need to pass the ID of the current record
+        context['default_customer_id'] = self.id
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'New Case',
+            'res_model': 'case',
+            'view_mode': 'form',
+            'view_id': self.env.ref('case_management.case_form_view').id,
+            'target': 'current',
+            'context': context
+        }
         
 
-    #     return result
+
 
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
@@ -515,56 +265,59 @@ class Customer(models.Model):
 
     @api.model
     def cron_run_risk_assessment(self):
-        """
-        Main entry point for risk assessment cron job with protection against
-        concurrent execution.
-        """
-        # Get a timestamp to use as a unique identifier
-        cron_name = "risk_assessment_cron"
-        cron_record = self.env.ref(
-            'compliance_management.ir_cron_run_risk_assessment')
+        customer_counts = self.search_count([])
 
-        # Check if the cron is already running
-        if cron_record.nextcall and fields.Datetime.from_string(cron_record.nextcall) > fields.Datetime.now():
-            _logger.info(
-                "Risk assessment job already running or scheduled, skipping this run")
-            return False
+        if customer_counts <= 200:
+            """
+            Main entry point for risk assessment cron job with protection against
+            concurrent execution.
+            """
+            # Get a timestamp to use as a unique identifier
+            cron_name = "risk_assessment_cron"
+            cron_record = self.env.ref(
+                'compliance_management.ir_cron_run_risk_assessment')
 
-        try:
-            # Set the nextcall far in the future to prevent new runs starting
-
-            # cron_record.write({
-            #     'nextcall': fields.Datetime.now() + timedelta(hours=24)
-            # })
-            # self.env.cr.commit()
-
-            _logger.info("Starting scheduled risk assessment process")
-            results = {'sanction_status': {}, 'risk_scores': 0}
+            # Check if the cron is already running
+            if cron_record.nextcall and fields.Datetime.from_string(cron_record.nextcall) > fields.Datetime.now():
+                _logger.info(
+                    "Risk assessment job already running or scheduled, skipping this run")
+                return False
 
             try:
-                results['sanction_status'] = self.update_sanction_status()
-                _logger.info("Sanction status update completed successfully")
-            except Exception as e:
-                _logger.error(
-                    f"Error in update_sanction_status: {str(e)}", exc_info=True)
+                # Set the nextcall far in the future to prevent new runs starting
 
-            try:
-                results['risk_scores'] = self.compute_risk_score_for_all_users()
-                _logger.info("Risk score computation completed successfully")
-            except Exception as e:
-                _logger.error(
-                    f"Error in compute_risk_score_for_all_users: {str(e)}", exc_info=True)
+                # cron_record.write({
+                #     'nextcall': fields.Datetime.now() + timedelta(hours=24)
+                # })
+                # self.env.cr.commit()
 
-            _logger.info(f"Completed full risk assessment process: {results}")
-            return results
+                _logger.info("Starting scheduled risk assessment process")
+                results = {'sanction_status': {}, 'risk_scores': 0}
 
-        finally:
-            # Reset the nextcall to 5 minutes from now
-            next_run = fields.Datetime.now() + timedelta(minutes=5)
-            cron_record.write({
-                'nextcall': next_run
-            })
-            self.env.cr.commit()
+                try:
+                    results['sanction_status'] = self.update_sanction_status()
+                    _logger.info("Sanction status update completed successfully")
+                except Exception as e:
+                    _logger.error(
+                        f"Error in update_sanction_status: {str(e)}", exc_info=True)
+
+                try:
+                    results['risk_scores'] = self.compute_risk_score_for_all_users()
+                    _logger.info("Risk score computation completed successfully")
+                except Exception as e:
+                    _logger.error(
+                        f"Error in compute_risk_score_for_all_users: {str(e)}", exc_info=True)
+
+                _logger.info(f"Completed full risk assessment process: {results}")
+                return results
+
+            finally:
+                # Reset the nextcall to 5 minutes from now
+                next_run = fields.Datetime.now() + timedelta(minutes=5)
+                cron_record.write({
+                    'nextcall': next_run
+                })
+                self.env.cr.commit()
 
     def update_sanction_status(self):
         _logger.info("Starting PEP status check using Odoo ORM for tracking.")
@@ -654,14 +407,19 @@ class Customer(models.Model):
             'blacklist_updated': len(blacklist_ids),
             'watchlist_updated': len(watchlist_ids)
         }
-
+    
     def init(self):
         # Drop the trigger if it exists
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
-
+        
+        # Create index on res_partner which we know exists
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)") 
+               
+    
         # Create the trigger
         self.env.cr.execute("""
             CREATE OR REPLACE FUNCTION set_partner_defaults_func()
@@ -780,6 +538,8 @@ class Customer(models.Model):
             EXECUTE FUNCTION set_partner_defaults_after_func();
         """)
 
+        # self.cron_run_risk_assessment()
+
     @api.model_create_multi
     def create(self, vals_list):
         # Create records
@@ -871,10 +631,6 @@ class Customer(models.Model):
         # Call the original method from adverse.media
         return adverse_media.scan_news_articles()
 
-    # @api.depends('account_ids')
-    # def _total_accounts(self):
-    #     for e in self:
-    #         e.total_accounts = len(e.account_ids)
 
     @api.depends('res_partner_account_ids')
     def customer_total_accounts(self):
@@ -1037,9 +793,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'customer'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -1068,9 +827,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'vendor'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -1098,9 +860,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'partner')]
         else:
@@ -1126,9 +891,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'correspondent'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -1153,9 +921,12 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
+        
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if is_chief_compliance_officer:
+        if is_chief_compliance_officer or is_compliance_officer:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'respondent'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -1252,27 +1023,7 @@ class Customer(models.Model):
     def get_risk_level_name(self):
         return '%s risk' % (self.risk_level)
 
-    # logic to commpute total risk sore of all users
-
-    # @api.model
-    # def compute_risk_score_for_all_users(self):
-    #     records = self.search([])
-    #     for record in records:
-    #         score = record._get_risk_score_from_plan()
-    #         risk_level = record.compute_risk_level()
-
-    #         # Use direct SQL update to avoid triggering write()
-    #         self.env.cr.execute(
-    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s
-    #             WHERE id = %%s""" % self._table,
-    #             (score, risk_level, record.id)
-    #         )
-
-    #         # Invalidate cache for these fields
-    #         # record.invalidate_cache(['risk_score', 'risk_level'])
-    #         record.invalidate_recordset(['risk_score', 'risk_level'])
-
-    #     return True
+   
 
     @api.model
     def compute_risk_score_for_all_users(self):
@@ -1322,23 +1073,7 @@ class Customer(models.Model):
             f"Completed risk score computation for {total_processed} users")
         return True
 
-    # def action_compute_risk_score_with_plan(self):
-    #     """Manual action to compute risk score"""
-    #     for record in self:
-    #         score = record._get_risk_score_from_plan()
-    #         risk_level = record.compute_risk_level()
-
-    #         # Use direct SQL update to avoid triggering write()
-    #         self.env.cr.execute(
-    #             """UPDATE %s SET risk_score = %%s, risk_level = %%s
-    #             WHERE id = %%s""" % self._table,
-    #             (score, risk_level, record.id)
-    #         )
-
-    #         # Invalidate cache for these fields
-    #         record.invalidate_recordset(['risk_score', 'risk_level'])
-
-    #     return True
+    
 
     def action_compute_risk_score_with_plan(self):
         """Manual action to compute risk score using ORM for proper tracking"""
@@ -1416,6 +1151,58 @@ class Customer(models.Model):
         for e in self:
             e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
+    
+    @api.depends('customer_id')
+    def _compute_digital_products(self):
+        """
+        Compute digital product fields.
+        """
+        # Get all customer_ids in current recordset
+        customer_ids = [rec.customer_id for rec in self if rec.customer_id]
+
+        if not customer_ids:
+            # Set default values for records without customer_id
+            for record in self:
+                self._set_default_digital_values(record)
+            return
+
+        # Single query to get all digital products for current recordset
+        digital_products = self.env['customer.digital.product'].search([
+            ('customer_id', 'in', customer_ids)
+        ])
+
+        # Create a mapping for lookup
+        product_map = {dp.customer_id: dp for dp in digital_products}
+
+        # Assign values to each record
+        for record in self:
+            if record.customer_id and record.customer_id in product_map:
+                dp = product_map[record.customer_id]
+                record.ussd = dp.ussd
+                record.onebank = dp.onebank
+                record.carded_customer = dp.carded_customer
+                record.alt_bank = dp.alt_bank
+                record.sterling_pro = dp.sterling_pro
+                record.banca = dp.banca
+                record.doubble = dp.doubble
+                record.specta = dp.specta
+                record.switch = dp.switch
+                record.customer_segment = dp.customer_segment
+            else:
+                self._set_default_digital_values(record)
+
+    def _set_default_digital_values(self, record):
+        """Set default values for digital product fields"""
+        record.ussd = None
+        record.onebank = None
+        record.carded_customer = None
+        record.alt_bank = None
+        record.sterling_pro = None
+        record.banca = None
+        record.doubble = None
+        record.specta = None
+        record.switch = None
+        record.customer_segment = None
 
     # @api.model
     # def _compute_is_branch_compliance(self):
@@ -1428,3 +1215,182 @@ class Customer(models.Model):
     #     # Set domain based on user group
     #     for record in self:
     #         record.is_branch_compliance = is_branch_compliance_officer
+    
+    
+    # @api.depends('customer_phone')
+    # def _compute_formatted_phone(self):
+    #     for record in self:
+    #         if record.customer_phone and '^' in record.customer_phone:
+    #             record.formatted_phone = record.customer_phone.replace(
+    #                 '^', ', ')
+    #         else:
+    #             record.formatted_phone = record.customer_phone
+
+    
+    # def _compute_risk_scores(self):
+    #     """Cron job to precompute and store weighted average risk scores."""
+    #     # Clear existing records
+    #     self.env['customer.agg.risk.score'].search([]).unlink()
+
+    #     # Group customers by branch_id
+    #     customers = self.search([['internal_category', '=', 'customer'], ['origin', 'in', ['demo', 'test', 'prod']]])
+
+    #     grouped_data = {}
+    #     for record in customers:
+    #         group_key = record.branch_id
+    #         group_key_value = group_key.display_name if group_key else 'No Branch'
+    #         if group_key_value not in grouped_data:
+    #             grouped_data[group_key_value] = []
+    #         grouped_data[group_key_value].append(record)
+
+    #     # Compute and store weighted averages
+    #     for key, group_records in grouped_data.items():
+    #         total_customers = len(group_records)
+    #         formatted_key = f"{key}({total_customers})" if total_customers > 0 else key
+
+    #         if total_customers == 0:
+    #             weighted_avg = 0.0
+
+    #         else:
+    #             risk_counts = {'low': 0, 'medium': 0, 'high': 0}
+    #             risk_scores = {'low': 0, 'medium': 0, 'high': 0}
+    #             for rec in group_records:
+    #                 risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
+    #                 risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
+    #                 risk_scores[risk_level] += rec.risk_score or 0.0
+    #             _logger.info("start of each branch calculation")
+    #             _logger.info(f"the risk_count is {risk_counts}")
+    #             _logger.info(f"the risk_scores is {risk_scores}")
+
+    #             # Compute mean average per risk level
+    #             mean_avg_low = risk_scores['low'] / risk_counts['low'] if risk_counts['low'] > 0 else 0.0
+    #             mean_avg_medium = risk_scores['medium'] / risk_counts['medium'] if risk_counts['medium'] > 0 else 0.0
+    #             mean_avg_high = risk_scores['high'] / risk_counts['high'] if risk_counts['high'] > 0 else 0.0
+
+    #             _logger.info(f"the mean avg is {mean_avg_low} | {mean_avg_medium} | {mean_avg_high}")
+    #             _logger.info(f"total customer is {total_customers}")
+
+    #             weighted_avg = ((risk_counts['low'] * mean_avg_low) +
+    #                         (risk_counts['medium'] * mean_avg_medium) +
+    #                         (risk_counts['high'] * mean_avg_high)) / total_customers if total_customers > 0 else 0.0
+
+    #             _logger.info(f"for low risk level customer is {risk_counts['low']} and avg = {mean_avg_low} sum up to  {(risk_counts['low'] * mean_avg_low)}")
+    #             _logger.info(f"for medium risk level customer is {risk_counts['medium']} and avg = {mean_avg_medium} sum up to {(risk_counts['medium'] * mean_avg_medium)}")
+    #             _logger.info(f"for high risk level customer is {risk_counts['high']} and avg = {mean_avg_high} sum up to {(risk_counts['high'] * mean_avg_high)}")
+
+    #             _logger.info(f"the weighted avg is {weighted_avg}")
+    #             _logger.info("end of each branch calculation")
+
+    #         # Store in customer.risk.score
+    #         branch = self.env['res.branch'].search([('name', '=', key)], limit=1)
+    #         self.env['customer.agg.risk.score'].create({
+    #             'branch_id': branch.id if branch else False,
+    #             'weighted_avg_risk_score': weighted_avg,
+    #             'total_customers': total_customers,
+    #             'formatted_name': formatted_key
+    #         })
+
+    
+    # def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+    #     if not any(f in fields for f in ['risk_score']):
+    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+    #     result = []
+    #     groupby_field = groupby[0] if groupby else None
+
+    #     if groupby_field == 'branch_id':
+    #         # Parse the orderby parameter to determine sorting
+    #         order_field = 'branch_id'  # Default order field
+    #         order_direction = 'ASC'    # Default direction
+
+    #         if orderby:
+    #             # Handle multiple orderby fields separated by comma
+    #             orderby_parts = orderby.split(',')
+    #             for part in orderby_parts:
+    #                 part = part.strip()
+    #                 if 'risk_score' in part:
+    #                     order_field = 'weighted_avg_risk_score'
+    #                     order_direction = 'DESC' if 'DESC' in part.upper() else 'ASC'
+    #                     break
+    #                 elif 'branch_id' in part:
+    #                     order_field = 'branch_id'
+    #                     order_direction = 'DESC' if 'DESC' in part.upper() else 'ASC'
+    #                     break
+
+    #         # Build the order string for the search
+    #         order_str = f"{order_field} {order_direction}"
+
+    #         # Fetch precomputed data with pagination
+    #         risk_scores = self.env['customer.agg.risk.score'].search(
+    #             [], order=order_str, offset=offset, limit=limit
+    #         )
+
+    #         # Get total count for pagination info
+    #         total_count = self.env['customer.agg.risk.score'].search_count([])
+
+    #         for risk_score in risk_scores:
+    #             group_result = {
+    #                 'branch_id': risk_score.branch_id.display_name if risk_score.branch_id else False,
+    #                 'branch_id_count': risk_score.total_customers,
+    #                 'branch_id:formatted': risk_score.formatted_name,
+    #                 'risk_score': risk_score.weighted_avg_risk_score,
+    #                 '__count': risk_score.total_customers,
+    #                 '__domain': [('branch_id', '=', risk_score.branch_id.id if risk_score.branch_id else False)] + domain
+    #             }
+    #             # Only include requested fields
+    #             result.append(group_result)
+
+    #         # Add pagination metadata if needed
+    #         if hasattr(result, '__dict__'):
+    #             result.__dict__['total_count'] = total_count
+
+    #         return result
+    #     else:
+    #         # Fallback to super if grouping by a different field
+    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+
+class CustomerDigitalProduct(models.Model):
+    _name = 'customer.digital.product'
+    _sql_constraints = [
+        ('uniq_customer_id', 'unique(customer_id)',
+         "Customer already exists. Customer must be unique!"),
+    ]
+    
+    customer_id = fields.Text(string='Customer ID',
+                              index=True, readonly=True)  # customer,
+    customer_name = fields.Char(string='Name', tracking=True, readonly=True)
+    customer_segment = fields.Char(string='Customer Segment', tracking=True, readonly=True)
+    ussd = fields.Char(string='Uses USSD',index=True,readonly=True)
+    onebank = fields.Char(string='Uses One Bank', index=True,readonly=True)
+    carded_customer = fields.Char(string='Has A Card',index=True,readonly=True)
+    alt_bank = fields.Char(string='Is On Alt Bank',readonly=True)
+    sterling_pro = fields.Char(string='Has Sterling Pro',readonly=True)
+    banca = fields.Char(string='Has Banca',readonly=True)
+    doubble = fields.Char(string='Has Doubble',readonly=True)
+    specta = fields.Char(string='Has Specta',readonly=True)
+    switch = fields.Char(string='Has Switch',readonly=True)
+    
+    def init(self):
+        # Drop the trigger if it exists
+        self.env.cr.execute("""
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.tables
+            WHERE table_name = 'customer_digital_product'
+        )
+    """)
+        table_exists = self.env.cr.fetchone()[0]
+
+        if table_exists:
+            # Create the index if it doesn't exist
+            self.env.cr.execute("""
+                CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx
+                ON customer_digital_product (id)
+            """)
+       
+
+    
+
+
+

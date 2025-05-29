@@ -1,0 +1,13 @@
+<odoo>
+    <record id="case_form_inherit_disable_save_discard" model="ir.ui.view">
+        <field name="name">case.form.inherit.disable.save.discard</field>
+        <field name="model">case</field>
+        <field name="inherit_id" ref="case_management.case_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="edit">false</attribute>
+                <attribute name="create">false</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
