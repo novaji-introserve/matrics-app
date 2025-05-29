@@ -1318,19 +1318,19 @@ class CustomerDigitalProduct(models.Model):
          "Customer already exists. Customer must be unique!"),
     ]
     
-    
-    customer_id = fields.Text(string='Customer ID',index=True) #customer,
+    customer_id = fields.Text(string='Customer ID',
+                              index=True, readonly=True)  # customer,
     customer_name = fields.Char(string='Name', tracking=True, readonly=True)
     customer_segment = fields.Char(string='Customer Segment', tracking=True, readonly=True)
-    ussd = fields.Char(string='Uses USSD',index=True)
-    onebank = fields.Char(string='Uses One Bank', index=True)
-    carded_customer = fields.Char(string='Has A Card',index=True)
-    alt_bank = fields.Char(string='Is On Alt Bank')
-    sterling_pro = fields.Char(string='Has Sterling Pro')
-    banca = fields.Char(string='Has Banca')
-    doubble = fields.Char(string='Has Doubble')
-    specta = fields.Char(string='Has Specta')
-    switch = fields.Char(string='Has Switch')
+    ussd = fields.Char(string='Uses USSD',index=True,readonly=True)
+    onebank = fields.Char(string='Uses One Bank', index=True,readonly=True)
+    carded_customer = fields.Char(string='Has A Card',index=True,readonly=True)
+    alt_bank = fields.Char(string='Is On Alt Bank',readonly=True)
+    sterling_pro = fields.Char(string='Has Sterling Pro',readonly=True)
+    banca = fields.Char(string='Has Banca',readonly=True)
+    doubble = fields.Char(string='Has Doubble',readonly=True)
+    specta = fields.Char(string='Has Specta',readonly=True)
+    switch = fields.Char(string='Has Switch',readonly=True)
     
     def init(self):
         # Drop the trigger if it exists
