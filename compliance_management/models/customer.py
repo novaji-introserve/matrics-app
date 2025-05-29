@@ -644,7 +644,7 @@ class Customer(models.Model):
             EXECUTE FUNCTION set_partner_defaults_after_func();
         """)
 
-        self.cron_run_risk_assessment()
+        # self.cron_run_risk_assessment()
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -207,7 +207,7 @@ class CustomerAccount(models.Model):
             WHERE active IS NULL;
         """)
 
-        self.compute_aggregate_risk_scores()
+        # self.compute_aggregate_risk_scores()
 
     @api.model
     def open_accounts(self):
