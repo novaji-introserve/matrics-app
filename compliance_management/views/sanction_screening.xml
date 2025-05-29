@@ -303,15 +303,32 @@
             <field name="code">action = model.action_view_customer_pep()</field>
         </record>
 
+        <!-- Actions for PEPlist-->
+        <record id="action_peplist" model="ir.actions.act_window">
+            <field name="name">PEP List</field>
+            <field name="res_model">pep.list</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first PEP List
+                </p>
+            </field>
+        </record>
 
 
+        
+        
+        
+        
         <!-- Menu Items -->
-
+        
         <menuitem id="menu_sanction_screening_root" name="Sanction screening" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="150" />
-
-        <menuitem id="menu_compliance_customer_pep" action="action_view_customer_pep" parent="menu_sanction_screening_root" name="PEP List" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
-
+        
         <!-- <menuitem id="menu_is_fep" action="action_res_partner_fep" parent="menu_sanction_screening_root" name="FEP List" groups="group_compliance_compliance_officer" sequence="20" /> -->
+      
+        <!-- Action for Local PepList -->
+        <menuitem id="menu_compliance_peplist" action="action_peplist" parent="menu_sanction_screening_root" name="PEP List" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
 
         <menuitem id="menu_watchlist" action="action_res_partner_watchlist" parent="menu_sanction_screening_root" name="Watchlist" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="30" />
 

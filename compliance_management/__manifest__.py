@@ -97,6 +97,7 @@
         # "data/demo_data/account/res_partner_accounts.xml" # CUSTOMER ACCOUNT
         # "data/transactions.xml" # TRANSACTION
         "views/res_users.xml",
+        "views/peplist.xml",
         'data/gender.xml',
         'data/identification_type.xml',
         'data/demo_data/stat/compliance_stats.xml',
