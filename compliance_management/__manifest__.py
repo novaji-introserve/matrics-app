@@ -92,7 +92,7 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
-        # "data/demo_data/chart/charts.xml", #CHARTS
+        "data/demo_data/chart/charts.xml", #CHARTS
         # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
         # "data/demo_data/account/res_partner_accounts.xml" # CUSTOMER ACCOUNT
         # "data/transactions.xml" # TRANSACTION
