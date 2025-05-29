@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 class ColorGenerator:
     """Service for generating chart colors with improved performance.
     

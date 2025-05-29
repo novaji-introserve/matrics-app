@@ -2,10 +2,8 @@
 
 import logging
 import time
-from odoo import api, fields
+from odoo import api
 import psycopg2
-import re
-from datetime import datetime, timedelta
 
 _logger = logging.getLogger(__name__)
 
@@ -302,3 +300,4 @@ class DatabaseService:
                     cr.commit()
         except Exception as e:
             _logger.error(f"Failed to record execution statistics: {e}")
+            

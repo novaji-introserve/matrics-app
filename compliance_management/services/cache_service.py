@@ -8,6 +8,9 @@ import time
 import threading
 from datetime import datetime, timedelta
 from odoo import fields, api
+from odoo import registry
+
+from ..utils.request_context import RequestContextManager
 
 _logger = logging.getLogger(__name__)
 
@@ -69,7 +72,6 @@ class ThreadRegistry:
                 ):
                     del self._threads[key]
 
-# Global thread registry
 THREAD_REGISTRY = ThreadRegistry()
 
 class CacheService:
@@ -258,7 +260,6 @@ class CacheService:
             time.sleep(0.25)
             _logger.debug(f"Starting background refresh for key: {key}")
             
-            from odoo import registry
             with registry(dbname).cursor() as cr:
                 env = api.Environment(cr, uid, {})
                 cache = env["res.dashboard.cache"].search(
@@ -325,7 +326,6 @@ class CacheService:
             except:
                 branches_id = []
 
-            from ..utils.request_context import RequestContextManager
             with RequestContextManager(self.env) as request:
                 request.uid = user_id
 
@@ -358,7 +358,6 @@ class CacheService:
             except:
                 branches_id = []
 
-            from ..utils.request_context import RequestContextManager
             with RequestContextManager(self.env) as request:
                 request.uid = user_id
 
@@ -391,3 +390,4 @@ class CacheService:
             
         THREAD_REGISTRY.cleanup_stale()
         return True
+    

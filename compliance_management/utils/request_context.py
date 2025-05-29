@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import threading
 from werkzeug.local import Local
 from werkzeug.test import EnvironBuilder

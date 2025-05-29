@@ -3,6 +3,9 @@
 from odoo import models, fields, api
 import logging
 
+from ..services.materialized_view import MaterializedViewService
+from ..services.database_service import DatabaseService
+
 _logger = logging.getLogger(__name__)
 
 class StatisticViewRefresher(models.Model):
@@ -36,23 +39,14 @@ class StatisticViewRefresher(models.Model):
         Returns:
             bool: True if the refresh was successful, False otherwise.
         """
-        try:
-            stats = self.env["res.compliance.stat"].search([("state", "=", "active")])
-            refreshed = 0
-            errors = 0
-            for stat in stats:
-                if self.refresh_stat_view(stat.id, low_priority):
-                    refreshed += 1
-                else:
-                    errors += 1
-            refresher = self.search([], limit=1)
-            if refresher:
-                refresher.write({"last_run": fields.Datetime.now()})
-            _logger.info(f"Refreshed {refreshed} statistic views, {errors} errors")
-            return True
-        except Exception as e:
-            _logger.error(f"Error refreshing statistic views: {e}")
-            return False
+        mv_service = MaterializedViewService(self.env)
+        result = mv_service.refresh_all_stat_views(low_priority)
+        
+        refresher = self.search([], limit=1)
+        if refresher:
+            refresher.write({"last_run": fields.Datetime.now()})
+            
+        return result.get('refreshed', 0) > 0
 
     @api.model
     def refresh_stat_view(self, stat_id, low_priority=False):
@@ -65,42 +59,20 @@ class StatisticViewRefresher(models.Model):
         Returns:
             bool: True if the refresh was successful, False otherwise.
         """
-        try:
-            registry = self.env.registry
-            with registry.cursor() as cr:
-                if low_priority:
-                    cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
-                cr.execute("SELECT pg_try_advisory_xact_lock(%s)", (stat_id,))
-                view_name = f"stat_view_{stat_id}"
-            self.env.cr.execute(
-                """
-                SELECT EXISTS (
-                    SELECT FROM pg_catalog.pg_class c
-                    WHERE c.relname = %s AND c.relkind = 'm'
-                )
-            """,
-                (view_name,),
-            )
-            view_exists = self.env.cr.fetchone()[0]
-            if not view_exists:
-                return self.create_materialized_view_for_stat(stat_id)
-            self.env.cr.execute(f"REFRESH MATERIALIZED VIEW {view_name}")
+        mv_service = MaterializedViewService(self.env)
+        success = mv_service.refresh_stat_view(stat_id, low_priority)
+        
+        if success:
             refresher = self.search([("stat_id", "=", stat_id)], limit=1)
             now = fields.Datetime.now()
             if refresher:
                 refresher.write({"last_refresh": now})
+                
             stat = self.env["res.compliance.stat"].browse(stat_id)
             if stat.exists():
                 stat.write({"materialized_view_last_refresh": now})
-            _logger.info(
-                f"Refreshed materialized view {view_name} for statistic {stat_id}"
-            )
-            return True
-        except Exception as e:
-            _logger.error(
-                f"Error refreshing materialized view for statistic {stat_id}: {e}"
-            )
-            return False
+                
+        return success
 
     @api.model
     def create_materialized_view_for_stat(self, stat_id):
@@ -112,89 +84,30 @@ class StatisticViewRefresher(models.Model):
         Returns:
             bool: True if the view was created successfully, False otherwise.
         """
-        try:
+        mv_service = MaterializedViewService(self.env)
+        success = mv_service.create_stat_materialized_view(stat_id)
+        
+        if success:
             stat = self.env["res.compliance.stat"].browse(stat_id)
-            if not stat.exists():
-                _logger.error(f"Statistic {stat_id} not found")
-                return False
             view_name = f"stat_view_{stat_id}"
-            self.env.cr.execute(
-                """
-                SELECT EXISTS (
-                    SELECT FROM pg_catalog.pg_class c
-                    WHERE c.relname = %s AND c.relkind = 'm'
-                )
-            """,
-                (view_name,),
-            )
-            view_exists = self.env.cr.fetchone()[0]
-            if view_exists:
-                _logger.info(
-                    f"Materialized view {view_name} already exists, skipping creation"
-                )
-                return True
-            original_query, query = stat._prepare_and_validate_query(stat.sql_query)
-            if not original_query:
-                _logger.error(f"Invalid query for statistic {stat_id}")
-                return False
-            with self.env.registry.cursor() as cr:
-                try:
-                    cr.execute("SET LOCAL statement_timeout = 120000;")
-                    cr.execute(
-                        """
-                        SELECT EXISTS (
-                            SELECT FROM pg_catalog.pg_class c
-                            WHERE c.relname = %s AND c.relkind = 'm'
-                        )
-                    """,
-                        (view_name,),
-                    )
-                    if cr.fetchone()[0]:
-                        _logger.info(
-                            f"Materialized view {view_name} already exists (double-check), skipping creation"
-                        )
-                        return True
-                    if original_query.strip().endswith(";"):
-                        original_query = original_query.strip()[:-1]
-                    create_view_query = f"""
-                        CREATE MATERIALIZED VIEW {view_name} AS
-                        {original_query}
-                        WITH DATA
-                    """
-                    _logger.info(
-                        f"Creating materialized view for statistic {stat_id}: {view_name}"
-                    )
-                    cr.execute(create_view_query)
-                    refresher = self.search([("stat_id", "=", stat_id)], limit=1)
-                    now = fields.Datetime.now()
-                    if refresher:
-                        refresher.write({"view_name": view_name, "last_refresh": now})
-                    else:
-                        self.create(
-                            {
-                                "name": f"Refresher for {stat.name}",
-                                "stat_id": stat_id,
-                                "view_name": view_name,
-                                "last_refresh": now,
-                            }
-                        )
-                    stat.write({"materialized_view_last_refresh": now})
-                    cr.commit()
-                    _logger.info(
-                        f"Successfully created materialized view {view_name} for statistic {stat_id}"
-                    )
-                    return True
-                except Exception as e:
-                    cr.rollback()
-                    _logger.error(
-                        f"Error creating materialized view for statistic {stat_id}: {e}"
-                    )
-                    return False
-        except Exception as e:
-            _logger.error(
-                f"Error creating materialized view for statistic {stat_id}: {e}"
-            )
-            return False
+            
+            refresher = self.search([("stat_id", "=", stat_id)], limit=1)
+            now = fields.Datetime.now()
+            
+            if refresher:
+                refresher.write({
+                    "view_name": view_name,
+                    "last_refresh": now,
+                })
+            else:
+                self.create({
+                    "name": f"Refresher for {stat.name}",
+                    "stat_id": stat_id,
+                    "view_name": view_name,
+                    "last_refresh": now,
+                })
+                
+        return success
 
     @api.model
     def ensure_all_stat_views_exist(self):
@@ -207,35 +120,34 @@ class StatisticViewRefresher(models.Model):
         """
         _logger.info("Ensuring all statistic materialized views exist")
         try:
-            stats = self.env["res.compliance.stat"].search([("state", "=", "active")])
+            stats = self.env["res.compliance.stat"].search([
+                ("state", "=", "active"), 
+                ("use_materialized_view", "=", True)
+            ])
+            
             if not stats:
-                _logger.info("No statistics found")
+                _logger.info("No statistics found with materialized views enabled")
                 return True
+                
             _logger.info(f"Found {len(stats)} statistics to create views for")
             created = 0
             errors = 0
+            
             for stat in stats:
                 view_name = f"stat_view_{stat.id}"
-                self.env.cr.execute(
-                    """
-                    SELECT EXISTS (
-                        SELECT FROM pg_catalog.pg_class c
-                        WHERE c.relname = %s AND c.relkind = 'm'
-                    )
-                """,
-                    (view_name,),
-                )
-                view_exists = self.env.cr.fetchone()[0]
+                
+                db_service = DatabaseService(self.env)
+                view_exists = db_service.check_view_exists(view_name)
+                
                 if not view_exists:
                     _logger.info(f"Creating materialized view for statistic {stat.id}")
                     if self.create_materialized_view_for_stat(stat.id):
                         created += 1
                     else:
                         errors += 1
-            _logger.info(
-                f"Materialized view initialization complete: {created} created, {errors} errors"
-            )
-            return True
+                        
+            _logger.info(f"Materialized view initialization complete: {created} created, {errors} errors")
+            return errors == 0
         except Exception as e:
             _logger.error(f"Error ensuring all statistic views exist: {e}")
             return False
@@ -247,10 +159,14 @@ class StatisticViewRefresher(models.Model):
         This method ensures that a refresher record exists and all necessary statistic views are created.
         """
         super(StatisticViewRefresher, self).init()
+        
         if not self.search([], limit=1):
             self.create({"name": "Statistics View Refresher"})
+            
         self.env.cr.commit()
+        
         try:
             self.ensure_all_stat_views_exist()
         except Exception as e:
             _logger.error(f"Error in init for StatisticViewRefresher: {e}")
+            

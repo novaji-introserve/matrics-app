@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import re
-from odoo import tools
+
+from ..services.security_service import SecurityService
+from ..services.database_service import DatabaseService
+from ..services.query_service import QueryService
 
 _logger = logging.getLogger(__name__)
 
@@ -38,7 +40,6 @@ class ChartDataService:
                 "datasets": [{"data": [], "backgroundColor": []}],
             }
             
-        # Find X and Y fields in results
         x_field = chart.x_axis_field or "name"
         if x_field not in results[0]:
             x_field = next(iter(results[0]))
@@ -57,8 +58,7 @@ class ChartDataService:
                 y_field = next(
                     (k for k in results[0].keys() if k != x_field and k != "id"), None
                 )
-                
-        # Find ID field
+
         id_field = "id"
         if id_field not in results[0]:
             id_field = next((k for k in results[0].keys() if k.endswith("_id")), None)
@@ -68,8 +68,7 @@ class ChartDataService:
             if id_field and id_field in results[0]
             else []
         )
-        
-        # Check if Y field was found
+
         if not y_field:
             _logger.error(f"Cannot determine Y-axis field for chart {chart.id}")
             return {
@@ -81,7 +80,6 @@ class ChartDataService:
                 "datasets": [{"data": [], "backgroundColor": []}],
             }
             
-        # Extract labels and values
         labels = [str(r.get(x_field, "")) for r in results]
         values = []
         for r in results:
@@ -90,8 +88,7 @@ class ChartDataService:
                 values.append(float(val) if val is not None else 0)
             except (ValueError, TypeError):
                 values.append(0)
-                
-        # Extract additional domain if needed
+
         additional_domain = []
         if chart.query:
             original_query = chart.query.upper()
@@ -126,8 +123,7 @@ class ChartDataService:
                                     additional_domain.append(
                                         (field.lower(), "=", value)
                                     )
-                                    
-        # Generate colors
+
         colors = self.color_generator._generate_colors(chart.color_scheme, len(results))
         
         return {
@@ -155,7 +151,6 @@ class ChartDataService:
 
     def _is_safe_query(self, query):
         """Check if a query is safe to execute"""
-        from ..services.query_service import QueryService
         return QueryService.is_safe_query(query)
 
     def get_chart_data_from_materialized_view(self, chart, cco, branches_id):
@@ -169,10 +164,6 @@ class ChartDataService:
         Returns:
             dict: The chart data extracted from the materialized view.
         """
-        from ..services.query_service import QueryService
-        from ..services.database_service import DatabaseService
-        from ..services.security_service import SecurityService
-        
         if not self.env:
             return {
                 "id": chart.id,
@@ -187,8 +178,7 @@ class ChartDataService:
             view_name = f"dashboard_chart_view_{chart.id}"
             db_service = DatabaseService(self.env)
             security_service = SecurityService()
-            
-            # Check if view exists
+
             view_exists = db_service.check_view_exists(view_name)
             if not view_exists:
                 _logger.warning(f"Materialized view {view_name} does not exist - creating it")
@@ -197,19 +187,15 @@ class ChartDataService:
                     _logger.error(f"Failed to create materialized view for chart {chart.id}")
                     return self.get_chart_data_from_direct_query(chart, cco, branches_id)
                     
-            # Get columns from view
             columns = db_service.get_table_columns(view_name)
             if not columns:
                 _logger.error(f"No columns found in materialized view {view_name}")
                 return self.get_chart_data_from_direct_query(chart, cco, branches_id)
                 
-            # Find branch column
             branch_col = QueryService.find_branch_column_in_view(columns, chart.branch_field)
             
-            # Build query
             query = f"SELECT * FROM {view_name}"
             
-            # Apply branch filtering if needed
             if (
                 chart.branch_field
                 and not cco
@@ -232,22 +218,18 @@ class ChartDataService:
                         query += f" WHERE {branch_col} IN {tuple(effective_branches)}"
                 elif branch_col:
                     query += " WHERE 1=0"
-                    
-            # Apply sorting
+             
             sort_col = QueryService.find_sort_column_in_view(columns, chart.y_axis_field)
             if sort_col:
                 query += f" ORDER BY {sort_col} DESC"
                 
-            # Apply limit
             query += " LIMIT 100"
             
-            # Execute query
             success, results, _ = db_service.execute_query_with_timeout(query, timeout=30000)
             if not success or not results:
                 _logger.error(f"Error executing materialized view query for chart {chart.id}")
                 return self.get_chart_data_from_direct_query(chart, cco, branches_id)
                 
-            # Post-process results for additional security
             if (
                 not cco
                 and not security_service.is_cco_user()
@@ -272,7 +254,6 @@ class ChartDataService:
                         )
                     results = filtered_results
                     
-            # Extract chart data
             return self._extract_chart_data(chart, results, query)
         except Exception as e:
             _logger.error(f"Error getting chart from materialized view: {e}")
@@ -289,9 +270,6 @@ class ChartDataService:
         Returns:
             dict: A dictionary containing chart data or an error message.
         """
-        from ..services.security_service import SecurityService
-        from ..services.database_service import DatabaseService
-        
         if not self.env:
             return {
                 "id": chart.id,
@@ -342,3 +320,4 @@ class ChartDataService:
                 "labels": [],
                 "datasets": [{"data": [], "backgroundColor": []}],
             }
+            

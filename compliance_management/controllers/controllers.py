@@ -6,9 +6,7 @@ from datetime import datetime, timedelta
 from odoo import fields
 import re
 import logging
-import json
 
-# Import services and utilities
 from ..services.security_service import SecurityService
 from ..services.database_service import DatabaseService
 from ..services.cache_service import CacheService
@@ -107,16 +105,13 @@ class Compliance(http.Controller):
                 f"CO user {request.env.user.id} accessing dynamic SQL with CCO privileges"
             )
             
-        # Extract main table from query
         lower_query = sql_query.lower()
         table = None
         domain = []
         
-        # Skip aggregation queries
         if re.search(r"\b(?:sum|avg|min|max)\s*\(", lower_query):
             return None
             
-        # Find the main table
         table = self.query_service.extract_main_table(sql_query)
         if not table:
             join_match = re.search(
@@ -125,7 +120,6 @@ class Compliance(http.Controller):
             if join_match:
                 return None
                 
-        # Extract where conditions
         where_match = re.search(
             r"\bwhere\s+(.+?)(?:\s+(?:group\s+by|order\s+by|limit|having)\s+|\s*$)",
             lower_query,
@@ -136,21 +130,17 @@ class Compliance(http.Controller):
             condition_string = where_match.group(1).strip()
             domain = self.query_service.parse_condition_string(condition_string)
             
-        # Add additional filters
         additional_filters = []
         if table == "res_partner":
             additional_filters.append(("origin", "in", ["demo", "test", "prod"]))
             
-        # Check if table has branch_id column
         db_service = DatabaseService(request.env)
         has_branch_id = db_service.check_table_for_branch_column(table) is not None
         
-        # Apply branch filtering if needed
         if not cco and has_branch_id:
             branch_ids = self.check_branches_id(branches_id)
             additional_filters.append(("branch_id", "in", branch_ids))
             
-        # Combine filters with domain
         if additional_filters:
             if domain:
                 is_complex = any(op == "|" for op in domain if isinstance(op, str))
@@ -206,32 +196,27 @@ class Compliance(http.Controller):
             cco = True
             if is_co:
                 _logger.info(f"CO user {user_id} accessing stats with CCO privileges")
-                
-        # Generate cache key
+
         unique_id = get_unique_client_identifier()
         cco_str, branches_str, datepicked_str, unique_id = normalize_cache_key_components(
             cco, branches_id, datepicked, unique_id
         )
         cache_key = f"all_stats_{cco_str}_{branches_str}_{datepicked_str}_{unique_id}"
         _logger.info(f"This is the stats cache key: {cache_key}")
-        
-        # Check cache
+
         cache_service = CacheService(request.env)
         cache_data = cache_service.get_cache(cache_key, user_id)
         
         if cache_data:
             return cache_data
-            
-        # Tables to exclude from branch filtering for non-CCO users
+
         excluded_tables = ["res_branch", "res_risk_universe"]
-        
-        # For non-CCO users, verify branch access
+
         if not cco:
             branches_array = self.check_branches_id(branches_id)
             if not branches_array:
                 return {"data": [], "total": 0}
                 
-        # Get all active statistics
         query = """
             SELECT rcs.*
             FROM res_compliance_stat rcs
@@ -247,7 +232,6 @@ class Compliance(http.Controller):
             
         computed_results = []
         
-        # Process each statistic
         for stat in stat_records:
             with request.env.registry.cursor() as cr:
                 try:
@@ -256,27 +240,21 @@ class Compliance(http.Controller):
                     result_value = None
                     use_view = stat.get("use_materialized_view", False)
                     
-                    # Try to get data from materialized view if enabled
                     if use_view and db_service.check_view_exists(view_name):
-                        # Get view columns
+
                         columns = db_service.get_table_columns(view_name)
                         
-                        # Build filter query
                         filter_query = f"SELECT * FROM {view_name}"
                         
-                        # Apply branch filtering for non-CCO users
                         if not cco and branches_id:
                             original_query = stat["sql_query"].lower()
                             main_table = self.query_service.extract_main_table(original_query)
                             
-                            # Skip excluded tables for non-CCO users
                             if not cco and main_table in excluded_tables:
                                 continue
                                 
-                            # Find branch column
                             branch_column = self.query_service.find_branch_column_in_view(columns)
                             
-                            # Apply branch filtering
                             if branch_column:
                                 branches_array = list(map(int, branches_id))
                                 if branches_array:
@@ -286,8 +264,7 @@ class Compliance(http.Controller):
                                         filter_query += f" WHERE {branch_column} IN {tuple(branches_array)}"
                                 else:
                                     continue
-                                    
-                        # Execute query
+
                         try:
                             cr.execute(f"{filter_query} LIMIT 1")
                             result_row = cr.fetchone()
@@ -296,17 +273,14 @@ class Compliance(http.Controller):
                         except Exception as view_error:
                             _logger.warning(f"Error querying view for stat {stat_id}: {view_error}")
                             
-                    # If no result from view or view not used, execute direct query
                     if result_value is None:
                         original_query = stat["sql_query"]
                         query = original_query.lower()
                         main_table = self.query_service.extract_main_table(query)
                         
-                        # Skip excluded tables for non-CCO users
                         if not cco and main_table in excluded_tables:
                             continue
-                            
-                        # Check if query needs modification
+
                         needs_modification = False
                         has_branch_id = False
                         branch_column_name = None
@@ -315,12 +289,10 @@ class Compliance(http.Controller):
                             is not None
                         )
                         
-                        # Check if table has branch column
                         if main_table:
                             branch_column_name = db_service.check_table_for_branch_column(main_table)
                             has_branch_id = bool(branch_column_name)
                             
-                        # Modify query for partners or branch filtering
                         if has_res_partner or has_branch_id:
                             needs_modification = True
                             if query.endswith(";"):
@@ -330,7 +302,6 @@ class Compliance(http.Controller):
                             has_where = bool(re.search(r"\bwhere\b", query))
                             conditions = []
                             
-                            # Add branch condition for non-CCO users
                             if not cco and has_branch_id and branch_column_name:
                                 branches_array = (
                                     list(map(int, branches_id)) if branches_id else []
@@ -347,18 +318,15 @@ class Compliance(http.Controller):
                                 else:
                                     conditions.append("1=0")
                                     
-                            # Add partner origin condition
                             if has_res_partner:
                                 conditions.append("origin IN ('demo','test','prod')")
                                 
-                            # Apply conditions to query
                             if conditions:
                                 if has_where:
                                     condition_str = " AND " + " AND ".join(conditions)
                                 else:
                                     condition_str = " WHERE " + " AND ".join(conditions)
-                                    
-                                # Insert conditions before GROUP BY, ORDER BY, etc.
+                               
                                 clauses = [
                                     "group by",
                                     "order by",
@@ -383,7 +351,6 @@ class Compliance(http.Controller):
                                 else:
                                     original_query += condition_str
                                     
-                        # Execute query
                         try:
                             cr.execute(original_query)
                             result_row = cr.fetchone()
@@ -406,7 +373,6 @@ class Compliance(http.Controller):
                             )
                             continue
                             
-                    # Add result to computed results
                     computed_results.append(
                         {
                             "name": stat["name"],
@@ -436,7 +402,6 @@ class Compliance(http.Controller):
                         }
                     )
                     
-        # Cache results
         result = {"data": computed_results, "total": len(computed_results)}
         cache_service.set_cache(cache_key, result, user_id)
         
@@ -459,7 +424,6 @@ class Compliance(http.Controller):
         Returns:
             dict: A dictionary containing computed statistics and total count.
         """
-        # Calculate date range
         today = datetime.now().date()
         prevDate = today - timedelta(days=datepicked)
         start_of_prev_day = fields.Datetime.to_string(
@@ -468,8 +432,7 @@ class Compliance(http.Controller):
         end_of_today = fields.Datetime.to_string(
             datetime.combine(today, datetime.max.time())
         )
-        
-        # Check user permissions
+
         is_cco = self.security_service.is_cco_user()
         is_co = self.security_service.is_co_user()
         
@@ -480,12 +443,9 @@ class Compliance(http.Controller):
                     f"CO user {request.env.user.id} accessing stats by category with CCO privileges"
                 )
                 
-        # Convert branches_id to array of integers
         branches_array = list(map(int, branches_id)) if branches_id else []
         
-        # For CCO users
         if cco:
-            # Get statistics for the category
             results = request.env["res.compliance.stat"].search(
                 [
                     ("create_date", ">=", start_of_prev_day),
@@ -496,13 +456,11 @@ class Compliance(http.Controller):
             
             computed_results = []
             
-            # Process each statistic
             for result in results:
                 original_query = result["sql_query"]
                 query = original_query.lower()
                 needs_modification = False
                 
-                # Check if query needs modification for partners or branches
                 if any(
                     table in query
                     for table in ["res_partner", "res.partner", "tier", "transaction"]
@@ -515,18 +473,15 @@ class Compliance(http.Controller):
                     has_where = bool(re.search(r"\bwhere\b", query))
                     conditions = []
                     
-                    # Add partner origin condition
                     if "res_partner" in query or "res.partner" in query:
                         conditions.append("origin IN ('demo','test','prod')")
                         
-                    # Apply conditions to query
                     if conditions:
                         if has_where:
                             condition_str = " AND " + " AND ".join(conditions)
                         else:
                             condition_str = " WHERE " + " AND ".join(conditions)
                             
-                        # Insert conditions before GROUP BY, ORDER BY, etc.
                         clauses = ["group by", "order by", "limit", "offset", "having"]
                         clause_pos = -1
                         
@@ -545,18 +500,14 @@ class Compliance(http.Controller):
                         else:
                             original_query += condition_str
                             
-                    # Execute query
                     request.env.cr.execute(original_query)
                 else:
-                    # Execute original query without modification
                     request.env.cr.execute(original_query)
                     
-                # Get result
                 result_value = (
                     request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
                 )
                 
-                # Add result to computed results
                 computed_results.append(
                     {
                         "name": result["name"],
@@ -570,8 +521,6 @@ class Compliance(http.Controller):
                 
             return {"data": computed_results, "total": len(results)}
         else:
-            # For non-CCO users
-            # Get statistics for the category
             query = """
                 SELECT rcs.*
                 FROM res_compliance_stat rcs
@@ -587,13 +536,11 @@ class Compliance(http.Controller):
             
             computed_results = []
             
-            # Process each statistic
             for stat in stat_records:
                 original_query = stat["sql_query"]
                 query = original_query.lower()
                 needs_modification = False
                 
-                # Check if query needs modification for partners or branches
                 if any(
                     table in query
                     for table in ["res_partner", "res.partner", "transaction"]
@@ -606,24 +553,20 @@ class Compliance(http.Controller):
                     has_where = bool(re.search(r"\bwhere\b", query))
                     conditions = []
                     
-                    # Add branch condition
                     if branches_array:
                         conditions.append(f"branch_id IN {tuple(branches_array)}")
                     else:
                         conditions.append("1=0")
                         
-                    # Add partner origin condition
                     if "res_partner" in query or "res.partner" in query:
                         conditions.append("origin IN ('demo','test','prod')")
                         
-                    # Apply conditions to query
                     if conditions:
                         if has_where:
                             condition_str = " AND " + " AND ".join(conditions)
                         else:
                             condition_str = " WHERE " + " AND ".join(conditions)
                             
-                        # Insert conditions before GROUP BY, ORDER BY, etc.
                         clauses = ["group by", "order by", "limit", "offset", "having"]
                         clause_pos = -1
                         
@@ -642,7 +585,6 @@ class Compliance(http.Controller):
                         else:
                             original_query += condition_str
                             
-                        # Execute query
                         request.env.cr.execute(original_query)
                         result_value = (
                             request.env.cr.fetchone()[0]
@@ -650,7 +592,6 @@ class Compliance(http.Controller):
                             else 0
                         )
                         
-                        # Add result to computed results
                         computed_results.append(
                             {
                                 "name": stat["name"],
@@ -663,3 +604,4 @@ class Compliance(http.Controller):
                         )
                         
             return {"data": computed_results, "total": len(computed_results)}
+        

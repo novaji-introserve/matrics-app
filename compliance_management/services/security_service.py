@@ -4,6 +4,8 @@ import logging
 import re
 from odoo.http import request
 
+from ..services.query_service import QueryService
+
 _logger = logging.getLogger(__name__)
 
 class SecurityService:
@@ -85,8 +87,6 @@ class SecurityService:
         Returns:
             str: The secured SQL query.
         """
-        from ..services.query_service import QueryService
-
         if not chart or not chart.query:
             return chart.query
         query = chart.query
@@ -140,8 +140,6 @@ class SecurityService:
         Returns:
             str: The modified SQL query with the origin filter applied.
         """
-        from ..services.query_service import QueryService
-
         query = query.strip()
         if query.endswith(";"):
             query = query[:-1]
@@ -230,8 +228,6 @@ class SecurityService:
         Returns:
             str: The modified SQL query with branch filtering applied.
         """
-        from ..services.query_service import QueryService
-
         if "LEFT JOIN (" in query.upper() and "SELECT" in query.upper():
             parts = branch_field.split(".")
             if len(parts) == 2:
@@ -322,3 +318,4 @@ class SecurityService:
             return branches_id
         else:
             return branches_id
+        

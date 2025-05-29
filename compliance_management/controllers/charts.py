@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
 
 import psycopg2
-from odoo import api, http
+from odoo import http
 from odoo.http import request
 import json
 import logging
-import re
 import time
 
-# Import services and utilities
 from ..services.chart_data_service import ChartDataService
 from ..services.security_service import SecurityService
 from ..services.database_service import DatabaseService
 from ..services.cache_service import CacheService
 from ..services.materialized_view import MaterializedViewService
+from ..utils.cache_key_unique_identifier import generate_cache_key
 from ..utils.cache_key_unique_identifier import get_unique_client_identifier, normalize_cache_key_components
 from ..services.query_service import QueryService
 
 _logger = logging.getLogger(__name__)
-
 
 class DynamicChartController(http.Controller):
     """Controller for handling dynamic chart requests with security and performance"""
@@ -88,7 +86,6 @@ class DynamicChartController(http.Controller):
             
             secured_query = self.security_service.secure_chart_query(chart, cco, [])
             
-            # Execute query with database service
             db_service = DatabaseService(request.env)
             success, results, execution_time = db_service.execute_query_with_timeout(
                 secured_query, timeout=10000
@@ -148,7 +145,6 @@ class DynamicChartController(http.Controller):
         user_id = request.env.user.id
         datepicked = kw.get("datepicked", 20000)
         
-        # Create cache key for the chart page
         cache_params = {
             "chart_id": chart_id,
             "page": page,
@@ -160,7 +156,6 @@ class DynamicChartController(http.Controller):
         
         cache_key = self.generate_cache_key("chart_page", cache_params)
         
-        # Initialize cache service with environment
         cache_service = CacheService(request.env)
         cache_data = cache_service.get_cache(cache_key, user_id)
         
@@ -252,7 +247,6 @@ class DynamicChartController(http.Controller):
                     )
                     cr.execute(f"SET TRANSACTION ISOLATION LEVEL {isolation_level}")
                     
-                    # Check if materialized view exists
                     if not db_service.check_view_exists(view_name):
                         _logger.warning(
                             f"Materialized view {view_name} does not exist (attempt {retry_attempt+1}/{max_retries})"
@@ -275,7 +269,6 @@ class DynamicChartController(http.Controller):
                     try:
                         _logger.info(f"Querying materialized view {view_name} directly (attempt {retry_attempt+1})")
                         
-                        # Get columns from view
                         columns = db_service.get_table_columns(view_name)
                         if not columns:
                             _logger.warning(
@@ -296,16 +289,12 @@ class DynamicChartController(http.Controller):
                             
                         _logger.info(f"Successfully found {len(columns)} columns in {view_name}: {columns}")
                         
-                        # Find branch column for filtering
                         branch_col = query_service.find_branch_column_in_view(columns, chart.branch_field)
                             
-                        # Find sort column for ordering
                         sort_col = query_service.find_sort_column_in_view(columns, chart.y_axis_field)
                         
-                        # Build query
                         query = f"SELECT * FROM {view_name}"
                         
-                        # Apply branch filtering if needed
                         if (
                             chart.branch_field
                             and not cco
@@ -330,22 +319,18 @@ class DynamicChartController(http.Controller):
                             elif branch_col:
                                 query += " WHERE 1=0"
                                 
-                        # Get total count for pagination
                         cr.execute(f"SELECT COUNT(*) FROM ({query}) AS count_query")
                         total_count = cr.fetchone()[0]
                         
-                        # Apply sorting and pagination
                         if sort_col:
                             query += f" ORDER BY {sort_col} DESC"
                         query += f" LIMIT {page_size} OFFSET {page * page_size}"
                         
-                        # Execute query with timeout
                         timeout = int(retry_params.get_param("chart.view.query_timeout", default=30000))
                         cr.execute(f"SET LOCAL statement_timeout = {timeout}")
                         cr.execute(query)
                         results = cr.dictfetchall()
                         
-                        # Extract chart data
                         chart_data = chart_data_service._extract_chart_data(chart, results, query)
                         chart_data["pagination"] = {
                             "total": total_count,
@@ -358,7 +343,6 @@ class DynamicChartController(http.Controller):
                             ),
                         }
                         
-                        # Cache the results
                         cache_service.set_cache(cache_key, chart_data, user_id)
                         return chart_data
                     except Exception as query_error:
@@ -415,7 +399,6 @@ class DynamicChartController(http.Controller):
             chart_data_service = ChartDataService(request.env)
             result = chart_data_service.get_chart_data_from_direct_query(chart, cco, branches_id)
             
-            # Add pagination info
             result["pagination"] = {
                 "total": len(result.get("labels", [])),
                 "page": page,
@@ -423,7 +406,6 @@ class DynamicChartController(http.Controller):
                 "pages": 1,
             }
             
-            # Cache the results
             cache_service = CacheService(request.env)
             cache_service.set_cache(cache_key, result, user_id)
             
@@ -457,7 +439,6 @@ class DynamicChartController(http.Controller):
             list: A list of dictionaries containing chart data or an error message.
         """
         try:
-            # Normalize parameters
             if not isinstance(cco, bool):
                 cco = str(cco).lower() == "true"
                 
@@ -473,7 +454,6 @@ class DynamicChartController(http.Controller):
             user_id = request.env.user.id
             datepicked = kw.get("datepicked", 20000)
             
-            # Check user permissions
             actual_is_cco = self.security_service.is_cco_user()
             actual_is_co = self.security_service.is_co_user()
             
@@ -492,7 +472,6 @@ class DynamicChartController(http.Controller):
                 f"actual_is_cco={actual_is_cco}, actual_is_co={actual_is_co}"
             )
             
-            # Generate cache key
             unique_id = self.get_unique_client_identifier()
             cco_str, branches_str, datepicked_str, unique_id = self.normalize_cache_key_components(
                 cco, branches_id, datepicked, unique_id
@@ -500,18 +479,15 @@ class DynamicChartController(http.Controller):
             cache_key = f"charts_data_{cco_str}_{branches_str}_{datepicked_str}_{unique_id}"
             _logger.info(f"This is the charts cache key: {cache_key}")
             
-            # Check cache
             cache_service = CacheService(request.env)
             cache_data = cache_service.get_cache(cache_key, user_id)
             
             if cache_data:
                 return cache_data
                 
-            # Get all active charts
             charts = request.env["res.dashboard.charts"].search([("state", "=", "active")])
             results = []
             
-            # Process each chart
             chart_data_service = ChartDataService(request.env)
             for chart in charts:
                 try:
@@ -544,7 +520,6 @@ class DynamicChartController(http.Controller):
                         }
                     )
                     
-            # Cache the results
             cache_service.set_cache(cache_key, results, user_id)
             _logger.info(f"Returning {len(results)} charts for user {user_id}")
             
@@ -586,5 +561,5 @@ class DynamicChartController(http.Controller):
         Returns:
             str: The generated cache key.
         """
-        from ..utils.cache_key_unique_identifier import generate_cache_key
         return generate_cache_key(prefix, params)
+    

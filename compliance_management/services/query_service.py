@@ -317,7 +317,6 @@ class QueryService:
             if not expr.strip():
                 return []
             
-            # Handle OR parts
             or_parts = QueryService._split_by_operator(expr, "OR")
             if len(or_parts) > 1:
                 result = []
@@ -327,7 +326,6 @@ class QueryService:
                     result.extend(parse_expression(part, depth + 1))
                 return result
             
-            # Handle AND parts
             and_parts = QueryService._split_by_operator(expr, "AND")
             if len(and_parts) > 1:
                 result = []
@@ -337,12 +335,10 @@ class QueryService:
                 result.extend(parse_expression(and_parts[-1], depth + 1))
                 return result
             
-            # Handle parentheses
             if expr.strip().startswith("(") and expr.strip().endswith(")"):
                 inner_expr = expr.strip()[1:-1].strip()
                 return parse_expression(inner_expr, depth + 1)
             
-            # Handle single condition
             return [QueryService._parse_single_condition(expr)]
 
         try:
@@ -497,3 +493,4 @@ class QueryService:
         if value_str.upper() == "FALSE":
             return False
         return value_str
+    
