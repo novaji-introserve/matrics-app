@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 
 class PepCustomer(models.Model):
     _name = 'res.customer.pep'
-    _auto = False
+    # _auto = False
     _description = 'Customers matching PEP'
     _sql_constraints = [
         ('uniq_unique_id', 'unique(unique_id)',
