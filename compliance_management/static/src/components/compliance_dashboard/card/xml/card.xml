@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="owl.card" owl="1">
-        <div t-on-click="props.onClick" class="px-4 py-2 box cursor-pointer shadow bg-white position-relative" t-attf-style="">
+        <div t-on-click="props.onClick" class="px-4 py-2 mb-3 box cursor-pointer shadow bg-white position-relative" t-attf-style="">
             <h2 class="my-3 fs-1">
                 <t t-out="props.total" />
             </h2>
