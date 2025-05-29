@@ -45,20 +45,20 @@ class RiskAssessmentLine(models.Model):
     residual_risk_score = fields.Float(
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
     
-    # def init(self):
-    #     """
-    #     Override init() to drop constraint if exists.
-    #     """
-    #     self._cr.execute("""
-    #         SELECT conname FROM pg_constraint 
-    #         WHERE conname = 'res_risk_assessment_line_uniq_risk_assessment_line_name'
-    #     """)
-    #     if self._cr.fetchone():
-    #         self._cr.execute("""
-    #             ALTER TABLE res_risk_assessment_line 
-    #             DROP CONSTRAINT res_risk_assessment_line_uniq_risk_assessment_line_name
-    #         """)
-    #     super().init()
+    def init(self):
+        """
+        Override init() to drop constraint if exists.
+        """
+        self._cr.execute("""
+            SELECT conname FROM pg_constraint 
+            WHERE conname = 'res_risk_assessment_line_uniq_risk_assessment_line_name'
+        """)
+        if self._cr.fetchone():
+            self._cr.execute("""
+                ALTER TABLE res_risk_assessment_line 
+                DROP CONSTRAINT res_risk_assessment_line_uniq_risk_assessment_line_name
+            """)
+        super().init()
 
     @api.model
     def create(self, vals):
