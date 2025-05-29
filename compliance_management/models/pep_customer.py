@@ -1,5 +1,6 @@
 from odoo import _, api, fields, models, tools
 import logging
+import uuid
 
 _logger = logging.getLogger(__name__)
 
@@ -8,6 +9,10 @@ class PepCustomer(models.Model):
     _name = 'res.customer.pep'
     _auto = False
     _description = 'Customers matching PEP'
+    _sql_constraints = [
+        ('uniq_unique_id', 'unique(unique_id)',
+         "PEP already exists. PEP must be unique!"),
+    ]
 
     customer_id = fields.Many2one('res.partner', string='Customer',tracking=True)
     branch_id = fields.Many2one('res.branch', string='Branch', tracking=True)
@@ -17,6 +22,8 @@ class PepCustomer(models.Model):
     name = fields.Char(string='Name', tracking=True)
     pep_id = fields.Integer(string='PEP ID')
     is_pep = fields.Boolean(string="Is PEP")
+    unique_id = fields.Char(string='Unique Identifier', tracking=True, default=lambda self: str(uuid.uuid4()), readonly=True,  copy=False)
+    position = fields.Text(string='Position', tracking=True)
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
