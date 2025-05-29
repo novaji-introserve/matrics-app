@@ -142,415 +142,212 @@
 
                     <notebook>
                         <page string="Risk Assessment">
-                            <group>
+                            <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
+                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)]}">
                                 <group>
-                                    <field name="risk_score" widget="slider" step="0.5" min="0.5" max="25" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                     'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="risk_score" widget="slider" step="0.5" min="0.5" max="25" />
                                 </group>
 
                                 <group>
-                                    <field name="has_initiated_new_kyc" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                     'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="has_initiated_new_kyc"/>
                                 </group>
 
                                 <group>
-                                    <field name="was_kyc_comprehensive" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                    'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="was_kyc_comprehensive"/>
                                 </group>
 
                                 <group>
-                                     <field name="last_kyc_date" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                    'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                     <field name="last_kyc_date"/>
                                 </group>
 
                                 <group>
-                                     <field name="account_status" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                     <field name="account_status"/>
                                 </group>
 
                                 <group>
-                                    <field name="documentation_status" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="documentation_status"/>
                                 </group>
                             </group>
                         </page>
 
                         <page string="Customer Assessment">
-                            <group>
+                            <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
+                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)]}">
                                 <group colspan="2">
-                                        <field name="visitation_observation" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                        <field name="visitation_observation"/>
 
-                                        <field name="overall_kyc_outcome" placeholder="overall kyc outcome" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                        <field name="overall_kyc_outcome" placeholder="overall kyc outcome"/>
                                 </group>
                                   <group colspan="2">
-                                        <field name="occupation" string="Occupation/Employment Profile" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                        <field name="occupation" string="Occupation/Employment Profile"/>
                                     </group>
                              
                                    <group>
-                                        <field name="is_current_from_normal" string="Is Current Inflow From Normal Business" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                        <field name="is_current_from_normal" string="Is Current Inflow From Normal Business"/>
                                     </group>
 
                                     <group>
-                                        <field name="does_business_support_volume" string="Does Nature of Business Support Volume and Velocity Of Inflows"
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                        <field name="does_business_support_volume" string="Does Nature of Business Support Volume and Velocity Of Inflows"/>
                                     </group>
                             </group>
                         </page>
 
                         <page string="Additional Information">
-                            <group>
+                            <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
+                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)]}">
                                 <group colspan="2">
-                                    <field name="main_cash_purpose" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="main_cash_purpose"/>
 
-                                    <field name="main_inflow_purpose" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="main_inflow_purpose"/>
 
-                                    <field name="main_fund_remitters" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="main_fund_remitters"/>
 
-                                    <field name="inflow_sources" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="inflow_sources"/>
 
-                                    <field name="other_related_accounts" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="other_related_accounts"/>
 
-                                    <field name="supporting_document" widget="many2many_binary" 
-                                           attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                    <field name="supporting_document" widget="many2many_binary"/>
                                 </group>
                             </group>
                         </page>
 
-                    <page string="Due Diligence">
+                   <page string="Due Diligence">
                         <!-- Corporate Customer Section -->
-                        <group attrs="{'invisible': [('customer_type', '!=', 'corporate')]}">  
+                        <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
+                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
+                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
+                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)],
+                                            'invisible': [('customer_type', '!=', 'corporate')]}">  
                             <group string="Corporate Profile Information" name="corporate_profile_info">
-                                <field name="brief_customer_profile" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                <field name="nature_of_business" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                <field name="kycc_info" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-
-                                <field name="customer_address"
-                                   attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']),
-                                                          '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                             '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                          'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}"/>
+                                <field name="brief_customer_profile"/>
+                                <field name="nature_of_business"/>
+                                <field name="kycc_info"/>
+                                <field name="customer_address"/>
                             </group>
                             <group string="Company Registration and Legal Information" name="corporate_legal_info">
-                                <field name="company_registration_number" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                <field name="signatories_details" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                <field name="beneficial_owner_details" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                <field name="company_registration_number"/>
+                                <field name="signatories_details"/>
+                                <field name="beneficial_owner_details"/>
                             </group>
 
                             <group string="Corporate Citizenship Info" name="corporate_citizenship_info">
-                                <field name="dual_citizenship_info"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="citizenship_country_ids" widget="many2many_tags" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                <field name="dual_citizenship_info"/>
+                                <field name="citizenship_country_ids" widget="many2many_tags"/>
                             </group>
                         </group>
 
-                        <group attrs="{'invisible': [('customer_type', '!=', 'corporate')]}">    
-                            <group string="Corporate Financial Details" name="corporate_financial_details">
-                                <field name="high_risk_industries"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
+                        <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
                                                         '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
                                                             '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)],
+                                            'invisible': [('customer_type', '!=', 'corporate')]}">    
+                            <group string="Corporate Financial Details" name="corporate_financial_details">
+                                <field name="high_risk_industries"/>
+                                <field name="expected_monthly_income"/>
+                                <field name="estimated_net_worth"/>   
                             </group>
 
                             <group string="Corporate PEP Information" name="corporate_pep_info">
-                                <field name="pep_association"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                <field name="pep_association"/>
                                 
-                                <field name="pep_relationship_details" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('pep_association', '=', True)],
-                                            'invisible': [('pep_association', '=', False)]}" />
+                                <field name="pep_relationship_details" attrs="{'invisible': [('pep_association', '=', False)]}"/>
 
-                                <field name="third_party_involvement"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                <field name="third_party_involvement"/>
 
-                                <field name="third_party_details"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('third_party_involvement', '=', True)],
-                                            'invisible': [('third_party_involvement', '=', False)]}" />
+                                <field name="third_party_details" attrs="{'invisible': [('third_party_involvement', '=', False)]}" />
 
-                                <field name="third_party_document" widget="many2many_binary"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'corporate'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('third_party_involvement', '=', True)],
-                                            'invisible': [('third_party_involvement', '=', False)]}" />
+                                <field name="third_party_document" widget="many2many_binary" attrs="{'invisible': [('third_party_involvement', '=', False)]}"/>
                             </group>
                         </group>
 
                         <!-- Individual Customer Section -->
-                        <group attrs="{'invisible': [('customer_type', '!=', 'individual')]}">
+                        <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
+                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
+                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
+                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)],
+                                            'invisible': [('customer_type', '!=', 'individual')]}">
                             <group string="Individual Profile Information" name="individual_profile_info">
-                                <field name="brief_customer_profile" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="nature_of_business" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="employment_position"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'individual'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="employer_name" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'individual'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                <field name="brief_customer_profile"/>
+                                <field name="nature_of_business"/>
+                                <field name="employment_position"/>
+                                <field name="employer_name"/>
                             </group>
 
                             <group string="Residency Information" name="individual_residency_info">
-
-                                <field name="customer_address"
-                                   attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']),
-                                                          '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                             '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                          'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}"/>
-                                <field name="residency_status"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'individual'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                
-                                <field name="applicable_country_ids" widget="many2many_tags" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'individual'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
+                                <field name="customer_address"/>
+                                <field name="residency_status"/>                  
+                                <field name="applicable_country_ids" widget="many2many_tags"/>
                             </group>
                         </group>
 
-                        <group attrs="{'invisible': [('customer_type', '!=', 'individual')]}">  
-                            <group string="Individual Financial Details" name="individual_financial_details">
-                                <field name="estimated_net_worth"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
+                        <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
                                                         '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
                                                             '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'individual'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
+                                            'required': ['&amp;', ('customer_type', '=', 'individual'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)],
+                                            'invisible': [('customer_type', '!=', 'individual')]}">  
+                            <group string="Individual Financial Details" name="individual_financial_details">
+                                <field name="expected_monthly_income"/>
+                                <field name="estimated_net_worth"/>           
                             </group>
 
                             <group string="Individual PEP Information" name="individual_pep_info">
-                                <field name="is_customer_pep"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'individual'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                <field name="is_customer_pep"/>
                                 
                                 <field name="relationship_with_pep" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': ['&amp;', ('customer_type', '=', 'individual'), ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('is_customer_pep', '=', True)],
-                                            'invisible': [('is_customer_pep', '=', False)]}" />
+                                    attrs="{'invisible': [('is_customer_pep', '=', False)]}" />
                             </group>
                         </group>
+                        
                         <!-- Common Fields Section (applies to both Corporate and Individual) -->
-                        <group>
+                        <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
+                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
+                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
+                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}">
                             <group string="Source of Funds/Wealth" name="financial_info">
-                                <field name="expected_source_of_funds" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="source_of_funds_document" widget="many2many_binary" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="source_of_wealth" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="source_of_wealth_document" widget="many2many_binary" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                <field name="expected_source_of_funds"/>
+                                <field name="source_of_funds_document" widget="many2many_binary"/>
+                                <field name="source_of_wealth"/>
+                                <field name="source_of_wealth_document" widget="many2many_binary"/>
                             </group>
                                 
                             <group string="Transaction Details" name="transaction_details">
-                                <field name="inflow_purpose"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="inflow_document" widget="many2many_binary"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="outflow_purpose"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="outflow_document" widget="many2many_binary"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
+                                <field name="inflow_purpose"/>
+                                <field name="inflow_document" widget="many2many_binary"/>
+                                <field name="outflow_purpose"/>
+                                <field name="outflow_document" widget="many2many_binary"/>
                             </group>
                         </group>
 
-                        <group>   
+                        <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
+                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
+                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
+                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}">   
                             <group string="Media Publicity" name="media_info">
-                                <field name="has_negative_media"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
+                                <field name="has_negative_media"/>   
                                 <field name="negative_media_details" 
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('has_negative_media', '=', True)],
-                                            'invisible': [('has_negative_media', '=', False)]}" />
-                                
+                                    attrs="{'invisible': [('has_negative_media', '=', False)]}" />  
                                 <field name="negative_media_document" widget="many2many_binary"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('has_negative_media', '=', True)],
-                                            'invisible': [('has_negative_media', '=', False)]}" />
+                                    attrs="{'invisible': [('has_negative_media', '=', False)]}" />
                             </group>
 
                             <group string="Cross-Border Transactions" name="cross_border_info">
-                                <field name="cross_border_transaction"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
+                                <field name="cross_border_transaction"/>
                                 <field name="cross_border_jurisdictions" widget="many2many_tags"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('cross_border_transaction', '=', True)],
-                                            'invisible': [('cross_border_transaction', '=', False)]}" />
+                                    attrs="{'invisible': [('cross_border_transaction', '=', False)]}" />
                             </group>
                         </group>
 
-                        <group>
+                        <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
+                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
+                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
+                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}">
                             <group string="Additional Comments" name="additional_info">
-                                <field name="other_comments"
-                                    attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
-                                <field name="attestation_checked"
-                                attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), 
-                                                        '|', '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),
-                                                            '&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-                                
+                                <field name="other_comments"/>
+                                <field name="attestation_checked"/>    
                             </group>
                         </group>
-                    </page>
-                 </notebook>
+                    </page>          
+                </notebook>
              </sheet>
                 
                 <div class="oe_chatter">
