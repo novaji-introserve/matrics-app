@@ -127,6 +127,7 @@ class ResCharts(models.Model):
         string="Refresh Interval (minutes)",
         default=60,
         help="How often the materialized view should be refreshed (in minutes)",
+        readonly=True
     )
     last_execution_time = fields.Float(
         string="Last Execution Time (ms)",

@@ -57,6 +57,7 @@ class Statistic(models.Model):
         string="Refresh Interval (minutes)",
         default=60,
         help="How often the materialized view should be refreshed (in minutes)",
+        readonly=True
     )
     materialized_view_last_refresh = fields.Datetime(
         string="Last View Refresh", readonly=True
