@@ -93,7 +93,7 @@
         "views/transaction_screening_rule.xml",
         "data/demo_data/chart/charts.xml",
         "data/demo_data/partner/res_partner.xml",
-        "views/res_users.xml",
+        # "views/res_users.xml",
         'data/gender.xml',
         'data/identification_type.xml',
         'data/demo_data/stat/compliance_stats.xml',
