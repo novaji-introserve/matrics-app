@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from odoo.http import request
 import re
+from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
-class ChartSecurityService:
-    """Service for enforcing branch-level security for charts"""
+class SecurityService:
+    """Service for security-related operations."""
 
     @staticmethod
     def get_user_branch_ids():
@@ -74,103 +74,61 @@ class ChartSecurityService:
         )
 
     @staticmethod
-    def apply_branch_security_filter(
-        self, query, branch_field, cco=False, branches_id=None
-    ):
-        """Apply branch security filter to an SQL query.
+    def secure_chart_query(chart, cco=False, branches_id=None):
+        """Apply all security filters to a chart query.
 
         Args:
-            query (str): The SQL query to apply the filter to.
-            branch_field (str): The field name used for branch filtering.
+            chart (record): The chart record containing the query.
             cco (bool, optional): Indicates if the user is a CCO.
             branches_id (list, optional): List of branch IDs from the UI.
 
         Returns:
-            str: The modified SQL query with branch security applied.
+            str: The secured SQL query.
         """
-        if not query or not branch_field:
-            return query
-        if cco or self.is_cco_user() or self.is_co_user():
-            return query
-        user_branches = self.get_user_branch_ids()
-        _logger.info(f"Applying branch security filter with field: {branch_field}")
-        _logger.info(f"User branches: {user_branches}, UI branches: {branches_id}")
-        if not user_branches:
-            if branches_id and len(branches_id) > 0:
-                return self._add_branch_filter_to_query(
-                    query, branch_field, branches_id
-                )
-            return query
-        effective_branches = []
-        if branches_id and len(branches_id) > 0:
-            effective_branches = [b for b in branches_id if b in user_branches]
-        else:
-            effective_branches = user_branches
-        _logger.info(f"Effective branches: {effective_branches}")
-        if not effective_branches:
-            return self._add_condition_to_query(query, "1 = 0")
-        return self._add_branch_filter_to_query(query, branch_field, effective_branches)
+        from ..services.query_service import QueryService
 
-    @staticmethod
-    def _add_branch_filter_to_query(query, branch_field, branches_id):
-        """Add a branch filter to the SQL query.
-
-        Args:
-            query (str): The SQL query to modify.
-            branch_field (str): The field name for branch filtering.
-            branches_id (list): List of branch IDs to filter by.
-
-        Returns:
-            str: The modified SQL query with the branch condition added.
-        """
-        if not branches_id or len(branches_id) == 0:
-            return ChartSecurityService._add_condition_to_query(query, "1 = 0")
-        if len(branches_id) == 1:
-            condition = f"{branch_field} = {branches_id[0]}"
-        else:
-            condition = f"{branch_field} IN {tuple(branches_id)}"
-        return ChartSecurityService._add_condition_to_query(query, condition)
-
-    @staticmethod
-    def _add_condition_to_query(query, condition):
-        """Add a WHERE condition to an SQL query.
-
-        Args:
-            query (str): The SQL query to modify.
-            condition (str): The condition to add.
-
-        Returns:
-            str: The modified SQL query with the new condition.
-        """
+        if not chart or not chart.query:
+            return chart.query
+        query = chart.query
         query = query.strip()
         if query.endswith(";"):
             query = query[:-1]
-        if condition in query:
-            return query
-        if not condition or not condition.strip():
-            return query
-        condition = condition.strip()
-        if condition.upper().startswith("WHERE "):
-            condition = condition[6:].strip()
-        has_where = bool(re.search(r"\bWHERE\b", query, re.IGNORECASE))
-        if has_where:
-            for clause in ["GROUP BY", "ORDER BY", "LIMIT", "OFFSET", "HAVING"]:
-                clause_pattern = r"\b" + clause + r"\b"
-                clause_match = re.search(clause_pattern, query, re.IGNORECASE)
-                if clause_match:
-                    position = clause_match.start()
-                    return query[:position] + f" AND ({condition}) " + query[position:]
-            return query + f" AND ({condition})"
-        else:
-            for clause in ["GROUP BY", "ORDER BY", "LIMIT", "OFFSET", "HAVING"]:
-                clause_pattern = r"\b" + clause + r"\b"
-                clause_match = re.search(clause_pattern, query, re.IGNORECASE)
-                if clause_match:
-                    position = clause_match.start()
-                    return (
-                        query[:position] + f" WHERE ({condition}) " + query[position:]
+        has_subqueries = (
+            "(" in query and "SELECT" in query.upper() and "FROM" in query.upper()
+        )
+        query = SecurityService.apply_partner_origin_filter(query)
+        if (
+            chart.branch_filter
+            and chart.branch_field
+            and not cco
+            and not SecurityService.is_cco_user()
+        ):
+            user_branches = SecurityService.get_user_branch_ids()
+            effective_branches = []
+            if branches_id:
+                if user_branches:
+                    effective_branches = [b for b in branches_id if b in user_branches]
+                else:
+                    effective_branches = branches_id
+            elif user_branches:
+                effective_branches = user_branches
+            if effective_branches:
+                if has_subqueries:
+                    query = SecurityService._apply_branch_filter_with_laterals(
+                        query, chart.branch_field, effective_branches
                     )
-            return query + f" WHERE ({condition})"
+                else:
+                    branch_condition = SecurityService._build_branch_condition(
+                        chart.branch_field, effective_branches
+                    )
+                    query = QueryService.add_condition_to_query(
+                        query, branch_condition
+                    )
+            else:
+                query = QueryService.add_condition_to_query(query, "1 = 0")
+        if not query.endswith(";"):
+            query += ";"
+        return query
 
     @staticmethod
     def apply_partner_origin_filter(query):
@@ -182,6 +140,8 @@ class ChartSecurityService:
         Returns:
             str: The modified SQL query with the origin filter applied.
         """
+        from ..services.query_service import QueryService
+
         query = query.strip()
         if query.endswith(";"):
             query = query[:-1]
@@ -259,61 +219,6 @@ class ChartSecurityService:
         return modified_query
 
     @staticmethod
-    def secure_chart_query(chart, cco=False, branches_id=None):
-        """Apply all security filters to a chart query.
-
-        Args:
-            chart (record): The chart record containing the query.
-            cco (bool, optional): Indicates if the user is a CCO.
-            branches_id (list, optional): List of branch IDs from the UI.
-
-        Returns:
-            str: The secured SQL query.
-        """
-        if not chart or not chart.query:
-            return chart.query
-        query = chart.query
-        query = query.strip()
-        if query.endswith(";"):
-            query = query[:-1]
-        has_subqueries = (
-            "(" in query and "SELECT" in query.upper() and "FROM" in query.upper()
-        )
-        query = ChartSecurityService.apply_partner_origin_filter(query)
-        if (
-            chart.branch_filter
-            and chart.branch_field
-            and not cco
-            and not ChartSecurityService.is_cco_user()
-        ):
-            user_branches = ChartSecurityService.get_user_branch_ids()
-            effective_branches = []
-            if branches_id:
-                if user_branches:
-                    effective_branches = [b for b in branches_id if b in user_branches]
-                else:
-                    effective_branches = branches_id
-            elif user_branches:
-                effective_branches = user_branches
-            if effective_branches:
-                if has_subqueries:
-                    query = ChartSecurityService._apply_branch_filter_with_laterals(
-                        query, chart.branch_field, effective_branches
-                    )
-                else:
-                    branch_condition = ChartSecurityService._build_branch_condition(
-                        chart.branch_field, effective_branches
-                    )
-                    query = ChartSecurityService._add_condition_to_query(
-                        query, branch_condition
-                    )
-            else:
-                query = ChartSecurityService._add_condition_to_query(query, "1 = 0")
-        if not query.endswith(";"):
-            query += ";"
-        return query
-
-    @staticmethod
     def _apply_branch_filter_with_laterals(query, branch_field, branches_id):
         """Apply branch filtering to queries with subqueries using LATERAL JOIN.
 
@@ -325,6 +230,8 @@ class ChartSecurityService:
         Returns:
             str: The modified SQL query with branch filtering applied.
         """
+        from ..services.query_service import QueryService
+
         if "LEFT JOIN (" in query.upper() and "SELECT" in query.upper():
             parts = branch_field.split(".")
             if len(parts) == 2:
@@ -373,10 +280,10 @@ class ChartSecurityService:
                 )
                 return query
         else:
-            branch_condition = ChartSecurityService._build_branch_condition(
+            branch_condition = SecurityService._build_branch_condition(
                 branch_field, branches_id
             )
-            return ChartSecurityService._add_condition_to_query(query, branch_condition)
+            return QueryService.add_condition_to_query(query, branch_condition)
 
     @staticmethod
     def _build_branch_condition(branch_field, branches_id):
@@ -397,3 +304,21 @@ class ChartSecurityService:
             return f"{branch_field} = {branches_id[0]}"
         else:
             return f"{branch_field} IN {tuple(branches_id)}"
+
+    @staticmethod
+    def check_branches_id(branches_id):
+        """Ensure branches_id is always a list.
+
+        This method checks the type of branches_id and converts it to a list if necessary.
+
+        Args:
+            branches_id (list or any): The branches ID to check.
+
+        Returns:
+            list: A list of branches IDs.
+        """
+        if not isinstance(branches_id, list):
+            branches_id = [branches_id]
+            return branches_id
+        else:
+            return branches_id
