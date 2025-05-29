@@ -47,7 +47,7 @@ class DashboardCache(models.Model):
                 cache.refresh_after = fields.Datetime.now()
 
     @api.model
-    def set_cache(self, key, data, user_id=None, ttl=600):
+    def set_cache(self, key, data, user_id=None, ttl=2400):
         """Store data in cache by delegating to CacheService.
         
         Args:

@@ -129,7 +129,7 @@ class CacheService:
             _logger.error(f"Error retrieving cache: {str(e)}")
             return None
 
-    def set_cache(self, key, data, user_id=None, ttl=600):
+    def set_cache(self, key, data, user_id=None, ttl=2400):
         """Store data in cache.
 
         Args:

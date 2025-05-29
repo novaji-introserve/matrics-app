@@ -56,7 +56,7 @@ class CacheController(http.Controller):
         """
         try:
             user_id = request.env.user.id
-            ttl = kw.get("ttl", 600)
+            ttl = kw.get("ttl", 2400)
 
             _logger.debug(f"Setting cache for key: {key}")
 
