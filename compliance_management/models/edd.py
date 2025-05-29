@@ -222,6 +222,16 @@ class CustomerEDD(models.Model):
         compute='_compute_is_current_user_approving_officer')
     is_cco = fields.Boolean(compute='_compute_is_cco', store=False,
                             default=lambda self: self._default_is_cco())
+    
+
+    _sql_constraints = [
+    ('unique_name', 'UNIQUE(name)', 'The EDD name must be unique.')]
+
+    @api.constrains('name')
+    def _check_unique_name(self):
+        for record in self:
+            if self.search_count([('name', '=', record.name), ('id', '!=', record.id)]):
+                raise ValidationError("An EDD record with this name already exists.")
 
     @api.model
     def _default_is_cco(self):
@@ -432,6 +442,13 @@ class CustomerEDD(models.Model):
 
     def action_submit_for_review(self):
         self.ensure_one()
+        # Perform attestation check before allowing submission
+        if (self.is_current_user_responsible and
+            self.status == 'draft' and
+            not self.is_cco and
+            not self.attestation_checked):
+            raise ValidationError("Attestation must be checked before submission.")
+
         self.write({
             'status': 'completed',
             'date_reviewed': fields.Date.today()
@@ -618,5 +635,3 @@ class CustomerEDD(models.Model):
             'url': f'{base_url}/compliance/pdf_report/{self.id}',
             'target': 'new',
         }
-
-       

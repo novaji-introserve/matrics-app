@@ -12,6 +12,7 @@
                 <field name="transaction_id" invisible="1" />
                 <!-- <field name="transaction_reference" invisible="1"/> -->
                 <field name="customer_id" invisible="1"/>
+                <field name="case_ref" string="Case Reference" readonly="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
                 <field name="title_html" string= "Severity" readonly="1" widget="html"/>
                 <field name="created_at" readonly="1" invisible="1"/>
@@ -25,7 +26,7 @@
                 <field name="status_html" widget="html"/>
                 <field name="severity_level" invisible="1"/>
                 <!-- <field name="title_html" string= "Case Severity" readonly="1" widget="html"/> -->
-                <field name="case_ref" string="Case Reference" readonly="1"/>
+                <!-- <field name="case_ref" string="Case Reference" readonly="1"/> -->
                 <field name="has_responses" invisible="1"/>
                 <field name="is_creator" invisible="1"/>
                 <field name="is_assigned_staff" invisible="1"/>
@@ -44,6 +45,7 @@
                 <field name="transaction_id" invisible='1'/>
                 <!-- <field name="transaction_reference" invisible='1'/> -->
                 <field name="customer_id" invisible="1"/>
+                <field name="case_ref" string="Case Reference" readonly="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
                 <field name="title_html" string= "Case Severity" readonly="1" widget="html"/>
                 <!-- <field name="created_at" string="Case Creation Date"/> -->
@@ -55,7 +57,6 @@
                 <field name="cases_action" string="Recommended Action" readonly="1"/>
                 <field name="team_id"/>
                 <field name="status_html" widget="html"/>
-                <field name="case_ref" string="Case Reference" readonly="1"/>
             </tree>
         </field>
     </record>
@@ -70,6 +71,7 @@
                 <!-- <field name="transaction_reference" invisible="1"/> -->
                 <field name="transaction_id" invisible="1"/>
                 <field name="customer_id" invisible="1"/>
+                <field name="case_ref" string="Case Reference" readonly="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
                 <field name="title_html" string= "Case Severity" readonly="1" widget="html"/>
                 <!-- <field name="created_at" string="Start Date"/> -->
@@ -81,7 +83,7 @@
                 <field name="cases_action" string="Recommended Action" readonly="1"/>
                 <field name="team_id"/>
                 <field name="status_html" widget="html"/>
-                <field name="case_ref" string="Case Reference" readonly="1"/>
+                <!-- <field name="case_ref" string="Case Reference" readonly="1"/> -->
             </tree>
         </field>
     </record>

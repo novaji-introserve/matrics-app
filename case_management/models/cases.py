@@ -127,7 +127,7 @@ class Cases(models.Model):
     def _generate_case_ref(self):
         """Generate a Unique case REF using uuid"""
         
-        return 'CASE-'+str(uuid.uuid4())
+        return 'CASE-'+str(uuid.uuid4().hex[:13])
 
     # Basic Info
     name = fields.Char(string="Name", compute='_compute_name', store=True, tracking=True)
