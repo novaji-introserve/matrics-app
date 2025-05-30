@@ -1,52 +1,57 @@
 <odoo>
     <data noupdate="1">
         <record id="demo_chart_top10_branch_by_customer" model="res.dashboard.charts">
-            <field name="name">top 10 branch by customer</field>
-            <field name="description">top 10 branch by customer</field>
+            <field name="name">Top 10 branch by accounts</field>
+            <field name="description">Top 10 branch by accounts</field>
             <field name="chart_type">bar</field>
             <field name="query">
-            SELECT rb.id, rb.name, COUNT(rp.id) AS customer_count
-            FROM res_branch rb
-            JOIN res_partner rp ON rb.id = rp.branch_id
-            GROUP BY rb.id, rb.name
-            ORDER BY customer_count DESC
-            LIMIT 10;
+                SELECT rb.id, rb.name, COUNT(rp.id) AS account_count
+                    FROM res_branch rb
+                    JOIN res_partner_account rp ON rb.id = rp.branch_id
+                    GROUP BY rb.id, rb.name
+                    ORDER BY account_count DESC
+                    LIMIT 10;
             </field>
             <field name="color_scheme">brown</field>
             <field name="x_axis_field">name</field>
-            <field name="y_axis_field">customer_count</field>
+            <field name="y_axis_field">account_count</field>
             <field name="branch_filter" eval="True"/>
             <field name="date_field">rp.create_date</field>
             <field name="branch_field">rb.id</field>
             <field name="column">6</field>
             <field name="state">active</field>
-            <field name="target_model_id" ref="compliance_management.model_res_partner" />
+            <field name="use_materialized_view">true</field>
+            <field name="materialized_view_refresh_interval">60</field>
+            <field name="target_model_id" ref="compliance_management.model_res_partner_account" />
             <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
         </record>
         
         
         <record id="demo_chart_top10_high_risk_branch" model="res.dashboard.charts">
-            <field name="name">Top 10 High Risk Branch</field>
-            <field name="description">Top 10 High Risk Branch</field>
+            <field name="name">Top 10 High Risk Branch by accounts</field>
+            <field name="description">Top 10 High Risk Branch by accounts</field>
             <field name="chart_type">pie</field>
             <field name="query">
-                SELECT rb.id, rb.name AS name, COUNT(rp.id) AS high_risk_customers
+                SELECT rb.id, rb.name AS name, COUNT(rp.id) AS high_risk_accounts
                     FROM res_branch rb
-                    JOIN res_partner rp ON rb.id = rp.branch_id
-                    WHERE rp.risk_level = 'high'
+                    JOIN res_partner_account rp ON rb.id = rp.branch_id
+                    JOIN res_partner p ON rp.customer_id = p.id
+                    WHERE p.risk_level = 'high'
                     GROUP BY rb.id, rb.name
-                    ORDER BY high_risk_customers DESC
-                    LIMIT 10
+                    ORDER BY high_risk_accounts DESC
+                    LIMIT 10;
             </field>
             <field name="color_scheme">brown</field>
             <field name="x_axis_field">name</field>
-            <field name="y_axis_field">high_risk_customers</field>
+            <field name="y_axis_field">high_risk_accounts</field>
             <field name="branch_filter" eval="True"/>
             <field name="date_field">rp.create_date</field>
             <field name="branch_field">rb.id</field>
             <field name="column">6</field>
             <field name="state">active</field>
-            <field name="target_model_id" ref="compliance_management.model_res_partner"/>
+            <field name="use_materialized_view">true</field>
+            <field name="materialized_view_refresh_interval">60</field>
+            <field name="target_model_id" ref="compliance_management.model_res_partner_account"/>
             <field name="domain_field_id" ref="compliance_management.field_res_partner__branch_id"/>
 
         </record>
