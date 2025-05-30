@@ -954,6 +954,23 @@ class Cases(models.Model):
             _logger.error("Case creation email template not found")
             return False
         
+        # Get the default outgoing mail server
+        mail_server = self.env['ir.mail_server'].sudo().search([], limit=1)
+        default_email_from = 'noreply@example.com'  # Fallback email
+        
+        if mail_server:
+            # Use the configured email from the mail server
+            default_email_from = mail_server.smtp_user or mail_server.smtp_host or default_email_from
+            _logger.info(f"Using email_from from mail server: {default_email_from}")
+        else:
+            # Try to get from system parameters as another fallback
+            system_email = self.env['ir.config_parameter'].sudo().get_param('mail.default.from')
+            if system_email:
+                default_email_from = system_email
+                _logger.info(f"Using email_from from system parameters: {default_email_from}")
+            else:
+                _logger.warning(f"No mail server configured, using fallback email: {default_email_from}")
+        
         # Prepare recipient data
         staff_user = self.staff_id
         creator_user = self.user_id
@@ -975,7 +992,7 @@ class Cases(models.Model):
         mail_values = {
             'email_to': staff_user.email if staff_user else '',
             'email_cc': ','.join(cc_emails),
-            'email_from': 'noreply@example.com',
+            'email_from': default_email_from,
         }
 
         
@@ -1125,6 +1142,23 @@ class Cases(models.Model):
             _logger.error("Case response alert email template not found")
             return False
         
+        # Get the default outgoing mail server
+        mail_server = self.env['ir.mail_server'].sudo().search([], limit=1)
+        default_email_from = 'noreply@example.com'  # Fallback email
+        
+        if mail_server:
+            # Use the configured email from the mail server
+            default_email_from = mail_server.smtp_user or mail_server.smtp_host or default_email_from
+            _logger.info(f"Using email_from from mail server: {default_email_from}")
+        else:
+            # Try to get from system parameters as another fallback
+            system_email = self.env['ir.config_parameter'].sudo().get_param('mail.default.from')
+            if system_email:
+                default_email_from = system_email
+                _logger.info(f"Using email_from from system parameters: {default_email_from}")
+            else:
+                _logger.warning(f"No mail server configured, using fallback email: {default_email_from}")
+        
         # Prepare recipient data
         creator_user = self.user_id
         staff_user = self.staff_id
@@ -1147,7 +1181,7 @@ class Cases(models.Model):
         mail_values = {
             'email_to': creator_user.email if creator_user and creator_user.email else '',
             'email_cc': ','.join(cc_emails),
-            'email_from': 'noreply@example.com',
+            'email_from': default_email_from,
         }
         
         # Check if we have valid recipient
@@ -1311,6 +1345,23 @@ class Cases(models.Model):
             
             _logger.info(f"Found template: {template.name} (ID: {template.id})")
             
+            # Get the default outgoing mail server
+            mail_server = self.env['ir.mail_server'].sudo().search([], limit=1)
+            default_email_from = 'noreply@example.com'  # Fallback email
+            
+            if mail_server:
+                # Use the configured email from the mail server
+                default_email_from = mail_server.smtp_user or mail_server.smtp_host or default_email_from
+                _logger.info(f"Using email_from from mail server: {default_email_from}")
+            else:
+                # Try to get from system parameters as another fallback
+                system_email = self.env['ir.config_parameter'].sudo().get_param('mail.default.from')
+                if system_email:
+                    default_email_from = system_email
+                    _logger.info(f"Using email_from from system parameters: {default_email_from}")
+                else:
+                    _logger.warning(f"No mail server configured, using fallback email: {default_email_from}")
+                
             # Prepare recipient data
             staff_user = self.staff_id
             creator_user = self.user_id
@@ -1335,7 +1386,7 @@ class Cases(models.Model):
             mail_values = {
                 'email_to': staff_user.email if staff_user and staff_user.email else '',
                 'email_cc': ','.join(cc_emails),
-                'email_from': 'noreply@example.com',
+                'email_from': default_email_from,
             }
             
             _logger.info(f"Mail values: To={mail_values['email_to']}, CC={mail_values['email_cc']}")

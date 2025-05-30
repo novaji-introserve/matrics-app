@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<odoo>
-    <!-- <data>
-        <record id="case_status_closed" model="case.status">
-            <field name="name">closed</field>
-            <field name="description">Case has been closed</field>
-        </record>
-    </data> -->
-</odoo>
