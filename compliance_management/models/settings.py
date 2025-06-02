@@ -26,7 +26,7 @@ class IrUiMenu(models.Model):
     def _auto_init(self):
         res = super(IrUiMenu, self)._auto_init()
         # Execute menu hiding after init
-        self.env.cr.commit()  # Commit any pending changes
+        #self.env.cr.commit()  # Commit any pending changes
         self._hide_unwanted_menus()
         return res
     @api.model

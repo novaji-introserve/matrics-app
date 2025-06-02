@@ -1100,15 +1100,22 @@ class Cases(models.Model):
                 mail = self.env['mail.mail'].browse(email_result)
                 if mail.state == 'sent':
                     model_description = self._description
+                    
+                    ref_id_value = f"{self._name},{self.id}"  # This is what you store in 'ref_id'
+
+                    # Print to console (for debugging)
+                    print(f"ref_id value before creating alert: {ref_id_value}")
                     # Register the alert in alert_history
                     self.env['alert.history'].sudo(flag=True).create({
                         #'alert_id': alert_id,
                         #'attachment_data': attachment_rec and str(attachment_rec) or None,
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
+                        'case_id' : case_ref,
                         # 'ref_id': self.id,  
                         'case_ref': response_link,  
                         #'ref_id': case_ref,
+                       # 'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
@@ -1122,6 +1129,7 @@ class Cases(models.Model):
                         'last_checked': fields.Datetime.now()
                     })
                     print(f"Alert for case {self.id} Logged successfully")
+                    print(f"Alert source after create: {self.source}")
                     _logger.info(f"Case creation alert sent and registered in alert_history for case {self.id}")
                     
                 return True
@@ -1211,6 +1219,7 @@ class Cases(models.Model):
             rating_name = rec.rating_id.name if rec.rating_id else ''
             staff_dept = rec.team_id.name if rec.team_id else ''
             status_name = rec.status_name.capitalize()
+            case_ref = rec.case_ref
             exception_process = rec.new_process_id.name if rec.new_process_id else ''
            # process_type = rec.root_category_id.name if rec.root_category_id else ''
             process_type = rec.new_process_id.name if rec.new_process_id else ''
@@ -1230,7 +1239,7 @@ class Cases(models.Model):
                 'event_date': event_date,
                 'alert_id': alert_id,
                 #'alert_name': alert_name,
-               # 'case_ref': case_ref,
+                'case_ref': case_ref,
                 'severity_level':severity_level,
                 'title': title,
                 'rating_name': rating_name,
@@ -1294,6 +1303,7 @@ class Cases(models.Model):
                         #'attachment_data': attachment_rec and str(attachment_rec) or None,
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
+                        'case_id' : case_ref,
                         #'ref_id': self.id,  
                         'case_ref': response_link,  
                         'ref_id': f"{self._name},{self.id}",  # Reference to the case model
@@ -1419,6 +1429,7 @@ class Cases(models.Model):
                     rating_name = rec.rating_id.name if rec.rating_id else ''
                     staff_dept = rec.team_id.name if rec.team_id else ''
                     status_name = rec.status_name.capitalize()
+                    case_ref = rec.case_ref
                     exception_process = rec.new_process_id.name if rec.new_process_id else ''
                    # process_type = rec.root_category_id.name if rec.root_category_id else ''
                     process_type = rec.new_process_id.name if rec.new_process_id else ''
@@ -1438,6 +1449,7 @@ class Cases(models.Model):
                    # 'alert_name': alert_name,
                     'alert_id': alert_id,
                     'severity_level':severity_level,
+                    'case_ref':case_ref,
                     'title': title,
                     'rating_name': rating_name,
                     'staff_dept': staff_dept,
@@ -1502,6 +1514,7 @@ class Cases(models.Model):
                             #'attachment_data': attachment_rec and str(attachment_rec) or None,
                             #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                             'html_body': rendered_html,
+                            'case_id' : case_ref,
                             #'ref_id': self.id,    # Reference to the case model
                             'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                             'case_ref': response_link, 

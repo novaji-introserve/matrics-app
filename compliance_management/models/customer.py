@@ -57,7 +57,10 @@ class Customer(models.Model):
     bvn = fields.Char(string='BVN', tracking=True, readonly=True, index=True)
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True, 
-        tracking=True, readonly=True,compute='_compute_branch',store=True,)
+        tracking=True, readonly=True,store=True)
+    # branch_id = fields.Many2one(
+    #     comodel_name='res.branch', string='Branch', index=True, 
+    #     tracking=True, readonly=True,compute='_compute_branch',store=True,)
     
     education_level_id = fields.Many2one(
         comodel_name='res.education.level', string='Education Level', index=True, tracking=True, readonly=True)

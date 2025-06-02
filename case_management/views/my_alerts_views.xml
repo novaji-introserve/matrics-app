@@ -84,7 +84,24 @@
     </record>
 
     <!-- Action to open My Alerts -->
+
     <record id="action_my_alert_history" model="ir.actions.act_window">
+        <field name="name">My Alerts</field>
+        <field name="res_model">alert.history</field>
+        <field name="view_mode">tree,form</field>
+        <!-- All conditions are AND by default: user_in_emails AND source=case AND case_ref exists -->
+        <field name="domain">[
+            ('user_in_emails', '=', True),
+            ('case_id', 'ilike', '%CASE-%')
+        ]</field>
+
+        <!-- <field name="domain">[('user_in_emails', '=', True), ('case_ref', 'ilike', 'web#id')]</field> -->
+        <!-- <field name="domain">[('user_in_emails', '=', True), ('ref_id', '=', 'Case')]</field> -->
+        <field name="view_ids" eval="[(5, 0, 0), 
+                                      (0, 0, {'view_mode': 'tree', 'view_id': ref('view_my_alert_history_tree')}),
+                                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_my_alert_history_form')})]"/>
+    </record>
+    <!-- <record id="action_my_alert_history" model="ir.actions.act_window">
         <field name="name">My Alerts</field>
         <field name="res_model">alert.history</field>
         <field name="view_mode">tree,form</field>
@@ -92,7 +109,7 @@
         <field name="view_ids" eval="[(5, 0, 0), 
                                       (0, 0, {'view_mode': 'tree', 'view_id': ref('view_my_alert_history_tree')}),
                                       (0, 0, {'view_mode': 'form', 'view_id': ref('view_my_alert_history_form')})]"/>
-    </record>
+    </record> -->
         <record id="access_alert_history_user" model="ir.model.access">
         <field name="name">alert.history user access</field>
         <field name="model_id" ref="alert_management.model_alert_history"/>
@@ -102,6 +119,8 @@
         <field name="perm_create" eval="0"/>
         <field name="perm_unlink" eval="0"/>
     </record>
+
+    
     <!-- Menu Item for My Alerts -->
     <!-- <menuitem id="menu_my_alerts"
         name="My Alerts"
