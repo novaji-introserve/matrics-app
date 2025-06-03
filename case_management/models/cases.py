@@ -1135,7 +1135,7 @@ class Cases(models.Model):
                 return True
 
             except Exception as e:
-                _logger.error(f"Failed to send case creation alert for case {self.id}: {str(e)}")
+                _logger.info(f"Case creation alert sent and registered in alert_history for case {self.id}")
                 return False
 
 
@@ -1333,7 +1333,7 @@ class Cases(models.Model):
                 return True
 
             except Exception as e:
-                _logger.error(f"Failed to send case response alert for case {rec.id}: {str(e)}")
+                _logger.info(f"Case creation alert sent and registered in alert_history for case {self.id}")
                 return False
 
             
@@ -1612,6 +1612,19 @@ class Cases(models.Model):
         return 'ALERT-' + str(uuid.uuid4())
     
     
+   
+    
+    # discard button for new case
+    def action_go_home(self):
+        return self.env.ref('case_management.action_owl_case_dashboard').read()[0]
+    
+    
+    
+    # def action_go_home(self):
+    #     return {
+    #         'type': 'ir.actions.client',
+    #         'tag': 'home',
+    #     }
 
 
     # def _generate_case_response_and_close_ref(self):

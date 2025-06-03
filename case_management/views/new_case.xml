@@ -5,9 +5,14 @@
         <field name="arch" type="xml">
             <form string="Case Manager">
                 <header>
-                    <!-- Modified save button to be invisible or disabled when case is already created -->
-                    <button string="Save" special="save" class="btn-primary" attrs="{'invisible': [('id', '!=', False)]}"/>
-                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                   
+                    <!-- <button string="Save" special="save" class="btn-primary" attrs="{'invisible': [('id', '!=', False)]}"/> -->
+                    <button name="action_go_home" string="Done" 
+                        type="object"
+                        class="btn-primary" 
+                        attrs="{'invisible': [('id', '=', False)]}"
+                        confirm="Are you sure you want to return to the previous page?"/>
+
                 </header>
                 
                 <sheet>
