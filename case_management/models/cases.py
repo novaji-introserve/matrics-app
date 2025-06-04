@@ -782,30 +782,22 @@ class Cases(models.Model):
     
     @api.model
     def create(self, vals):
-        # Ensure creator is properly set to current user
+        # Your existing create method - keep it exactly as it was
         vals['user_id'] = self.env.user.id
-
-        # Create the record
         record = super(Cases, self).create(vals)
 
         if vals.get('attachment'):
             self._log_attachment_change(record, 'Created')
 
-        # Flush to database to make sure record truly exists
         record.flush()
-
-        # Make sure key computed fields are up-to-date
         record._compute_user_roles()
         record._compute_has_responses()
 
-        # NEW: Add quick response if provided
         if vals.get('quick_response'):
             record._create_quick_response(vals['quick_response'])
 
-        # Log the creation
         _logger.info(f"Created case {record.id} with creator {record.user_id.name} and assigned staff {record.staff_id.name}")
 
-        # Send email alert with proper error handling
         try:
             success = record._send_case_creation_alert()
             if success:
@@ -815,13 +807,64 @@ class Cases(models.Model):
         except Exception as e:
             _logger.error(f"Error sending case creation alert for case {record.id}: {str(e)}")
 
-        # Trigger a message in the chatter
         record.message_post(
             body=f"<p>Case created by {record.user_id.name}.</p>",
             subtype_xmlid='mail.mt_note'
         )
 
+        # Store the redirect info in context for later use
+        if self.env.context.get('case_created') and self.env.context.get('show_creation_notification'):
+            # Set a flag that can be checked by the frontend
+            record.with_context(should_redirect_after_create=True)
+
         return record
+
+    # new method to handle the redirect
+    
+    
+        
+    # @api.model
+    # def create(self, vals):
+    #     # Ensure creator is properly set to current user
+    #     vals['user_id'] = self.env.user.id
+
+    #     # Create the record
+    #     record = super(Cases, self).create(vals)
+
+    #     if vals.get('attachment'):
+    #         self._log_attachment_change(record, 'Created')
+
+    #     # Flush to database to make sure record truly exists
+    #     record.flush()
+
+    #     # Make sure key computed fields are up-to-date
+    #     record._compute_user_roles()
+    #     record._compute_has_responses()
+
+    #     # NEW: Add quick response if provided
+    #     if vals.get('quick_response'):
+    #         record._create_quick_response(vals['quick_response'])
+
+    #     # Log the creation
+    #     _logger.info(f"Created case {record.id} with creator {record.user_id.name} and assigned staff {record.staff_id.name}")
+
+    #     # Send email alert with proper error handling
+    #     try:
+    #         success = record._send_case_creation_alert()
+    #         if success:
+    #             _logger.info(f"Successfully sent creation alert for case {record.id}")
+    #         else:
+    #             _logger.warning(f"Failed to send creation alert for case {record.id}")
+    #     except Exception as e:
+    #         _logger.error(f"Error sending case creation alert for case {record.id}: {str(e)}")
+
+    #     # Trigger a message in the chatter
+    #     record.message_post(
+    #         body=f"<p>Case created by {record.user_id.name}.</p>",
+    #         subtype_xmlid='mail.mt_note'
+    #     )
+
+    #     return record
 
         
     
@@ -1617,6 +1660,27 @@ class Cases(models.Model):
     # discard button for new case
     def action_go_home(self):
         return self.env.ref('case_management.action_owl_case_dashboard').read()[0]
+    
+    
+    
+    
+    def action_redirect_discard(self):
+        if not self.id:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'owl.case_dashboard',
+                'target': 'current',
+            }
+        # Otherwise fallback to form refresh or something else
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'case',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+
     
     
     

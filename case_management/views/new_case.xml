@@ -4,13 +4,16 @@
         <field name="model">case</field>
         <field name="arch" type="xml">
             <form string="Case Manager">
-            
+
+
                 <header>
                    
                     <!-- <button string="Save" special="save" class="btn-primary" attrs="{'invisible': [('id', '!=', False)]}"/> -->
-                    <button name="action_go_home" string="Exit" 
+                    <button name="action_go_home" 
+                        string="Exit" 
                         type="object"
                         class="btn-primary" 
+                        attrs="{'invisible': [('id', '=', False)]}"
                         onclick="window.location.href='/web#action=case_management.action_owl_case_dashboard'; return false;"
                         confirm="Are you sure you want to exit this page?"/>
 
@@ -18,6 +21,12 @@
                 </header>
                 
                 <sheet>
+                    
+
+                <!-- Add this to your form view, inside the <sheet> tag -->
+                <!-- <div class="alert alert-success" attrs="{'invisible': [('id', '=', False)]}" style="display: none;" id="success_redirect"> -->
+                
+        
                 <div class="oe_title">
                     <h1 class="text-success">CASE MANAGER</h1>
                     <div class="alert alert-info" role="alert">
@@ -27,6 +36,7 @@
                         <field name="name" readonly="1"/>
                     </h1> -->
                 </div>
+                
                 <group>
                     <group string="Basic Information">
                         <field name="title" string="Severity Rating"/>

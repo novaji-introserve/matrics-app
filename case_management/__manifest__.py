@@ -33,6 +33,7 @@
         'web.assets_backend': [
             'case_management/static/src/js/case_form_action.js',
             'case_management/static/src/js/success_message.js',
+            # 'case_management/static/src/js/case_redirect.js',
             'case_management/static/src/components/kpi_card/kpi_card.js',
             'case_management/static/src/components/chart_renderer/chart_renderers.js',  # ADDED THIS
             'case_management/static/src/components/case_dashboard.js',
