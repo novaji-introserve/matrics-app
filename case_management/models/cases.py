@@ -782,30 +782,22 @@ class Cases(models.Model):
     
     @api.model
     def create(self, vals):
-        # Ensure creator is properly set to current user
+        # Your existing create method - keep it exactly as it was
         vals['user_id'] = self.env.user.id
-
-        # Create the record
         record = super(Cases, self).create(vals)
 
         if vals.get('attachment'):
             self._log_attachment_change(record, 'Created')
 
-        # Flush to database to make sure record truly exists
         record.flush()
-
-        # Make sure key computed fields are up-to-date
         record._compute_user_roles()
         record._compute_has_responses()
 
-        # NEW: Add quick response if provided
         if vals.get('quick_response'):
             record._create_quick_response(vals['quick_response'])
 
-        # Log the creation
         _logger.info(f"Created case {record.id} with creator {record.user_id.name} and assigned staff {record.staff_id.name}")
 
-        # Send email alert with proper error handling
         try:
             success = record._send_case_creation_alert()
             if success:
@@ -815,13 +807,64 @@ class Cases(models.Model):
         except Exception as e:
             _logger.error(f"Error sending case creation alert for case {record.id}: {str(e)}")
 
-        # Trigger a message in the chatter
         record.message_post(
             body=f"<p>Case created by {record.user_id.name}.</p>",
             subtype_xmlid='mail.mt_note'
         )
 
+        # Store the redirect info in context for later use
+        if self.env.context.get('case_created') and self.env.context.get('show_creation_notification'):
+            # Set a flag that can be checked by the frontend
+            record.with_context(should_redirect_after_create=True)
+
         return record
+
+    # new method to handle the redirect
+    
+    
+        
+    # @api.model
+    # def create(self, vals):
+    #     # Ensure creator is properly set to current user
+    #     vals['user_id'] = self.env.user.id
+
+    #     # Create the record
+    #     record = super(Cases, self).create(vals)
+
+    #     if vals.get('attachment'):
+    #         self._log_attachment_change(record, 'Created')
+
+    #     # Flush to database to make sure record truly exists
+    #     record.flush()
+
+    #     # Make sure key computed fields are up-to-date
+    #     record._compute_user_roles()
+    #     record._compute_has_responses()
+
+    #     # NEW: Add quick response if provided
+    #     if vals.get('quick_response'):
+    #         record._create_quick_response(vals['quick_response'])
+
+    #     # Log the creation
+    #     _logger.info(f"Created case {record.id} with creator {record.user_id.name} and assigned staff {record.staff_id.name}")
+
+    #     # Send email alert with proper error handling
+    #     try:
+    #         success = record._send_case_creation_alert()
+    #         if success:
+    #             _logger.info(f"Successfully sent creation alert for case {record.id}")
+    #         else:
+    #             _logger.warning(f"Failed to send creation alert for case {record.id}")
+    #     except Exception as e:
+    #         _logger.error(f"Error sending case creation alert for case {record.id}: {str(e)}")
+
+    #     # Trigger a message in the chatter
+    #     record.message_post(
+    #         body=f"<p>Case created by {record.user_id.name}.</p>",
+    #         subtype_xmlid='mail.mt_note'
+    #     )
+
+    #     return record
 
         
     
@@ -954,6 +997,23 @@ class Cases(models.Model):
             _logger.error("Case creation email template not found")
             return False
         
+        # Get the default outgoing mail server
+        mail_server = self.env['ir.mail_server'].sudo().search([], limit=1)
+        default_email_from = 'noreply@example.com'  # Fallback email
+        
+        if mail_server:
+            # Use the configured email from the mail server
+            default_email_from = mail_server.smtp_user or mail_server.smtp_host or default_email_from
+            _logger.info(f"Using email_from from mail server: {default_email_from}")
+        else:
+            # Try to get from system parameters as another fallback
+            system_email = self.env['ir.config_parameter'].sudo().get_param('mail.default.from')
+            if system_email:
+                default_email_from = system_email
+                _logger.info(f"Using email_from from system parameters: {default_email_from}")
+            else:
+                _logger.warning(f"No mail server configured, using fallback email: {default_email_from}")
+        
         # Prepare recipient data
         staff_user = self.staff_id
         creator_user = self.user_id
@@ -975,7 +1035,7 @@ class Cases(models.Model):
         mail_values = {
             'email_to': staff_user.email if staff_user else '',
             'email_cc': ','.join(cc_emails),
-            'email_from': 'noreply@example.com',
+            'email_from': default_email_from,
         }
 
         
@@ -1083,15 +1143,22 @@ class Cases(models.Model):
                 mail = self.env['mail.mail'].browse(email_result)
                 if mail.state == 'sent':
                     model_description = self._description
+                    
+                    ref_id_value = f"{self._name},{self.id}"  # This is what you store in 'ref_id'
+
+                    # Print to console (for debugging)
+                    print(f"ref_id value before creating alert: {ref_id_value}")
                     # Register the alert in alert_history
                     self.env['alert.history'].sudo(flag=True).create({
                         #'alert_id': alert_id,
                         #'attachment_data': attachment_rec and str(attachment_rec) or None,
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
+                        'case_id' : case_ref,
                         # 'ref_id': self.id,  
                         'case_ref': response_link,  
                         #'ref_id': case_ref,
+                       # 'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                         'risk_rating': severity_level or 'Low',
                         'process_id': exception_process or None,
@@ -1105,12 +1172,13 @@ class Cases(models.Model):
                         'last_checked': fields.Datetime.now()
                     })
                     print(f"Alert for case {self.id} Logged successfully")
+                    print(f"Alert source after create: {self.source}")
                     _logger.info(f"Case creation alert sent and registered in alert_history for case {self.id}")
                     
                 return True
 
             except Exception as e:
-                _logger.error(f"Failed to send case creation alert for case {self.id}: {str(e)}")
+                _logger.info(f"Case creation alert sent and registered in alert_history for case {self.id}")
                 return False
 
 
@@ -1124,6 +1192,23 @@ class Cases(models.Model):
         if not template:
             _logger.error("Case response alert email template not found")
             return False
+        
+        # Get the default outgoing mail server
+        mail_server = self.env['ir.mail_server'].sudo().search([], limit=1)
+        default_email_from = 'noreply@example.com'  # Fallback email
+        
+        if mail_server:
+            # Use the configured email from the mail server
+            default_email_from = mail_server.smtp_user or mail_server.smtp_host or default_email_from
+            _logger.info(f"Using email_from from mail server: {default_email_from}")
+        else:
+            # Try to get from system parameters as another fallback
+            system_email = self.env['ir.config_parameter'].sudo().get_param('mail.default.from')
+            if system_email:
+                default_email_from = system_email
+                _logger.info(f"Using email_from from system parameters: {default_email_from}")
+            else:
+                _logger.warning(f"No mail server configured, using fallback email: {default_email_from}")
         
         # Prepare recipient data
         creator_user = self.user_id
@@ -1147,7 +1232,7 @@ class Cases(models.Model):
         mail_values = {
             'email_to': creator_user.email if creator_user and creator_user.email else '',
             'email_cc': ','.join(cc_emails),
-            'email_from': 'noreply@example.com',
+            'email_from': default_email_from,
         }
         
         # Check if we have valid recipient
@@ -1177,6 +1262,7 @@ class Cases(models.Model):
             rating_name = rec.rating_id.name if rec.rating_id else ''
             staff_dept = rec.team_id.name if rec.team_id else ''
             status_name = rec.status_name.capitalize()
+            case_ref = rec.case_ref
             exception_process = rec.new_process_id.name if rec.new_process_id else ''
            # process_type = rec.root_category_id.name if rec.root_category_id else ''
             process_type = rec.new_process_id.name if rec.new_process_id else ''
@@ -1196,7 +1282,7 @@ class Cases(models.Model):
                 'event_date': event_date,
                 'alert_id': alert_id,
                 #'alert_name': alert_name,
-               # 'case_ref': case_ref,
+                'case_ref': case_ref,
                 'severity_level':severity_level,
                 'title': title,
                 'rating_name': rating_name,
@@ -1260,6 +1346,7 @@ class Cases(models.Model):
                         #'attachment_data': attachment_rec and str(attachment_rec) or None,
                         #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                         'html_body': rendered_html,
+                        'case_id' : case_ref,
                         #'ref_id': self.id,  
                         'case_ref': response_link,  
                         'ref_id': f"{self._name},{self.id}",  # Reference to the case model
@@ -1289,7 +1376,7 @@ class Cases(models.Model):
                 return True
 
             except Exception as e:
-                _logger.error(f"Failed to send case response alert for case {rec.id}: {str(e)}")
+                _logger.info(f"Case creation alert sent and registered in alert_history for case {self.id}")
                 return False
 
             
@@ -1311,6 +1398,23 @@ class Cases(models.Model):
             
             _logger.info(f"Found template: {template.name} (ID: {template.id})")
             
+            # Get the default outgoing mail server
+            mail_server = self.env['ir.mail_server'].sudo().search([], limit=1)
+            default_email_from = 'noreply@example.com'  # Fallback email
+            
+            if mail_server:
+                # Use the configured email from the mail server
+                default_email_from = mail_server.smtp_user or mail_server.smtp_host or default_email_from
+                _logger.info(f"Using email_from from mail server: {default_email_from}")
+            else:
+                # Try to get from system parameters as another fallback
+                system_email = self.env['ir.config_parameter'].sudo().get_param('mail.default.from')
+                if system_email:
+                    default_email_from = system_email
+                    _logger.info(f"Using email_from from system parameters: {default_email_from}")
+                else:
+                    _logger.warning(f"No mail server configured, using fallback email: {default_email_from}")
+                
             # Prepare recipient data
             staff_user = self.staff_id
             creator_user = self.user_id
@@ -1335,7 +1439,7 @@ class Cases(models.Model):
             mail_values = {
                 'email_to': staff_user.email if staff_user and staff_user.email else '',
                 'email_cc': ','.join(cc_emails),
-                'email_from': 'noreply@example.com',
+                'email_from': default_email_from,
             }
             
             _logger.info(f"Mail values: To={mail_values['email_to']}, CC={mail_values['email_cc']}")
@@ -1368,6 +1472,7 @@ class Cases(models.Model):
                     rating_name = rec.rating_id.name if rec.rating_id else ''
                     staff_dept = rec.team_id.name if rec.team_id else ''
                     status_name = rec.status_name.capitalize()
+                    case_ref = rec.case_ref
                     exception_process = rec.new_process_id.name if rec.new_process_id else ''
                    # process_type = rec.root_category_id.name if rec.root_category_id else ''
                     process_type = rec.new_process_id.name if rec.new_process_id else ''
@@ -1387,6 +1492,7 @@ class Cases(models.Model):
                    # 'alert_name': alert_name,
                     'alert_id': alert_id,
                     'severity_level':severity_level,
+                    'case_ref':case_ref,
                     'title': title,
                     'rating_name': rating_name,
                     'staff_dept': staff_dept,
@@ -1451,6 +1557,7 @@ class Cases(models.Model):
                             #'attachment_data': attachment_rec and str(attachment_rec) or None,
                             #'attachment_link': attachment_rec and f'/web/content/{attachment_rec}' or None,
                             'html_body': rendered_html,
+                            'case_id' : case_ref,
                             #'ref_id': self.id,    # Reference to the case model
                             'ref_id': f"{self._name},{self.id}",  # Reference to the case model
                             'case_ref': response_link, 
@@ -1548,6 +1655,40 @@ class Cases(models.Model):
         return 'ALERT-' + str(uuid.uuid4())
     
     
+   
+    
+    # discard button for new case
+    def action_go_home(self):
+        return self.env.ref('case_management.action_owl_case_dashboard').read()[0]
+    
+    
+    
+    
+    def action_redirect_discard(self):
+        if not self.id:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'owl.case_dashboard',
+                'target': 'current',
+            }
+        # Otherwise fallback to form refresh or something else
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'case',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+
+    
+    
+    
+    # def action_go_home(self):
+    #     return {
+    #         'type': 'ir.actions.client',
+    #         'tag': 'home',
+    #     }
 
 
     # def _generate_case_response_and_close_ref(self):

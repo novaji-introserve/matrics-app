@@ -27,6 +27,7 @@ class alert_history(models.Model):
     process_id = fields.Char()
     case_ref = fields.Char()
     case_ref_display = fields.Html('Case Reference', compute='_compute_case_ref_display', sanitize=False)
+    case_id= fields.Char()
     name = fields.Char()
     date_created = fields.Char()
     narration = fields.Char()
