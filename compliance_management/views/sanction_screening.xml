@@ -50,11 +50,15 @@
             <field name="arch" type="xml">
                 <tree>
                     <!-- <field name="name"/> -->
-                    <field name="watchlist_id"/>
+                    <!-- <field name="watchlist_id"/> -->
+                    <!-- <field name="first_name" readonly="1"/> -->
                     <field name="name"/>
-                    <field name="nationality"/>
-                    <field name="source"/>
+                    <field name="middle_name" readonly="1"/>
+                    <field name="surname" readonly="1"/>
                     <field name="bvn"/>
+                    
+                    <!-- <field name="nationality"/> -->
+                    <!-- <field name="source"/> -->
                 </tree>
             </field>
         </record>
@@ -70,17 +74,17 @@
                         <group>
                             
                             <group>
+                                <!-- <field name="first_name" readonly="1"/> -->
                                 <field name="name" readonly="1"/>
-                                <field name="first_name" readonly="1"/>
                                 <field name="middle_name" readonly="1"/>
                                 <field name="surname" readonly="1"/>
                             </group>
                             
                             <group >
-                                <field name="watchlist_id" readonly="1"/>
+                                <!-- <field name="watchlist_id" readonly="1"/> -->
                                 <field name="bvn" readonly="1"/>
-                                <field name="nationality" readonly="1"/>
-                                <field name="source" readonly="1"/>
+                                <!-- <field name="nationality" readonly="1"/> -->
+                                <!-- <field name="source" readonly="1"/> -->
                             </group>
 
                         </group>
@@ -372,7 +376,7 @@
            <field name="context">{'search_default_active': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    Create your first PEP List
+                    Create your first Sanction List
                 </p>
             </field>
         </record>

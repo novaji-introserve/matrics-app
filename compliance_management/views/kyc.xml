@@ -44,7 +44,8 @@
                             <field name="othername" />
                             <field name="dob" />
                             <field name="education_level_id" />
-                            <field name="sex_id" />
+                            <field name="gender" invisible="1" />
+                            <field name="formatted_gender" />
                             <field name="town" />
                             <field name="internal_category" invisible="1" />
                         </group>
