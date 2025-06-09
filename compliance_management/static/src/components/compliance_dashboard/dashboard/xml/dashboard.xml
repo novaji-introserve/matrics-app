@@ -22,7 +22,7 @@
                         <t t-if="state.loadingStates.stats">
                             <!-- Show placeholder cards while loading -->
                             <div class="d-flex flex-nowrap overflow-auto">
-                                <t t-foreach="[1,2,3,4,5,6]" t-as="placeholder" t-key="placeholder">
+                                <t t-foreach="[1,2,3,4,5,6,7,8]" t-as="placeholder" t-key="placeholder">
                                     <div class="px-4 py-2 mx-2 box cursor-pointer shadow bg-white position-relative">
                                         <h2 class="my-3 fs-1 placeholder-glow">
                                             <span class="placeholder col-8"></span>

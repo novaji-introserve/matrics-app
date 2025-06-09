@@ -81,7 +81,7 @@
         "data/demo_data/customer/products.xml",
         "data/demo_data/customer/region.xml",
         "views/risk_assessment.xml",
-        # "views/open_sanctions.xml",
+        "views/open_sanctions.xml",
         "views/sanction_screening.xml",
         "views/customer.xml",
         "views/statistics.xml",
