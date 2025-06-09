@@ -118,9 +118,10 @@
                             <field name="global_pep_id" attrs="{'readonly': True}" />
                         </group>
                         <group name="other" string="Others">
-                            <field name="is_fep" attrs="{'readonly': True}" />
-                            <field name="is_blacklist" attrs="{'readonly': True}" />
+                            <!-- <field name="is_fep" attrs="{'readonly': True}" /> -->
+                            <!-- <field name="is_blacklist" attrs="{'readonly': True}" /> -->
                             <field name="is_watchlist" attrs="{'readonly': True}" />
+                            <field name="likely_sanction" attrs="{'readonly': True}" />
                             <field name="is_greylist" attrs="{'readonly': True}" />
                         </group>
                     </group>

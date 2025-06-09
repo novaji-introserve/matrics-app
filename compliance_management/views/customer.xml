@@ -28,7 +28,7 @@
             <xpath expr="//field[@name='phone']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            
+
             <!-- Add the formatted_phone field after hiding the original phone field -->
             <xpath expr="//field[@name='phone']" position="after">
                 <field name="formatted_phone" optional="show" />
@@ -85,7 +85,11 @@
                     <button name="action_watchlist" class="oe_highlight" type="object" string="Add to Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '=',True)]}" />
 
                     <button name="action_remove_watchlist" type="object" string="Remove from Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '!=',True)]}" />
+                    <!-- SANCTION LIST -->
+                    <button name="action_sanction_list" class="oe_highlight" type="object" string="Add to Sanctionlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '=',True)]}" />
 
+                    <button name="action_remove_sanction_list" type="object" string="Remove from SanctionList" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '!=',True)]}" />
+                    <!--End Sanction list  -->
                     <button name="action_greylist" class="oe_highlight" type="object" string="Add to Greylist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Greylist. Are you sure?" attrs="{'invisible': [('is_greylist', '=',True)]}" />
 
                     <button name="action_remove_greylist" type="object" string="Remove from Greylist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Greylist. Are you sure?" attrs="{'invisible': [('is_greylist', '!=',True)]}" />
@@ -243,7 +247,7 @@
 
             <xpath expr="//field[@name='phone']" position="attributes">
                 <!-- <attribute name="readonly">1</attribute> -->
-                 
+
                 <attribute name="invisible">1</attribute>
             </xpath>
 

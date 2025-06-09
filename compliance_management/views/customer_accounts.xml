@@ -18,6 +18,7 @@
 
                 <field name="risk_score" optional="show"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" optional="show"/>
+                <field name="account_tier" optional="show"/>
                 <field name="state" widget="badge" decoration-success="state == 'Active'" decoration-warning="state in ('Dormant', 'Flagged')" decoration-danger="state in ('Inactive', 'Closed')" optional="show"/>
                 <field name="date_created" optional="show"/>
             </tree>
@@ -71,6 +72,7 @@
                                     <field name="account_type" readonly="1" />
                                     <field name="account_position" readonly="1" />
                                     <field name="account_officer_id" readonly="1" />
+                                    <field name="account_tier" readonly="1"/>
                                     <field name="uncleared_balance" readonly="1" />
                                     <field name="start_year_balance" readonly="1" />
                                     <field name="opening_date" readonly="1" />
@@ -139,6 +141,7 @@
                     <filter name="group_product" string="Product" context="{'group_by': 'product_id'}" />
                     <filter name="group_account_type" string="Account Type" context="{'group_by': 'account_type_id'}" />
                     <filter name="group_state" string="Status" context="{'group_by': 'state'}" />
+                    <filter name="group_tier" string="Tier" context="{'group_by': 'account_tier'}" />
                 </group>
             </search>
         </field>

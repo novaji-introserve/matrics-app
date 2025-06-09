@@ -56,12 +56,12 @@ class Customer(models.Model):
                               index=True, tracking=True, readonly=True)
     bvn = fields.Char(string='BVN', tracking=True, readonly=True, index=True)
     branch_id = fields.Many2one(
-        comodel_name='res.branch', string='Branch', index=True, 
-        tracking=True, readonly=True,store=True)
+        comodel_name='res.branch', string='Branch', index=True,
+        tracking=True, readonly=True, store=True)
     # branch_id = fields.Many2one(
-    #     comodel_name='res.branch', string='Branch', index=True, 
+    #     comodel_name='res.branch', string='Branch', index=True,
     #     tracking=True, readonly=True,compute='_compute_branch',store=True,)
-    
+
     education_level_id = fields.Many2one(
         comodel_name='res.education.level', string='Education Level', index=True, tracking=True, readonly=True)
     kyc_limit_id = fields.Many2one(
@@ -181,12 +181,12 @@ class Customer(models.Model):
     formatted_phone = fields.Char(
         string='Phone Number(s)', index=True, compute='_compute_formatted_phone')
 
-    likely_sanction = fields.Boolean()
+    likely_sanction = fields.Boolean(string='Is Sanctioned',tracking=True)
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code", index=True)
-    
+
     ussd = fields.Char(string='Uses USSD',
-                       compute='_compute_digital_products',index=True)
+                       compute='_compute_digital_products', index=True)
     onebank = fields.Char(string='Uses One Bank',
                           compute='_compute_digital_products')
     carded_customer = fields.Char(
@@ -206,8 +206,6 @@ class Customer(models.Model):
     customer_segment = fields.Char(
         string='Customer Segment', compute='_compute_digital_products')
 
-    
-    
     def action_create_case(self):
         """
         Opens the case management form with the customer pre-filled
@@ -218,12 +216,12 @@ class Customer(models.Model):
             'case_created': True,
             'show_creation_notification': True,
         }
-        
+
         # Since customer_id in the case model is a Many2one field referencing res.partner,
         # and this model (Customer) inherits from res.partner,
         # we need to pass the ID of the current record
         context['default_customer_id'] = self.id
-        
+
         return {
             'type': 'ir.actions.act_window',
             'name': 'New Case',
@@ -233,9 +231,6 @@ class Customer(models.Model):
             'target': 'current',
             'context': context
         }
-        
-
-
 
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
@@ -243,28 +238,26 @@ class Customer(models.Model):
             if not record.customer_phone:
                 record.formatted_phone = False
                 continue
-                
+
             # Get the original phone number
             phone = record.customer_phone
-            
+
             # Step 1: Strip any trailing or leading commas
             phone = phone.strip(',')
-            
+
             # Step 2: Replace ^ with comma
             phone = phone.replace('^', ',')
-            
+
             # Step 3: Split by comma, clean each part, and rejoin with proper formatting
             parts = [part.strip() for part in phone.split(',')]
-            
+
             # Step 4: Filter out empty parts
             parts = [part for part in parts if part]
-            
+
             # Step 5: Join with comma+space
             formatted = ', '.join(parts)
-            
-            record.formatted_phone = formatted
 
-    
+            record.formatted_phone = formatted
 
     @api.model
     def cron_run_risk_assessment(self):
@@ -299,19 +292,22 @@ class Customer(models.Model):
 
                 try:
                     results['sanction_status'] = self.update_sanction_status()
-                    _logger.info("Sanction status update completed successfully")
+                    _logger.info(
+                        "Sanction status update completed successfully")
                 except Exception as e:
                     _logger.error(
                         f"Error in update_sanction_status: {str(e)}", exc_info=True)
 
                 try:
                     results['risk_scores'] = self.compute_risk_score_for_all_users()
-                    _logger.info("Risk score computation completed successfully")
+                    _logger.info(
+                        "Risk score computation completed successfully")
                 except Exception as e:
                     _logger.error(
                         f"Error in compute_risk_score_for_all_users: {str(e)}", exc_info=True)
 
-                _logger.info(f"Completed full risk assessment process: {results}")
+                _logger.info(
+                    f"Completed full risk assessment process: {results}")
                 return results
 
             finally:
@@ -410,19 +406,18 @@ class Customer(models.Model):
             'blacklist_updated': len(blacklist_ids),
             'watchlist_updated': len(watchlist_ids)
         }
-    
+
     def init(self):
         # Drop the trigger if it exists
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
-        
+
         # Create index on res_partner which we know exists
         self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)") 
-               
-    
+            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
+
         # Create the trigger
         self.env.cr.execute("""
             CREATE OR REPLACE FUNCTION set_partner_defaults_func()
@@ -634,7 +629,6 @@ class Customer(models.Model):
         # Call the original method from adverse.media
         return adverse_media.scan_news_articles()
 
-
     @api.depends('res_partner_account_ids')
     def customer_total_accounts(self):
         for e in self:
@@ -772,6 +766,16 @@ class Customer(models.Model):
             e.write({'is_watchlist': False})
             e.action_compute_risk_score_with_plan()
 
+    def action_sanction_list(self):
+        for e in self:
+            e.write({'likely_sanction': True})
+            e.action_compute_risk_score_with_plan()
+
+    def action_remove_sanction_list(self):
+        for e in self:
+            e.write({'likely_sanction': False})
+            e.action_compute_risk_score_with_plan()
+
     def action_conduct_risk_assessment(self):
         return {
             'name': _('Risk Assessment'),
@@ -796,7 +800,7 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
-        
+
         is_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_compliance_officer')
 
@@ -830,7 +834,7 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
-        
+
         is_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_compliance_officer')
 
@@ -863,7 +867,7 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
-        
+
         is_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_compliance_officer')
 
@@ -894,7 +898,7 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
-        
+
         is_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_compliance_officer')
 
@@ -924,7 +928,7 @@ class Customer(models.Model):
         # Check if the current user belongs to the Chief Compliance Officer group
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
-        
+
         is_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_compliance_officer')
 
@@ -954,20 +958,31 @@ class Customer(models.Model):
 
     @api.model
     def action_view_likely_sanction_customer(self):
-        # Check if the current user belongs to the Chief Compliance Officer group
+
         is_chief_compliance_officer = self.env.user.has_group(
             'compliance_management.group_compliance_chief_compliance_officer')
 
-        domain = [('origin', 'in', ['demo', 'test', 'prod']),
-                  ('likely_sanction', '=', True)]
+        is_compliance_officer = self.env.user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
 
         # Set domain based on user group
-        if not is_chief_compliance_officer:
-            domain.append(('branch_id.id', 'in', [
-                e.id for e in self.env.user.branches_id]))
+        if is_chief_compliance_officer or is_compliance_officer:
+            # Chief Compliance Officers see all customers
+            domain = [('origin', 'in', ['demo', 'test', 'prod']),
+                      ('likely_sanction', '=', True)]
+
+        else:
+            # Regular users only see customers in their assigned branches
+            domain = [
+                ('branch_id.id', 'in', [
+                 e.id for e in self.env.user.branches_id]),
+                ('likely_sanction', '=', True),
+                ('origin', 'in', ['demo', 'test', 'prod'])
+
+            ]
 
         return {
-            'name': _('Customers on the Santions List'),
+            'name': _('Customers on the Sanction List'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
@@ -1026,8 +1041,6 @@ class Customer(models.Model):
     def get_risk_level_name(self):
         return '%s risk' % (self.risk_level)
 
-   
-
     @api.model
     def compute_risk_score_for_all_users(self):
         _logger.info(
@@ -1075,8 +1088,6 @@ class Customer(models.Model):
         _logger.info(
             f"Completed risk score computation for {total_processed} users")
         return True
-
-    
 
     def action_compute_risk_score_with_plan(self):
         """Manual action to compute risk score using ORM for proper tracking"""
@@ -1154,7 +1165,7 @@ class Customer(models.Model):
         for e in self:
             e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
-    
+
     @api.depends('customer_id')
     def _compute_digital_products(self):
         """
@@ -1218,8 +1229,7 @@ class Customer(models.Model):
     #     # Set domain based on user group
     #     for record in self:
     #         record.is_branch_compliance = is_branch_compliance_officer
-    
-    
+
     # @api.depends('customer_phone')
     # def _compute_formatted_phone(self):
     #     for record in self:
@@ -1229,7 +1239,6 @@ class Customer(models.Model):
     #         else:
     #             record.formatted_phone = record.customer_phone
 
-    
     # def _compute_risk_scores(self):
     #     """Cron job to precompute and store weighted average risk scores."""
     #     # Clear existing records
@@ -1293,7 +1302,6 @@ class Customer(models.Model):
     #             'formatted_name': formatted_key
     #         })
 
-    
     # def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
     #     if not any(f in fields for f in ['risk_score']):
     #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
@@ -1359,21 +1367,23 @@ class CustomerDigitalProduct(models.Model):
         ('uniq_customer_id', 'unique(customer_id)',
          "Customer already exists. Customer must be unique!"),
     ]
-    
+
     customer_id = fields.Text(string='Customer ID',
                               index=True, readonly=True)  # customer,
     customer_name = fields.Char(string='Name', tracking=True, readonly=True)
-    customer_segment = fields.Char(string='Customer Segment', tracking=True, readonly=True)
-    ussd = fields.Char(string='Uses USSD',index=True,readonly=True)
-    onebank = fields.Char(string='Uses One Bank', index=True,readonly=True)
-    carded_customer = fields.Char(string='Has A Card',index=True,readonly=True)
-    alt_bank = fields.Char(string='Is On Alt Bank',readonly=True)
-    sterling_pro = fields.Char(string='Has Sterling Pro',readonly=True)
-    banca = fields.Char(string='Has Banca',readonly=True)
-    doubble = fields.Char(string='Has Doubble',readonly=True)
-    specta = fields.Char(string='Has Specta',readonly=True)
-    switch = fields.Char(string='Has Switch',readonly=True)
-    
+    customer_segment = fields.Char(
+        string='Customer Segment', tracking=True, readonly=True)
+    ussd = fields.Char(string='Uses USSD', index=True, readonly=True)
+    onebank = fields.Char(string='Uses One Bank', index=True, readonly=True)
+    carded_customer = fields.Char(
+        string='Has A Card', index=True, readonly=True)
+    alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
+    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
+    banca = fields.Char(string='Has Banca', readonly=True)
+    doubble = fields.Char(string='Has Doubble', readonly=True)
+    specta = fields.Char(string='Has Specta', readonly=True)
+    switch = fields.Char(string='Has Switch', readonly=True)
+
     def init(self):
         # Drop the trigger if it exists
         self.env.cr.execute("""
@@ -1391,9 +1401,3 @@ class CustomerDigitalProduct(models.Model):
                 CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx
                 ON customer_digital_product (id)
             """)
-       
-
-    
-
-
-
