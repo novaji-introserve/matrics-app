@@ -2,7 +2,8 @@
 
 ## Python packages to install
 
-pip install fitz frontend
+pip install PyMuPDF
+
 
 ## Overview
 

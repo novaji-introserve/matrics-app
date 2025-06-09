@@ -44,7 +44,7 @@
                         <group>
                             <!-- <field name="risk_score" widget="percentage" readonly="1"/> -->
                             <field name="risk_score_decoration" invisible="1"/>
-                            <field name="risk_score" widget="slider" step="1" min="1" max="25" readonly="1" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'"/>
+                            <field name="risk_score" widget="slider" step="1" min="1" max="9" readonly="1" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'"/>
                             <!-- <field name="risk_score" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'"/> -->
 
                             <field name="source_url" widget="url" readonly="1"/>

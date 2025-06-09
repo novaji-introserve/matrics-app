@@ -148,7 +148,7 @@
                             <group attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
                                                      '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)]}">
                                 <group>
-                                    <field name="risk_score" widget="slider" step="0.5" min="0.5" max="25" />
+                                    <field name="risk_score" widget="slider" step="0.5" min="0.5" max="9" />
                                 </group>
 
                                 <group>

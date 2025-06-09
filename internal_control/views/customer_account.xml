@@ -107,7 +107,7 @@
                 <field name="accounttitle" class="oe_inline" readonly="1" />
             </xpath>
             
-            <xpath expr="//field[@name='ledger_id']" position="replace" />
+            <!-- <xpath expr="//field[@name='ledger_id']" position="replace" /> -->
             <xpath expr="//field[@name='customer_id']" position="replace" />
             <xpath expr="//field[@name='risk_assessment']" position="replace" />
             <xpath expr="//sheet//button[@name='get_risk_level']" position="replace" />

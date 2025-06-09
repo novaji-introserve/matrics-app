@@ -73,3 +73,4 @@ def uninstall_hook(cr, registry):
         _logger.info("WebSocket server stopped successfully")
     except Exception as e:
         _logger.error(f"Error stopping WebSocket server: {e}")
+        
