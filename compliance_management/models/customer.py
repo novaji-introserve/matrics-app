@@ -205,6 +205,23 @@ class Customer(models.Model):
                          compute='_compute_digital_products')
     customer_segment = fields.Char(
         string='Customer Segment', compute='_compute_digital_products')
+   
+    formatted_gender=fields.Char(string='Gender', compute='_compute_gender')
+    
+    @api.depends('gender')
+    def _compute_gender(self):
+        for record in self:
+            if not record.gender:
+                record.formatted_gender = False
+                continue
+
+            # trim whitespace and convert to lowercase
+            cleaned_gender = record.gender.strip().lower()
+
+            if cleaned_gender.startswith('f'):
+                record.formatted_gender = 'Female'
+            elif cleaned_gender.startswith('m'):
+                record.formatted_gender = 'Male'
 
     def action_create_case(self):
         """
