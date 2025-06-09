@@ -50,10 +50,15 @@
             <field name="arch" type="xml">
                 <tree>
                     <!-- <field name="name"/> -->
-                    <field name="watchlist_id"/>
+                    <!-- <field name="watchlist_id"/> -->
+                    <!-- <field name="first_name" readonly="1"/> -->
                     <field name="name"/>
-                    <field name="nationality"/>
-                    <field name="source"/>
+                    <field name="middle_name" readonly="1"/>
+                    <field name="surname" readonly="1"/>
+                    <field name="bvn"/>
+                    
+                    <!-- <field name="nationality"/> -->
+                    <!-- <field name="source"/> -->
                 </tree>
             </field>
         </record>
@@ -69,13 +74,17 @@
                         <group>
                             
                             <group>
-                                <field name="watchlist_id" readonly="1"/>
+                                <!-- <field name="first_name" readonly="1"/> -->
                                 <field name="name" readonly="1"/>
+                                <field name="middle_name" readonly="1"/>
+                                <field name="surname" readonly="1"/>
                             </group>
                             
                             <group >
-                                <field name="nationality" readonly="1"/>
-                                <field name="source" readonly="1"/>
+                                <!-- <field name="watchlist_id" readonly="1"/> -->
+                                <field name="bvn" readonly="1"/>
+                                <!-- <field name="nationality" readonly="1"/> -->
+                                <!-- <field name="source" readonly="1"/> -->
                             </group>
 
                         </group>
@@ -114,6 +123,50 @@
                             <field name="first_name"/>
                             <field name="middle_name"/>
                             <field name= "bvn"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Views for sanction list -->
+        <!-- Tree View -->
+     
+        <record id="view_sanction_list_tree" model="ir.ui.view">
+            <field name="name">sanction_list.tree</field>
+            <field name="model">sanction.list</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <!-- <field name="name"/> -->
+                    <field name="sanction_id"/>
+                    <field name="name"/>
+                    <field name="nationality"/>
+                    <field name="source"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_sanction_list_form" model="ir.ui.view">
+            <field name="name">sanction_list.form</field>
+            <field name="model">sanction.list</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+
+                        <group>
+
+                            <group>
+                                <field name="sanction_id" readonly="1"/>
+                                <field name="name" readonly="1"/>
+                               
+                            </group>
+
+                            <group >
+                                <field name="nationality" readonly="1"/>
+                                <field name="source" readonly="1"/>
+                            </group>
+
                         </group>
                     </sheet>
                 </form>
@@ -315,6 +368,19 @@
             </field>
         </record>
 
+        <!-- Actions for Sanction ist-->
+        <record id="action_sanction_list" model="ir.actions.act_window">
+            <field name="name">Sanction List</field>
+            <field name="res_model">sanction.list</field>
+            <field name="view_mode">tree,form</field>
+           <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first Sanction List
+                </p>
+            </field>
+        </record>
+
 
         
         
@@ -335,7 +401,10 @@
 
         <menuitem id="menu_global_pep_list" action="action_res_global_pep" parent="menu_sanction_screening_root" name="Global PEP List" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="50" />
 
+        <menuitem id="menu_sanction" action="action_sanction_list" parent="menu_sanction_screening_root" name="Sanction List" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="55" />
+        
         <menuitem id="menu_greylist" action="action_res_partner_greylist" parent="menu_sanction_screening_root" name="Greylist" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="60" />
+       
 
         <menuitem id="menu_csv_import" name="List Upload" parent="menu_sanction_screening_root" action="compliance_management.action_csv_import" groups="compliance_management.group_compliance_chief_compliance_officer" sequence="70" />
 

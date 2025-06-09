@@ -13,7 +13,7 @@
   </record>
 
   <!-- Define a top-level menu (if necessary) -->
-  <menuitem id="menu_custom_mail_root" name="Alert Managment" sequence="2" />
+  <menuitem id="menu_custom_mail_root" name="Alert Management" sequence="2" />
 
   <!-- Define a submenu for mail.mail -->
   <menuitem id="menu_mail_mail" name="Alerts"
