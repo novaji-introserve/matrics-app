@@ -134,6 +134,14 @@
             <search string="Search Account">
                 <field name="name" />
                 <field name="customer_id" />
+                <field name="category"/>
+                <field name="account_tier"/>
+
+                <!-- Account Tier Filters -->
+                <filter string="Tier 1" name="tier_1" domain="[('account_tier', '=', 'tier_1')]"/>
+                <filter string="Tier 2" name="tier_2" domain="[('account_tier', '=', 'tier_2')]"/>
+                <filter string="Tier 3" name="tier_3" domain="[('account_tier', '=', 'tier_3')]"/>
+
                 <separator />
                 <group expand="0" name="group_by" string="Group By">
                     <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" />
@@ -141,7 +149,8 @@
                     <filter name="group_product" string="Product" context="{'group_by': 'product_id'}" />
                     <filter name="group_account_type" string="Account Type" context="{'group_by': 'account_type_id'}" />
                     <filter name="group_state" string="Status" context="{'group_by': 'state'}" />
-                    <filter name="group_tier" string="Tier" context="{'group_by': 'account_tier'}" />
+                    <filter string="Category" name="group_by_category" context="{'group_by': 'category'}"/>
+
                 </group>
             </search>
         </field>
