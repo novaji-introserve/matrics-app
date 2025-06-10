@@ -41,7 +41,13 @@
         </record>
         <record id="sql_process_system_users" model="process.sql">
             <field name="name">System Users</field>
-            <field name="query">select b.name branch,u.login login_username,p.name description,u.active, to_char(u.create_date,'yyyy-mm-dd hh:mi AM') create_at from res_users u left join res_branch_users_rel rb ON u.id = rb.user_id  left join res_branch b on rb.branch_id=b.id  join res_partner p on u.partner_id=p.id  order by u.create_date desc,b.name,u.login</field>
+            <field name="query">select b.id branch_id,b.name branch,u.login login_username,p.name description,u.active,
+to_char(u.create_date,'yyyy-mm-dd hh:mi AM') create_at
+from res_users u
+left join res_branch_users_rel rb ON u.id = rb.user_id 
+left join res_branch b on rb.branch_id=b.id 
+join res_partner p on u.partner_id=p.id 
+where rb.branch_id = 1</field>
         </record>
         
         <record id="alert_rule_system_users" model="alert.rules">
