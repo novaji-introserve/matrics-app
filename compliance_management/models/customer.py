@@ -37,7 +37,7 @@ class Shareholders(models.Model):
 
 class PartnerRiskPlanLines(models.Model):
     _name = "res.partner.risk.plan.line"
-    _description = "Partner Risk Plan Lines"
+    _description = "Partner Risk Analysis Lines"
     partner_id = fields.Many2one(
         'res.partner', string='Partner', ondelete="cascade", index=True)
     plan_line_id = fields.Many2one(
@@ -119,7 +119,7 @@ class Customer(models.Model):
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
     risk_plan_line_ids = fields.One2many(
-        comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
+        comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Analysis Lines', tracking=True)
     risk_assessment_ids = fields.One2many(
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
     is_pep = fields.Boolean(

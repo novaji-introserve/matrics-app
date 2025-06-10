@@ -3,7 +3,7 @@
         <field name="name">risk_plan_line_ids.view.tree</field>
         <field name="model">res.partner.risk.plan.line</field>
         <field name="arch" type="xml">
-            <tree string="Risk Assessment Plan Lines" create="False" edit="False" delete="False">
+            <tree string="Risk Analysis Lines" create="False" edit="False" delete="False">
                 <field name="plan_line_id" />
                 <field name="risk_score" />
                 <!-- <field name="create_date" /> -->
@@ -88,7 +88,7 @@
                 </page>
 
                     
-                <page name='plans' string="Risk Plan">
+                <page name='plans' string="Risk Analysis">
                     <field name="risk_plan_line_ids" context="{'default_partner_id': active_id}" />
                 </page>
                 <page name='risk_assessment' string="Risk Assessment">

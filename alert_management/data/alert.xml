@@ -43,12 +43,14 @@
             <field name="name">System Users</field>
             <field name="query">select b.name branch,u.login login_username,p.name description,u.active, to_char(u.create_date,'yyyy-mm-dd hh:mi AM') create_at from res_users u left join res_branch_users_rel rb ON u.id = rb.user_id  left join res_branch b on rb.branch_id=b.id  join res_partner p on u.partner_id=p.id  order by u.create_date desc,b.name,u.login</field>
         </record>
-        <!--
-        <record id="alert_rules_1" model="alert.rules">
-            <field name="name">Retrieve User In The System For Test</field>
-            <field name="sql_text" ref="alert_management.sql_text_1" />
-            <field name="frequency_id" ref="alert_management.exception_frequency_1" />
+        
+        <record id="alert_rule_system_users" model="alert.rules">
+            <field name="name">Daily System Users Alert</field>
+            <field name="narration">Daily Email Alert of Users</field>
+            <field name="risk_rating">medium</field>
+            <field name="sql_text" ref="sql_process_system_users" />
+            <field name="frequency_id" ref="exception_frequency_4" />
+            <field name="alert_id" ref="alert_group_internal_control" />
         </record>
-        -->
     </data>
 </odoo>

@@ -6,7 +6,10 @@
         <field name="arch" type="xml">
             <tree string="SQL Queries">
                 <field name="name" />
-                <field name="query" />
+                <field name="create_uid" />
+                <field name="create_date" />
+                <field name="write_uid" />
+                <field name="write_date" />
             </tree>
         </field>
     </record>

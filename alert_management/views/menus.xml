@@ -65,7 +65,7 @@
 
     <menuitem 
         id="menu_alert_management_alert_rules_monitoring" 
-        name="Processes" 
+        name="Alert Rules" 
         parent="menu_internal_ctrl_alert_monitoring" 
         action="action_alert_rules" 
         sequence="10"

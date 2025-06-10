@@ -96,7 +96,7 @@
 
                     <button name="action_conduct_risk_assessment" class="oe_highlight" type="object" string="Conduct Risk Assessment" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Conduct Risk Assessment. Are you sure?" />
 
-                    <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Compute Risk Score" confirm="Compute Risk Score: Using your defined Risk Plan, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
+                    <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Compute Risk Score" confirm="Compute Risk Score: Using your defined Risk Analysis, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
 
                     <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
                     <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?" />

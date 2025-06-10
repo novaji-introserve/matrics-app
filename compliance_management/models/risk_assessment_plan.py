@@ -5,7 +5,7 @@ from odoo import models, fields, api, _
 
 class RiskAssessmentPlan(models.Model):
     _name = 'res.compliance.risk.assessment.plan'
-    _description = 'Risk Assessment Plan'
+    _description = 'Risk Analysis'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _sql_constraints = [
         ('uniq_stats_code', 'unique(code)',
