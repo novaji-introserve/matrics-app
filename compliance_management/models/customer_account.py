@@ -200,7 +200,7 @@ class CustomerAccount(models.Model):
         ('tier_1', 'Tier 1'),
         ('tier_2', 'Tier 2'),
         ('tier_3', 'Tier 3'),
-    ], string='Account Tier', compute='_compute_account_tier', index=True)
+    ], string='Account Tier', compute='_compute_account_tier', index=True, search='_search_account_tier')
 
     def init(self):
         """Initialize database triggers when module is installed/updated"""
@@ -621,6 +621,33 @@ class CustomerAccount(models.Model):
                 record.account_tier = 'tier_2'
             else:
                 record.account_tier = 'tier_3'
+                
+    def _search_account_tier(self, operator, value):
+        """Custom search method for account_tier computed field"""
+        if operator == '=' and value == 'tier_1':
+            return [('category', 'in', ['SAV025', 'SAV146'])]
+        elif operator == '=' and value == 'tier_2':
+            return [('category', 'in', ['SAV023', 'SAV019'])]
+        elif operator == '=' and value == 'tier_3':
+            return [('category', 'not in', ['SAV025', 'SAV146', 'SAV023', 'SAV019']), ('category', '!=', False)]
+        elif operator == '!=' and value == 'tier_1':
+            return ['|', ('category', 'not in', ['SAV025', 'SAV146']), ('category', '=', False)]
+        elif operator == '!=' and value == 'tier_2':
+            return ['|', ('category', 'not in', ['SAV023', 'SAV019']), ('category', '=', False)]
+        elif operator == '!=' and value == 'tier_3':
+            return ['|', ('category', 'in', ['SAV025', 'SAV146', 'SAV023', 'SAV019']), ('category', '=', False)]
+        elif operator == 'in' and isinstance(value, list):
+            domain = []
+            for tier in value:
+                if tier == 'tier_1':
+                    domain.append(('category', 'in', ['SAV025', 'SAV146']))
+                elif tier == 'tier_2':
+                    domain.append(('category', 'in', ['SAV023', 'SAV019']))
+                elif tier == 'tier_3':
+                    domain.append([('category', 'not in', ['SAV025', 'SAV146', 'SAV023', 'SAV019']), ('category', '!=', False)])
+            return ['|'] * (len(domain) - 1) + domain if len(domain) > 1 else domain[0] if domain else []
+        else:
+            return []
 
 
 class CustomerAccountOfficer(models.Model):
