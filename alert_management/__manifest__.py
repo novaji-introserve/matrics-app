@@ -58,7 +58,7 @@
         # cron job
         'data/schedule/cron_job.xml',
         # mail conf
-        'data/email_smtp.xml',
+        # 'data/email_smtp.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
