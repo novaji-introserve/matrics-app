@@ -16,9 +16,9 @@ load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
-LOW_RISK_THRESHOLD = 3
-MEDIUM_RISK_THRESHOLD = 6
-HIGH_RISK_THRESHOLD = 9
+LOW_RISK_THRESHOLD = 10
+MEDIUM_RISK_THRESHOLD =  15
+HIGH_RISK_THRESHOLD =  16
 
 
 class Shareholders(models.Model):
@@ -674,11 +674,11 @@ class Customer(models.Model):
             try:
                 if record.risk_score is None:
                     return 'low'
-                if record.risk_score <= LOW_RISK_THRESHOLD:
+                if record.risk_score <=  float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                     return 'low'
-                if record.risk_score <= MEDIUM_RISK_THRESHOLD:
+                if record.risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                     return 'medium'
-                if record.risk_score <= HIGH_RISK_THRESHOLD:
+                if record.risk_score >= float(self.env['res.compliance.settings'].get_setting('high_risk_threshold')):
                     return 'high'
             except:
                 return 'low'
@@ -687,11 +687,11 @@ class Customer(models.Model):
         try:
             if score is None:
                 return 'low'
-            if score <= LOW_RISK_THRESHOLD:
+            if score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                 return 'low'
-            if score <= MEDIUM_RISK_THRESHOLD:
+            if score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                 return 'medium'
-            if score <= HIGH_RISK_THRESHOLD:
+            if score >= float(self.env['res.compliance.settings'].get_setting('high_risk_threshold')):
                 return 'high'
         except:
             return 'low'
@@ -701,11 +701,11 @@ class Customer(models.Model):
         try:
             if risk_score is None:
                 return 'low'
-            if risk_score <= LOW_RISK_THRESHOLD:
+            if risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                 return 'low'
-            if risk_score <= MEDIUM_RISK_THRESHOLD:
+            if risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                 return 'medium'
-            if risk_score <= HIGH_RISK_THRESHOLD:
+            if risk_score >= float(self.env['res.compliance.settings'].get_setting('high_risk_threshold')):
                 return 'high'
         except:
             return 'low'

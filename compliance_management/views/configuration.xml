@@ -743,13 +743,13 @@
         <menuitem id="menu_accounts" name="Accounts"
             parent="menu_compliance_configuration" sequence="80" />
 
-        <!-- <menuitem
+        <menuitem
             id="menu_compliance_account_type"
             action="action_list_customer_account_type"
             parent="menu_accounts"
             name="Account Types"
             groups="group_compliance_compliance_officer"
-            sequence="1" /> -->
+            sequence="1" />
         <menuitem
             id="menu_compliance_account_product"
             action="action_list_account_product"
@@ -769,37 +769,38 @@
             parent="menu_compliance_configuration"
             groups="group_tech_support"/>
 
-        <!-- <menuitem
+        <menuitem
             id="menu_compliance_sector"
             action="action_list_customer_sector"
             parent="menu_customer"
             name="Customer Sectors"
             groups="group_compliance_compliance_officer"
-            sequence="1" /> -->
+            sequence="1" />
        
-            <!-- <menuitem
+         <menuitem
             id="menu_compliance_customer_tier"
             action="action_list_customer_tier"
             parent="menu_customer"
             name="Customer Tiers"
             groups="group_compliance_compliance_officer"
-            sequence="2" /> -->
+            sequence="2" />
        
-            <!-- <menuitem
+             <menuitem
             id="menu_compliance_customer_region"
             action="action_list_customer_region"
             parent="menu_customer"
             name="Customer Regions"
             groups="group_compliance_compliance_officer"
-            sequence="3" /> -->
+            sequence="3" />
        
-            <!-- <menuitem
+            <menuitem
             id="menu_compliance_education_level"
             action="action_list_education_level"
             parent="menu_customer"
             name="Education Levels"
             groups="group_compliance_compliance_officer"
-            sequence="4" /> -->
+            sequence="4" /> 
+        
 
         <menuitem id="menu_risk_assessment" name="Risk Management"
             parent="menu_compliance_configuration" sequence="100" />

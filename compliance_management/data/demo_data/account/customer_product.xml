@@ -1,5 +1,10 @@
 <odoo>
 <!-- Customer Products -->
+    <record id="compliance_checklist_product_dom_savings" model="res.partner.account.product">
+        <field name="name">Domiciliary Savings</field>
+        <field name="code">dom_saving</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
     <record id="compliance_checklist_product_1" model="res.partner.account.product">
         <field name="name">Diaspora Dom Current</field>
         <field name="code">diaspora_dom_current</field>

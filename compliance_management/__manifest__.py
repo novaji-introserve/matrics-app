@@ -80,6 +80,7 @@
         "data/demo_data/customer/sector.xml",
         "data/demo_data/customer/products.xml",
         "data/demo_data/customer/region.xml",
+        "data/demo_data/customer/account_officers.xml",
         "views/risk_assessment.xml",
         "views/sanction_screening.xml",
         "views/open_sanctions.xml",
