@@ -3,10 +3,55 @@
         <field name="name">case.form</field>
         <field name="model">case</field>
         <field name="arch" type="xml">
+        <header>
+            <button name="action_go_home" 
+                string="Exit" 
+                type="button"
+                class="btn-primary"
+                special="cancel"
+                onclick="
+                    if (confirm('Are you sure you want to exit without saving?')) {
+                        window.location.href='/web#action=case_management.action_owl_case_dashboard';
+                    }
+                    return false;"
+                />
+        </header>
             <form string="Case Manager">
 
 
                 <header>
+                    <!-- Exit button for new records (no validation required) -->
+
+                    <!-- <button name="action_go_home" 
+                        string="Exit" 
+                        type="button"
+                        class="btn-primary"
+                        onclick="
+                            event.preventDefault();
+                            event.stopPropagation();
+                            if (confirm('Are you sure you want to exit without saving?')) {
+                                window.location.href='/web#action=case_management.action_owl_case_dashboard';
+                            }
+                            return false;"
+                        /> -->
+
+
+
+                    <!-- <button name="action_go_home" string="Exit" 
+                            type="button"
+                            class="btn-primary" 
+                            formnovalidate="true"
+                            onclick="
+                                if (confirm('Are you sure you want to exit without saving?')) {
+                                    window.location.href='/web#action=case_management.action_owl_case_dashboard';
+                                }
+                                return false;"
+                            /> -->
+                <!-- <button string="Exit" 
+                    special="cancel" 
+                    class="btn-primary" 
+                    attrs="{'invisible': [('id', '!=', False)]}"
+                    confirm="Are you sure you want to exit without saving?"/> -->
                    
                     <!-- <button string="Save" special="save" class="btn-primary" attrs="{'invisible': [('id', '!=', False)]}"/> -->
                     <button name="action_go_home" 
@@ -15,7 +60,7 @@
                         class="btn-primary" 
                         attrs="{'invisible': [('id', '=', False)]}"
                         onclick="window.location.href='/web#action=case_management.action_owl_case_dashboard'; return false;"
-                        confirm="Are you sure you want to exit this page?"/>
+                       />
 
                     
                 </header>
@@ -131,6 +176,18 @@
         <field name="target">current</field>
         <field name="view_id" ref="case_management.case_form_view"/>
         <field name="context" eval="{'default_status_id': ref('case_management.case_status_open'), 'case_created': True, 'show_creation_notification': True}"/>
+
+        <!-- Add domain to show open cases when switching to tree view -->
+        <field name="domain">['|', '|', '|', 
+                        ('status_id.name', '=', 'open'),
+                        ('supervisor_one_id', '=', uid),
+                        ('supervisor_two_id', '=', uid),
+                        ('supervisor_three_id', '=', uid)]</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('case_management.case_form_view')}),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('case_management.view_cases_tree')})
+        ]"/>
     </record>
 
 

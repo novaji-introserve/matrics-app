@@ -280,7 +280,7 @@
                 </header>
             </header>
             <field name="is_supervisor" position="after">
-                <field name="statuses" invisible="1"/>
+                <field name="status_code" invisible="1"/>
             </field>
             <notebook position="replace">
                 <notebook>
