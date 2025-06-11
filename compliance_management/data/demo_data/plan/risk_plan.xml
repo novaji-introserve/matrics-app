@@ -56,14 +56,14 @@
     </record>
 
     <record id="risk_plan_3" model="res.compliance.risk.assessment.plan">
-        <field name="name">Customers on Blacklist</field>
+        <field name="name">Customers on SanctionList</field>
         <field name="risk_score">9</field>
-        <field name="code">cust_blacklist</field>
-        <field name="sql_query">select risk_score from res_partner where id=%s and is_blacklist=true</field>
+        <field name="code">cust_sanctionlist</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and likely_sanction=true</field>
         <field name="priority">3</field>
         <field name="state">active</field>
         <field name="compute_score_from">static</field>
-        <field name="narration">Customers on blacklist are significantly high risk</field>
+        <field name="narration">Customers on Sanction list are significantly high risk</field>
     </record>
     <record id="risk_plan_pep" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on PEPlist</field>

@@ -59,5 +59,6 @@ from . import dashboard_chart_view_refresher
 from . import dashboard_stats_view_refresher
 from . import res_materialized_views    
 from . import peplist    
+from . import sanction_list    
 
 from . import account_aggregate

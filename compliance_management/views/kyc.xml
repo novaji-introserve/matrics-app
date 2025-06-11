@@ -44,7 +44,8 @@
                             <field name="othername" />
                             <field name="dob" />
                             <field name="education_level_id" />
-                            <field name="sex_id" />
+                            <field name="gender" invisible="1" />
+                            <field name="formatted_gender" />
                             <field name="town" />
                             <field name="internal_category" invisible="1" />
                         </group>
@@ -118,9 +119,10 @@
                             <field name="global_pep_id" attrs="{'readonly': True}" />
                         </group>
                         <group name="other" string="Others">
-                            <field name="is_fep" attrs="{'readonly': True}" />
-                            <field name="is_blacklist" attrs="{'readonly': True}" />
+                            <!-- <field name="is_fep" attrs="{'readonly': True}" /> -->
+                            <!-- <field name="is_blacklist" attrs="{'readonly': True}" /> -->
                             <field name="is_watchlist" attrs="{'readonly': True}" />
+                            <field name="likely_sanction" attrs="{'readonly': True}" />
                             <field name="is_greylist" attrs="{'readonly': True}" />
                         </group>
                     </group>

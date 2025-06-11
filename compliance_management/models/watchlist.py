@@ -6,8 +6,10 @@ class Watchlist(models.Model):
     _description = 'Watchlist'
     _sql_constraints = [
 
-        ('watchlist_id', 'unique(watchlist_id)',
-         "Watch List ID already exists. Value must be unique!")
+        # ('watchlist_id', 'unique(watchlist_id)',
+        #  "Watch List ID already exists. Value must be unique!"),
+        ('bvn', 'unique(bvn)',
+         "bvn already exists. Value must be unique!")
     ]
 
     name = fields.Char(string="Name")
@@ -26,3 +28,7 @@ class Watchlist(models.Model):
     def init(self):
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_watchlist_id_idx ON res_partner_watchlist (id)")
+        self.env.cr.execute("""
+            ALTER TABLE res_partner_watchlist
+            DROP CONSTRAINT IF EXISTS res_partner_watchlist_watchlist_id
+        """)
