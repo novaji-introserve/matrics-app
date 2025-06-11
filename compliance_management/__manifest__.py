@@ -83,6 +83,8 @@
         "views/risk_assessment.xml",
         "views/sanction_screening.xml",
         "views/open_sanctions.xml",
+        # remove unwanted partner/customer actions
+        'views/remove_partner_actions.xml',
         "views/customer.xml",
         "views/statistics.xml",
         "views/dashboard.xml",
@@ -117,7 +119,7 @@
     "auto_install": False,
     'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
-    'assets':{
+    'assets': {
         'web.assets_backend': [
             # Styles
             'compliance_management/static/src/components/file_upload/scss/csv_import.scss',

@@ -1,6 +1,7 @@
 
 # -*- coding: utf-8 -*-
 
+from odoo import models, api
 from odoo import models, fields, api, _, tools
 from psycopg2 import ProgrammingError
 import logging
@@ -1396,3 +1397,95 @@ class PartnerDigitalProductView(models.Model):
                 WHERE rp.customer_id IS NOT NULL
             )
         """ % self._table)
+
+
+class Partner(models.Model):
+    _inherit = 'res.partner'
+
+    @api.model
+    def remove_unwanted_partner_actions(self):
+        """Remove unwanted actions from partner view"""
+        _logger.info("Starting removal of unwanted partner actions")
+
+        # Try various possible XML IDs for merge actions
+        merge_action_refs = [
+            'base.partner_merge_automatic_wizard_action',
+            'contacts.action_partner_merge',
+            'base_partner_merge.action_partner_merge_automatic',
+            'base_partner_merge.partner_merge_automatic_wizard_action'
+        ]
+
+        for xml_id in merge_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found merge action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Try various possible XML IDs for portal actions
+        portal_action_refs = [
+            'portal.partner_portal_action',
+            'portal.portal_share_action',
+            'portal.portal_share_wizard_action'
+        ]
+
+        for xml_id in portal_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found portal action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Try various possible XML IDs for email actions
+        email_action_refs = [
+            'mail.action_partner_mass_mail',
+            'mail.email_compose_message_wizard_action',
+            'mail.action_email_compose_message_wizard'
+        ]
+
+        for xml_id in email_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found email action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Fallback to searching for actions by model and name pattern
+        try:
+            # Find merge actions
+            merge_actions = self.env['ir.actions.act_window'].search([
+                ('res_model', '=', 'base.partner.merge.automatic.wizard'),
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            if merge_actions:
+                merge_actions.write({'binding_model_id': False})
+
+            # Find actions with "Mail" or "Email" in name
+            email_actions = self.env['ir.actions.act_window'].search([
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            for action in email_actions:
+                if 'mail' in action.name.lower() or 'email' in action.name.lower():
+                    action.binding_model_id = False
+
+            # Find actions with "Portal" in name
+            portal_actions = self.env['ir.actions.server'].search([
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            for action in portal_actions:
+                if 'portal' in action.name.lower():
+                    action.binding_model_id = False
+        except Exception as e:
+            _logger.error("Error in fallback action search: %s", e)
+
+        _logger.info("Completed removal of unwanted partner actions")
+        return True
