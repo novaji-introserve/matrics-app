@@ -172,7 +172,6 @@ class Cases(models.Model):
     # Status
     status_id = fields.Many2one('case.status', string='Status', required=False, default=lambda self: self._default_status())
     status_name = fields.Char(string="Status Name", compute="_compute_status_name", store=True)
-    statuses = fields.Selection(related='status_id.name', string='Status Name', store=True) # for a modification in created by me
     status_html = fields.Html(compute='_compute_status_html', string='Status')
     status_code = fields.Selection(related='status_id.name', store=True, string='Status Code')
 
