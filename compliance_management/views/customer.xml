@@ -9,7 +9,9 @@
             <xpath expr="//tree" position="attributes">
                 <attribute name="sample"/>
                 <attribute name="create">false</attribute>
+                <attribute name="delete">false</attribute>
             </xpath>
+
 
 
             <!-- Replace the phone field with custom fields -->
@@ -465,6 +467,9 @@
         <field name="view_mode">kanban,tree,form</field>
         <field name="domain">[('is_pep', '=', True)]</field>
     </record>
+
+   
+ 
 
     <menuitem id="menu_is_pep" action="action_res_pep" parent="menu_compliance_customer_heading" name="PEPs Customers" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="10" />
     <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanctioned" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" />

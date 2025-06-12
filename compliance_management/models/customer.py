@@ -1,7 +1,8 @@
 
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, api
+from odoo import models, fields, api, _, tools
 from psycopg2 import ProgrammingError
 import logging
 from dotenv import load_dotenv
@@ -184,29 +185,12 @@ class Customer(models.Model):
     likely_sanction = fields.Boolean(string='Is Sanctioned',tracking=True)
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code", index=True)
-
-    ussd = fields.Char(string='Uses USSD',
-                       compute='_compute_digital_products', index=True)
-    onebank = fields.Char(string='Uses One Bank',
-                          compute='_compute_digital_products')
-    carded_customer = fields.Char(
-        string='Has A Card', compute='_compute_digital_products')
-    alt_bank = fields.Char(string='Is On Alt Bank',
-                           compute='_compute_digital_products')
-    sterling_pro = fields.Char(
-        string='Has Sterling Pro', compute='_compute_digital_products')
-    banca = fields.Char(string='Has Banca',
-                        compute='_compute_digital_products')
-    doubble = fields.Char(string='Has Doubble',
-                          compute='_compute_digital_products')
-    specta = fields.Char(string='Has Specta',
-                         compute='_compute_digital_products')
-    switch = fields.Char(string='Has Switch',
-                         compute='_compute_digital_products')
-    customer_segment = fields.Char(
-        string='Customer Segment', compute='_compute_digital_products')
    
     formatted_gender=fields.Char(string='Gender', compute='_compute_gender')
+    
+    digital_product_view_ids = fields.One2many(
+        'res.partner.digital.product.view', 'partner_id', 
+        string='Digital Products', readonly=True, auto_join=True)
     
     @api.depends('gender')
     def _compute_gender(self):
@@ -1191,57 +1175,7 @@ class Customer(models.Model):
             e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
 
-    @api.depends('customer_id')
-    def _compute_digital_products(self):
-        """
-        Compute digital product fields.
-        """
-        # Get all customer_ids in current recordset
-        customer_ids = [rec.customer_id for rec in self if rec.customer_id]
-
-        if not customer_ids:
-            # Set default values for records without customer_id
-            for record in self:
-                self._set_default_digital_values(record)
-            return
-
-        # Single query to get all digital products for current recordset
-        digital_products = self.env['customer.digital.product'].search([
-            ('customer_id', 'in', customer_ids)
-        ])
-
-        # Create a mapping for lookup
-        product_map = {dp.customer_id: dp for dp in digital_products}
-
-        # Assign values to each record
-        for record in self:
-            if record.customer_id and record.customer_id in product_map:
-                dp = product_map[record.customer_id]
-                record.ussd = dp.ussd
-                record.onebank = dp.onebank
-                record.carded_customer = dp.carded_customer
-                record.alt_bank = dp.alt_bank
-                record.sterling_pro = dp.sterling_pro
-                record.banca = dp.banca
-                record.doubble = dp.doubble
-                record.specta = dp.specta
-                record.switch = dp.switch
-                record.customer_segment = dp.customer_segment
-            else:
-                self._set_default_digital_values(record)
-
-    def _set_default_digital_values(self, record):
-        """Set default values for digital product fields"""
-        record.ussd = None
-        record.onebank = None
-        record.carded_customer = None
-        record.alt_bank = None
-        record.sterling_pro = None
-        record.banca = None
-        record.doubble = None
-        record.specta = None
-        record.switch = None
-        record.customer_segment = None
+  
 
     # @api.model
     # def _compute_is_branch_compliance(self):
@@ -1426,3 +1360,140 @@ class CustomerDigitalProduct(models.Model):
                 CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx
                 ON customer_digital_product (id)
             """)
+
+# view model to display Customer digital products
+class PartnerDigitalProductView(models.Model):
+    _name = 'res.partner.digital.product.view'
+    _description = 'Partner Digital Products View'
+    _auto = False  # This is a database view
+
+    partner_id = fields.Many2one(
+        'res.partner', string='Partner', readonly=True)
+    customer_id = fields.Char(string='Customer ID', readonly=True)
+    ussd = fields.Char(string='Uses USSD', readonly=True)
+    onebank = fields.Char(string='Uses One Bank', readonly=True)
+    carded_customer = fields.Char(string='Has A Card', readonly=True)
+    alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
+    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
+    banca = fields.Char(string='Has Banca', readonly=True)
+    doubble = fields.Char(string='Has Doubble', readonly=True)
+    specta = fields.Char(string='Has Specta', readonly=True)
+    switch = fields.Char(string='Has Switch', readonly=True)
+    customer_segment = fields.Char(string='Customer Segment', readonly=True)
+
+    def init(self):
+        """Create database view that joins partner with digital products"""
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (
+                SELECT 
+                    cdp.id,  
+                    rp.id AS partner_id,
+                    cdp.customer_id,
+                    cdp.ussd,
+                    cdp.onebank,
+                    cdp.carded_customer,
+                    cdp.alt_bank,
+                    cdp.sterling_pro,
+                    cdp.banca,
+                    cdp.doubble,
+                    cdp.specta,
+                    cdp.switch,
+                    cdp.customer_segment
+                FROM customer_digital_product cdp
+                JOIN res_partner rp ON cdp.customer_id = rp.customer_id
+                WHERE rp.customer_id IS NOT NULL
+            )
+        """ % self._table)
+
+
+class Partner(models.Model):
+    _inherit = 'res.partner'
+
+    @api.model
+    def remove_unwanted_partner_actions(self):
+        """Remove unwanted actions from partner view"""
+        _logger.info("Starting removal of unwanted partner actions")
+
+        # Try various possible XML IDs for merge actions
+        merge_action_refs = [
+            'base.partner_merge_automatic_wizard_action',
+            'contacts.action_partner_merge',
+            'base_partner_merge.action_partner_merge_automatic',
+            'base_partner_merge.partner_merge_automatic_wizard_action'
+        ]
+
+        for xml_id in merge_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found merge action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Try various possible XML IDs for portal actions
+        portal_action_refs = [
+            'portal.partner_portal_action',
+            'portal.portal_share_action',
+            'portal.portal_share_wizard_action'
+        ]
+
+        for xml_id in portal_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found portal action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Try various possible XML IDs for email actions
+        email_action_refs = [
+            'mail.action_partner_mass_mail',
+            'mail.email_compose_message_wizard_action',
+            'mail.action_email_compose_message_wizard'
+        ]
+
+        for xml_id in email_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found email action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Fallback to searching for actions by model and name pattern
+        try:
+            # Find merge actions
+            merge_actions = self.env['ir.actions.act_window'].search([
+                ('res_model', '=', 'base.partner.merge.automatic.wizard'),
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            if merge_actions:
+                merge_actions.write({'binding_model_id': False})
+
+            # Find actions with "Mail" or "Email" in name
+            email_actions = self.env['ir.actions.act_window'].search([
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            for action in email_actions:
+                if 'mail' in action.name.lower() or 'email' in action.name.lower():
+                    action.binding_model_id = False
+
+            # Find actions with "Portal" in name
+            portal_actions = self.env['ir.actions.server'].search([
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            for action in portal_actions:
+                if 'portal' in action.name.lower():
+                    action.binding_model_id = False
+        except Exception as e:
+            _logger.error("Error in fallback action search: %s", e)
+
+        _logger.info("Completed removal of unwanted partner actions")
+        return True
