@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, tools
 import logging
 from collections import defaultdict
 _logger = logging.getLogger(__name__)
@@ -196,14 +196,23 @@ class CustomerAccount(models.Model):
     amount_last_credit_customer = fields.Char(
         string='Amount Last Credit Customer')
     date_last_debit_customer = fields.Char(string='Date Last Dedit Customer')
-    account_tier = fields.Selection([
-        ('tier_1', 'Tier 1'),
-        ('tier_2', 'Tier 2'),
-        ('tier_3', 'Tier 3'),
-    ], string='Account Tier', compute='_compute_account_tier', index=True, search='_search_account_tier')
+    
+    tier_level = fields.Selection([
+        ('1', 'Tier 1'),
+        ('2', 'Tier 2'),
+        ('3', 'Tier 3')
+    ], string="Tier Level", compute='_compute_tier_info', search='_search_tier_level', store=False)
+
+    tier_name = fields.Char(
+        string="Account Tier", compute='_compute_tier_info', store=False)
+
+   
+
+    
 
     def init(self):
         """Initialize database triggers when module is installed/updated"""
+    
         # Drop existing trigger if it exists
         self.env.cr.execute(
             "DROP TRIGGER IF EXISTS update_customer_id_field ON res_partner_account;")
@@ -609,46 +618,66 @@ class CustomerAccount(models.Model):
         return results
 
     @api.depends('category')
-    def _compute_account_tier(self):
-        for record in self:
-            if not record.category:
-                record.account_tier = False
-                continue
+    def _compute_tier_info(self):
+        """Get tier information from materialized view"""
+        # Get all IDs at once for better performance
+        ids_to_query = self.ids
+        if not ids_to_query:
+            return
 
-            if record.category in ['SAV025', 'SAV146']:
-                record.account_tier = 'tier_1'
-            elif record.category in ['SAV023', 'SAV019']:
-                record.account_tier = 'tier_2'
-            else:
-                record.account_tier = 'tier_3'
-                
-    def _search_account_tier(self, operator, value):
-        """Custom search method for account_tier computed field"""
-        if operator == '=' and value == 'tier_1':
-            return [('category', 'in', ['SAV025', 'SAV146'])]
-        elif operator == '=' and value == 'tier_2':
-            return [('category', 'in', ['SAV023', 'SAV019'])]
-        elif operator == '=' and value == 'tier_3':
-            return [('category', 'not in', ['SAV025', 'SAV146', 'SAV023', 'SAV019']), ('category', '!=', False)]
-        elif operator == '!=' and value == 'tier_1':
-            return ['|', ('category', 'not in', ['SAV025', 'SAV146']), ('category', '=', False)]
-        elif operator == '!=' and value == 'tier_2':
-            return ['|', ('category', 'not in', ['SAV023', 'SAV019']), ('category', '=', False)]
-        elif operator == '!=' and value == 'tier_3':
-            return ['|', ('category', 'in', ['SAV025', 'SAV146', 'SAV023', 'SAV019']), ('category', '=', False)]
-        elif operator == 'in' and isinstance(value, list):
-            domain = []
-            for tier in value:
-                if tier == 'tier_1':
-                    domain.append(('category', 'in', ['SAV025', 'SAV146']))
-                elif tier == 'tier_2':
-                    domain.append(('category', 'in', ['SAV023', 'SAV019']))
-                elif tier == 'tier_3':
-                    domain.append([('category', 'not in', ['SAV025', 'SAV146', 'SAV023', 'SAV019']), ('category', '!=', False)])
-            return ['|'] * (len(domain) - 1) + domain if len(domain) > 1 else domain[0] if domain else []
-        else:
+        # Query the materialized view directly with SQL for better performance
+        self._cr.execute("""
+            SELECT account_id, tier_level, tier_name 
+            FROM account_tier_materialized 
+            WHERE account_id IN %s
+        """, (tuple(ids_to_query),))
+
+        # Build a dictionary for efficient lookup
+        tier_data = {row[0]: {'tier_level': row[1], 'tier_name': row[2]}
+                     for row in self._cr.fetchall()}
+
+        # Assign values from the dictionary
+        for record in self:
+            data = tier_data.get(
+                record.id, {'tier_level': '3', 'tier_name': 'Tier 3'})
+            record.tier_level = data['tier_level']
+            record.tier_name = data['tier_name']
+
+    @api.model
+    def _search_tier_level(self, operator, value):
+        """Search method for tier_level using materialized view"""
+        if operator not in ('=', '!=', 'in', 'not in'):
             return []
 
+        if operator == '=':
+            # For equality, get IDs directly
+            account_ids = self.env['account.tier.materialized'].get_tier_ids(
+                value)
+            return [('id', 'in', account_ids)]
+
+        elif operator == '!=':
+            # For inequality, exclude IDs
+            account_ids = self.env['account.tier.materialized'].get_tier_ids(
+                value)
+            return [('id', 'not in', account_ids)]
+
+        elif operator == 'in':
+            # For 'in' operator, combine multiple tier levels
+            account_ids = []
+            for tier in value:
+                account_ids.extend(
+                    self.env['account.tier.materialized'].get_tier_ids(tier))
+            return [('id', 'in', account_ids)]
+
+        elif operator == 'not in':
+            # For 'not in' operator, exclude multiple tier levels
+            account_ids = []
+            for tier in value:
+                account_ids.extend(
+                    self.env['account.tier.materialized'].get_tier_ids(tier))
+            return [('id', 'not in', account_ids)]
+
+        return []
 
 class CustomerAccountOfficer(models.Model):
     _name = 'account.officers'
@@ -671,9 +700,7 @@ class CustomerAccountDetails(models.Model):
         ('uniq_account_number', 'unique(account_number)',
          "Account Number already exists. Account Number must be unique!"),
     ]
-    # is_office_account = fields.Boolean(string="Is Office Account")
-    # enable_sms_alert = fields.Boolean(string="Enabled Sms alert")
-    # last_transaction_date = fields.Date(string="Last Transaction Date")
+    
     account_name = fields.Char(string="Account Name", required=True)
     account_number = fields.Char(string="Account Number", index=True)
     account_status = fields.Integer(string="Account Status")

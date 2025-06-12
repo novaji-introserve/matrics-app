@@ -1,25 +1,86 @@
 <odoo>
-<!--  Customer Tier -->
+    <data noupdate="0">
+        <!-- Tier 1 - Customers -->
+        <record id="customer_tier_1" model="res.partner.tier">
+            <field name="name">Tier 1</field>
+            <field name="code">tier1</field>
+            <field name="tier_level">1</field>
+            <field name="status">active</field>
+        </record>
 
-    <record id="res_partner_tier_1" model="res.partner.tier">
-        <field name="name">Tier 1 - Individual</field>
-        <field name="code">tier_1</field>
-        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
-    </record>
-
-
-    <record id="res_partner_tier_2" model="res.partner.tier">
-        <field name="name">Tier 2 - Corporate</field>
-        <field name="code">tier_2</field>
-        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
-    </record>
-
-
-    <record id="res_partner_tier_3" model="res.partner.tier">
-        <field name="name">Tier 3 - Corporate</field>
-        <field name="code">tier_3</field>
-        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
-    </record>
+        <!-- Tier 2 -  Customers -->
+        <record id="customer_tier_2" model="res.partner.tier">
+            <field name="name">Tier 2</field>
+            <field name="code">tier2</field>
+            <field name="tier_level">2</field>
+            <field name="status">active</field>
+        </record>
 
 
+        <!-- Tier 3  Customers -->
+        <record id="customer_tier_3" model="res.partner.tier">
+            <field name="name">Tier 3</field>
+            <field name="code">tier3</field>
+            <field name="tier_level">3</field>
+            <field name="status">active</field>
+        </record>
+
+        <!-- Some example Tier 3 Codes -->
+        <record id="customer_tier_code_SAV025" model="res.partner.tier">
+            <field name="name">Tier 1</field>
+            <field name="code">SAV025</field>
+            <field name="tier_level">1</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="customer_tier_code_SAV146" model="res.partner.tier">
+            <field name="name">Tier 1</field>
+            <field name="code">SAV146</field>
+            <field name="tier_level">1</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="customer_tier_code_SAV023" model="res.partner.tier">
+            <field name="name">Tier 2</field>
+            <field name="code">SAV023</field>
+            <field name="tier_level">2</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="customer_tier_code_SAV019" model="res.partner.tier">
+            <field name="name">Tier 2</field>
+            <field name="code">SAV019</field>
+            <field name="tier_level">2</field>
+            <field name="status">active</field>
+        </record>
+
+       
+    </data>
 </odoo>
+
+
+    <!-- <odoo>
+    
+        <record id="res_partner_tier_1" model="res.partner.tier">
+            <field name="name">Tier 1 - Individual</field>
+            <field name="code">tier_1</field>
+            <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+        </record>
+    
+    
+        <record id="res_partner_tier_2" model="res.partner.tier">
+            <field name="name">Tier 2 - Corporate</field>
+            <field name="code">tier_2</field>
+            <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+        </record>
+    
+    
+        <record id="res_partner_tier_3" model="res.partner.tier">
+            <field name="name">Tier 3 - Corporate</field>
+            <field name="code">tier_3</field>
+            <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+        </record>
+    
+    
+    
+    </odoo> -->
