@@ -1,0 +1,4 @@
+odoo_connect
+click-odoo
+pandas
+numpy

@@ -1171,6 +1171,14 @@ class Customer(models.Model):
             records = self.env.cr.fetchone()
 
         # Ensure records is not None before returning
+        """
+        - First check for approved EDD then use the Plan if no EDD
+        """
+        approved_edd = self.env['res.partner.edd'].search(
+            [('status', '=', 'approved'),('customer_id','=',record_id)],order='date_approved desc', limit=1)
+        for edd in approved_edd:
+            if edd.risk_score:
+                return edd.risk_score
         return records[0] if records is not None else 0.00
 
     def action_greylist(self):
