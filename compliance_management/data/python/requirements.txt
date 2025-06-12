@@ -1,4 +1,2 @@
-#odoo_connect
-#odoo-client-lib
-pyodoo_connect
+odoo_connect
 pandas

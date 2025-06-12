@@ -125,7 +125,7 @@ def create_accounts():
                     'account_status': 'active',
                     'balance': bal,
                     'product_id': account_product.id if account_product else None,
-                    'account_tier': account_tier.id if account_tier else None,
+                    'account_tier': account_tier.code,
                 }
                 try:
                     tot_created += 1
