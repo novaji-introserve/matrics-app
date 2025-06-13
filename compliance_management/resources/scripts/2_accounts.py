@@ -129,7 +129,6 @@ def create_accounts():
                 }
                 try:
                     tot_created += 1
-                    print(account_data)
                     new_account = account.create(account_data)
                     print(f"Created account: {account_name} with ID: {new_account}")
                 except Exception as e:
