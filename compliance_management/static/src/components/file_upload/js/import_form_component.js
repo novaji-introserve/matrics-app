@@ -510,6 +510,74 @@ export class ImportFormComponent extends Component {
         }
     }
 
+
+    async fetchTableColumns(modelId) {
+        if (!modelId) return;
+        
+        this.state.loadingColumns = true;
+        this.state.tableColumns = [];
+        
+        try {
+            if (this.terminal) {
+                this.terminal.addLog(`Fetching columns for table ID ${modelId}...`, "info");
+            }
+            
+            const result = await this.rpc("/csv_import/get_table_columns", {
+                model_id: modelId
+            });
+            
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            this.state.tableColumns = result.columns || [];
+            
+            if (this.terminal) {
+                this.terminal.addLog(`Loaded ${this.state.tableColumns.length} columns for selected table`, "success");
+            }
+        } catch (error) {
+            console.error("Error fetching table columns:", error);
+            this.state.errorMessage = `Failed to fetch table columns: ${error.message}`;
+            
+            if (this.terminal) {
+                this.terminal.addLog(`Error fetching table columns: ${error.message}`, "error");
+            }
+        } finally {
+            this.state.loadingColumns = false;
+        }
+    }
+
+    onDeleteModeChange(ev) {
+        this.state.deleteMode = ev.target.checked;
+        
+        // Reset unique identifier when toggling
+        this.state.selectedUniqueIdentifier = null;
+        
+        if (this.state.deleteMode && this.state.selectedModel) {
+            // Fetch columns when delete mode is enabled and we have a model
+            this.fetchTableColumns(this.state.selectedModel.id);
+        }
+        
+        if (this.terminal) {
+            if (this.state.deleteMode) {
+                this.terminal.addLog("Delete mode enabled - records with matching identifiers will be deleted", "warning");
+            } else {
+                this.terminal.addLog("Delete mode disabled", "info");
+            }
+        }
+    }
+
+    onUniqueIdentifierChange(ev) {
+        this.state.selectedUniqueIdentifier = ev.target.value;
+        
+        if (this.terminal) {
+            const field = this.state.tableColumns.find(col => col.name === this.state.selectedUniqueIdentifier);
+            if (field) {
+                this.terminal.addLog(`Selected "${field.string}" as unique identifier for deletion`, "info");
+            }
+        }
+    }
+
     /**
      * Handle file upload success with improved async handling
      * @param {Object} result - Upload result from server
