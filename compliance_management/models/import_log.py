@@ -98,6 +98,12 @@ class ImportLog(models.Model):
     )
 
     summary = fields.Text(string="Import Summary", help="JSON summary of import results")
+    delete_mode = fields.Boolean(string="Delete Mode", default=False, 
+                                help="When enabled, records with matching unique identifiers will be deleted")
+    unique_identifier_field = fields.Char(string="Unique Identifier Field", 
+                                        help="Field used to identify records for deletion")
+    delete_progress = fields.Text(string="Delete Progress", 
+                             help="JSON tracking of delete operation progress")
     
     # SQL constraints
     _sql_constraints = [
@@ -654,16 +660,23 @@ class ImportLog(models.Model):
             
             # Import the CSV processor with improved error handling
             try:
-                from compliance_management.services.csv_processor import CSVProcessor
+                from ..services.csv_processor import CSVProcessor
                 processor_class = CSVProcessor
             except ImportError as e:
                 _logger.error(f"Error importing CSVProcessor: {str(e)}")
-                # Try relative import as fallback
-                try:
-                    from . import services
-                    processor_class = services.csv_processor.CSVProcessor
-                except ImportError:
-                    raise ImportError("Could not import CSVProcessor - module may be missing")
+                raise ImportError("Could not import CSVProcessor - module may be missing")
+
+            # try:
+            #     from compliance_management.services.csv_processor import CSVProcessor
+            #     processor_class = CSVProcessor
+            # except ImportError as e:
+            #     _logger.error(f"Error importing CSVProcessor: {str(e)}")
+            #     # Try relative import as fallback
+            #     try:
+            #         from . import services
+            #         processor_class = services.csv_processor.CSVProcessor
+            #     except ImportError:
+            #         raise ImportError("Could not import CSVProcessor - module may be missing")
             
             # Process batches within this segment with transaction isolation
             with self.env.registry.cursor() as segment_cr:
@@ -1529,6 +1542,57 @@ class ImportLog(models.Model):
             importable_fields.append(field_info)
 
         return importable_fields
+
+    def get_delete_progress(self):
+        """Get the current delete progress as a dictionary"""
+        if not self.delete_progress:
+            return {
+                'total': 0,
+                'processed': 0,
+                'deleted': 0,
+                'failed': 0,
+                'status': 'not_started',
+            }
+            
+        try:
+            return json.loads(self.delete_progress)
+        except Exception as e:
+            _logger.error(f"Error parsing delete progress: {str(e)}")
+            return {
+                'total': 0,
+                'processed': 0,
+                'deleted': 0,
+                'failed': 0,
+                'status': 'error',
+                'error': str(e)
+            }
+            
+    def reset_delete_progress(self):
+        """Reset the delete progress"""
+        self._safe_update({
+            'delete_progress': json.dumps({
+                'total': 0,
+                'processed': 0,
+                'deleted': 0,
+                'failed': 0,
+                'status': 'not_started',
+                'processed_values': []
+            })
+        })
+        
+        self._log_message("Delete progress has been reset", "info")
+        return True
+        
+    def resume_delete_operation(self):
+        """Resume an interrupted delete operation"""
+        if not self.delete_mode or not self.unique_identifier_field:
+            raise ValueError("This import is not configured for delete mode")
+            
+        progress = self.get_delete_progress()
+        if progress.get('status') != 'in_progress':
+            raise ValueError("No interrupted delete operation found to resume")
+           
+        return self.process_file()
 
 class ImportFieldMapping(models.Model):
     _name = "import.field.mapping"
