@@ -578,6 +578,7 @@ export class ImportFormComponent extends Component {
         }
     }
 
+<<<<<<< HEAD
     /**
      * Handle file upload success with improved async handling
      * @param {Object} result - Upload result from server
@@ -868,6 +869,8 @@ export class ImportFormComponent extends Component {
         }
     }
 
+=======
+>>>>>>> 9e153fb (feat(import): implement record deletion via file upload using user-selected unique identifier)
     /**
      * Reset form after upload
      */
