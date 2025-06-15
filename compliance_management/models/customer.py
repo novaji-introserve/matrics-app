@@ -161,7 +161,7 @@ class Customer(models.Model):
     employment_status = fields.Char(
         string="Employment Status", required=False, readonly=True)
     state_residence = fields.Char(
-        string="Region", required=False, readonly=True)
+        string="State Residence", required=False, readonly=True)
     nin = fields.Char(
         string="National Identification Number (NIN)", index=True, required=False, readonly=True)
     customer_rating = fields.Char(
@@ -1125,14 +1125,17 @@ class Customer(models.Model):
             for pl in plans:
                 score = 0
                 try:
+                    
                     self.env.cr.execute(pl.sql_query, (record_id,))
                     rec = self.env.cr.fetchone()
                     if rec is not None:
                         # we have a hit
                         if pl.compute_score_from == 'dynamic':
-                            score = float(rec[0]) if rec is not None else score
+                            score = float(rec[0]) if rec is not None else pl.risk_score
                         if pl.compute_score_from == 'static':
                             score = pl.risk_score
+                        if pl.compute_score_from == 'risk_assessment':
+                            score = pl.risk_assessment.risk_rating if  pl.risk_assessment is not None else pl.risk_score
                     scores.append(score)
                     line_id = self.env['res.partner.risk.plan.line'].create({
                         'partner_id': record_id,

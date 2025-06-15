@@ -26,7 +26,10 @@ class RiskAssessmentPlan(models.Model):
     narration = fields.Text(string='Narration')
     risk_score = fields.Integer(string='Risk Score', default=1)
     compute_score_from = fields.Selection(string='Compute Risk Score From', selection=[(
-        'dynamic', 'Dynamically From Return Value'), ('static', 'Static From Risk Rating')], default='static', index=True,required=True)
+        'dynamic', 'SQL Query Return Value'), ('static', 'From Risk Rating'),('risk_assessment','Related Risk Assessment')], default='risk_assessment', index=True,required=True)
+    risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment', index=True, required=False,
+                                      help="Risk Assessment to which this plan is associated")
+    risk_assessment_score = fields.Float(string='Risk Assessment Score',digits=(10, 2),related="risk_assessment.risk_rating")
 
     def action_activate(self):
         for e in self:

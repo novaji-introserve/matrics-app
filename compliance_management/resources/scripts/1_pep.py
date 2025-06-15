@@ -5,6 +5,9 @@
 import odoo_connect
 from odoo_connect.explore import explore
 import pandas as pd
+import os
+# importing necessary functions from dotenv library
+from dotenv import load_dotenv, dotenv_values 
 
 # Change path to list as required
 PEP_LIST='/home/jonathan/data_pro_pep.csv'
@@ -56,7 +59,7 @@ df = df.fillna('')
 df = df.replace('NaN', '')
 df = df.replace('NULL', '')
 total_rows = len(df)
-odoo = env = odoo_connect.connect(url='http://localhost:8069', database='icomply_dev',username='admin', password='admin')
+odoo = env = odoo_connect.connect(url=os.getenv("HOST_URL"), database=os.getenv("DB"),username=os.getenv("USERNAME"), password='PASSWORD')
 pep = env['res.pep']
 #env['res.pep'].search([]).unlink()
 for i in range(0, total_rows, chunk_size):

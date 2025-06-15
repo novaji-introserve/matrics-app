@@ -8,7 +8,9 @@
             <tree string="Risk Analysis">
                 <field name="name" />
                 <field name="priority"/>
-                <field name="risk_score" />
+                <field name="risk_assessment"/>
+                <field name="risk_assessment_score"/>
+                <field name="risk_score" string="Static Risk Score" />
                 <field name="create_uid" />
                 <field name="create_date" />
             </tree>
@@ -44,6 +46,7 @@
                     </div>
                     <group>
                         <group>
+                            <field name="risk_assessment" nocreate="True" noedit="True" />
                             <field name="risk_score" widget="slider" step="1" min="1" max="eval()"/>
                         </group>
                         <group>
@@ -67,6 +70,11 @@
                             <field name="narration" placeholder="Narration..." />
                         </page>
                     </notebook>
+                <div class="alert alert-info" role="alert" name="sql_tips">
+                Customer ID will be replaced with the %s placeholder value and used to evaluate for each customer. The query result will be returned as the risk score<br/>
+                Example SQL Query to give all customers without BVN a risk score: <br/>
+                <code>SELECT 17 FROM res_partner WHERE id = %s AND bvn IS NULL</code>
+                </div>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" />
