@@ -91,6 +91,44 @@
                                 </div>
                                 <p class="csv-help-text">Supported formats: CSV, Excel (.xlsx, .xls) files up to 2GB</p>
                             </div>
+                            
+                            <!-- Delete Mode Option -->
+                            <div t-if="state.selectedModel" class="csv-form-group">
+                                <div class="csv-checkbox-container">
+                                    <input type="checkbox"
+                                        class="csv-checkbox"
+                                        id="delete-mode"
+                                        t-att-checked="state.deleteMode"
+                                        t-on-change="onDeleteModeChange" />
+                                    <label for="delete-mode">Delete Mode (delete records with matching identifiers)</label>
+                                </div>
+                                <p t-if="state.deleteMode" class="csv-help-text">
+                                    ⚠️ <strong>Warning:</strong> This will permanently delete records in the database 
+                                    that match the unique identifiers in your file. This action cannot be undone.
+                                </p>
+                            </div>
+                            
+                            <!-- Unique Identifier Selection for Delete Mode -->
+                            <div t-if="state.deleteMode" class="csv-form-group">
+                                <label class="csv-form-label" for="unique-identifier">Unique Identifier Field</label>
+                                <div t-if="state.loadingColumns" class="csv-spinner-container">
+                                    <div class="csv-spinner"></div>
+                                    <span>Loading columns...</span>
+                                </div>
+                                <select t-else="" 
+                                        id="unique-identifier" 
+                                        class="csv-select" 
+                                        t-on-change="onUniqueIdentifierChange"
+                                        t-att-disabled="state.tableColumns.length === 0">
+                                    <option value="">Select a field...</option>
+                                    <t t-foreach="state.tableColumns" t-as="column" t-key="column.name">
+                                        <option t-att-value="column.name">
+                                            <t t-esc="column.string" /> (<t t-esc="column.name" />)
+                                        </option>
+                                    </t>
+                                </select>
+                                <p class="csv-help-text">Select the field that uniquely identifies records to be deleted</p>
+                            </div>
 
                             <!-- Upload Progress -->
                             <div t-if="state.isUploading" class="csv-progress">
