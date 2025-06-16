@@ -98,8 +98,8 @@
         "data/transaction_type.xml",
         "data/demo_data/chart/charts.xml", #CHARTS
         # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
-        # "data/demo_data/account/res_partner_accounts.xml" # CUSTOMER ACCOUNT
-        # "data/transactions.xml" # TRANSACTION
+        # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
+        # "data/transactions.xml", # TRANSACTION
         "views/res_users.xml",
         "views/peplist.xml",
         'data/gender.xml',
