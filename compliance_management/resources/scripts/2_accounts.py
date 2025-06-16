@@ -8,11 +8,14 @@ import numpy as np
 import random
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
+import os
+# importing necessary functions from dotenv library
+from dotenv import load_dotenv, dotenv_values 
+load_dotenv()
 chunk_size = 1000
 branch_ids = []
 
-odoo = env = odoo_connect.connect(url='http://localhost:8069', database='icomply_dev',username='admin', password='admin')
+odoo = env = odoo_connect.connect(url=os.getenv("HOST_URL"), database=os.getenv("DB"),username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
 
 def get_branch_ids():
     branches = explore(env['res.branch'])
@@ -125,11 +128,9 @@ def create_accounts():
                     'account_status': 'active',
                     'balance': bal,
                     'product_id': account_product.id if account_product else None,
-                    'account_tier': account_tier.code,
                 }
                 try:
                     tot_created += 1
-                    print(account_data)
                     new_account = account.create(account_data)
                     print(f"Created account: {account_name} with ID: {new_account}")
                 except Exception as e:

@@ -88,9 +88,9 @@
 
                     <button name="action_remove_watchlist" type="object" string="Remove from Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '!=',True)]}" />
                     <!-- SANCTION LIST -->
-                    <button name="action_sanction_list" class="oe_highlight" type="object" string="Add to Sanctionlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '=',True)]}" />
+                    <button name="action_sanction_list" class="oe_highlight" type="object" string="Add to Sanctions List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '=',True)]}" />
 
-                    <button name="action_remove_sanction_list" type="object" string="Remove from SanctionList" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '!=',True)]}" />
+                    <button name="action_remove_sanction_list" type="object" string="Remove from Sanctions List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '!=',True)]}" />
                     <!--End Sanction list  -->
                     <button name="action_greylist" class="oe_highlight" type="object" string="Add to Greylist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Greylist. Are you sure?" attrs="{'invisible': [('is_greylist', '=',True)]}" />
 
@@ -98,7 +98,7 @@
 
                     <button name="action_conduct_risk_assessment" class="oe_highlight" type="object" string="Conduct Risk Assessment" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Conduct Risk Assessment. Are you sure?" />
 
-                    <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Compute Risk Score" confirm="Compute Risk Score: Using your defined Risk Analysis, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
+                    <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Run Risk Analysis" confirm="Compute Risk Score: Using your defined Risk Analysis, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
 
                     <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
                     <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?" />
@@ -114,13 +114,11 @@
                     <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level in ('high')" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')"/>
                     </span>                   
                 </button> -->
-
                 <button class="oe_stat_button" icon="fa-thermometer-0">
                     <span>Risk
                         <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'low'"/>
                     </span>
                 </button>
-
                 <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
                     <field string="Risk Score" name="risk_score" widget="statinfo"/>
                 </button>
@@ -131,16 +129,18 @@
                 <!-- <attribute name="invisible">1</attribute> -->
             </xpath>
 
-            <xpath expr="//field[@name='region_id']" position="replace">
-                <field name="state_residence" invisible="0" />
+            <xpath expr="//field[@name='street']" position="after">
+                <field name="region_id" invisible="0" />
+            </xpath>
 
+            <xpath expr="//field[@name='region_id']" position="after">
+                <field name="state_residence" invisible="0" />
             </xpath>
 
             <xpath expr="//field[@name='function']" position="replace">
                 <field name="employment_status" invisible="0" />
                 <field name="active" invisible="1" />
             </xpath>
-
 
             <xpath expr="//field[@name='mobile']" position="attributes">
                 <attribute name="invisible">1</attribute>

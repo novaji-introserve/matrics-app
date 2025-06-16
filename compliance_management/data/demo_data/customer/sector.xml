@@ -4,10 +4,10 @@
     <!-- Risk Assessment -->
     <record id="res_risk_assessment_onboarding" model="res.risk.assessment">
         <field name="name">Onboarding Risk Assessment</field>
-        <field name="code">onboarding</field>
+        <!--field name="code">onboarding</field-->
         <field name="is_default">True</field>
         <field name="risk_rating">3</field>
-        <field name="state">draft</field>
+        <!--field name="state">draft</field-->
     </record>
  <!--Sectors-->
     <record id="compliance_customer_sector_1" model="res.partner.sector">
