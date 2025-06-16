@@ -11,6 +11,8 @@ import os
 from datetime import timedelta, datetime
 import pytz
 from dateutil.relativedelta import relativedelta
+from odoo.exceptions import UserError, AccessError
+
 
 
 load_dotenv()
@@ -191,6 +193,58 @@ class Customer(models.Model):
     digital_product_view_ids = fields.One2many(
         'res.partner.digital.product.view', 'partner_id', 
         string='Digital Products', readonly=True, auto_join=True)
+    
+    channel_subscription_ids = fields.One2many(
+        'customer.channel.subscription', 'partner_id',
+        string='Channel Subscriptions', readonly=True)
+    
+    
+    
+    
+    def action_sync_channels(self):
+        """Fast channel sync for individual customer"""
+        if not self.customer_id:
+            from odoo.exceptions import UserError
+            raise UserError("Customer ID is required for syncing channels")
+
+        self._cr.execute("""
+            INSERT INTO customer_channel_subscription (customer_id, partner_id, channel_id, value, last_updated)
+            SELECT %s, %s, dc.id, 'NO', NOW()
+            FROM digital_delivery_channel dc
+            WHERE dc.status = 'active'
+            AND NOT EXISTS (
+                SELECT 1 FROM customer_channel_subscription ccs
+                WHERE ccs.customer_id = %s AND ccs.channel_id = dc.id
+            )
+        """, (self.customer_id, self.id, self.customer_id))
+
+        created_count = self._cr.rowcount
+        self._cr.commit()
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Sync Complete',
+                'message': f'Customer synced - {created_count} new channels added',
+                'type': 'success',
+            }
+        }
+
+    def action_view_channels(self):
+        """Open customer channels view"""
+        return {
+            'name': f'Digital Channels - {self.name}',
+            'type': 'ir.actions.act_window',
+            'res_model': 'customer.channel.subscription',
+            'view_mode': 'tree,form',
+            'domain': [('partner_id', '=', self.id)],
+            'context': {
+                'default_customer_id': self.customer_id,
+                'default_partner_id': self.id,
+            }
+        }
+        
     
     @api.depends('gender')
     def _compute_gender(self):
@@ -1183,6 +1237,20 @@ class Customer(models.Model):
         for e in self:
             e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
+            
+    
+    
+    # Smart button method to show customer's channels
+    def action_view_channel_subscriptions(self):
+        self.ensure_one()
+        return {
+            'name': 'Digital Channels',
+            'view_mode': 'tree,form',
+            'res_model': 'customer.channel.subscription',
+            'domain': [('customer_id', '=', self.customer_id)],
+            'type': 'ir.actions.act_window',
+            'context': {'default_customer_id': self.customer_id}
+        }
 
   
 
@@ -1328,92 +1396,6 @@ class Customer(models.Model):
     #         # Fallback to super if grouping by a different field
     #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
 
-
-class CustomerDigitalProduct(models.Model):
-    _name = 'customer.digital.product'
-    _sql_constraints = [
-        ('uniq_customer_id', 'unique(customer_id)',
-         "Customer already exists. Customer must be unique!"),
-    ]
-
-    customer_id = fields.Text(string='Customer ID',
-                              index=True, readonly=True)  # customer,
-    customer_name = fields.Char(string='Name', tracking=True, readonly=True)
-    customer_segment = fields.Char(
-        string='Customer Segment', tracking=True, readonly=True)
-    ussd = fields.Char(string='Uses USSD', index=True, readonly=True)
-    onebank = fields.Char(string='Uses One Bank', index=True, readonly=True)
-    carded_customer = fields.Char(
-        string='Has A Card', index=True, readonly=True)
-    alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
-    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
-    banca = fields.Char(string='Has Banca', readonly=True)
-    doubble = fields.Char(string='Has Doubble', readonly=True)
-    specta = fields.Char(string='Has Specta', readonly=True)
-    switch = fields.Char(string='Has Switch', readonly=True)
-
-    def init(self):
-        # Drop the trigger if it exists
-        self.env.cr.execute("""
-        SELECT EXISTS (
-            SELECT 1
-            FROM information_schema.tables
-            WHERE table_name = 'customer_digital_product'
-        )
-    """)
-        table_exists = self.env.cr.fetchone()[0]
-
-        if table_exists:
-            # Create the index if it doesn't exist
-            self.env.cr.execute("""
-                CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx
-                ON customer_digital_product (id)
-            """)
-
-# view model to display Customer digital products
-class PartnerDigitalProductView(models.Model):
-    _name = 'res.partner.digital.product.view'
-    _description = 'Partner Digital Products View'
-    _auto = False  # This is a database view
-
-    partner_id = fields.Many2one(
-        'res.partner', string='Partner', readonly=True)
-    customer_id = fields.Char(string='Customer ID', readonly=True)
-    ussd = fields.Char(string='Uses USSD', readonly=True)
-    onebank = fields.Char(string='Uses One Bank', readonly=True)
-    carded_customer = fields.Char(string='Has A Card', readonly=True)
-    alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
-    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
-    banca = fields.Char(string='Has Banca', readonly=True)
-    doubble = fields.Char(string='Has Doubble', readonly=True)
-    specta = fields.Char(string='Has Specta', readonly=True)
-    switch = fields.Char(string='Has Switch', readonly=True)
-    customer_segment = fields.Char(string='Customer Segment', readonly=True)
-
-    def init(self):
-        """Create database view that joins partner with digital products"""
-        tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute("""
-            CREATE OR REPLACE VIEW %s AS (
-                SELECT 
-                    cdp.id,  
-                    rp.id AS partner_id,
-                    cdp.customer_id,
-                    cdp.ussd,
-                    cdp.onebank,
-                    cdp.carded_customer,
-                    cdp.alt_bank,
-                    cdp.sterling_pro,
-                    cdp.banca,
-                    cdp.doubble,
-                    cdp.specta,
-                    cdp.switch,
-                    cdp.customer_segment
-                FROM customer_digital_product cdp
-                JOIN res_partner rp ON cdp.customer_id = rp.customer_id
-                WHERE rp.customer_id IS NOT NULL
-            )
-        """ % self._table)
 
 
 class Partner(models.Model):

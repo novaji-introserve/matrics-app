@@ -174,3 +174,5 @@ compliance_management.branch_access_res_materialized_views,branch_access_res_mat
 compliance_management.pep_list,pep_list,compliance_management.model_pep_list,base.group_user,1,0,0,0
 compliance_management.sanction_list,sanction_list,compliance_management.model_sanction_list,base.group_user,1,0,0,0
 compliance_management.res_partner_digital_product_view,res_partner_digital_product_view,compliance_management.model_res_partner_digital_product_view,base.group_user,1,0,0,0
+compliance_management.digital.delivery.channel,digital.delivery.channel,compliance_management.model_digital_delivery_channel,base.group_user,1,0,1,0
+compliance_management.customer.channel.subscription,customer.channel.subscription,compliance_management.model_customer_channel_subscription,base.group_user,1,1,1,0

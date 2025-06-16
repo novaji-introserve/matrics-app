@@ -14,6 +14,8 @@ class RiskAssessment(models.Model):
     _order = "name"
 
     name = fields.Char(string="Name", required=True)
+    code = fields.Char(string="Code", index=True)
+    state = fields.Char(string="State")
     user_id = fields.Many2one(comodel_name='res.users', string='User',
                               required=True, index=True, default=lambda self: self.env.user.id)
     risk_rating = fields.Float(
