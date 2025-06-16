@@ -1159,13 +1159,19 @@ class Customer(models.Model):
 
         # Ensure records is not None before returning
         """
-        - First check for approved EDD then use the Plan if no EDD
+        - Priority is Risk Assessment > EDD > Risk Plan
         """
+        risk_assessments = self.env['res.risk.assessment'].search([('partner_id', '=', record_id)],order='create_date desc',limit=1)
+        if risk_assessments:
+            for r in risk_assessments:
+                if r.risk_rating:
+                    return r.risk_rating
         approved_edd = self.env['res.partner.edd'].search(
             [('status', '=', 'approved'),('customer_id','=',record_id)],order='date_approved desc', limit=1)
         for edd in approved_edd:
             if edd.risk_score:
                 return edd.risk_score
+        # Use risk analysis
         return records[0] if records is not None else 0.00
 
     def action_greylist(self):
