@@ -322,14 +322,13 @@ class CSVImportController(http.Controller):
                 status=500,
             )
 
-    def _handle_final_chunk(
-        self, file_id, total_chunks, original_filename, ir_model, chunk_dir
-    ):
+    def _handle_final_chunk(self, file_id, total_chunks, original_filename, ir_model, chunk_dir):
         """
-        Process the final chunk with improved transaction management
+        Process the final chunk with improved transaction management and async processing
         """
         final_path = None
         try:
+            # File processing steps (no changes to this part)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             random_suffix = "".join(
                 random.choices(string.ascii_letters + string.digits, k=6)
@@ -340,6 +339,8 @@ class CSVImportController(http.Controller):
             batch_dir = os.path.join(self.UPLOAD_DIR, batch_folder)
             os.makedirs(batch_dir, exist_ok=True)
             final_path = os.path.join(batch_dir, unique_filename)
+            
+            # Assemble file from chunks
             with open(final_path, "wb") as outfile:
                 for i in range(total_chunks):
                     chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
@@ -352,27 +353,33 @@ class CSVImportController(http.Controller):
                         )
                     with open(chunk_path, "rb") as infile:
                         outfile.write(infile.read())
+            
             file_size = os.path.getsize(final_path)
             self._send_message(
                 f"File successfully reassembled: {self._format_bytes(file_size)}",
                 "success",
             )
+            
+            # Determine content type
             content_type = "text/csv"
             if original_filename.lower().endswith((".xlsx", ".xls")):
                 content_type = (
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-
+            
+            # Create import log record
+            import_log_id = None
+            
+            # Get delete mode parameters
             delete_mode = request.httprequest.headers.get("X-Delete-Mode") == "true"
             unique_identifier_field = request.httprequest.headers.get("X-Unique-Identifier", "")
-
-            import_log_id = None
-            import_log = None
+            
             with request.env.registry.cursor() as new_cr:
                 try:
                     env = api.Environment(new_cr, request.env.uid, request.env.context)
                     with open(final_path, "rb") as infile:
                         file_content = base64.b64encode(infile.read())
+                    
                     import_log = (
                         env["import.log"]
                         .sudo()
@@ -388,6 +395,7 @@ class CSVImportController(http.Controller):
                                 "batch_folder": batch_folder,
                                 "file_path": final_path,
                                 "uploaded_by": request.env.user.id,
+                                # Delete mode parameters
                                 "delete_mode": delete_mode,
                                 "unique_identifier_field": unique_identifier_field if delete_mode else False,
                             }
@@ -401,6 +409,8 @@ class CSVImportController(http.Controller):
                 except Exception as e:
                     new_cr.rollback()
                     raise e
+            
+            # Clean up temporary chunks
             for i in range(total_chunks):
                 chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
                 if os.path.exists(chunk_path):
@@ -409,30 +419,92 @@ class CSVImportController(http.Controller):
                 os.rmdir(chunk_dir)
             except:
                 pass
-            use_queue = False
-            try:
-                queue_job_installed = (
-                    request.env["ir.module.module"]
-                    .sudo()
-                    .search(
-                        [("name", "=", "queue_job"), ("state", "=", "installed")],
-                        limit=1,
-                    )
-                )
-                use_queue = bool(queue_job_installed)
-            except Exception as e:
-                _logger.warning(f"Error checking for queue_job module: {str(e)}")
+            
+            # Process the import based on mode
             with request.env.registry.cursor() as proc_cr:
                 env = api.Environment(proc_cr, request.env.uid, request.env.context)
-                process_import_log = env["import.log"].sudo().browse(import_log_id)
-                if use_queue and not hasattr(process_import_log, "with_delay"):
-                    use_queue = False
-                    _logger.warning("ImportLog model doesn't have with_delay method")
-                if use_queue:
+                import_log = env["import.log"].sudo().browse(import_log_id)
+                
+                # Check if queue_job is available
+                use_queue = False
+                try:
+                    queue_job_installed = (
+                        env["ir.module.module"]
+                        .sudo()
+                        .search(
+                            [("name", "=", "queue_job"), ("state", "=", "installed")],
+                            limit=1,
+                        )
+                    )
+                    use_queue = bool(queue_job_installed)
+                except Exception as e:
+                    _logger.warning(f"Error checking for queue_job module: {str(e)}")
+                
+                # For delete mode operations
+                if delete_mode:
+                    self._send_message("Processing in delete mode...", "info")
+                    
+                    if use_queue and hasattr(import_log, "with_delay"):
+                        self._send_message("Queueing delete operation as background job...", "info")
+                        job = import_log.with_delay(
+                            description=f"Delete from {ir_model.model} using {unique_identifier_field}",
+                            channel="csv_import",
+                            priority=15
+                        ).queue_delete_operation()
+                        proc_cr.commit()
+                        
+                        return Response(
+                            json.dumps({
+                                "status": "success",
+                                "import_id": import_log_id,
+                                "message": "File upload complete, delete operation queued",
+                                "mode": "delete",
+                                "filename": unique_filename
+                            }),
+                            content_type="application/json"
+                        )
+                    else:
+                        # For smaller files, we can start the delete process directly
+                        self._send_message("Starting delete operation directly...", "info")
+                        try:
+                            # Use a separate thread to avoid blocking the request
+                            import threading
+                            thread = threading.Thread(
+                                target=lambda: import_log.queue_delete_operation()
+                            )
+                            thread.start()
+                            
+                            # Return response immediately without waiting for completion
+                            return Response(
+                                json.dumps({
+                                    "status": "success",
+                                    "import_id": import_log_id,
+                                    "message": "File upload complete, delete operation started",
+                                    "mode": "delete",
+                                    "filename": unique_filename
+                                }),
+                                content_type="application/json"
+                            )
+                        except Exception as e:
+                            _logger.error(f"Error starting delete operation: {str(e)}")
+                            return Response(
+                                json.dumps({
+                                    "status": "warning",
+                                    "import_id": import_log_id,
+                                    "message": "File upload complete, but delete operation could not be started automatically. Please start it manually.",
+                                    "error": str(e),
+                                    "mode": "delete",
+                                    "filename": unique_filename
+                                }),
+                                content_type="application/json"
+                            )
+                
+                # For regular import operations (no change to existing code)
+                if use_queue and hasattr(import_log, "with_delay"):
                     self._send_message("Queueing file for batch processing...", "info")
                     try:
                         job = (
-                            process_import_log.sudo()
+                            import_log.sudo()
                             .with_delay(
                                 description=f"Process CSV Import {import_log_id}",
                                 channel="csv_import",
@@ -457,12 +529,13 @@ class CSVImportController(http.Controller):
                         proc_cr.rollback()
                         _logger.error(f"Error creating queue job: {str(e)}")
                         use_queue = False
+                        
                 if not use_queue:
                     try:
                         self._send_message(
                             "Starting direct processing (no job queue)...", "info"
                         )
-                        result = process_import_log.sudo().process_file()
+                        result = import_log.sudo().process_file()
                         proc_cr.commit()
                         return Response(
                             json.dumps(
@@ -498,9 +571,9 @@ class CSVImportController(http.Controller):
                             ),
                             content_type="application/json",
                         )
+        
         except Exception as e:
             _logger.error(f"Error handling final chunk: {str(e)}")
-
             _logger.error(f"Traceback: {traceback.format_exc()}")
             self._send_message(f"Error processing file: {str(e)}", "error")
             if final_path and os.path.exists(final_path):
@@ -513,6 +586,197 @@ class CSVImportController(http.Controller):
                 content_type="application/json",
                 status=500,
             )
+    # def _handle_final_chunk(
+    #     self, file_id, total_chunks, original_filename, ir_model, chunk_dir
+    # ):
+    #     """
+    #     Process the final chunk with improved transaction management
+    #     """
+    #     final_path = None
+    #     try:
+    #         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    #         random_suffix = "".join(
+    #             random.choices(string.ascii_letters + string.digits, k=6)
+    #         )
+    #         name, ext = os.path.splitext(original_filename)
+    #         unique_filename = f"{name}_{timestamp}_{random_suffix}{ext}"
+    #         batch_folder = f"batch_{ir_model.model}_{timestamp}"
+    #         batch_dir = os.path.join(self.UPLOAD_DIR, batch_folder)
+    #         os.makedirs(batch_dir, exist_ok=True)
+    #         final_path = os.path.join(batch_dir, unique_filename)
+    #         with open(final_path, "wb") as outfile:
+    #             for i in range(total_chunks):
+    #                 chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
+    #                 if not os.path.exists(chunk_path):
+    #                     self._send_message(f"Missing chunk {i}", "error")
+    #                     return Response(
+    #                         json.dumps({"error": f"Missing chunk {i}"}),
+    #                         content_type="application/json",
+    #                         status=500,
+    #                     )
+    #                 with open(chunk_path, "rb") as infile:
+    #                     outfile.write(infile.read())
+    #         file_size = os.path.getsize(final_path)
+    #         self._send_message(
+    #             f"File successfully reassembled: {self._format_bytes(file_size)}",
+    #             "success",
+    #         )
+    #         content_type = "text/csv"
+    #         if original_filename.lower().endswith((".xlsx", ".xls")):
+    #             content_type = (
+    #                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    #             )
+
+    #         delete_mode = request.httprequest.headers.get("X-Delete-Mode") == "true"
+    #         unique_identifier_field = request.httprequest.headers.get("X-Unique-Identifier", "")
+
+    #         import_log_id = None
+    #         import_log = None
+    #         with request.env.registry.cursor() as new_cr:
+    #             try:
+    #                 env = api.Environment(new_cr, request.env.uid, request.env.context)
+    #                 with open(final_path, "rb") as infile:
+    #                     file_content = base64.b64encode(infile.read())
+    #                 import_log = (
+    #                     env["import.log"]
+    #                     .sudo()
+    #                     .create(
+    #                         {
+    #                             "name": f"Import {unique_filename}",
+    #                             "file_name": unique_filename,
+    #                             "original_filename": original_filename,
+    #                             "content_type": content_type,
+    #                             "ir_model_id": ir_model.id,
+    #                             "file": file_content,
+    #                             "status": "pending",
+    #                             "batch_folder": batch_folder,
+    #                             "file_path": final_path,
+    #                             "uploaded_by": request.env.user.id,
+    #                             "delete_mode": delete_mode,
+    #                             "unique_identifier_field": unique_identifier_field if delete_mode else False,
+    #                         }
+    #                     )
+    #                 )
+    #                 import_log_id = import_log.id
+    #                 new_cr.commit()
+    #                 self._send_message(
+    #                     "File successfully uploaded and saved", "success"
+    #                 )
+    #             except Exception as e:
+    #                 new_cr.rollback()
+    #                 raise e
+    #         for i in range(total_chunks):
+    #             chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
+    #             if os.path.exists(chunk_path):
+    #                 os.unlink(chunk_path)
+    #         try:
+    #             os.rmdir(chunk_dir)
+    #         except:
+    #             pass
+    #         use_queue = False
+    #         try:
+    #             queue_job_installed = (
+    #                 request.env["ir.module.module"]
+    #                 .sudo()
+    #                 .search(
+    #                     [("name", "=", "queue_job"), ("state", "=", "installed")],
+    #                     limit=1,
+    #                 )
+    #             )
+    #             use_queue = bool(queue_job_installed)
+    #         except Exception as e:
+    #             _logger.warning(f"Error checking for queue_job module: {str(e)}")
+    #         with request.env.registry.cursor() as proc_cr:
+    #             env = api.Environment(proc_cr, request.env.uid, request.env.context)
+    #             process_import_log = env["import.log"].sudo().browse(import_log_id)
+    #             if use_queue and not hasattr(process_import_log, "with_delay"):
+    #                 use_queue = False
+    #                 _logger.warning("ImportLog model doesn't have with_delay method")
+    #             if use_queue:
+    #                 self._send_message("Queueing file for batch processing...", "info")
+    #                 try:
+    #                     job = (
+    #                         process_import_log.sudo()
+    #                         .with_delay(
+    #                             description=f"Process CSV Import {import_log_id}",
+    #                             channel="csv_import",
+    #                         )
+    #                         .process_file()
+    #                     )
+    #                     proc_cr.commit()
+    #                     self._send_message(f"Job queued for processing", "success")
+    #                     return Response(
+    #                         json.dumps(
+    #                             {
+    #                                 "status": "success",
+    #                                 "import_id": import_log_id,
+    #                                 "message": "File upload complete, processing queued",
+    #                                 "filename": unique_filename,
+    #                                 "file_path": final_path,
+    #                             }
+    #                         ),
+    #                         content_type="application/json",
+    #                     )
+    #                 except Exception as e:
+    #                     proc_cr.rollback()
+    #                     _logger.error(f"Error creating queue job: {str(e)}")
+    #                     use_queue = False
+    #             if not use_queue:
+    #                 try:
+    #                     self._send_message(
+    #                         "Starting direct processing (no job queue)...", "info"
+    #                     )
+    #                     result = process_import_log.sudo().process_file()
+    #                     proc_cr.commit()
+    #                     return Response(
+    #                         json.dumps(
+    #                             {
+    #                                 "status": (
+    #                                     "success"
+    #                                     if result.get("success", False)
+    #                                     else "warning"
+    #                                 ),
+    #                                 "import_id": import_log_id,
+    #                                 "message": result.get(
+    #                                     "message", "Processing started"
+    #                                 ),
+    #                                 "filename": unique_filename,
+    #                                 "file_path": final_path,
+    #                             }
+    #                         ),
+    #                         content_type="application/json",
+    #                     )
+    #                 except Exception as e:
+    #                     proc_cr.rollback()
+    #                     _logger.error(f"Error starting direct processing: {str(e)}")
+    #                     return Response(
+    #                         json.dumps(
+    #                             {
+    #                                 "status": "warning",
+    #                                 "import_id": import_log_id,
+    #                                 "message": "File upload complete. Please start processing manually.",
+    #                                 "error": str(e),
+    #                                 "filename": unique_filename,
+    #                                 "file_path": final_path,
+    #                             }
+    #                         ),
+    #                         content_type="application/json",
+    #                     )
+    #     except Exception as e:
+    #         _logger.error(f"Error handling final chunk: {str(e)}")
+
+    #         _logger.error(f"Traceback: {traceback.format_exc()}")
+    #         self._send_message(f"Error processing file: {str(e)}", "error")
+    #         if final_path and os.path.exists(final_path):
+    #             try:
+    #                 os.unlink(final_path)
+    #             except:
+    #                 pass
+    #         return Response(
+    #             json.dumps({"error": f"Error handling final chunk: {str(e)}"}),
+    #             content_type="application/json",
+    #             status=500,
+    #         )
 
     @http.route("/csv_import/start_import", type="json", auth="user")
     def start_import(self, import_id):
@@ -531,6 +795,59 @@ class CSVImportController(http.Controller):
                 cr.rollback()
                 _logger.error(f"Error starting import: {str(e)}")
                 return {"success": False, "error": str(e)}
+
+    @http.route("/csv_import/start_delete", type="json", auth="user")
+    def start_delete_operation(self, import_id):
+        """Start or resume a delete operation for an import"""
+        import_id = int(import_id)
+        
+        try:
+            import_log = request.env["import.log"].sudo().browse(import_id)
+            if not import_log.exists():
+                return {"success": False, "error": "Import not found"}
+                
+            if not import_log.delete_mode:
+                return {"success": False, "error": "This import is not configured for delete mode"}
+                
+            # Check if queue_job is available
+            use_queue = False
+            try:
+                queue_job_installed = (
+                    request.env["ir.module.module"]
+                    .sudo()
+                    .search(
+                        [("name", "=", "queue_job"), ("state", "=", "installed")],
+                        limit=1,
+                    )
+                )
+                use_queue = bool(queue_job_installed) and hasattr(import_log, "with_delay")
+            except Exception as e:
+                _logger.warning(f"Error checking for queue_job module: {str(e)}")
+                
+            if use_queue:
+                # Queue the job
+                job = import_log.with_delay(
+                    description=f"Delete from {import_log.model_name} using {import_log.unique_identifier_field}",
+                    channel="csv_import",
+                    priority=15
+                ).queue_delete_operation()
+                
+                return {
+                    "success": True, 
+                    "message": "Delete operation queued",
+                    "job_method": "queue_delete_operation"
+                }
+            else:
+                # Start directly
+                result = import_log.queue_delete_operation()
+                return {
+                    "success": True,
+                    "message": "Delete operation started directly",
+                    "result": result
+                }
+        except Exception as e:
+            _logger.error(f"Error starting delete operation: {str(e)}")
+            return {"success": False, "error": str(e)}
 
     @http.route(
         "/csv_import/download_template/<int:model_id>", type="http", auth="user"

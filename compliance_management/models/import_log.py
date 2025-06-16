@@ -1594,6 +1594,448 @@ class ImportLog(models.Model):
            
         return self.process_file()
 
+    def queue_delete_operation(self):
+        """Queue a delete operation as a background job to prevent timeout issues"""
+        if not self.delete_mode or not self.unique_identifier_field:
+            raise ValueError("Delete mode and unique identifier field must be specified")
+            
+        self._log_message("Queuing delete operation as background job...", "info")
+        
+        # Check if queue_job is available
+        if hasattr(self, 'with_delay'):
+            # Create a job with appropriate description and channel
+            self.with_delay(
+                description=f"Delete records from {self.model_name} using {self.unique_identifier_field}",
+                channel="csv_import",
+                priority=15  # Higher priority than normal imports
+            ).execute_delete_operation()
+            
+            self._log_message("Delete operation queued successfully", "success")
+            return True
+        else:
+            # Fall back to direct execution with warning
+            self._log_message(
+                "Queue job module not available, running delete operation directly (may timeout)", 
+                "warning"
+            )
+            return self.execute_delete_operation()
+
+    def execute_delete_operation(self):
+        """Execute the delete operation using the file's unique identifiers"""
+        if not self.delete_mode or not self.unique_identifier_field:
+            raise ValueError("Delete mode and unique identifier field must be specified")
+            
+        # Initialize progress tracking
+        if not self.delete_progress:
+            self.delete_progress = json.dumps({
+                'total': 0,
+                'processed': 0,
+                'deleted': 0,
+                'failed': 0,
+                'status': 'initializing',
+                'start_time': fields.Datetime.now().isoformat(),
+                'processed_values': []
+            })
+            # Commit progress immediately
+            self.env.cr.commit()
+        
+        self._log_message(f"Starting delete operation using field: {self.unique_identifier_field}", "info")
+        
+        try:
+            # Process in manageable chunks to avoid timeouts
+            chunk_size = 5000  # Process 5000 records per transaction
+            
+            # Get all values from the file in batches to avoid memory issues
+            deleted_count = 0
+            failed_count = 0
+            total_count = 0
+            processed_values = set()
+            
+            # Read and process the file in smaller batches
+            with self._get_file_reader() as reader:
+                # Get column index of the unique identifier
+                header = next(reader)
+                
+                # Find the column that matches our unique identifier field (case-insensitive)
+                col_index = -1
+                normalized_field = self.unique_identifier_field.lower().replace('_', '')
+                
+                for i, col_name in enumerate(header):
+                    normalized_col = col_name.lower().replace('_', '')
+                    if normalized_col == normalized_field or col_name.lower() == self.unique_identifier_field.lower():
+                        col_index = i
+                        self._log_message(f"Found unique identifier in column: {col_name}", "info")
+                        break
+                
+                if col_index == -1:
+                    available_cols = ", ".join(header[:10])
+                    if len(header) > 10:
+                        available_cols += f", ... and {len(header) - 10} more"
+                    
+                    raise ValueError(
+                        f"Could not find column matching '{self.unique_identifier_field}' in file. "
+                        f"Available columns: {available_cols}"
+                    )
+                
+                # Process the file in batches
+                batch_num = 0
+                unique_values = set()
+                
+                # Get the current progress to resume if needed
+                progress = json.loads(self.delete_progress) if self.delete_progress else {}
+                if progress.get('status') == 'in_progress' and 'processed_values' in progress:
+                    processed_values = set(progress.get('processed_values', []))
+                    self._log_message(f"Resuming from previous run, {len(processed_values)} values already processed", "info")
+                
+                # Update status to in_progress
+                self._update_delete_status('in_progress')
+                
+                # Process the file row by row to minimize memory usage
+                for i, row in enumerate(reader):
+                    if i % 10000 == 0:
+                        self._log_message(f"Reading file: processed {i:,} rows...", "info")
+                    
+                    # Skip header or empty rows
+                    if i == 0 or not row or len(row) <= col_index:
+                        continue
+                    
+                    # Get value and add to batch if not empty
+                    value = row[col_index]
+                    if value and str(value).strip():
+                        unique_values.add(str(value).strip())
+                    
+                    # Process batch when size threshold reached
+                    if len(unique_values) >= chunk_size:
+                        batch_num += 1
+                        self._log_message(f"Processing batch {batch_num}: {len(unique_values):,} values", "info")
+                        
+                        # Process this batch
+                        batch_deleted, batch_failed = self._delete_records_batch(
+                            unique_values, processed_values
+                        )
+                        
+                        # Update counts
+                        deleted_count += batch_deleted
+                        failed_count += batch_failed
+                        total_count += len(unique_values)
+                        
+                        # Update progress after each batch with commit
+                        self._update_delete_progress(deleted_count, failed_count, total_count, unique_values)
+                        
+                        # Add to processed values
+                        processed_values.update(unique_values)
+                        
+                        # Reset batch
+                        unique_values = set()
+                
+                # Process any remaining values
+                if unique_values:
+                    batch_num += 1
+                    self._log_message(f"Processing final batch {batch_num}: {len(unique_values):,} values", "info")
+                    
+                    # Process final batch
+                    batch_deleted, batch_failed = self._delete_records_batch(
+                        unique_values, processed_values
+                    )
+                    
+                    # Update counts
+                    deleted_count += batch_deleted
+                    failed_count += batch_failed
+                    total_count += len(unique_values)
+                    
+                    # Update progress
+                    self._update_delete_progress(deleted_count, failed_count, total_count, unique_values)
+            
+            # Mark as completed
+            self._update_delete_status('completed', deleted_count, failed_count, total_count)
+            
+            # Log summary
+            self._log_message(
+                f"Delete operation completed: {deleted_count:,} records deleted, {failed_count:,} failed", 
+                "success"
+            )
+            
+            return True
+            
+        except Exception as e:
+            # Handle errors
+            self._log_message(f"Error in delete operation: {str(e)}", "error")
+            
+            # Mark as failed
+            self._update_delete_status('failed', error_message=str(e))
+            
+            # Raise the exception for the job queue to handle
+            raise
+
+    def _get_file_reader(self):
+        """Get an appropriate file reader based on file type"""
+        import csv
+        import tempfile
+        import xlrd
+        import openpyxl
+        from io import BytesIO
+        
+        if not self.file_path or not os.path.exists(self.file_path):
+            if not self.file:
+                raise ValueError("No file to process")
+                
+            # Create a temporary file from the binary data
+            file_data = base64.b64decode(self.file)
+            temp_file = tempfile.NamedTemporaryFile(delete=False)
+            temp_file.write(file_data)
+            temp_file.close()
+            self.file_path = temp_file.name
+        
+        # Determine file type
+        file_path = self.file_path
+        file_extension = os.path.splitext(file_path)[1].lower()
+        
+        if file_extension in ('.xlsx'):
+            # Excel XLSX reader
+            workbook = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
+            sheet = workbook.active
+            
+            # Create a generator that yields rows
+            def xlsx_reader():
+                for row in sheet.iter_rows(values_only=True):
+                    yield [str(cell) if cell is not None else "" for cell in row]
+            
+            return xlsx_reader()
+            
+        elif file_extension in ('.xls'):
+            # Excel XLS reader
+            workbook = xlrd.open_workbook(file_path)
+            sheet = workbook.sheet_by_index(0)
+            
+            # Create a generator that yields rows
+            def xls_reader():
+                for i in range(sheet.nrows):
+                    yield [str(cell.value) if cell.value is not None else "" for cell in sheet.row(i)]
+            
+            return xls_reader()
+            
+        else:
+            # Default to CSV reader
+            # Try to detect encoding
+            with open(file_path, 'rb') as f:
+                sample = f.read(min(10000, os.path.getsize(file_path)))
+                
+            import chardet
+            result = chardet.detect(sample)
+            encoding = result['encoding'] or 'utf-8'
+            
+            # Try different separators
+            for sep in [',', ';', '\t', '|']:
+                try:
+                    # Open file with detected encoding
+                    f = open(file_path, 'r', encoding=encoding)
+                    reader = csv.reader(f, delimiter=sep)
+                    
+                    # Read the first row to test if it parses correctly
+                    first_row = next(reader)
+                    if len(first_row) > 1:  # We have multiple columns - seems valid
+                        # Reset file pointer
+                        f.seek(0)
+                        
+                        # Create a wrapper to ensure file gets closed
+                        class FileWrapper:
+                            def __init__(self, file, reader):
+                                self.file = file
+                                self.reader = reader
+                                
+                            def __iter__(self):
+                                return self.reader
+                                
+                            def __next__(self):
+                                return next(self.reader)
+                                
+                            def __enter__(self):
+                                return self.reader
+                                
+                            def __exit__(self, exc_type, exc_val, exc_tb):
+                                self.file.close()
+                        
+                        return FileWrapper(f, reader)
+                except Exception as e:
+                    # Try next separator
+                    try:
+                        f.close()
+                    except:
+                        pass
+                    
+            # If we get here, none of the separators worked
+            raise ValueError(f"Could not determine file format for {file_path}")
+
+    def _delete_records_batch(self, values, already_processed=None):
+        """Delete a batch of records and return counts of deleted and failed"""
+        if not values:
+            return 0, 0
+            
+        # Skip values that were already processed
+        if already_processed:
+            values = [v for v in values if v not in already_processed]
+            
+        if not values:
+            return 0, 0
+        
+        # Create a new cursor for this operation
+        with self.env.registry.cursor() as cr:
+            env = api.Environment(cr, self.env.uid, self.env.context)
+            model_obj = env[self.model_name]
+            
+            try:
+                # Find records to delete
+                domain = [(self.unique_identifier_field, 'in', list(values))]
+                records = model_obj.search(domain)
+                
+                if not records:
+                    self._log_message(f"No records found matching {len(values)} values", "info")
+                    return 0, 0
+                    
+                # Store IDs for verification
+                record_ids = records.ids
+                count_before = len(record_ids)
+                
+                # Delete records
+                records.unlink()
+                
+                # Verify deletion
+                remaining = model_obj.search([('id', 'in', record_ids)])
+                failed_count = len(remaining)
+                deleted_count = count_before - failed_count
+                
+                # Log results
+                if deleted_count > 0:
+                    self._log_message(f"Deleted {deleted_count} records", "success")
+                    
+                if failed_count > 0:
+                    self._log_message(f"Failed to delete {failed_count} records", "warning")
+                    
+                # Commit this batch
+                cr.commit()
+                
+                return deleted_count, failed_count
+                
+            except Exception as e:
+                # Roll back and log error
+                cr.rollback()
+                self._log_message(f"Error deleting batch: {str(e)}", "error")
+                
+                # Return all as failed
+                return 0, len(values)
+
+    def _update_delete_progress(self, deleted_count, failed_count, total_count, batch_values=None):
+        """Update delete progress with atomic transaction"""
+        try:
+            # Get current progress
+            progress = json.loads(self.delete_progress) if self.delete_progress else {}
+            
+            # Update counts
+            progress['deleted'] = deleted_count
+            progress['failed'] = failed_count
+            progress['total'] = total_count
+            progress['processed'] = deleted_count + failed_count
+            progress['status'] = 'in_progress'
+            
+            # Update time
+            progress['updated_at'] = fields.Datetime.now().isoformat()
+            
+            # Add batch values to processed values (without storing the full list in the log)
+            if 'processed_values' not in progress:
+                progress['processed_values'] = []
+                
+            if batch_values:
+                # Convert batch values to list and extend the processed values
+                batch_list = list(batch_values)
+                progress['processed_values'].extend(batch_list)
+                
+                # To avoid memory issues, just store a count in the database
+                progress_copy = progress.copy()
+                progress_copy['processed_value_count'] = len(progress['processed_values'])
+                del progress_copy['processed_values']
+                
+                # Update the progress in the database
+                with self.env.registry.cursor() as new_cr:
+                    # Use pg_advisory_xact_lock to ensure atomic update
+                    new_cr.execute("SELECT pg_advisory_xact_lock(%s)", (self.id,))
+                    
+                    # Update the progress
+                    new_cr.execute("""
+                        UPDATE import_log
+                        SET delete_progress = %s
+                        WHERE id = %s
+                    """, (json.dumps(progress_copy), self.id))
+                    
+                    new_cr.commit()
+            
+            # Update the local progress
+            self.delete_progress = json.dumps(progress)
+            
+        except Exception as e:
+            _logger.error(f"Error updating delete progress: {str(e)}")
+
+    def _update_delete_status(self, status, deleted_count=0, failed_count=0, total_count=0, error_message=None):
+        """Update the status of the delete operation"""
+        try:
+            # Get current progress
+            progress = json.loads(self.delete_progress) if self.delete_progress else {}
+            
+            # Update status
+            progress['status'] = status
+            
+            if status == 'completed':
+                progress['completed_at'] = fields.Datetime.now().isoformat()
+                progress['deleted'] = deleted_count
+                progress['failed'] = failed_count
+                progress['total'] = total_count
+                progress['processed'] = deleted_count + failed_count
+            elif status == 'failed':
+                progress['error_message'] = error_message
+                progress['failed_at'] = fields.Datetime.now().isoformat()
+            
+            # Create a copy for database storage (without the potentially large processed_values)
+            progress_copy = progress.copy()
+            if 'processed_values' in progress_copy:
+                progress_copy['processed_value_count'] = len(progress_copy['processed_values'])
+                del progress_copy['processed_values']
+            
+            # Update the progress in the database
+            with self.env.registry.cursor() as new_cr:
+                # Use pg_advisory_xact_lock to ensure atomic update
+                new_cr.execute("SELECT pg_advisory_xact_lock(%s)", (self.id,))
+                
+                # Update the progress
+                new_cr.execute("""
+                    UPDATE import_log
+                    SET delete_progress = %s
+                    WHERE id = %s
+                """, (json.dumps(progress_copy), self.id))
+                
+                # Store summary for completed operations
+                if status == 'completed':
+                    summary = {
+                        "operation": "delete",
+                        "identifier_field": self.unique_identifier_field,
+                        "total_values": total_count,
+                        "records_deleted": deleted_count,
+                        "records_failed": failed_count,
+                        "completion_time": fields.Datetime.now().isoformat()
+                    }
+                    
+                    new_cr.execute("""
+                        UPDATE import_log
+                        SET summary = %s
+                        WHERE id = %s
+                    """, (json.dumps(summary), self.id))
+                
+                new_cr.commit()
+            
+            # Update the local progress
+            self.delete_progress = json.dumps(progress)
+            
+        except Exception as e:
+            _logger.error(f"Error updating delete status: {str(e)}")
+
 class ImportFieldMapping(models.Model):
     _name = "import.field.mapping"
     _description = "Import Field Mapping"
