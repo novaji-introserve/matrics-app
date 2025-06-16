@@ -96,6 +96,16 @@ class CSVProcessor:
             "technical_details": "",
             "failure_summary": {},
         }
+
+        self.delete_mode = import_log.delete_mode
+        self.unique_identifier_field = import_log.unique_identifier_field
+        self.delete_progress = None
+        if import_log.delete_progress:
+            try:
+                self.delete_progress = json.loads(import_log.delete_progress)
+            except:
+                _logger.warning(f"Failed to parse delete progress JSON: {import_log.delete_progress}")
+
     
     def process_batch(self, start_position, end_position):
         """Process a specific batch of records with proper transaction handling"""
@@ -116,6 +126,32 @@ class CSVProcessor:
                 f"Processing records {start_position:,} to {end_position:,}", 
                 "info"
             )
+
+            if self.delete_mode:
+                self._log_message("Processing in delete mode", "info")
+                
+                self.df = self._read_file_chunk(start_position, end_position - start_position)
+                if self.df is None or self.df.empty:
+                    self._log_message("No data found in specified range", "warning")
+                    return self.results
+                
+                self.csv_columns = list(self.df.columns)
+                
+                self._initialize_dynamic_schema()
+                
+                self.df = self._preprocess_dataframe(self.df)
+                
+                deleted_count = self.process_delete_mode()
+                
+                self.results.update({
+                    "success": True,
+                    "deleted": deleted_count,
+                    "mode": "delete"
+                })
+                
+                self.process_time = (datetime.now() - self.start_time).total_seconds()
+                
+                return self.results
             
             # Initialize dynamic schema for mapping
             self._initialize_dynamic_schema()
@@ -1848,3 +1884,370 @@ class CSVProcessor:
         
         # Generic error message as fallback
         return "An error occurred during the import process. Please contact support for assistance."
+
+    def process_delete_mode(self):
+        """Delete records with matching unique identifiers with interruption recovery"""
+        if not self.unique_identifier_field:
+            raise ValueError("Unique identifier field is required for delete mode")
+            
+        self._log_message(f"Processing in delete mode with identifier field: {self.unique_identifier_field}", "info")
+        
+        # Ensure field exists in the model
+        if self.unique_identifier_field not in self.model_fields:
+            raise ValueError(f"Field '{self.unique_identifier_field}' does not exist in model {self.model_name}")
+        
+        # Find the CSV column mapped to this field - IMPROVED MAPPING LOGIC
+        csv_column = None
+        
+        # Method 1: Check existing field mappings (most reliable)
+        for csv_field, model_field in self.field_mappings.items():
+            if model_field == self.unique_identifier_field:
+                csv_column = csv_field
+                self._log_message(f"Found column '{csv_column}' in field mappings for '{self.unique_identifier_field}'", "info")
+                break
+        
+        # Method 2: If not found in mappings, try case-insensitive search on column names
+        if not csv_column or csv_column not in self.df.columns:
+            # Normalize field name (remove underscores, lowercase)
+            normalized_field = self.unique_identifier_field.lower().replace('_', '')
+            
+            for col in self.df.columns:
+                # Normalize column name the same way
+                normalized_col = col.lower().replace('_', '')
+                
+                # Check if normalized names match
+                if normalized_col == normalized_field:
+                    csv_column = col
+                    self._log_message(f"Found column '{csv_column}' via case-insensitive match for '{self.unique_identifier_field}'", "info")
+                    break
+                    
+        # Method 3: Try partial matching as last resort
+        if not csv_column or csv_column not in self.df.columns:
+            best_match = None
+            best_score = 0
+            
+            for col in self.df.columns:
+                # Convert both to lowercase for comparison
+                col_lower = col.lower()
+                field_lower = self.unique_identifier_field.lower()
+                
+                # Check if one contains the other
+                if field_lower in col_lower or col_lower in field_lower:
+                    # Calculate a simple match score (length of overlap)
+                    score = min(len(col_lower), len(field_lower))
+                    if score > best_score:
+                        best_score = score
+                        best_match = col
+            
+            if best_match:
+                csv_column = best_match
+                self._log_message(f"Found column '{csv_column}' via partial match for '{self.unique_identifier_field}'", "info")
+        
+        # Final verification
+        if not csv_column or csv_column not in self.df.columns:
+            # Generate helpful error message with available columns
+            available_columns = ", ".join(self.df.columns[:10])
+            if len(self.df.columns) > 10:
+                available_columns += f", ... and {len(self.df.columns) - 10} more"
+                
+            raise ValueError(
+                f"Could not find a column matching unique identifier field '{self.unique_identifier_field}'. "
+                f"Available columns: {available_columns}. "
+                f"Please ensure the unique identifier exists in your CSV file."
+            )
+        
+        self._log_message(f"Using column '{csv_column}' as the unique identifier source", "info")
+        
+        # Check for existing progress
+        processed_values = set()
+        if self.delete_progress and self.delete_progress.get('status') == 'in_progress':
+            if 'processed_values' in self.delete_progress:
+                try:
+                    processed_values = set(self.delete_progress['processed_values'])
+                    self._log_message(f"Resuming delete operation: {len(processed_values)} values already processed", "info")
+                except Exception as e:
+                    _logger.warning(f"Error parsing processed values: {str(e)}")
+        
+        # Get values from the dataframe
+        values = self.df[csv_column].dropna().tolist()
+        if not values:
+            self._log_message("No values found for unique identifier field", "warning")
+            return 0
+            
+        # Clean values and remove empty strings
+        identifier_values = [str(v).strip() for v in values if str(v).strip()]
+        if not identifier_values:
+            self._log_message("No valid values found for unique identifier field", "warning")
+            return 0
+            
+        # Remove already processed values
+        if processed_values:
+            identifier_values = [v for v in identifier_values if v not in processed_values]
+            
+        if not identifier_values:
+            self._log_message("All values have already been processed", "info")
+            return 0
+        
+        # Log the number of unique values
+        self._log_message(f"Found {len(identifier_values)} unique values for deletion", "info")
+        
+        # Initialize progress tracking without processed values to avoid memory issues
+        # We'll track processed values only in batches
+        if not self.delete_progress:
+            self.delete_progress = {
+                'total': len(identifier_values),
+                'processed': 0,
+                'deleted': 0,
+                'failed': 0,
+                'status': 'in_progress',
+                'processed_values': []
+            }
+        else:
+            self.delete_progress['total'] = self.delete_progress.get('total', 0) + len(identifier_values)
+            self.delete_progress['status'] = 'in_progress'
+            if 'processed_values' not in self.delete_progress:
+                self.delete_progress['processed_values'] = []
+        
+        # Store initial progress
+        self._update_delete_progress()
+        
+        # Process in chunks to avoid memory issues
+        chunk_size = 100  # Smaller chunks for better reliability
+        deleted_count = self.delete_progress.get('deleted', 0)
+        failed_count = self.delete_progress.get('failed', 0)
+        
+        # Process in chunks with independent transactions
+        for i in range(0, len(identifier_values), chunk_size):
+            chunk = identifier_values[i:i+chunk_size]
+            chunk_processed = False
+            retries = 0
+            max_retries = 3
+            
+            # Retry logic for each chunk
+            while not chunk_processed and retries < max_retries:
+                # Use a new cursor for each chunk to isolate transactions
+                with self.env.registry.cursor() as chunk_cr:
+                    try:
+                        # Create environment with new cursor
+                        chunk_env = api.Environment(chunk_cr, self.env.uid, self.env.context)
+                        model_obj = chunk_env[self.model_name]
+                        
+                        # Build the domain for deletion
+                        domain = [(self.unique_identifier_field, 'in', chunk)]
+                        
+                        # Get records to delete
+                        records = model_obj.search(domain)
+                        record_count = len(records)
+                        
+                        if records:
+                            # Store IDs before deletion for confirmation
+                            record_ids = records.ids
+                            
+                            # Delete the records
+                            records.unlink()
+                            
+                            # Verify deletion was successful
+                            remaining = model_obj.search([('id', 'in', record_ids)])
+                            if remaining:
+                                # Some records weren't deleted
+                                failed_ids = remaining.ids
+                                failed_count += len(failed_ids)
+                                deleted_count += (record_count - len(failed_ids))
+                                self._log_message(f"Failed to delete {len(failed_ids)} records", "warning")
+                            else:
+                                # All records were deleted
+                                deleted_count += record_count
+                                self._log_message(f"Deleted {record_count} records", "success")
+                        else:
+                            self._log_message(f"No records found matching {len(chunk)} values", "info")
+                        
+                        # Track current processed batch separately from the main progress
+                        # This avoids serialization errors by keeping batch updates small
+                        batch_progress = {
+                            'total': self.delete_progress['total'],
+                            'processed': self.delete_progress.get('processed', 0) + len(chunk),
+                            'deleted': deleted_count,
+                            'failed': failed_count,
+                            'status': 'in_progress',
+                            'processed_values': chunk  # Only include current chunk
+                        }
+                        
+                        # Store current batch progress
+                        self.delete_progress = batch_progress
+                        self._update_delete_progress()
+                        
+                        # Commit this chunk's transaction
+                        chunk_cr.commit()
+                        chunk_processed = True
+                        
+                        # Log progress
+                        current_position = i + len(chunk)
+                        progress_pct = round(current_position / len(identifier_values) * 100, 1)
+                        self._log_message(f"Processed {current_position} of {len(identifier_values)} values ({progress_pct}% complete)", "info")
+                        
+                    except Exception as e:
+                        # Rollback this chunk
+                        chunk_cr.rollback()
+                        
+                        retries += 1
+                        if retries >= max_retries:
+                            # Mark as failed after max retries
+                            failed_count += len(chunk)
+                            error_msg = f"Error deleting records after {max_retries} attempts: {str(e)}"
+                            self._log_message(error_msg, "error")
+                        else:
+                            # Log retry attempt
+                            self._log_message(f"Retry {retries}/{max_retries} for chunk {i//chunk_size + 1}: {str(e)}", "warning")
+                            time.sleep(1 * retries)  # Increasing delay between retries
+        
+        # Mark as completed with a final update
+        final_progress = {
+            'total': self.delete_progress.get('total', len(identifier_values)),
+            'processed': len(identifier_values),
+            'deleted': deleted_count,
+            'failed': failed_count,
+            'status': 'completed',
+            'processed_values': []  # Don't store all values in the final summary
+        }
+        
+        self.delete_progress = final_progress
+        
+        # Use a separate transaction for the final update
+        with self.env.registry.cursor() as final_cr:
+            try:
+                # Create environment with new cursor
+                final_env = api.Environment(final_cr, self.env.uid, self.env.context)
+                
+                # Store the final progress
+                final_import_log = final_env['import.log'].browse(self.import_log.id)
+                final_import_log.write({
+                    'delete_progress': json.dumps(final_progress)
+                })
+                
+                # Store a human-readable summary
+                summary = {
+                    "operation": "delete",
+                    "identifier_field": self.unique_identifier_field,
+                    "values_processed": len(identifier_values),
+                    "records_deleted": deleted_count,
+                    "records_failed": failed_count,
+                    "completion_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
+                
+                final_import_log.write({
+                    'summary': json.dumps(summary)
+                })
+                
+                final_cr.commit()
+            except Exception as e:
+                final_cr.rollback()
+                _logger.error(f"Error updating final delete progress: {str(e)}")
+        
+        total_summary = f"Delete operation completed: {deleted_count} records deleted, {failed_count} failed"
+        self._log_message(total_summary, "success")
+        
+        return deleted_count
+
+    def _update_delete_progress(self):
+        """Update the delete progress in the import log with robust concurrency handling"""
+        if not self.delete_progress:
+            return
+            
+        # Create a separate progress summary without the large processed_values list
+        try:
+            # Make a copy without the potentially large processed_values list for the summary
+            progress_summary = dict(self.delete_progress)
+            if 'processed_values' in progress_summary:
+                # Just store the count in the summary to avoid huge JSON
+                progress_summary['processed_value_count'] = len(progress_summary['processed_values'])
+                del progress_summary['processed_values']
+            
+            # Use advisory locks and retries for atomic updates
+            max_retries = 5
+            for attempt in range(max_retries):
+                try:
+                    # Create a new cursor for isolated transaction
+                    with self.env.registry.cursor() as update_cr:
+                        # Get a unique lock ID based on import log ID
+                        lock_id = self.import_log.id + 50000000  # Different offset from other locks
+                        
+                        # Try to acquire advisory lock (non-blocking first attempt)
+                        update_cr.execute("SELECT pg_try_advisory_xact_lock(%s)", (lock_id,))
+                        lock_acquired = update_cr.fetchone()[0]
+                        
+                        if not lock_acquired:
+                            # If lock not acquired, try a blocking acquire with timeout
+                            _logger.info(f"Waiting for lock to update delete progress (attempt {attempt+1})")
+                            
+                            # Set statement timeout to 2 seconds to avoid hanging
+                            update_cr.execute("SET LOCAL statement_timeout = 2000")
+                            
+                            try:
+                                # Try blocking lock with timeout
+                                update_cr.execute("SELECT pg_advisory_xact_lock(%s)", (lock_id,))
+                            except Exception as lock_error:
+                                if "statement timeout" in str(lock_error):
+                                    # Timeout is fine, we'll retry
+                                    _logger.info("Lock acquisition timed out, will retry")
+                                    time.sleep(0.5 * (attempt + 1))  # Backoff
+                                    continue
+                                else:
+                                    # Other error, propagate
+                                    raise
+                        
+                        # First check if record still exists and get current progress
+                        update_cr.execute("""
+                            SELECT id, delete_progress 
+                            FROM import_log 
+                            WHERE id = %s
+                            FOR UPDATE
+                        """, (self.import_log.id,))
+                        
+                        result = update_cr.fetchone()
+                        if not result:
+                            _logger.warning(f"Import log {self.import_log.id} not found during progress update")
+                            return
+                            
+                        # If there's existing progress, merge it intelligently
+                        current_id, current_progress_json = result
+                        if current_progress_json:
+                            try:
+                                current_progress = json.loads(current_progress_json)
+                                
+                                # Keep processed values from current progress if our list is empty
+                                if ('processed_values' not in self.delete_progress or 
+                                    not self.delete_progress['processed_values']) and 'processed_values' in current_progress:
+                                    self.delete_progress['processed_values'] = current_progress['processed_values']
+                                    
+                                # Add existing processed values to our list (avoid duplicates)
+                                elif 'processed_values' in current_progress:
+                                    current_set = set(current_progress['processed_values'])
+                                    if 'processed_values' in self.delete_progress:
+                                        new_set = set(self.delete_progress['processed_values'])
+                                        combined = list(current_set.union(new_set))
+                                        self.delete_progress['processed_values'] = combined
+                            except Exception as e:
+                                _logger.warning(f"Error merging progress data: {str(e)}")
+                        
+                        # Serialize delete progress for storage (with processed values)
+                        progress_json = json.dumps(self.delete_progress)
+                        
+                        # Store delete progress with safe SQL update
+                        update_cr.execute("""
+                            UPDATE import_log
+                            SET delete_progress = %s
+                            WHERE id = %s
+                        """, (progress_json, self.import_log.id))
+                        
+                        # Commit the transaction
+                        update_cr.commit()
+                        return
+                except Exception as e:
+                    _logger.warning(f"Error updating delete progress (attempt {attempt+1}/{max_retries}): {str(e)}")
+                    time.sleep(0.5 * (2 ** attempt))  # Exponential backoff
+                    
+            # If all retries failed, log error but continue
+            _logger.error(f"Failed to update delete progress after {max_retries} attempts")
+        except Exception as e:
+            _logger.error(f"Error in _update_delete_progress: {str(e)}")
+

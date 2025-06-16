@@ -103,6 +103,11 @@ class ChunkedUploader {
             'X-Model-Id': metadata.modelId,
         };
 
+        if (metadata.deleteMode) {
+            headers['X-Delete-Mode'] = 'true';
+            headers['X-Unique-Identifier'] = metadata.uniqueIdentifierField || '';
+        }
+
         try {
             // Create an XMLHttpRequest to track progress
             return new Promise((resolve, reject) => {
