@@ -9,10 +9,15 @@ import random
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import uuid
+import os
+# importing necessary functions from dotenv library
+from dotenv import load_dotenv, dotenv_values 
 
+load_dotenv()
 chunk_size = 1000
 branch_ids = []
-odoo = env = odoo_connect.connect(url='http://localhost:8069', database='icomply_dev',username='admin', password='admin')
+odoo = env = odoo_connect.connect(url=os.getenv("HOST_URL"), database=os.getenv("DB"),username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+
 
 def get_branch_ids():
     branches = explore(env['res.branch'])

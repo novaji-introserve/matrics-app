@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 class FcraScore(models.Model):
     _name = 'res.fcra.score'
-    _description = 'FCRA Risk Score'
+    _description = 'Risk Score'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
     name = fields.Text(string='Name')

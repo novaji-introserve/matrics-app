@@ -137,7 +137,7 @@
                 <!-- <notebook position="inside"> -->
                 <page string="Enhanced Due Diligence" name="edd_record">
                     <field name="edd_ids" nolabel="1">
-                        <tree string="EDD Record">
+                        <tree string="EDD Record" delete="False" create="False" edit="False">
                             <field name="name" />
                             <field name="status" />
                             <field name="customer_id" />

@@ -15,19 +15,21 @@ class Branch(models.Model):
     code = fields.Char(string="Code")
     co_code = fields.Char(string="Co-Code")
     users = fields.Many2many(
-        'res.users', 'res_branch_users_rel', 'branch_id', 'user_id', required=False)
-    region = fields.Char(string="Region", required=False)
+       'res.users', 'res_branch_users_rel', 'branch_id', 'user_id', required=False)
+    region = fields.Char(string="Region Name", required=False)
+    region_id = fields.Many2one(comodel_name='res.partner.region', string='Region')
     zone = fields.Char(string="Zone", required=False)
     address = fields.Char(string="Branch Address", required=False)
     state_located = fields.Char(string="State Located", required=False)
     town_area = fields.Char(string="Area",  required=False)
-
+    
     @api.model
     def create(self, vals_list):
         # Create records
         records = super(Branch, self).create(vals_list)
 
         # Trigger notification for UI refresh
+        
         self.env['bus.bus']._sendmany([
             ('dashboard_refresh_channel', 'refresh', {
                 'type': 'refresh', 
@@ -54,5 +56,7 @@ class Branch(models.Model):
         ])
 
         return result
+        
+    
 
     

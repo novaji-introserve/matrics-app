@@ -8,7 +8,11 @@ import numpy as np
 import random
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import os
+# importing necessary functions from dotenv library
+from dotenv import load_dotenv, dotenv_values 
 
+load_dotenv()
 chunk_size = 1000
 branch_ids = []
 
@@ -19,7 +23,7 @@ df['customer_id'] = df['customer_id'].fillna(0).astype('string')
 #df['branch_id'] = df['branch_id'].fillna(0).astype('int64')
 df['phone'] = df['phone'].fillna(0).astype('Int64')
 total_rows = len(df)
-odoo = env = odoo_connect.connect(url='http://localhost:8069', database='icomply_dev',username='admin', password='admin')
+odoo = env = odoo_connect.connect(url=os.getenv("HOST_URL"), database=os.getenv("DB"),username=os.getenv("USERNAME"), password=os.getenv('PASSWORD'))
 
 def get_branch_ids():
     branches = explore(env['res.branch'])
@@ -27,6 +31,9 @@ def get_branch_ids():
     for b in branches.search([]):
         branch_ids.append(b.id)
     return branch_ids
+
+def get_branch(id):
+    return explore(env['res.branch']).search([('id', '=', id)], limit=1)
 
 def get_education_level_ids():
     education_levels = explore(env['res.education.level'])
@@ -78,13 +85,17 @@ def create_customers():
             lastname = row['name'].capitalize().split()[0] if pd.notnull(row['name']) else ''
             customer_id = int(float(row['customer_id'])) if pd.notnull(row['customer_id']) else ''
             email =  f"{firstname.lower()}.{lastname.lower()}@example.com" if firstname and lastname else ''
+            branch_id = random.choice(branch_ids) if branch_ids else None
+            branch = get_branch(branch_id) if branch_id else None
+           
             record = {
                 'name': f"{firstname} {lastname}",
                 'customer_id': customer_id,
                 'firstname': firstname,
                 'lastname': lastname,
                 'customer_id': int(float(row['customer_id'])) if pd.notnull(row['customer_id']) else '',
-                'branch_id': random.choice(branch_ids) if branch_ids else 0,  # Randomly select a branch ID
+                'branch_id': branch_id,  # Randomly select a branch ID,
+                'region_id': branch.region_id.id,  # Get region ID from the branch,
                 'phone': str(row['phone']),
                 'mobile': str(row['phone']),
                 'origin':"prod",
@@ -94,7 +105,7 @@ def create_customers():
                 'sector_id': random.choice(sector_ids) if sector_ids else None,  # Randomly select a sector ID,
                 'education_level_id': random.choice(education_level_ids) if education_level_ids else None,  # Randomly select an education level ID
                 'dob': get_random_date(18, 75).strftime('%Y-%m-%d'),
-                'registration_date': get_random_date(0,3).strftime('%Y-%m-%d'),
+                'registration_date': get_random_date(0,3).strftime('%Y-%m-%d')
                 
             }
             records.append(record)
