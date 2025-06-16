@@ -1594,7 +1594,6 @@ class ImportLog(models.Model):
            
         return self.process_file()
 
-<<<<<<< HEAD
     def queue_delete_operation(self):
         """Queue a delete operation as a background job to prevent timeout issues"""
         if not self.delete_mode or not self.unique_identifier_field:
@@ -2037,8 +2036,6 @@ class ImportLog(models.Model):
         except Exception as e:
             _logger.error(f"Error updating delete status: {str(e)}")
 
-=======
->>>>>>> 9e153fb (feat(import): implement record deletion via file upload using user-selected unique identifier)
 class ImportFieldMapping(models.Model):
     _name = "import.field.mapping"
     _description = "Import Field Mapping"
