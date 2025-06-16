@@ -210,6 +210,48 @@ class CSVImportController(http.Controller):
             self._send_message(error_msg, "error")
             return {"error": error_msg}
 
+    @http.route("/csv_import/get_table_columns", type="json", auth="user")
+    def get_table_columns(self, model_id):
+        """Get columns for a specific model table"""
+        try:
+            ir_model = request.env["ir.model"].sudo().browse(int(model_id))
+            if not ir_model.exists():
+                self._send_message(f"Error: Model with ID {model_id} not found", "error")
+                return {"error": "Model not found"}
+                
+            model_name = ir_model.model
+            if model_name not in request.env:
+                return {"error": f"Model {model_name} is not accessible"}
+                
+            self._send_message(f"Getting columns for table: {ir_model.name}", "info")
+            model_obj = request.env[model_name]
+            
+            columns = []
+            for field_name, field in model_obj._fields.items():
+                # Skip non-storable fields, computed fields without inverse, and complex relation fields
+                if (not field.store or 
+                    field.type in ["many2many", "one2many", "binary", "reference"] or
+                    (field.compute and not field.inverse)):
+                    continue
+                    
+                columns.append({
+                    "name": field_name,
+                    "string": field.string,
+                    "type": field.type,
+                    "required": field.required,
+                    "relation": field.comodel_name if field.type == "many2one" else False,
+                })
+                    
+            self._send_message(f"Loaded {len(columns)} columns for table {ir_model.name}", "success")
+            return {
+                "columns": columns,
+            }
+        except Exception as e:
+            error_msg = f"Error getting model columns: {str(e)}"
+            _logger.exception(error_msg)
+            self._send_message(error_msg, "error")
+            return {"error": error_msg}
+
     @http.route(
         "/csv_import/upload_chunk",
         type="http",
@@ -366,8 +408,10 @@ class CSVImportController(http.Controller):
                 content_type = (
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-            
-            # Create import log record
+
+            delete_mode = request.httprequest.headers.get("X-Delete-Mode") == "true"
+            unique_identifier_field = request.httprequest.headers.get("X-Unique-Identifier", "")
+
             import_log_id = None
             
             # Get delete mode parameters
@@ -395,8 +439,6 @@ class CSVImportController(http.Controller):
                                 "batch_folder": batch_folder,
                                 "file_path": final_path,
                                 "uploaded_by": request.env.user.id,
-                                # Delete mode parameters
-                                # Delete mode parameters
                                 "delete_mode": delete_mode,
                                 "unique_identifier_field": unique_identifier_field if delete_mode else False,
                             }
