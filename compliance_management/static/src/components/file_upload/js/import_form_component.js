@@ -510,6 +510,44 @@ export class ImportFormComponent extends Component {
         }
     }
 
+    /**
+     * Handle file upload success with improved async handling
+     * @param {Object} result - Upload result from server
+     */
+    onUploadSuccess(result) {
+        if (result.mode === 'delete') {
+            // For delete operations
+            this.showMessage(
+                "success", 
+                _t("File Uploaded for Deletion"),
+                _t("Your file has been uploaded and the deletion process has been queued. You can monitor progress in the logs below.")
+            );
+            
+            // Add tracking information to show status
+            if (this.terminal) {
+                this.terminal.addLog(`Delete operation started for import ID: ${result.import_id}`, "info");
+                this.terminal.addLog("The operation will continue in the background and you'll see progress updates here", "info");
+                
+                // Set an interval to check status (every 5 seconds)
+                this.statusCheckInterval = setInterval(() => {
+                    this.checkDeleteStatus(result.import_id);
+                }, 5000);
+                
+                // Store the import ID for status checking
+                this.currentDeleteImportId = result.import_id;
+            }
+        } else {
+            // For regular imports
+            this.showMessage(
+                "success", 
+                _t("Upload Successful"),
+                _t("Your file has been uploaded and is being processed")
+            );
+        }
+        
+        // Reset form in both cases
+        this.resetForm();
+    }
 
     async fetchTableColumns(modelId) {
         if (!modelId) return;
