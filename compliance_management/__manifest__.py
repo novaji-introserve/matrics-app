@@ -52,7 +52,6 @@
         "data/schedules/count-weight-avg.xml",
         "views/dynamic_charts.xml",
         "views/fcra_score.xml",
-        "views/configuration.xml",
         "views/edd.xml",
         "views/kyc.xml",
         "views/adverse_media.xml",
@@ -86,6 +85,7 @@
         "views/open_sanctions.xml",
         # remove unwanted partner/customer actions
         'views/remove_partner_actions.xml',
+        "views/configuration.xml",
         "views/customer.xml",
         "views/statistics.xml",
         "views/dashboard.xml",
