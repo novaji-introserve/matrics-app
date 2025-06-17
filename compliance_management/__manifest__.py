@@ -36,8 +36,10 @@
         # "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
-        "data/demo_data/keyword/media_keywords.xml",
         "security/security.xml",
+        "views/adverse_media.xml",
+        "views/configuration.xml",
+        "data/demo_data/keyword/media_keywords.xml",
         "data/schedules/adverse_media_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
         'data/schedules/clean_cache.xml',
@@ -54,7 +56,6 @@
         "views/fcra_score.xml",
         "views/edd.xml",
         "views/kyc.xml",
-        "views/adverse_media.xml",
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
@@ -85,7 +86,6 @@
         "views/open_sanctions.xml",
         # remove unwanted partner/customer actions
         'views/remove_partner_actions.xml',
-        "views/configuration.xml",
         "views/customer.xml",
         "views/statistics.xml",
         "views/dashboard.xml",
@@ -112,6 +112,8 @@
         'data/demo_data/partner/sectors.xml',
         'data/watchlist.xml',
         'data/blacklist.xml',
+        "views/menu_actions.xml",
+
     ],
     # only loaded in demonstration mode
     "demo": [

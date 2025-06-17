@@ -81,23 +81,5 @@
     </form>
 </field>
 </record>
-<!-- Action -->
-<record id="action_list_risk_assessment_plan" model="ir.actions.act_window">
-<field name="name">Risk Analysis</field>
-<field name="type">ir.actions.act_window</field>
-<field name="res_model">res.compliance.risk.assessment.plan</field>
-<field name="view_id" ref="compliance_risk_assessment_plan_tree" />
-<field name="view_mode">tree,form</field>
-<field name="help" type="html">
-    <p class="o_view_nocontent_smiling_face">
-                Add a Risk Analysis Line
-    </p>
-    <p>
-                No records yet
-    </p>
-</field>
-</record>
-<!-- Menu -->
-<menuitem id="menu_compliance_risk_assessment_plan" action="action_list_risk_assessment_plan" parent="menu_risk_assessment" name="Risk Analysis" groups="group_compliance_compliance_risk_manager" sequence="100" />
 
 </odoo>

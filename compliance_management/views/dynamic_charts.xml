@@ -93,19 +93,5 @@
                 </form>
             </field>
         </record>
-
-        <record model="ir.actions.act_window" id="res_charts_action">
-            <field name="name">Dashboard Charts</field>
-            <field name="res_model">res.dashboard.charts</field>
-            <field name="view_mode">tree,form</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Create your first dynamic chart
-                </p>
-                <p>
-                    Configure SQL queries to generate dynamic charts for your Odoo data.
-                </p>
-            </field>
-        </record>
     </data>
 </odoo>

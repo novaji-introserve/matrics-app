@@ -316,15 +316,7 @@
         </field>
     </record>
 
-    <!-- Inherit and modify the action_contacts -->
-    <record id="contacts_action_contacts_inherit" model="ir.actions.act_window">
-        <field name="name">Customers</field>
-        <field name="res_model">res.partner</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="view_mode">tree,kanban,form,activity</field>
-        <field name="search_view_id" ref="base.view_res_partner_filter"/>
-        <field name="context">{'search_default_group_branch': 1}</field>
-    </record>
+
 
     <!-- Override the menu item to use the new action -->
     <!-- <record id="contacts.res_partner_menu_contacts" model="ir.ui.menu">
@@ -460,19 +452,5 @@
         <field name="code">action = model.action_view_likely_sanction_customer()</field>
     </record>
 
-    <!-- Action for PEP -->
-    <record id="action_res_pep" model="ir.actions.act_window">
-        <field name="name">Customers on PEP List</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="domain">[('is_pep', '=', True)]</field>
-    </record>
-
-   
- 
-
-    <menuitem id="menu_is_pep" action="action_res_pep" parent="menu_compliance_customer_heading" name="PEPs Customers" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanctioned" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" />
-    <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_global_pep" parent="menu_compliance_customer_heading" name="Matching Global PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="70" />
 
 </odoo>

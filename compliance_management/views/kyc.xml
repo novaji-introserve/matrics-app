@@ -350,24 +350,4 @@
         <field name="code">action = model.open_correspondents()</field>
     </record>
 
-    <menuitem id="base.menu_board_root" name="Dashboards" sequence="260" web_icon="compliance_management,static/description/icon-dashboard.png" groups="base.group_user" />
-    <menuitem id="spreadsheet_dashboard.spreadsheet_dashboard_menu_root" name="Dashboards" groups="group_tech_support" action="spreadsheet_dashboard.ir_actions_dashboard_action" web_icon="compliance_management,static/description/icon-dashboard.png" sequence="37" />
-    <menuitem name="Customers" id="contacts.menu_contacts" sequence="20" web_icon="compliance_management,static/description/icons-contact.png" groups="group_tech_support" />
-    <!-- <menuitem id="contacts.res_partner_menu_contacts" name="Customers" action="contacts.action_contacts" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="contacts.menu_contacts" sequence="2" /> -->
-
-    <menuitem id="mail.menu_root_discuss" name="Messaging" web_icon="compliance_management,static/description/icon-chat.png" groups="group_tech_support" sequence="1" />
-    <menuitem id="menu_compliance_dd" name="Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="5" />
-    <menuitem id="menu_compliance_kyc" name="KYC" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="10" />
-
-    <menuitem id="menu_compliance_customer_heading" action="open_customers" parent="menu_compliance_kyc" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_customer" action="open_customers" parent="menu_compliance_customer_heading" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_customer_dd" action="open_customers" parent="menu_compliance_dd" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_vendor_dd" action="open_vendors" parent="menu_compliance_dd" name="Vendors" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
-    <menuitem id="menu_compliance_paerner_dd" action="open_partners" parent="menu_compliance_dd" name="Partners" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
-    <menuitem id="menu_compliance_respondents_dd" action="open_respondents" parent="menu_compliance_dd" name="Respondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="40" />
-    <menuitem id="menu_compliance_correspondents_dd" action="open_correspondents" parent="menu_compliance_dd" name="Correspondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="50" />
-
-    <menuitem id="menu_compliance_edd" action="action_res_partner_edd" parent="menu_compliance_kyc" name="Enhanced Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="100" />
-
-
 </odoo>

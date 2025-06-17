@@ -164,13 +164,4 @@
             </search>
         </field>
     </record>
-    <record id="open_accounts" model="ir.actions.server">
-        <field name="name">Open Accounts</field>
-        <field name="model_id" ref="model_res_partner_account" />
-        <field name="type">ir.actions.server</field>
-        <field name="state">code</field>
-        <field name="code">action = model.open_accounts()</field>
-    </record>
-    <menuitem id="menu_compliance_accounts" action="open_accounts" parent="menu_compliance_kyc" name="Accounts" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
-
 </odoo>
