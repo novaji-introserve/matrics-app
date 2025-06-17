@@ -711,9 +711,6 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <menuitem id="menu_digital_delivery_channel" name="Digital Channels" action="action_digital_delivery_channel" parent="menu_customer" sequence="5"/>
-
-
         <!-- Menu Items -->
         <!-- <menuitem
             id="hr.menu_hr_root"
@@ -917,6 +914,14 @@
             name="Charts"
             sequence="10" 
             groups="group_compliance_compliance_officer"
+        />
+
+        <menuitem 
+            id="menu_digital_delivery_channel" 
+            name="Digital Channels" 
+            action="action_digital_delivery_channel" 
+            parent="menu_customer" 
+            sequence="5"
         />
     </data>
 </odoo>

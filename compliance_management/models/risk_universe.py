@@ -21,17 +21,7 @@ class RiskUniverse(models.Model):
                                      help="Weight percentage used in composite risk calculation")
     is_included_in_composite = fields.Boolean(string='Include in Composite', default=True,
                                               help="If checked, this risk universe will be included in composite risk calculations")
-    
-    def init(self):
-        
-        # Create indexes on the materialized view for fast lookups
-        self._cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_risk_universe_composite_idx ON res_risk_universe(id) WHERE is_included_in_composite=True")
-        self._cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_risk_universe_weight_universe_id_idx ON res_partner_risk_universe_weight(universe_id) ")
-        
-    
-
+   
 class PartnerRiskUniverseWeight(models.Model):
     _name = 'res.partner.risk.universe.weight'
     _description = 'Partner Risk Universe Weight'
@@ -99,6 +89,9 @@ class PartnerRiskUniverseWeightReport(models.Model):
                     ru.is_included_in_composite = True
             )
         ''' % (self._table,))
-        
-        
 
+        self._cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_risk_universe_composite_idx ON res_risk_universe(id) WHERE is_included_in_composite=True")
+        self._cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_risk_universe_weight_universe_id_idx ON res_partner_risk_universe_weight(universe_id) ")
+        
