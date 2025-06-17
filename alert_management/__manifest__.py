@@ -48,7 +48,7 @@
 
         'data/hr/hr_dpt.xml',
         'data/hr/hr_job.xml',
-        # 'data/alert.xml',
+        'data/alert.xml',
         # 'data/hr/hr_employee.xml',
         # 'data/users.xml',
 
@@ -58,7 +58,7 @@
         # cron job
         'data/schedule/cron_job.xml',
         # mail conf
-        'data/email_smtp.xml',
+        # 'data/email_smtp.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

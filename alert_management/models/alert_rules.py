@@ -36,7 +36,7 @@ class alert_rules(models.Model):
     string="Alert Status",
     tracking=True
     )
-    specific_email_recipients = fields.Many2many('res.users', "alert_rules_email_rel", "alert_rules_id", "user_id", string="Specific Recipients", required=True, tracking=True)
+    specific_email_recipients = fields.Many2many('res.users', "alert_rules_email_rel", "alert_rules_id", "user_id", string="Specific Recipients", required=False, tracking=True)
     alert_id = fields.Many2one("alert.group", string="Alert Group")
     first_owner = fields.Many2one("res.users",string="First Line Owner") 
     second_owner = fields.Many2one("res.users", string="Second Line Owner") 

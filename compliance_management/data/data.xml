@@ -1,11 +1,9 @@
 <odoo>
 
-   
-
-
+   <data noupdate="1">
     <!-- Settings-->
     <record id="res_compl_settings_risk_plan_computation" model="res.compliance.settings">
-        <field name="name">Risk Plan Computation</field>
+        <field name="name">Risk Analysis Computation</field>
         <field name="code">risk_plan_computation</field>
         <field name="val">max</field>
         <field name="narration">Deteremines the policy for computin the risk assessment from the set
@@ -20,6 +18,30 @@
         <field name="code">default_risk_score</field>
         <field name="val">7.5</field>
         <field name="narration">Default Risk Score</field>
+    </record>
+    <record id="res_compl_settings_low_risk_threshold" model="res.compliance.settings">
+        <field name="name">Low Risk Threshold</field>
+        <field name="code">low_risk_threshold</field>
+        <field name="val">9</field>
+        <field name="narration">Low Risk Threshold</field>
+    </record>
+    <record id="res_compl_settings_medium_risk_threshold" model="res.compliance.settings">
+        <field name="name">Medium Risk Threshold</field>
+        <field name="code">medium_risk_threshold</field>
+        <field name="val">15</field>
+        <field name="narration">Medium Risk Threshold</field>
+    </record>
+    <record id="res_compl_settings_high_risk_threshold" model="res.compliance.settings">
+        <field name="name">High Risk Threshold</field>
+        <field name="code">high_risk_threshold</field>
+        <field name="val">16</field>
+        <field name="narration">High Risk Threshold</field>
+    </record>
+    <record id="res_compl_settings_max_risk_score" model="res.compliance.settings">
+        <field name="name">Maximum Risk Threshold</field>
+        <field name="code">maximum_risk_threshold</field>
+        <field name="val">25</field>
+        <field name="narration">Maximum Risk Threshold</field>
     </record>
     <function model="ir.config_parameter" name="set_param"
         eval="('gemini_api_key', 'AIzaSyAvRsSTIahJWVT-iwPC1nPrSqUoK_fsBq4')" />
@@ -261,6 +283,5 @@
     <field name="bvn">3942087651</field>
     
 </record>
-
-
+</data>
 </odoo>

@@ -20,7 +20,7 @@ class SqlModel(models.Model):
             query = self.query.strip().lower()
             
             if not query.startswith('select') :
-                raise ValidationError(f'query not supported.\n Hint: start with select')
+                raise ValidationError(f'Query not supported.\n Hint: Query must start with SELECT')
             
             elif re.search(r"\w+\.\w+\s+AS\s+\w+", query, re.IGNORECASE):
                 if not re.search(r"\w+\.branch_id", query, re.IGNORECASE):
@@ -30,7 +30,7 @@ class SqlModel(models.Model):
                     "type": "ir.actions.client",
                     "tag": "display_notification",
                     "params":{
-                        "message": "Valid Sql",
+                        "message": "SQL Query validated successfully",
                         "type": "success"
                     }
                 }
@@ -43,19 +43,19 @@ class SqlModel(models.Model):
                         "type": "ir.actions.client",
                         "tag": "display_notification",
                         "params":{
-                            "message": "Valid Sql",
+                            "message": "SQL Query validated successfully",
                             "type": "success"
                         }
                     }
                 except Exception as e:
-                    raise ValidationError(f'failed to execute query {str(e)}')
+                    raise ValidationError(f'Failed to execute query {str(e)}')
 
 
 
                 
                 
         except Exception as e:
-            raise ValidationError(f'failed to execute query {str(e)}')
+            raise ValidationError(f'Failed to execute query {str(e)}')
     
     def savetodb(self):
         pass

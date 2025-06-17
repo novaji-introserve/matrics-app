@@ -1,7 +1,8 @@
 
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, api
+from odoo import models, fields, api, _, tools
 from psycopg2 import ProgrammingError
 import logging
 from dotenv import load_dotenv
@@ -16,9 +17,9 @@ load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
-LOW_RISK_THRESHOLD = 3
-MEDIUM_RISK_THRESHOLD = 6
-HIGH_RISK_THRESHOLD = 9
+LOW_RISK_THRESHOLD = 10
+MEDIUM_RISK_THRESHOLD =  15
+HIGH_RISK_THRESHOLD =  16
 
 
 class Shareholders(models.Model):
@@ -37,7 +38,7 @@ class Shareholders(models.Model):
 
 class PartnerRiskPlanLines(models.Model):
     _name = "res.partner.risk.plan.line"
-    _description = "Partner Risk Plan Lines"
+    _description = "Partner Risk Analysis Lines"
     partner_id = fields.Many2one(
         'res.partner', string='Partner', ondelete="cascade", index=True)
     plan_line_id = fields.Many2one(
@@ -119,7 +120,7 @@ class Customer(models.Model):
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
     risk_plan_line_ids = fields.One2many(
-        comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
+        comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Analysis Lines', tracking=True)
     risk_assessment_ids = fields.One2many(
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
     is_pep = fields.Boolean(
@@ -160,7 +161,7 @@ class Customer(models.Model):
     employment_status = fields.Char(
         string="Employment Status", required=False, readonly=True)
     state_residence = fields.Char(
-        string="Region", required=False, readonly=True)
+        string="State Residence", required=False, readonly=True)
     nin = fields.Char(
         string="National Identification Number (NIN)", index=True, required=False, readonly=True)
     customer_rating = fields.Char(
@@ -184,27 +185,6 @@ class Customer(models.Model):
     likely_sanction = fields.Boolean(string='Is Sanctioned',tracking=True)
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code", index=True)
-
-    ussd = fields.Char(string='Uses USSD',
-                       compute='_compute_digital_products', index=True)
-    onebank = fields.Char(string='Uses One Bank',
-                          compute='_compute_digital_products')
-    carded_customer = fields.Char(
-        string='Has A Card', compute='_compute_digital_products')
-    alt_bank = fields.Char(string='Is On Alt Bank',
-                           compute='_compute_digital_products')
-    sterling_pro = fields.Char(
-        string='Has Sterling Pro', compute='_compute_digital_products')
-    banca = fields.Char(string='Has Banca',
-                        compute='_compute_digital_products')
-    doubble = fields.Char(string='Has Doubble',
-                          compute='_compute_digital_products')
-    specta = fields.Char(string='Has Specta',
-                         compute='_compute_digital_products')
-    switch = fields.Char(string='Has Switch',
-                         compute='_compute_digital_products')
-    customer_segment = fields.Char(
-        string='Customer Segment', compute='_compute_digital_products')
    
     formatted_gender=fields.Char(string='Gender', compute='_compute_gender')
     
@@ -694,11 +674,11 @@ class Customer(models.Model):
             try:
                 if record.risk_score is None:
                     return 'low'
-                if record.risk_score <= LOW_RISK_THRESHOLD:
+                if record.risk_score <=  float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                     return 'low'
-                if record.risk_score <= MEDIUM_RISK_THRESHOLD:
+                if record.risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                     return 'medium'
-                if record.risk_score <= HIGH_RISK_THRESHOLD:
+                if record.risk_score >= float(self.env['res.compliance.settings'].get_setting('high_risk_threshold')):
                     return 'high'
             except:
                 return 'low'
@@ -707,11 +687,11 @@ class Customer(models.Model):
         try:
             if score is None:
                 return 'low'
-            if score <= LOW_RISK_THRESHOLD:
+            if score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                 return 'low'
-            if score <= MEDIUM_RISK_THRESHOLD:
+            if score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                 return 'medium'
-            if score <= HIGH_RISK_THRESHOLD:
+            if score >= float(self.env['res.compliance.settings'].get_setting('high_risk_threshold')):
                 return 'high'
         except:
             return 'low'
@@ -721,11 +701,11 @@ class Customer(models.Model):
         try:
             if risk_score is None:
                 return 'low'
-            if risk_score <= LOW_RISK_THRESHOLD:
+            if risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                 return 'low'
-            if risk_score <= MEDIUM_RISK_THRESHOLD:
+            if risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                 return 'medium'
-            if risk_score <= HIGH_RISK_THRESHOLD:
+            if risk_score >= float(self.env['res.compliance.settings'].get_setting('high_risk_threshold')):
                 return 'high'
         except:
             return 'low'
@@ -1161,14 +1141,17 @@ class Customer(models.Model):
             for pl in plans:
                 score = 0
                 try:
+                    
                     self.env.cr.execute(pl.sql_query, (record_id,))
                     rec = self.env.cr.fetchone()
                     if rec is not None:
                         # we have a hit
                         if pl.compute_score_from == 'dynamic':
-                            score = float(rec[0]) if rec is not None else score
+                            score = float(rec[0]) if rec is not None else pl.risk_score
                         if pl.compute_score_from == 'static':
                             score = pl.risk_score
+                        if pl.compute_score_from == 'risk_assessment':
+                            score = pl.risk_assessment.risk_rating if  pl.risk_assessment is not None else pl.risk_score
                     scores.append(score)
                     line_id = self.env['res.partner.risk.plan.line'].create({
                         'partner_id': record_id,
@@ -1191,6 +1174,20 @@ class Customer(models.Model):
             records = self.env.cr.fetchone()
 
         # Ensure records is not None before returning
+        """
+        - Priority is Risk Assessment > EDD > Risk Plan
+        """
+        risk_assessments = self.env['res.risk.assessment'].search([('partner_id', '=', record_id)],order='create_date desc',limit=1)
+        if risk_assessments:
+            for r in risk_assessments:
+                if r.risk_rating:
+                    return r.risk_rating
+        approved_edd = self.env['res.partner.edd'].search(
+            [('status', '=', 'approved'),('customer_id','=',record_id)],order='date_approved desc', limit=1)
+        for edd in approved_edd:
+            if edd.risk_score:
+                return edd.risk_score
+        # Use risk analysis
         return records[0] if records is not None else 0.00
 
     def action_greylist(self):
@@ -1203,57 +1200,7 @@ class Customer(models.Model):
             e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
 
-    @api.depends('customer_id')
-    def _compute_digital_products(self):
-        """
-        Compute digital product fields.
-        """
-        # Get all customer_ids in current recordset
-        customer_ids = [rec.customer_id for rec in self if rec.customer_id]
-
-        if not customer_ids:
-            # Set default values for records without customer_id
-            for record in self:
-                self._set_default_digital_values(record)
-            return
-
-        # Single query to get all digital products for current recordset
-        digital_products = self.env['customer.digital.product'].search([
-            ('customer_id', 'in', customer_ids)
-        ])
-
-        # Create a mapping for lookup
-        product_map = {dp.customer_id: dp for dp in digital_products}
-
-        # Assign values to each record
-        for record in self:
-            if record.customer_id and record.customer_id in product_map:
-                dp = product_map[record.customer_id]
-                record.ussd = dp.ussd
-                record.onebank = dp.onebank
-                record.carded_customer = dp.carded_customer
-                record.alt_bank = dp.alt_bank
-                record.sterling_pro = dp.sterling_pro
-                record.banca = dp.banca
-                record.doubble = dp.doubble
-                record.specta = dp.specta
-                record.switch = dp.switch
-                record.customer_segment = dp.customer_segment
-            else:
-                self._set_default_digital_values(record)
-
-    def _set_default_digital_values(self, record):
-        """Set default values for digital product fields"""
-        record.ussd = None
-        record.onebank = None
-        record.carded_customer = None
-        record.alt_bank = None
-        record.sterling_pro = None
-        record.banca = None
-        record.doubble = None
-        record.specta = None
-        record.switch = None
-        record.customer_segment = None
+  
 
     # @api.model
     # def _compute_is_branch_compliance(self):
@@ -1438,3 +1385,140 @@ class CustomerDigitalProduct(models.Model):
                 CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx
                 ON customer_digital_product (id)
             """)
+
+# view model to display Customer digital products
+class PartnerDigitalProductView(models.Model):
+    _name = 'res.partner.digital.product.view'
+    _description = 'Partner Digital Products View'
+    _auto = False  # This is a database view
+
+    partner_id = fields.Many2one(
+        'res.partner', string='Partner', readonly=True)
+    customer_id = fields.Char(string='Customer ID', readonly=True)
+    ussd = fields.Char(string='Uses USSD', readonly=True)
+    onebank = fields.Char(string='Uses One Bank', readonly=True)
+    carded_customer = fields.Char(string='Has A Card', readonly=True)
+    alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
+    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
+    banca = fields.Char(string='Has Banca', readonly=True)
+    doubble = fields.Char(string='Has Doubble', readonly=True)
+    specta = fields.Char(string='Has Specta', readonly=True)
+    switch = fields.Char(string='Has Switch', readonly=True)
+    customer_segment = fields.Char(string='Customer Segment', readonly=True)
+
+    def init(self):
+        """Create database view that joins partner with digital products"""
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (
+                SELECT 
+                    cdp.id,  
+                    rp.id AS partner_id,
+                    cdp.customer_id,
+                    cdp.ussd,
+                    cdp.onebank,
+                    cdp.carded_customer,
+                    cdp.alt_bank,
+                    cdp.sterling_pro,
+                    cdp.banca,
+                    cdp.doubble,
+                    cdp.specta,
+                    cdp.switch,
+                    cdp.customer_segment
+                FROM customer_digital_product cdp
+                JOIN res_partner rp ON cdp.customer_id = rp.customer_id
+                WHERE rp.customer_id IS NOT NULL
+            )
+        """ % self._table)
+
+
+class Partner(models.Model):
+    _inherit = 'res.partner'
+
+    @api.model
+    def remove_unwanted_partner_actions(self):
+        """Remove unwanted actions from partner view"""
+        _logger.info("Starting removal of unwanted partner actions")
+
+        # Try various possible XML IDs for merge actions
+        merge_action_refs = [
+            'base.partner_merge_automatic_wizard_action',
+            'contacts.action_partner_merge',
+            'base_partner_merge.action_partner_merge_automatic',
+            'base_partner_merge.partner_merge_automatic_wizard_action'
+        ]
+
+        for xml_id in merge_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found merge action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Try various possible XML IDs for portal actions
+        portal_action_refs = [
+            'portal.partner_portal_action',
+            'portal.portal_share_action',
+            'portal.portal_share_wizard_action'
+        ]
+
+        for xml_id in portal_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found portal action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Try various possible XML IDs for email actions
+        email_action_refs = [
+            'mail.action_partner_mass_mail',
+            'mail.email_compose_message_wizard_action',
+            'mail.action_email_compose_message_wizard'
+        ]
+
+        for xml_id in email_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found email action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Fallback to searching for actions by model and name pattern
+        try:
+            # Find merge actions
+            merge_actions = self.env['ir.actions.act_window'].search([
+                ('res_model', '=', 'base.partner.merge.automatic.wizard'),
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            if merge_actions:
+                merge_actions.write({'binding_model_id': False})
+
+            # Find actions with "Mail" or "Email" in name
+            email_actions = self.env['ir.actions.act_window'].search([
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            for action in email_actions:
+                if 'mail' in action.name.lower() or 'email' in action.name.lower():
+                    action.binding_model_id = False
+
+            # Find actions with "Portal" in name
+            portal_actions = self.env['ir.actions.server'].search([
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            for action in portal_actions:
+                if 'portal' in action.name.lower():
+                    action.binding_model_id = False
+        except Exception as e:
+            _logger.error("Error in fallback action search: %s", e)
+
+        _logger.info("Completed removal of unwanted partner actions")
+        return True

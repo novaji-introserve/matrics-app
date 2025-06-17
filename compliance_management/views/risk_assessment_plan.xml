@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Risk Assessment Plan Report -->
+    <!-- Risk Analysis Report -->
     <record id="compliance_risk_assessment_plan_tree" model="ir.ui.view">
         <field name="name">compliance_risk_assessment_plan_tree</field>
         <field name="model">res.compliance.risk.assessment.plan</field>
         <field name="arch" type="xml">
-            <tree string="Risk Assessment Plan">
+            <tree string="Risk Analysis">
                 <field name="name" />
                 <field name="priority"/>
-                <field name="risk_score" />
+                <field name="risk_assessment"/>
+                <field name="risk_assessment_score"/>
+                <field name="risk_score" string="Static Risk Score" />
                 <field name="create_uid" />
                 <field name="create_date" />
             </tree>
@@ -16,7 +18,7 @@
     </record>
     <!-- Risk Assessment Form -->
     <record id="compliance_risk_assessment_plan_form" model="ir.ui.view">
-        <field name="name">Risk Assessment Plan</field>
+        <field name="name">Risk Analysis</field>
         <field name="model">res.compliance.risk.assessment.plan</field>
         <field name="arch" type="xml">
             <form>
@@ -34,7 +36,7 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,active,inactive"
                         clickable="True" />
                 </header>
-                <sheet string="Risk Assessment Plan">
+                <sheet string="Risk Analysis">
 
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" />
@@ -44,7 +46,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="risk_score" widget="slider" step="1" min="1" max="9"/>
+                            <field name="risk_assessment" nocreate="True" noedit="True" />
+                            <field name="risk_score" widget="slider" step="1" min="1" max="eval()"/>
                         </group>
                         <group>
                             <field name="compute_score_from" />
@@ -67,6 +70,11 @@
                             <field name="narration" placeholder="Narration..." />
                         </page>
                     </notebook>
+                <div class="alert alert-info" role="alert" name="sql_tips">
+                Customer ID will be replaced with the %s placeholder value and used to evaluate for each customer. The query result will be returned as the risk score<br/>
+                Example SQL Query to give all customers without BVN a risk score: <br/>
+                <code>SELECT 17 FROM res_partner WHERE id = %s AND bvn IS NULL</code>
+                </div>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" />
@@ -78,14 +86,14 @@
     </record>
     <!-- Action -->
     <record id="action_list_risk_assessment_plan" model="ir.actions.act_window">
-        <field name="name">Risk Assessment Plan</field>
+        <field name="name">Risk Analysis</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.compliance.risk.assessment.plan</field>
         <field name="view_id" ref="compliance_risk_assessment_plan_tree" />
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Add a Risk Assessment Plan
+                Add a Risk Analysis Line
             </p>
             <p>
                 No records yet
@@ -97,7 +105,7 @@
         id="menu_compliance_risk_assessment_plan"
         action="action_list_risk_assessment_plan"
         parent="menu_risk_assessment"
-        name="Risk Plan"
+        name="Risk Analysis"
         groups="group_compliance_compliance_risk_manager"
         sequence="100" />
 

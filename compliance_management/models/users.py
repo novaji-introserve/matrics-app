@@ -9,13 +9,15 @@ class Users(models.Model):
     default_branch_id = fields.Many2one(
         comodel_name='res.branch', string='Default Branch')
     
+    """
     @api.model
     def create(self, vals):
-        """Override create to handle branch assignments"""
+        #Override create to handle branch assignments
         user = super(Users, self).create(vals)
         return user
     
     def write(self, vals):
-        """Override write to handle branch updates"""
+        #Override write to handle branch updates
         result = super(Users, self).write(vals)
         return result
+    """

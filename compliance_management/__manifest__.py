@@ -80,9 +80,12 @@
         "data/demo_data/customer/sector.xml",
         "data/demo_data/customer/products.xml",
         "data/demo_data/customer/region.xml",
+        "data/demo_data/customer/account_officers.xml",
         "views/risk_assessment.xml",
-        "views/open_sanctions.xml",
         "views/sanction_screening.xml",
+        "views/open_sanctions.xml",
+        # remove unwanted partner/customer actions
+        'views/remove_partner_actions.xml',
         "views/customer.xml",
         "views/statistics.xml",
         "views/dashboard.xml",
@@ -92,10 +95,12 @@
         "views/customer_accounts.xml",
         "views/transaction.xml",
         "views/transaction_screening_rule.xml",
+        "data/transaction_type.xml",
+        'data/transaction_screening_rule.xml',
         "data/demo_data/chart/charts.xml", #CHARTS
         # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
-        # "data/demo_data/account/res_partner_accounts.xml" # CUSTOMER ACCOUNT
-        # "data/transactions.xml" # TRANSACTION
+        # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
+        # "data/transactions.xml", # TRANSACTION
         "views/res_users.xml",
         "views/peplist.xml",
         'data/gender.xml',
@@ -117,7 +122,7 @@
     "auto_install": False,
     'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
-    'assets':{
+    'assets': {
         'web.assets_backend': [
             # Styles
             'compliance_management/static/src/components/file_upload/scss/csv_import.scss',

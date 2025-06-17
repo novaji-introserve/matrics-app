@@ -8,5 +8,5 @@ class Control_officer(models.Model):
     
     branch_id = fields.Many2one("res.branch", string="Branch", required=True)
     alert_id = fields.Many2one("alert.group", string="Alert Group", required=True)
-    officer = fields.Many2one("res.users", string="Control Officer", required=True)
+    officer = fields.Many2one("res.users", string="User", required=True)
     

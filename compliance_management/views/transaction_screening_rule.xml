@@ -68,6 +68,17 @@
                             <field name="narration" placeholder="Narration..." />
                         </page>
                     </notebook>
+                    <div class="alert alert-info" role="alert" name="test_warning">
+                        You can use the following placeholders in the SQL query:
+                        <ul>
+                            <li><code>#AMOUNT#</code> - Transaction Amount</li>
+                            <li><code>#ACCOUNT_ID#</code> - Account ID</li>
+                            <li><code>#BRANCH_ID#</code> - Branch ID</li>
+                            <li><code>#TRAN_DATE#</code> - Transaction Date</li>
+                            <li><code>#CURRENCY_ID#</code> - Currency ID</li>
+                            <li><code>#CUSTOMER_ID#</code> - Customer ID</li>
+                        </ul>
+                    </div>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" />

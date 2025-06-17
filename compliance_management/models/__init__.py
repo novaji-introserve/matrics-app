@@ -6,14 +6,14 @@ This module includes models that handle customer-related information, risk manag
 and dashboard components necessary for the application.
 """
 
-from . import branch
+
 from . import education_level
-from . import customer_tier
 from . import kyc_limit
 from . import identification_types
 from . import marital_status
 from . import customer_sector
 from . import region
+from . import branch
 from . import account_ledger
 from . import account_product
 from . import gender
@@ -22,6 +22,7 @@ from . import users
 from . import customer
 from . import customer_account_type
 from . import customer_account
+from . import customer_tier
 from . import risk_assessment_type
 from . import risk_category
 from . import risk_subject
