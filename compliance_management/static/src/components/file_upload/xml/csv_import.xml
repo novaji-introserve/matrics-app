@@ -94,13 +94,14 @@
                             
                             <!-- Delete Mode Option -->
                             <div t-if="state.selectedModel" class="csv-form-group">
-                                <div class="csv-checkbox-container">
+                                <!-- <div class="csv-checkbox-container"> -->
+                                <div class="form-check">
                                     <input type="checkbox"
-                                        class="csv-checkbox"
+                                        class="form-check-input"
                                         id="delete-mode"
                                         t-att-checked="state.deleteMode"
                                         t-on-change="onDeleteModeChange" />
-                                    <label for="delete-mode">Delete Mode (delete records with matching identifiers)</label>
+                                    <label class="form-check-label" for="delete-mode">Delete Mode (delete records with matching identifiers)</label>
                                 </div>
                                 <p t-if="state.deleteMode" class="csv-help-text">
                                     ⚠️ <strong>Warning:</strong> This will permanently delete records in the database 
@@ -155,7 +156,7 @@
                                     <t t-else="">Show</t>
                                     Important Upload Guidance
                                 </button>
-                                <div t-if="state.showWarning" class="csv-alert csv-alert-yellow">
+                                <div t-if="state.showWarning" class="csv-alert csv-alert-yellow mt-4">
                                     <p class="csv-alert-title">Important Upload Guidance</p>
                                     <p>⚠️ Please ensure your CSV/Excel file has headers that match the fields of the selected model. 
                                     The import will try to map columns automatically based on field names and labels, but exact matches work best.</p>
@@ -173,7 +174,7 @@
                                     <t t-else="">Show</t>
                                     Template Downloads
                                 </button>
-                                <div t-if="state.showTemplates" class="csv-alert csv-alert-blue">
+                                <div t-if="state.showTemplates" class="csv-alert csv-alert-blue mt-4">
                                     <div class="csv-checkbox-container">
                                         <p class="csv-alert-title">Download Templates</p>
                                         <div style="display: flex; align-items: center;">
