@@ -33,7 +33,7 @@
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
-        "data/demo_data/branch/res.branch.csv", #BRANCH
+        # "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "data/demo_data/keyword/media_keywords.xml",
