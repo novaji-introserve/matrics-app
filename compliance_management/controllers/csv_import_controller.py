@@ -396,6 +396,7 @@ class CSVImportController(http.Controller):
                                 "file_path": final_path,
                                 "uploaded_by": request.env.user.id,
                                 # Delete mode parameters
+                                # Delete mode parameters
                                 "delete_mode": delete_mode,
                                 "unique_identifier_field": unique_identifier_field if delete_mode else False,
                             }
