@@ -208,6 +208,26 @@ class Customer(models.Model):
    
     formatted_gender=fields.Char(string='Gender', compute='_compute_gender')
     
+        
+    show_create_case_button = fields.Boolean(
+    string="Case Management Installed",
+    compute='_compute_is_case_management_installed',
+    store=False,
+)
+
+    @api.depends('registration_date')  
+    def _compute_is_case_management_installed(self):
+        case_management_installed = bool(self.env['ir.module.module'].search([
+            ('name', '=', 'case_management'),
+            ('state', '=', 'installed')
+        ], limit=1))
+        
+        for record in self:
+            record.show_create_case_button = case_management_installed
+        
+    
+
+        
     @api.depends('gender')
     def _compute_gender(self):
         for record in self:

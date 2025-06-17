@@ -15,6 +15,7 @@
         'security/case_access_rule.xml',
         'security/security_two.xml',
         'security/security.xml',
+        'security/groups.xml',
         'security/ir.model.access.csv',
         
         'views/new_case.xml',        # Then load views and connect to menus
