@@ -16,5 +16,20 @@
             <!-- Add a small delay to avoid exact hourly overlap with cache cleaning -->
             <field name="nextcall" eval="(datetime.now() + timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')"/>
         </record>
+
+
+        <record id="ir_cron_refresh_digital_mat_view" model="ir.cron">
+            <field name="name">Refresh Digital Products Materialized View</field>
+            <field name="model_id" ref="model_customer_digital_product_mat"/>
+            <field name="state">code</field>
+            <field name="code">model.refresh_view()</field>
+            <field name="interval_number">6</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active" eval="True"/>
+            </record>
     </data>
+
+    
 </odoo>
