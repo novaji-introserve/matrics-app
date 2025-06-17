@@ -24,6 +24,7 @@
                 <field name="branch_id" optional="hide" />
                 <field name="registration_date" optional="hide" />
                 <field name="tier_id" optional="hide" />
+                <field name="show_create_case_button" invisible="1"/>
             </xpath>
 
             <!-- Hide the original phone field -->
@@ -68,6 +69,7 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
                 <header>
+                    <field name="show_create_case_button" invisible="1"/>
                     <button name="action_initiate_edd" class="oe_highlight" type="object" string="Initiate EDD" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="This will trigger a request to carry out EDD on this customer. Are you sure?" />
 
                     <button name="action_add_pep" class="oe_highlight" type="object" string="Add to PEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to PEP List. Are you sure?" attrs="{'invisible': [('is_pep', '=',True)]}" />
@@ -102,6 +104,15 @@
 
                     <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
                     <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?" />
+
+
+                    <!-- Create case button with visibility based on case installation -->
+                    <button name="action_create_case" 
+                            class="oe_highlight"
+                            string="Create Case" 
+                            type="object" 
+                            attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
+
                 </header>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
