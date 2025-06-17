@@ -497,6 +497,8 @@
                             <group string="Details">
                                 <field name="code" />
                                 <field name="user_id" />
+                                <field name="is_included_in_composite" widget="boolean_toggle"/>
+                                <field name="weight_percentage" attrs="{'invisible': [('is_included_in_composite', '=', False)]}"/>
                             </group>
                         </group>
                     </sheet>
@@ -528,7 +530,7 @@
                 <tree string="Risk Subject" delete="False">
                     <field name="name" string="Name" />
                     <field name="code" string="Code" />
-                    <field name="universe_id" string="Risk Universe" />
+                    <!-- <field name="universe_id" string="Risk Universe" /> -->
                 </tree>
             </field>
         </record>

@@ -85,11 +85,46 @@
 
                 <page name="digital_products" string="Digital Products">
                     <!-- Simplified view without problematic fields -->
-                     
+
                     <field name="channel_subscription_ids" context="{'default_customer_id': customer_id}" domain="[]">
                         <tree editable="bottom" create="false" delete="false">
                             <field name="channel_id"/>
                             <field name="value"/>
+                        </tree>
+                    </field>
+                </page>
+
+                <!-- <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
+                        <field name="universe_weight_ids" nolabel="1" readonly="1">
+                            <tree editable="bottom" create="false" delete="false">
+                                <field name="name"/>
+                                <field name="weight_percentage" sum="Total %"/>
+                                <field name="universe_score"/>
+                                <field name="weighted_score" sum="Total Weighted"/>
+                            </tree>
+                        </field>
+                        
+                        <group string="Composite Risk Score">
+                            <field name="composite_risk_score" string="Composite Risk Score" readonly="1"/>
+                        </group>
+                </page> -->
+
+                <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
+                    
+                    <separator string="COMPOSITE RISK SCORE" class="mt16"/>
+                    <p>
+                        <field name="composite_risk_score" class="oe_inline" readonly="1" nolabel="1"/>
+                    </p>
+
+                    <separator string="UNIVERSE RISK WEIGHTS" class="mt16"/>
+                    <field name="universe_weight_ids" readonly="1" context="{'tree_view_ref': 'view_partner_risk_universe_weight_tree'}">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="name"/>
+                            <field name="subject_id"/>
+                            <field name="weight_percentage" sum="Total %"/>
+                            <field name="universe_score" string="Risk score"/>
+                            <!-- <field name="weighted_score" sum="Total Weighted"/> -->
+                            <!-- <field name="assigned_score"/> -->
                         </tree>
                     </field>
                 </page>
