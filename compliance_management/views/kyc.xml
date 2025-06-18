@@ -69,21 +69,7 @@
                 </page>
 
 
-                <!-- <page name="digital_products" string="Digital Products">
-
-                    <field name="channel_subscription_ids" context="{'default_customer_id': customer_id}" domain="[]">
-                        <tree editable="bottom" create="false" delete="false">
-                            <field name="channel_id"/>
-                            <field name="value"/>
-                        </tree>
-                    </field>
-
-                    <field name="digital_product_view_ids" invisible="1"/>
-                    <field name="customer_id" invisible="1"/>
-
-                </page> -->
-
-                <page name="digital_products" string="Digital Products">
+                <page name="digital_products" string="Customer Channels">
                     <!-- Simplified view without problematic fields -->
 
                     <field name="channel_subscription_ids" context="{'default_customer_id': customer_id}" domain="[]">
@@ -94,20 +80,6 @@
                     </field>
                 </page>
 
-                <!-- <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
-                        <field name="universe_weight_ids" nolabel="1" readonly="1">
-                            <tree editable="bottom" create="false" delete="false">
-                                <field name="name"/>
-                                <field name="weight_percentage" sum="Total %"/>
-                                <field name="universe_score"/>
-                                <field name="weighted_score" sum="Total Weighted"/>
-                            </tree>
-                        </field>
-                        
-                        <group string="Composite Risk Score">
-                            <field name="composite_risk_score" string="Composite Risk Score" readonly="1"/>
-                        </group>
-                </page> -->
 
                 <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
                     
@@ -161,8 +133,8 @@
                             <field name="global_pep_id" attrs="{'readonly': True}" />
                         </group>
                         <group name="other" string="Others">
-                            <!-- <field name="is_fep" attrs="{'readonly': True}" /> -->
-                            <!-- <field name="is_blacklist" attrs="{'readonly': True}" /> -->
+                            <field name="is_fep" attrs="{'readonly': True}" />
+                            <field name="is_blacklist" attrs="{'readonly': True}" />
                             <field name="is_watchlist" attrs="{'readonly': True}" />
                             <field name="likely_sanction" attrs="{'readonly': True}" />
                             <field name="is_greylist" attrs="{'readonly': True}" />

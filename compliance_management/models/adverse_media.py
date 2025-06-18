@@ -66,9 +66,9 @@ class AdverseMedia(models.Model):
     @api.depends('partner_risk_score')
     def _compute_risk_score_decoration(self):
         for record in self:
-            if record.partner_risk_score <= 10:  # Match with 'low'
+            if record.partner_risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):  # Match with 'low'
                 record.risk_score_decoration = 'success'
-            elif 10 < record.partner_risk_score <= 19:  # Match with 'medium'
+            elif record.partner_risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):  # Match with 'medium'
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
@@ -539,9 +539,11 @@ class AdverseMediaAlert(models.Model):
     @api.depends('risk_score')
     def _compute_risk_score_decoration(self):
         for record in self:
-            if record.risk_score <= 10:  # Match with 'low'
+            if record.risk_score <= float(
+                    self.env['res.compliance.settings'].get_setting('low_risk_threshold')):  # Match with 'low'
                 record.risk_score_decoration = 'success'
-            elif 10 < record.risk_score <= 19:  # Match with 'medium'
+            elif record.risk_score <= float(
+                    self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):  # Match with 'medium'
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
@@ -613,9 +615,11 @@ class MediaKeyword(models.Model):
     @api.depends('risk_score')
     def _compute_risk_score_decoration(self):
         for record in self:
-            if record.risk_score <= 10:  # Match with 'low'
+            if record.risk_score <= float(
+                    self.env['res.compliance.settings'].get_setting('low_risk_threshold')):  # Match with 'low'
                 record.risk_score_decoration = 'success'
-            elif 10 < record.risk_score <= 19:  # Match with 'medium'
+            elif record.risk_score <= float(
+                    self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):  # Match with 'medium'
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'

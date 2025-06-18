@@ -211,16 +211,74 @@ class Customer(models.Model):
     
     universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
                                           string='Universe Weights')
-    # universe_weight_report_ids = fields.One2many('partner.risk.universe.weight.report', 'partner_id',
-    #                                              string='Universe Weight Report')
-    # total_weight_percentage = fields.Float(string='Total Weight %', compute='_compute_total_weight',
-    #                                        store=False)
+    
 
     show_create_case_button = fields.Boolean(
         string="Case Management Installed",
         compute='_compute_is_case_management_installed',
         store=False,
     )
+    
+    screening_ids = fields.One2many(
+        'res.partner.screening.result', 'partner_id',
+        string='Screening Results', domain=[('active', '=', True)])
+    last_screening_date = fields.Datetime(
+        string='Last Screening Date', readonly=True)
+    likely_pep_match_id = fields.Many2one(
+        'pep.list', string='Likely PEP Match')
+    likely_watchlist_match_id = fields.Many2one(
+        'res.partner.watchlist', string='Likely Watchlist Match')
+    likely_sanction_match_id = fields.Many2one(
+        'sanction.list', string='Likely Sanction Match')
+    likely_global_pep_match_id = fields.Many2one(
+        'res.pep', string='Likely Global PEP Match')
+    screening_needed = fields.Boolean(
+        string='Screening Needed',
+        help="Flag to indicate if customer needs screening")
+    
+
+
+    def action_view_screening_results(self):
+        """View screening results for this customer"""
+        self.ensure_one()
+        return {
+            'name': _('Screening Results'),
+            'view_mode': 'tree,form',
+            'res_model': 'res.partner.screening.result',
+            'domain': [('partner_id', '=', self.id), ('active', '=', True)],
+            'type': 'ir.actions.act_window',
+            'context': {'default_partner_id': self.id}
+        }
+
+    def action_screen_customer(self):
+        """Screen customer against all lists"""
+        self.ensure_one()
+        screening = self.env['res.partner.screening']
+        result = screening.screen_customer(self.id)
+
+        # Show appropriate message
+        if result:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Screening Complete'),
+                    'message': _('Potential matches found. Compliance officers have been notified.'),
+                    'type': 'warning',
+                    'sticky': False,
+                }
+            }
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Screening Complete'),
+                    'message': _('No matches found.'),
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
 
     @api.depends('registration_date')  
     def _compute_is_case_management_installed(self):
@@ -231,12 +289,6 @@ class Customer(models.Model):
         
         for record in self:
             record.show_create_case_button = case_management_installed
-    
-    @api.depends('universe_weight_report_ids.weight_percentage')
-    def _compute_total_weight(self):
-        for record in self:
-            record.total_weight_percentage = sum(
-                record.universe_weight_report_ids.mapped('weight_percentage'))
 
 
 
@@ -306,7 +358,6 @@ class Customer(models.Model):
                         f"Error executing risk plan {pl.name}: {str(e)}")
                     pass
 
-        # Default value for records to avoid unbound variable error
         records = None
 
         if len(scores) > 0:
@@ -1669,77 +1720,6 @@ class Customer(models.Model):
 
         return True
 
-    # def _get_risk_score_from_plan(self):
-    #     setting = self.env['res.compliance.settings'].search(
-    #         [('code', '=', 'risk_plan_computation')], limit=1)
-
-    #     # Default value if no settings found
-    #     plan_setting = 'avg'  # Default to 'avg'
-    #     for e in setting:
-    #         plan_setting = e.val
-
-    #     record_id = self.id
-    #     self.env["res.partner.risk.plan.line"].search(
-    #         [('partner_id', '=', record_id)]).unlink()
-    #     scores = []
-    #     plans = self.env['res.compliance.risk.assessment.plan'].search(
-    #         [('state', '=', 'active')], order='priority')
-
-    #     if plans:
-    #         for pl in plans:
-    #             score = 0
-    #             try:
-                    
-    #                 self.env.cr.execute(pl.sql_query, (record_id,))
-    #                 rec = self.env.cr.fetchone()
-    #                 if rec is not None:
-    #                     # we have a hit
-    #                     if pl.compute_score_from == 'dynamic':
-    #                         score = float(rec[0]) if rec is not None else pl.risk_score
-    #                     if pl.compute_score_from == 'static':
-    #                         score = pl.risk_score
-    #                     if pl.compute_score_from == 'risk_assessment':
-    #                         score = pl.risk_assessment.risk_rating if  pl.risk_assessment is not None else pl.risk_score
-    #                         # score = pl.risk_assessment_score if pl.risk_assessment_score else pl.risk_score
-    #                 scores.append(score)
-    #                 line_id = self.env['res.partner.risk.plan.line'].create({
-    #                     'partner_id': record_id,
-    #                     'plan_line_id': pl.id,
-    #                     'risk_score': score,
-    #                 })
-    #             except Exception as e:
-    #                 _logger.error(f"Error executing risk plan {pl.name}: {str(e)}")
-
-    #                 pass
-
-    #     # Default value for records to avoid unbound variable error
-    #     records = None
-
-    #     if len(scores) > 0:
-    #         if plan_setting == 'avg':
-    #             self.env.cr.execute(
-    #                 f"select avg(risk_score) from res_partner_risk_plan_line where partner_id={record_id} and risk_score > 0")
-    #         if plan_setting == 'max':
-    #             self.env.cr.execute(
-    #                 f"select max(risk_score) from res_partner_risk_plan_line where partner_id={record_id}")
-    #         records = self.env.cr.fetchone()
-
-    #     # Ensure records is not None before returning
-    #     """
-    #     - Priority is Risk Assessment > EDD > Risk Plan
-    #     """
-    #     risk_assessments = self.env['res.risk.assessment'].search([('partner_id', '=', record_id)],order='create_date desc',limit=1)
-    #     if risk_assessments:
-    #         for r in risk_assessments:
-    #             if r.risk_rating:
-    #                 return r.risk_rating
-    #     approved_edd = self.env['res.partner.edd'].search(
-    #         [('status', '=', 'approved'),('customer_id','=',record_id)],order='date_approved desc', limit=1)
-    #     for edd in approved_edd:
-    #         if edd.risk_score:
-    #             return edd.risk_score
-    #     # Use risk analysis
-    #     return records[0] if records is not None else 0.00
 
     def action_greylist(self):
         for e in self:

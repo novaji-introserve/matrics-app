@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="email_template_screening_alert" model="mail.template">
+            <field name="name">Customer Screening Alert</field>
+            <field name="model_id" ref="model_res_partner_screening"/>
+            <field name="subject">Screening Alert: Potential Match Found for ${object.name}</field>
+            <field name="email_from">${ctx.get('from_filter') or ''}</field>
+            <field name="partner_to">${object.id}</field>
+            <field name="body_html"><![CDATA[
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear Compliance Officer,
+                        <br/><br/>
+                        A potential match has been found during customer screening on ${ctx.get('datetime', '')}.
+                        <br/><br/>
+                        <strong>Customer Details:</strong><br/>
+                        <strong>Name:</strong> ${object.name}<br/>
+                        <strong>Customer ID:</strong> ${object.customer_id or 'N/A'}<br/>
+                        <strong>BVN:</strong> ${object.bvn or 'N/A'}<br/>
+                        <strong>Current Risk Score:</strong> ${object.risk_score or '0.00'}<br/>
+                        <strong>Current Risk Level:</strong> ${object.risk_level or 'Unknown'}<br/>
+                        <br/>
+                        <strong>Screening Results:</strong><br/>
+                        % for result in ctx.get('results', []):
+                            - Match found in <strong>${result['list_type'].upper()}</strong> list<br/>
+                        % endfor
+                        <br/>
+                        <strong>Action Required:</strong><br/>
+                        Please review these matches and confirm or dismiss them in the system immediately.
+                        <br/><br/>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&model=res.partner&view_type=form" style="background-color: #875A7B; padding: 12px 24px; text-decoration: none; color: #fff; border-radius: 5px; font-weight: bold; display: inline-block;">
+                                Review Customer Profile
+                            </a>
+                        </div>
+                        <br/>
+                        <small style="color: #666;">
+                            This is an automated notification from the Compliance Management System.<br/>
+                            Alert sent to: ${ctx.get('officers_email', 'Compliance Officers')}
+                        </small>
+                        <br/><br/>
+                        Best regards,<br/>
+                        <strong>Compliance Management System</strong>
+                    </p>
+                </div>
+            ]]>            </field>
+        </record>
+    </data>
+</odoo>
