@@ -913,9 +913,9 @@
     <menuitem id="base.menu_board_root" name="Dashboards" sequence="260"
         web_icon="compliance_management,static/description/icon-dashboard.png"
         groups="base.group_user" />
-    <menuitem id="spreadsheet_dashboard.spreadsheet_dashboard_menu_root" name="Dashboards"
+    <!-- <menuitem id="spreadsheet_dashboard.spreadsheet_dashboard_menu_root" name="Dashboards"
         groups="group_tech_support" action="spreadsheet_dashboard.ir_actions_dashboard_action"
-        web_icon="compliance_management,static/description/icon-dashboard.png" sequence="37" />
+        web_icon="compliance_management,static/description/icon-dashboard.png" sequence="37" /> -->
     <!-- <menuitem id="contacts.res_partner_menu_contacts" name="Customers"
     action="contacts.action_contacts"
     groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"

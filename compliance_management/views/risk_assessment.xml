@@ -29,11 +29,7 @@
                             <field name="inherent_risk_score"  widget="risk_slider" options="{'step': 1, 'show_value': true, 'reverse_colors': false, 'readonly': false}" />
                         </group>
                     </group>
-                    <group>
-                        <group colspan="2">
-                            <field name="implication" widget="many2many_tags"/>
-                        </group>
-                    </group>
+        
                     <group>
                         <group colspan="2">
                             <field name="existing_controls" widget="many2many_tags"/>
@@ -61,6 +57,11 @@
                         </group>
                         <group>
                             <field name="implementation_date" />
+                        </group>
+                    </group>
+                    <group>
+                        <group colspan="2">
+                            <field name="implication" widget="many2many_tags"/>
                         </group>
                     </group>
                 </sheet>
