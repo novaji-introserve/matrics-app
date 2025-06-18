@@ -2,7 +2,8 @@
     <data noupdate="1">
      <record id="fcra_score" model="res.fcra.score">
         <field name="name">Default Score Range</field>
-        <field name="max_score">25</field>
+        <field name="max_score">9</field>
+        <field name="min_score">6</field>
         <field name="min_score">1</field>
     </record>
     
