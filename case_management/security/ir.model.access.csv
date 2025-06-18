@@ -35,3 +35,4 @@ team_admin_rule,Team Admin Rule,model_team,base.group_user,1,1,1,1
 access_case_manager,Case Manager Access,model_case,base.group_user,1,1,1,1
 access_case_system,Case System Access,model_case,base.group_user,1,1,1,1
 access_case_staff,Case Staff Access,model_case,base.group_user,1,1,1,0
+access_case_manager,Case Manager Access,model_case,case_management.group_case_manager,1,1,1,1

@@ -420,19 +420,4 @@
             </form>
         </field>
     </record>
-
-    <record id="action_res_partner_edd" model="ir.actions.act_window">
-            <field name="name">Enhanced Due Diligence</field>
-            <field name="res_model">res.partner.edd</field>
-            <field name="view_id" ref="edd_tree_view"/>
-            <field name="view_mode">tree,form</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Conduct EDD for a Customer
-                </p>
-                <p>
-                    Customer Enhanced Due Diligence is conducted here
-                </p>
-            </field>
-    </record>
 </odoo>

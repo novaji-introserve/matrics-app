@@ -21,13 +21,4 @@
             </form>
         </field>
     </record>
-
-     <record id="action_newsearch_settings" model="ir.actions.act_window">
-            <field name="name">API Settings</field>
-            <field name="res_model">icomply.newsearch.settings</field>
-            <field name="view_mode">form</field>
-            <field name="target">current</field>
-    </record>
-
-    <menuitem id="menu_icomply_config" action="action_newsearch_settings" name="News API" parent="menu_fcra_risk" sequence="30"/>
 </odoo>

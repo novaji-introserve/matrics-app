@@ -39,22 +39,6 @@
             </field>
         </record>
 
-        <!-- Account Type Action -->
-        <record id="action_list_customer_account_type" model="ir.actions.act_window">
-            <field name="name">Customer Account Type</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.partner.account.type</field>
-            <field name="view_id" ref="compliance_customer_account_type_tree" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add a Customer Account Type
-                </p>
-                <p>
-                    No Account Type
-                </p>
-            </field>
-        </record>
-
         <!-- Customer Sectors Report -->
         <record id="compliance_customer_sector_tree" model="ir.ui.view">
             <field name="name">res.partner.sector.tree</field>
@@ -90,22 +74,6 @@
                         </group>
                     </sheet>
                 </form>
-            </field>
-        </record>
-
-        <!-- Customer Sectors Action -->
-        <record id="action_list_customer_sector" model="ir.actions.act_window">
-            <field name="name">Customer Sectors</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.partner.sector</field>
-            <field name="view_id" ref="compliance_management.compliance_customer_sector_tree" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add a Customer Sector
-                </p>
-                <p>
-                    Customer are grouped by sector or industries
-                </p>
             </field>
         </record>
 
@@ -158,22 +126,6 @@
             </field>
         </record>
 
-        <!-- Account Products Action -->
-        <record id="action_list_account_product" model="ir.actions.act_window">
-            <field name="name">Account Products</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.partner.account.product</field>
-            <field name="view_id" ref="account_product_tree_view" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add an Account Product
-                </p>
-                <p>
-                    Account products are listed here.
-                </p>
-            </field>
-        </record>
-
         <!-- Education Levels Tree View -->
         <record id="education_level_tree_view" model="ir.ui.view">
             <field name="name">res.education.level.tree</field>
@@ -213,21 +165,7 @@
             </field>
         </record>
 
-        <!-- Education Levels Action -->
-        <record id="action_list_education_level" model="ir.actions.act_window">
-            <field name="name">Education Levels</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.education.level</field>
-            <field name="view_id" ref="education_level_tree_view" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add an Education Level
-                </p>
-                <p>
-                    Education levels are defined here.
-                </p>
-            </field>
-        </record>
+
 
         <!-- Customer Tiers Tree View -->
         <record id="customer_tier_tree_view" model="ir.ui.view">
@@ -270,21 +208,7 @@
             </field>
         </record>
 
-        <!-- Customer Tiers Action -->
-        <record id="action_list_customer_tier" model="ir.actions.act_window">
-            <field name="name">Customer Tiers</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.partner.tier</field>
-            <field name="view_id" ref="customer_tier_tree_view" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add a Customer Tier
-                </p>
-                <p>
-                    Tiers categorize customers based on their levels.
-                </p>
-            </field>
-        </record>
+        
 
         <!-- Customer Regions Tree View -->
         <record id="customer_region_tree_view" model="ir.ui.view">
@@ -342,21 +266,7 @@
             </field>
         </record>
 
-        <!-- Customer Regions Action -->
-        <record id="action_list_customer_region" model="ir.actions.act_window">
-            <field name="name">Customer Regions</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.partner.region</field>
-            <field name="view_id" ref="customer_region_tree_view" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add a Customer Region
-                </p>
-                <p>
-                    Regions categorize customers based on geographical areas.
-                </p>
-            </field>
-        </record>
+       
 
         <!-- Branch Tree View -->
         <record id="view_branch_tree" model="ir.ui.view">
@@ -397,21 +307,7 @@
             </field>
         </record>
 
-        <!-- Branch Action -->
-        <record id="action_list_branch" model="ir.actions.act_window">
-            <field name="name">Branches</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.branch</field>
-            <field name="view_mode">tree,form</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add a Branch
-                </p>
-                <p>
-                    Manage all company branches here.
-                </p>
-            </field>
-        </record>
+
 
 
         <!-- Risk Categories Tree View -->
@@ -451,21 +347,6 @@
             </field>
         </record>
 
-        <!-- Risk Categories Action -->
-        <record id="action_list_risk_category" model="ir.actions.act_window">
-            <field name="name">Risk Categories</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.risk.category</field>
-            <field name="view_id" ref="risk_category_tree_view" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add a Risk Category
-                </p>
-                <p>
-                    Risk Categories help group risks for better management.
-                </p>
-            </field>
-        </record>
 
         <!-- Risk Universe Tree View -->
         <record id="risk_universe_tree_view" model="ir.ui.view">
@@ -497,6 +378,8 @@
                             <group string="Details">
                                 <field name="code" />
                                 <field name="user_id" />
+                                <field name="is_included_in_composite" widget="boolean_toggle"/>
+                                <field name="weight_percentage" attrs="{'invisible': [('is_included_in_composite', '=', False)]}"/>
                             </group>
                         </group>
                     </sheet>
@@ -504,21 +387,7 @@
             </field>
         </record>
 
-        <!-- Risk Universe Action -->
-        <record id="action_list_risk_universe" model="ir.actions.act_window">
-            <field name="name">Risk Universe</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.risk.universe</field>
-            <field name="view_id" ref="risk_universe_tree_view" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add a Risk Universe
-                </p>
-                <p>
-                    The Risk Universe encompasses all potential risks faced by the organization.
-                </p>
-            </field>
-        </record>
+       
 
         <!-- Risk Subject Tree View -->
         <record id="risk_subject_tree_view" model="ir.ui.view">
@@ -528,7 +397,7 @@
                 <tree string="Risk Subject" delete="False">
                     <field name="name" string="Name" />
                     <field name="code" string="Code" />
-                    <field name="universe_id" string="Risk Universe" />
+                    <!-- <field name="universe_id" string="Risk Universe" /> -->
                 </tree>
             </field>
         </record>
@@ -557,22 +426,7 @@
             </field>
         </record>
 
-        <!-- Risk Subject Action -->
-        <record id="action_list_risk_subject" model="ir.actions.act_window">
-            <field name="name">Risk Subjects</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.risk.subject</field>
-            <field name="view_id" ref="risk_subject_tree_view" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add a Risk Subject
-                </p>
-                <p>
-                    Risk Subjects represent specific topics or areas related to risk within a
-                    universe.
-                </p>
-            </field>
-        </record>
+        
 
         <!-- Risk Type Tree View -->
         <record id="risk_type_tree_view" model="ir.ui.view">
@@ -611,22 +465,7 @@
             </field>
         </record>
 
-        <!-- Risk Type Action -->
-        <record id="action_list_risk_type" model="ir.actions.act_window">
-            <field name="name">Risk Types</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.risk.type</field>
-            <field name="view_id" ref="risk_type_tree_view" />
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Add a Risk Type
-                </p>
-                <p>
-                    Risk Types represent different categories or kinds of risks managed within the
-                    system.
-                </p>
-            </field>
-        </record>
+
 
         <!-- Risk Level Form View -->
         <record id="risk_level_form_view" model="ir.ui.view">
@@ -656,6 +495,54 @@
             <field name="groups_id" eval="[(6, 0, [ref('compliance_management.group_compliance_chief_compliance_officer')])]"/>
         </record> 
 
+      
+
+        
+        <!-- Digital Delivery Channel Views -->
+        <record id="view_digital_delivery_channel_tree" model="ir.ui.view">
+            <field name="name">digital.delivery.channel.tree</field>
+            <field name="model">digital.delivery.channel</field>
+            <field name="arch" type="xml">
+                <tree string="Digital Delivery Channels">
+                    <header>
+                        <button name="action_create_dynamic_demo_subscriptions" type="object" string="Create Random Demo Data" class="btn btn-warning mr-2"  help="Creates random YES/NO subscriptions for all channels dynamically"/>
+                    </header>
+        
+                
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="description"/>
+                    <field name="status"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Other required views... -->
+        <record id="view_digital_delivery_channel_form" model="ir.ui.view">
+            <field name="name">digital.delivery.channel.form</field>
+            <field name="model">digital.delivery.channel</field>
+            <field name="arch" type="xml">
+                <form string="Digital Delivery Channel">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="description"/>
+                            </group>
+                            <group>
+                                <field name="code"/>
+                                <field name="status"/>
+                            </group>
+                        </group>
+                       
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        
+
+
         <!-- Menu Items -->
         <!-- <menuitem
             id="hr.menu_hr_root"
@@ -664,201 +551,6 @@
             web_icon="hr,static/description/icon.svg"
             sequence="500" /> -->
 
-        <menuitem 
-            id="hr.menu_hr_root" 
-            name="Employees" 
-            web_icon="hr,static/description/icon.svg" 
-            sequence="500"
-            groups="compliance_management.group_compliance_chief_compliance_officer"/>
-            
-
-        <menuitem 
-            id="menu_etl_root" 
-            name="ETL Manager" 
-            sequence="100" 
-            web_icon="custom_etl,static/description/icon.png"
-            groups="group_tech_support"/>
-
-        <menuitem 
-            id="link_tracker_menu_main" 
-            name="Link Tracker" 
-             groups="group_tech_support"/>
-          
-        <menuitem 
-            name="Project" 
-            id="menu_main_pm" 
-            groups="group_tech_support" 
-            web_icon="project,static/description/icon.svg" 
-            />
-
-        <menuitem 
-            id="mass_mailing_sms_menu_root" 
-            name="SMS Marketing" 
-            web_icon="mass_mailing_sms,static/description/icon.svg" 
-            groups="group_tech_support"/>
-
-        <menuitem name="Surveys" 
-            id="menu_surveys" 
-            groups="group_tech_support" 
-            web_icon="survey,static/description/icon.svg"/>
-
-        <menuitem 
-            name="Contacts" 
-            id="menu_contacts" 
-            web_icon="contacts,static/description/icon.svg" 
-            groups="group_tech_support"/>
-
-        <menuitem
-             id="menu_queue_job_root" 
-            name="Job Queue" 
-            web_icon="queue_job,static/description/icon.png" 
-            groups="group_tech_support" />
-
-        <menuitem 
-            id="menu_board_root" 
-            name="Dashboards"
-            web_icon="base,static/description/board.png" 
-            groups="group_tech_support"/>
        
-        <menuitem name="Settings"
-            id="base.menu_administration"
-            web_icon="compliance_management,static/description/icon-settings.png"
-            sequence="550"
-            groups="compliance_management.group_compliance_chief_compliance_officer" />
-        
-        <menuitem id="base.menu_management" name="Apps" sequence="500"
-            web_icon="compliance_management,static/description/icon-apps.png"
-            groups="group_tech_support" />
-       
-        <menuitem
-            id="menu_compliance_root"
-            name="Compliance"
-            groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-            web_icon="compliance_management,static/description/icons-compliance.png"
-            sequence="-1000" />
-     
-        <menuitem
-            id="menu_compliance_configuration"
-            name="Configuration"
-            groups="group_compliance_compliance_officer,base.group_system"
-            parent="menu_compliance_root"
-            sequence="1500" />
-
-        <menuitem id="menu_accounts" name="Accounts"
-            parent="menu_compliance_configuration" sequence="80" />
-
-        <menuitem
-            id="menu_compliance_account_type"
-            action="action_list_customer_account_type"
-            parent="menu_accounts"
-            name="Account Types"
-            groups="group_compliance_compliance_officer"
-            sequence="1" />
-        <menuitem
-            id="menu_compliance_account_product"
-            action="action_list_account_product"
-            parent="menu_accounts"
-            name="Account Products"
-            groups="group_compliance_compliance_officer"
-            sequence="2" />
-        <menuitem
-            id="menu_compliance_branch"
-            action="action_list_branch"
-            parent="menu_compliance_configuration"
-            name="Branches"
-            groups="group_compliance_compliance_officer"
-            sequence="90" />
-
-        <menuitem id="menu_customer" name="Customer"
-            parent="menu_compliance_configuration"
-            groups="group_tech_support"/>
-
-        <menuitem
-            id="menu_compliance_sector"
-            action="action_list_customer_sector"
-            parent="menu_customer"
-            name="Customer Sectors"
-            groups="group_compliance_compliance_officer"
-            sequence="1" />
-       
-         <menuitem
-            id="menu_compliance_customer_tier"
-            action="action_list_customer_tier"
-            parent="menu_customer"
-            name="Customer Tiers"
-            groups="group_compliance_compliance_officer"
-            sequence="2" />
-       
-             <menuitem
-            id="menu_compliance_customer_region"
-            action="action_list_customer_region"
-            parent="menu_customer"
-            name="Customer Regions"
-            groups="group_compliance_compliance_officer"
-            sequence="3" />
-       
-            <menuitem
-            id="menu_compliance_education_level"
-            action="action_list_education_level"
-            parent="menu_customer"
-            name="Education Levels"
-            groups="group_compliance_compliance_officer"
-            sequence="4" /> 
-        
-
-        <menuitem id="menu_risk_assessment" name="Risk Management"
-            parent="menu_compliance_configuration" sequence="100" />
-
-        <menuitem
-            id="menu_compliance_risk_category"
-            action="action_list_risk_category"
-            parent="menu_risk_assessment"
-            name="Risk Categories"
-            groups="group_compliance_compliance_officer"
-            sequence="1" />
-        <menuitem
-            id="menu_compliance_risk_universe"
-            action="action_list_risk_universe"
-            parent="menu_risk_assessment"
-            name="Risk Universe"
-            groups="group_compliance_compliance_officer"
-            sequence="2" />
-        <menuitem
-            id="menu_compliance_risk_subject"
-            action="action_list_risk_subject"
-            parent="menu_risk_assessment"
-            name="Risk Subjects"
-            groups="group_compliance_compliance_officer"
-            sequence="3" />
-        <menuitem
-            id="menu_compliance_risk_type"
-            action="action_list_risk_type"
-            parent="menu_risk_assessment"
-            name="Risk Types"
-            groups="group_compliance_compliance_officer"
-            sequence="4" />
-    
-        <menuitem
-            id="menu_compliance_risk_fcra_score"
-            action="action_fcra_score_action"
-             parent="menu_risk_assessment"
-            name="Risk Scoring"
-            groups="group_compliance_compliance_officer"
-            sequence="5" />
-
-        <menuitem id="menu_compliance_risk_settings" name="Configuration"
-            parent="menu_compliance_configuration" sequence="500" />
-       
-        <menuitem id="menu_compliance_dashboard_charts" name="Dashboard Charts"
-            parent="menu_compliance_configuration" sequence="100" />
-
-        <menuitem
-            id="menu_dashboard_chart"
-            action="res_charts_action"
-            parent="menu_compliance_dashboard_charts"
-            name="Charts"
-            sequence="10" 
-            groups="group_compliance_compliance_officer"
-        />
     </data>
 </odoo>

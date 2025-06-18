@@ -14,7 +14,6 @@ from requests.exceptions import RequestException, HTTPError, ConnectionError, Ti
 from odoo.modules.module import get_module_resource
 import base64
 import logging
-from .customer import LOW_RISK_THRESHOLD, MEDIUM_RISK_THRESHOLD, HIGH_RISK_THRESHOLD
 
 
 load_dotenv()
@@ -299,9 +298,11 @@ class AdverseMedia(models.Model):
 
                 # Determine risk level based on the highest risk score
                 alert_risk_level = None
-                if highest_risk_score <= LOW_RISK_THRESHOLD:
+                if highest_risk_score <= float(
+                        self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                     alert_risk_level = "low"
-                elif highest_risk_score <= MEDIUM_RISK_THRESHOLD:
+                elif highest_risk_score <= float(
+                        self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                     alert_risk_level = "medium"
                 else:
                     alert_risk_level = "high"
@@ -621,9 +622,11 @@ class MediaKeyword(models.Model):
 
     @api.onchange('risk_score')
     def _onchange_risk_score(self):
-        if self.risk_score <= LOW_RISK_THRESHOLD:
+        if self.risk_score <= float(
+                self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
             self.media_risk_level = "low"
-        elif self.risk_score <= MEDIUM_RISK_THRESHOLD:
+        elif self.risk_score <= float(
+                self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
             self.media_risk_level = "medium"
         else:
             self.media_risk_level = "high"

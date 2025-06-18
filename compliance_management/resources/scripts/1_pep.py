@@ -9,6 +9,7 @@ import os
 # importing necessary functions from dotenv library
 from dotenv import load_dotenv, dotenv_values 
 
+load_dotenv()
 # Change path to list as required
 PEP_LIST='/home/jonathan/data_pro_pep.csv'
 chunk_size = 500
@@ -59,7 +60,7 @@ df = df.fillna('')
 df = df.replace('NaN', '')
 df = df.replace('NULL', '')
 total_rows = len(df)
-odoo = env = odoo_connect.connect(url=os.getenv("HOST_URL"), database=os.getenv("DB"),username=os.getenv("USERNAME"), password='PASSWORD')
+odoo = env = odoo_connect.connect(url=os.getenv("HOST_URL"), database=os.getenv("DB"),username=os.getenv("USERNAME"), password=os.getenv('PASSWORD'))
 pep = env['res.pep']
 #env['res.pep'].search([]).unlink()
 for i in range(0, total_rows, chunk_size):

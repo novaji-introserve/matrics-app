@@ -10,7 +10,7 @@
             </tree>
         </field>
     </record>
-   
+
 
     <record model="ir.ui.view" id="partner_inherit_form_view">
         <field name="name">compliance.customer.form.view</field>
@@ -67,27 +67,69 @@
                 <page name='accounts' string="Accounts">
                     <field name="account_ids" context="{'default_customer_id': active_id}" />
                 </page>
-             
+
+
+                <!-- <page name="digital_products" string="Digital Products">
+
+                    <field name="channel_subscription_ids" context="{'default_customer_id': customer_id}" domain="[]">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="channel_id"/>
+                            <field name="value"/>
+                        </tree>
+                    </field>
+
+                    <field name="digital_product_view_ids" invisible="1"/>
+                    <field name="customer_id" invisible="1"/>
+
+                </page> -->
 
                 <page name="digital_products" string="Digital Products">
-                    <field name="digital_product_view_ids" readonly="1" context="{'prefetch_fields': False}">
+                    <!-- Simplified view without problematic fields -->
 
-                        <tree>
-                            <field name="ussd"/>
-                            <field name="onebank"/>
-                            <field name="carded_customer"/>
-                            <field name="alt_bank"/>
-                            <field name="sterling_pro"/>
-                            <field name="banca"/>
-                            <field name="doubble"/>
-                            <field name="specta"/>
-                            <field name="switch"/>
-                            <field name="customer_segment"/>
+                    <field name="channel_subscription_ids" context="{'default_customer_id': customer_id}" domain="[]">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="channel_id"/>
+                            <field name="value"/>
                         </tree>
                     </field>
                 </page>
-                
+
+                <!-- <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
+                        <field name="universe_weight_ids" nolabel="1" readonly="1">
+                            <tree editable="bottom" create="false" delete="false">
+                                <field name="name"/>
+                                <field name="weight_percentage" sum="Total %"/>
+                                <field name="universe_score"/>
+                                <field name="weighted_score" sum="Total Weighted"/>
+                            </tree>
+                        </field>
+                        
+                        <group string="Composite Risk Score">
+                            <field name="composite_risk_score" string="Composite Risk Score" readonly="1"/>
+                        </group>
+                </page> -->
+
+                <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
                     
+                    <separator string="COMPOSITE RISK SCORE" class="mt16"/>
+                    <p>
+                        <field name="composite_risk_score" class="oe_inline" readonly="1" nolabel="1"/>
+                    </p>
+
+                    <separator string="UNIVERSE RISK WEIGHTS" class="mt16"/>
+                    <field name="universe_weight_ids" readonly="1" context="{'tree_view_ref': 'view_partner_risk_universe_weight_tree'}">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="name"/>
+                            <field name="subject_id"/>
+                            <field name="weight_percentage" sum="Total %"/>
+                            <field name="universe_score" string="Risk score"/>
+                            <!-- <field name="weighted_score" sum="Total Weighted"/> -->
+                            <!-- <field name="assigned_score"/> -->
+                        </tree>
+                    </field>
+                </page>
+
+
                 <page name='plans' string="Risk Analysis">
                     <field name="risk_plan_line_ids" context="{'default_partner_id': active_id}" />
                 </page>
@@ -193,25 +235,5 @@
         <field name="state">code</field>
         <field name="code">action = model.open_correspondents()</field>
     </record>
-
-    <menuitem id="base.menu_board_root" name="Dashboards" sequence="260" web_icon="compliance_management,static/description/icon-dashboard.png" groups="base.group_user" />
-    <menuitem id="spreadsheet_dashboard.spreadsheet_dashboard_menu_root" name="Dashboards" groups="group_tech_support" action="spreadsheet_dashboard.ir_actions_dashboard_action" web_icon="compliance_management,static/description/icon-dashboard.png" sequence="37" />
-    <menuitem name="Customers" id="contacts.menu_contacts" sequence="20" web_icon="compliance_management,static/description/icons-contact.png" groups="group_tech_support" />
-    <!-- <menuitem id="contacts.res_partner_menu_contacts" name="Customers" action="contacts.action_contacts" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="contacts.menu_contacts" sequence="2" /> -->
-   
-    <menuitem id="mail.menu_root_discuss" name="Messaging"  web_icon="compliance_management,static/description/icon-chat.png" groups="group_tech_support" sequence="1" />
-    <menuitem id="menu_compliance_dd" name="Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="5" />
-    <menuitem id="menu_compliance_kyc" name="KYC" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="10" />
-
-    <menuitem id="menu_compliance_customer_heading" action="open_customers" parent="menu_compliance_kyc" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_customer" action="open_customers" parent="menu_compliance_customer_heading" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_customer_dd" action="open_customers" parent="menu_compliance_dd" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_vendor_dd" action="open_vendors" parent="menu_compliance_dd" name="Vendors" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
-    <menuitem id="menu_compliance_paerner_dd" action="open_partners" parent="menu_compliance_dd" name="Partners" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
-    <menuitem id="menu_compliance_respondents_dd" action="open_respondents" parent="menu_compliance_dd" name="Respondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="40" />
-    <menuitem id="menu_compliance_correspondents_dd" action="open_correspondents" parent="menu_compliance_dd" name="Correspondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="50" />
-     
-    <menuitem id="menu_compliance_edd" action="action_res_partner_edd" parent="menu_compliance_kyc" name="Enhanced Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="100" />
-
 
 </odoo>
