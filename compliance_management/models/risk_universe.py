@@ -56,3 +56,4 @@ class PartnerCompositePlanLine(models.Model):
             else:
                 record.weighted_score = 0.0
         
+
