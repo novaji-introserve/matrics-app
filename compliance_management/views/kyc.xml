@@ -81,25 +81,6 @@
                 </page>
 
 
-                <!-- <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
-                    
-                    <separator string="COMPOSITE RISK SCORE" class="mt16"/>
-                    <p>
-                        <field name="composite_risk_score" class="oe_inline" readonly="1" nolabel="1"/>
-                    </p>
-
-                    <separator string="UNIVERSE RISK WEIGHTS" class="mt16"/>
-                    <field name="universe_weight_ids" readonly="1" context="{'tree_view_ref': 'view_partner_risk_universe_weight_tree'}">
-                        <tree editable="bottom" create="false" delete="false">
-                            <field name="name"/>
-                            <field name="subject_id"/>
-                            <field name="weight_percentage" sum="Total %"/>
-                            <field name="universe_score" string="Risk score"/>
-                           
-                        </tree>
-                    </field>
-                </page> -->
-
                 <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
 
                     <separator string="COMPOSITE RISK SCORE" class="mt16"/>
@@ -107,16 +88,6 @@
                         <field name="composite_risk_score" class="oe_inline" readonly="1" nolabel="1"/>
                     </p>
 
-                    <!-- <separator string="UNIVERSE RISK WEIGHTS" class="mt16"/>
-                    <field name="universe_weight_ids" readonly="1" context="{'tree_view_ref': 'view_partner_risk_universe_weight_tree'}">
-                        <tree editable="bottom" create="false" delete="false">
-                            <field name="name"/>
-                            <field name="subject_id"/>
-                            <field name="weight_percentage" sum="Total %"/>
-                            <field name="universe_score" string="Risk score"/>
-                            
-                        </tree>
-                    </field> -->
 
                     <!-- Add this new section -->
                     <separator string="COMPOSITE RISK PLANS" class="mt16"/>
