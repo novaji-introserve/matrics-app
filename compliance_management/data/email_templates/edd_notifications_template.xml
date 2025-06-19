@@ -47,7 +47,8 @@
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-                    <div style="text-align: left; padding-bottom: 20px;">
+                  
+                <div style="text-align: left; padding-bottom: 20px;">
                         <img t-if="object.company_id and object.company_id.logo_web"
                             t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>

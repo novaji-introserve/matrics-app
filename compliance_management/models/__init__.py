@@ -64,3 +64,4 @@ from . import sanction_list
 from . import digital_product    
 from . import risk_profiling
 from . import account_aggregate
+from . import customer_screening

@@ -526,389 +526,333 @@
         </field>
     </record>
 
+    <!-- Actions for Blacklist-->
+    <record id="action_res_partner_blacklist" model="ir.actions.act_window">
+        <field name="name">Black List</field>
+        <field name="res_model">res.partner.blacklist</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                    Create your first Black List
+            </p>
+
+        </field>
+    </record>
+
+
+    <!-- Actions for Optimized Sanction Screening result type -->
+
+    <record id="action_screening_result_pep" model="ir.actions.act_window">
+        <field name="name">PEP List Matches</field>
+        <field name="res_model">res.partner.screening.result</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('list_type', '=', 'pep'), ('active', '=', True)]</field>
+        <field name="context">{'default_list_type': 'pep', 'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No PEP matches found
+            </p>
+            <p>
+            Run customer screening to detect potential PEP matches.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_screening_result_watchlist" model="ir.actions.act_window">
+        <field name="name">Watchlist Matches</field>
+        <field name="res_model">res.partner.screening.result</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('list_type', '=', 'watchlist'), ('active', '=', True)]</field>
+        <field name="context">{'default_list_type': 'watchlist', 'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No Watchlist matches found
+            </p>
+            <p>
+            Run customer screening to detect potential watchlist matches.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_screening_result_sanction" model="ir.actions.act_window">
+        <field name="name">Sanction List Matches</field>
+        <field name="res_model">res.partner.screening.result</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('list_type', '=', 'sanction'), ('active', '=', True)]</field>
+        <field name="context">{'default_list_type': 'sanction', 'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No Sanction list matches found
+            </p>
+            <p>
+            Run customer screening to detect potential sanction list matches.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_screening_result_global_pep" model="ir.actions.act_window">
+        <field name="name">Global PEP Matches</field>
+        <field name="res_model">res.partner.screening.result</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('list_type', '=', 'global_pep'), ('active', '=', True)]</field>
+        <field name="context">{'default_list_type': 'global_pep', 'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No Global PEP matches found
+            </p>
+            <p>
+            Run customer screening to detect potential global PEP matches.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_screening_result_blacklist" model="ir.actions.act_window">
+        <field name="name">Blacklist Matches</field>
+        <field name="res_model">res.partner.screening.result</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('list_type', '=', 'blacklist'), ('active', '=', True)]</field>
+        <field name="context">{'default_list_type': 'blacklist', 'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No Blacklist matches found
+            </p>
+            <p>
+            Run customer screening to detect potential blacklist matches.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_screening_result_fep" model="ir.actions.act_window">
+        <field name="name">FEP List Matches</field>
+        <field name="res_model">res.partner.screening.result</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('list_type', '=', 'fep'), ('active', '=', True)]</field>
+        <field name="context">{'default_list_type': 'fep', 'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No FEP list matches found
+            </p>
+            <p>
+            Run customer screening to detect potential FEP list matches.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_sc_alert" model="ir.actions.act_window">
+        <field name="name">Sanction Screening Alert</field>
+        <field name="res_model">res.partner.screening.alert</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Create regulatory Sanction Screening officer(s)
+            </p>
+            <p>
+            Define alert officers for Sanction Screening.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_screening_result_pending" model="ir.actions.act_window">
+        <field name="name">Pending Reviews</field>
+        <field name="res_model">res.partner.screening.result</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'pending'), ('active', '=', True)]</field>
+        <field name="context">{'default_state': 'pending', 'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No pending reviews found
+            </p>
+            <p>
+                All screening results have been reviewed.
+            </p>
+        </field>
+    </record>
+
+
 
     <!-- Compliance module root menu item -->
-    <menuitem
-        id="menu_compliance_root"
-        name="Compliance"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        web_icon="compliance_management,static/description/icons-compliance.png"
-        sequence="-1000" />
+    <menuitem id="menu_compliance_root" name="Compliance" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" web_icon="compliance_management,static/description/icons-compliance.png" sequence="-1000" />
 
     <!-- Risk main menu -->
-    <menuitem
-        id="menu_compliance_risk"
-        name="Risk"
-        groups="group_compliance_compliance_risk_manager"
-        parent="menu_compliance_root"
-        sequence="30" />
+    <menuitem id="menu_compliance_risk" name="Risk" groups="group_compliance_compliance_risk_manager" parent="menu_compliance_root" sequence="30" />
 
     <!-- Configuration main menu -->
-    <menuitem
-        id="menu_compliance_configuration"
-        name="Configuration"
-        groups="group_compliance_compliance_officer,base.group_system"
-        parent="menu_compliance_root"
-        sequence="1500" />
+    <menuitem id="menu_compliance_configuration" name="Configuration" groups="group_compliance_compliance_officer,base.group_system" parent="menu_compliance_root" sequence="1500" />
 
     <!-- Sanction screening main menu -->
-    <menuitem id="menu_sanction_screening_root" name="Sanction screening"
-        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
-        parent="menu_compliance_root" sequence="150" />
+    <menuitem id="menu_sanction_screening_root" name="Sanction screening" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="150" />
 
     <!-- Due dilligence main menu -->
-    <menuitem id="menu_compliance_dd" name="Due Diligence"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        parent="menu_compliance_root" sequence="5" />
+    <menuitem id="menu_compliance_dd" name="Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="5" />
 
     <!-- KYC main menu -->
-    <menuitem id="menu_compliance_kyc" name="KYC"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        parent="menu_compliance_root" sequence="10" />
+    <menuitem id="menu_compliance_kyc" name="KYC" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="10" />
 
     <!-- Dashboard main menu -->
-    <menuitem id="menu_compliance_dashboard" name="Dashboard" action="action_compliance_dashboard"
-        parent="compliance_management.menu_compliance_root" sequence="-1" />
+    <menuitem id="menu_compliance_dashboard" name="Dashboard" action="action_compliance_dashboard" parent="compliance_management.menu_compliance_root" sequence="-1" />
 
     <!-- Adverse media main menu -->
-    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root"
-        sequence="499" groups="group_compliance_chief_compliance_officer" />
+    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499" groups="group_compliance_chief_compliance_officer" />
 
     <!-- Main menu for customer on sidebar -->
-    <menuitem name="Customers" id="contacts.menu_contacts" sequence="20"
-        web_icon="compliance_management,static/description/icons-contact.png"
-        groups="group_tech_support" />
+    <menuitem name="Customers" id="contacts.menu_contacts" sequence="20" web_icon="compliance_management,static/description/icons-contact.png" groups="group_tech_support" />
 
     <!-- Sub menu for Transaction Monitoring under KYC -->
-    <menuitem id="menu_compliance_transaction_monitoring" parent="menu_compliance_kyc"
-        name="Transaction Monitoring"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="30" />
+    <menuitem id="menu_compliance_transaction_monitoring" parent="menu_compliance_kyc" name="Transaction Monitoring" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
 
     <!-- Sub menu for FCRA Risk Assessment under Risk -->
-    <menuitem id="menu_fcra_risk" name="FCRA Risk Assessment"
-        parent="menu_compliance_risk" sequence="100" />
+    <menuitem id="menu_fcra_risk" name="FCRA Risk Assessment" parent="menu_compliance_risk" sequence="100" />
 
     <!-- Sub menu for Accounts under Configuration -->
-    <menuitem id="menu_accounts" name="Accounts"
-        parent="menu_compliance_configuration" sequence="80" />
+    <menuitem id="menu_accounts" name="Accounts" parent="menu_compliance_configuration" sequence="80" />
 
     <!-- Sub menu for Risk Management under Configuration -->
-    <menuitem id="menu_risk_assessment" name="Risk Management"
-        parent="menu_compliance_configuration" sequence="100" />
+    <menuitem id="menu_risk_assessment" name="Risk Management" parent="menu_compliance_configuration" sequence="100" />
 
     <!-- Sub menu for Customer under Configuration -->
-    <menuitem id="menu_customer" name="Customer"
-        parent="menu_compliance_configuration"
-        groups="group_tech_support" />
+    <menuitem id="menu_customer" name="Customer" parent="menu_compliance_configuration" groups="group_tech_support" />
 
     <!-- Sub menu for Configuration under Configuration -->
-    <menuitem id="menu_compliance_risk_settings" name="Configuration"
-        parent="menu_compliance_configuration" sequence="500" />
+    <menuitem id="menu_compliance_risk_settings" name="Configuration" parent="menu_compliance_configuration" sequence="500" />
 
     <!-- Sub menu for Dashboard Charts under Configuration -->
-    <menuitem id="menu_compliance_dashboard_charts" name="Dashboard Charts"
-        parent="menu_compliance_configuration" sequence="100" />
+    <menuitem id="menu_compliance_dashboard_charts" name="Dashboard Charts" parent="menu_compliance_configuration" sequence="100" />
 
     <!-- Sub menu for transaction monitoring under Configuration -->
-    <menuitem id="menu_compliance_transaction_screening" name="Transaction Monitoring"
-        parent="menu_compliance_configuration" sequence="400" />
+    <menuitem id="menu_compliance_transaction_screening" name="Transaction Monitoring" parent="menu_compliance_configuration" sequence="400" />
 
     <!-- Sub menu for PEP Configurations under Configuration -->
-    <menuitem id="menu_pep_configurations" name="PEP Configurations"
-        parent="menu_compliance_configuration"
-        sequence="460" />
+    <menuitem id="menu_pep_configurations" name="PEP Configurations" parent="menu_compliance_configuration" sequence="460" />
 
     <!-- Sub menu for Adverse Media under Configuration -->
-    <menuitem id="menu_compliance_adverse_media_config" name="Adverse Media"
-        parent="menu_compliance_configuration" sequence="501" />
+    <menuitem id="menu_compliance_adverse_media_config" name="Adverse Media" parent="menu_compliance_configuration" sequence="501" />
 
 
-    <menuitem id="menu_media_keyword" name="Media Configurations"
-        parent="menu_compliance_adverse_media_config" action="action_media_keyword" sequence="12" />
+    <menuitem id="menu_media_keyword" name="Media Configurations" parent="menu_compliance_adverse_media_config" action="action_media_keyword" sequence="12" />
 
 
-    <menuitem
-        id="menu_compliance_transaction_screening_rule"
-        action="action_list_transaction_screening_rule"
-        parent="menu_compliance_transaction_screening"
-        name="Rules"
-        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
-        sequence="100" />
+    <menuitem id="menu_compliance_transaction_screening_rule" action="action_list_transaction_screening_rule" parent="menu_compliance_transaction_screening" name="Rules" groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" sequence="100" />
 
 
     <!-- Menu -->
-    <menuitem
-        id="menu_compliance_stat"
-        action="action_list_compliance_stat"
-        parent="menu_compliance_risk_settings"
-        name="Statistics"
-        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
-        sequence="1000" />
+    <menuitem id="menu_compliance_stat" action="action_list_compliance_stat" parent="menu_compliance_risk_settings" name="Statistics" groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" sequence="1000" />
 
-    <menuitem
-        id="menu_compliance_compliance_settings"
-        action="action_compliance_settings"
-        parent="menu_compliance_risk_settings"
-        name="Settings"
-        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
-        sequence="1100" />
+    <menuitem id="menu_compliance_compliance_settings" action="action_compliance_settings" parent="menu_compliance_risk_settings" name="Settings" groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" sequence="1100" />
+
+
+    <!--Optimized Sanction Screening -->
+    <!-- Sub menu for Sanction Screening  -->
+    <menuitem id="menu_compliance_sanction_matches" parent="menu_sanction_screening_root" name="Matches" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
+
+    <menuitem id="menu_screening_result_pep" name="PEP List Matches" action="action_screening_result_pep" parent="menu_compliance_sanction_matches" sequence="10"/>
+
+    <menuitem id="menu_screening_result_watchlist" name="Watchlist Matches" action="action_screening_result_watchlist" parent="menu_compliance_sanction_matches" sequence="20"/>
+
+    <menuitem id="menu_screening_result_sanction" name="Sanction List Matches" action="action_screening_result_sanction" parent="menu_compliance_sanction_matches" sequence="30"/>
+
+    <menuitem id="menu_screening_result_global_pep" name="Global PEP Matches" action="action_screening_result_global_pep" parent="menu_compliance_sanction_matches" sequence="40"/>
+
+    <!-- <menuitem id="menu_screening_result_blacklist" name="Blacklist Matches" action="action_screening_result_blacklist" parent="menu_compliance_sanction_matches" sequence="50"/> -->
+
+    <menuitem id="menu_screening_result_fep" name="FEP List Matches" action="action_screening_result_fep" parent="menu_compliance_sanction_matches" sequence="60"/>
+
+    <menuitem id="menu_screening_result_pending" name="Pending Reviews" action="action_screening_result_pending" parent="menu_compliance_sanction_matches" sequence="5"/>
+
+
+    <!-- Sanction Screening Alert -->
+    <menuitem id="menu_compliance_sc_config" name="Sanction Screening" parent="menu_compliance_configuration" sequence="600" />
+
+    <menuitem id="menu_sanction_screening_alert" name="Configurations" parent="menu_compliance_sc_config" action="action_sc_alert" sequence="18"/>
+
+
 
 
     <!-- Menu Items -->
 
+    <menuitem id="menu_compliance_sanction_list" parent="menu_sanction_screening_root" name="Screening List" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
 
-    <!-- <menuitem id="menu_is_fep" action="action_res_partner_fep"
-    parent="menu_sanction_screening_root" name="FEP List"
-    groups="group_compliance_compliance_officer" sequence="20" /> -->
+    <menuitem id="menu_is_fep" action="action_res_partner_fep" parent="menu_compliance_sanction_list" name="FEP List" groups="group_compliance_compliance_officer" sequence="20" />
 
     <!-- Action for Local PepList -->
-    <menuitem id="menu_compliance_peplist" action="action_peplist"
-        parent="menu_sanction_screening_root" name="PEP List"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="20" />
+    <menuitem id="menu_compliance_peplist" action="action_peplist" parent="menu_compliance_sanction_list" name="PEP List" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
 
-    <menuitem id="menu_watchlist" action="action_res_partner_watchlist"
-        parent="menu_sanction_screening_root" name="Watchlist"
-        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
-        sequence="30" />
+    <menuitem id="menu_watchlist" action="action_res_partner_watchlist" parent="menu_compliance_sanction_list" name="Watchlist" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="30" />
 
-    <!-- <menuitem id="menu_blacklist" action="action_res_partner_blacklist"
-    parent="menu_sanction_screening_root" name="Blacklist"
-    groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
-    sequence="40" /> -->
+    <!-- <menuitem id="menu_blacklist" action="action_res_partner_blacklist" parent="menu_sanction_screening_root" name="Blacklist" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="40" /> -->
 
-    <menuitem id="menu_global_pep_list" action="action_res_global_pep"
-        parent="menu_sanction_screening_root" name="Global PEP List"
-        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
-        sequence="50" />
+    <menuitem id="menu_global_pep_list" action="action_res_global_pep" parent="menu_compliance_sanction_list" name="Global PEP List" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="50" />
 
-    <menuitem id="menu_sanction" action="action_sanction_list" parent="menu_sanction_screening_root"
-        name="Sanction List"
-        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
-        sequence="55" />
+    <menuitem id="menu_sanction" action="action_sanction_list" parent="menu_compliance_sanction_list" name="Sanction List" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="55" />
 
-    <menuitem id="menu_greylist" action="action_res_partner_greylist"
-        parent="menu_sanction_screening_root" name="Greylist"
-        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
-        sequence="60" />
+    <menuitem id="menu_greylist" action="action_res_partner_greylist" parent="menu_compliance_sanction_list" name="Greylist" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="60" />
 
 
-    <menuitem id="menu_csv_import" name="List Upload" parent="menu_sanction_screening_root"
-        action="compliance_management.action_csv_import"
-        groups="compliance_management.group_compliance_chief_compliance_officer" sequence="70" />
+    <menuitem id="menu_csv_import" name="List Upload" parent="menu_sanction_screening_root" action="compliance_management.action_csv_import" groups="compliance_management.group_compliance_chief_compliance_officer" sequence="70" />
 
-    <menuitem id="menu_high_risk_jurisdiction" name="High Risk Jurisdiction" parent="menu_fcra_risk"
-        action="action_high_risk_jurisdiction" sequence="40" />
-
+    
     <!-- Menu -->
-    <menuitem
-        id="menu_compliance_risk_assessment"
-        action="action_list_risk_assessment"
-        parent="menu_fcra_risk"
-        name="Institutional"
-        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
-        sequence="10" />
-    <menuitem
-        id="menu_compliance_risk_assessment_cp"
-        action="action_list_risk_assessment_cp"
-        parent="menu_fcra_risk"
-        name="Counter Party"
-        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
-        sequence="20" />
-
+    <menuitem id="menu_compliance_risk_assessment" action="action_list_risk_assessment" parent="menu_fcra_risk" name="Institutional" groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" sequence="10" />
+    <menuitem id="menu_compliance_risk_assessment_cp" action="action_list_risk_assessment_cp" parent="menu_fcra_risk" name="Counter Party" groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" sequence="20" />
+    
     <!-- Menu -->
-    <menuitem id="menu_compliance_risk_assessment_plan" action="action_list_risk_assessment_plan"
-        parent="menu_risk_assessment" name="Risk Analysis"
-        groups="group_compliance_compliance_risk_manager" sequence="100" />
+    <menuitem id="menu_compliance_risk_assessment_plan" action="action_list_risk_assessment_plan" parent="menu_risk_assessment" name="Risk Analysis" groups="group_compliance_compliance_risk_manager" sequence="100" />
 
     <!-- Menu -->
 
-    <menuitem id="menu_pep_sources" name="PEP Sources" parent="menu_pep_configurations"
-        action="action_pep_sources" sequence="10" />
+    <menuitem id="menu_pep_sources" name="PEP Sources" parent="menu_pep_configurations" action="action_pep_sources" sequence="10" />
 
-    <menuitem id="menu_compliance_accounts" action="open_accounts" parent="menu_compliance_kyc"
-        name="Accounts"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="20" />
+    <menuitem id="menu_compliance_accounts" action="open_accounts" parent="menu_compliance_kyc" name="Accounts" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
 
-    <menuitem
-        id="hr.menu_hr_root"
-        name="Employees"
-        web_icon="hr,static/description/icon.svg"
-        sequence="500"
-        groups="compliance_management.group_compliance_chief_compliance_officer" />
+    <menuitem id="hr.menu_hr_root" name="Employees" web_icon="hr,static/description/icon.svg" sequence="500" groups="compliance_management.group_compliance_chief_compliance_officer" />
 
 
-    <menuitem
-        id="menu_etl_root"
-        name="ETL Manager"
-        sequence="100"
-        web_icon="custom_etl,static/description/icon.png"
-        groups="group_tech_support" />
+    <menuitem id="menu_etl_root" name="ETL Manager" sequence="100" web_icon="custom_etl,static/description/icon.png" groups="group_tech_support" />
 
-    <menuitem
-        id="link_tracker_menu_main"
-        name="Link Tracker"
-        groups="group_tech_support" />
+    <menuitem id="link_tracker_menu_main" name="Link Tracker" groups="group_tech_support" />
 
-    <menuitem
-        name="Project"
-        id="menu_main_pm"
-        groups="group_tech_support"
-        web_icon="project,static/description/icon.svg"
-    />
+    <menuitem name="Project" id="menu_main_pm" groups="group_tech_support" web_icon="project,static/description/icon.svg" />
 
-    <menuitem
-        id="mass_mailing_sms_menu_root"
-        name="SMS Marketing"
-        web_icon="mass_mailing_sms,static/description/icon.svg"
-        groups="group_tech_support" />
+    <menuitem id="mass_mailing_sms_menu_root" name="SMS Marketing" web_icon="mass_mailing_sms,static/description/icon.svg" groups="group_tech_support" />
 
-    <menuitem name="Surveys"
-        id="menu_surveys"
-        groups="group_tech_support"
-        web_icon="survey,static/description/icon.svg" />
+    <menuitem name="Surveys" id="menu_surveys" groups="group_tech_support" web_icon="survey,static/description/icon.svg" />
 
-    <menuitem
-        name="Contacts"
-        id="menu_contacts"
-        web_icon="contacts,static/description/icon.svg"
-        groups="group_tech_support" />
+    <menuitem name="Contacts" id="menu_contacts" web_icon="contacts,static/description/icon.svg" groups="group_tech_support" />
 
-    <menuitem
-        id="menu_queue_job_root"
-        name="Job Queue"
-        web_icon="queue_job,static/description/icon.png"
-        groups="group_tech_support" />
+    <menuitem id="menu_queue_job_root" name="Job Queue" web_icon="queue_job,static/description/icon.png" groups="group_tech_support" />
 
-    <menuitem
-        id="menu_board_root"
-        name="Dashboards"
-        web_icon="base,static/description/board.png"
-        groups="group_tech_support" />
+    <menuitem id="menu_board_root" name="Dashboards" web_icon="base,static/description/board.png" groups="group_tech_support" />
+    
+    <menuitem name="Settings" id="base.menu_administration" web_icon="compliance_management,static/description/icon-settings.png" sequence="550" groups="compliance_management.group_compliance_chief_compliance_officer" />
 
-    <menuitem name="Settings"
-        id="base.menu_administration"
-        web_icon="compliance_management,static/description/icon-settings.png"
-        sequence="550"
-        groups="compliance_management.group_compliance_chief_compliance_officer" />
-
-    <menuitem id="base.menu_management" name="Apps" sequence="500"
-        web_icon="compliance_management,static/description/icon-apps.png"
-        groups="group_tech_support" />
+    <menuitem id="base.menu_management" name="Apps" sequence="500" web_icon="compliance_management,static/description/icon-apps.png" groups="group_tech_support" />
 
 
-    <menuitem
-        id="menu_compliance_account_type"
-        action="action_list_customer_account_type"
-        parent="menu_accounts"
-        name="Account Types"
-        groups="group_compliance_compliance_officer"
-        sequence="1" />
-    <menuitem
-        id="menu_compliance_account_product"
-        action="action_list_account_product"
-        parent="menu_accounts"
-        name="Account Products"
-        groups="group_compliance_compliance_officer"
-        sequence="2" />
-    <menuitem
-        id="menu_compliance_branch"
-        action="action_list_branch"
-        parent="menu_compliance_configuration"
-        name="Branches"
-        groups="group_compliance_compliance_officer"
-        sequence="90" />
+    <menuitem id="menu_compliance_account_type" action="action_list_customer_account_type" parent="menu_accounts" name="Account Types" groups="group_compliance_compliance_officer" sequence="1" />
+    <menuitem id="menu_compliance_account_product" action="action_list_account_product" parent="menu_accounts" name="Account Products" groups="group_compliance_compliance_officer" sequence="2" />
+    <menuitem id="menu_compliance_branch" action="action_list_branch" parent="menu_compliance_configuration" name="Branches" groups="group_compliance_compliance_officer" sequence="90" />
+    
+
+    <menuitem id="menu_compliance_sector" action="action_list_customer_sector" parent="menu_customer" name="Customer Sectors" groups="group_compliance_compliance_officer" sequence="1" />
+    
+    <menuitem id="menu_compliance_customer_tier" action="action_list_customer_tier" parent="menu_customer" name="Customer Tiers" groups="group_compliance_compliance_officer" sequence="2" />
+    
+    <menuitem id="menu_compliance_customer_region" action="action_list_customer_region" parent="menu_customer" name="Customer Regions" groups="group_compliance_compliance_officer" sequence="3" />
+    
+    <menuitem id="menu_compliance_education_level" action="action_list_education_level" parent="menu_customer" name="Education Levels" groups="group_compliance_compliance_officer" sequence="4" />
+    
+
+    <menuitem id="menu_compliance_risk_category" action="action_list_risk_category" parent="menu_risk_assessment" name="Risk Categories" groups="group_compliance_compliance_officer" sequence="1" />
+    <menuitem id="menu_compliance_risk_universe" action="action_list_risk_universe" parent="menu_risk_assessment" name="Risk Universe" groups="group_compliance_compliance_officer" sequence="2" />
+    <menuitem id="menu_compliance_risk_subject" action="action_list_risk_subject" parent="menu_risk_assessment" name="Risk Subjects" groups="group_compliance_compliance_officer" sequence="3" />
+    <menuitem id="menu_compliance_risk_type" action="action_list_risk_type" parent="menu_risk_assessment" name="Risk Types" groups="group_compliance_compliance_officer" sequence="4" />
+
+    <menuitem id="menu_compliance_risk_fcra_score" action="action_fcra_score_action" parent="menu_risk_assessment" name="Risk Scoring" groups="group_compliance_compliance_officer" sequence="5" />
 
 
-    <menuitem
-        id="menu_compliance_sector"
-        action="action_list_customer_sector"
-        parent="menu_customer"
-        name="Customer Sectors"
-        groups="group_compliance_compliance_officer"
-        sequence="1" />
+    <menuitem id="menu_dashboard_chart" action="res_charts_action" parent="menu_compliance_dashboard_charts" name="Charts" sequence="10" groups="group_compliance_compliance_officer" />
 
-    <menuitem
-        id="menu_compliance_customer_tier"
-        action="action_list_customer_tier"
-        parent="menu_customer"
-        name="Customer Tiers"
-        groups="group_compliance_compliance_officer"
-        sequence="2" />
-
-    <menuitem
-        id="menu_compliance_customer_region"
-        action="action_list_customer_region"
-        parent="menu_customer"
-        name="Customer Regions"
-        groups="group_compliance_compliance_officer"
-        sequence="3" />
-
-    <menuitem
-        id="menu_compliance_education_level"
-        action="action_list_education_level"
-        parent="menu_customer"
-        name="Education Levels"
-        groups="group_compliance_compliance_officer"
-        sequence="4" />
-
-
-    <menuitem
-        id="menu_compliance_risk_category"
-        action="action_list_risk_category"
-        parent="menu_risk_assessment"
-        name="Risk Categories"
-        groups="group_compliance_compliance_officer"
-        sequence="1" />
-    <menuitem
-        id="menu_compliance_risk_universe"
-        action="action_list_risk_universe"
-        parent="menu_risk_assessment"
-        name="Risk Universe"
-        groups="group_compliance_compliance_officer"
-        sequence="2" />
-    <menuitem
-        id="menu_compliance_risk_subject"
-        action="action_list_risk_subject"
-        parent="menu_risk_assessment"
-        name="Risk Subjects"
-        groups="group_compliance_compliance_officer"
-        sequence="3" />
-    <menuitem
-        id="menu_compliance_risk_type"
-        action="action_list_risk_type"
-        parent="menu_risk_assessment"
-        name="Risk Types"
-        groups="group_compliance_compliance_officer"
-        sequence="4" />
-
-    <menuitem
-        id="menu_compliance_risk_fcra_score"
-        action="action_fcra_score_action"
-        parent="menu_risk_assessment"
-        name="Risk Scoring"
-        groups="group_compliance_compliance_officer"
-        sequence="5" />
-
-
-    <menuitem
-        id="menu_dashboard_chart"
-        action="res_charts_action"
-        parent="menu_compliance_dashboard_charts"
-        name="Charts"
-        sequence="10"
-        groups="group_compliance_compliance_officer"
-    />
-
-    <menuitem
-        id="menu_digital_delivery_channel"
-        name="Digital Channels"
-        action="action_digital_delivery_channel"
-        parent="menu_customer"
-        sequence="5"
-    />
+    <menuitem id="menu_digital_delivery_channel" name="Digital Channels" action="action_digital_delivery_channel" parent="menu_customer" sequence="5" />
 
     <menuitem id="base.menu_board_root" name="Dashboards" sequence="260"
         web_icon="compliance_management,static/description/icon-dashboard.png"
@@ -921,93 +865,39 @@
     groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
     parent="contacts.menu_contacts" sequence="2" /> -->
 
-    <menuitem id="mail.menu_root_discuss" name="Messaging"
-        web_icon="compliance_management,static/description/icon-chat.png"
-        groups="group_tech_support" sequence="1" />
+    <menuitem id="mail.menu_root_discuss" name="Messaging" web_icon="compliance_management,static/description/icon-chat.png" groups="group_tech_support" sequence="1" />
 
-    <menuitem id="menu_compliance_customer_heading" action="open_customers"
-        parent="menu_compliance_kyc" name="Customers"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="10" />
-    <menuitem id="menu_compliance_customer" action="open_customers"
-        parent="menu_compliance_customer_heading" name="Customers"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="10" />
-    <menuitem id="menu_compliance_customer_dd" action="open_customers" parent="menu_compliance_dd"
-        name="Customers"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="10" />
-    <menuitem id="menu_compliance_vendor_dd" action="open_vendors" parent="menu_compliance_dd"
-        name="Vendors"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="20" />
-    <menuitem id="menu_compliance_paerner_dd" action="open_partners" parent="menu_compliance_dd"
-        name="Partners"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="30" />
-    <menuitem id="menu_compliance_respondents_dd" action="open_respondents"
-        parent="menu_compliance_dd" name="Respondents"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="40" />
-    <menuitem id="menu_compliance_correspondents_dd" action="open_correspondents"
-        parent="menu_compliance_dd" name="Correspondents"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="50" />
+    <menuitem id="menu_compliance_customer_heading" action="open_customers" parent="menu_compliance_kyc" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
+    <menuitem id="menu_compliance_customer" action="open_customers" parent="menu_compliance_customer_heading" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
+    <menuitem id="menu_compliance_customer_dd" action="open_customers" parent="menu_compliance_dd" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
+    <menuitem id="menu_compliance_vendor_dd" action="open_vendors" parent="menu_compliance_dd" name="Vendors" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
+    <menuitem id="menu_compliance_paerner_dd" action="open_partners" parent="menu_compliance_dd" name="Partners" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
+    <menuitem id="menu_compliance_respondents_dd" action="open_respondents" parent="menu_compliance_dd" name="Respondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="40" />
+    <menuitem id="menu_compliance_correspondents_dd" action="open_correspondents" parent="menu_compliance_dd" name="Correspondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="50" />
 
-    <menuitem id="menu_compliance_edd" action="action_res_partner_edd" parent="menu_compliance_kyc"
-        name="Enhanced Due Diligence"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="100" />
-    <menuitem id="menu_icomply_config" action="action_newsearch_settings" name="News API"
-        parent="menu_fcra_risk" sequence="30" />
-
-
-    <menuitem id="menu_is_pep" action="action_res_pep" parent="menu_compliance_customer_heading"
-        name="PEPs Customers"
-        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer"
-        sequence="10" />
-    <menuitem id="menu_compliance_likely_sanction_customer"
-        action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading"
-        name="Likely Sanctioned"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="60" />
-    <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_global_pep"
-        parent="menu_compliance_customer_heading" name="Matching Global PEPs"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="70" />
+    <menuitem id="menu_compliance_edd" action="action_res_partner_edd" parent="menu_compliance_kyc" name="Enhanced Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="100" />
+    
+    
+    <menuitem id="menu_is_pep" action="action_res_pep" parent="menu_compliance_customer_heading" name="PEPs Customers" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="10" />
+    <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanctioned" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" />
+    <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_global_pep" parent="menu_compliance_customer_heading" name="Matching Global PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="70" />
     <!-- Menu Items -->
-    <menuitem id="menu_opensanctions_jobs"
-        name="OpenSanctions Jobs"
-        parent="menu_pep_configurations"
-        action="action_opensanctions_job_queue"
-        sequence="20"
-        groups="group_tech_support" />
+    <menuitem id="menu_opensanctions_jobs" name="OpenSanctions Jobs" parent="menu_pep_configurations" action="action_opensanctions_job_queue" sequence="20" groups="group_tech_support" />
 
 
     <!-- Adverse media menu items -->
-    <menuitem id="menu_adverse_media_alert" name="Adverse Media Logs"
-        parent="menu_adverse_media_root" action="action_adverse_media_alert" sequence="11" />
-    <menuitem id="menu_adverse_media" name="Media Watchlist" parent="menu_adverse_media_root"
-        action="action_adverse_media" sequence="10" />
+    <menuitem id="menu_adverse_media_alert" name="Adverse Media Logs" parent="menu_adverse_media_root" action="action_adverse_media_alert" sequence="11" />
+    <menuitem id="menu_adverse_media" name="Media Watchlist" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10" />
 
 
     <!-- Menu Items -->
-    <!-- <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root"
-    sequence="499"/> -->
+    <!-- <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499"/> -->
 
-    <menuitem id="menu_compliance_transactions" action="open_transactions"
-        parent="menu_compliance_transaction_monitoring" name="Transactions To Review"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="10" />
-    <menuitem id="menu_compliance_transactions_done" action="open_transactions_done"
-        parent="menu_compliance_transaction_monitoring" name="Transactions Reviewed"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="20" />
-    <menuitem id="menu_compliance_transactions_all" action="open_transactions_all"
-        parent="menu_compliance_transaction_monitoring" name="All Transactions"
-        groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
-        sequence="30" />
+    <menuitem id="menu_compliance_transactions" action="open_transactions" parent="menu_compliance_transaction_monitoring" name="Transactions To Review" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
+    <menuitem id="menu_compliance_transactions_done" action="open_transactions_done" parent="menu_compliance_transaction_monitoring" name="Transactions Reviewed" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
+    <menuitem id="menu_compliance_transactions_all" action="open_transactions_all" parent="menu_compliance_transaction_monitoring" name="All Transactions" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
 
-    <!-- <menuitem id="menu_adverse_media" name="Monitoring Configuration"
-    parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/> -->
+    <!-- <menuitem id="menu_adverse_media" name="Monitoring Configuration" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/> -->
+    <!-- <menuitem id="menu_icomply_config" action="action_newsearch_settings" name="News API" parent="menu_fcra_risk" sequence="30" /> -->
+    <!-- <menuitem id="menu_high_risk_jurisdiction" name="High Risk Jurisdiction" parent="menu_fcra_risk" action="action_high_risk_jurisdiction" sequence="40" /> -->
 </odoo>

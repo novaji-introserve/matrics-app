@@ -48,6 +48,8 @@
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
         'data/email_templates/case_alert_template.xml',
+        "data/email_templates/customer_screening_template.xml",
+
 
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
@@ -99,8 +101,11 @@
         "views/transaction_screening_rule.xml",
         "data/transaction_type.xml",
         'data/transaction_screening_rule.xml',
-        "data/demo_data/chart/charts.xml", #CHARTS
-        "data/demo_data/partner/res_partner.xml",
+        # "data/demo_data/sanction/sanction_screening.xml", # SANCTION SCREENING DATA
+        # "data/demo_data/chart/charts.xml", #CHARTS
+        # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
+        # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
+        # "data/transactions.xml", # TRANSACTION
         "views/res_users.xml",
         "views/peplist.xml",
         'data/gender.xml',
@@ -111,8 +116,8 @@
         'data/demo_data/plan/assessment_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
-        'data/watchlist.xml',
         'data/blacklist.xml',
+        "views/customer_screening.xml",
         "views/menu_actions.xml",
 
     ],

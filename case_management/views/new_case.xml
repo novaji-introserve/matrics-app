@@ -57,19 +57,19 @@
                             onclick="window.location.href='/web#action=case_management.action_owl_case_dashboard'; return false;"
                            />
                 </header>
-                
+                <div class="alert alert-info" role="alert">
+                    All cases opened must be closed within 48 hours!!!
+                </div>
+            
                 <sheet>
                     <!-- Add this to your form view, inside the <sheet> tag -->
                     <!-- <div class="alert alert-success" attrs="{'invisible': [('id', '=', False)]}" style="display: none;" id="success_redirect"> -->
                     
                     <div class="oe_title">
-                        <h1 class="text-success">CASE MANAGER</h1>
-                        <div class="alert alert-info" role="alert">
-                            All cases opened must be closed within 48 hours!!!
-                        </div>
-                        <!-- <h1>
-                            <field name="name" readonly="1"/>
-                        </h1> -->
+                        <!--h1 class="text-success">Case Management</h1-->
+                         <h1>
+                            <field name="name" readonly="0"/>
+                        </h1>
                     </div>
                     
                     <group>
@@ -81,7 +81,6 @@
                             <field name="event_date"/>
                             <field name="transaction_id"/>
                             <!-- <field name="transaction_reference" readonly="1"/> -->
-                            <field name="cases_description" widget="html"/>
                             <field name="data_source" invisible="1"/>
                         </group>
                         <group string="Status and Others">
@@ -104,27 +103,30 @@
                             <field name="customer_id"/>
                         </group>
                     </group>
+                    <label for="cases_description"/>
+                    <field name="cases_description" placeholder="Description" widget="html"/>
                     <label for="cases_action"/>
-                    <field name="cases_action" placeholder="Recommended Action..." widget="text"/>
-                    <group>
-                        <group string="Responsibility">
-                            <field name="rating_id" invisible="1"/>
-                            <field name="staff_id" string="Staff Responsible" options="{'no_create': True, 'no_edit': True}"/>
-                            <field name="team_id" string="Department/Unit" readonly="1"/>
-                            <field name="branch_id"/>
-                            <field name="severity_level" invisible="1"/>
-                        </group>
-                        <group string="Supervisors">
-                            <field name="supervisor_one_id"/>
-                            <field name="supervisor_two_id" attrs="{'invisible': [('title', '!=', '2')]}"/>
-                            <field name="supervisor_two_id" attrs="{'invisible': [('title', '!=', '3')]}"/>
-                            <field name="supervisor_three_id" attrs="{'invisible': [('title', '!=', '3')]}"/>
-                        </group>
-                    </group>
-                    <label for="further_description"/>
-                    <field name="further_description" widget="html"/>
+                    <field name="cases_action" placeholder="Recommended Action..." widget="html"/>
+                                        
                     <notebook>
-                        <page string="Attachments">
+                        <page string="Users and Teams">
+                            <group>
+                                <group string="Responsibility">
+                                    <field name="rating_id" invisible="1"/>
+                                    <field name="staff_id" string="Staff Responsible" options="{'no_create': True, 'no_edit': True}"/>
+                                    <field name="team_id" string="Department/Unit" readonly="1"/>
+                                    <field name="branch_id"/>
+                                    <field name="severity_level" invisible="1"/>
+                                </group>
+                                <group string="Supervisors">
+                                    <field name="supervisor_one_id"/>
+                                    <field name="supervisor_two_id" attrs="{'invisible': [('title', '!=', '2')]}"/>
+                                    <field name="supervisor_two_id" attrs="{'invisible': [('title', '!=', '3')]}"/>
+                                    <field name="supervisor_three_id" attrs="{'invisible': [('title', '!=', '3')]}"/>
+                                </group>
+                            </group>
+                        </page>
+                         <page string="Documentation">
                             <!-- <field name="attachment_ids" widget="many2many_binary"/> -->
                             <group>
                                 <field name="attachment" filename="filename" 
@@ -133,6 +135,10 @@
                                 <field name="filename" invisible="1"/>
                             </group>
                         </page>
+                        <page string="Additional Narration">
+                           <field name="further_description" widget="html"/>
+                        </page>
+                       
                     </notebook>
                     <group invisible="1">
                         <field name="id"/>
