@@ -61,5 +61,7 @@ from . import dashboard_stats_view_refresher
 from . import res_materialized_views    
 from . import peplist    
 from . import sanction_list    
-
+from . import digital_product    
+from . import risk_profiling
 from . import account_aggregate
+from . import customer_screening

@@ -8,3 +8,5 @@ class FEPlist(models.Model):
     name = fields.Char(string='')
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', required=True, index=True)
+    
+    

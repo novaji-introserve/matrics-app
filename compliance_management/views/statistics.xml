@@ -98,22 +98,7 @@
             </kanban>
         </field>
     </record>
-    <!-- Action -->
-    <record id="action_list_compliance_stat" model="ir.actions.act_window">
-        <field name="name">Compliance Statistics</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.compliance.stat</field>
-        <field name="view_id" ref="compliance_stat_tree" />
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Add a Statitics
-            </p>
-            <p>
-                No records yet
-            </p>
-        </field>
-    </record>
+
 
     <!-- server -->
     <record id="action_stat_card_click" model="ir.actions.server">
@@ -122,13 +107,5 @@
     <field name="state">code</field>
     <field name="code">action = model.open_action()</field>
     </record>
-    <!-- Menu -->
-    <menuitem
-        id="menu_compliance_stat"
-        action="action_list_compliance_stat"
-        parent="menu_compliance_risk_settings"
-        name="Statistics"
-        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
-        sequence="1000" />
 
 </odoo>

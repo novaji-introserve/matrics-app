@@ -7,7 +7,7 @@
             <field name="tag">owl.case_dashboard</field>
         </record>
 
-        <menuitem id="menu_case_mgt" name="Case Management" sequence="10"
+        <menuitem id="menu_case_mgt" name="Cases" sequence="10"
                   web_icon="case_management,static/description/icon.png"/>
 
         <menuitem id="case_dashboard" name="Dashboard" sequence="5"
@@ -16,7 +16,7 @@
         <!-- <menuitem id="menu_case_dashboard" name="Case"
                   parent="menu_case_mgt" sequence="10"
                   action="action_owl_case_dashboard" /> -->
-        <menuitem id="menu_case_dashboard" name="Case"
+        <menuitem id="menu_case_dashboard" name="Cases"
                   parent="menu_case_mgt" sequence="10" />
 
         <menuitem 
