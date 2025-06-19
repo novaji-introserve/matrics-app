@@ -1,5 +1,6 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.exceptions import ValidationError
 from datetime import timedelta
 import logging
 import uuid
@@ -111,9 +112,120 @@ class CaseResponseWizard(models.TransientModel):
 
 
 
+# models/case_configuration.py
 
 
+class CaseConfiguration(models.Model):
+    _name = 'case.configuration'
+    _description = 'Case Management Configuration'
+    _rec_name = 'name'
 
+    name = fields.Char(string='Configuration Name', required=True, default='Default Configuration')
+    deadline_value = fields.Integer(string='Deadline Value', required=True, default=48)
+    deadline_unit = fields.Selection([
+        ('hours', 'Hours'),
+        ('days', 'Days'),
+        ('weeks', 'Weeks'),
+        ('months', 'Months')
+    ], string='Deadline Unit', required=True, default='hours')
+    
+    active = fields.Boolean(string='Active', default=True)
+    is_default = fields.Boolean(string='Default Configuration', default=False)
+    
+    company_id = fields.Many2one('res.company', string='Company', 
+                                default=lambda self: self.env.company)
+    
+    # Additional fields for future configuration options
+    notify_before_overdue = fields.Boolean(string='Notify Before Overdue', default=False)
+    notification_hours = fields.Integer(string='Notification Hours Before Deadline', default=24)
+    
+    deadline_message = fields.Char(
+        string="Deadline Message",
+        compute="_compute_deadline_message",
+        store=False
+    )
+    
+    @api.constrains('deadline_value')
+    def _check_deadline_value(self):
+        for record in self:
+            if record.deadline_value <= 0:
+                raise ValidationError("Deadline value must be greater than 0")
+    
+    @api.constrains('is_default')
+    def _check_single_default(self):
+        for record in self:
+            if record.is_default:
+                # Ensure only one default configuration per company
+                existing_default = self.search([
+                    ('is_default', '=', True),
+                    ('company_id', '=', record.company_id.id),
+                    ('id', '!=', record.id)
+                ])
+                if existing_default:
+                    raise ValidationError("Only one default configuration is allowed per company")
+    
+    @api.model
+    def get_default_configuration(self):
+        """Get the default configuration for the current company"""
+        config = self.search([
+            ('is_default', '=', True),
+            ('company_id', '=', self.env.company.id),
+            ('active', '=', True)
+        ], limit=1)
+        
+        if not config:
+            # Create default configuration if none exists
+            config = self.create({
+                'name': 'Default Configuration',
+                'deadline_value': 48,
+                'deadline_unit': 'hours',
+                'is_default': True
+            })
+        
+        return config
+    
+    def get_deadline_timedelta(self):
+        """Convert deadline value and unit to timedelta object"""
+        from datetime import timedelta
+        
+        if self.deadline_unit == 'hours':
+            return timedelta(hours=self.deadline_value)
+        elif self.deadline_unit == 'days':
+            return timedelta(days=self.deadline_value)
+        elif self.deadline_unit == 'weeks':
+            return timedelta(weeks=self.deadline_value)
+        elif self.deadline_unit == 'months':
+            # Approximate months as 30 days
+            return timedelta(days=self.deadline_value * 30)
+        
+        return timedelta(hours=48)  # Fallback
+    
+    def name_get(self):
+        """Custom name display"""
+        result = []
+        for record in self:
+            name = f"{record.name} ({record.deadline_value} {record.deadline_unit})"
+            result.append((record.id, name))
+        return result
+    
+    
+    @api.depends('deadline_value', 'deadline_unit')
+    def _compute_deadline_message(self):
+        for rec in self:
+            unit = rec.deadline_unit
+            if rec.deadline_value == 1:
+                # Remove 's' for singular form
+                unit = unit.rstrip("s")
+            rec.deadline_message = _(
+                "All CASES OPENED WILL BECOME OVERDUE IN %(value)s %(unit)s."
+            ) % {
+                "value": rec.deadline_value,
+                "unit": unit.upper()
+            }
+
+    
+    
+    
 
 
 class Cases(models.Model):
@@ -218,7 +330,19 @@ class Cases(models.Model):
     is_assigned_staff = fields.Boolean(compute='_compute_user_roles', compute_sudo=False)
     is_supervisor = fields.Boolean(compute='_compute_is_supervisor', store=False)
     response_text = fields.Text(string="Response", compute="_compute_latest_response", store=False)
+    
+    deadline_message = fields.Char(
+        string="Deadline Message",
+        compute="_compute_deadline_message",
+        store=False
+    )
 
+    @api.depends()
+    def _compute_deadline_message(self):
+        """Get deadline message from configuration"""
+        config = self.env['case.configuration'].sudo().get_default_configuration()
+        for rec in self:
+            rec.deadline_message = config.deadline_message
     
     def write(self, vals):
         for record in self:
@@ -730,13 +854,20 @@ class Cases(models.Model):
     
 
     # ------------------- CRON -------------------
-
+    
+    # Updated cron method in your case model
     @api.model
     def cron_check_overdue_cases(self):
         _logger.info("Running cron_check_overdue_cases...")
         
+        # Get the configuration
+        config_model = self.env['case.configuration']
+        config = config_model.get_default_configuration()
+        
+        _logger.info(f"Using configuration: {config.name} - {config.deadline_value} {config.deadline_unit}")
+        
         # Make sure we're operating on the correct model
-        case_model = self.env['case']  # Ensure we're using the right model name
+        case_model = self.env['case']  
         
         # Check available statuses
         status_records = self.env['case.status'].search([])
@@ -754,7 +885,11 @@ class Cases(models.Model):
             _logger.warning("Open status not found! Check the exact status name.")
             return
         
-        deadline = fields.Datetime.now() - timedelta(hours=48)
+        # Get dynamic deadline from configuration
+        deadline_delta = config.get_deadline_timedelta()
+        deadline = fields.Datetime.now() - deadline_delta
+        
+        _logger.info(f"Deadline calculated as: {deadline} (using {config.deadline_value} {config.deadline_unit})")
         
         # Search for cases with the confirmed open status
         open_cases = case_model.search([
@@ -768,10 +903,228 @@ class Cases(models.Model):
             try:
                 open_cases.write({'status_id': overdue_status.id})
                 _logger.info(f"Overdue status applied to cases: {open_cases.ids}")
+                
+                # Optional: Send notifications if configured
+                if config.notify_before_overdue:
+                    self._send_overdue_notifications(open_cases, config)
+                    
             except Exception as e:
                 _logger.error(f"Failed to update cases: {str(e)}")
         else:
             _logger.info("No cases to update.")
+
+    def _send_overdue_notifications(self, cases, config):
+        """Send overdue notification emails to case creator, supervisors, and assignee"""
+        _logger.info(f"Sending overdue notifications for {len(cases)} cases")
+        
+        # Get the overdue notification email template
+        template = self.env.ref('case_management.case_overdue_notification_template', raise_if_not_found=False)
+        
+        if not template:
+            _logger.error("Case overdue notification email template not found")
+            return False
+        
+        # Get the default outgoing mail server
+        mail_server = self.env['ir.mail_server'].sudo().search([], limit=1)
+        default_email_from = 'noreply@example.com'  # Fallback email
+        
+        if mail_server:
+            # Use the configured email from the mail server
+            default_email_from = mail_server.smtp_user or mail_server.smtp_host or default_email_from
+            _logger.info(f"Using email_from from mail server: {default_email_from}")
+        else:
+            # Try to get from system parameters as another fallback
+            system_email = self.env['ir.config_parameter'].sudo().get_param('mail.default.from')
+            if system_email:
+                default_email_from = system_email
+                _logger.info(f"Using email_from from system parameters: {default_email_from}")
+            else:
+                _logger.warning(f"No mail server configured, using fallback email: {default_email_from}")
+        
+        successful_notifications = 0
+        failed_notifications = 0
+        
+        for case in cases:
+            try:
+                # Prepare recipient data
+                staff_user = case.staff_id  # Case assignee
+                creator_user = case.user_id  # Case creator
+                supervisors = [case.supervisor_one_id]
+                if case.supervisor_two_id:
+                    supervisors.append(case.supervisor_two_id)
+                if case.supervisor_three_id:
+                    supervisors.append(case.supervisor_three_id)
+                
+                # Primary recipient - case assignee (staff)
+                primary_email = staff_user.email if staff_user else ''
+                
+                # CC list - creator and supervisors
+                cc_emails = []
+                if creator_user and creator_user.email:
+                    cc_emails.append(creator_user.email)
+                for supervisor in supervisors:
+                    if supervisor and supervisor.email:
+                        cc_emails.append(supervisor.email)
+                
+                # Skip if no recipients
+                if not primary_email and not cc_emails:
+                    _logger.warning(f"No recipients found for overdue case {case.id}")
+                    failed_notifications += 1
+                    continue
+                
+                # Prepare mail values
+                mail_values = {
+                    'email_to': primary_email,
+                    'email_cc': ','.join(cc_emails),
+                    'email_from': default_email_from,
+                }
+                
+                # Extract case information for template context
+                alert_id = case._generate_alert_id() if hasattr(case, '_generate_alert_id') else f"OVERDUE-{case.id}"
+                event_date = case.event_date
+                alert_name = case.name
+                case_ref = case.case_ref
+                
+                # Extract severity level from alert_name
+                severity_level = ''
+                if alert_name:
+                    if 'Low' in alert_name:
+                        severity_level = 'Low'
+                    elif 'Medium' in alert_name:
+                        severity_level = 'Medium'
+                    elif 'High' in alert_name:
+                        severity_level = 'High'
+                
+                title = case.cases_description
+                rating_name = case.rating_id.name if case.rating_id else ''
+                staff_dept = case.team_id.name if case.team_id else ''
+                status_name = case.status_name.capitalize() if hasattr(case, 'status_name') else 'Open'
+                exception_process = case.new_process_id.name if case.new_process_id else ''
+                process_type = case.new_process_id.name if case.new_process_id else ''
+                process_category = case.new_process_category_id.name if case.new_process_category_id else ''
+                case_action = case.cases_action
+                description = case.further_description
+                response_link = f'/web#id={case.id}&model=case&view_type=form'
+                
+                # Calculate how long the case has been overdue
+                deadline_delta = config.get_deadline_timedelta()
+                case_created = case.created_at or case.create_date
+                expected_completion = case_created + deadline_delta
+                overdue_duration = fields.Datetime.now() - expected_completion
+                
+                # Format overdue duration
+                overdue_days = overdue_duration.days
+                overdue_hours = overdue_duration.seconds // 3600
+                if overdue_days > 0:
+                    overdue_text = f"{overdue_days} day(s) and {overdue_hours} hour(s)"
+                else:
+                    overdue_text = f"{overdue_hours} hour(s)"
+                
+                # Context for email template
+                ctx = {
+                    'event_date': event_date,
+                    'alert_id': alert_id,
+                    'case_ref': case_ref,
+                    'severity_level': severity_level,
+                    'title': title,
+                    'rating_name': rating_name,
+                    'staff_dept': staff_dept,
+                    'status_name': status_name,
+                    'exception_process': exception_process,
+                    'process_type': process_type,
+                    'process_category': process_category,
+                    'case_action': case_action,
+                    'description': description,
+                    'response_link': response_link,
+                    'creator_user_name': creator_user.name if creator_user else '',
+                    'creator_user_email': creator_user.email if creator_user else '',
+                    'staff_user_name': staff_user.name if staff_user else '',
+                    'deadline_config': f"{config.deadline_value} {config.deadline_unit}",
+                    'overdue_duration': overdue_text,
+                    'expected_completion': expected_completion.strftime('%Y-%m-%d %H:%M:%S'),
+                    'case_url': response_link,
+                }
+                
+                _logger.info(f"Sending overdue notification for case {case.id} to {primary_email}")
+                
+                # Use the template with the context
+                template_id = template.with_context(**ctx)
+                
+                # Send the email
+                email_result = template_id.send_mail(
+                    case.id,
+                    force_send=True,
+                    raise_exception=True,
+                    email_values=mail_values
+                )
+                
+                # Check if the email was sent successfully
+                mail = self.env['mail.mail'].browse(email_result)
+                if mail.state == 'sent':
+                    _logger.info(f"Overdue notification sent successfully for case {case.id}")
+                    successful_notifications += 1
+                    
+                    # Add a note to the case's chatter
+                    case.message_post(
+                        body=f"Overdue notification sent to {primary_email}" + 
+                            (f" (CC: {', '.join(cc_emails)})" if cc_emails else ""),
+                        message_type='notification',
+                        subtype_xmlid='mail.mt_note'
+                    )
+                else:
+                    _logger.warning(f"Failed to send overdue notification for case {case.id}")
+                    failed_notifications += 1
+                    
+            except Exception as e:
+                _logger.error(f"Error sending overdue notification for case {case.id}: {str(e)}")
+                failed_notifications += 1
+                continue
+        
+        _logger.info(f"Overdue notifications completed. Success: {successful_notifications}, Failed: {failed_notifications}")
+        return successful_notifications > 0
+            
+
+    # @api.model
+    # def cron_check_overdue_cases(self):
+    #     _logger.info("Running cron_check_overdue_cases...")
+        
+    #     # Make sure we're operating on the correct model
+    #     case_model = self.env['case']  # Ensure we're using the right model name
+        
+    #     # Check available statuses
+    #     status_records = self.env['case.status'].search([])
+    #     _logger.info(f"Available statuses: {status_records.mapped('name')}")
+        
+    #     # Find the overdue status
+    #     overdue_status = self.env['case.status'].search([('name', '=', 'overdue')], limit=1)
+    #     if not overdue_status:
+    #         _logger.warning("Overdue status not found!")
+    #         return
+        
+    #     # Find the open status to verify it exists
+    #     open_status = self.env['case.status'].search([('name', '=', 'open')], limit=1)
+    #     if not open_status:
+    #         _logger.warning("Open status not found! Check the exact status name.")
+    #         return
+        
+    #     deadline = fields.Datetime.now() - timedelta(hours=48)
+        
+    #     # Search for cases with the confirmed open status
+    #     open_cases = case_model.search([
+    #         ('status_id', '=', open_status.id),  # Use the ID instead of the name
+    #         ('created_at', '<=', deadline)
+    #     ])
+        
+    #     _logger.info(f"Found {len(open_cases)} open cases past deadline.")
+        
+    #     if open_cases:
+    #         try:
+    #             open_cases.write({'status_id': overdue_status.id})
+    #             _logger.info(f"Overdue status applied to cases: {open_cases.ids}")
+    #         except Exception as e:
+    #             _logger.error(f"Failed to update cases: {str(e)}")
+    #     else:
+    #         _logger.info("No cases to update.")
         
     
     

@@ -19,6 +19,13 @@
         <menuitem id="menu_case_dashboard" name="Case"
                   parent="menu_case_mgt" sequence="10" />
 
+        <menuitem 
+                id="case_configuration_menu"
+                name="Configuration"
+                parent="menu_case_mgt"
+                action="case_configuration_action"
+                sequence="11"/>
+
         <!-- <menuitem id="menu_case" name="Cases"
                   parent="menu_case_mgt" sequence="11" /> -->
 

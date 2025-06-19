@@ -9,6 +9,7 @@
                     <button name="action_go_home" 
                         string="Exit" 
                         type="button"
+                        attrs="{'invisible': [('id', '!=', False)]}"
                         class="btn-primary"
                         special="cancel"
                         onclick="
@@ -64,9 +65,23 @@
                     
                     <div class="oe_title">
                         <h1 class="text-success">CASE MANAGER</h1>
+
+                        <field name="deadline_message" invisible="1"/>
+
+                        <xpath expr="//sheet" position="before">
+                            <div class="alert alert-info" role="alert">
+                                <field name="deadline_message" nolabel="1" readonly="1"/>
+                            </div>
+                        </xpath>
+
+
+                        <!-- <div class="alert alert-info" role="alert">
+                            <t t-esc="record.deadline_message"/>
+                        </div>
+
                         <div class="alert alert-info" role="alert">
                             All cases opened must be closed within 48 hours!!!
-                        </div>
+                        </div> -->
                         <!-- <h1>
                             <field name="name" readonly="1"/>
                         </h1> -->
