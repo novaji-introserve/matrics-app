@@ -4,14 +4,6 @@
        
 
 
-        <!-- Actions for Blacklist-->
-        <!-- <record id="action_res_partner_blacklist" model="ir.actions.act_window">
-            <field name="name">Black List</field>
-            <field name="res_model">res.partner.blacklist</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[]</field>
-        </record> -->
-
         <!-- Actions for CSV Import -->
         <record id="action_csv_import" model="ir.actions.client">
             <field name="name">CSV Import</field>

@@ -18,7 +18,7 @@
     "version": "0.3",
     # any module necessary for this one to work correctly
     
-    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification', 'project',
+    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification','project',
         'mass_mailing',
         'utm',
         'contacts',
@@ -48,6 +48,8 @@
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
         'data/email_templates/case_alert_template.xml',
+        "data/email_templates/customer_screening_template.xml",
+
 
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
@@ -97,10 +99,11 @@
         "views/transaction_screening_rule.xml",
         "data/transaction_type.xml",
         'data/transaction_screening_rule.xml',
-        "data/demo_data/chart/charts.xml", #CHARTS
-        "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
-        "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
-        "data/transactions.xml", # TRANSACTION
+        # "data/demo_data/sanction/sanction_screening.xml", # SANCTION SCREENING DATA
+        # "data/demo_data/chart/charts.xml", #CHARTS
+        # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
+        # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
+        # "data/transactions.xml", # TRANSACTION
         "views/res_users.xml",
         "views/peplist.xml",
         'data/gender.xml',
@@ -110,8 +113,8 @@
         'data/demo_data/plan/risk_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
-        'data/watchlist.xml',
         'data/blacklist.xml',
+        "views/customer_screening.xml",
         "views/menu_actions.xml",
 
     ],

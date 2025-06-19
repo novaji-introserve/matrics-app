@@ -28,6 +28,8 @@ class Watchlist(models.Model):
     def init(self):
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_watchlist_id_idx ON res_partner_watchlist (id)")
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_watchlist_bvn_idx  ON res_partner_watchlist(bvn)           ")
         self.env.cr.execute("""
             ALTER TABLE res_partner_watchlist
             DROP CONSTRAINT IF EXISTS res_partner_watchlist_watchlist_id

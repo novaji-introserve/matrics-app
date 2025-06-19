@@ -19,3 +19,16 @@ class PepCustomer(models.Model):
     unique_id = fields.Char(string='Unique Identifier', tracking=True,
                             default=lambda self: str(uuid.uuid4()), readonly=True,  copy=False)
     position = fields.Text(string='Position', tracking=True)
+    
+    def init(self):
+        # Add performance-critical indexes for large datasets
+        self.env.cr.execute("""
+            CREATE INDEX IF NOT EXISTS pep_list_name_normalized_idx 
+            ON pep_list (LOWER(REPLACE(name, ' ', '')));
+            
+            CREATE INDEX IF NOT EXISTS pep_list_firstname_lastname_idx 
+            ON pep_list (LOWER(REPLACE(firstname, ' ', '')), LOWER(REPLACE(lastname, ' ', '')));          
+           
+        """)
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS pep_list_id_idx ON pep_list (id)")
