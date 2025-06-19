@@ -1209,7 +1209,7 @@ class CSVProcessor:
                         odoo_error = %s
                     WHERE {quoted_field} IS NOT NULL
                     AND {quoted_field}::text != ''
-                    AND {quoted_field}::text !~ '^-?[0-9]*\.?[0-9]*$'
+                    AND {quoted_field}::text !~ r'^-?[0-9]*\.[0-9]*$|^-?[0-9]+$'
                     AND odoo_status = 'pending'
                     RETURNING tmp_id
                 """, (error_msg,))
