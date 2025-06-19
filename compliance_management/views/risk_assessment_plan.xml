@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Risk Assessment Plan Report -->
+    <!-- Risk Analysis Report -->
     <record id="compliance_risk_assessment_plan_tree" model="ir.ui.view">
         <field name="name">compliance_risk_assessment_plan_tree</field>
         <field name="model">res.compliance.risk.assessment.plan</field>
         <field name="arch" type="xml">
-            <tree string="Risk Assessment Plan">
+            <tree string="Risk Analysis">
                 <field name="name" />
                 <field name="priority"/>
-                <field name="risk_score" />
+                <field name="risk_assessment"/>
+                <field name="risk_assessment_score"/>
+                <field name="risk_score" string="Static Risk Score" />
                 <field name="create_uid" />
                 <field name="create_date" />
             </tree>
@@ -16,25 +18,16 @@
     </record>
     <!-- Risk Assessment Form -->
     <record id="compliance_risk_assessment_plan_form" model="ir.ui.view">
-        <field name="name">Risk Assessment Plan</field>
+        <field name="name">Risk Analysis</field>
         <field name="model">res.compliance.risk.assessment.plan</field>
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_activate" class="oe_highlight" type="object"
-                        string="Activate Plan"
-                        groups="compliance_management.group_compliance_compliance_risk_manager"
-                        confirm="Activate this Plan. Are you sure?"
-                        attrs="{'invisible': [('state', 'not in',['draft','inactive'])]}" />
-                    <button name="action_deactivate" type="object"
-                        string="Deactivate Plan"
-                        groups="compliance_management.group_compliance_branch_compliance_officer"
-                        confirm="Deactivate this Plan. Are you sure?"
-                        attrs="{'invisible': [('state','not in',['active','draft'])]}" />
-                    <field name="state" widget="statusbar" statusbar_visible="draft,active,inactive"
-                        clickable="True" />
+                    <button name="action_activate" class="oe_highlight" type="object" string="Activate Plan" groups="compliance_management.group_compliance_compliance_risk_manager" confirm="Activate this Plan. Are you sure?" attrs="{'invisible': [('state', 'not in',['draft','inactive'])]}" />
+                    <button name="action_deactivate" type="object" string="Deactivate Plan" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Deactivate this Plan. Are you sure?" attrs="{'invisible': [('state','not in',['active','draft'])]}" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,inactive" clickable="True" />
                 </header>
-                <sheet string="Risk Assessment Plan">
+                <sheet string="Risk Analysis">
 
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" />
@@ -44,7 +37,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="risk_score" widget="slider" step="1" min="1" max="9"/>
+                            <field name="risk_assessment" nocreate="True" noedit="True" />
+                            <field name="risk_score" widget="slider" step="1" min="1" max="eval()"/>
                         </group>
                         <group>
                             <field name="compute_score_from" />
@@ -57,48 +51,35 @@
                         <group>
                             <field name="priority" />
                         </group>
+                        <group>
+                            <field name="use_composite_calculation" widget="boolean_toggle"/>
+                        </group>
+                        
+                        <group attrs="{'required': [('use_composite_calculation', '=', True)], 'invisible': [('use_composite_calculation', '=', False)]}">
+                            <field name="universe_id" attrs="{'required': [('use_composite_calculation', '=', True)], 'invisible': [('use_composite_calculation', '=', False)]}"/>
+                        </group>
                     </group>
                     <notebook colspan="4">
                         <page name='plan_query' string="Plan SQL Query" autofocus="autofocus">
-                            <field name="sql_query"
-                                placeholder="SQL Query returning a single value..." />
+                            <field name="sql_query" placeholder="SQL Query returning a single value..." />
                         </page>
                         <page name='internal_notes' string="Internal Notes">
                             <field name="narration" placeholder="Narration..." />
                         </page>
                     </notebook>
-                </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" />
-                    <field name="activity_ids" />
-                    <field name="message_ids" />
-                </div>
-            </form>
-        </field>
-    </record>
-    <!-- Action -->
-    <record id="action_list_risk_assessment_plan" model="ir.actions.act_window">
-        <field name="name">Risk Assessment Plan</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.compliance.risk.assessment.plan</field>
-        <field name="view_id" ref="compliance_risk_assessment_plan_tree" />
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Add a Risk Assessment Plan
-            </p>
-            <p>
-                No records yet
-            </p>
-        </field>
-    </record>
-    <!-- Menu -->
-    <menuitem
-        id="menu_compliance_risk_assessment_plan"
-        action="action_list_risk_assessment_plan"
-        parent="menu_risk_assessment"
-        name="Risk Plan"
-        groups="group_compliance_compliance_risk_manager"
-        sequence="100" />
+                    <div class="alert alert-info" role="alert" name="sql_tips">
+                Customer ID will be replaced with the %s placeholder value and used to evaluate for each customer. The query result will be returned as the risk score<br/>
+                Example SQL Query to give all customers without BVN a risk score: <br/>
+                <code>SELECT 17 FROM res_partner WHERE id = %s AND bvn IS NULL</code>
+            </div>
+        </sheet>
+        <div class="oe_chatter">
+            <field name="message_follower_ids" />
+            <field name="activity_ids" />
+            <field name="message_ids" />
+        </div>
+    </form>
+</field>
+</record>
 
 </odoo>

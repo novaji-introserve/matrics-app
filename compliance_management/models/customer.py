@@ -1,7 +1,8 @@
 
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, api
+from odoo import models, fields, api, _, tools
 from psycopg2 import ProgrammingError
 import logging
 from dotenv import load_dotenv
@@ -10,15 +11,22 @@ import os
 from datetime import timedelta, datetime
 import pytz
 from dateutil.relativedelta import relativedelta
+from odoo.exceptions import UserError, AccessError
+from psycopg2.extras import execute_values
+import time
+from datetime import datetime, timedelta
+
+
 
 
 load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
-LOW_RISK_THRESHOLD = 3
-MEDIUM_RISK_THRESHOLD = 6
-HIGH_RISK_THRESHOLD = 9
+# LOW_RISK_THRESHOLD = 10
+# MEDIUM_RISK_THRESHOLD =  15
+# HIGH_RISK_THRESHOLD =  16
+
 
 
 class Shareholders(models.Model):
@@ -37,7 +45,7 @@ class Shareholders(models.Model):
 
 class PartnerRiskPlanLines(models.Model):
     _name = "res.partner.risk.plan.line"
-    _description = "Partner Risk Plan Lines"
+    _description = "Partner Risk Analysis Lines"
     partner_id = fields.Many2one(
         'res.partner', string='Partner', ondelete="cascade", index=True)
     plan_line_id = fields.Many2one(
@@ -119,7 +127,7 @@ class Customer(models.Model):
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
     risk_plan_line_ids = fields.One2many(
-        comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Assessment Plan')
+        comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Analysis Lines', tracking=True)
     risk_assessment_ids = fields.One2many(
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
     is_pep = fields.Boolean(
@@ -160,7 +168,7 @@ class Customer(models.Model):
     employment_status = fields.Char(
         string="Employment Status", required=False, readonly=True)
     state_residence = fields.Char(
-        string="Region", required=False, readonly=True)
+        string="State Residence", required=False, readonly=True)
     nin = fields.Char(
         string="National Identification Number (NIN)", index=True, required=False, readonly=True)
     customer_rating = fields.Char(
@@ -184,29 +192,654 @@ class Customer(models.Model):
     likely_sanction = fields.Boolean(string='Is Sanctioned',tracking=True)
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code", index=True)
-
-    ussd = fields.Char(string='Uses USSD',
-                       compute='_compute_digital_products', index=True)
-    onebank = fields.Char(string='Uses One Bank',
-                          compute='_compute_digital_products')
-    carded_customer = fields.Char(
-        string='Has A Card', compute='_compute_digital_products')
-    alt_bank = fields.Char(string='Is On Alt Bank',
-                           compute='_compute_digital_products')
-    sterling_pro = fields.Char(
-        string='Has Sterling Pro', compute='_compute_digital_products')
-    banca = fields.Char(string='Has Banca',
-                        compute='_compute_digital_products')
-    doubble = fields.Char(string='Has Doubble',
-                          compute='_compute_digital_products')
-    specta = fields.Char(string='Has Specta',
-                         compute='_compute_digital_products')
-    switch = fields.Char(string='Has Switch',
-                         compute='_compute_digital_products')
-    customer_segment = fields.Char(
-        string='Customer Segment', compute='_compute_digital_products')
    
     formatted_gender=fields.Char(string='Gender', compute='_compute_gender')
+    
+    digital_product_view_ids = fields.One2many(
+        'res.partner.digital.product.view', 'partner_id', 
+        string='Digital Products', readonly=True, auto_join=True)
+    
+    channel_subscription_ids = fields.One2many(
+        'customer.channel.subscription', 'partner_id',
+        string='Channel Subscriptions', readonly=True)
+    
+    composite_risk_score = fields.Float(
+        string='Composite Risk Score', digits=(10, 2))
+    
+    last_risk_calculation = fields.Datetime(string='Last Risk Calculation', readonly=True,
+                                            help="When the risk score was last calculated")
+    
+    universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
+                                          string='Universe Weights')
+    
+
+    show_create_case_button = fields.Boolean(
+        string="Case Management Installed",
+        compute='_compute_is_case_management_installed',
+        store=False,
+    )
+    
+    screening_ids = fields.One2many(
+        'res.partner.screening.result', 'partner_id',
+        string='Screening Results', domain=[('active', '=', True)])
+    last_screening_date = fields.Datetime(
+        string='Last Screening Date', readonly=True)
+    likely_pep_match_id = fields.Many2one(
+        'pep.list', string='Likely PEP Match')
+    likely_watchlist_match_id = fields.Many2one(
+        'res.partner.watchlist', string='Likely Watchlist Match')
+    likely_sanction_match_id = fields.Many2one(
+        'sanction.list', string='Likely Sanction Match')
+    likely_global_pep_match_id = fields.Many2one(
+        'res.pep', string='Likely Global PEP Match')
+    screening_needed = fields.Boolean(
+        string='Screening Needed',
+        help="Flag to indicate if customer needs screening")
+    
+
+
+    def action_view_screening_results(self):
+        """View screening results for this customer"""
+        self.ensure_one()
+        return {
+            'name': _('Screening Results'),
+            'view_mode': 'tree,form',
+            'res_model': 'res.partner.screening.result',
+            'domain': [('partner_id', '=', self.id), ('active', '=', True)],
+            'type': 'ir.actions.act_window',
+            'context': {'default_partner_id': self.id}
+        }
+
+    # def action_screen_customer(self):
+    #     """Screen customer against all lists"""
+    #     self.ensure_one()
+    #     screening = self.env['res.partner.screening.result']
+    #     result = screening.screen_customer(self.id)
+
+    #     # Show appropriate message
+    #     if result:
+    #         return {
+    #             'type': 'ir.actions.client',
+    #             'tag': 'display_notification',
+    #             'params': {
+    #                 'title': _('Screening Complete'),
+    #                 'message': _('Potential matches found. Compliance officers have been notified.'),
+    #                 'type': 'warning',
+    #                 'sticky': False,
+    #             }
+    #         }
+    #     else:
+    #         return {
+    #             'type': 'ir.actions.client',
+    #             'tag': 'display_notification',
+    #             'params': {
+    #                 'title': _('Screening Complete'),
+    #                 'message': _('No matches found.'),
+    #                 'type': 'success',
+    #                 'sticky': False,
+    #             }
+    #         }
+            
+    def action_screen_customer(self):
+        """Screen customer against all lists"""
+        self.ensure_one()
+        screening = self.env['res.partner.screening.result']
+        result = screening.screen_customer(self.id)
+
+        # Show appropriate message based on screening result and email status
+        if result:
+            # result is now a dict with 'matches_found' and 'email_sent' keys
+            if result.get('email_sent', False):
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Screening Complete'),
+                        'message': _('Potential matches found. Compliance officers have been notified via email.'),
+                        'type': 'warning',
+                        'sticky': True,
+                    }
+                }
+            else:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Screening Complete'),
+                        'message': _('Potential matches found, but email notification failed. Please check system logs'),
+                        'type': 'danger',
+                        'sticky': True,  # Make it sticky so user notices the email failure
+                    }
+                }
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Screening Complete'),
+                    'message': _('No matches found.'),
+                    'type': 'success',
+                    'sticky': True,
+                }
+            }
+
+    @api.depends('registration_date')  
+    def _compute_is_case_management_installed(self):
+        case_management_installed = bool(self.env['ir.module.module'].search([
+            ('name', '=', 'case_management'),
+            ('state', '=', 'installed')
+        ], limit=1))
+        
+        for record in self:
+            record.show_create_case_button = case_management_installed
+
+
+
+    def _get_risk_score_from_plan(self):
+        """
+        Modified method to calculate both normal and composite risk scores
+        """
+        setting = self.env['res.compliance.settings'].search(
+            [('code', '=', 'risk_plan_computation')], limit=1)
+
+        # Default value if no settings found
+        plan_setting = 'max'  # Default to 'max'
+        for e in setting:
+            plan_setting = e.val
+
+        record_id = self.id
+        self.env["res.partner.risk.plan.line"].search(
+            [('partner_id', '=', record_id)]).unlink()
+        scores = []
+
+        # First, check if we need to calculate composite score
+        # We'll identify plans that should contribute to composite calculation
+        composite_plans = self.env['res.compliance.risk.assessment.plan'].search([
+            ('state', '=', 'active'),
+            ('use_composite_calculation', '=', True),
+            ('compute_score_from', '=', 'risk_assessment')
+        ])
+
+        # Get IDs of composite plans to exclude from regular calculation
+        composite_plan_ids = composite_plans.ids
+
+        if composite_plans:
+            # Calculate composite score
+            composite_score = self._calculate_composite_score(composite_plans)
+            # Store composite score directly
+            self.composite_risk_score = composite_score
+
+        # Now process regular risk plans, excluding those used for composite calculation
+        plans = self.env['res.compliance.risk.assessment.plan'].search([
+            ('state', '=', 'active'),
+            ('id', 'not in', composite_plan_ids),  # Exclude composite plans
+        ], order='priority')
+
+        if plans:
+            for pl in plans:
+                score = 0
+                try:
+                    self.env.cr.execute(pl.sql_query, (record_id,))
+                    rec = self.env.cr.fetchone()
+                    if rec is not None:
+                        # we have a hit
+                        if pl.compute_score_from == 'dynamic':
+                            score = float(
+                                rec[0]) if rec is not None else pl.risk_score
+                        if pl.compute_score_from == 'static':
+                            score = pl.risk_score
+                        if pl.compute_score_from == 'risk_assessment':
+                            score = pl.risk_assessment.risk_rating if pl.risk_assessment is not None else pl.risk_score
+                    scores.append(score)
+                    line_id = self.env['res.partner.risk.plan.line'].create({
+                        'partner_id': record_id,
+                        'plan_line_id': pl.id,
+                        'risk_score': score,
+                    })
+                except Exception as e:
+                    _logger.error(
+                        f"Error executing risk plan {pl.name}: {str(e)}")
+                    pass
+
+        records = None
+
+        if len(scores) > 0:
+            if plan_setting == 'avg':
+                self.env.cr.execute(
+                    f"select avg(risk_score) from res_partner_risk_plan_line where partner_id={record_id} and risk_score > 0")
+            elif plan_setting == 'max':
+                self.env.cr.execute(
+                    f"select max(risk_score) from res_partner_risk_plan_line where partner_id={record_id}")
+            elif plan_setting == 'sum':
+                self.env.cr.execute(
+                    f"select sum(risk_score) from res_partner_risk_plan_line where partner_id={record_id} and risk_score > 0")
+            else:
+                # Default to max if the setting isn't recognized
+                self.env.cr.execute(
+                    f"select max(risk_score) from res_partner_risk_plan_line where partner_id={record_id} ")
+
+            records = self.env.cr.fetchone()
+
+        # Ensure records is not None before returning
+        """
+        - Priority is Risk Assessment > EDD > Risk Plan
+        """
+        risk_assessments = self.env['res.risk.assessment'].search(
+            [('partner_id', '=', record_id)], order='create_date desc', limit=1)
+        if risk_assessments:
+            for r in risk_assessments:
+                if r.risk_rating:
+                    # Store the risk score directly
+                    self.risk_score = r.risk_rating
+                    return r.risk_rating
+        approved_edd = self.env['res.partner.edd'].search(
+            [('status', '=', 'approved'), ('customer_id', '=', record_id)], order='date_approved desc', limit=1)
+        for edd in approved_edd:
+            if edd.risk_score:
+                # Store the risk score directly
+                self.risk_score = edd.risk_score
+                return edd.risk_score
+        # Use risk analysis
+        risk_score = records[0] if records is not None else 0.00
+        # Store the risk score directly
+        self.risk_score = risk_score
+        return risk_score
+    
+    def calculate_risk_batch(self, batch_size=1000):
+        """
+        Optimized method to calculate risk for the current recordset in batches
+        Returns the number of customers processed
+        """
+        start_time = time.time()
+        total_processed = 0
+
+        # Process in batches to avoid memory issues
+        for i in range(0, len(self), batch_size):
+            batch = self[i:i+batch_size]
+            self._calculate_risk_batch_internal(batch)
+            total_processed += len(batch)
+            _logger.info(
+                f"Processed batch {i//batch_size + 1}, total {total_processed} customers")
+            # Commit transaction to release memory
+            self.env.cr.commit()
+
+        end_time = time.time()
+        _logger.info(
+            f"Total processing time for {total_processed} customers: {end_time - start_time:.2f} seconds")
+        return total_processed
+
+    def _calculate_risk_batch_internal(self, batch):
+        """Internal method to process a batch of customers"""
+        if not batch:
+            return
+
+        # Get all the configuration we need up front
+        setting = self.env['res.compliance.settings'].search(
+            [('code', '=', 'risk_plan_computation')], limit=1)
+        plan_setting = setting.val if setting else 'max'
+
+        record_ids = batch.ids
+        timestamp = fields.Datetime.now()
+
+        # 1. Clear existing risk plan lines in bulk
+        if record_ids:
+            self.env.cr.execute(
+                "DELETE FROM res_partner_risk_plan_line WHERE partner_id IN %s",
+                (tuple(record_ids),)
+            )
+
+        # 2. Get all active risk plans in one query
+        plans = self.env['res.compliance.risk.assessment.plan'].search(
+            [('state', '=', 'active')], order='priority')
+
+        # 3. Process composite plans - get them all at once
+        composite_plans = plans.filtered(
+            lambda p: p.use_composite_calculation and p.compute_score_from == 'risk_assessment')
+
+        # 4. Prepare data for bulk insert of risk plan lines
+        risk_line_values = []
+        score_data = {rec_id: [] for rec_id in record_ids}
+
+        # 5. Execute all plans for all customers in a more efficient way
+        for plan in plans:
+            try:
+                # Create a modified query that works for multiple customer IDs
+                base_query = plan.sql_query
+                # If the original query has a WHERE clause, we need to adapt it
+                if "WHERE" in base_query.upper():
+                    # Replace the parameter placeholder with a value for IN clause
+                    batch_query = base_query.replace(
+                        "(%s)", f"IN {tuple(record_ids)}")
+                else:
+                    # Add a WHERE clause for the parameter
+                    batch_query = base_query + \
+                        f" WHERE partner_id IN {tuple(record_ids)}"
+
+                self.env.cr.execute(batch_query)
+                results = self.env.cr.fetchall()
+
+                # Map results to customer IDs - this depends on your query structure
+                # Assuming query returns (customer_id, score) or just (score) for one customer
+                if results:
+                    if len(results[0]) > 1:  # If query returns customer_id and score
+                        for res in results:
+                            cust_id = res[0]
+                            score_val = res[1] if res[1] is not None else plan.risk_score
+                            if cust_id in score_data:
+                                score_data[cust_id].append(score_val)
+                                risk_line_values.append({
+                                    'partner_id': cust_id,
+                                    'plan_line_id': plan.id,
+                                    'risk_score': score_val,
+                                })
+                    else:  # If query returns just a score for the single customer in WHERE clause
+                        # For single customer query case
+                        if len(record_ids) == 1:
+                            cust_id = record_ids[0]
+                            score_val = results[0][0] if results[0][0] is not None else plan.risk_score
+                            score_data[cust_id].append(score_val)
+                            risk_line_values.append({
+                                'partner_id': cust_id,
+                                'plan_line_id': plan.id,
+                                'risk_score': score_val,
+                            })
+            except Exception as e:
+                _logger.error(
+                    f"Error executing batch risk plan {plan.name}: {str(e)}")
+                continue
+
+        # 6. Bulk insert risk plan lines
+        if risk_line_values:
+            self._bulk_create_risk_plan_lines(risk_line_values)
+
+        # 7. Calculate final scores for all customers in batch
+        final_scores = {}
+        composite_scores = {}
+
+        # Calculate risk scores based on plan setting
+        for cust_id, scores in score_data.items():
+            if not scores:
+                continue
+
+            if plan_setting == 'avg':
+                # Filter out zeros to match original behavior
+                non_zero_scores = [s for s in scores if s > 0]
+                if non_zero_scores:
+                    final_scores[cust_id] = sum(
+                        non_zero_scores) / len(non_zero_scores)
+            elif plan_setting == 'max':
+                final_scores[cust_id] = max(scores) if scores else 0
+            elif plan_setting == 'sum':
+                # Filter out zeros to match original behavior
+                non_zero_scores = [s for s in scores if s > 0]
+                final_scores[cust_id] = sum(non_zero_scores)
+            else:
+                # Default to avg
+                non_zero_scores = [s for s in scores if s > 0]
+                if non_zero_scores:
+                    final_scores[cust_id] = sum(
+                        non_zero_scores) / len(non_zero_scores)
+
+        # 8. Calculate composite scores for customers in batch
+        if composite_plans:
+            composite_scores = self._calculate_composite_scores_batch(
+                batch, composite_plans)
+
+        # 9. Apply priority logic (Risk Assessment > EDD > Risk Plan)
+        # Get all relevant risk assessments in one query
+        risk_assessments = self.env['res.risk.assessment'].search([
+            ('partner_id', 'in', record_ids),
+        ], order='create_date desc')
+
+        # Group by partner_id to get the most recent for each
+        grouped_assessments = {}
+        for ra in risk_assessments:
+            if ra.partner_id.id not in grouped_assessments and ra.risk_rating:
+                grouped_assessments[ra.partner_id.id] = ra.risk_rating
+
+        # Get all relevant EDDs in one query
+        edds = self.env['res.partner.edd'].search([
+            ('status', '=', 'approved'),
+            ('customer_id', 'in', record_ids),
+        ], order='date_approved desc')
+
+        # Group by customer_id to get the most recent for each
+        grouped_edds = {}
+        for edd in edds:
+            if edd.customer_id not in grouped_edds and edd.risk_score:
+                grouped_edds[edd.customer_id] = edd.risk_score
+
+        # 10. Prepare values for bulk update
+        update_values = []
+        for cust_id in record_ids:
+            # Priority: Risk Assessment > EDD > Risk Plan
+            if cust_id in grouped_assessments:
+                risk_score = grouped_assessments[cust_id]
+            elif cust_id in grouped_edds:
+                risk_score = grouped_edds[cust_id]
+            elif cust_id in final_scores:
+                risk_score = final_scores[cust_id]
+            else:
+                risk_score = 0.0
+
+            composite_score = composite_scores.get(cust_id, 0.0)
+
+            update_values.append({
+                'id': cust_id,
+                'risk_score': risk_score,
+                'composite_risk_score': composite_score,
+                'last_risk_calculation': timestamp,
+            })
+
+        # 11. Bulk update customer risk scores
+        if update_values:
+            self._bulk_update_risk_scores(update_values)
+
+    def _bulk_create_risk_plan_lines(self, values_list):
+        """Efficiently create risk plan lines in bulk"""
+        if not values_list:
+            return
+
+        # Prepare columns and values for execute_values
+        columns = ['partner_id', 'plan_line_id', 'risk_score']
+        vals = [(v['partner_id'], v['plan_line_id'], v['risk_score'])
+                for v in values_list]
+
+        query = """
+            INSERT INTO res_partner_risk_plan_line
+            (partner_id, plan_line_id, risk_score, create_uid, create_date, write_uid, write_date)
+            VALUES %s
+        """
+
+        # Add create/write user and timestamps
+        uid = self.env.user.id
+        timestamp = datetime.now()
+        vals = [(v[0], v[1], v[2], uid, timestamp, uid, timestamp)
+                for v in vals]
+
+        # Execute the bulk insert
+        execute_values(self.env.cr, query, vals, template=None, page_size=1000)
+
+    def _bulk_update_risk_scores(self, values_list):
+        """Efficiently update customer risk scores in bulk"""
+        if not values_list:
+            return
+
+        # Group updates in batches of 1000 to avoid query size limits
+        batch_size = 1000
+        for i in range(0, len(values_list), batch_size):
+            batch = values_list[i:i+batch_size]
+
+            # Build CASE statements for each field
+            case_risk_score = " ".join([
+                f"WHEN id = {v['id']} THEN {v['risk_score']}" for v in batch
+            ])
+
+            case_composite_score = " ".join([
+                f"WHEN id = {v['id']} THEN {v['composite_risk_score']}" for v in batch
+            ])
+
+            # Get all IDs for this batch
+            ids = [str(v['id']) for v in batch]
+
+            # Build and execute the update query
+            query = f"""
+                UPDATE res_partner
+                SET 
+                    risk_score = CASE {case_risk_score} ELSE risk_score END,
+                    composite_risk_score = CASE {case_composite_score} ELSE composite_risk_score END,
+                    last_risk_calculation = %s,
+                    write_uid = %s,
+                    write_date = %s
+                WHERE id IN ({','.join(ids)})
+            """
+
+            self.env.cr.execute(
+                query, (values_list[0]['last_risk_calculation'], self.env.user.id, fields.Datetime.now()))
+
+    def _calculate_composite_score(self, composite_plans):
+        """
+        Calculate composite risk score based on weighted risk universes
+        - Display ALL universes in the UI
+        - Only include universes with violations (universe_score > 0) in the CCR calculation
+        """
+        record_id = self.id
+        composite_score = 0.0
+
+        # Clear previous universe weights
+        self.env['res.partner.risk.universe.weight'].search(
+            [('partner_id', '=', record_id)]).unlink()
+
+        # Get all universes that are included in composite calculation and have weight > 0
+        universes = self.env['res.risk.universe'].search([
+            ('is_included_in_composite', '=', True),
+            ('weight_percentage', '>', 0)
+        ])
+
+        # Initialize dictionary to track all universes
+        all_universes = {}
+        for universe in universes:
+            all_universes[universe.id] = {
+                'universe': universe,
+                'score': 0.0,  # Default to 0
+                'assigned_score': 0.0,
+                'weight': universe.weight_percentage / 100.0,
+                'name': universe.name,
+                'assessment': None,
+                'subject': None
+            }
+
+        # Process all plans to find violations
+        for plan in composite_plans:
+            # Skip if universe doesn't exist, isn't included, or has no weight
+            if not plan.universe_id or not plan.universe_id.is_included_in_composite or plan.universe_id.weight_percentage <= 0:
+                continue
+
+            # Skip if risk assessment has empty/zero score
+            if not plan.risk_assessment or not plan.risk_assessment.risk_rating or plan.risk_assessment.risk_rating <= 0:
+                continue
+
+            universe_id = plan.universe_id.id
+
+            # Always set the assessment and subject
+            all_universes[universe_id]['assessment'] = plan.risk_assessment
+            all_universes[universe_id]['subject'] = plan.risk_assessment.subject_id
+            all_universes[universe_id]['assigned_score'] = plan.risk_assessment.risk_rating
+
+            # Only check for SQL hit if compute_score_from is risk_assessment
+            if plan.compute_score_from == 'risk_assessment':
+                # Check for SQL hit (violation)
+                try:
+                    self.env.cr.execute(plan.sql_query, (record_id,))
+                    rec = self.env.cr.fetchone()
+
+                    if rec is not None:  # SQL hit (violation)
+                        # Use the assigned score
+                        score = plan.risk_assessment.risk_rating
+
+                        # Update the universe score if this is higher than current score
+                        if score > all_universes[universe_id]['score']:
+                            all_universes[universe_id]['score'] = score
+
+                except Exception as e:
+                    _logger.error(
+                        f"Error checking for violations in plan {plan.name}: {str(e)}")
+                    continue
+
+        # Create records for ALL universes and calculate CCR using only those with violations
+        for universe_id, data in all_universes.items():
+            # Calculate weighted score
+            weighted_score = data['score'] * data['weight']
+
+            # Only add to CCR if there's a violation (score > 0)
+            if data['score'] > 0:
+                composite_score += weighted_score
+                _logger.info(
+                f"Universe {data['name']} : Score=0, "
+                f"Weight={data['weight']}, Weighted Score=0")
+
+
+            # Create weight record for ALL universes
+            self.env['res.partner.risk.universe.weight'].create({
+                'partner_id': record_id,
+                'universe_id': universe_id,
+                'weight_percentage': data['universe'].weight_percentage,
+                'universe_score': data['score'],  # Will be 0 for non-violations
+                'weighted_score': weighted_score,  # Will be 0 for non-violations
+                'assigned_score': data['assigned_score'],
+                'subject_id': data['subject'].id if data['subject'] else False,
+                'assessment_id': data['assessment'].id if data['assessment'] else False,
+            })
+            
+            _logger.info(f"Final CCR for customer {record_id}: {composite_score}")
+
+
+        return round(composite_score, 2)
+    
+    def action_sync_channels(self):
+        """Fast channel sync for individual customer"""
+        if not self.customer_id:
+            from odoo.exceptions import UserError
+            raise UserError("Customer ID is required for syncing channels")
+
+        self._cr.execute("""
+            INSERT INTO customer_channel_subscription (customer_id, partner_id, channel_id, value, last_updated)
+            SELECT %s, %s, dc.id, 'NO', NOW()
+            FROM digital_delivery_channel dc
+            WHERE dc.status = 'active'
+            AND NOT EXISTS (
+                SELECT 1 FROM customer_channel_subscription ccs
+                WHERE ccs.customer_id = %s AND ccs.channel_id = dc.id
+            )
+        """, (self.customer_id, self.id, self.customer_id))
+
+        created_count = self._cr.rowcount
+        self._cr.commit()
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Sync Complete',
+                'message': f'Customer synced - {created_count} new channels added',
+                'type': 'success',
+            }
+        }
+
+    def action_view_channels(self):
+        """Open customer channels view"""
+        return {
+            'name': f'Digital Channels - {self.name}',
+            'type': 'ir.actions.act_window',
+            'res_model': 'customer.channel.subscription',
+            'view_mode': 'tree,form',
+            'domain': [('partner_id', '=', self.id)],
+            'context': {
+                'default_customer_id': self.customer_id,
+                'default_partner_id': self.id,
+            }
+        }
+        
     
     @api.depends('gender')
     def _compute_gender(self):
@@ -579,6 +1212,8 @@ class Customer(models.Model):
             risk_level = record.compute_risk_level()
 
             # Use direct SQL update to avoid triggering write()
+            if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
+                score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
             self.env.cr.execute(
                 """UPDATE %s SET risk_score = %%s, risk_level = %%s 
                 WHERE id = %%s""" % self._table,
@@ -674,11 +1309,11 @@ class Customer(models.Model):
             try:
                 if record.risk_score is None:
                     return 'low'
-                if record.risk_score <= LOW_RISK_THRESHOLD:
+                if record.risk_score <=  float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                     return 'low'
-                if record.risk_score <= MEDIUM_RISK_THRESHOLD:
+                if record.risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                     return 'medium'
-                if record.risk_score <= HIGH_RISK_THRESHOLD:
+                else :
                     return 'high'
             except:
                 return 'low'
@@ -687,11 +1322,11 @@ class Customer(models.Model):
         try:
             if score is None:
                 return 'low'
-            if score <= LOW_RISK_THRESHOLD:
+            if score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                 return 'low'
-            if score <= MEDIUM_RISK_THRESHOLD:
+            if score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                 return 'medium'
-            if score <= HIGH_RISK_THRESHOLD:
+            else :
                 return 'high'
         except:
             return 'low'
@@ -701,11 +1336,11 @@ class Customer(models.Model):
         try:
             if risk_score is None:
                 return 'low'
-            if risk_score <= LOW_RISK_THRESHOLD:
+            if risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                 return 'low'
-            if risk_score <= MEDIUM_RISK_THRESHOLD:
+            if risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                 return 'medium'
-            if risk_score <= HIGH_RISK_THRESHOLD:
+            else:
                 return 'high'
         except:
             return 'low'
@@ -1039,18 +1674,18 @@ class Customer(models.Model):
     @api.depends('risk_score')
     def _compute_risk_level(self):
         for record in self:
-            if record.risk_score <= LOW_RISK_THRESHOLD:
+            if record.risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                 record.risk_level = "low"
-            elif record.risk_score <= MEDIUM_RISK_THRESHOLD:
+            elif record.risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                 record.risk_level = "medium"
             else:
                 record.risk_level = "high"
 
     @api.onchange('risk_score')
     def _onchange_risk_score(self):
-        if self.risk_score <= LOW_RISK_THRESHOLD:
+        if self.risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
             self.risk_level = "low"
-        elif self.risk_score <= MEDIUM_RISK_THRESHOLD:
+        elif self.risk_score <=  float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
             self.risk_level = "medium"
         else:
             self.risk_level = "high"
@@ -1083,6 +1718,9 @@ class Customer(models.Model):
                 if key not in groups:
                     groups[key] = self.env[self._name]
                 groups[key] |= record
+                
+                if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
+                    score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
 
             # Use ORM write for each group of records with same values
             for (score, risk_level), records in groups.items():
@@ -1112,6 +1750,10 @@ class Customer(models.Model):
             # Calculate the risk score and level
             score = record._get_risk_score_from_plan()
             risk_level = self.compute_customer_rating(score)
+            
+            if record.composite_risk_score and record.composite_risk_score >0:
+                composite_risk_score = record.composite_risk_score
+                score = composite_risk_score + score
 
             # Use ORM write method to update and track changes
             record.sudo().write({
@@ -1121,57 +1763,6 @@ class Customer(models.Model):
 
         return True
 
-    def _get_risk_score_from_plan(self):
-        setting = self.env['res.compliance.settings'].search(
-            [('code', '=', 'risk_plan_computation')], limit=1)
-
-        # Default value if no settings found
-        plan_setting = 'avg'  # Default to 'avg'
-        for e in setting:
-            plan_setting = e.val
-
-        record_id = self.id
-        self.env["res.partner.risk.plan.line"].search(
-            [('partner_id', '=', record_id)]).unlink()
-        scores = []
-        plans = self.env['res.compliance.risk.assessment.plan'].search(
-            [('state', '=', 'active')], order='priority')
-
-        if plans:
-            for pl in plans:
-                score = 0
-                try:
-                    self.env.cr.execute(pl.sql_query, (record_id,))
-                    rec = self.env.cr.fetchone()
-                    if rec is not None:
-                        # we have a hit
-                        if pl.compute_score_from == 'dynamic':
-                            score = float(rec[0]) if rec is not None else score
-                        if pl.compute_score_from == 'static':
-                            score = pl.risk_score
-                    scores.append(score)
-                    line_id = self.env['res.partner.risk.plan.line'].create({
-                        'partner_id': record_id,
-                        'plan_line_id': pl.id,
-                        'risk_score': score,
-                    })
-                except:
-                    pass
-
-        # Default value for records to avoid unbound variable error
-        records = None
-
-        if len(scores) > 0:
-            if plan_setting == 'avg':
-                self.env.cr.execute(
-                    f"select avg(risk_score) from res_partner_risk_plan_line where partner_id={record_id} and risk_score > 0")
-            if plan_setting == 'max':
-                self.env.cr.execute(
-                    f"select max(risk_score) from res_partner_risk_plan_line where partner_id={record_id}")
-            records = self.env.cr.fetchone()
-
-        # Ensure records is not None before returning
-        return records[0] if records is not None else 0.00
 
     def action_greylist(self):
         for e in self:
@@ -1182,58 +1773,22 @@ class Customer(models.Model):
         for e in self:
             e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
+            
+    
+    
+    # Smart button method to show customer's channels
+    def action_view_channel_subscriptions(self):
+        self.ensure_one()
+        return {
+            'name': 'Digital Channels',
+            'view_mode': 'tree,form',
+            'res_model': 'customer.channel.subscription',
+            'domain': [('customer_id', '=', self.customer_id)],
+            'type': 'ir.actions.act_window',
+            'context': {'default_customer_id': self.customer_id}
+        }
 
-    @api.depends('customer_id')
-    def _compute_digital_products(self):
-        """
-        Compute digital product fields.
-        """
-        # Get all customer_ids in current recordset
-        customer_ids = [rec.customer_id for rec in self if rec.customer_id]
-
-        if not customer_ids:
-            # Set default values for records without customer_id
-            for record in self:
-                self._set_default_digital_values(record)
-            return
-
-        # Single query to get all digital products for current recordset
-        digital_products = self.env['customer.digital.product'].search([
-            ('customer_id', 'in', customer_ids)
-        ])
-
-        # Create a mapping for lookup
-        product_map = {dp.customer_id: dp for dp in digital_products}
-
-        # Assign values to each record
-        for record in self:
-            if record.customer_id and record.customer_id in product_map:
-                dp = product_map[record.customer_id]
-                record.ussd = dp.ussd
-                record.onebank = dp.onebank
-                record.carded_customer = dp.carded_customer
-                record.alt_bank = dp.alt_bank
-                record.sterling_pro = dp.sterling_pro
-                record.banca = dp.banca
-                record.doubble = dp.doubble
-                record.specta = dp.specta
-                record.switch = dp.switch
-                record.customer_segment = dp.customer_segment
-            else:
-                self._set_default_digital_values(record)
-
-    def _set_default_digital_values(self, record):
-        """Set default values for digital product fields"""
-        record.ussd = None
-        record.onebank = None
-        record.carded_customer = None
-        record.alt_bank = None
-        record.sterling_pro = None
-        record.banca = None
-        record.doubble = None
-        record.specta = None
-        record.switch = None
-        record.customer_segment = None
+  
 
     # @api.model
     # def _compute_is_branch_compliance(self):
@@ -1378,43 +1933,94 @@ class Customer(models.Model):
     #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
 
 
-class CustomerDigitalProduct(models.Model):
-    _name = 'customer.digital.product'
-    _sql_constraints = [
-        ('uniq_customer_id', 'unique(customer_id)',
-         "Customer already exists. Customer must be unique!"),
-    ]
 
-    customer_id = fields.Text(string='Customer ID',
-                              index=True, readonly=True)  # customer,
-    customer_name = fields.Char(string='Name', tracking=True, readonly=True)
-    customer_segment = fields.Char(
-        string='Customer Segment', tracking=True, readonly=True)
-    ussd = fields.Char(string='Uses USSD', index=True, readonly=True)
-    onebank = fields.Char(string='Uses One Bank', index=True, readonly=True)
-    carded_customer = fields.Char(
-        string='Has A Card', index=True, readonly=True)
-    alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
-    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
-    banca = fields.Char(string='Has Banca', readonly=True)
-    doubble = fields.Char(string='Has Doubble', readonly=True)
-    specta = fields.Char(string='Has Specta', readonly=True)
-    switch = fields.Char(string='Has Switch', readonly=True)
+class Partner(models.Model):
+    _inherit = 'res.partner'
 
-    def init(self):
-        # Drop the trigger if it exists
-        self.env.cr.execute("""
-        SELECT EXISTS (
-            SELECT 1
-            FROM information_schema.tables
-            WHERE table_name = 'customer_digital_product'
-        )
-    """)
-        table_exists = self.env.cr.fetchone()[0]
+    @api.model
+    def remove_unwanted_partner_actions(self):
+        """Remove unwanted actions from partner view"""
+        _logger.info("Starting removal of unwanted partner actions")
 
-        if table_exists:
-            # Create the index if it doesn't exist
-            self.env.cr.execute("""
-                CREATE INDEX IF NOT EXISTS customer_digital_product_id_idx
-                ON customer_digital_product (id)
-            """)
+        # Try various possible XML IDs for merge actions
+        merge_action_refs = [
+            'base.partner_merge_automatic_wizard_action',
+            'contacts.action_partner_merge',
+            'base_partner_merge.action_partner_merge_automatic',
+            'base_partner_merge.partner_merge_automatic_wizard_action'
+        ]
+
+        for xml_id in merge_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found merge action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Try various possible XML IDs for portal actions
+        portal_action_refs = [
+            'portal.partner_portal_action',
+            'portal.portal_share_action',
+            'portal.portal_share_wizard_action'
+        ]
+
+        for xml_id in portal_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found portal action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Try various possible XML IDs for email actions
+        email_action_refs = [
+            'mail.action_partner_mass_mail',
+            'mail.email_compose_message_wizard_action',
+            'mail.action_email_compose_message_wizard'
+        ]
+
+        for xml_id in email_action_refs:
+            try:
+                action = self.env.ref(xml_id, raise_if_not_found=False)
+                if action:
+                    _logger.info("Found email action with XML ID: %s", xml_id)
+                    action.binding_model_id = False
+            except Exception as e:
+                _logger.warning(
+                    "Error when trying to disable %s: %s", xml_id, e)
+
+        # Fallback to searching for actions by model and name pattern
+        try:
+            # Find merge actions
+            merge_actions = self.env['ir.actions.act_window'].search([
+                ('res_model', '=', 'base.partner.merge.automatic.wizard'),
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            if merge_actions:
+                merge_actions.write({'binding_model_id': False})
+
+            # Find actions with "Mail" or "Email" in name
+            email_actions = self.env['ir.actions.act_window'].search([
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            for action in email_actions:
+                if 'mail' in action.name.lower() or 'email' in action.name.lower():
+                    action.binding_model_id = False
+
+            # Find actions with "Portal" in name
+            portal_actions = self.env['ir.actions.server'].search([
+                ('binding_model_id.model', '=', 'res.partner')
+            ])
+            for action in portal_actions:
+                if 'portal' in action.name.lower():
+                    action.binding_model_id = False
+        except Exception as e:
+            _logger.error("Error in fallback action search: %s", e)
+
+        _logger.info("Completed removal of unwanted partner actions")
+        return True

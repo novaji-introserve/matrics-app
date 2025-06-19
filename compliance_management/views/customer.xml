@@ -9,7 +9,9 @@
             <xpath expr="//tree" position="attributes">
                 <attribute name="sample"/>
                 <attribute name="create">false</attribute>
+                <attribute name="delete">false</attribute>
             </xpath>
+
 
 
             <!-- Replace the phone field with custom fields -->
@@ -22,6 +24,7 @@
                 <field name="branch_id" optional="hide" />
                 <field name="registration_date" optional="hide" />
                 <field name="tier_id" optional="hide" />
+                <field name="show_create_case_button" invisible="1"/>
             </xpath>
 
             <!-- Hide the original phone field -->
@@ -66,6 +69,7 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
                 <header>
+                    <field name="show_create_case_button" invisible="1"/>
                     <button name="action_initiate_edd" class="oe_highlight" type="object" string="Initiate EDD" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="This will trigger a request to carry out EDD on this customer. Are you sure?" />
 
                     <button name="action_add_pep" class="oe_highlight" type="object" string="Add to PEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to PEP List. Are you sure?" attrs="{'invisible': [('is_pep', '=',True)]}" />
@@ -74,9 +78,9 @@
 
                     <button name="action_remove_pep" type="object" string="Remove From PEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove Customer from PEP List. Are you sure?" attrs="{'invisible': [('is_pep', '!=',True)]}" />
 
-                    <!-- <button name="action_add_fep" class="oe_highlight" type="object" string="Add to FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '=',True)]}" style="display: none;" /> -->
+                    <button name="action_add_fep" class="oe_highlight" type="object" string="Add to FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '=',True)]}" style="display: none;" />
 
-                    <!-- <button name="action_remove_fep" type="object" string="Remove from FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '!=',True)]}" /> -->
+                    <button name="action_remove_fep" type="object" string="Remove from FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '!=',True)]}" />
 
                     <!-- <button name="action_blacklist" class="oe_highlight" type="object" string="Add to Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '=',True)]}" /> -->
 
@@ -86,9 +90,9 @@
 
                     <button name="action_remove_watchlist" type="object" string="Remove from Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '!=',True)]}" />
                     <!-- SANCTION LIST -->
-                    <button name="action_sanction_list" class="oe_highlight" type="object" string="Add to Sanctionlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '=',True)]}" />
+                    <button name="action_sanction_list" class="oe_highlight" type="object" string="Add to Sanctions List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '=',True)]}" />
 
-                    <button name="action_remove_sanction_list" type="object" string="Remove from SanctionList" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '!=',True)]}" />
+                    <button name="action_remove_sanction_list" type="object" string="Remove from Sanctions List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '!=',True)]}" />
                     <!--End Sanction list  -->
                     <button name="action_greylist" class="oe_highlight" type="object" string="Add to Greylist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Greylist. Are you sure?" attrs="{'invisible': [('is_greylist', '=',True)]}" />
 
@@ -96,10 +100,22 @@
 
                     <button name="action_conduct_risk_assessment" class="oe_highlight" type="object" string="Conduct Risk Assessment" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Conduct Risk Assessment. Are you sure?" />
 
-                    <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Compute Risk Score" confirm="Compute Risk Score: Using your defined Risk Plan, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
+                    <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Run Risk Analysis" confirm="Compute Risk Score: Using your defined Risk Analysis, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
 
                     <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
                     <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?" />
+
+                    <button name="action_screen_customer" string="Run Sanction Screening" type="object" class="btn-primary" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?"/>
+
+
+
+                    <!-- Create case button with visibility based on case installation -->
+                    <button name="action_create_case" 
+                            class="oe_highlight"
+                            string="Create Case" 
+                            type="object" 
+                            attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
+
                 </header>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
@@ -112,13 +128,11 @@
                     <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level in ('high')" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')"/>
                     </span>                   
                 </button> -->
-
                 <button class="oe_stat_button" icon="fa-thermometer-0">
                     <span>Risk
                         <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'low'"/>
                     </span>
                 </button>
-
                 <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
                     <field string="Risk Score" name="risk_score" widget="statinfo"/>
                 </button>
@@ -129,16 +143,18 @@
                 <!-- <attribute name="invisible">1</attribute> -->
             </xpath>
 
-            <xpath expr="//field[@name='region_id']" position="replace">
-                <field name="state_residence" invisible="0" />
+            <xpath expr="//field[@name='street']" position="after">
+                <field name="region_id" invisible="0" />
+            </xpath>
 
+            <xpath expr="//field[@name='region_id']" position="after">
+                <field name="state_residence" invisible="0" />
             </xpath>
 
             <xpath expr="//field[@name='function']" position="replace">
                 <field name="employment_status" invisible="0" />
                 <field name="active" invisible="1" />
             </xpath>
-
 
             <xpath expr="//field[@name='mobile']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -314,15 +330,7 @@
         </field>
     </record>
 
-    <!-- Inherit and modify the action_contacts -->
-    <record id="contacts_action_contacts_inherit" model="ir.actions.act_window">
-        <field name="name">Customers</field>
-        <field name="res_model">res.partner</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="view_mode">tree,kanban,form,activity</field>
-        <field name="search_view_id" ref="base.view_res_partner_filter"/>
-        <field name="context">{'search_default_group_branch': 1}</field>
-    </record>
+
 
     <!-- Override the menu item to use the new action -->
     <!-- <record id="contacts.res_partner_menu_contacts" model="ir.ui.menu">
@@ -458,16 +466,5 @@
         <field name="code">action = model.action_view_likely_sanction_customer()</field>
     </record>
 
-    <!-- Action for PEP -->
-    <record id="action_res_pep" model="ir.actions.act_window">
-        <field name="name">Customers on PEP List</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="domain">[('is_pep', '=', True)]</field>
-    </record>
-
-    <menuitem id="menu_is_pep" action="action_res_pep" parent="menu_compliance_customer_heading" name="PEPs Customers" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanctioned" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" />
-    <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_global_pep" parent="menu_compliance_customer_heading" name="Matching Global PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="70" />
 
 </odoo>

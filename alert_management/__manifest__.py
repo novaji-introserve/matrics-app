@@ -31,8 +31,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mail', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation'],
-
+    'depends': ['base','compliance_management', 'mail', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation'],
     # always loaded
     'data': [
         'security/ir.model.access.csv',
@@ -48,7 +47,7 @@
 
         'data/hr/hr_dpt.xml',
         'data/hr/hr_job.xml',
-        # 'data/alert.xml',
+        'data/alert.xml',
         # 'data/hr/hr_employee.xml',
         # 'data/users.xml',
 
@@ -58,7 +57,7 @@
         # cron job
         'data/schedule/cron_job.xml',
         # mail conf
-        'data/email_smtp.xml',
+        # 'data/email_smtp.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -4,7 +4,8 @@
     <field name="name">fcra.score.tree</field>
     <field name="model">res.fcra.score</field>
     <field name="arch" type="xml">
-        <tree string="FCRA Scores" create="false" delete="false">
+        <tree string="Risk Assessment Scores" create="false" delete="false">
+             <field name="name" />
             <field name="max_score"/>
             <field name="min_score"/>
             
@@ -16,9 +17,14 @@
     <field name="name">fcra.score.form</field>
     <field name="model">res.fcra.score</field>
     <field name="arch" type="xml">
-        <form string="FCRA Score">
+        <form string="Risk Assessment Score">
             <sheet>
-               
+                 <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                 <group>
                     <group>
                         <field name="max_score"/>
@@ -37,16 +43,4 @@
         </form>
     </field>
 </record>
-
-<record id="action_fcra_score_action" model="ir.actions.act_window">
-    <field name="name">FCRA Scores</field>
-    <field name="res_model">res.fcra.score</field>
-    <field name="view_mode">tree,form</field>
-    <field name="help" type="html">
-        <p class="oe_view_nocontent_create">
-            Click to add a new FCRA Score.
-        </p>
-    </field>
-</record>
-
 </odoo>

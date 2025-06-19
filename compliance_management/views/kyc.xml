@@ -3,14 +3,14 @@
         <field name="name">risk_plan_line_ids.view.tree</field>
         <field name="model">res.partner.risk.plan.line</field>
         <field name="arch" type="xml">
-            <tree string="Risk Assessment Plan Lines" create="False" edit="False" delete="False">
+            <tree string="Risk Analysis Lines" create="False" edit="False" delete="False">
                 <field name="plan_line_id" />
                 <field name="risk_score" />
                 <!-- <field name="create_date" /> -->
             </tree>
         </field>
     </record>
-   
+
 
     <record model="ir.ui.view" id="partner_inherit_form_view">
         <field name="name">compliance.customer.form.view</field>
@@ -67,28 +67,42 @@
                 <page name='accounts' string="Accounts">
                     <field name="account_ids" context="{'default_customer_id': active_id}" />
                 </page>
-             
-                <page name="name" string="Digital Products" >
-                    <group name="digital_products" attrs="{'invisible': [('customer_id', '=', False)]}">
-                            <group>
-                                <field name="customer_segment" readonly="1"/>
-                                <field name="ussd" readonly="1"/>
-                                <field name="onebank" readonly="1"/>
-                                <field name="carded_customer" readonly="1"/>
-                                <field name="alt_bank" readonly="1"/>
-                            </group>
-                            <group>
-                                <field name="sterling_pro" readonly="1"/>
-                                <field name="banca" readonly="1"/>
-                                <field name="doubble" readonly="1"/>
-                                <field name="specta" readonly="1"/>
-                                <field name="switch" readonly="1"/>
-                            </group>
-                        </group>
+
+
+                <page name="digital_products" string="Customer Channels">
+                    <!-- Simplified view without problematic fields -->
+
+                    <field name="channel_subscription_ids" context="{'default_customer_id': customer_id}" domain="[]">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="channel_id"/>
+                            <field name="value"/>
+                        </tree>
+                    </field>
                 </page>
 
+
+                <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
                     
-                <page name='plans' string="Risk Plan">
+                    <separator string="COMPOSITE RISK SCORE" class="mt16"/>
+                    <p>
+                        <field name="composite_risk_score" class="oe_inline" readonly="1" nolabel="1"/>
+                    </p>
+
+                    <separator string="UNIVERSE RISK WEIGHTS" class="mt16"/>
+                    <field name="universe_weight_ids" readonly="1" context="{'tree_view_ref': 'view_partner_risk_universe_weight_tree'}">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="name"/>
+                            <field name="subject_id"/>
+                            <field name="weight_percentage" sum="Total %"/>
+                            <field name="universe_score" string="Risk score"/>
+                            <!-- <field name="weighted_score" sum="Total Weighted"/> -->
+                            <!-- <field name="assigned_score"/> -->
+                        </tree>
+                    </field>
+                </page>
+
+
+                <page name='plans' string="Risk Analysis">
                     <field name="risk_plan_line_ids" context="{'default_partner_id': active_id}" />
                 </page>
                 <page name='risk_assessment' string="Risk Assessment">
@@ -119,8 +133,8 @@
                             <field name="global_pep_id" attrs="{'readonly': True}" />
                         </group>
                         <group name="other" string="Others">
-                            <!-- <field name="is_fep" attrs="{'readonly': True}" /> -->
-                            <!-- <field name="is_blacklist" attrs="{'readonly': True}" /> -->
+                            <field name="is_fep" attrs="{'readonly': True}" />
+                            <field name="is_blacklist" attrs="{'readonly': True}" />
                             <field name="is_watchlist" attrs="{'readonly': True}" />
                             <field name="likely_sanction" attrs="{'readonly': True}" />
                             <field name="is_greylist" attrs="{'readonly': True}" />
@@ -136,8 +150,9 @@
 
                 <!-- <notebook position="inside"> -->
                 <page string="Enhanced Due Diligence" name="edd_record">
-                    <field name="edd_ids" nolabel="1">
-                        <tree string="EDD Record">
+                   <field name="edd_ids" nolabel="1"
+                        context="{'form_view_ref': 'compliance_management.edd_form_view'}">
+                        <tree string="EDD Record" create="False" edit="False" delete="False">
                             <field name="name" />
                             <field name="status" />
                             <field name="customer_id" />
@@ -149,121 +164,6 @@
                             <field name="account_status" />
                             <field name="documentation_status" />
                         </tree>
-                        <form string="EDD Record">
-                            <header>
-                                <button name="action_submit_for_review" class="oe_highlight" type="object" string="Submit for Review" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', '!=', 'draft'), '|', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}" />
-
-                                <button name="action_approve" class="oe_highlight" type="object" string="Approve" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', '!=', 'completed'), ('is_current_user_approving_officer', '=', False)]}" />
-
-                                <button name="action_cancel" class="oe_highlight" type="object" string="Cancel" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'in', ['cancelled', 'approved', 'draft']), ('is_current_user_approving_officer', '=', False)]}" />
-
-                                <button name="action_archive" class="oe_highlight" type="object" string="Archive" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'not in', ['cancelled', 'approved']), ('is_cco', '=', False)]}" />
-
-                                <button name="action_send_back" class="oe_highlight" type="object" string="Send Back" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'in', ['draft', 'approved']), ('is_current_user_approving_officer', '=', False)]}" />
-                                
-
-                                <field name="status" widget="statusbar" statusbar_visible="draft,completed,approved,cancelled,deleted,archived"/>
-                            </header>
-                            <sheet>
-                                <group>
-                                    <group>
-                                        <field name="name" />
-                                        <!-- <field name="status" /> -->
-                                        <field name="customer_id" readonly="1"/>
-                                        <field name="responsible_id" />
-                                        <field name="user_id" />
-
-                                        <field name="is_cco" invisible="1"/>
-                                        <field name="status" invisible="1"/>
-                                        <field name="is_current_user_responsible" invisible="1"/>
-                                        <field name="is_current_user_approver" invisible="1"/>
-                                        <field name="is_current_user_approving_officer" invisible="1"/>
-                                        <field name="risk_score" widget="numeric_step" options="{'step': 0.25, 'min': 0.5, 'max': 25}" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                     'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-
-
-
-
-                                    </group>
-                                    <group>
-                                        <field name="account_status" />
-                                        <field name="documentation_status" />
-                                        <field name="last_kyc_date" />
-                                        <field name="approved_by" />
-                                        <field name="date_approved" />
-
-
-                                    </group>
-                                </group>
-                                <notebook>
-                                    <page string="Details">
-                                        <group>
-                                            <field name="description" />
-                                            <field name="visitation_observation" />
-                                            <field name="overall_kyc_outcome" />
-
-                                        </group>
-
-                                    </page>
-                                    <page string="Transaction Information">
-                                        <group>
-                                            <group string="Cash Information">
-                                                <field name="main_cash_purpose" />
-                                            </group>
-                                            <group string="Inflow Information">
-                                                <field name="main_inflow_purpose" />
-                                                <field name="main_fund_remitters" />
-                                                <field name="inflow_sources" />
-                                            </group>
-                                        </group>
-                                        <group>
-                                            <group string="Additional Information">
-                                                <field name="other_related_accounts" />
-                                                <field name="occupation" />
-                                            </group>
-                                        </group>
-                                    </page>
-                                   
-                                    <page string="Customer Assessment">
-
-                                        <group>
-                                            
-                                            <group >
-    
-                                                <field name="is_foreigner" />
-                                                <field name="is_pep" />
-                                                <field name="id_expired" />
-                                                <field name="was_kyc_comprehensive" />
-                                            </group>
-    
-                                            <group >
-    
-                                                <field name="has_initiated_new_kyc" />
-                                                <field name="is_current_from_normal" />
-                                                <field name="activity_level_matches_business" />
-                                                <field name="does_business_support_volume" />
-    
-                                            </group>
-                                        </group>
-
-
-                                    </page>
-
-                                    <page string="Supporting Document(s)">
-                                        <group >,
-                                            <field name="supporting_document" widget="many2many_binary" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-
-                                            
-                                        </group>
-                                        
-                                    </page>
-
-                                </notebook>
-                            </sheet>
-                        </form>
                     </field>
                 </page>
 
@@ -307,25 +207,5 @@
         <field name="state">code</field>
         <field name="code">action = model.open_correspondents()</field>
     </record>
-
-    <menuitem id="base.menu_board_root" name="Dashboards" sequence="260" web_icon="compliance_management,static/description/icon-dashboard.png" groups="base.group_user" />
-    <menuitem id="spreadsheet_dashboard.spreadsheet_dashboard_menu_root" name="Dashboards" groups="group_tech_support" action="spreadsheet_dashboard.ir_actions_dashboard_action" web_icon="compliance_management,static/description/icon-dashboard.png" sequence="37" />
-    <menuitem name="Customers" id="contacts.menu_contacts" sequence="20" web_icon="compliance_management,static/description/icons-contact.png" groups="group_tech_support" />
-    <!-- <menuitem id="contacts.res_partner_menu_contacts" name="Customers" action="contacts.action_contacts" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="contacts.menu_contacts" sequence="2" /> -->
-   
-    <menuitem id="mail.menu_root_discuss" name="Messaging"  web_icon="compliance_management,static/description/icon-chat.png" groups="group_tech_support" sequence="1" />
-    <menuitem id="menu_compliance_dd" name="Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="5" />
-    <menuitem id="menu_compliance_kyc" name="KYC" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="10" />
-
-    <menuitem id="menu_compliance_customer_heading" action="open_customers" parent="menu_compliance_kyc" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_customer" action="open_customers" parent="menu_compliance_customer_heading" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_customer_dd" action="open_customers" parent="menu_compliance_dd" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_vendor_dd" action="open_vendors" parent="menu_compliance_dd" name="Vendors" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
-    <menuitem id="menu_compliance_paerner_dd" action="open_partners" parent="menu_compliance_dd" name="Partners" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
-    <menuitem id="menu_compliance_respondents_dd" action="open_respondents" parent="menu_compliance_dd" name="Respondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="40" />
-    <menuitem id="menu_compliance_correspondents_dd" action="open_correspondents" parent="menu_compliance_dd" name="Correspondents" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="50" />
-     
-    <menuitem id="menu_compliance_edd" action="action_res_partner_edd" parent="menu_compliance_kyc" name="Enhanced Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="100" />
-
 
 </odoo>

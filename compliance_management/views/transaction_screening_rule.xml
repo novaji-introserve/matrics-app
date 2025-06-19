@@ -68,6 +68,17 @@
                             <field name="narration" placeholder="Narration..." />
                         </page>
                     </notebook>
+                    <div class="alert alert-info" role="alert" name="test_warning">
+                        You can use the following placeholders in the SQL query:
+                        <ul>
+                            <li><code>#AMOUNT#</code> - Transaction Amount</li>
+                            <li><code>#ACCOUNT_ID#</code> - Account ID</li>
+                            <li><code>#BRANCH_ID#</code> - Branch ID</li>
+                            <li><code>#TRAN_DATE#</code> - Transaction Date</li>
+                            <li><code>#CURRENCY_ID#</code> - Currency ID</li>
+                            <li><code>#CUSTOMER_ID#</code> - Customer ID</li>
+                        </ul>
+                    </div>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" />
@@ -77,31 +88,5 @@
             </form>
         </field>
     </record>
-    <!-- Action -->
-    <record id="action_list_transaction_screening_rule" model="ir.actions.act_window">
-        <field name="name">Transaction Screening Rule</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.transaction.screening.rule</field>
-        <field name="view_id" ref="compliance_transaction_screening_rule_tree" />
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Add a Transaction Screening Rule
-            </p>
-            <p>
-                No records yet
-            </p>
-        </field>
-    </record>
-    <!-- Menu -->
-    <menuitem id="menu_compliance_transaction_screening" name="Transaction Monitoring"
-        parent="menu_compliance_configuration" sequence="400" />
-    <menuitem
-        id="menu_compliance_transaction_screening_rule"
-        action="action_list_transaction_screening_rule"
-        parent="menu_compliance_transaction_screening"
-        name="Rules"
-        groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
-        sequence="100" />
 
 </odoo>

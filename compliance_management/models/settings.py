@@ -16,6 +16,14 @@ class ComplianceSettings(models.Model):
     code = fields.Char(string='Code', required=True,index=True)
     val = fields.Char(string='Value')
     narration = fields.Text(string='Narration')
+    
+    @api.model
+    def get_setting(self, code):
+        """Get a setting value by code"""
+        setting = self.search([('code', '=', code)], limit=1)
+        if setting:
+            return setting.val
+        return None
 
 
 _logger = logging.getLogger(__name__)

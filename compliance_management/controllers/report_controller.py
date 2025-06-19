@@ -54,11 +54,72 @@ class PDFController(http.Controller):
                 words[i] = word.lower()
         
         return ' '.join(words)
+    
+    def add_company_logo(self, story, record, styles):
+        if record.company_id and record.company_id.logo_web:
+            try:
+                logo_data = record.company_id.logo_web
+                
+                # Handle different data types
+                if isinstance(logo_data, str):
+                    # It's a base64 string, decode it
+                    if logo_data.startswith('data:'):
+                        logo_data = logo_data.split(',', 1)[1]
+                    
+                    # Clean up base64 string (remove whitespace/newlines)
+                    logo_data = logo_data.strip().replace('\n', '').replace('\r', '').replace(' ', '')
+                    decoded_logo = base64.b64decode(logo_data)
+                    
+                elif isinstance(logo_data, bytes):
+                    try:
+                        decoded_logo = base64.b64decode(logo_data)
+                        if (decoded_logo.startswith(b'\x89PNG') or  
+                            decoded_logo.startswith(b'\xff\xd8\xff') or 
+                            decoded_logo.startswith(b'\xff\xd8\xfe') or  
+                            decoded_logo.startswith(b'GIF87a') or 
+                            decoded_logo.startswith(b'GIF89a') or  
+                            decoded_logo.startswith(b'RIFF')):  
+                            pass
+                        else:
+                            decoded_logo = logo_data
+                            
+                    except Exception:
+                        decoded_logo = logo_data
+                else:
+
+                    decoded_logo = logo_data
+                
+                if len(decoded_logo) < 10:
+                    raise ValueError("Image data is too small")
+                
+                logo_buffer = BytesIO(decoded_logo)
+                logo_buffer.seek(0)  
+                
+                # Create Image object
+                logo = Image(logo_buffer, width=1.5*inch, height=0.75*inch)
+                logo.hAlign = 'CENTER'
+                story.append(logo)
+                story.append(Spacer(1, 8))
+                
+            except Exception as e:
+                print(f"Error processing logo: {e}")
+                print(f"Logo data type: {type(record.company_id.logo_web)}")
+                if hasattr(record.company_id, 'logo_web') and record.company_id.logo_web:
+                    print(f"Logo data length: {len(record.company_id.logo_web)}")
+                    # Show first few bytes as hex for debugging
+                    first_bytes = record.company_id.logo_web[:20] if isinstance(record.company_id.logo_web, bytes) else str(record.company_id.logo_web)[:20]
+                    print(f"First bytes: {first_bytes}")
+                # Fallback to text logo
+                story.append(Paragraph("COMPANY LOGO", styles['BankTitle']))
+                story.append(Spacer(1, 8))
+        else:
+            # Fallback if logo not found
+            story.append(Paragraph("COMPANY LOGO", styles['BankTitle']))
+            story.append(Spacer(1, 8))
+
 
     @http.route('/compliance/pdf_report/<int:record_id>', type='http', auth="user")
-    def generate_pdf_report(self, record_id, **kwargs):
-        module_path = get_module_path('compliance_management') 
-        LOGO_PATH = os.path.join(module_path, 'static', 'img', 'alt_bank_logo_.png')
+    def generate_pdf_report(self, record_id, **kwargs): 
         record = request.env['res.partner.edd'].browse(record_id)
         if not record.exists():
             return request.not_found()
@@ -90,19 +151,7 @@ class PDFController(http.Controller):
 
         story = []
         
-        # Add Bank Logo Section (
-        if Path(LOGO_PATH).exists():
-            try:
-                logo = Image(LOGO_PATH, width=1.5*inch, height=0.75*inch)  # Smaller dimensions
-                logo.hAlign = 'CENTER'
-                story.append(logo)
-                story.append(Spacer(1, 8)) 
-            except:
-                pass
-        else:
-            # Fallback if logo not found
-            story.append(Paragraph("Logo", styles['BankTitle']))
-            story.append(Spacer(1, 8))
+        self.add_company_logo(story,record,styles)
         
         # Bank Name and Report Title
         story.append(Paragraph("DUE DILIGENCE REPORT", styles['BankTitle']))

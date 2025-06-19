@@ -53,7 +53,7 @@
                         </group>
                         <group>
                             <field name="monitoring_frequency"/>
-                            <field name="last_scan_date" readonly="1"/>
+                            <field name="last_scan_date" />
                             <!-- <field name="keyword_id"/> -->
                             <field name="keyword_id" widget="many2many_tags" />
 
@@ -87,24 +87,4 @@
             </search>
         </field>
     </record>
-
-    <!-- Action for Adverse Media -->
-    <record id="action_adverse_media" model="ir.actions.act_window">
-        <field name="name">Media Watchlist</field>
-        <field name="res_model">adverse.media</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="view_adverse_media_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                No data found
-            </p>
-        </field>
-    </record>
-
-    <!-- Menu Items -->
-    <!-- <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499"/> -->
-    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499" groups="group_compliance_chief_compliance_officer"/>
-
-    <menuitem id="menu_adverse_media" name="Media Watchlist" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/>
-    <!-- <menuitem id="menu_adverse_media" name="Monitoring Configuration" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/> -->
 </odoo>

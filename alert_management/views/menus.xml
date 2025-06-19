@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+   
+    <!-- Customize Employee icon-->
+    <menuitem
+        id="hr.menu_hr_root" 
+        name="Personnel" 
+        web_icon="alert_management,static/description/icon-employee.png" 
+        groups="hr.group_hr_manager,hr.group_hr_user,base.group_user" 
+        sequence="200"/>
     <!-- Main Menu -->
-    <menuitem web_icon="alert_management,static/description/icon.png" id="menu_alert_management_main"  name="Alert Management" sequence="-400"/>
+    <menuitem web_icon="alert_management,static/description/icon-alert.png" id="menu_alert_management_main"  name="Alerts" sequence="-400"/>
 
 
     <!-- Alert Monitoring -->
@@ -11,13 +19,20 @@
         parent="menu_alert_management_main"
         action="action_alert_history_status" 
         sequence="1" 
+        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_chief_compliance_officer"
+        />
+    <menuitem 
+        id="menu_alert_user_history" name="My Alert" 
+        parent="menu_alert_management_main"
+        action="action_alert_history_individual" 
+        sequence="2" 
         />
     
      <!-- Configurations -->
     <menuitem id="menu_alert_management_configurations"
         name="Configurations"
         parent="menu_alert_management_main"
-        sequence="2"
+        sequence="3"
     />
         <!-- groups="compliance_management.group_tech_support" -->
 
@@ -49,7 +64,7 @@
     />
 
    <menuitem id="process_sql" 
-        name="Process SQL" 
+        name="SQL Queries" 
         parent="menu_internal_ctrl_alert_monitoring" 
         action="action_process_sql" 
         sequence="4" 
@@ -57,7 +72,7 @@
 
     <menuitem 
         id="menu_alert_management_alert_rules_monitoring" 
-        name="Processes" 
+        name="Alert Rules" 
         parent="menu_internal_ctrl_alert_monitoring" 
         action="action_alert_rules" 
         sequence="10"
