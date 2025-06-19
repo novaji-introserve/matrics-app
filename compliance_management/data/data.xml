@@ -6,7 +6,7 @@
         <field name="name">Risk Analysis Computation</field>
         <field name="code">risk_plan_computation</field>
         <field name="val">sum</field>
-        <field name="narration">Deteremines the policy for computin the risk assessment from the set
+        <field name="narration">Deteremines the policy for computing the risk Analysis from the set
             of plan
             Values:
             avg: use the average
@@ -14,6 +14,20 @@
             max: use the maximum. Default
         </field>
     </record>
+
+    <record id="res_compl_settings_risk_assessment_computation" model="res.compliance.settings">
+        <field name="name">Risk Assessment Computation</field>
+        <field name="code">risk_assessment_computation</field>
+        <field name="val">avg</field>
+        <field name="narration">Deteremines the policy for computing the risk assessment from the set
+            of plan
+            Values:
+            avg: use the average Default
+            sum: use the sum total
+            max: use the maximum. 
+        </field>
+    </record>
+
     <record id="res_compl_settings_default_risk_score" model="res.compliance.settings">
         <field name="name">Default Risk Score</field>
         <field name="code">default_risk_score</field>

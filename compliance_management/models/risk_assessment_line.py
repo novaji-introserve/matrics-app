@@ -113,17 +113,13 @@ class RiskAssessmentLine(models.Model):
 
     def _compute_risk_probability(self, control_effectiveness_score):
         max_score = self.get_control_effectiveness_max_score()
-        print(f"max score is {max_score}")
         if max_score == 0:
             return 100.0  # Avoid division by zero
         
         score =  (1 - (control_effectiveness_score / max_score))
-        print(f"the score is {score}")
         return score  * 100
 
     def _compute_residual_risk_score(self, probability, impact):
-        print(f"the probability is {probability}")
-        print(f"the impact is {impact}")
         return (probability/100) * impact
 
     def update_aggregate_risk_score(self):
