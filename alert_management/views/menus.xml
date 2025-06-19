@@ -19,13 +19,20 @@
         parent="menu_alert_management_main"
         action="action_alert_history_status" 
         sequence="1" 
+        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_chief_compliance_officer"
+        />
+    <menuitem 
+        id="menu_alert_user_history" name="My Alert" 
+        parent="menu_alert_management_main"
+        action="action_alert_history_individual" 
+        sequence="2" 
         />
     
      <!-- Configurations -->
     <menuitem id="menu_alert_management_configurations"
         name="Configurations"
         parent="menu_alert_management_main"
-        sequence="2"
+        sequence="3"
     />
         <!-- groups="compliance_management.group_tech_support" -->
 

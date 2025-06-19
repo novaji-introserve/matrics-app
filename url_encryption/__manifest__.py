@@ -21,6 +21,11 @@
     'assets': {
         'web.assets_backend': [
             'url_encryption/static/src/js/url_encryption.js',
+            'url_encryption/static/src/js/url_encryption_service.js',
+            'url_encryption/static/src/js/url_masking.js',
+            'url_encryption/static/src/js/navigation_interceptor.js',
+            'url_encryption/static/src/js/action_hook.js',
+            'url_encryption/static/src/js/rpc_handler.js',
         ],
     },
     
