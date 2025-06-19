@@ -32,7 +32,6 @@
 
     # any module necessary for this one to work correctly
     'depends': ['base','compliance_management', 'mail', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation'],
-    'auto_install': True,
     # always loaded
     'data': [
         'security/ir.model.access.csv',

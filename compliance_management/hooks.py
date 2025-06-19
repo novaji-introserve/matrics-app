@@ -64,6 +64,8 @@ def post_init_hook(cr, registry):
         _logger.error(f"Error initializing persistent database settings: {e}")
 
     _logger.info("Completed post-init hook for compliance_management")
+    # installed alert management
+    install_alert_management(cr, registry)
 
 def uninstall_hook(cr, registry):
     """Uninstallation hook called when the module is uninstalled"""
@@ -74,3 +76,72 @@ def uninstall_hook(cr, registry):
     except Exception as e:
         _logger.error(f"Error stopping WebSocket server: {e}")
         
+    
+
+def install_alert_management(cr, registry):
+    """
+    Auto-install alert_management when compliance_management is installed
+    """
+    _logger.info("=== Starting alert_management auto-installation ===")
+    
+    try:
+        # Use existing environment instead of creating new one
+        env = api.Environment(cr, SUPERUSER_ID, {})
+        
+        # First, let's see all modules with 'alert' in the name
+        all_alert_modules = env['ir.module.module'].search([
+            ('name', 'ilike', 'alert')
+        ])
+        _logger.info(f"Found {len(all_alert_modules)} modules with 'alert' in name:")
+        for module in all_alert_modules:
+            _logger.info(f"  - {module.name}: {module.state}")
+        
+        # Check if alert_management exists and is not installed
+        alert_module = env['ir.module.module'].search([
+            ('name', '=', 'alert_management'),
+            ('state', '=', 'uninstalled')
+        ])
+        
+        _logger.info(f"Found {len(alert_module)} uninstalled alert_management modules")
+        
+        if alert_module:
+            _logger.info("Found uninstalled alert_management module, installing...")
+            alert_module.button_install()
+            cr.commit()
+            _logger.info("✅ Alert Management auto-installed successfully!")
+        else:
+            # Check if already installed
+            installed_alert = env['ir.module.module'].search([
+                ('name', '=', 'alert_management')
+            ])
+            _logger.info(f"Found {len(installed_alert)} alert_management modules in any state")
+            
+            if installed_alert:
+                _logger.info(f"ℹ️ Alert Management found with state: {installed_alert.state}")
+            else:
+                _logger.warning("❌ Alert Management module not found at all")
+                
+                # Let's check if the module is in the filesystem but not in database
+                # This happens when modules aren't scanned yet
+                _logger.info("Attempting to update module list...")
+                env['ir.module.module'].update_list()
+                cr.commit()
+                
+                # Try again after updating module list
+                alert_module_after_update = env['ir.module.module'].search([
+                    ('name', '=', 'alert_management')
+                ])
+                
+                if alert_module_after_update:
+                    _logger.info(f"Found alert_management after update: {alert_module_after_update.state}")
+                    if alert_module_after_update.state == 'uninstalled':
+                        alert_module_after_update.button_immediate_install()
+                        cr.commit()
+                        _logger.info("✅ Alert Management installed after module list update!")
+                else:
+                    _logger.error("❌ Still no alert_management module found after update")
+                
+    except Exception as e:
+        _logger.error(f"Error auto-installing alert_management: {e}")
+        import traceback
+        _logger.error(traceback.format_exc())
