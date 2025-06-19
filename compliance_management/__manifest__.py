@@ -18,7 +18,7 @@
     "version": "0.3",
     # any module necessary for this one to work correctly
     
-    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification', 'alert_management', 'project',
+    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification', 'project',
         'mass_mailing',
         'utm',
         'contacts',
@@ -33,7 +33,7 @@
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
-        # "data/demo_data/branch/res.branch.csv", #BRANCH
+        "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -113,7 +113,6 @@
         'data/demo_data/plan/risk_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
-        'data/watchlist.xml',
         'data/blacklist.xml',
         "views/customer_screening.xml",
         "views/menu_actions.xml",

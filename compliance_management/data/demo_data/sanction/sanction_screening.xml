@@ -56,6 +56,31 @@
             <field name="bvn">3942087651</field>
 
         </record>
+
+        <!-- Sample Watchlist Records -->
+        <record id="watchlist_demo_1" model="res.partner.watchlist">
+            <field name="surname">Okonkwo</field>
+            <field name="first_name">Chinedu</field>
+            <field name="middle_name">Ifeanyi</field>
+            <field name="name">Chinedu Ifeanyi Okonkwo</field>
+            <field name="bvn">8041365792</field>
+        </record>
+
+        <record id="watchlist_demo_2" model="res.partner.watchlist">
+            <field name="surname">Abubakar</field>
+            <field name="first_name">Fatima</field>
+            <field name="middle_name">Zainab</field>
+            <field name="name">Fatima Zainab Abubakar</field>
+            <field name="bvn">6729451083</field>
+        </record>
+
+        <record id="watchlist_demo_3" model="res.partner.watchlist">
+            <field name="surname">Johnson</field>
+            <field name="first_name">David</field>
+            <field name="middle_name">Michael</field>
+            <field name="name">David Michael Johnson</field>
+            <field name="bvn">9024351083</field>
+        </record>
     
     </data>
     

@@ -1,50 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
+
+        <!-- Main Email Template -->
         <record id="email_template_screening_alert" model="mail.template">
-            <field name="name">Customer Screening Alert</field>
-            <field name="model_id" ref="model_res_partner_screening"/>
-            <field name="subject">Screening Alert: Potential Match Found for ${object.name}</field>
-            <field name="email_from">${ctx.get('from_filter') or ''}</field>
-            <field name="partner_to">${object.id}</field>
-            <field name="body_html"><![CDATA[
-                <div style="margin: 0px; padding: 0px;">
-                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
-                        Dear Compliance Officer,
-                        <br/><br/>
-                        A potential match has been found during customer screening on ${ctx.get('datetime', '')}.
-                        <br/><br/>
-                        <strong>Customer Details:</strong><br/>
-                        <strong>Name:</strong> ${object.name}<br/>
-                        <strong>Customer ID:</strong> ${object.customer_id or 'N/A'}<br/>
-                        <strong>BVN:</strong> ${object.bvn or 'N/A'}<br/>
-                        <strong>Current Risk Score:</strong> ${object.risk_score or '0.00'}<br/>
-                        <strong>Current Risk Level:</strong> ${object.risk_level or 'Unknown'}<br/>
-                        <br/>
-                        <strong>Screening Results:</strong><br/>
-                        % for result in ctx.get('results', []):
-                            - Match found in <strong>${result['list_type'].upper()}</strong> list<br/>
-                        % endfor
-                        <br/>
-                        <strong>Action Required:</strong><br/>
-                        Please review these matches and confirm or dismiss them in the system immediately.
-                        <br/><br/>
-                        <div style="text-align: center; margin: 20px 0;">
-                            <a href="${ctx.get('base_url', '')}/web#id=${object.id}&model=res.partner&view_type=form" style="background-color: #875A7B; padding: 12px 24px; text-decoration: none; color: #fff; border-radius: 5px; font-weight: bold; display: inline-block;">
-                                Review Customer Profile
-                            </a>
-                        </div>
-                        <br/>
-                        <small style="color: #666;">
-                            This is an automated notification from the Compliance Management System.<br/>
-                            Alert sent to: ${ctx.get('officers_email', 'Compliance Officers')}
-                        </small>
-                        <br/><br/>
-                        Best regards,<br/>
-                        <strong>Compliance Management System</strong>
+            <field name="name">Sanction Screening Alert</field>
+            <field name="model_id" ref="model_res_partner_screening_result"/>
+            <field name="subject">Sanction Screening Alert: Potential Match Found!</field>
+            <field name="email_from">${ctx.get('from_email', user.company_id.email or 'noreply@company.com')}</field>
+            <field name="body_html" type="html">
+                <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+
+                    <!-- Header with Logo - Safe approach -->
+                    <div style="text-align: left; padding-bottom: 20px;">
+                        <!-- Use company logo from context (safest option) -->
+                        <t t-if="ctx.get('company_logo')">
+                            <img t-att-src="'data:image/png;base64,%s' % ctx.get('company_logo')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        </t>
+                        <!-- Fallback to user's company logo -->
+                        <t t-elif="user and user.company_id and user.company_id.logo_web">
+                            <img t-att-src="'data:image/png;base64,%s' % user.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        </t>
+                    </div>
+
+                    <p>Dear Compliance Officer, </p>
+
+                    <p>A potential match has been found during customer sanction screening.</p>
+
+                    <p style="line-height: 1.4;">
+                        <strong >Date and Time Entry:</strong>
+                        <t t-esc="ctx.get('datetime', '')"/>
                     </p>
+
+                    <p style="line-height: 1.4;">
+                        <strong>Customer Details:</strong>
+                    </p>
+
+                    <div>
+                        <p>
+                            <span style="border: 1px solid #ddd;">Customer Name:</span>
+                            <t t-esc="ctx.get('name', 'N/A')"/>
+                        </p>
+
+                        <p>
+                            <span style="border: 1px solid #ddd;">Customer ID:</span>
+                            <t t-esc="ctx.get('customer_id', 'N/A')"/>
+                        </p>
+                        <p>
+                            <span style="border: 1px solid #ddd;">BVN:</span>
+                            <t t-esc="ctx.get('bvn', 'N/A')"/>
+                        </p>
+                        <p>
+                            <span style="border: 1px solid #ddd;">Risk Score:</span>
+                            <t t-esc="ctx.get('risk_score', 'N/A')"/>
+                        </p>
+                        <p>
+                            <span style="border: 1px solid #ddd;">Risk Level:</span>
+                            <t t-esc="str(ctx.get('risk_level', 'N/A')).upper()"/>
+                        </p>
+                    </div>
+
+                    <p style="line-height: 1.4;">
+                        <strong>Screening Results:</strong>
+                    </p>
+
+                    <ul style="list-style-type: decimal;">
+                        <t t-foreach="ctx.get('results', [])" t-as="result">
+                            <li style="margin-bottom: 8px; padding: 5px;">
+                                <t t-if="result.get('list_type') == 'pep'">
+                                    <span style="border: 1px solid #ddd;">Pep</span>
+                                </t>
+                                <t t-elif="result.get('list_type') == 'watchlist'">
+                                    <span style="border: 1px solid #ddd;">Watchlist</span>
+                                </t>
+                                <t t-elif="result.get('list_type') == 'sanction'">
+                                    <span style="border: 1px solid #ddd;">Sanction</span>
+                                </t>
+                                <t t-elif="result.get('list_type') == 'global_pep'">
+                                    <span style="border: 1px solid #ddd;">Global Pep</span>
+                                </t>
+                                <t t-elif="result.get('list_type') == 'blacklist'">
+                                    <span style="border: 1px solid #ddd;">Blacklist</span>
+                                </t>
+                                <t t-elif="result.get('list_type') == 'fep'">
+                                    <span style="border: 1px solid #ddd;">Fep</span>
+                                </t>
+                                <t t-else="">
+                                    <t t-esc="' '.join([word.capitalize() for word in str(result.get('list_type', '')).split('_')])"/>
+                                </t>
+                            </li>
+                        </t>
+                    </ul>
+
+                    <p style="text-align: center; margin: 20px 0;">
+                        <a t-att-href="ctx.get('record_url', '#')" style="background-color:#95536c;color:white;padding:10px 20px;text-decoration:none;border-radius:5px; display: inline-block;">
+                            View Details
+                        </a>
+                    </p>
+
+                    <p>Please review these matches and take appropriate action.</p>
+
+                    <p>Best Regards,</p>
+                    <p>
+                        <strong>The Compliance Team</strong>
+                    </p>
+                    <hr/>
+
                 </div>
-            ]]>            </field>
+            </field>
+            <field name="auto_delete" eval="False"/>
         </record>
+
     </data>
 </odoo>

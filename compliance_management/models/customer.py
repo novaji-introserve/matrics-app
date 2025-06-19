@@ -250,24 +250,67 @@ class Customer(models.Model):
             'context': {'default_partner_id': self.id}
         }
 
+    # def action_screen_customer(self):
+    #     """Screen customer against all lists"""
+    #     self.ensure_one()
+    #     screening = self.env['res.partner.screening.result']
+    #     result = screening.screen_customer(self.id)
+
+    #     # Show appropriate message
+    #     if result:
+    #         return {
+    #             'type': 'ir.actions.client',
+    #             'tag': 'display_notification',
+    #             'params': {
+    #                 'title': _('Screening Complete'),
+    #                 'message': _('Potential matches found. Compliance officers have been notified.'),
+    #                 'type': 'warning',
+    #                 'sticky': False,
+    #             }
+    #         }
+    #     else:
+    #         return {
+    #             'type': 'ir.actions.client',
+    #             'tag': 'display_notification',
+    #             'params': {
+    #                 'title': _('Screening Complete'),
+    #                 'message': _('No matches found.'),
+    #                 'type': 'success',
+    #                 'sticky': False,
+    #             }
+    #         }
+            
     def action_screen_customer(self):
         """Screen customer against all lists"""
         self.ensure_one()
-        screening = self.env['res.partner.screening']
+        screening = self.env['res.partner.screening.result']
         result = screening.screen_customer(self.id)
 
-        # Show appropriate message
+        # Show appropriate message based on screening result and email status
         if result:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Screening Complete'),
-                    'message': _('Potential matches found. Compliance officers have been notified.'),
-                    'type': 'warning',
-                    'sticky': False,
+            # result is now a dict with 'matches_found' and 'email_sent' keys
+            if result.get('email_sent', False):
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Screening Complete'),
+                        'message': _('Potential matches found. Compliance officers have been notified via email.'),
+                        'type': 'warning',
+                        'sticky': True,
+                    }
                 }
-            }
+            else:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Screening Complete'),
+                        'message': _('Potential matches found, but email notification failed. Please check system logs'),
+                        'type': 'danger',
+                        'sticky': True,  # Make it sticky so user notices the email failure
+                    }
+                }
         else:
             return {
                 'type': 'ir.actions.client',
@@ -276,7 +319,7 @@ class Customer(models.Model):
                     'title': _('Screening Complete'),
                     'message': _('No matches found.'),
                     'type': 'success',
-                    'sticky': False,
+                    'sticky': True,
                 }
             }
 

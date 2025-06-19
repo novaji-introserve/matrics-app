@@ -179,6 +179,5 @@ compliance_management.customer.channel.subscription,customer.channel.subscriptio
 compliance_management.res.partner.risk.universe.weight,res.partner.risk.universe.weight,compliance_management.model_res_partner_risk_universe_weight,base.group_user,1,1,1,1
 compliance_management.res.partner.screening.list.metadata,screening.list.metadata,compliance_management.model_screening_list_metadata,base.group_user,1,1,1,1
 compliance_management.res.partner.screening.result,res.partner.screening.result,compliance_management.model_res_partner_screening_result,base.group_user,1,1,1,0
-compliance_management.res.partner.screening,res.partner.screening,compliance_management.model_res_partner_screening,base.group_user,1,1,1,1
 compliance_management.res.partner.screening.status,res.partner.screening.status,compliance_management.model_res_partner_screening_status,base.group_user,1,1,1,0
 compliance_management.res.partner.screening.alert,res.partner.screening.alert,compliance_management.model_res_partner_screening_alert,base.group_user,1,1,1,1

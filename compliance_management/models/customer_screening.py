@@ -5,7 +5,9 @@ from psycopg2.extras import execute_values
 import os
 from dotenv import load_dotenv
 from datetime import timedelta, datetime, time
-
+import uuid
+import json
+import urllib.parse
 
 
 load_dotenv()
@@ -77,14 +79,14 @@ class CustomerScreeningResult(models.Model):
     ], string='Status', default='pending', tracking=True, index=True)
     active = fields.Boolean(string='Active', default=True, index=True,
                             help="If the match is no longer valid, it will be set to inactive", readonly=True)
-    reviewed_by_id = fields.Many2one('res.users', string='Reviewed By')
+    reviewed_by_id = fields.Many2one(
+        'res.users', string='Reviewed By', readonly=True)
     review_date = fields.Datetime(string='Review Date', readonly=True)
     notes = fields.Text(string='Review Notes')
-    screening_id = fields.Many2one(
-        'res.partner.screening', string='Related Screening', required=True)
+    company_id = fields.Many2one(
+        'res.company', string='Company', default=lambda self: self.env.company)
 
 
-    
     def action_confirm(self):
         """Confirm the screening match"""
         for record in self:
@@ -114,7 +116,6 @@ class CustomerScreeningResult(models.Model):
             # Recalculate risk score using existing method
             record.partner_id.action_compute_risk_score_with_plan()
 
-
         return True
 
     def action_dismiss(self):
@@ -129,13 +130,7 @@ class CustomerScreeningResult(models.Model):
                 'review_date': fields.Datetime.now()
             })
 
-
         return True
-    
-    
-class CustomerScreening(models.Model):
-    _name = 'res.partner.screening'
-    _description = 'Customer Screening'
 
     @api.model
     def _normalize_name(self, name):
@@ -205,38 +200,42 @@ class CustomerScreening(models.Model):
     def _screen_customer_against_watchlist(self, partner):
         """Screen customer against Watchlist using BVN with direct SQL query"""
         results = []
-        
+
         # Skip if no BVN
         if not partner.bvn:
-            _logger.info(f"Customer {partner.id} ({partner.name}) has no BVN, skipping watchlist screening")
+            _logger.info(
+                f"Customer {partner.id} ({partner.name}) has no BVN, skipping watchlist screening")
             return results
-        
+
         # Normalize BVN (remove whitespace and convert to string)
         normalized_bvn = str(partner.bvn).strip()
-        _logger.info(f"Screening customer {partner.id} ({partner.name}) with BVN: '{normalized_bvn}'")
-        
+        _logger.info(
+            f"Screening customer {partner.id} ({partner.name}) with BVN: '{normalized_bvn}'")
+
         # Try exact match first
         self.env.cr.execute("""
             SELECT id FROM res_partner_watchlist
             WHERE bvn = %s
             LIMIT 1
         """, (normalized_bvn,))
-        
+
         watchlist_record = self.env.cr.fetchone()
-        
+
         # If no exact match, try with trimmed values (to handle whitespace issues)
         if not watchlist_record:
-            _logger.info(f"No exact match found for BVN: '{normalized_bvn}', trying with TRIM")
+            _logger.info(
+                f"No exact match found for BVN: '{normalized_bvn}', trying with TRIM")
             self.env.cr.execute("""
                 SELECT id FROM res_partner_watchlist
                 WHERE TRIM(bvn) = %s
                 LIMIT 1
             """, (normalized_bvn,))
             watchlist_record = self.env.cr.fetchone()
-        
+
         # If still no match, log available BVNs in watchlist for debugging
         if not watchlist_record:
-            _logger.info(f"No match found for BVN: '{normalized_bvn}', checking available BVNs in watchlist")
+            _logger.info(
+                f"No match found for BVN: '{normalized_bvn}', checking available BVNs in watchlist")
             self.env.cr.execute("""
                 SELECT bvn FROM res_partner_watchlist
                 LIMIT 10
@@ -244,15 +243,16 @@ class CustomerScreening(models.Model):
             available_bvns = [r[0] for r in self.env.cr.fetchall()]
             _logger.info(f"Sample BVNs in watchlist: {available_bvns}")
         else:
-            _logger.info(f"Found watchlist match for BVN: '{normalized_bvn}', record ID: {watchlist_record[0]}")
+            _logger.info(
+                f"Found watchlist match for BVN: '{normalized_bvn}', record ID: {watchlist_record[0]}")
             results.append({
                 'list_type': 'watchlist',
                 'match_id': f'res.partner.watchlist,{watchlist_record[0]}'
             })
-            
+
             # Update the likely match for quick reference
             partner.write({'likely_watchlist_match_id': watchlist_record[0]})
-                
+
         return results
 
     @api.model
@@ -369,143 +369,122 @@ class CustomerScreening(models.Model):
 
         return results
 
-
-    @api.model
     def screen_customer(self, partner_id):
         """Screen a customer against all lists"""
         partner = self.env['res.partner'].browse(partner_id)
         if not partner.exists():
             return False
-            
+
         # Get or create screening status
         status = self.env['res.partner.screening.status'].get_status(partner_id)
-        
+
         all_results = []
-        
+
         # Get changed lists
         changed_lists = self.check_list_changes()
-        
+
         # Only screen against changed lists
         if 'pep' in changed_lists or not status.pep_status:
             all_results.extend(self._screen_customer_against_pep(partner))
             status.pep_status = True
-            
+
         if 'watchlist' in changed_lists or not status.watchlist_status:
             all_results.extend(self._screen_customer_against_watchlist(partner))
             status.watchlist_status = True
-            
+
         if 'sanction' in changed_lists or not status.sanction_status:
             all_results.extend(self._screen_customer_against_sanction(partner))
             status.sanction_status = True
-            
+
         if 'global_pep' in changed_lists or not status.global_pep_status:
             all_results.extend(self._screen_customer_against_global_pep(partner))
             status.global_pep_status = True
-        
-        # ... handle other lists similarly ...
-        
+
         # Create screening results
         for result in all_results:
             # Check if a similar result already exists
-            existing = self.env['res.partner.screening.result'].search([
+            existing = self.search([
                 ('partner_id', '=', partner.id),
                 ('list_type', '=', result['list_type']),
                 ('active', '=', True)
             ], limit=1)
-            
+
+            # Convert match_id to string for proper comparison
+            match_id_str = result['match_id']
+
             if existing:
+                # Fix: Convert existing.match_id to string for comparison
+                existing_match_id = False
+                if existing.match_id:
+                    existing_match_id = f"{existing.match_id._name},{existing.match_id.id}"
+
                 # Update existing result if the match_id is different
-                if existing.match_id != result['match_id']:
-                    existing.write({
-                        'match_id': result['match_id'],
-                        'state': 'pending',  # Reset to pending since it's a new match
-                        'reviewed_by_id': False,
-                        'review_date': False
-                    })
+                if existing_match_id != match_id_str:
+                    try:
+                        existing.write({
+                            'match_id': match_id_str,
+                            'state': 'pending',  # Reset to pending since it's a new match
+                            'reviewed_by_id': False,
+                            'review_date': False
+                        })
+                        _logger.info(
+                            f"Updated existing screening result for partner {partner.id} with new match: {match_id_str}")
+                    except Exception as e:
+                        _logger.error(
+                            f"Error updating existing screening result: {e}")
             else:
                 # Create new result
-                self.env['res.partner.screening.result'].create({
-                    'partner_id': partner.id,
-                    'list_type': result['list_type'],
-                    'match_id': result['match_id'],
-                    'state': 'pending',
-                    'active': True
-                })
-        
+                try:
+                    self.create({
+                        'partner_id': partner.id,
+                        'list_type': result['list_type'],
+                        'match_id': match_id_str,
+                        'state': 'pending',
+                        'active': True
+                    })
+                    _logger.info(
+                        f"Created new screening result for partner {partner.id}: {match_id_str}")
+                except Exception as e:
+                    _logger.error(f"Error creating new screening result: {e}")
+
         # Update last screening date
         status.write({'last_screening_date': fields.Datetime.now()})
-        
-        # If matches found, update risk score
+
+        # If matches found, update risk score and send notification
         if all_results:
             partner.action_compute_risk_score_with_plan()
-            self._send_screening_notification(partner, all_results)
-            
-        return bool(all_results)
-    
-    # @api.model
-    # def _send_screening_notification(self, partner, results):
-    #     """Send email notification for screening results"""
-        
-    #     sc_alert_records = self.env['res.partner.screening.alert'].search([])
-    #     # Collect all users from the alert_officers Many2many field
-    #     officers = sc_alert_records.mapped('sanction_alert_officers')
-    #     if not officers:
-    #         _logger.warning("No officers configured for alerts")
-    #         return
-        
-    #     # from_filter = self.env['ir.config_parameter'].sudo().get_param(
-    #     #     'mail.default.from', tools.config.get('from_filter'))
-    #     from_filter = self.env['ir.config_parameter'].sudo().get_param(
-    #         'mail.default.from_filter', tools.config.get('from_filter'))
-        
-    #     if not from_filter:
-    #         _logger.error("EmailFrom variable not configured in ir.config_parameter settings")
-    #         raise ValidationError("Email sender address not configured")
-        
-    #     # officers_name = ", ".join(officers.mapped('name')) or ""
-    #     officers_email = ", ".join(officers.mapped('email')) or ""
-                
+            email_sent = self._send_screening_notification(partner, all_results)
 
-    #     template = self.env.ref(
-    #         'compliance_management.email_template_screening_alert', raise_if_not_found=False)
-    #     if not template:
-    #         _logger.warning("Email template for screening alert not found")
-    #         return
+            # Return dict with both match status and email status
+            return {
+                'matches_found': True,
+                'email_sent': email_sent
+            }
 
-
-    #     # Prepare context for template
-    #     ctx = {
-    #         'partner': partner,
-    #         'results': results,
-    #         'base_url': self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-    #     }
-
-    #     # Send email to each compliance officer
-    #     for officer in officers:
-    #         template.with_context(ctx).send_mail(
-    #             partner.id,
-    #             force_send=True,
-    #             email_values={'email_to': officer.email}
-    #         )
+        return False  # No matches found
 
     @api.model
     def _send_screening_notification(self, partner, results):
-        """Send email notification for screening results"""
+        """Send email notification for screening results
+        Returns: bool - True if email was sent successfully, False otherwise
+        """
         try:
             sc_alert_records = self.env['res.partner.screening.alert'].search([])
             # Collect all users from the alert_officers Many2many field
             officers = sc_alert_records.mapped('sanction_alert_officers')
             if not officers:
                 _logger.warning("No officers configured for alerts")
-                return
+                return False
 
-            from_filter = self.env['ir.config_parameter'].sudo().get_param(
-                'mail.default.from_filter', tools.config.get('from_filter'))
+            # Get from email with fallbacks
+            from_email = self.env['ir.config_parameter'].sudo(
+            ).get_param('mail.default.from')
+            _logger.info(
+                f"Retrieved mail.default.from in ir.config value: '{from_email}'")
 
-            if not from_filter:
-                _logger.error(
-                    "EmailFrom variable not configured in ir.config_parameter settings")
-                raise ValidationError("Email sender address not configured")
+            if not from_email:
+                from_email = "developer@novajii.com"
+                _logger.info(f"Using hardcoded fallback email: '{from_email}'")
 
             officers_email = ", ".join(officers.mapped('email')) or ""
 
@@ -513,102 +492,463 @@ class CustomerScreening(models.Model):
                 'compliance_management.email_template_screening_alert', raise_if_not_found=False)
             if not template:
                 _logger.warning("Email template for screening alert not found")
-                return
+                return False
 
-            # Prepare context for template
+            # Get company logo safely
+            def get_company_logo():
+                try:
+                    # Try user's company first
+                    company = self.env.user.company_id
+                    if company and company.logo_web:
+                        return company.logo_web.decode('utf-8')
+
+                    # Try current company
+                    company = self.env.company
+                    if company and company.logo_web:
+                        return company.logo_web.decode('utf-8')
+
+                    # Try first company in system
+                    company = self.env['res.company'].sudo().search([], limit=1)
+                    if company and company.logo_web:
+                        return company.logo_web.decode('utf-8')
+
+                    return None
+                except Exception as e:
+                    _logger.warning(f"Error getting company logo: {e}")
+                    return None
+
+            # Generate URL for the record
+            base_url = self.env['ir.config_parameter'].sudo(
+            ).get_param('web.base.url')
+            try:
+                action = self.env.ref(
+                    'compliance_management.action_screening_result_pending')
+                record_url = f"{base_url}/web#id={partner.id}&action={action.id}&model=res.partner.screening.result&view_type=tree"
+            except Exception as e:
+                _logger.warning(f"Could not get action reference: {e}")
+                record_url = f"{base_url}/web#id={partner.id}&model=res.partner.screening.result&view_type=form"
+
+            domain_url = self.get_partner_filtered_tree_url(partner)
+            _logger.warning(f"Domain Link to record : {domain_url}")
+
+            # Format date as string to avoid serialization issues
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            # Safe attribute getter
+            def safe_getattr(obj, attr, default='N/A'):
+                try:
+                    value = getattr(obj, attr, default)
+                    return str(value) if value is not None else default
+                except Exception:
+                    return default
+
+            # Prepare context for template - AVOID referencing any specific record object
             ctx = {
                 'partner': partner,
-                'results': results,
-                'base_url': self.env['ir.config_parameter'].sudo().get_param('web.base.url'),
+                'results': results or [],
+                'record_url': record_url,
                 'officers_email': officers_email,
-                'datetime': datetime.now().replace(microsecond=0)
+                'datetime': current_time,
+                'from_email': from_email,
+                'name': safe_getattr(partner, 'name', 'Unknown'),
+                'bvn': safe_getattr(partner, 'bvn'),
+                'risk_score': safe_getattr(partner, 'risk_score'),
+                'risk_level': safe_getattr(partner, 'risk_level'),
+                'customer_id': safe_getattr(partner, 'customer_id'),
+                'company_logo': get_company_logo(),  # Safe logo getter
             }
 
-            # Render the template to get HTML content for alert history
-            template_with_ctx = template.with_context(**ctx)
-
-            # Get the rendered HTML content
-            rendered_html = template_with_ctx._render_template(
-                template_with_ctx.body_html,
-                template_with_ctx.model,
-                [partner.id],
-                engine='qweb',
-                add_context=ctx
-            )[partner.id]
-
-            # Determine risk level based on partner's risk score
-            partner_risk_score = float(
-                partner.risk_score) if partner.risk_score else 0.0
-            alert_risk_level = "low"  # default
-
+            # Create a minimal mail values dict instead of using a record
             try:
-                low_threshold = float(
-                    self.env['res.compliance.settings'].get_setting('low_risk_threshold'))
-                medium_threshold = float(
-                    self.env['res.compliance.settings'].get_setting('medium_risk_threshold'))
+                # Render template manually to avoid record dependency
+                mail_values = {
+                    'subject': 'Sanction Screening Alert: Potential Match Found!',
+                    'email_from': from_email,
+                    'email_to': officers_email,
+                    'auto_delete': False,
+                    'model': 'res.partner',
+                    'res_id': partner.id,
+                }
 
-                if partner_risk_score <= low_threshold:
-                    alert_risk_level = "low"
-                elif partner_risk_score <= medium_threshold:
-                    alert_risk_level = "medium"
-                else:
-                    alert_risk_level = "high"
-            except Exception as e:
-                _logger.warning(
-                    f"Could not determine risk thresholds, using default 'low': {str(e)}")
+                # Render the body HTML safely
+                try:
+                    # Use template rendering without a specific record
+                    rendered_body = template.with_context(**ctx)._render_template(
+                        template.body_html,
+                        template.model,
+                        [partner.id],  # Use partner ID instead
+                        engine='qweb',
+                        add_context=ctx
+                    ).get(partner.id, '')
 
-            # Send email to all compliance officers at once
-            try:
-                email_result = template_with_ctx.send_mail(
-                    partner.id,
-                    force_send=True,
-                    raise_exception=True,
-                    email_values={
-                        'email_to': officers_email,
-                        'email_from': from_filter
-                    }
-                )
+                    mail_values['body_html'] = rendered_body
 
-                # Check if email was sent successfully
-                mail = self.env['mail.mail'].browse(email_result)
+                except Exception as render_error:
+                    _logger.error(f"Template rendering failed: {render_error}")
+                    # Create a simple fallback email body
+                    
+
+                # Create and send mail
+                mail = self.env['mail.mail'].sudo().create(mail_values)
+                mail.send()
+
                 email_sent_successfully = mail.state == 'sent'
 
                 if email_sent_successfully:
                     _logger.info(
                         f"Screening notification sent to officers: {officers_email}")
 
+                    # Save to alert history
+                    try:
+                        # Determine risk level
+                        partner_risk_score = float(
+                            partner.risk_score) if partner.risk_score else 0.0
+                        alert_risk_level = "low"  # default
+
+                        try:
+                            low_threshold = float(
+                                self.env['res.compliance.settings'].get_setting('low_risk_threshold'))
+                            medium_threshold = float(
+                                self.env['res.compliance.settings'].get_setting('medium_risk_threshold'))
+
+                            if partner_risk_score <= low_threshold:
+                                alert_risk_level = "low"
+                            elif partner_risk_score <= medium_threshold:
+                                alert_risk_level = "medium"
+                            else:
+                                alert_risk_level = "high"
+                        except Exception as e:
+                            _logger.warning(
+                                f"Could not determine risk thresholds: {e}")
+
+                        self.env['alert.history'].sudo().create({
+                            "ref_id": f"res.partner.screening.result,{partner.id}",
+                            'html_body': mail_values['body_html'],
+                            'attachment_data': None,
+                            'attachment_link': None,
+                            'last_checked': fields.Datetime.now(),
+                            'risk_rating': alert_risk_level,
+                            'process_id': None,
+                            'source': 'Sanction Screening Alert',
+                            'date_created': fields.Datetime.now(),
+                            'email': officers_email
+                        })
+                        _logger.info(
+                            f"Alert history record created for partner: {partner.name}")
+
+                    except Exception as e:
+                        _logger.error(
+                            f"Failed to create alert history record: {e}")
+                else:
+                    _logger.error(f"Mail failed to send. State: {mail.state}")
+
+                # Return whether email was sent successfully
+                return email_sent_successfully
+
             except Exception as e:
-                _logger.error(f"Failed to send screening notification: {str(e)}")
-                email_sent_successfully = False
-
-            # Insert into alert history table if at least one email was sent successfully
-            if email_sent_successfully:
-                try:
-                    self.env['alert.history'].sudo(flag=True).create({
-                        "ref_id": f"res.partner.screening.result,{partner.id}",
-                        'html_body': rendered_html,
-                        'attachment_data': None,
-                        'attachment_link': None,
-                        'last_checked': fields.Datetime.now(),
-                        'risk_rating': alert_risk_level,
-                        'process_id': None,
-                        'source': 'Sanction Screening Alert',
-                        'date_created': fields.Datetime.now(),
-                        'email': officers_email
-                    })
-                    _logger.info(
-                        f"Screening alert history record created for partner: {partner.name}")
-
-                except Exception as e:
-                    _logger.error(
-                        f"Failed to create alert history record: {str(e)}")
+                _logger.error(
+                    f"Failed to send screening notification: {e}", exc_info=True)
+                return False
 
         except Exception as e:
             _logger.error(
-                f"Error in screening notification process: {str(e)}", exc_info=True)
-            raise ValidationError(
-                f"Failed to send screening notifications: {str(e)}")
+                f"Error in screening notification process: {e}", exc_info=True)
+            return False
+
+    # @api.model
+    # def _send_screening_notification(self, partner, results):
+    #     """Send email notification for screening results"""
+    #     try:
+    #         sc_alert_records = self.env['res.partner.screening.alert'].search([])
+    #         # Collect all users from the alert_officers Many2many field
+    #         officers = sc_alert_records.mapped('sanction_alert_officers')
+    #         if not officers:
+    #             _logger.warning("No officers configured for alerts")
+    #             return
+
+    #         # Get from email with fallbacks
+    #         from_email = self.env['ir.config_parameter'].sudo(
+    #         ).get_param('mail.default.from')
+    #         _logger.info(
+    #             f"Retrieved mail.default.from in ir.config value: '{from_email}'")
+
+    #         if not from_email:
+    #             from_email = "developer@novajii.com"
+    #             _logger.info(f"Using hardcoded fallback email: '{from_email}'")
+
+    #         officers_email = ", ".join(officers.mapped('email')) or ""
+
+    #         template = self.env.ref(
+    #             'compliance_management.email_template_screening_alert', raise_if_not_found=False)
+    #         if not template:
+    #             _logger.warning("Email template for screening alert not found")
+    #             return
+
+    #         # Get company logo safely
+    #         def get_company_logo():
+    #             try:
+    #                 # Try user's company first
+    #                 company = self.env.user.company_id
+    #                 if company and company.logo_web:
+    #                     return company.logo_web.decode('utf-8')
+
+    #                 # Try current company
+    #                 company = self.env.company
+    #                 if company and company.logo_web:
+    #                     return company.logo_web.decode('utf-8')
+
+    #                 # Try first company in system
+    #                 company = self.env['res.company'].sudo().search([], limit=1)
+    #                 if company and company.logo_web:
+    #                     return company.logo_web.decode('utf-8')
+
+    #                 return None
+    #             except Exception as e:
+    #                 _logger.warning(f"Error getting company logo: {e}")
+    #                 return None
+
+    #         # Generate URL for the record
+    #         base_url = self.env['ir.config_parameter'].sudo(
+    #         ).get_param('web.base.url')
+    #         try:
+    #             action = self.env.ref(
+    #                 'compliance_management.action_screening_result_pending')
+    #             record_url = f"{base_url}/web#id={partner.id}&action={action.id}&model=res.partner.screening.result&view_type=tree"
+    #         except Exception as e:
+    #             _logger.warning(f"Could not get action reference: {e}")
+    #             record_url = f"{base_url}/web#id={partner.id}&model=res.partner.screening.result&view_type=form"
+
+    #         domain_url = self.get_partner_filtered_tree_url(partner)
+    #         _logger.warning(f"Domain Link to record : {domain_url}")
+    #         # Format date as string to avoid serialization issues
+    #         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    #         # Safe attribute getter
+    #         def safe_getattr(obj, attr, default='N/A'):
+    #             try:
+    #                 value = getattr(obj, attr, default)
+    #                 return str(value) if value is not None else default
+    #             except Exception:
+    #                 return default
+
+    #         # Prepare context for template - AVOID referencing any specific record object
+    #         ctx = {
+    #             'partner': partner,
+    #             'results': results or [],
+    #             'record_url': record_url,
+    #             'officers_email': officers_email,
+    #             'datetime': current_time,
+    #             'from_email': from_email,
+    #             'name': safe_getattr(partner, 'name', 'Unknown'),
+    #             'bvn': safe_getattr(partner, 'bvn'),
+    #             'risk_score': safe_getattr(partner, 'risk_score'),
+    #             'risk_level': safe_getattr(partner, 'risk_level'),
+    #             'customer_id': safe_getattr(partner, 'customer_id'),
+    #             'company_logo': get_company_logo(),  # Safe logo getter
+    #         }
+
+    #         # Create a minimal mail values dict instead of using a record
+    #         try:
+    #             # Render template manually to avoid record dependency
+    #             mail_values = {
+    #                 'subject': 'Sanction Screening Alert: Potential Match Found!',
+    #                 'email_from': from_email,
+    #                 'email_to': officers_email,
+    #                 'auto_delete': False,
+    #                 'model': 'res.partner',
+    #                 'res_id': partner.id,
+    #             }
+
+    #             # Render the body HTML safely
+    #             try:
+    #                 # Use template rendering without a specific record
+    #                 rendered_body = template.with_context(**ctx)._render_template(
+    #                     template.body_html,
+    #                     template.model,
+    #                     [partner.id],  # Use partner ID instead
+    #                     engine='qweb',
+    #                     add_context=ctx
+    #                 ).get(partner.id, '')
+
+    #                 mail_values['body_html'] = rendered_body
+
+    #             except Exception as render_error:
+    #                 _logger.error(f"Template rendering failed: {render_error}")
+    #                 # Create a simple fallback email body
+
+    #             # Create and send mail
+    #             mail = self.env['mail.mail'].sudo().create(mail_values)
+    #             mail.send()
+
+    #             if mail.state == 'sent':
+    #                 _logger.info(
+    #                     f"Screening notification sent to officers: {officers_email}")
+
+    #                 # Save to alert history
+    #                 try:
+    #                     # Determine risk level
+    #                     partner_risk_score = float(
+    #                         partner.risk_score) if partner.risk_score else 0.0
+    #                     alert_risk_level = "low"  # default
+
+    #                     try:
+    #                         low_threshold = float(
+    #                             self.env['res.compliance.settings'].get_setting('low_risk_threshold'))
+    #                         medium_threshold = float(
+    #                             self.env['res.compliance.settings'].get_setting('medium_risk_threshold'))
+
+    #                         if partner_risk_score <= low_threshold:
+    #                             alert_risk_level = "low"
+    #                         elif partner_risk_score <= medium_threshold:
+    #                             alert_risk_level = "medium"
+    #                         else:
+    #                             alert_risk_level = "high"
+    #                     except Exception as e:
+    #                         _logger.warning(
+    #                             f"Could not determine risk thresholds: {e}")
+
+    #                     self.env['alert.history'].sudo().create({
+    #                         "ref_id": f"res.partner.screening.result,{partner.id}",
+    #                         'html_body': mail_values['body_html'],
+    #                         'attachment_data': None,
+    #                         'attachment_link': None,
+    #                         'last_checked': fields.Datetime.now(),
+    #                         'risk_rating': alert_risk_level,
+    #                         'process_id': None,
+    #                         'source': 'Sanction Screening Alert',
+    #                         'date_created': fields.Datetime.now(),
+    #                         'email': officers_email
+    #                     })
+    #                     _logger.info(
+    #                         f"Alert history record created for partner: {partner.name}")
+
+    #                 except Exception as e:
+    #                     _logger.error(
+    #                         f"Failed to create alert history record: {e}")
+    #             else:
+    #                 _logger.error(f"Mail failed to send. State: {mail.state}")
+
+    #         except Exception as e:
+    #             _logger.error(
+    #                 f"Failed to send screening notification: {e}", exc_info=True)
+
+    #     except Exception as e:
+    #         _logger.error(
+    #             f"Error in screening notification process: {e}", exc_info=True)
+            
     
+    # def screen_customer(self, partner_id):
+    #     """Screen a customer against all lists"""
+    #     partner = self.env['res.partner'].browse(partner_id)
+    #     if not partner.exists():
+    #         return False
+
+    #     # Get or create screening status
+    #     status = self.env['res.partner.screening.status'].get_status(
+    #         partner_id)
+
+    #     all_results = []
+
+    #     # Get changed lists
+    #     changed_lists = self.check_list_changes()
+
+    #     # Only screen against changed lists
+    #     if 'pep' in changed_lists or not status.pep_status:
+    #         all_results.extend(self._screen_customer_against_pep(partner))
+    #         status.pep_status = True
+
+    #     if 'watchlist' in changed_lists or not status.watchlist_status:
+    #         all_results.extend(
+    #             self._screen_customer_against_watchlist(partner))
+    #         status.watchlist_status = True
+
+    #     if 'sanction' in changed_lists or not status.sanction_status:
+    #         all_results.extend(self._screen_customer_against_sanction(partner))
+    #         status.sanction_status = True
+
+    #     if 'global_pep' in changed_lists or not status.global_pep_status:
+    #         all_results.extend(
+    #             self._screen_customer_against_global_pep(partner))
+    #         status.global_pep_status = True
+
+    #     # Create screening results
+    #     for result in all_results:
+    #         # Check if a similar result already exists
+    #         existing = self.search([
+    #             ('partner_id', '=', partner.id),
+    #             ('list_type', '=', result['list_type']),
+    #             ('active', '=', True)
+    #         ], limit=1)
+
+    #         # Convert match_id to string for proper comparison
+    #         match_id_str = result['match_id']
+
+    #         if existing:
+    #             # Fix: Convert existing.match_id to string for comparison
+    #             existing_match_id = False
+    #             if existing.match_id:
+    #                 existing_match_id = f"{existing.match_id._name},{existing.match_id.id}"
+
+    #             # Update existing result if the match_id is different
+    #             if existing_match_id != match_id_str:
+    #                 try:
+    #                     existing.write({
+    #                         'match_id': match_id_str,
+    #                         'state': 'pending',  # Reset to pending since it's a new match
+    #                         'reviewed_by_id': False,
+    #                         'review_date': False
+    #                     })
+    #                     _logger.info(
+    #                         f"Updated existing screening result for partner {partner.id} with new match: {match_id_str}")
+    #                 except Exception as e:
+    #                     _logger.error(
+    #                         f"Error updating existing screening result: {e}")
+    #         else:
+    #             # Create new result
+    #             try:
+    #                 self.create({
+    #                     'partner_id': partner.id,
+    #                     'list_type': result['list_type'],
+    #                     'match_id': match_id_str,
+    #                     'state': 'pending',
+    #                     'active': True
+    #                 })
+    #                 _logger.info(
+    #                     f"Created new screening result for partner {partner.id}: {match_id_str}")
+    #             except Exception as e:
+    #                 _logger.error(f"Error creating new screening result: {e}")
+
+    #     # Update last screening date
+    #     status.write({'last_screening_date': fields.Datetime.now()})
+
+    #     # If matches found, update risk score
+    #     if all_results:
+    #         partner.action_compute_risk_score_with_plan()
+    #         self._send_screening_notification(partner, all_results)
+
+    #     return bool(all_results)
+    
+    def get_partner_filtered_tree_url(self, partner):
+        """Simple method to get partner-filtered tree view URL"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        try:
+            action = self.env.ref(
+                'compliance_management.action_screening_result_pending')
+
+            # Domain to filter by partner ID and pending state
+            domain = [('partner_id', '=', partner.id),
+                    ('state', '=', 'pending'), ('active', '=', True)]
+            domain_encoded = urllib.parse.quote(json.dumps(domain))
+
+            # Generate URL
+            url = f"{base_url}/web#action={action.id}&model=res.partner.screening.result&view_type=tree&domain={domain_encoded}"
+
+            return url
+
+        except Exception as e:
+            _logger.warning(f"Could not generate partner-filtered URL: {e}")
+            return f"{base_url}/web#model=res.partner.screening.result&view_type=tree"   
+
     @api.model
     def _get_list_details(self):
         """Get details of all screening lists"""
@@ -699,7 +1039,7 @@ class CustomerScreening(models.Model):
             return False
 
         # Get all current active matches for this list
-        screening_results = self.env['res.partner.screening.result'].search([
+        screening_results = self.search([
             ('list_type', '=', list_type),
             ('active', '=', True),
             ('state', '=', 'confirmed')  # Only check confirmed matches
@@ -739,54 +1079,6 @@ class CustomerScreening(models.Model):
         _logger.info(
             f"Deactivated {deactivated_count} outdated matches for {list_type}")
         return deactivated_count
-
-    # @api.model
-    # def _cron_daily_screening(self, limit=1000):
-    #     """Daily screening based on list changes"""
-    #     # Check which lists have changed
-    #     changed_lists = self.check_list_changes()
-
-    #     if not changed_lists:
-    #         _logger.info("No list changes detected, skipping screening")
-    #         return {'screened': 0, 'matches': 0}
-
-    #     _logger.info(f"Detected changes in lists: {', '.join(changed_lists)}")
-
-    #     # Deactivate outdated matches for changed lists
-    #     for list_type in changed_lists:
-    #         self._deactivate_outdated_matches(list_type)
-
-    #     # Get all customers to screen
-    #     # Limit batch size for performance
-    #     customers = self.env['res.partner'].search([], limit=limit)
-
-    #     processed_count = 0
-    #     match_count = 0
-
-    #     for customer in customers:
-    #         try:
-    #             result = self.screen_customer(customer.id)
-    #             processed_count += 1
-    #             if result:
-    #                 match_count += 1
-    #         except Exception as e:
-    #             _logger.error(f"Error screening customer {customer.id}: {e}")
-    #             continue
-
-    #     # Update last screening date for all lists
-    #     now = fields.Datetime.now()
-    #     list_metadata = self.env['screening.list.metadata'].search([
-    #         ('list_type', 'in', changed_lists)
-    #     ])
-    #     list_metadata.write({'last_screening': now})
-
-    #     _logger.info(
-    #         f"Daily screening completed: {processed_count} processed, {match_count} matches found")
-
-    #     return {
-    #         'processed': processed_count,
-    #         'matches': match_count
-    #     }
 
     @api.model
     def _cron_daily_screening(self, limit=5000):
@@ -839,7 +1131,8 @@ class CustomerScreening(models.Model):
                     LIMIT %s
                 """ % (status_fields[list_type], '%s'), (limit,))
 
-                customers_to_screen.extend([r[0] for r in self.env.cr.fetchall()])
+                customers_to_screen.extend(
+                    [r[0] for r in self.env.cr.fetchall()])
 
         # Remove duplicates
         customers_to_screen = list(set(customers_to_screen))
@@ -858,7 +1151,8 @@ class CustomerScreening(models.Model):
                     if result:
                         match_count += 1
                 except Exception as e:
-                    _logger.error(f"Error screening customer {customer_id}: {e}")
+                    _logger.error(
+                        f"Error screening customer {customer_id}: {e}")
                     continue
 
             self.env.cr.commit()  # Commit after each batch
@@ -879,7 +1173,7 @@ class CustomerScreening(models.Model):
             'processed': processed_count,
             'matches': match_count
         }
-    
+
     @api.model
     def bulk_screen_customers(self, list_types=None, batch_size=1000):
         """API method to trigger batch screening for specific lists"""
@@ -930,7 +1224,8 @@ class CustomerScreening(models.Model):
             'processed': processed,
             'matches': matches
         }
-        
+
+    
     def init(self):
         # Add performance-critical indexes for large datasets
         self.env.cr.execute("""            
@@ -940,125 +1235,10 @@ class CustomerScreening(models.Model):
             CREATE INDEX IF NOT EXISTS res_partner_screening_result_partner_active_idx 
             ON res_partner_screening_result (partner_id, active, state);
         """)
-        
-    def copy_screening_chatter_to_result(self):
-        """Copy all messages and attachments from screening to screening result"""
-        try:
-            # Search for existing screening results for this screening record
-            existing_results = self.env['res.partner.screening.result'].search([
-                ('screening_id', '=', self.id)  # Assuming there's a relation field
-            ], order='create_date desc', limit=1)
 
-            # Prepare values for the new screening result
-            result_vals = self._prepare_screening_result_vals()
-            result_vals['screening_id'] = self.id
-
-            # Create new screening result if none exists
-            if not existing_results:
-                try:
-                    screening_result = self.env['res.partner.screening.result'].create(
-                        result_vals)
-                    _logger.info(
-                        f"Created screening result record for screening {self.id}")
-                except Exception as e:
-                    _logger.error(f"Error creating screening result: {e}")
-                    return None
-            else:
-                # Use existing screening result
-                screening_result = existing_results[0]
-
-            # Ensure screening_result is not None
-            if not screening_result:
-                _logger.error(
-                    f"Failed to find or create screening result for screening {self.id}")
-                return None
-
-            # Copy all messages from screening to screening result
-            messages = self.env['mail.message'].search([
-                ('res_id', '=', self.id),
-                ('model', '=', 'res.partner.screening')
-            ], order='create_date asc')
-
-            for message in messages:
-                # Copy the message to the screening result
-                try:
-                    message.copy({
-                        'model': 'res.partner.screening.result',
-                        'res_id': screening_result.id
-                    })
-                    _logger.debug(
-                        f"Copied message {message.id} to screening result {screening_result.id}")
-                except Exception as e:
-                    _logger.error(f"Error copying message {message.id}: {e}")
-                    continue
-
-            # Copy email templates and attachments
-            if hasattr(self, 'message_main_attachment_id') and self.message_main_attachment_id:
-                try:
-                    # Link the main attachment to the screening result
-                    self.message_main_attachment_id.copy({
-                        'res_model': 'res.partner.screening.result',
-                        'res_id': screening_result.id
-                    })
-                    _logger.debug(
-                        f"Copied main attachment to screening result {screening_result.id}")
-                except Exception as e:
-                    _logger.error(f"Error copying main attachment: {e}")
-
-            # Copy all other attachments related to this screening
-            attachments = self.env['ir.attachment'].search([
-                ('res_model', '=', 'res.partner.screening'),
-                ('res_id', '=', self.id)
-            ])
-
-            for attachment in attachments:
-                try:
-                    attachment.copy({
-                        'res_model': 'res.partner.screening.result',
-                        'res_id': screening_result.id
-                    })
-                    _logger.debug(
-                        f"Copied attachment {attachment.id} to screening result {screening_result.id}")
-                except Exception as e:
-                    _logger.error(f"Error copying attachment {attachment.id}: {e}")
-                    continue
-
-            _logger.info(
-                f"Successfully copied {len(messages)} messages and {len(attachments)} attachments to screening result {screening_result.id}")
-            return screening_result
-
-        except Exception as e:
-            _logger.error(
-                f"Error in copy_screening_chatter_to_result: {e}", exc_info=True)
-            return None
-
-
-    def _prepare_screening_result_vals(self):
-        """Prepare values for creating screening result record"""
-        return {
-            'partner_id': self.partner_id.id if hasattr(self, 'partner_id') else False,
-            'screening_date': fields.Datetime.now(),
-            'status': 'pending',
-            'result_summary': f"Screening initiated for {self.partner_id.name if hasattr(self, 'partner_id') else 'Partner'}",
-            # Add other fields as needed based on your model structure
-        }
-
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        """Override create method to automatically copy messages when screening is created"""
-        records = super().create(vals_list)
-
-        # Copy messages for each created record
-        for record in records:
-            try:
-                record.copy_screening_chatter_to_result()
-            except Exception as e:
-                _logger.error(
-                    f"Error copying messages for screening {record.id}: {e}")
-
-        return records
     
+
+
 class CustomerScreeningStatus(models.Model):
     _name = 'res.partner.screening.status'
     _description = 'Customer Screening Status'

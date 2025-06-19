@@ -150,8 +150,9 @@
 
                 <!-- <notebook position="inside"> -->
                 <page string="Enhanced Due Diligence" name="edd_record">
-                    <field name="edd_ids" nolabel="1">
-                        <tree string="EDD Record" delete="False" create="False" edit="False">
+                   <field name="edd_ids" nolabel="1"
+                        context="{'form_view_ref': 'compliance_management.edd_form_view'}">
+                        <tree string="EDD Record" create="False" edit="False" delete="False">
                             <field name="name" />
                             <field name="status" />
                             <field name="customer_id" />
@@ -163,121 +164,6 @@
                             <field name="account_status" />
                             <field name="documentation_status" />
                         </tree>
-                        <form string="EDD Record">
-                            <header>
-                                <button name="action_submit_for_review" class="oe_highlight" type="object" string="Submit for Review" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', '!=', 'draft'), '|', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}" />
-
-                                <button name="action_approve" class="oe_highlight" type="object" string="Approve" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', '!=', 'completed'), ('is_current_user_approving_officer', '=', False)]}" />
-
-                                <button name="action_cancel" class="oe_highlight" type="object" string="Cancel" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'in', ['cancelled', 'approved', 'draft']), ('is_current_user_approving_officer', '=', False)]}" />
-
-                                <button name="action_archive" class="oe_highlight" type="object" string="Archive" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'not in', ['cancelled', 'approved']), ('is_cco', '=', False)]}" />
-
-                                <button name="action_send_back" class="oe_highlight" type="object" string="Send Back" groups="compliance_management.group_compliance_branch_compliance_officer" attrs="{'invisible': ['|', ('status', 'in', ['draft', 'approved']), ('is_current_user_approving_officer', '=', False)]}" />
-
-
-                                <field name="status" widget="statusbar" statusbar_visible="draft,completed,approved,cancelled,deleted,archived"/>
-                            </header>
-                            <sheet>
-                                <group>
-                                    <group>
-                                        <field name="name" />
-                                        <!-- <field name="status" /> -->
-                                        <field name="customer_id" readonly="1"/>
-                                        <field name="responsible_id" />
-                                        <field name="user_id" />
-
-                                        <field name="is_cco" invisible="1"/>
-                                        <field name="status" invisible="1"/>
-                                        <field name="is_current_user_responsible" invisible="1"/>
-                                        <field name="is_current_user_approver" invisible="1"/>
-                                        <field name="is_current_user_approving_officer" invisible="1"/>
-                                        <field name="risk_score" widget="numeric_step" options="{'step': 0.25, 'min': 0.5, 'max': 25}" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                     'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-
-
-
-
-                                    </group>
-                                    <group>
-                                        <field name="account_status" />
-                                        <field name="documentation_status" />
-                                        <field name="last_kyc_date" />
-                                        <field name="approved_by" />
-                                        <field name="date_approved" />
-
-
-                                    </group>
-                                </group>
-                                <notebook>
-                                    <page string="Details">
-                                        <group>
-                                            <field name="description" />
-                                            <field name="visitation_observation" />
-                                            <field name="overall_kyc_outcome" />
-
-                                        </group>
-
-                                    </page>
-                                    <page string="Transaction Information">
-                                        <group>
-                                            <group string="Cash Information">
-                                                <field name="main_cash_purpose" />
-                                            </group>
-                                            <group string="Inflow Information">
-                                                <field name="main_inflow_purpose" />
-                                                <field name="main_fund_remitters" />
-                                                <field name="inflow_sources" />
-                                            </group>
-                                        </group>
-                                        <group>
-                                            <group string="Additional Information">
-                                                <field name="other_related_accounts" />
-                                                <field name="occupation" />
-                                            </group>
-                                        </group>
-                                    </page>
-
-                                    <page string="Customer Assessment">
-
-                                        <group>
-
-                                            <group >
-
-                                                <field name="is_foreigner" />
-                                                <field name="is_pep" />
-                                                <field name="id_expired" />
-                                                <field name="was_kyc_comprehensive" />
-                                            </group>
-
-                                            <group >
-
-                                                <field name="has_initiated_new_kyc" />
-                                                <field name="is_current_from_normal" />
-                                                <field name="activity_level_matches_business" />
-                                                <field name="does_business_support_volume" />
-
-                                            </group>
-                                        </group>
-
-
-                                    </page>
-
-                                    <page string="Supporting Document(s)">
-                                        <group >,
-                                            <field name="supporting_document" widget="many2many_binary" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'cancelled', 'deleted', 'archived', 'completed']), '|',
-                                                     '&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'completed'),'&amp;', ('is_current_user_responsible', '=', False), ('status', '=', 'draft'), ('is_cco', '=', False)],
-                                                  'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)]}" />
-
-
-                                        </group>
-
-                                    </page>
-
-                                </notebook>
-                            </sheet>
-                        </form>
                     </field>
                 </page>
 

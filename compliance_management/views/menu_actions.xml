@@ -566,7 +566,7 @@
         <field name="context">{'default_list_type': 'watchlist', 'default_active': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No watchlist matches found
+            No Watchlist matches found
             </p>
             <p>
             Run customer screening to detect potential watchlist matches.
@@ -582,7 +582,7 @@
         <field name="context">{'default_list_type': 'sanction', 'default_active': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No sanction list matches found
+            No Sanction list matches found
             </p>
             <p>
             Run customer screening to detect potential sanction list matches.
@@ -598,7 +598,7 @@
         <field name="context">{'default_list_type': 'global_pep', 'default_active': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No global PEP matches found
+            No Global PEP matches found
             </p>
             <p>
             Run customer screening to detect potential global PEP matches.
@@ -614,7 +614,7 @@
         <field name="context">{'default_list_type': 'blacklist', 'default_active': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-            No blacklist matches found
+            No Blacklist matches found
             </p>
             <p>
             Run customer screening to detect potential blacklist matches.
@@ -649,6 +649,22 @@
             </p>
             <p>
             Define alert officers for Sanction Screening.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_screening_result_pending" model="ir.actions.act_window">
+        <field name="name">Pending Reviews</field>
+        <field name="res_model">res.partner.screening.result</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'pending'), ('active', '=', True)]</field>
+        <field name="context">{'default_state': 'pending', 'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No pending reviews found
+            </p>
+            <p>
+                All screening results have been reviewed.
             </p>
         </field>
     </record>
@@ -741,6 +757,9 @@
 
     <menuitem id="menu_screening_result_fep" name="FEP List Matches" action="action_screening_result_fep" parent="menu_compliance_sanction_matches" sequence="60"/>
 
+    <menuitem id="menu_screening_result_pending" name="Pending Reviews" action="action_screening_result_pending" parent="menu_compliance_sanction_matches" sequence="5"/>
+
+
     <!-- Sanction Screening Alert -->
     <menuitem id="menu_compliance_sc_config" name="Sanction Screening" parent="menu_compliance_configuration" sequence="600" />
 
@@ -751,7 +770,7 @@
 
     <!-- Menu Items -->
 
-    <menuitem id="menu_compliance_sanction_list" parent="menu_sanction_screening_root" name="List" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
+    <menuitem id="menu_compliance_sanction_list" parent="menu_sanction_screening_root" name="Screening List" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
 
     <menuitem id="menu_is_fep" action="action_res_partner_fep" parent="menu_compliance_sanction_list" name="FEP List" groups="group_compliance_compliance_officer" sequence="20" />
 
@@ -836,9 +855,16 @@
 
     <menuitem id="menu_digital_delivery_channel" name="Digital Channels" action="action_digital_delivery_channel" parent="menu_customer" sequence="5" />
 
-    <menuitem id="base.menu_board_root" name="Dashboards" sequence="260" web_icon="compliance_management,static/description/icon-dashboard.png" groups="base.group_user" />
-    <menuitem id="spreadsheet_dashboard.spreadsheet_dashboard_menu_root" name="Dashboards" groups="group_tech_support" action="spreadsheet_dashboard.ir_actions_dashboard_action" web_icon="compliance_management,static/description/icon-dashboard.png" sequence="37" />
-    <!-- <menuitem id="contacts.res_partner_menu_contacts" name="Customers" action="contacts.action_contacts" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" parent="contacts.menu_contacts" sequence="2" /> -->
+    <menuitem id="base.menu_board_root" name="Dashboards" sequence="260"
+        web_icon="compliance_management,static/description/icon-dashboard.png"
+        groups="base.group_user" />
+    <!-- <menuitem id="spreadsheet_dashboard.spreadsheet_dashboard_menu_root" name="Dashboards"
+        groups="group_tech_support" action="spreadsheet_dashboard.ir_actions_dashboard_action"
+        web_icon="compliance_management,static/description/icon-dashboard.png" sequence="37" /> -->
+    <!-- <menuitem id="contacts.res_partner_menu_contacts" name="Customers"
+    action="contacts.action_contacts"
+    groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer"
+    parent="contacts.menu_contacts" sequence="2" /> -->
 
     <menuitem id="mail.menu_root_discuss" name="Messaging" web_icon="compliance_management,static/description/icon-chat.png" groups="group_tech_support" sequence="1" />
 

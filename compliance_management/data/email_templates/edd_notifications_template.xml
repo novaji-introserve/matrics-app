@@ -1,6 +1,6 @@
 <odoo>
     <data>
-        <record id="enhanced_due_diligence_assessment_template" model="mail.template">
+         <record id="enhanced_due_diligence_assessment_template" model="mail.template">
             <field name="name">EDD Assessment Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Assessment Required</field>
@@ -9,9 +9,10 @@
             <field name="email_cc">${ctx.get('email_cc')}</field> 
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
-                <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+               <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
                     <div style="text-align: left; padding-bottom: 20px;">
-                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        <img t-if="object.company_id and object.company_id.logo_web"
+                            t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <p>Dear <t t-out="ctx.get('officer_name')"></t>,</p>
@@ -46,8 +47,10 @@
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-                    <div style="text-align: left; padding-bottom: 20px;">
-                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                  
+                <div style="text-align: left; padding-bottom: 20px;">
+                        <img t-if="object.company_id and object.company_id.logo_web"
+                            t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 `
                     <p>Dear <t t-out="ctx.get('cco')"></t>,</p>
@@ -82,9 +85,9 @@
             <field name="body_html">
                 <![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-
                     <div style="text-align: left; padding-bottom: 20px;">
-                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        <img t-if="object.company_id and object.company_id.logo_web"
+                            t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <!-- Email Content -->
@@ -126,9 +129,9 @@
             <field name="body_html">
                 <![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-                    <div style="text-align: left; padding-bottom: 20px;">
-                     
-                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                   <div style="text-align: left; padding-bottom: 20px;">
+                        <img t-if="object.company_id and object.company_id.logo_web"
+                            t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <p>Dear <t t-out="ctx.get('cco')"></t>,</p>
@@ -169,8 +172,8 @@
                 <![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
                     <div style="text-align: left; padding-bottom: 20px;">
-                      
-                         <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        <img t-if="object.company_id and object.company_id.logo_web"
+                            t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <p>Dear <t t-out="ctx.get('officer_name')"></t>,</p> 
@@ -210,8 +213,8 @@
                 <![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
                     <div style="text-align: left; padding-bottom: 20px;">
-                     
-                        <img src="/compliance_management/static/img/alt_bank_logo_.png" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        <img t-if="object.company_id and object.company_id.logo_web"
+                            t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
                     <p>Dear <t t-out="ctx.get('cco')"></t>,</p>

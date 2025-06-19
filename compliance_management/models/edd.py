@@ -3,7 +3,6 @@ import logging
 from datetime import datetime
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-
 # from odoo.exceptions import ValidationError, UserError
 _logger = logging.getLogger(__name__)
 
@@ -222,6 +221,7 @@ class CustomerEDD(models.Model):
         compute='_compute_is_current_user_approving_officer')
     is_cco = fields.Boolean(compute='_compute_is_cco', store=False,
                             default=lambda self: self._default_is_cco())
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     
 
     _sql_constraints = [
@@ -265,6 +265,7 @@ class CustomerEDD(models.Model):
             # Check if the approved_by matches the current user ID
             record.is_current_user_approving_officer = (
                 record.approving_officer_id.id == self.env.user.id)
+    
 
     # logic to send email      
     def _send_email_to_officers(self, template_ref, to_cco_only, officer=None):
@@ -295,38 +296,31 @@ class CustomerEDD(models.Model):
                 target_officer = self.approving_officer_id or officer.responsible_id
             
             officer = target_officer 
-           
             officer_email = officer.email
 
             if officer is None or not officer_email:
-                _logger.warning(
-                    "No valid officer found or officer has no email.")
+                _logger.warning("No valid officer found or officer has no email.")
                 raise ValidationError("No valid officer to send email to.")
 
-            base_url = self.env['ir.config_parameter'].sudo(
-            ).get_param('web.base.url')
-
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
             edd_url = f"{base_url}/web#id={self.id}&model=res.partner.edd&view_type=tree"
             _logger.info(f"EDD URL: {edd_url}")
 
-            ctx = {
+            # Prepare email context
+            email_context = {
                 'officer_name': officer.name,
                 'cco': cco_name,
                 'edd_url': edd_url,
             }
-            _logger.info(f"your officer {officer.name}")                
-            
+            # Determine email recipients
             if to_cco_only:
                 primary_email = cco_email
-                email_values = {
-                    'email_to': cco_email
-                }
+                email_values = {'email_to': cco_email}
                 # If sending officer is different from CCO, add them to CC
                 if sending_officer_email and sending_officer_email != cco_email:
                     email_values['email_cc'] = sending_officer_email
                     
-                _logger.info(
-                    f"{template.name} notification sent to {cco_email}")
+                _logger.info(f"{template.name} notification sent to {cco_email}")
             else:
                 primary_email = officer_email
                 # Build CC list
@@ -336,69 +330,65 @@ class CustomerEDD(models.Model):
                 if sending_officer_email and sending_officer_email != officer_email and sending_officer_email != cco_email:
                     cc_emails.append(sending_officer_email)
                 
-                email_values = {
-                    'email_to': officer_email,
-                }
+                email_values = {'email_to': officer_email}
                 
                 # Only add CC if there are emails to CC
                 if cc_emails:
                     email_values['email_cc'] = ','.join(cc_emails)
                 
-                _logger.info(
-                    f"{template.name} notification sent to {officer.email} with CC to {email_values.get('email_cc', 'none')}")
+                _logger.info(f"{template.name} notification sent to {officer.email} with CC to {email_values.get('email_cc', 'none')}")
                 
-            
             try:
-                 # Render the template with context
-                template_id = template.with_context(**ctx)
-
-                 # Get the rendered HTML content
-                rendered_html = template_id._render_template(
-                    template_id.body_html,
-                    template_id.model,
-                    [self.id],
-                    engine='qweb',
-                    add_context=ctx
-                )[self.id]
-    
-
-                email_result = template_id.send_mail(
+                template_with_context = template.with_context(**email_context)
+                
+                # Send the email with the context
+                email_result = template_with_context.send_mail(
                     self.id,
                     force_send=True,
                     email_values=email_values
                 )
+                
                 _logger.info(f"Email sent with ID: {email_result}")
                 _logger.info(f"Email values: {email_values}")
-            
+                
                 if email_result:    
-                        _logger.info(f"Email sent successfully to {primary_email}")
-                        try:
-                        # create alert history record 
-                            alert_history = self.env['alert.history'].sudo(flag=True).create({
-                                "ref_id": f"{self._name},{self.id}",
-                                'html_body': rendered_html,
-                                'attachment_data':  None,
-                                'attachment_link':  None,
-                                'last_checked': fields.Datetime.now(),
-                                'risk_rating': 'low',
-                                'process_id': None,
-                                'source': self._description,
-                                'date_created': fields.Datetime.now(),
-                                'email': primary_email,
-                                'email_cc': email_values.get('email_cc', ''),
-                                'narration': f"EDD notification sent via {template.name}",
-                                'name': f"EDD-{self.id} Email Notification"
-                                
-                            })
-                            _logger.info(f"Alert history created with ID: {alert_history.id}")
-                            _logger.info(f"EDD notification sent to officers ({primary_email})")   
-                        except Exception as history_error:
-                                _logger.error(f"Failed to create alert history: {str(history_error)}")
+                    _logger.info(f"Email sent successfully to {primary_email}")
+                    
+                    try:
+                        # Get the rendered HTML for history 
+                        rendered_html = template_with_context._render_template(
+                            template.body_html,
+                            template.model,
+                            [self.id],
+                            engine='qweb'
+                        )[self.id]
+                        
+                        # Create alert history record 
+                        alert_history = self.env['alert.history'].sudo(flag=True).create({
+                            "ref_id": f"{self._name},{self.id}",
+                            'html_body': rendered_html,
+                            'attachment_data': None,
+                            'attachment_link': None,
+                            'last_checked': fields.Datetime.now(),
+                            'risk_rating': 'low',
+                            'process_id': None,
+                            'source': self._description,
+                            'date_created': fields.Datetime.now(),
+                            'email': primary_email,
+                            'email_cc': email_values.get('email_cc', ''),
+                            'narration': f"EDD notification sent via {template.name}",
+                            'name': f"EDD-{self.id} Email Notification"
+                        })
+                        _logger.info(f"Alert history created with ID: {alert_history.id}")
+                        _logger.info(f"EDD notification sent to officers ({primary_email})")   
+                        
+                    except Exception as history_error:
+                        _logger.error(f"Failed to create alert history: {str(history_error)}")
                 else:
                     error_msg = "Email sending returned no mail ID - send may have failed"
                     _logger.error(error_msg)
                     raise ValidationError(f"Failed to send email: {error_msg}")
-               
+            
             except Exception as send_error:
                 _logger.error(f"Failed to send email or create history: {str(send_error)}")
                 raise ValidationError(f"Failed to send notification: {str(send_error)}")
@@ -635,3 +625,8 @@ class CustomerEDD(models.Model):
             'url': f'{base_url}/compliance/pdf_report/{self.id}',
             'target': 'new',
         }
+
+    
+        
+    
+    
