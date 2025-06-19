@@ -139,6 +139,63 @@ class CustomerScreeningResult(models.Model):
             return ""
         return name.lower().replace(" ", "").strip()
 
+    # @api.model
+    # def _screen_customer_against_pep(self, partner):
+    #     """Screen customer against PEP list using optimized SQL query"""
+    #     results = []
+
+    #     # Skip if no name information
+    #     if not partner.name and not partner.firstname and not partner.lastname:
+    #         return results
+
+    #     # Get normalized customer names
+    #     customer_name = self._normalize_name(partner.name)
+    #     customer_firstname = self._normalize_name(partner.firstname)
+    #     customer_lastname = self._normalize_name(partner.lastname)
+
+    #     if not customer_name and not customer_firstname and not customer_lastname:
+    #         return results
+
+    #     # Build SQL query for optimized matching
+    #     query = """
+    #         SELECT id, name, firstname, lastname
+    #         FROM pep_list
+    #         WHERE 1=0
+    #     """
+    #     params = []
+
+    #     if customer_name:
+    #         query = query.replace("1=0", "LOWER(REPLACE(name, ' ', '')) = %s")
+    #         params.append(customer_name)
+
+    #     if customer_firstname and customer_lastname:
+    #         if params:
+    #             query = query.replace(
+    #                 "1=0", "1=0 OR (LOWER(REPLACE(firstname, ' ', '')) = %s AND LOWER(REPLACE(lastname, ' ', '')) = %s)")
+    #             params.extend([customer_firstname, customer_lastname])
+    #         else:
+    #             query = query.replace(
+    #                 "1=0", "(LOWER(REPLACE(firstname, ' ', '')) = %s AND LOWER(REPLACE(lastname, ' ', '')) = %s)")
+    #             params.extend([customer_firstname, customer_lastname])
+
+    #     if not params:
+    #         return results
+
+    #     self.env.cr.execute(query, tuple(params))
+    #     pep_records = self.env.cr.dictfetchall()
+
+    #     for pep in pep_records:
+    #         results.append({
+    #             'list_type': 'pep',
+    #             'match_id': f'pep.list,{pep["id"]}'
+    #         })
+
+    #         # Update the likely match for quick reference
+    #         partner.write({'likely_pep_match_id': pep["id"]})
+    #         break
+
+    #     return results
+
     @api.model
     def _screen_customer_against_pep(self, partner):
         """Screen customer against PEP list using optimized SQL query"""
@@ -156,46 +213,52 @@ class CustomerScreeningResult(models.Model):
         if not customer_name and not customer_firstname and not customer_lastname:
             return results
 
-        # Build SQL query for optimized matching
-        query = """
-            SELECT id, name, firstname, lastname
-            FROM pep_list
-            WHERE 1=0
-        """
+        # Build SQL query conditions and parameters
+        conditions = []
         params = []
 
+        # Add condition for full name match
         if customer_name:
-            query = query.replace("1=0", "LOWER(REPLACE(name, ' ', '')) = %s")
+            conditions.append("LOWER(REPLACE(name, ' ', '')) = %s")
             params.append(customer_name)
 
+        # Add condition for first name and last name match
         if customer_firstname and customer_lastname:
-            if params:
-                query = query.replace(
-                    "1=0", "1=0 OR (LOWER(REPLACE(firstname, ' ', '')) = %s AND LOWER(REPLACE(lastname, ' ', '')) = %s)")
-                params.extend([customer_firstname, customer_lastname])
-            else:
-                query = query.replace(
-                    "1=0", "(LOWER(REPLACE(firstname, ' ', '')) = %s AND LOWER(REPLACE(lastname, ' ', '')) = %s)")
-                params.extend([customer_firstname, customer_lastname])
+            conditions.append("(LOWER(REPLACE(firstname, ' ', '')) = %s AND LOWER(REPLACE(lastname, ' ', '')) = %s)")
+            params.extend([customer_firstname, customer_lastname])
 
-        if not params:
+        # If no valid conditions, return empty results
+        if not conditions:
             return results
 
-        self.env.cr.execute(query, tuple(params))
-        pep_records = self.env.cr.dictfetchall()
+        # Build the final query
+        query = f"""
+            SELECT id, name, firstname, lastname
+            FROM pep_list
+            WHERE {' OR '.join(conditions)}
+        """
 
-        for pep in pep_records:
-            results.append({
-                'list_type': 'pep',
-                'match_id': f'pep.list,{pep["id"]}'
-            })
+        try:
+            self.env.cr.execute(query, tuple(params))
+            pep_records = self.env.cr.dictfetchall()
 
-            # Update the likely match for quick reference
-            partner.write({'likely_pep_match_id': pep["id"]})
-            break
+            for pep in pep_records:
+                results.append({
+                    'list_type': 'pep',
+                    'match_id': f'pep.list,{pep["id"]}'
+                })
+
+                # Update the likely match for quick reference
+                partner.write({'likely_pep_match_id': pep["id"]})
+                break
+
+        except Exception as e:
+            _logger.error(f"Error executing PEP screening query: {e}")
+            # Return empty results on error to prevent system crash
+            return []
 
         return results
-
+    
     @api.model
     def _screen_customer_against_watchlist(self, partner):
         """Screen customer against Watchlist using BVN with direct SQL query"""
