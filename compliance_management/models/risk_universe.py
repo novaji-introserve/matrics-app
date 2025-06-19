@@ -21,77 +21,38 @@ class RiskUniverse(models.Model):
                                      help="Weight percentage used in composite risk calculation")
     is_included_in_composite = fields.Boolean(string='Include in Composite', default=True,
                                               help="If checked, this risk universe will be included in composite risk calculations")
-   
-class PartnerRiskUniverseWeight(models.Model):
-    _name = 'res.partner.risk.universe.weight'
-    _description = 'Partner Risk Universe Weight'
+ 
+class PartnerCompositePlanLine(models.Model):
+    _name = 'res.partner.composite.plan.line'
+    _description = 'Partner Composite Risk Plan Line'
 
-    
     partner_id = fields.Many2one(
         'res.partner', string='Partner', ondelete='cascade', index=True)
+    plan_id = fields.Many2one(
+        'res.compliance.risk.assessment.plan', string='Risk Plan', index=True)
     universe_id = fields.Many2one(
         'res.risk.universe', string='Risk Universe', index=True)
-    weight_percentage = fields.Float(string='Weight %', digits=(5, 2))
-    universe_score = fields.Float(string='Risk Score', digits=(10, 2))
-    weighted_score = fields.Float(string='Weighted Score', digits=(10, 2))
-    name = fields.Char(related='universe_id.name',
-                       string='Universe', store=True, readonly=True)
-    code = fields.Char(related='universe_id.code',
-                    string='Code', store=True, readonly=True)
     subject_id = fields.Many2one(
-        'res.risk.subject', string='Risk Subject', readonly=True)
+        'res.risk.subject', string='Risk Subject')
+    matched = fields.Boolean(string='Matched', default=False,
+                             help="Whether this plan matched the SQL criteria")
+    risk_score = fields.Float(string='Risk Score', digits=(10, 2))
     assessment_id = fields.Many2one(
-        'res.risk.assessment', string='Risk Assessment', readonly=True)
-    assigned_score = fields.Float(string='Risk Score', digits=(10, 2),
-                                  help="The original risk assessment score assigned to this universe")
+        'res.risk.assessment', string='Risk Assessment')
+    name = fields.Char(related='plan_id.name',
+                       string='Plan Name', store=True, readonly=True)
+    # Add these new fields
+    universe_weight_percentage = fields.Float(related='universe_id.weight_percentage',
+                                              string='Universe Weight %', store=False, readonly=True)
+    weighted_score = fields.Float(string='Weighted Score', digits=(10, 2),
+                                  compute='_compute_weighted_score', store=False)
 
-    
-class PartnerRiskUniverseWeightReport(models.Model):
-    _name = 'partner.risk.universe.weight.report'
-    _description = 'Partner Risk Universe Weight Report'
-    _auto = False
-    _order = 'weight_percentage desc'
-
-    partner_id = fields.Many2one(
-        'res.partner', string='Partner', readonly=True)
-    universe_id = fields.Many2one(
-        'res.risk.universe', string='Risk Universe', readonly=True)
-    subject_id = fields.Many2one(
-        'res.risk.subject', string='Risk Subject', readonly=True)
-    name = fields.Char(string='Universe Name', readonly=True)
-    code = fields.Char(string='Universe Code', readonly=True)
-    weight_percentage = fields.Float(string='Weight %', readonly=True)
-    universe_score = fields.Float(string='Risk Score', readonly=True)
-    weighted_score = fields.Float(string='Weighted Score', readonly=True)
-    assigned_score = fields.Float(string='Risk Score', readonly=True)
-
-
-    def init(self):
-        tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute('''
-            CREATE OR REPLACE VIEW %s AS (
-                SELECT
-                    pruw.id as id,
-                    pruw.partner_id as partner_id,
-                    pruw.universe_id as universe_id,
-                    pruw.subject_id as subject_id,
-                    ru.name as name,
-                    ru.code as code,
-                    pruw.weight_percentage as weight_percentage,
-                    pruw.universe_score as universe_score,
-                    pruw.weighted_score as weighted_score,
-                    pruw.assigned_score  as assigned_score 
-                FROM
-                    res_partner_risk_universe_weight pruw
-                JOIN
-                    res_risk_universe ru ON ru.id = pruw.universe_id
-                WHERE
-                    ru.is_included_in_composite = True
-            )
-        ''' % (self._table,))
-
-        self._cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_risk_universe_composite_idx ON res_risk_universe(id) WHERE is_included_in_composite=True")
-        self._cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_risk_universe_weight_universe_id_idx ON res_partner_risk_universe_weight(universe_id) ")
+    @api.depends('risk_score', 'universe_id.weight_percentage')
+    def _compute_weighted_score(self):
+        for record in self:
+            if record.universe_id and record.risk_score:
+                record.weighted_score = record.risk_score * \
+                    (record.universe_id.weight_percentage / 100.0)
+            else:
+                record.weighted_score = 0.0
         
