@@ -209,18 +209,94 @@ class Customer(models.Model):
     last_risk_calculation = fields.Datetime(string='Last Risk Calculation', readonly=True,
                                             help="When the risk score was last calculated")
     
-    universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
-                                          string='Universe Weights')
-    # universe_weight_report_ids = fields.One2many('partner.risk.universe.weight.report', 'partner_id',
-    #                                              string='Universe Weight Report')
-    # total_weight_percentage = fields.Float(string='Total Weight %', compute='_compute_total_weight',
-    #                                        store=False)
+    # universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
+    #                                       string='Universe Weights')
+    
 
     show_create_case_button = fields.Boolean(
         string="Case Management Installed",
         compute='_compute_is_case_management_installed',
         store=False,
     )
+    
+    screening_ids = fields.One2many(
+        'res.partner.screening.result', 'partner_id',
+        string='Screening Results', domain=[('active', '=', True)])
+    last_screening_date = fields.Datetime(
+        string='Last Screening Date', readonly=True)
+    likely_pep_match_id = fields.Many2one(
+        'pep.list', string='Likely PEP Match')
+    likely_watchlist_match_id = fields.Many2one(
+        'res.partner.watchlist', string='Likely Watchlist Match')
+    likely_sanction_match_id = fields.Many2one(
+        'sanction.list', string='Likely Sanction Match')
+    likely_global_pep_match_id = fields.Many2one(
+        'res.pep', string='Likely Global PEP Match')
+    screening_needed = fields.Boolean(
+        string='Screening Needed',
+        help="Flag to indicate if customer needs screening")
+    composite_plan_line_ids = fields.One2many(
+        'res.partner.composite.plan.line', 'partner_id',
+        string='Composite Risk Plan Lines')
+    
+
+
+    def action_view_screening_results(self):
+        """View screening results for this customer"""
+        self.ensure_one()
+        return {
+            'name': _('Screening Results'),
+            'view_mode': 'tree,form',
+            'res_model': 'res.partner.screening.result',
+            'domain': [('partner_id', '=', self.id), ('active', '=', True)],
+            'type': 'ir.actions.act_window',
+            'context': {'default_partner_id': self.id}
+        }
+
+    
+            
+    def action_screen_customer(self):
+        """Screen customer against all lists"""
+        self.ensure_one()
+        screening = self.env['res.partner.screening.result']
+        result = screening.screen_customer(self.id)
+
+        # Show appropriate message based on screening result and email status
+        if result:
+            # result is now a dict with 'matches_found' and 'email_sent' keys
+            if result.get('email_sent', False):
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Screening Complete'),
+                        'message': _('Potential matches found. Compliance officers have been notified via email.'),
+                        'type': 'warning',
+                        'sticky': True,
+                    }
+                }
+            else:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Screening Complete'),
+                        'message': _('Potential matches found, but email notification failed. Please check system logs'),
+                        'type': 'danger',
+                        'sticky': True,  # Make it sticky so user notices the email failure
+                    }
+                }
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Screening Complete'),
+                    'message': _('No matches found.'),
+                    'type': 'success',
+                    'sticky': True,
+                }
+            }
 
     @api.depends('registration_date')  
     def _compute_is_case_management_installed(self):
@@ -231,13 +307,6 @@ class Customer(models.Model):
         
         for record in self:
             record.show_create_case_button = case_management_installed
-    
-    @api.depends('universe_weight_report_ids.weight_percentage')
-    def _compute_total_weight(self):
-        for record in self:
-            record.total_weight_percentage = sum(
-                record.universe_weight_report_ids.mapped('weight_percentage'))
-
 
 
     def _get_risk_score_from_plan(self):
@@ -253,12 +322,18 @@ class Customer(models.Model):
             plan_setting = e.val
 
         record_id = self.id
+
+        # Clear previous risk plan lines
         self.env["res.partner.risk.plan.line"].search(
             [('partner_id', '=', record_id)]).unlink()
+
+        # Clear previous composite plan lines (added this line)
+        self.env['res.partner.composite.plan.line'].sudo().search(
+            [('partner_id', '=', record_id)]).unlink()
+
         scores = []
 
-        # First, check if we need to calculate composite score
-        # We'll identify plans that should contribute to composite calculation
+        # First, find all plans that should contribute to composite calculation
         composite_plans = self.env['res.compliance.risk.assessment.plan'].search([
             ('state', '=', 'active'),
             ('use_composite_calculation', '=', True),
@@ -306,7 +381,6 @@ class Customer(models.Model):
                         f"Error executing risk plan {pl.name}: {str(e)}")
                     pass
 
-        # Default value for records to avoid unbound variable error
         records = None
 
         if len(scores) > 0:
@@ -350,6 +424,7 @@ class Customer(models.Model):
         # Store the risk score directly
         self.risk_score = risk_score
         return risk_score
+
     
     def calculate_risk_batch(self, batch_size=1000):
         """
@@ -603,17 +678,20 @@ class Customer(models.Model):
             self.env.cr.execute(
                 query, (values_list[0]['last_risk_calculation'], self.env.user.id, fields.Datetime.now()))
 
+    
     def _calculate_composite_score(self, composite_plans):
         """
         Calculate composite risk score based on weighted risk universes
-        - Display ALL universes in the UI
+        - Display ALL universes and ALL subjects in the UI
         - Only include universes with violations (universe_score > 0) in the CCR calculation
+        - Show all risk plans regardless of match status
         """
         record_id = self.id
         composite_score = 0.0
 
-        # Clear previous universe weights
-        self.env['res.partner.risk.universe.weight'].search(
+
+        # Clear previous composite plan lines
+        self.env['res.partner.composite.plan.line'].sudo().search(
             [('partner_id', '=', record_id)]).unlink()
 
         # Get all universes that are included in composite calculation and have weight > 0
@@ -622,20 +700,19 @@ class Customer(models.Model):
             ('weight_percentage', '>', 0)
         ])
 
-        # Initialize dictionary to track all universes
-        all_universes = {}
+        # Initialize dictionary to track all universes and their subjects
+        universe_scores = {}
         for universe in universes:
-            all_universes[universe.id] = {
+            universe_scores[universe.id] = {
                 'universe': universe,
-                'score': 0.0,  # Default to 0
-                'assigned_score': 0.0,
+                # Total universe score (sum of matching subjects)
+                'total_score': 0.0,
                 'weight': universe.weight_percentage / 100.0,
                 'name': universe.name,
-                'assessment': None,
-                'subject': None
+                'subjects': {}  # Dict to track each subject's score
             }
 
-        # Process all plans to find violations
+        # Process all plans to find matches and create plan lines
         for plan in composite_plans:
             # Skip if universe doesn't exist, isn't included, or has no weight
             if not plan.universe_id or not plan.universe_id.is_included_in_composite or plan.universe_id.weight_percentage <= 0:
@@ -646,62 +723,114 @@ class Customer(models.Model):
                 continue
 
             universe_id = plan.universe_id.id
+            subject_id = plan.risk_assessment.subject_id.id if plan.risk_assessment.subject_id else False
 
-            # Always set the assessment and subject
-            all_universes[universe_id]['assessment'] = plan.risk_assessment
-            all_universes[universe_id]['subject'] = plan.risk_assessment.subject_id
-            all_universes[universe_id]['assigned_score'] = plan.risk_assessment.risk_rating
+            # Ensure the subject is tracked in this universe
+            if subject_id and subject_id not in universe_scores[universe_id]['subjects']:
+                universe_scores[universe_id]['subjects'][subject_id] = {
+                    'subject': plan.risk_assessment.subject_id,
+                    'score': 0.0,
+                    'matched_plans': [],
+                    'assessment': None
+                }
 
-            # Only check for SQL hit if compute_score_from is risk_assessment
-            if plan.compute_score_from == 'risk_assessment':
-                # Check for SQL hit (violation)
-                try:
-                    self.env.cr.execute(plan.sql_query, (record_id,))
-                    rec = self.env.cr.fetchone()
+            # Check for SQL hit if compute_score_from is risk_assessment
+            matched = False
+            score = 0.0
 
-                    if rec is not None:  # SQL hit (violation)
-                        # Use the assigned score
-                        score = plan.risk_assessment.risk_rating
+            try:
+                self.env.cr.execute(plan.sql_query, (record_id,))
+                rec = self.env.cr.fetchone()
 
-                        # Update the universe score if this is higher than current score
-                        if score > all_universes[universe_id]['score']:
-                            all_universes[universe_id]['score'] = score
+                if rec is not None:  # SQL hit (violation)
+                    matched = True
+                    score = plan.risk_assessment.risk_rating
 
-                except Exception as e:
-                    _logger.error(
-                        f"Error checking for violations in plan {plan.name}: {str(e)}")
-                    continue
+                    # Update subject score if this subject exists
+                    if subject_id:
+                        # Add to matched plans list
+                        universe_scores[universe_id]['subjects'][subject_id]['matched_plans'].append(
+                            plan)
 
-        # Create records for ALL universes and calculate CCR using only those with violations
-        for universe_id, data in all_universes.items():
-            # Calculate weighted score
-            weighted_score = data['score'] * data['weight']
+                        # Set the assessment if not already set
+                        if not universe_scores[universe_id]['subjects'][subject_id]['assessment']:
+                            universe_scores[universe_id]['subjects'][subject_id]['assessment'] = plan.risk_assessment
+
+                        # Update the subject score by adding this score (sum all matches)
+                        universe_scores[universe_id]['subjects'][subject_id]['score'] += score
+
+                # Create plan line records for ALL plans, whether they match or not
+                self.env['res.partner.composite.plan.line'].sudo().create({
+                    'partner_id': record_id,
+                    'plan_id': plan.id,
+                    'universe_id': universe_id,
+                    'subject_id': subject_id,
+                    'matched': matched,
+                    'risk_score': score,
+                    'assessment_id': plan.risk_assessment.id if plan.risk_assessment else False,
+                })
+
+            except Exception as e:
+                _logger.error(
+                    f"Error checking for violations in plan {plan.name}: {str(e)}")
+                # Still create a record for the plan even if there was an error
+                self.env['res.partner.composite.plan.line'].sudo().create({
+                    'partner_id': record_id,
+                    'plan_id': plan.id,
+                    'universe_id': universe_id,
+                    'subject_id': subject_id,
+                    'matched': False,
+                    'risk_score': 0.0,
+                    'assessment_id': plan.risk_assessment.id if plan.risk_assessment else False,
+                })
+
+        # Calculate the total score for each universe by summing all subject scores
+        for universe_id, universe_data in universe_scores.items():
+            for subject_id, subject_data in universe_data['subjects'].items():
+                if subject_data['score'] > 0:
+                    universe_data['total_score'] += subject_data['score']
+
+        # Create records for ALL universes and ALL subjects and calculate composite score
+        for universe_id, universe_data in universe_scores.items():
+            # Calculate weighted score for the universe
+            weighted_score = universe_data['total_score'] * universe_data['weight']
 
             # Only add to CCR if there's a violation (score > 0)
-            if data['score'] > 0:
+            if universe_data['total_score'] > 0:
                 composite_score += weighted_score
                 _logger.info(
-                f"Universe {data['name']} : Score=0, "
-                f"Weight={data['weight']}, Weighted Score=0")
+                    f"Universe {universe_data['name']} : Score={universe_data['total_score']}, "
+                    f"Weight={universe_data['weight']}, Weighted Score={weighted_score}")
 
+            # Create universe weight records for ALL subjects in this universe
+            # if universe_data['subjects']:
+            #     for subject_id, subject_data in universe_data['subjects'].items():
+            #         self.env['res.partner.risk.universe.weight'].sudo().create({
+            #             'partner_id': record_id,
+            #             'universe_id': universe_id,
+            #             'weight_percentage': universe_data['universe'].weight_percentage,
+            #             'universe_score': subject_data['score'],
+            #             'weighted_score': subject_data['score'] * universe_data['weight'],
+            #             'assigned_score': subject_data['score'],
+            #             'subject_id': subject_id,
+            #             'assessment_id': subject_data['assessment'].id if subject_data['assessment'] else False,
+            #         })
+            # else:
+            #     # Create at least one record for universes with no subjects
+            #     self.env['res.partner.risk.universe.weight'].sudo().create({
+            #         'partner_id': record_id,
+            #         'universe_id': universe_id,
+            #         'weight_percentage': universe_data['universe'].weight_percentage,
+            #         'universe_score': 0.0,
+            #         'weighted_score': 0.0,
+            #         'assigned_score': 0.0,
+            #         'subject_id': False,
+            #         'assessment_id': False,
+            #     })
 
-            # Create weight record for ALL universes
-            self.env['res.partner.risk.universe.weight'].create({
-                'partner_id': record_id,
-                'universe_id': universe_id,
-                'weight_percentage': data['universe'].weight_percentage,
-                'universe_score': data['score'],  # Will be 0 for non-violations
-                'weighted_score': weighted_score,  # Will be 0 for non-violations
-                'assigned_score': data['assigned_score'],
-                'subject_id': data['subject'].id if data['subject'] else False,
-                'assessment_id': data['assessment'].id if data['assessment'] else False,
-            })
-            
-            _logger.info(f"Final CCR for customer {record_id}: {composite_score}")
-
-
+        _logger.info(f"Final CCR for customer {record_id}: {composite_score}")
         return round(composite_score, 2)
-    
+
     def action_sync_channels(self):
         """Fast channel sync for individual customer"""
         if not self.customer_id:
@@ -1669,77 +1798,6 @@ class Customer(models.Model):
 
         return True
 
-    # def _get_risk_score_from_plan(self):
-    #     setting = self.env['res.compliance.settings'].search(
-    #         [('code', '=', 'risk_plan_computation')], limit=1)
-
-    #     # Default value if no settings found
-    #     plan_setting = 'avg'  # Default to 'avg'
-    #     for e in setting:
-    #         plan_setting = e.val
-
-    #     record_id = self.id
-    #     self.env["res.partner.risk.plan.line"].search(
-    #         [('partner_id', '=', record_id)]).unlink()
-    #     scores = []
-    #     plans = self.env['res.compliance.risk.assessment.plan'].search(
-    #         [('state', '=', 'active')], order='priority')
-
-    #     if plans:
-    #         for pl in plans:
-    #             score = 0
-    #             try:
-                    
-    #                 self.env.cr.execute(pl.sql_query, (record_id,))
-    #                 rec = self.env.cr.fetchone()
-    #                 if rec is not None:
-    #                     # we have a hit
-    #                     if pl.compute_score_from == 'dynamic':
-    #                         score = float(rec[0]) if rec is not None else pl.risk_score
-    #                     if pl.compute_score_from == 'static':
-    #                         score = pl.risk_score
-    #                     if pl.compute_score_from == 'risk_assessment':
-    #                         score = pl.risk_assessment.risk_rating if  pl.risk_assessment is not None else pl.risk_score
-    #                         # score = pl.risk_assessment_score if pl.risk_assessment_score else pl.risk_score
-    #                 scores.append(score)
-    #                 line_id = self.env['res.partner.risk.plan.line'].create({
-    #                     'partner_id': record_id,
-    #                     'plan_line_id': pl.id,
-    #                     'risk_score': score,
-    #                 })
-    #             except Exception as e:
-    #                 _logger.error(f"Error executing risk plan {pl.name}: {str(e)}")
-
-    #                 pass
-
-    #     # Default value for records to avoid unbound variable error
-    #     records = None
-
-    #     if len(scores) > 0:
-    #         if plan_setting == 'avg':
-    #             self.env.cr.execute(
-    #                 f"select avg(risk_score) from res_partner_risk_plan_line where partner_id={record_id} and risk_score > 0")
-    #         if plan_setting == 'max':
-    #             self.env.cr.execute(
-    #                 f"select max(risk_score) from res_partner_risk_plan_line where partner_id={record_id}")
-    #         records = self.env.cr.fetchone()
-
-    #     # Ensure records is not None before returning
-    #     """
-    #     - Priority is Risk Assessment > EDD > Risk Plan
-    #     """
-    #     risk_assessments = self.env['res.risk.assessment'].search([('partner_id', '=', record_id)],order='create_date desc',limit=1)
-    #     if risk_assessments:
-    #         for r in risk_assessments:
-    #             if r.risk_rating:
-    #                 return r.risk_rating
-    #     approved_edd = self.env['res.partner.edd'].search(
-    #         [('status', '=', 'approved'),('customer_id','=',record_id)],order='date_approved desc', limit=1)
-    #     for edd in approved_edd:
-    #         if edd.risk_score:
-    #             return edd.risk_score
-    #     # Use risk analysis
-    #     return records[0] if records is not None else 0.00
 
     def action_greylist(self):
         for e in self:

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <function model="ir.config_parameter" name="init_url_encryption_key"/>
+    </data>
+</odoo>

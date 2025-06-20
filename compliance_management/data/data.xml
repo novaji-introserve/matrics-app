@@ -6,7 +6,7 @@
         <field name="name">Risk Analysis Computation</field>
         <field name="code">risk_plan_computation</field>
         <field name="val">sum</field>
-        <field name="narration">Deteremines the policy for computin the risk assessment from the set
+        <field name="narration">Deteremines the policy for computing the risk Analysis from the set
             of plan
             Values:
             avg: use the average
@@ -14,34 +14,48 @@
             max: use the maximum. Default
         </field>
     </record>
+
+    <record id="res_compl_settings_risk_assessment_computation" model="res.compliance.settings">
+        <field name="name">Risk Assessment Computation</field>
+        <field name="code">risk_assessment_computation</field>
+        <field name="val">avg</field>
+        <field name="narration">Deteremines the policy for computing the risk assessment from the set
+            of plan
+            Values:
+            avg: use the average Default
+            sum: use the sum total
+            max: use the maximum. 
+        </field>
+    </record>
+
     <record id="res_compl_settings_default_risk_score" model="res.compliance.settings">
         <field name="name">Default Risk Score</field>
         <field name="code">default_risk_score</field>
-        <field name="val">7.5</field>
+        <field name="val">1</field>
         <field name="narration">Default Risk Score</field>
     </record>
     <record id="res_compl_settings_low_risk_threshold" model="res.compliance.settings">
         <field name="name">Low Risk Threshold</field>
         <field name="code">low_risk_threshold</field>
-        <field name="val">9</field>
+        <field name="val">3.9</field>
         <field name="narration">Low Risk Threshold</field>
     </record>
     <record id="res_compl_settings_medium_risk_threshold" model="res.compliance.settings">
         <field name="name">Medium Risk Threshold</field>
         <field name="code">medium_risk_threshold</field>
-        <field name="val">15</field>
+        <field name="val">6.9</field>
         <field name="narration">Medium Risk Threshold</field>
     </record>
     <record id="res_compl_settings_high_risk_threshold" model="res.compliance.settings">
         <field name="name">High Risk Threshold</field>
         <field name="code">high_risk_threshold</field>
-        <field name="val">16</field>
+        <field name="val">9</field>
         <field name="narration">High Risk Threshold</field>
     </record>
     <record id="res_compl_settings_max_risk_score" model="res.compliance.settings">
         <field name="name">Maximum Risk Threshold</field>
         <field name="code">maximum_risk_threshold</field>
-        <field name="val">25</field>
+        <field name="val">9</field>
         <field name="narration">Maximum Risk Threshold</field>
     </record>
     <function model="ir.config_parameter" name="set_param"
@@ -231,58 +245,5 @@
 
 
 
-   <!-- Sample Watchlist Records -->
-    <record id="watchlist_demo_1" model="res.partner.watchlist">
-        <field name="surname">Okonkwo</field>
-        <field name="first_name">Chinedu</field>
-        <field name="middle_name">Ifeanyi</field>
-        <field name="name">Chinedu Ifeanyi Okonkwo</field>
-        <field name="bvn">8041365792</field>
-    </record>
-
-    <record id="watchlist_demo_2" model="res.partner.watchlist">
-        <field name="surname">Abubakar</field>
-        <field name="first_name">Fatima</field>
-        <field name="middle_name">Zainab</field>
-        <field name="name">Fatima Zainab Abubakar</field>
-        <field name="bvn">6729451083</field>
-    </record>
-
-    <record id="watchlist_demo_3" model="res.partner.watchlist">
-        <field name="surname">Johnson</field>
-        <field name="first_name">David</field>
-        <field name="middle_name">Michael</field>
-        <field name="name">David Michael Johnson</field>
-        <field name="bvn">9024351083</field>
-    </record>
-
-
-
-
-    <!-- Sample Blacklist Records with New Names -->
-<record id="blacklist_demo_1" model="res.partner.blacklist">
-    <field name="surname">Smith</field>
-    <field name="first_name">John</field>
-    <field name="middle_name">Alexander</field>
-    <field name="name">John Alexander Smith</field>
-    <field name="bvn">5298431026</field>
-</record>
-
-<record id="blacklist_demo_2" model="res.partner.blacklist">
-    <field name="surname">Taylor</field>
-    <field name="first_name">Emma</field>
-    <field name="middle_name">Rose</field>
-    <field name="name">Emma Rose Taylor</field>
-    <field name="bvn">7610954832</field>
-</record>
-
-<record id="blacklist_demo_3" model="res.partner.blacklist">
-    <field name="surname">Williams</field>
-    <field name="first_name">Michael</field>
-    <field name="middle_name">James</field>
-    <field name="name">Michael James Williams</field>
-    <field name="bvn">3942087651</field>
-    
-</record>
 </data>
 </odoo>

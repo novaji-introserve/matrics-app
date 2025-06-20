@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Main Email Template -->
+        <record id="email_template_screening_alert_old" model="mail.template">
+            <field name="name">Sanction Screening Alert</field>
+            <field name="model_id" ref="model_res_partner_screening_result"/>
+            <field name="subject">Sanction Screening Alert: Potential Match Found!</field>
+            <field name="email_from">${ctx.get('email_from')}</field>
+            <field name="body_html" type="html">
+                <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+
+                    <!-- Header with Logo -->
+                   <!-- Header with Logo - Multiple fallback options -->
+                    <div style="text-align: left; padding-bottom: 20px;">
+                        <!-- Option 1: Try object.company_id if object exists -->
+                        <t t-if="object and hasattr(object, 'company_id') and object.company_id and object.company_id.logo_web">
+                            <img t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        </t>
+                        <!-- Option 2: Use user's company if object doesn't exist -->
+                        <t t-elif="user.company_id and user.company_id.logo_web">
+                            <img t-att-src="'data:image/png;base64,%s' % user.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        </t>
+                        <!-- Option 3: Use company from context -->
+                        <t t-elif="ctx.get('company_logo')">
+                            <img t-att-src="'data:image/png;base64,%s' % ctx.get('company_logo')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        </t>
+                        <!-- Option 4: Default company (first company in system) -->
+                        <t t-else="">
+                            <t t-set="default_company" t-value="env['res.company'].sudo().search([], limit=1)"/>
+                            <img t-if="default_company and default_company.logo_web" t-att-src="'data:image/png;base64,%s' % default_company.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                        </t>
+                    </div>
+
+                    <p>Dear Compliance Officer, </p>
+
+                    <p>A potential match has been found during customer sanction screening.</p>
+
+
+                    <p style="line-height: 1.4;">
+                        <strong style="color: #2c3e50;font-size: 1.17em;">Date and Time Entry:
+                        </strong>
+                        <t t-esc="ctx.get('datetime')"/>
+                    </p>
+
+
+
+                    <p style="line-height: 1.4;">
+                        <strong style="color: #2c3e50;font-size: 1.17em;">Customer Details:
+                        </strong>
+                    </p>
+
+                    <div >
+                        <p>
+                            <i style="border: 1px solid #ddd;">Customer Name:</i>
+                            <t t-esc="ctx.get('name', '')"/>
+                        </p>
+
+                        <p>
+                            <i style="border: 1px solid #ddd;">Customer ID:</i>
+                            <t t-esc="ctx.get('customer_id', '')"/>
+                        </p>
+                        <p>
+                            <i style="border: 1px solid #ddd;">BVN:</i>
+                            <t t-esc="ctx.get('bvn', '')"/>
+                        </p>
+                        <p>
+                            <i style="border: 1px solid #ddd;">Risk Score:</i>
+                            <t t-esc="ctx.get('risk_score', '')"/>
+                        </p>
+                        <p>
+                            <i style="border: 1px solid #ddd;">Risk Level:</i>
+                            <t t-esc="ctx.get('risk_level', '').upper()"/>
+                        </p>
+                    </div>
+
+
+                    <p style="line-height: 1.4;">
+                        <strong style="color: #2c3e50;font-size: 1.17em;">Screening Results:
+                        </strong>
+                    </p>
+
+                    <ul style="list-style-type: decimal;">
+                        <t t-foreach="ctx.get('results', [])" t-as="result">
+                            <li style="margin-bottom: 8px; padding: 5px;">
+                                <t t-if="result['list_type'] == 'pep'">
+                                    <i style="border: 1px solid #ddd;">Pep</i>
+                                </t>
+                                <t t-elif="result['list_type'] == 'watchlist'">
+                                    <i style="border: 1px solid #ddd;">Watchlist</i>
+                                </t>
+                                <t t-elif="result['list_type'] == 'sanction'">
+                                    <i style="border: 1px solid #ddd;">Sanction</i>
+                                </t>
+                                <t t-elif="result['list_type'] == 'global_pep'">
+                                    <i style="border: 1px solid #ddd;">Global Pep</i>
+                                </t>
+                                <t t-elif="result['list_type'] == 'blacklist'">
+                                    <i style="border: 1px solid #ddd;">Blacklist</i>
+                                </t>
+                                <t t-elif="result['list_type'] == 'fep'">
+                                    <i style="border: 1px solid #ddd;">Fep</i>
+                                </t>
+                                <t t-else="">
+                                    <t t-esc="' '.join([word.capitalize() for word in result['list_type'].split('_')])"/>
+                                </t>
+                            </li>
+                        </t>
+                    </ul>
+
+
+                    <p style="text-align: center; margin: 20px 0;">
+                        <a href="${ctx.get('record_url', '')}" style="background-color:#95536c;color:white;padding:10px 20px;text-decoration:none;border-radius:5px; display: inline-block;">
+                            View Details
+                        </a>
+                    </p>
+
+                    <p>Please review these matches and take appropriate action.</p>
+
+                    <p>Best Regards,</p>
+                    <p>
+                        <strong>The Compliance Team</strong>
+                    </p>
+                    <hr/>
+
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

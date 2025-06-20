@@ -102,6 +102,13 @@
         <field name="view_mode">list,form</field>
         <field name="domain">[('user_in_emails', '=', True)]</field>
     </record>
+    
+    <record id="action_alert_history_individual" model="ir.actions.act_window">
+        <field name="name">User Alert</field>
+        <field name="res_model">alert.history</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('user_in_emails', '=', True)]</field>
+    </record>
 
 
 </odoo>

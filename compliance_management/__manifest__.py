@@ -18,7 +18,7 @@
     "version": "0.3",
     # any module necessary for this one to work correctly
     
-    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification', 'alert_management', 'project',
+    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification','project',
         'mass_mailing',
         'utm',
         'contacts',
@@ -50,6 +50,8 @@
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
         'data/email_templates/case_alert_template.xml',
+        "data/email_templates/customer_screening_template.xml",
+
 
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
@@ -70,6 +72,7 @@
         "data/demo_data/risk_assessment/risk_level.xml",
         "data/demo_data/risk_assessment/risk_subject.xml",
         "data/demo_data/risk_assessment/risk_subject_2.xml",
+        "data/demo_data/risk_assessment/digital_delivery_channel.xml",
         "data/demo_data/risk_assessment/customer_type.xml",
         "data/demo_data/risk_assessment/jurisdiction.xml",
         "data/demo_data/risk_assessment/delivery_channel.xml",
@@ -77,6 +80,7 @@
         "data/demo_data/risk_assessment/compliance_history.xml",
         "data/demo_data/risk_assessment/data_quality.xml",
         "data/demo_data/risk_assessment/transaction_behavior.xml",
+        'data/demo_data/risk_assessment/digital_delivery_channel_assessment.xml',
         "data/demo_data/account/account_type.xml",
         "data/demo_data/education/educational_level.xml",
         "data/demo_data/tier/customer_tier.xml",
@@ -100,7 +104,8 @@
         "views/transaction_screening_rule.xml",
         "data/transaction_type.xml",
         'data/transaction_screening_rule.xml',
-        "data/demo_data/chart/charts.xml", #CHARTS
+        # "data/demo_data/sanction/sanction_screening.xml", # SANCTION SCREENING DATA
+        # "data/demo_data/chart/charts.xml", #CHARTS
         # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
         # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
         # "data/transactions.xml", # TRANSACTION
@@ -113,10 +118,11 @@
         'data/demo_data/plan/risk_plan.xml',
         'data/demo_data/plan/jurisdiction_plan.xml',
         'data/demo_data/plan/customer_type_plan.xml',
+        'data/demo_data/plan/assessment_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
-        'data/watchlist.xml',
         'data/blacklist.xml',
+        "views/customer_screening.xml",
         "views/menu_actions.xml",
 
     ],

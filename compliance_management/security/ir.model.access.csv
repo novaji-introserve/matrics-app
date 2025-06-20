@@ -176,4 +176,9 @@ compliance_management.sanction_list,sanction_list,compliance_management.model_sa
 compliance_management.res_partner_digital_product_view,res_partner_digital_product_view,compliance_management.model_res_partner_digital_product_view,base.group_user,1,0,0,0
 compliance_management.digital.delivery.channel,digital.delivery.channel,compliance_management.model_digital_delivery_channel,base.group_user,1,0,1,0
 compliance_management.customer.channel.subscription,customer.channel.subscription,compliance_management.model_customer_channel_subscription,base.group_user,1,1,1,0
-compliance_management.res.partner.risk.universe.weight,res.partner.risk.universe.weight,compliance_management.model_res_partner_risk_universe_weight,base.group_user,1,1,1,1
+compliance_management.res.partner.screening.list.metadata,screening.list.metadata,compliance_management.model_screening_list_metadata,base.group_user,1,1,1,1
+compliance_management.res.partner.screening.result,res.partner.screening.result,compliance_management.model_res_partner_screening_result,base.group_user,1,1,1,0
+compliance_management.res.partner.screening.status,res.partner.screening.status,compliance_management.model_res_partner_screening_status,base.group_user,1,1,1,0
+compliance_management.res.partner.screening.alert,res.partner.screening.alert,compliance_management.model_res_partner_screening_alert,base.group_user,1,1,1,1
+access_res_partner_composite_plan_line_user,res.partner.composite.plan.line user,model_res_partner_composite_plan_line,base.group_user,1,1,1,1
+access_res_partner_composite_plan_line_bco,res.partner.composite.plan.line officer,model_res_partner_composite_plan_line,compliance_management.group_compliance_branch_compliance_officer,1,1,1,1
