@@ -1,0 +1,49 @@
+<odoo>
+
+ <!-- Risk Subject -->
+    <record id="compliance_inst_fc_risk_subject_ussd" model="res.risk.subject">
+        <field name="name">USSD</field>
+        <field name="code">ussd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_onebank" model="res.risk.subject">
+        <field name="name">One Bank</field>
+        <field name="code">one_bank</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_card" model="res.risk.subject">
+        <field name="name">Card</field>
+        <field name="code">card</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_alt" model="res.risk.subject">
+        <field name="name">Alt Bank</field>
+        <field name="code">alt</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_sterling" model="res.risk.subject">
+        <field name="name">Sterling Pro</field>
+        <field name="code">sterling</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_banca" model="res.risk.subject">
+        <field name="name">Banca</field>
+        <field name="code">banca</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_doubble" model="res.risk.subject">
+        <field name="name">Doubble</field>
+        <field name="code">doubble</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_specta" model="res.risk.subject">
+        <field name="name">Specta</field>
+        <field name="code">specta</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_switch" model="res.risk.subject">
+        <field name="name">Switch</field>
+        <field name="code">switch</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+</odoo>

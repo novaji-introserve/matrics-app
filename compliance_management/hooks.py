@@ -76,7 +76,37 @@ def uninstall_hook(cr, registry):
     except Exception as e:
         _logger.error(f"Error stopping WebSocket server: {e}")
         
-    
+     # Uninstall alert_management module
+    try:
+        env = api.Environment(cr, SUPERUSER_ID, {})
+        
+        # Find installed alert_management module
+        alert_module = env['ir.module.module'].search([
+            ('name', '=', 'alert_management'),
+            ('state', '=', 'installed')
+        ])
+        
+        if alert_module:
+            _logger.info("Found installed alert_management module, uninstalling...")
+            alert_module.button_uninstall()
+            cr.commit()
+            _logger.info("✅ Alert Management auto-uninstalled successfully!")
+        else:
+            # Check current state
+            alert_any_state = env['ir.module.module'].search([
+                ('name', '=', 'alert_management')
+            ])
+            if alert_any_state:
+                _logger.info(f"ℹ️ Alert Management found with state: {alert_any_state.state}")
+            else:
+                _logger.info("ℹ️ Alert Management module not found")
+                
+    except Exception as e:
+        _logger.error(f"Error auto-uninstalling alert_management: {e}")
+        import traceback
+        _logger.error(traceback.format_exc())
+   
+
 
 def install_alert_management(cr, registry):
     """

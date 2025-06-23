@@ -33,7 +33,7 @@
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
-        "data/demo_data/branch/res.branch.csv", #BRANCH
+        # "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -69,6 +69,7 @@
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
         "data/demo_data/risk_assessment/risk_subject.xml",
+        "data/demo_data/risk_assessment/digital_delivery_channel.xml",
         "data/demo_data/risk_assessment/customer_type.xml",
         "data/demo_data/risk_assessment/jurisdiction.xml",
         "data/demo_data/risk_assessment/delivery_channel.xml",
@@ -76,6 +77,7 @@
         "data/demo_data/risk_assessment/compliance_history.xml",
         "data/demo_data/risk_assessment/data_quality.xml",
         "data/demo_data/risk_assessment/transaction_behavior.xml",
+        'data/demo_data/risk_assessment/digital_delivery_channel_assessment.xml',
         "data/demo_data/account/account_type.xml",
         "data/demo_data/education/educational_level.xml",
         "data/demo_data/tier/customer_tier.xml",
@@ -111,6 +113,7 @@
         'data/demo_data/stat/compliance_stats.xml',
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
+        'data/demo_data/plan/assessment_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
         'data/blacklist.xml',

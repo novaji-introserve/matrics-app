@@ -3,18 +3,22 @@
     <record id="compliance_inst_fc_risk_univ_21" model="res.risk.universe">
         <field name="name">Jurisdiction</field>
         <field name="code">jurisdiction</field>
+        <field name="weight_percentage">10</field>
     </record>
     <record id="compliance_inst_fc_risk_univ_22" model="res.risk.universe">
         <field name="name">Products And Services</field>
         <field name="code">products_and_services</field>
+        <field name="weight_percentage">30</field>
     </record>
     <record id="compliance_inst_fc_risk_univ_23" model="res.risk.universe">
         <field name="name">Delivery Channels</field>
         <field name="code">delivery_channels</field>
+        <field name="weight_percentage">25</field>
     </record>
     <record id="compliance_inst_fc_risk_univ_24" model="res.risk.universe">
         <field name="name">Customer Types</field>
         <field name="code">customer_types</field>
+        <field name="weight_percentage">35</field>
     </record>
     <record id="compliance_inst_fc_risk_univ_25" model="res.risk.universe">
         <field name="name">Transaction Behavior</field>

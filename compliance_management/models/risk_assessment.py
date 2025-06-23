@@ -67,7 +67,7 @@ class RiskAssessment(models.Model):
             rec.write({"risk_rating": score})     
 
     def compute_risk_score_from_lines(self):
-        setting  = self.env['res.compliance.settings'].search([('code','=','risk_plan_computation')],limit = 1)
+        setting  = self.env['res.compliance.settings'].search([('code','=','risk_assessment_computation')],limit = 1)
         for e in setting:
             plan_setting = e.val.strip().lower()
         if plan_setting == 'avg':
