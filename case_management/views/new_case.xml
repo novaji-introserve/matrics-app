@@ -58,9 +58,6 @@
                             onclick="window.location.href='/web#action=case_management.action_owl_case_dashboard'; return false;"
                            />
                 </header>
-                <div class="alert alert-info" role="alert">
-                    All cases opened must be closed within 48 hours!!!
-                </div>
             
                 <sheet>
                     <!-- Add this to your form view, inside the <sheet> tag -->

@@ -2,6 +2,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
 from datetime import timedelta
+import datetime
 import logging
 import uuid
 
@@ -286,17 +287,28 @@ class Cases(models.Model):
     status_name = fields.Char(string="Status Name", compute="_compute_status_name", store=True)
     status_html = fields.Html(compute='_compute_status_html', string='Status')
     status_code = fields.Selection(related='status_id.name', store=True, string='Status Code')
+    
+
 
 
     # Dates
     created_at = fields.Datetime(string='Created_at', default=fields.Datetime.now)
-    event_date = fields.Datetime(string='Event Date', required=True)
+    event_date = fields.Datetime(
+        string='Event Date',
+        required=True,
+        default=fields.Datetime.now
+    )
     updated_at = fields.Datetime(string='Updated At')
     start_date = fields.Datetime(string="Start Date", compute="_compute_start_date", store=True)
     end_date = fields.Datetime(string="End Date", compute="_compute_end_date", store=True)
     current_date = fields.Datetime(string='Current Date', compute='_compute_current_date')
     created_at_formatted_datetime = fields.Char(string='Case Creation Date', compute='_compute_created_at_formatted_datetime')
     event_date_formatted_datetime = fields.Char(string='Date of Event', compute='_compute_event_date_formatted_datetime')
+    closed_date = fields.Datetime(string='Closed Date', readonly=True)
+    closed_date_formatted = fields.Char(string='Closed Date Formatted', compute='_compute_closed_date_formatted')
+    archived_date = fields.Datetime(string='Archived Date', readonly=True)
+    archived_date_formatted = fields.Char(string='Archived Date Formatted', compute='_compute_archived_date_formatted')
+    
 
 
     # Relations
@@ -437,6 +449,23 @@ class Cases(models.Model):
             formatted_datetime = self.event_date.strftime(f'%B, %Y at %I:%M%p').replace(' 0', ' ')
             return f"{day}{suffix} {formatted_datetime}"
         return False
+    
+    
+    @api.depends('closed_date')
+    def _compute_closed_date_formatted(self):
+        for record in self:
+            if record.closed_date:
+                record.closed_date_formatted = record.closed_date.strftime('%B %d, %Y at %I:%M %p')
+            else:
+                record.closed_date_formatted = ''
+    
+    @api.depends('archived_date')
+    def _compute_archived_date_formatted(self):
+        for record in self:
+            if record.archived_date:
+                record.archived_date_formatted = record.archived_date.strftime('%B %d, %Y at %I:%M %p')
+            else:
+                record.archived_date_formatted = ''
 
     # ------------------- COMPUTES -------------------
     
@@ -512,6 +541,7 @@ class Cases(models.Model):
                 'overdue': 'danger',
                 'closed': 'success',
                 'open': 'primary',
+                'archived': 'secondary',
             }.get(rec.status_id.name, 'warning')
             status = rec.status_id.name.capitalize() if rec.status_id else 'Unknown'
             rec.status_html = f'<span class="badge bg-{color}" style="color: white; font-weight: bold;">{status}</span>'
@@ -750,7 +780,6 @@ class Cases(models.Model):
         }
 
 
-
     def action_close_case(self):
         """Closes the case - only available to the creator and when responses exist"""
         self.ensure_one()
@@ -779,7 +808,12 @@ class Cases(models.Model):
                 _logger.error(f"Failed to create 'closed' status: {str(e)}")
                 raise UserError("Required case status 'closed' could not be created: " + str(e))
         
-        self.status_id = closed_status.id
+        # Update status and set closed_date
+        self.write({
+            'status_id': closed_status.id,
+            'closed_date': fields.Datetime.now()
+        })
+        
         self.message_post(body="<p>Case has been closed.</p>", subtype_xmlid='mail.mt_note')
         
         # Send email alert
@@ -795,7 +829,69 @@ class Cases(models.Model):
             'view_mode': 'form',
             'target': 'current',
         }
+    
+    
+    
 
+    # def action_close_case(self):
+    #     """Closes the case - only available to the creator and when responses exist"""
+    #     self.ensure_one()
+        
+    #     if self.env.user.id != self.user_id.id: 
+    #         raise UserError("Only the case creator can close this case.")
+            
+    #     if not self.has_responses:
+    #         _logger.info(f"Case {self.id} cannot be closed because the assigned staff has not responded.")
+    #         raise UserError("This case cannot be closed until it has at least one response.")
+        
+    #     _logger.info(f"Case {self.id} can be closed because the assigned staff has responded.")
+            
+    #     # Try to find the closed status
+    #     closed_status = self.env['case.status'].search([('name', '=', 'closed')], limit=1)
+        
+    #     # Create it if it doesn't exist
+    #     if not closed_status:
+    #         try:
+    #             _logger.info("Creating missing 'closed' status")
+    #             closed_status = self.env['case.status'].create({
+    #                 'name': 'closed',
+    #                 'description': 'Closed Case'
+    #             })
+    #         except Exception as e:
+    #             _logger.error(f"Failed to create 'closed' status: {str(e)}")
+    #             raise UserError("Required case status 'closed' could not be created: " + str(e))
+        
+    #     self.status_id = closed_status.id
+    #     self.message_post(body="<p>Case has been closed.</p>", subtype_xmlid='mail.mt_note')
+        
+    #     # Send email alert
+    #     try:
+    #         self._send_case_closure_alert()
+    #     except Exception as e:
+    #         _logger.error(f"Error sending case closure alert: {str(e)}")
+        
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'res_model': 'case',
+    #         'res_id': self.id,
+    #         'view_mode': 'form',
+    #         'target': 'current',
+    #     }
+
+    def action_restore_case(self):
+        """Restore archived case back to closed status"""
+        for record in self:
+            if record.status_code == 'archived':
+                closed_status = self.env['case.status'].search([('name', '=', 'closed')], limit=1)
+                if closed_status:
+                    record.write({
+                        'status_id': closed_status.id,
+                        'archived_date': False
+                    })
+                    record.message_post(
+                        body="Case restored from archive",
+                        subtype_xmlid='mail.mt_note'  # Internal note - no email notification
+                    )
 
 
 
@@ -854,6 +950,72 @@ class Cases(models.Model):
     
 
     # ------------------- CRON -------------------
+    
+    @api.model
+    def cron_auto_archive_cases(self):
+        """Scheduled method to auto-archive cases closed for more than 90 days"""
+        try:
+            # Calculate the date 90 days ago
+            ninety_days_ago = datetime.now() - timedelta(days=90)
+            
+            # Find closed cases older than 90 days that are not already archived
+            cases_to_archive = self.search([
+                ('status_code', '=', 'closed'),
+                ('closed_date', '!=', False),
+                ('closed_date', '<=', ninety_days_ago)
+            ])
+            
+            if cases_to_archive:
+                # Get archived status
+                archived_status = self.env['case.status'].search([('name', '=', 'archived')], limit=1)
+                if not archived_status:
+                    _logger.error("Archived status not found. Please ensure 'archived' status exists in case.status model.")
+                    return
+                
+                # Archive the cases (no email alerts sent)
+                cases_to_archive.write({
+                    'status_id': archived_status.id,
+                    'archived_date': fields.Datetime.now()
+                })
+                
+                # Log the archiving activity (message post only, no email alerts)
+                for case in cases_to_archive:
+                    case.message_post(
+                        body=f"Case automatically archived after being closed for 90+ days (Closed on: {case.closed_date_formatted})",
+                        subtype_xmlid='mail.mt_note'  # Internal note - no email notification
+                    )
+                
+                _logger.info(f"Successfully archived {len(cases_to_archive)} cases")
+            else:
+                _logger.info("No cases found to archive")
+                
+        except Exception as e:
+            _logger.error(f"Error in auto-archiving cases: {str(e)}")
+    
+    @api.model
+    def action_view_archived_cases(self):
+        """Server action method for archived cases"""
+        return {
+            'name': 'Archived Cases',
+            'type': 'ir.actions.act_window',
+            'res_model': 'case',
+            'view_mode': 'tree,form',
+            'domain': [('status_id.name', '=', 'archived')],
+            'context': {'create': False, 'search_default_order': 'archived_date desc'},
+            'view_ids': [
+                (5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': self.env.ref('case_management.view_cases_tree_archived').id}),
+                (0, 0, {'view_mode': 'form', 'view_id': self.env.ref('case_management.view_case_form_archived').id})
+            ],
+            'help': '''
+                <p class="o_view_nocontent_smiling_face">
+                    No archived cases found
+                </p>
+                <p>
+                    Cases that have been archived after being closed for 90+ days will appear here.
+                </p>
+            '''
+        }
     
     # Updated cron method in your case model
     @api.model

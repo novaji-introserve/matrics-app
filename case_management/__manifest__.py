@@ -26,11 +26,13 @@
        # 'views/message_alert_views.xml',
         'views/all_cases_views.xml',
         'views/my_alerts_views.xml',
+        'views/company_logo_view.xml',
         'views/case_dashboard.xml',# Load menus first
         #'views/case_form_inherit.xml',
         'data/overdue_cronJob/cron.xml',
         # 'data/exception.process.type.csv',
         # 'data/exception.process.csv',
+        
     ],
     'demo': [],
     'assets': {

@@ -26,6 +26,14 @@
                 action="case_configuration_action"
                 sequence="11"/>
 
+        <menuitem
+            id="menu_logo_management"
+            name="Logo Management"
+            parent="base.menu_administration"
+            action="action_logo_management"
+            sequence="45"
+            groups="base.group_system"/>
+
         <!-- <menuitem id="menu_case" name="Cases"
                   parent="menu_case_mgt" sequence="11" /> -->
 
@@ -60,6 +68,10 @@
         <menuitem id="overdue_cases" name="Overdue Cases"
                   parent="menu_case_dashboard" sequence="12"
                   action="overdue_case_action" />
+
+        <menuitem id="archived_cases" name="Archived Cases"
+                  parent="menu_case_dashboard" sequence="12"
+                  action="action_archived_cases_custom" />
 
     </data>
 </odoo>

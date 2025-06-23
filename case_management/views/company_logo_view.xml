@@ -1,0 +1,61 @@
+<!-- views/company_logo_view.xml -->
+<odoo>
+    <!-- Add logo field to existing company form -->
+    <record id="view_company_alt_logo_form" model="ir.ui.view">
+        <field name="name">company.alt.logo.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='logo']" position="after">
+                <separator string="Alternative Bank Logo"/>
+                <field name="alt_bank_logo" 
+                       widget="image" 
+                       class="oe_avatar"
+                       options="{'size': [150, 90], 'preview_image': 'alt_bank_logo'}"
+                       help="Upload logo - will automatically replace the existing alt_bank_logo.png file"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Optional: Create a dedicated logo management view -->
+    <record id="view_logo_management_form" model="ir.ui.view">
+        <field name="name">logo.management.form</field>
+        <field name="model">res.company</field>
+        <field name="arch" type="xml">
+            <form string="Logo Management">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Logo Management</h1>
+                    </div>
+                    <group>
+                        <group string="Current Logo">
+                            <field name="alt_bank_logo" 
+                                   widget="image" 
+                                   class="oe_avatar"
+                                   options="{'size': [200, 120]}"
+                                   nolabel="1"/>
+                        </group>
+                        <group string="Upload Instructions">
+                            <div>
+                                <p>Upload a new logo to replace the current one.</p>
+                                <p>The file will be saved as: <code>alt_bank_logo.png</code></p>
+                                <p>Recommended size: 200x120 pixels</p>
+                                <p>Supported formats: PNG, JPG, JPEG</p>
+                            </div>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Action for logo management -->
+    <record id="action_logo_management" model="ir.actions.act_window">
+        <field name="name">Logo Management</field>
+        <field name="res_model">res.company</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_logo_management_form"/>
+        <field name="target">current</field>
+        <field name="context">{'form_view_initial_mode': 'edit'}</field>
+    </record>
+</odoo>
