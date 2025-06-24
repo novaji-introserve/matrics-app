@@ -880,8 +880,8 @@
     
     
     <menuitem id="menu_is_pep" action="action_res_pep" parent="menu_compliance_customer_heading" name="PEPs Customers" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanctioned" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" />
-    <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_global_pep" parent="menu_compliance_customer_heading" name="Matching Global PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="70" />
+    <!-- <menuitem id="menu_compliance_likely_sanction_customer" action="action_view_likely_sanction_customer" parent="menu_compliance_customer_heading" name="Likely Sanctioned" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="60" /> -->
+    <!-- <menuitem id="menu_compliance_likely_pep_customer" action="action_view_customer_global_pep" parent="menu_compliance_customer_heading" name="Matching Global PEPs" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="70" /> -->
     <!-- Menu Items -->
     <menuitem id="menu_opensanctions_jobs" name="OpenSanctions Jobs" parent="menu_pep_configurations" action="action_opensanctions_job_queue" sequence="20" groups="group_tech_support" />
 

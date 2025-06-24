@@ -161,7 +161,7 @@ class Compliance(http.Controller):
         """
         Format a number with commas for better readability.
 
-        Args:
+        Args:Z 
             result_value (int or float): The number to format.
 
         Returns:

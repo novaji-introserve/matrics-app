@@ -3,11 +3,12 @@
     <record id="res_compl_settings_risk_plan_computation" model="res.compliance.settings">
         <field name="name">Risk Analysis Computation</field>
         <field name="code">risk_plan_computation</field>
-        <field name="val">avg</field>
+        <field name="val">sum</field>
         <field name="narration">Deteremines the policy for computin the risk assessment from the set
             of plan
             Values:
             avg: use the average
+            sum: use the sum total
             max: use the maximum. Default
         </field>
     </record>
