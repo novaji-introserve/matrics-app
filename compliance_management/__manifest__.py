@@ -59,6 +59,7 @@
         "views/dynamic_charts.xml",
         "views/fcra_score.xml",
         "views/edd.xml",
+        'views/wizard_view.xml',
         "views/kyc.xml",
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
@@ -109,7 +110,7 @@
         # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
         # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
         # "data/transactions.xml", # TRANSACTION
-        "views/res_users.xml",
+        # "views/res_users.xml",
         "views/peplist.xml",
         'data/gender.xml',
         'data/identification_type.xml',
