@@ -182,3 +182,5 @@ compliance_management.res.partner.screening.status,res.partner.screening.status,
 compliance_management.res.partner.screening.alert,res.partner.screening.alert,compliance_management.model_res_partner_screening_alert,base.group_user,1,1,1,1
 access_res_partner_composite_plan_line_user,res.partner.composite.plan.line user,model_res_partner_composite_plan_line,base.group_user,1,1,1,1
 access_res_partner_composite_plan_line_bco,res.partner.composite.plan.line officer,model_res_partner_composite_plan_line,compliance_management.group_compliance_branch_compliance_officer,1,1,1,1
+
+access_res_partner_edd_reject_wizard,access_res_partner_edd_reject_wizard,compliance_management.model_res_partner_edd_reject_wizard,compliance_management.group_compliance_branch_compliance_officer,1,1,1,1

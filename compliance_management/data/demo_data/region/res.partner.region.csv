@@ -1,0 +1,35 @@
+id,name,code
+region_abia,ABIA,abia
+region_adamawa,ADAMAWA,adamawa
+region_akwa_ibom,AKWA IBOM,akwa_ibom
+region_anambra,ANAMBRA,anambra
+region_bauchi,BAUCHI,bauchi
+region_bayelsa,BAYELSA,bayelsa
+region_benue,BENUE,benue
+region_borno,BORNO,borno
+region_cross_river,CROSS RIVER,cross_river
+region_delta,DELTA,delta
+region_edo,EDO,edo
+region_ekiti,EKITI,ekiti
+region_enugu,ENUGU,enugu
+region_gombe,GOMBE,gombe
+region_imo,IMO,imo
+region_jigawa,JIGAWA,jigawa
+region_kaduna,KADUNA,kaduna
+region_kano,KANO,kano
+region_katsina,KATSINA,katsina
+region_kebbi,KEBBI,kebbi
+region_kogi,KOGI,kogi
+region_kwara,KWARA,kwara
+region_lagos,LAGOS,lagos
+region_niger,NIGER,niger
+region_ogun,OGUN,ogun
+region_ondo,ONDO,ondo
+region_osun,OSUN,osun
+region_oyo,OYO,oyo
+region_plateau,PLATEAU,plateau
+region_rivers,RIVERS,rivers
+region_sokoto,SOKOTO,sokoto
+region_taraba,TARABA,taraba
+region_zamfara,ZAMFARA,zamfara
+region_fct,ABUJA,abuja

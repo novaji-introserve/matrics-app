@@ -34,6 +34,8 @@
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
         # "data/demo_data/branch/res.branch.csv", #BRANCH
+        # "data/demo_data/region/res.partner.region.csv",#REGION
+        # "data/demo_data/industries/customer.industry.csv",#INDUSTRY
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -57,6 +59,7 @@
         "views/dynamic_charts.xml",
         "views/fcra_score.xml",
         "views/edd.xml",
+        'views/wizard_view.xml',
         "views/kyc.xml",
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
@@ -69,6 +72,7 @@
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
         "data/demo_data/risk_assessment/risk_subject.xml",
+        "data/demo_data/risk_assessment/risk_subject_2.xml",
         "data/demo_data/risk_assessment/digital_delivery_channel.xml",
         "data/demo_data/risk_assessment/customer_type.xml",
         "data/demo_data/risk_assessment/jurisdiction.xml",
@@ -106,13 +110,15 @@
         # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
         # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
         # "data/transactions.xml", # TRANSACTION
-        "views/res_users.xml",
+        # "views/res_users.xml",
         "views/peplist.xml",
         'data/gender.xml',
         'data/identification_type.xml',
         'data/demo_data/stat/compliance_stats.xml',
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
+        'data/demo_data/plan/jurisdiction_plan.xml',
+        'data/demo_data/plan/customer_type_plan.xml',
         'data/demo_data/plan/assessment_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
