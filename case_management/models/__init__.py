@@ -9,6 +9,5 @@ from . import policy
 from . import rule_list
 from . import staff
 from . import team
-from . import res_company
 
 
