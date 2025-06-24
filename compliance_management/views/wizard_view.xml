@@ -1,6 +1,6 @@
 <odoo>
     <data>
-        <!-- edd_reject_wizard -->
+        <!-- Wizard Form View -->
         <record id="view_res_partner_edd_reject_wizard_form" model="ir.ui.view">
             <field name="name">res.partner.edd.reject.wizard.form</field>
             <field name="model">res.partner.edd.reject.wizard</field>
@@ -18,10 +18,13 @@
             </field>
         </record>
 
-        <act_window id="action_res_partner_edd_reject_wizard"
-                    name="Reject EDD"
-                    res_model="res.partner.edd.reject.wizard"
-                    view_mode="form"
-                    target="new"/>
+        <!-- Wizard Action -->
+        <record id="action_res_partner_edd_reject_wizard" model="ir.actions.act_window">
+            <field name="name">Reject EDD</field>
+            <field name="res_model">res.partner.edd.reject.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="view_res_partner_edd_reject_wizard_form"/>
+        </record>
     </data>
 </odoo>
