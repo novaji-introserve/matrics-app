@@ -38,49 +38,35 @@ class ChartRenderer extends Component {
             const dataset1 = this.props.data || [];
             const dataset2 = this.props.data2 || [];
             const dataset3 = this.props.data3 || [];
-            const dataset4 = this.props.data4 || [];
-            const backgroundColor = this.props.backgroundColor || ['rgb(255, 205, 86)', 'rgb(54, 162, 235)', 'rgb(255, 99, 132)', 'rgb(0, 255, 0)'];
+            const backgroundColor = this.props.backgroundColor || ['rgb(255, 205, 86)', 'rgb(54, 162, 235)', 'rgb(255, 99, 132)'];
 
             // Set a custom ID for the canvas to identify which chart is being clicked
             this.chartRef.el.id = this.props.chartType === 'severity' ? 'severity_chart' : 'case_rate_chart';
-
-            // Create datasets array - only include dataset4 for non-severity charts
-            const datasets = [
-                {
-                    label: this.props.label_1 || 'Dataset 1',
-                    data: dataset1,
-                    backgroundColor,
-                    hoverOffset: 4
-                },
-                {
-                    label: this.props.label_2 || 'Dataset 2',
-                    data: dataset2,
-                    backgroundColor,
-                    hoverOffset: 4
-                },
-                {
-                    label: this.props.label_3 || 'Dataset 3',
-                    data: dataset3,
-                    backgroundColor,
-                    hoverOffset: 4
-                }
-            ];
-
-            // Only add dataset4 if chartType is NOT 'severity'
-            if (this.props.chartType !== 'severity') {
-                datasets.push({
-                    label: this.props.label_4 || 'Dataset 4',
-                    data: dataset4,
-                    backgroundColor,
-                    hoverOffset: 4
-                });
-            }
 
             this.chartInstance = new Chart(this.chartRef.el, {
                 type: this.props.type || 'doughnut',
                 data: {
                     labels,
-                    datasets
+                    datasets: [
+                        {
+                            label: this.props.label_1 || 'Dataset 1',
+                            data: dataset1,
+                            backgroundColor,
+                            hoverOffset: 4
+                        },
+                        {
+                            label: this.props.label_2 || 'Dataset 2',
+                            data: dataset2,
+                            backgroundColor,
+                            hoverOffset: 4
+                        },
+                        {
+                            label: this.props.label_3 || 'Dataset 3',
+                            data: dataset3,
+                            backgroundColor,
+                            hoverOffset: 4
+                        }
+                    ],
                 },
                 options: {
                     responsive: true,
@@ -171,9 +157,53 @@ class ChartRenderer extends Component {
             views: [[false, 'tree'], [false, 'form']],
         });
     }
+    
+
+    // goToSeverityView(severity) {
+    //     this.env.services.action.doAction({
+    //         type: 'ir.actions.act_window',
+    //         name: `${severity} Severity Cases`,
+    //         res_model: 'case',
+    //         view_mode: 'tree,form',
+    //         domain: [['severity', '=', severity.toLowerCase()]],
+    //         views: [[false, 'tree'], [false, 'form']],
+    //     });
+    // }
 }
 
 ChartRenderer.template = "owl.ChartRenderer";
 registry.category("components").add("owl.ChartRenderer", ChartRenderer);
 
 export { ChartRenderer };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
