@@ -34,6 +34,8 @@
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
         # "data/demo_data/branch/res.branch.csv", #BRANCH
+        "data/demo_data/region/res.partner.region.csv",
+        # "data/demo_data/industries/customer.industry.csv", # INDUSTRY
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -70,6 +72,7 @@
         "data/demo_data/risk_assessment/risk_level.xml",
         "data/demo_data/risk_assessment/risk_subject.xml",
         "data/demo_data/risk_assessment/digital_delivery_channel.xml",
+        "data/demo_data/risk_assessment/risk_subject_2.xml",
         "data/demo_data/risk_assessment/customer_type.xml",
         "data/demo_data/risk_assessment/jurisdiction.xml",
         "data/demo_data/risk_assessment/delivery_channel.xml",
@@ -114,6 +117,8 @@
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
         'data/demo_data/plan/assessment_plan.xml',
+        'data/demo_data/plan/jurisdiction_plan.xml',
+        'data/demo_data/plan/customer_type_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
         'data/blacklist.xml',
