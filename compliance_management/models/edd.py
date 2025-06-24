@@ -223,6 +223,7 @@ class CustomerEDD(models.Model):
         compute='_compute_is_current_user_approving_officer')
     is_cco = fields.Boolean(compute='_compute_is_cco', store=False,
                             default=lambda self: self._default_is_cco())
+    is_officer_notified = fields.Boolean(string="Officer Notified", default=False)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     reject_reason = fields.Text(string='Reject Reason', tracking =True)
     
@@ -400,24 +401,32 @@ class CustomerEDD(models.Model):
             _logger.error(f"{template.name} Failed to send notification: {str(e)}")
             raise ValidationError(f"{template.name} Failed to send notification: {str(e)}")
 
-    @api.model
-    def create(self, vals):
-        _logger.info(f"Creating EDD record with values: {vals}")
-        record = super(CustomerEDD, self).create(vals)
-        _logger.info(f"Created EDD record ID: {record.id}")
 
-        if record.status == 'draft' and record.create_date:
-            _logger.info(
-                f"EDD record is in draft and has create_date — sending email.")
-            record._send_email_to_officers(
-                'compliance_management.enhanced_due_diligence_assessment_template',
-                to_cco_only=False,
-                officer=record.responsible_id
-            )
-        else:
-            _logger.info(
-                "EDD record is not in draft or has no create_date, skipping email.")
-        return record
+    def action_notify_officer(self):
+        self.write({
+            'is_officer_notified':True
+        })
+        _logger.info(f"Creating EDD record with values: {self}")
+        self._send_email_to_officers(
+            'compliance_management.enhanced_due_diligence_assessment_template', to_cco_only=False)
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Enhanced Due Diligence'),
+            'res_model': 'res.partner.edd',
+            'view_mode': 'list,form',
+            'view_id': False,
+            'views': [
+                (self.env.ref('compliance_management.edd_tree_view').id, 'list'),
+                (False, 'form')
+            ],
+            'target': 'main',
+            'context': {
+                'message': _('Submitted to officer successfully.'),
+                'type': 'success',
+                'sticky': False,
+            },
+        }
 
     # @api.model
     # def cron_send_for_assessment(self):
