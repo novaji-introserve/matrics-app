@@ -23,11 +23,6 @@ load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
-# LOW_RISK_THRESHOLD = 10
-# MEDIUM_RISK_THRESHOLD =  15
-# HIGH_RISK_THRESHOLD =  16
-
-
 
 class Shareholders(models.Model):
     _name = 'res.partner.shareholders'
@@ -252,7 +247,6 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'context': {'default_partner_id': self.id}
         }
-
     
             
     def action_screen_customer(self):
@@ -1789,6 +1783,8 @@ class Customer(models.Model):
             if record.composite_risk_score and record.composite_risk_score >0:
                 composite_risk_score = record.composite_risk_score
                 score = composite_risk_score + score
+            if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
+                score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
 
             # Use ORM write method to update and track changes
             record.sudo().write({

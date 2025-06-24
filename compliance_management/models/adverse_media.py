@@ -719,6 +719,16 @@ class AdverseMediaAlert(models.Model):
                 if media_keyword:
                     _logger.info(
                         f"Updating partner {record.media_id.partner_id} with risk_score: {media_keyword.risk_score}, risk_level: {media_keyword.media_risk_level}")
+                    
+                    media_keyword.media_risk_level=self.env['res.partner'].compute_customer_rating(media_keyword.risk_score)
+                    # partner = self.env['res.partner'].search([('id', '=', record.media_id.partner_id.id)], limit=1)
+                    
+                    if record.media_id.partner_id.composite_risk_score and record.media_id.partner_id.composite_risk_score >0:
+                        composite_risk_score = record.media_id.partner_id.composite_risk_score
+                        media_keyword.risk_score = composite_risk_score + media_keyword.risk_score
+                    if media_keyword.risk_score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
+                        media_keyword.risk_score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
+
 
                     # Use direct SQL update to avoid triggering write() method
                     self.env.cr.execute(
