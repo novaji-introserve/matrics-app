@@ -20,7 +20,7 @@
                 <field name="user_id" string="Created By"/>
                 <field name="staff_id" string="Staff Responsible"/>
                 <field name="data_source" readonly="1" invisible="1"/>
-                <field name="cases_action" string="Recommended Action" readonly="1"/>
+                <!-- <field name="cases_action" string="Recommended Action" readonly="1"/> -->
                 <field name="status_code" invisible="1"/>
                 <field name="team_id" readonly='1'/>
                 <field name="status_html" widget="html"/>
@@ -47,14 +47,14 @@
                 <field name="customer_id" invisible="1"/>
                 <field name="case_ref" string="Case Reference" readonly="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
-                <field name="title_html" string= "Case Severity" readonly="1" widget="html"/>
+                <field name="title_html" string= "Severity" readonly="1" widget="html"/>
                 <!-- <field name="created_at" string="Case Creation Date"/> -->
                 <field name="created_at" readonly="1" invisible="1"/>
                 <field name="created_at_formatted_datetime" string="Created Date" widget="text"/>
                 <field name="user_id" string="Created By"/>
                 <field name="staff_id" string="Staff Responsible"/>
                 <field name="data_source" readonly="1" invisible="1"/>
-                <field name="cases_action" string="Recommended Action" readonly="1"/>
+                <!-- <field name="cases_action" string="Recommended Action" readonly="1"/> -->
                 <field name="team_id"/>
                 <field name="status_html" widget="html"/>
             </tree>
@@ -73,14 +73,14 @@
                 <field name="customer_id" invisible="1"/>
                 <field name="case_ref" string="Case Reference" readonly="1"/>
                 <field name="title" string="Severity" readonly="1" invisible="1" />
-                <field name="title_html" string= "Case Severity" readonly="1" widget="html"/>
+                <field name="title_html" string= "Severity" readonly="1" widget="html"/>
                 <!-- <field name="created_at" string="Start Date"/> -->
                 <field name="created_at" readonly="1" invisible="1"/>
                 <field name="created_at_formatted_datetime" string="Created Date" widget="text"/>
                 <field name="user_id" string="Created By"/>
                 <field name="staff_id" string="Staff Responsible"/>
                 <field name="data_source" readonly="1" invisible="1"/>
-                <field name="cases_action" string="Recommended Action" readonly="1"/>
+                <!-- <field name="cases_action" string="Recommended Action" readonly="1"/> -->
                 <field name="team_id"/>
                 <field name="status_html" widget="html"/>
                 <!-- <field name="case_ref" string="Case Reference" readonly="1"/> -->
@@ -120,7 +120,7 @@
                             <field name="transaction_id" attrs="{'invisible': [('transaction_id', '=', False)]}" readonly='1'/>
                             <field name="customer_id" attrs="{'invisible': [('customer_id', '=', False)]}" readonly="1"/>
                             <field name="data_source" readonly="1" invisible="1"/>
-                            <field name="cases_action" string="Recommended Action" readonly="1"/>
+                            <field name="cases_action" string="Recommended Action" readonly="1" widget="html"/>
                             <field name="title" string="Severity" invisible="1" readonly="1" />
                             <field name="title_html" string= "Case Severity" readonly="1" widget="html"/>
                         </group>
@@ -238,7 +238,9 @@
                                 <field name="create_date" readonly="1"/>
                                 <field name="create_uid" string="Responder" options="{'no_open': True, 'no_create': True}"/>
                                 <!-- <field name="quick_response" readonly="1" required="1"/> -->
-                                <field name="response" required="1" />
+                                <!-- <field name="response" required="1" /> -->
+                                <field name="response" required="1" colspan="4" style="height: 150px;"/>
+
                                 <field name="case_id" invisible="1"/>
                             </tree>
                             <form>
@@ -389,11 +391,13 @@
                         <field name="new_process_id" string="Process" readonly="1"/>
                         <field name="case_ref" string="Case Reference" readonly="1"/>
                         <field name="status_code" invisible="1"/>
-                        <field name="quick_response" string="Respond to Case"
+                        <field name="quick_response" string="Respond to Case" 
                         attrs="{'invisible': ['|',
                         ('is_assigned_staff', '=', False),
                         ('status_code', '=', 'closed')
-                        ]}"/>
+                        ]}" colspan="4" style="height: 150px;"/>
+                        
+
                     </group>
                 </group>
             </xpath>
@@ -505,6 +509,113 @@
             </div>
         </field>
     </record>
+
+    <!-- Tree View for Archived Cases -->
+    <record id="view_cases_tree_archived" model="ir.ui.view">
+        <field name="name">cases.tree.archived</field>
+        <field name="model">case</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false" delete="false">
+                <field name="name" invisible='1'/>
+                <field name="transaction_id" invisible="1" />
+                <field name="customer_id" invisible="1"/>
+                <field name="case_ref" string="Case Reference" readonly="1"/>
+                <field name="title" string="Severity" readonly="1" invisible="1" />
+                <field name="title_html" string= "Severity" readonly="1" widget="html"/>
+                <field name="created_at" readonly="1" invisible="1"/>
+                <field name="created_at_formatted_datetime" string="Created Date" widget="text"/>
+                <field name="closed_date" string="Closed Date" readonly="1" invisible="1"/>
+                <field name="closed_date_formatted" string="Closed Date" widget="text"/>
+                <field name="archived_date" string="Archived Date" readonly="1" invisible="1"/>
+                <field name="archived_date_formatted" string="Archived Date" widget="text"/>
+                <field name="user_id" string="Created By"/>
+                <field name="staff_id" string="Staff Responsible"/>
+                <field name="data_source" readonly="1" invisible="1"/>
+                <field name="status_code" invisible="1"/>
+                <field name="team_id" readonly='1'/>
+                <field name="status_html" widget="html"/>
+                <field name="severity_level" invisible="1"/>
+                <field name="has_responses" invisible="1"/>
+                <field name="is_creator" invisible="1"/>
+                <field name="is_assigned_staff" invisible="1"/>
+                <field name="is_supervisor" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for Archived Cases -->
+    <record id="view_case_form_archived" model="ir.ui.view">
+        <field name="name">case.form.archived</field>
+        <field name="model">case</field>
+        <field name="inherit_id" ref="view_case_form_base"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <header position="replace">
+                <header>
+                    <!-- Restore button for archived cases -->
+                    <button name="action_restore_case" 
+                            string="Restore Case" 
+                            type="object" 
+                            class="btn-primary" 
+                            attrs="{'invisible': [('status_code', '!=', 'archived')]}"/>
+                    <field name="status_id" widget="statusbar" readonly="1"/>
+                </header>
+            </header>
+            
+            <field name="created_at_formatted_datetime" position="after">
+                <field name="closed_date" string="Closed Date" readonly="1" invisible="1"/>
+                <field name="closed_date_formatted" string="Closed Date" widget="text"/>
+                <field name="archived_date" string="Archived Date" readonly="1" invisible="1"/>
+                <field name="archived_date_formatted" string="Archived Date" widget="text"/>
+            </field>
+            
+            <field name="quick_response" position="replace">
+                <!-- Remove quick response field for archived cases -->
+            </field>
+            
+            <notebook position="replace">
+                <notebook>
+                    <page string="Description">
+                        <group>
+                            <field name="cases_description" readonly="1" widget="html"/>
+                            <field name="further_description" readonly="1" widget="html"/>
+                        </group>
+                    </page>
+                    <page string="Responses">
+                        <field name="response_ids" readonly="1" nolabel="1">
+                            <tree>
+                                <field name="create_uid" string="Responder"/>
+                                <field name="create_date" string="Date" widget="datetime"/>
+                                <field name="response" string="Response"/>
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="create_uid" readonly="1"/>
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="response" readonly="1"/>
+                                </group>
+                            </form>
+                        </field>
+                    </page>
+                    <page string="Attachments">
+                        <field name="attachment"
+                            filename="filename"
+                            readonly="1"
+                            options="{'no_delete': True}"  />
+                        <field name="filename" invisible="1"/>
+                    </page>
+                </notebook>
+            </notebook>
+            
+            <div class="oe_chatter" position="replace">
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </div>
+        </field>
+    </record>
+
 
     <!-- ACTIONS -->
     
@@ -630,6 +741,27 @@
         <field name="code">action = model.action_view_overdue_cases()</field>
     </record>
 
+    <!-- Server Action for Archived Cases -->
+    <record id="action_archived_cases_custom" model="ir.actions.server">
+        <field name="name">Archived Cases</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_view_archived_cases()</field>
+    </record>
+
+    <!-- Scheduled Action to Auto-Archive Cases -->
+    <record id="ir_cron_auto_archive_cases" model="ir.cron">
+        <field name="name">Auto Archive Cases</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_auto_archive_cases()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+        <field name="doall" eval="False"/>
+    </record>
+
     <!-- SECURITY RULES -->
     
     <record id="case_rule_supervisor" model="ir.rule">
@@ -643,5 +775,17 @@
             ('supervisor_three_id', '=', user.id)
     ]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Security Rule for Archived Cases -->
+    <record id="case_rule_archived" model="ir.rule">
+        <field name="name">Case: users can view archived cases</field>
+        <field name="model_id" ref="model_case"/>
+        <field name="domain_force">[('status_id.name', '=', 'archived')]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 </odoo>

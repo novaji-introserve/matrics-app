@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Tree View -->
+    <record id="case_configuration_tree_view" model="ir.ui.view">
+        <field name="name">case.configuration.tree</field>
+        <field name="model">case.configuration</field>
+        <field name="arch" type="xml">
+            <tree string="Case Configurations" editable="bottom">
+                <field name="name"/>
+                <field name="deadline_value"/>
+                <field name="deadline_unit"/>
+                <field name="is_default"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="case_configuration_form_view" model="ir.ui.view">
+        <field name="name">case.configuration.form</field>
+        <field name="model">case.configuration</field>
+        <field name="arch" type="xml">
+            <form string="Case Configuration">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Configuration Name"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group name="deadline_settings" string="Deadline Settings">
+                            <field name="deadline_value"/>
+                            <field name="deadline_unit"/>
+                            <field name="is_default"/>
+                        </group>
+                        
+                        <group name="company_settings" string="Company Settings">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    
+                    <group name="notification_settings" string="Notification Settings">
+                        <field name="notify_before_overdue"/>
+                        <field name="notification_hours" attrs="{'invisible': [('notify_before_overdue', '=', False)], 'required': [('notify_before_overdue', '=', True)]}"/>
+                    </group>
+                    
+                    <group name="preview" string="Preview" class="oe_read_only">
+                        <div class="alert alert-info" role="alert">
+                            <strong>Current Configuration:</strong><br/>
+                            Cases will be marked as overdue after <field name="deadline_value" readonly="1"/> <field name="deadline_unit" readonly="1"/>.
+                        </div>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="case_configuration_search_view" model="ir.ui.view">
+        <field name="name">case.configuration.search</field>
+        <field name="model">case.configuration</field>
+        <field name="arch" type="xml">
+            <search string="Case Configurations">
+                <field name="name"/>
+                <field name="deadline_unit"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <filter string="Default" name="default" domain="[('is_default', '=', True)]"/>
+                
+                <separator/>
+                <filter string="Hours" name="hours" domain="[('deadline_unit', '=', 'hours')]"/>
+                <filter string="Days" name="days" domain="[('deadline_unit', '=', 'days')]"/>
+                <filter string="Weeks" name="weeks" domain="[('deadline_unit', '=', 'weeks')]"/>
+                <filter string="Months" name="months" domain="[('deadline_unit', '=', 'months')]"/>
+                
+                <group expand="0" string="Group By">
+                    <filter string="Deadline Unit" name="group_deadline_unit" domain="[]" context="{'group_by': 'deadline_unit'}"/>
+                    <filter string="Company" name="group_company" domain="[]" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="case_configuration_action" model="ir.actions.act_window">
+        <field name="name">Case Configuration</field>
+        <field name="res_model">case.configuration</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first case configuration!
+            </p>
+            <p>
+                Configure deadline settings for case management. 
+                Set how long cases should remain open before being marked as overdue.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <!-- <menuitem 
+        id="case_configuration_menu"
+        name="Configuration"
+        parent="case_management_menu_root"
+        action="case_configuration_action"
+        sequence="100"/> -->
+
+</odoo>

@@ -17,17 +17,22 @@
         'security/security.xml',
         'security/groups.xml',
         'security/ir.model.access.csv',
+        'data/overdue_cronJob/case_configuration_data.xml',
+        'data/email_templates/case_configuration_templates.xml',
+        'views/case_configuration_views.xml',
         
         'views/new_case.xml',        # Then load views and connect to menus
        # 'views/case_form_inherit_disable_save_discard.xml', 
        # 'views/message_alert_views.xml',
         'views/all_cases_views.xml',
         'views/my_alerts_views.xml',
+        'views/company_logo_view.xml',
         'views/case_dashboard.xml',# Load menus first
         #'views/case_form_inherit.xml',
         'data/overdue_cronJob/cron.xml',
         # 'data/exception.process.type.csv',
         # 'data/exception.process.csv',
+        
     ],
     'demo': [],
     'assets': {
