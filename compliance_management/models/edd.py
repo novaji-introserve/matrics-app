@@ -19,12 +19,14 @@ class CustomerEDD(models.Model):
             ('draft', 'Draft'),
             ('completed', 'Completed'),
             ('approved', 'Approved'),
-            ('cancelled', 'Cancelled'),
-            ('deleted', 'Deleted'),
+            # ('cancelled', 'Cancelled'),
+            ('rejected', 'Rejected'),
+            # ('deleted', 'Deleted'),
             ('archived', 'Archived')],
         default='draft',
         tracking=True
     )
+    active = fields.Boolean(default=True, tracking=True)
     description = fields.Text(string='Description', tracking=True)
     user_id = fields.Many2one(comodel_name='res.users', string='User',
                               index=True, default=lambda self: self.env.user.id)
@@ -222,6 +224,7 @@ class CustomerEDD(models.Model):
     is_cco = fields.Boolean(compute='_compute_is_cco', store=False,
                             default=lambda self: self._default_is_cco())
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
+    reject_reason = fields.Text(string='Reject Reason', tracking =True)
     
 
     _sql_constraints = [
@@ -491,6 +494,10 @@ class CustomerEDD(models.Model):
 
     def action_approve(self):
         self.ensure_one()
+        if (self.is_current_user_approving_officer and
+            self.status == 'completed' and
+            not self.approving_officer_signature):
+            raise ValidationError("Signature must be uploaded before approval.")
         self.write({
             'status': 'approved',
             'approved_by': self.env.user.id,
@@ -521,7 +528,7 @@ class CustomerEDD(models.Model):
     def action_cancel(self):
         self.ensure_one()
         self.write({
-            'status': 'cancelled',
+            'status': 'draft',
             'approved_by': "",
             'date_approved': False,
         })
@@ -577,12 +584,15 @@ class CustomerEDD(models.Model):
 
     def action_archive(self):
         self.ensure_one()
-        self.write({
-            'status': 'archived',
-        })
 
         self._send_email_to_officers(
             'compliance_management.enhanced_due_diligence_archived_template', to_cco_only=True)
+        
+        result = super().action_archive()
+
+        self.write({
+            'status': 'archived',
+        })
 
         return {
             'type': 'ir.actions.act_window',
@@ -600,6 +610,47 @@ class CustomerEDD(models.Model):
                 'type': 'success',
                 'sticky': False,
             },
+        }
+    
+    def action_reject(self, reject_reason=None):
+        self.ensure_one()
+        self.write({
+            'status': 'rejected',
+            'approved_by': "",
+            'date_approved': False,
+            'approving_officer_signature': False,
+            'reject_reason': reject_reason or False,
+        })
+        self._send_email_to_officers(
+            'compliance_management.enhanced_due_diligence_rejected_template', to_cco_only=True)
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Enhanced Due Diligence'),
+            'res_model': 'res.partner.edd',
+            'view_mode': 'list,form',
+            'view_id': False,
+            'views': [
+                (self.env.ref('compliance_management.edd_tree_view').id, 'list'),
+                (False, 'form')
+            ],
+            'target': 'main',
+            'context': {
+                'message': _('EDD rejected'),
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+    def open_reject_wizard(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Reject EDD'),
+            'res_model': 'res.partner.edd.reject.wizard',
+            'view_mode': 'form',
+            'view_id': self.env.ref('compliance_management.view_res_partner_edd_reject_wizard_form').id,
+            'target': 'new',
+            'context': {'default_edd_id': self.id},
         }
 
     def _inverse_risk_score(self):
@@ -626,7 +677,16 @@ class CustomerEDD(models.Model):
             'target': 'new',
         }
 
-    
-        
+
+class EDDRrejectWizard(models.TransientModel):
+    _name = 'res.partner.edd.reject.wizard'
+    _description = 'EDD Reject Reason Wizard'
+
+    edd_id = fields.Many2one('res.partner.edd', string='EDD', required=True)
+    reject_reason = fields.Text(string='Reject Reason', required=True)
+
+    def action_confirm_reject(self):
+        self.edd_id.action_reject(self.reject_reason)
+        return {'type': 'ir.actions.act_window_close'}
     
     

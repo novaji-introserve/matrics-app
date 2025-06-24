@@ -753,11 +753,13 @@
             <field name="customer_phone">08034582910^08034582910</field>
             <field name="street">14 LAGOS STREET, IKEJA</field>
             <field name="city">LAGOS</field>
+            <field name="region_id" ref="compliance_management.region_lagos"/>
             <field name="country_id" ref="base.ng"/>
             <field name="title" ref="base.res_partner_title_prof" />
             <field name="active">True</field>
             <field name="origin">demo</field>
             <field name="internal_category">correspondent</field>
+            <field name="customer_industry_id" ref="compliance_management.industry_precious_metal_dealer"/>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="create_date" eval="(datetime.now() - timedelta(days=21)).strftime('%Y-%m-%d %H:%M:%S')" />
             <field name="email">abayomi.j@example.com</field>
