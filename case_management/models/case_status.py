@@ -7,7 +7,8 @@ class CaseStatus(models.Model):
     name = fields.Selection([
         ('open', 'Open'),
         ('closed', 'Closed'),
-        ('overdue', 'Overdue')
+        ('overdue', 'Overdue'),
+        ('archived', 'Archived'),
     ], string='Status', required=True)
 
     slug = fields.Char(string='Slug', compute='_compute_slug', store=True)
