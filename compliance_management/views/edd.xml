@@ -161,6 +161,8 @@
                                 'readonly': ['|', ('is_current_user_responsible', '=', False), ('status', '!=', 'draft')],
                                 'required': [('is_current_user_responsible', '=', True)]
                             }"/>
+                            <field name="risk_score" widget="risk_slider" options="{'step': 1, 'show_value': true, 'reverse_colors': false, 'readonly': false}" 
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
                             
                             <field name="is_current_user_responsible" invisible="1"/>
@@ -183,10 +185,6 @@
                     <notebook>
                         <page string="Risk Assessment">
                             <group>
-                                <group>
-                                    <field name="risk_score" widget="slider" step="0.5" min="0.5" max="9" 
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
-                                </group>
                                 <group>
                                     <field name="has_initiated_new_kyc" 
                                         attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>

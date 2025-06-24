@@ -560,7 +560,6 @@ class CustomerEDD(models.Model):
             'status': 'draft',
             'approved_by': "",
             'date_approved': False,
-            'responsible_officer_signature': False,
         })
         self._send_email_to_officers(
             'compliance_management.enhanced_due_diligence_sent_back_template', to_cco_only=True)
