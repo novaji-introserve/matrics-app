@@ -36,7 +36,6 @@
                             <KpiCard name="'Open Cases'" t-props="dashboardData.kpi_data.open_cases" status="'open'" onClick.bind="onCardClick"/>
                             <KpiCard name="'Closed Cases'" t-props="dashboardData.kpi_data.closed_cases" status="'closed'" onClick.bind="onCardClick"/>
                             <KpiCard name="'Overdue Cases'" t-props="dashboardData.kpi_data.overdue_cases" status="'overdue'" onClick.bind="onCardClick"/>
-                            <KpiCard name="'Archived Cases'" t-props="dashboardData.kpi_data.archived_cases" status="'archived'" onClick.bind="onCardClick"/>
                         </t>
                     </div>
                     
@@ -84,7 +83,6 @@
                                                        label_1="'Open'"
                                                        label_2="'Closed'"
                                                        label_3="'Overdue'"
-                                                       label_4="'Archived'"
                                                        text="'Cases By Status'"
                                                        backGroundColor="dashboardData.chart_data.cases_by_status.datasets[0].backgroundColor"
                                                        data="dashboardData.chart_data.cases_by_status.datasets[0].data"/>

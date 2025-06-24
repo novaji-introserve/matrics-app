@@ -34,7 +34,6 @@ class CaseDashboardController(http.Controller):
         open_cases = all_cases.filtered(lambda c: c.status_id.name == 'open')
         closed_cases = all_cases.filtered(lambda c: c.status_id.name == 'closed')
         overdue_cases = all_cases.filtered(lambda c: c.status_id.name == 'overdue')
-        archived_cases = all_cases.filtered(lambda c: c.status_id.name == 'archived')
         # all_cases = Case.search(domain)
         # open_cases = all_cases.filtered(lambda c: c.status_id.name == 'open')
         # closed_cases = all_cases.filtered(lambda c: c.status_id.name == 'closed')
@@ -63,10 +62,6 @@ class CaseDashboardController(http.Controller):
                     'value': len(overdue_cases),
                     'percentage': round((len(overdue_cases) / total_cases * 100)) if total_cases else 0
                 },
-                'archived_cases': {
-                    'value': len(archived_cases),
-                    'percentage': round((len(archived_cases) / total_cases * 100)) if total_cases else 0
-                },
             },
         
 
@@ -90,12 +85,12 @@ class CaseDashboardController(http.Controller):
                              for data in Case.read_group(domain, ['root_category_id'], ['root_category_id'])],
                 },
                 'case_rate': {
-                    'labels': ['Open', 'Close', 'Overdue', 'Archived'],
+                    'labels': ['Open', 'Close', 'Overdue'],
                     'datasets': [
                         {
                             'label': 'Cases',
-                            'data': [len(open_cases), len(closed_cases), len(overdue_cases), len(archived_cases)],
-                            'backgroundColor': ['yellow', 'blue', 'red', 'green']
+                            'data': [len(open_cases), len(closed_cases), len(overdue_cases)],
+                            'backgroundColor': ['yellow', 'blue', 'red']
                         }
                     ],
                 },
@@ -116,7 +111,7 @@ class CaseDashboardController(http.Controller):
                             'label': 'Status',
                             'data': [Case.search_count(domain + [('status_id', '=', status.id)])
                                      for status in request.env['case.status'].search([])],
-                            'backgroundColor': ['yellow', 'green', 'red', 'green']
+                            'backgroundColor': ['yellow', 'green', 'red']
                         }
                     ],
                 },
