@@ -1,4 +1,26 @@
-<odoo>      
+<odoo>  
+
+    <!-- Edd search view -->
+    <record id="edd_search_view" model="ir.ui.view">
+    <field name="name">Enhanced Due Diligence Search</field>
+    <field name="model">res.partner.edd</field>
+    <field name="arch" type="xml">
+        <search>
+            <!-- Regular search fields -->
+            <field name="name"/>
+            
+            <!-- Filters -->
+            <filter string="Active" name="active" domain="[('active','=',True)]"/>
+            <filter string="Archived" name="archived" domain="[('active','=',False)]"/>
+            
+            <!-- Group by -->
+            <group expand="1" string="Group By">
+                <filter string="Status" name="group_status" context="{'group_by':'status'}"/>
+            </group>
+        </search>
+    </field>
+</record>
+
     <!-- Edd Tree View --> 
     <record id="edd_tree_view" model="ir.ui.view">
         <field name="name">res.partner.edd.tree</field>
@@ -16,7 +38,7 @@
                     decoration-info="status == 'draft'"
                     decoration-success="status == 'approved'"
                     decoration-warning="status == 'cancelled'"
-                    decoration-danger="status == 'deleted'"
+                    decoration-danger="status == 'rejected'"
                     decoration-primary="status == 'completed'"
                     widget="badge" />
                 <field name="last_kyc_date" />
@@ -51,33 +73,47 @@
                             type="object"
                             string="Cancel"
                             groups="compliance_management.group_compliance_branch_compliance_officer"
-                            attrs="{'invisible': ['|', ('status', 'in', ['cancelled', 'approved', 'draft']), ('is_current_user_approving_officer', '=', False)]}" />
+                            attrs="{'invisible': ['|', ('status', 'in', ['cancelled', 'approved', 'draft','rejected']), ('is_current_user_responsible', '=', False)]}" />
 
                     <button name="action_archive"
                             class="oe_highlight"
                             type="object"
                             string="Archive"
                             groups="compliance_management.group_compliance_branch_compliance_officer"
-                            attrs="{'invisible': ['|', ('status', 'not in', ['cancelled', 'approved']), ('is_cco', '=', False)]}" />
+                            attrs="{'invisible': ['|', ('status', 'not in', ['approved']), ('is_cco', '=', False)]}" />
                     
                     <button name="action_download_pdf"
                             string="Download Document"
                             type="object"
                             class="oe_highlight"
                             groups="compliance_management.group_compliance_branch_compliance_officer"
-                            attrs="{'invisible': [('status', 'in', ['draft', 'cancelled', 'deleted','completed'])]}" />
+                            attrs="{'invisible': [('status', 'in', ['draft', 'cancelled', 'deleted','completed','rejected'])]}" />
 
                     <button name="action_send_back"
                             class="oe_highlight"
                             type="object"
                             string="Send Back"
                             groups="compliance_management.group_compliance_branch_compliance_officer"
-                            attrs="{'invisible': ['|', ('status', 'in', ['draft', 'approved']), ('is_current_user_approving_officer', '=', False)]}" />
+                            attrs="{'invisible': ['|', ('status', 'in', ['draft', 'approved','completed','archived']), ('is_cco', '=', False)]}" />
+                    
+                    <!-- <button name="action_reject"
+                            class="oe_highlight"
+                            type="object"
+                            string="Reject" confirm="Are you sure you want to reject this EDD" 
+                            groups="compliance_management.group_compliance_branch_compliance_officer"
+                            attrs="{'invisible': ['|', ('status', '!=', 'completed'), ('is_current_user_approving_officer', '=', False)]}" /> -->
+
+                    <button name="open_reject_wizard" 
+                            class="oe_highlight" 
+                            type="object" 
+                            string="Reject"
+                            groups="compliance_management.group_compliance_branch_compliance_officer" 
+                            attrs="{'invisible': ['|', ('status', '!=', 'completed'), ('is_current_user_approving_officer', '=', False)]}"/>
 
                    
 
 
-                    <field name="status" widget="statusbar" statusbar_visible="draft,completed,approved,cancelled,deleted,archived"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,completed,approved,rejected,archived"/>
                 </header>
 
                 <sheet>
@@ -95,7 +131,7 @@
                             <field name="description" placeholder="Reason Initiated" attrs="{'readonly': ['|', ('is_cco', '=', False), ('status', 'in', ['approved','archived'])], 'required': [('is_cco', '=', True)]}"/>
                             <field name="status" invisible="1"/>
                         </group>
-                           <group>
+                        <group>
                             <field name="customer_type"  attrs="{'readonly': ['|', ('is_cco', '=', False), ('status', 'in', ['approved','archived'])], 'required': [('is_cco', '=', True)]}"/>
                             <field name="status" invisible="1"/>
                         </group>
@@ -109,9 +145,9 @@
                             filename="approving_signature_filename"
                             attrs="{
                                     'readonly': ['|', ('is_current_user_approving_officer', '=', False), ('status', '!=', 'completed')],
-                                    'required': ['&amp;', ('is_current_user_approving_officer', '=', True), ('status', '=', 'completed')],
                                     'invisible': [('status', '=', 'draft')]
                                 }"/>
+                            <field name="reject_reason" invisible="1"/>
                         </group>
 
                         <group>
@@ -125,20 +161,23 @@
                                 'readonly': ['|', ('is_current_user_responsible', '=', False), ('status', '!=', 'draft')],
                                 'required': [('is_current_user_responsible', '=', True)]
                             }"/>
+                            <field name="risk_score" widget="risk_slider" options="{'step': 1, 'show_value': true, 'reverse_colors': false, 'readonly': false}" 
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
                             
                             <field name="is_current_user_responsible" invisible="1"/>
                         </group>
 
                         <group>
-                            <field name="approved_by" attrs="{'invisible': [('status', 'in', ['draft', 'cancelled', 'deleted','completed'])]}" />
-
-                        </group>
-                        
-                        <group>
+                            <field name="approved_by" attrs="{'invisible': [('status', 'in', ['draft', 'cancelled', 'deleted','completed'])]}"/>
                             <field name="date_approved" attrs="{'invisible': [('status', 'in', ['draft', 'cancelled', 'deleted','completed'])]}"/>
                             <field name="is_current_user_approver" invisible="1"/>
                             <field name="is_current_user_approving_officer" invisible="1"/>
+                        </group>
+                        
+                        <group>
+                          <!-- <field name="user_id" string="Initiated By" readonly="1"/> -->
+                          <field name="reject_reason"  readonly="1" attrs="{'invisible': [('status', '!=', 'rejected')]}"/>
                         </group>
 
                     </group>
@@ -147,28 +186,24 @@
                         <page string="Risk Assessment">
                             <group>
                                 <group>
-                                    <field name="risk_score" widget="slider" step="0.5" min="0.5" max="9" 
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
-                                </group>
-                                <group>
                                     <field name="has_initiated_new_kyc" 
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                                 <group>
                                     <field name="was_kyc_comprehensive" 
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                                 <group>
                                     <field name="last_kyc_date" 
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                                 <group>
                                     <field name="account_status" 
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                                 <group>
                                     <field name="documentation_status" 
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                             </group>
                         </page>
@@ -176,20 +211,20 @@
                         <page string="Customer Assessment">
                             <group>
                                 <group colspan="2">
-                                        <field name="visitation_observation" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        <field name="visitation_observation" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
-                                        <field name="overall_kyc_outcome" placeholder="overall kyc outcome" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        <field name="overall_kyc_outcome" placeholder="overall kyc outcome" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                                   <group colspan="2">
-                                        <field name="occupation" string="Occupation/Employment Profile" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        <field name="occupation" string="Occupation/Employment Profile" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     </group>
                              
                                    <group>
-                                        <field name="is_current_from_normal" string="Is Current Inflow From Normal Business" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        <field name="is_current_from_normal" string="Is Current Inflow From Normal Business" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     </group>
 
                                     <group>
-                                        <field name="does_business_support_volume" string="Does Nature of Business Support Volume and Velocity Of Inflows" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        <field name="does_business_support_volume" string="Does Nature of Business Support Volume and Velocity Of Inflows" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     </group>
                             </group>
                         </page>
@@ -197,17 +232,17 @@
                         <page string="Additional Information">
                             <group>
                                 <group colspan="2">
-                                    <field name="main_cash_purpose" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    <field name="main_cash_purpose" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
-                                    <field name="main_inflow_purpose" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    <field name="main_inflow_purpose" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
-                                    <field name="main_fund_remitters" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    <field name="main_fund_remitters" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
-                                    <field name="inflow_sources" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    <field name="inflow_sources" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
-                                    <field name="other_related_accounts" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    <field name="other_related_accounts" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
-                                    <field name="supporting_document" widget="many2many_binary" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    <field name="supporting_document" widget="many2many_binary" attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                             </group>
                         </page>
@@ -217,61 +252,61 @@
                         <group attrs="{'invisible': [('customer_type', '!=', 'corporate')]}">  
                             <group string="Corporate Profile Information" name="corporate_profile_info">
                                 <field name="brief_customer_profile" 
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 <field name="nature_of_business"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 <field name="kycc_info"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 <field name="customer_address"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                             </group>
                             <group string="Company Registration and Legal Information" name="corporate_legal_info">
                                 <field name="company_registration_number"
-                                  attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                  attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 <field name="signatories_details"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 <field name="beneficial_owner_details"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                             </group>
 
                             <group string="Corporate Citizenship Info" name="corporate_citizenship_info">
                                 <field name="dual_citizenship_info"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 <field name="citizenship_country_ids" widget="many2many_tags"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                             </group>
                         </group>
 
                         <group attrs="{'invisible': [('customer_type', '!=', 'corporate')]}">    
                             <group string="Corporate Financial Details" name="corporate_financial_details">
                                 <field name="high_risk_industries"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 <field name="expected_monthly_income"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 <field name="estimated_net_worth"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>  
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>  
                             </group>
 
                             <group string="Corporate PEP Information" name="corporate_pep_info">
                                 <field name="pep_association"
-                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                    attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 
                                 <field name="pep_relationship_details" 
                                     attrs="{'invisible': [('pep_association', '=', False)],
-                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate'), ('pep_association', '=', True)], 'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                            'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate'), ('pep_association', '=', True)], 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
                                 <field name="third_party_involvement"
                                     attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate')], 
-                                            'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                            'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
 
                                 <field name="third_party_details" 
                                     attrs="{'invisible': [('third_party_involvement', '=', False)],
                                             'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'corporate'), ('third_party_involvement', '=', True)], 
-                                            'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}" />
+                                            'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}" />
 
                                 <field name="third_party_document" widget="many2many_binary" 
                                     attrs="{'invisible': [('third_party_involvement', '=', False)], 
-                                            'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                            'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                             </group>
                         </group>
                         
@@ -281,33 +316,33 @@
                                 <group string="Individual Profile Information" name="individual_profile_info">
                                     <field name="brief_customer_profile"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="nature_of_business"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="employment_position"
                                          attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'individual')], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="employer_name"
                                          attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'individual')], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
 
                                 <group string="Residency Information" name="individual_residency_info">
                                     <field name="customer_address"
                                          attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'individual')], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="residency_status"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'individual')], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>                  
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>                  
                                     
                                     <field name="applicable_country_ids" widget="many2many_tags"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'individual')], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                         </group>
 
@@ -315,22 +350,22 @@
                                 <group string="Individual Financial Details" name="individual_financial_details">
                                     <field name="expected_monthly_income"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="estimated_net_worth"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>           
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>           
                                 </group>
 
                                 <group string="Individual PEP Information" name="individual_pep_info">
                                     <field name="is_customer_pep"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'individual')], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="relationship_with_pep" 
                                         attrs="{'invisible': [('is_customer_pep', '=', False)],
                                                 'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('customer_type', '=', 'individual'), ('is_customer_pep', '=', True)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}" />
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}" />
                                 </group>
                         </group>
 
@@ -339,33 +374,33 @@
                                 <group string="Source of Funds/Wealth" name="financial_info">
                                     <field name="expected_source_of_funds"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="source_of_funds_document" widget="many2many_binary"
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="source_of_wealth"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="source_of_wealth_document" widget="many2many_binary"
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                                     
                                 <group string="Transaction Details" name="transaction_details">
                                     <field name="inflow_purpose"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="inflow_document" widget="many2many_binary"
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="outflow_purpose"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="outflow_document" widget="many2many_binary"
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                 </group>
                         </group>
 
@@ -373,27 +408,27 @@
                                 <group string="Media Publicity" name="media_info">
                                     <field name="has_negative_media"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>   
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>   
                                     
                                     <field name="negative_media_details" 
                                         attrs="{'invisible': [('has_negative_media', '=', False)],
                                                 'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('has_negative_media', '=', True)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}" />  
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}" />  
                                     
                                     <field name="negative_media_document" widget="many2many_binary"
                                         attrs="{'invisible': [('has_negative_media', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}" />
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}" />
                                 </group>
 
                                 <group string="Cross-Border Transactions" name="cross_border_info">
                                     <field name="cross_border_transaction"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="cross_border_jurisdictions" widget="many2many_tags"
                                         attrs="{'invisible': [('cross_border_transaction', '=', False)],
                                                 'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False), ('cross_border_transaction', '=', True)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}" />
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}" />
                                 </group>
                          </group>
 
@@ -401,15 +436,15 @@
                                 <group string="Additional Comments" name="additional_info">
                                     <field name="other_comments"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>
                                     
                                     <field name="attestation_checked"
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_cco', '=', False)], 
-                                                'readonly': ['|', ('status', 'in', ['approved', 'archived', 'completed']), ('is_current_user_responsible', '=', False)]}"/>    
+                                                'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected']), '&amp;', ('is_current_user_responsible', '=', False), ('is_cco', '=', False)]}"/>    
                                 </group>
-                        </group>
-                    </page>          
-                </notebook>
+                           </group>
+                    </page>         
+                   </notebook>
              </sheet>
                 
                 <div class="oe_chatter">

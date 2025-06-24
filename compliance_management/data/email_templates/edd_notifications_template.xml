@@ -240,6 +240,44 @@
             </field>
         </record>
 
+         <record id="enhanced_due_diligence_rejected_template" model="mail.template">
+            <field name="name">EDD Rejected Notification</field>
+            <field name="model_id" ref="model_res_partner_edd"/>
+            <field name="subject">Enhanced Due Diligence (EDD) Rejected</field>
+            <field name="email_from"></field>
+            <field name="email_to">${ctx.get('email_to')}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+                <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+                   <div style="text-align: left; padding-bottom: 20px;">
+                        <img t-if="object.company_id and object.company_id.logo_web"
+                            t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+                    </div>
+
+                    <p>Dear <t t-out="ctx.get('cco')"></t>,</p>
+
+                    <p>
+                         We would like to inform you that an Enhanced Due Diligence (EDD) document has been <strong>rejected</strong>.
+                         Please find the details below.
+                    </p>
+
+                    <!-- Button -->
+                    <p style="text-align: center; margin: 20px 0;">
+                        <a t-att-href="ctx.get('edd_url')"
+                            style="background-color:#95536c;color:white;padding:10px 20px;text-decoration:none;border-radius:5px; display: inline-block;">
+                            View Details
+                        </a>
+                    </p>
+
+                    <p>Best Regards,</p>
+                    <p><strong>The Compliance Team</strong></p>
+                    <hr/>
+                </div>
+                ]]>
+            </field>
+        </record>
+
 
     </data>
 </odoo>
