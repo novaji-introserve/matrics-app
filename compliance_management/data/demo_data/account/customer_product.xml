@@ -1,4 +1,5 @@
 <odoo>
+
 <!-- Customer Products -->
     <record id="compliance_checklist_product_dom_savings" model="res.partner.account.product">
         <field name="name">Domiciliary Savings</field>
@@ -745,6 +746,78 @@
         <field name="name">Regular Individual Account</field>
         <field name="code">regular_individual_account</field>
         <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+
+    <!-- new -->
+
+    <record id="compliance_checklist_product_150" model="res.partner.account.product">
+        <field name="name">Master CARD 001</field>
+        <field name="code">master_card_001</field>
+        <field name="risk_assessment" ref="res_risk_assessment_master_card_001" />
+    </record>
+    <record id="compliance_checklist_product_151" model="res.partner.account.product">
+        <field name="name">TA Current Individual</field>
+        <field name="code">ta_current_individual</field>
+        <field name="risk_assessment" ref="res_risk_assessment_ta_current_individual" />
+    </record>
+
+    <record id="compliance_inst_fc_new003_product" model="res.partner.account.product">
+        <field name="name">Switch Savings Tier3 NGN</field>
+        <field name="code">switch_savings_tier3_ngn</field>
+        <field name="risk_assessment" ref="res_risk_assessment_switch_savings_tier3_ngn" />
+    </record>
+    <record id="compliance_inst_fc_new004_product" model="res.partner.account.product">
+        <field name="name">TT C CARD TEST</field>
+        <field name="code">tt_c_card_test</field>
+        <field name="risk_assessment" ref="res_risk_assessment_tt_c_card_test" />
+    </record>
+
+    <record id="compliance_inst_fc_new005_product" model="res.partner.account.product">
+       <field name="name">Individual Pb Overdraft</field>
+        <field name="code">individual_pb_overdraft</field>
+        <field name="risk_assessment" ref="res_risk_assessment_individual_pb_overdraft" />
+    </record>
+
+    <record id="compliance_inst_fc_new006_product" model="res.partner.account.product">
+        <field name="name">Interest Bearing Current</field>
+        <field name="code">interest_bearing_current</field>
+        <field name="risk_assessment" ref="res_risk_assessment_interest_bearing_current" />
+    </record>
+
+    <record id="compliance_inst_fc_new007_product" model="res.partner.account.product">
+        <field name="name">Smartcard Current</field>
+        <field name="code">smartcard_current</field>
+        <field name="risk_assessment" ref="res_risk_assessment_smartcard_current" />
+    </record>
+    <record id="compliance_inst_fc_new008_product" model="res.partner.account.product">
+        <field name="name">Healthcare Current</field>
+        <field name="code">healthcare_current</field>
+        <field name="risk_assessment" ref="res_risk_assessment_healthcare_current" />
+    </record>
+    <record id="compliance_inst_fc_new009_product" model="res.partner.account.product">
+        <field name="name">Lpo Finance</field>
+        <field name="code">lpo_finance</field>
+        <field name="risk_assessment" ref="res_risk_assessment_lpo_finance" />
+    </record>
+    <record id="compliance_inst_fc_new010_product" model="res.partner.account.product">
+        <field name="name">Prime Variant</field>
+        <field name="code">prime_variant</field>
+        <field name="risk_assessment" ref="res_risk_assessment_prime_variant" />
+    </record>
+    <record id="compliance_inst_fc_new011_product" model="res.partner.account.product">
+        <field name="name">Platinum Vintage Account</field>
+        <field name="code">platinum_vintage_account</field>
+        <field name="risk_assessment" ref="res_risk_assessment_platinum_vintage_account" />
+    </record>
+    <record id="compliance_inst_fc_new012_product" model="res.partner.account.product">
+        <field name="name">Ebanking Suspense</field>
+        <field name="code">ebanking_suspense</field>
+        <field name="risk_assessment" ref="res_risk_assessment_ebanking_suspense" />
+    </record>
+    <record id="compliance_inst_fc_new013_product" model="res.partner.account.product">
+        <field name="name">Interest Bearing Current</field>
+        <field name="code">interest_bearing_current</field>
+        <field name="risk_assessment" ref="res_risk_assessment_interest_bearing_current" />
     </record>
 
 </odoo>

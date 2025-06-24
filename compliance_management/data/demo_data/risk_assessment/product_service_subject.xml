@@ -1,0 +1,2935 @@
+<odoo>
+    <!-- Sterling Alumni Account -->
+    <record id="compliance_inst_fc_sterling_alumni_account_subject" model="res.risk.subject">
+        <field name="name">Sterling Alumni Account</field>
+        <field name="code">sterling_alumni_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling-Fanatic Platinum (Zero COT) -->
+    <record id="compliance_inst_fc_sterling_fanatic_platinum_zero_cot_subject" model="res.risk.subject">
+        <field name="name">Sterling-Fanatic Platinum (Zero COT)</field>
+        <field name="code">sterling_fanatic_platinum_zero_cot</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual- Concession -->
+    <record id="compliance_inst_fc_individual_concession_subject" model="res.risk.subject">
+        <field name="name">Individual- Concession</field>
+        <field name="code">individual_concession</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Matured Deposits -->
+    <record id="compliance_inst_fc_matured_deposits_subject" model="res.risk.subject">
+        <field name="name">Matured Deposits</field>
+        <field name="code">matured_deposits</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Principal Provision A/c -->
+    <record id="compliance_inst_fc_principal_provision_ac_subject" model="res.risk.subject">
+        <field name="name">Principal Provision A/c</field>
+        <field name="code">principal_provision_ac</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Priority Current A/c-Indiv(Regular) -->
+    <record id="compliance_inst_fc_priority_current_ac_indiv_regular_subject" model="res.risk.subject">
+        <field name="name">Priority Current A/c-Indiv(Regular)</field>
+        <field name="code">priority_current_ac_indiv_regular</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- SPECTA DEBT SERVICE -->
+    <record id="compliance_inst_fc_specta_debt_service_subject" model="res.risk.subject">
+        <field name="name">SPECTA DEBT SERVICE</field>
+        <field name="code">specta_debt_service</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Premier Current A/c- Indiv(Regular) -->
+    <record id="compliance_inst_fc_premier_current_ac_indiv_regular_subject" model="res.risk.subject">
+        <field name="name">Premier Current A/c- Indiv(Regular)</field>
+        <field name="code">premier_current_ac_indiv_regular</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Bento Account -->
+    <record id="compliance_inst_fc_bento_account_subject" model="res.risk.subject">
+        <field name="name">Bento Account</field>
+        <field name="code">bento_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Utility -->
+    <record id="compliance_inst_fc_sterling_utility_subject" model="res.risk.subject">
+        <field name="name">Sterling Utility</field>
+        <field name="code">sterling_utility</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Customer Staff Salary -->
+    <record id="compliance_inst_fc_corporate_customer_staff_salary_subject" model="res.risk.subject">
+        <field name="name">Corporate Customer Staff Salary</field>
+        <field name="code">corporate_customer_staff_salary</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- DISBURSED LOAN CORPORATE NGN -->
+    <record id="compliance_inst_fc_disbursed_loan_corporate_ngn_subject" model="res.risk.subject">
+        <field name="name">DISBURSED LOAN CORPORATE NGN</field>
+        <field name="code">disbursed_loan_corporate_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Regular -->
+    <record id="compliance_inst_fc_savings_regular_subject" model="res.risk.subject">
+        <field name="name">Savings - Regular</field>
+        <field name="code">savings_regular</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary TIER1 USD -->
+    <record id="compliance_inst_fc_domiciliary_tier1_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary TIER1 USD</field>
+        <field name="code">domiciliary_tier1_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- PTA/BTA Domiciliary Accounts USD -->
+    <record id="compliance_inst_fc_pta_bta_domiciliary_accounts_usd_subject" model="res.risk.subject">
+        <field name="name">PTA/BTA Domiciliary Accounts USD</field>
+        <field name="code">pta_bta_domiciliary_accounts_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current Indiv(Special) USD -->
+    <record id="compliance_inst_fc_domiciliary_current_indiv_special_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current Indiv(Special) USD</field>
+        <field name="code">domiciliary_current_indiv_special_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings Account NRNOA_NGN -->
+    <record id="compliance_inst_fc_savings_account_nrnoa_ngn_subject" model="res.risk.subject">
+        <field name="name">Savings Account NRNOA_NGN</field>
+        <field name="code">savings_account_nrnoa_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Non Oil Export Domiciliary(Regular) USD -->
+    <record id="compliance_inst_fc_non_oil_export_domiciliary_regular_usd_subject" model="res.risk.subject">
+        <field name="name">Non Oil Export Domiciliary(Regular) USD</field>
+        <field name="code">non_oil_export_domiciliary_regular_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - Corp Cash USD -->
+    <record id="compliance_inst_fc_domiciliary_current_corp_cash_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - Corp Cash USD</field>
+        <field name="code">domiciliary_current_corp_cash_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current Indiv Transfer USD -->
+    <record id="compliance_inst_fc_domiciliary_current_indiv_transfer_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current Indiv Transfer USD</field>
+        <field name="code">domiciliary_current_indiv_transfer_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current Indiv Cash Acts USD -->
+    <record id="compliance_inst_fc_domiciliary_current_indiv_cash_acts_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current Indiv Cash Acts USD</field>
+        <field name="code">domiciliary_current_indiv_cash_acts_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Education Plan Account -->
+    <record id="compliance_inst_fc_education_plan_account_subject" model="res.risk.subject">
+        <field name="name">Education Plan Account</field>
+        <field name="code">education_plan_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - Corp Special EUR -->
+    <record id="compliance_inst_fc_domiciliary_current_corp_special_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - Corp Special EUR</field>
+        <field name="code">domiciliary_current_corp_special_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings Account NRNOA_USD -->
+    <record id="compliance_inst_fc_savings_account_nrnoa_usd_subject" model="res.risk.subject">
+        <field name="name">Savings Account NRNOA_USD</field>
+        <field name="code">savings_account_nrnoa_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary TIER1 GBP -->
+    <record id="compliance_inst_fc_domiciliary_tier1_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary TIER1 GBP</field>
+        <field name="code">domiciliary_tier1_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- I CAN SAVE NPA -->
+    <record id="compliance_inst_fc_i_can_save_npa_subject" model="res.risk.subject">
+        <field name="name">I CAN SAVE NPA</field>
+        <field name="code">i_can_save_npa</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current Indiv(Special) GBP -->
+    <record id="compliance_inst_fc_domiciliary_current_indiv_special_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current Indiv(Special) GBP</field>
+        <field name="code">domiciliary_current_indiv_special_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current Indiv Cash Acts GBP -->
+    <record id="compliance_inst_fc_domiciliary_current_indiv_cash_acts_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current Indiv Cash Acts GBP</field>
+        <field name="code">domiciliary_current_indiv_cash_acts_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - State Govt GBP -->
+    <record id="compliance_inst_fc_domiciliary_current_state_govt_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - State Govt GBP</field>
+        <field name="code">domiciliary_current_state_govt_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current Indiv Transfer GBP -->
+    <record id="compliance_inst_fc_domiciliary_current_indiv_transfer_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current Indiv Transfer GBP</field>
+        <field name="code">domiciliary_current_indiv_transfer_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Non Oil Export Domiciliary(Regular) GBP -->
+    <record id="compliance_inst_fc_non_oil_export_domiciliary_regular_gbp_subject" model="res.risk.subject">
+        <field name="name">Non Oil Export Domiciliary(Regular) GBP</field>
+        <field name="code">non_oil_export_domiciliary_regular_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings Account NRNOA_GBP -->
+    <record id="compliance_inst_fc_savings_account_nrnoa_gbp_subject" model="res.risk.subject">
+        <field name="name">Savings Account NRNOA_GBP</field>
+        <field name="code">savings_account_nrnoa_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings Account NRNOA_EUR -->
+    <record id="compliance_inst_fc_savings_account_nrnoa_eur_subject" model="res.risk.subject">
+        <field name="name">Savings Account NRNOA_EUR</field>
+        <field name="code">savings_account_nrnoa_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Financial Inclusion-2 -->
+    <record id="compliance_inst_fc_savings_financial_inclusion_2_subject" model="res.risk.subject">
+        <field name="name">Savings - Financial Inclusion-2</field>
+        <field name="code">savings_financial_inclusion_2</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings Salary Account -->
+    <record id="compliance_inst_fc_savings_salary_account_subject" model="res.risk.subject">
+        <field name="name">Savings Salary Account</field>
+        <field name="code">savings_salary_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- ONEWOMAN SAVER -->
+    <record id="compliance_inst_fc_onewoman_saver_subject" model="res.risk.subject">
+        <field name="name">ONEWOMAN SAVER</field>
+        <field name="code">onewoman_saver</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Established/Medium Incubator -->
+    <record id="compliance_inst_fc_established_medium_incubator_subject" model="res.risk.subject">
+        <field name="name">Established/Medium Incubator</field>
+        <field name="code">established_medium_incubator</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Flex -->
+    <record id="compliance_inst_fc_platinum_flex_subject" model="res.risk.subject">
+        <field name="name">Platinum Flex</field>
+        <field name="code">platinum_flex</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Affinity Kiddies -->
+    <record id="compliance_inst_fc_affinity_kiddies_subject" model="res.risk.subject">
+        <field name="name">Affinity Kiddies</field>
+        <field name="code">affinity_kiddies</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- PTA/BTA Domiciliary Accounts GBP -->
+    <record id="compliance_inst_fc_pta_bta_domiciliary_accounts_gbp_subject" model="res.risk.subject">
+        <field name="name">PTA/BTA Domiciliary Accounts GBP</field>
+        <field name="code">pta_bta_domiciliary_accounts_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Diaspora Diamond -->
+    <record id="compliance_inst_fc_diaspora_diamond_subject" model="res.risk.subject">
+        <field name="name">Diaspora Diamond</field>
+        <field name="code">diaspora_diamond</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Agent Banking Savings -->
+    <record id="compliance_inst_fc_platinum_agent_banking_savings_subject" model="res.risk.subject">
+        <field name="name">Platinum Agent Banking Savings</field>
+        <field name="code">platinum_agent_banking_savings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- PTA/BTA Domiciliary Accounts EUR -->
+    <record id="compliance_inst_fc_pta_bta_domiciliary_accounts_eur_subject" model="res.risk.subject">
+        <field name="name">PTA/BTA Domiciliary Accounts EUR</field>
+        <field name="code">pta_bta_domiciliary_accounts_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual-Minimum Balance -->
+    <record id="compliance_inst_fc_individual_minimum_balance_subject" model="res.risk.subject">
+        <field name="name">Individual-Minimum Balance</field>
+        <field name="code">individual_minimum_balance</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Recurring Deposit Account EUR -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_account_eur_subject" model="res.risk.subject">
+        <field name="name">Monsterling Recurring Deposit Account EUR</field>
+        <field name="code">sterling_recurring_deposit_account_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- I CAN SAVE 2 -->
+    <record id="compliance_inst_fc_i_can_save_2_subject" model="res.risk.subject">
+        <field name="name">I CAN SAVE 2</field>
+        <field name="code">i_can_save_2</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Non Oil Export Domiciliary(Special) EUR -->
+    <record id="compliance_inst_fc_non_oil_export_domiciliary_special_eur_subject" model="res.risk.subject">
+        <field name="name">Non Oil Export Domiciliary(Special) EUR</field>
+        <field name="code">non_oil_export_domiciliary_special_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Non Oil Export Domiciliary(Regular) EUR -->
+    <record id="compliance_inst_fc_non_oil_export_domiciliary_regular_eur_subject" model="res.risk.subject">
+        <field name="name">Non Oil Export Domiciliary(Regular) EUR</field>
+        <field name="code">non_oil_export_domiciliary_regular_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - Corp Cash EUR -->
+    <record id="compliance_inst_fc_domiciliary_current_corp_cash_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - Corp Cash EUR</field>
+        <field name="code">domiciliary_current_corp_cash_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - Corp Transfer EUR -->
+    <record id="compliance_inst_fc_domiciliary_current_corp_transfer_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - Corp Transfer EUR</field>
+        <field name="code">domiciliary_current_corp_transfer_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Transfer2 USD -->
+    <record id="compliance_inst_fc_domiciliary_savings_transfer2_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Transfer2 USD</field>
+        <field name="code">domiciliary_savings_transfer2_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - State Govt EUR -->
+    <record id="compliance_inst_fc_domiciliary_current_state_govt_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - State Govt EUR</field>
+        <field name="code">domiciliary_current_state_govt_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Cash2 USD -->
+    <record id="compliance_inst_fc_domiciliary_savings_cash2_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Cash2 USD</field>
+        <field name="code">domiciliary_savings_cash2_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current Indiv Cash Acts EUR -->
+    <record id="compliance_inst_fc_domiciliary_current_indiv_cash_acts_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current Indiv Cash Acts EUR</field>
+        <field name="code">domiciliary_current_indiv_cash_acts_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- curpdor -->
+    <record id="compliance_inst_fc_curpdor_subject" model="res.risk.subject">
+        <field name="name">curpdor</field>
+        <field name="code">curpdor</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Recurring Deposit Account GBP -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_account_gbp_subject" model="res.risk.subject">
+        <field name="name">Sterling Recurring Deposit Account GBP</field>
+        <field name="code">sterling_recurring_deposit_account_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary TIER1 -->
+    <record id="compliance_inst_fc_domiciliary_tier1_subject" model="res.risk.subject">
+        <field name="name">Domiciliary TIER1</field>
+        <field name="code">domiciliary_tier1</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Pb Overdraft -->
+    <record id="compliance_inst_fc_corporate_pb_overdraft_subject" model="res.risk.subject">
+        <field name="name">Corporate Pb Overdraft</field>
+        <field name="code">corporate_pb_overdraft</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Incubator-M -->
+    <record id="compliance_inst_fc_incubator_m_subject" model="res.risk.subject">
+        <field name="name">Incubator-M</field>
+        <field name="code">incubator_m</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Disapora Vantage Gold -->
+    <record id="compliance_inst_fc_disapora_vantage_gold_subject" model="res.risk.subject">
+        <field name="name">Disapora Vantage Gold</field>
+        <field name="code">disapora_vantage_gold</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual NGOs USD -->
+    <record id="compliance_inst_fc_savings_non_individual_ngos_usd_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual NGOs USD</field>
+        <field name="code">savings_non_individual_ngos_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Recurring Deposit Account NGN -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_account_ngn_subject" model="res.risk.subject">
+        <field name="name">Sterling Recurring Deposit Account NGN</field>
+        <field name="code">sterling_recurring_deposit_account_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- E-Payment Account Variant -->
+    <record id="compliance_inst_fc_e_payment_account_variant_subject" model="res.risk.subject">
+        <field name="name">E-Payment Account Variant</field>
+        <field name="code">e_payment_account_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- SUPPLY CHAIN ACCOUNT -->
+    <record id="compliance_inst_fc_supply_chain_account_subject" model="res.risk.subject">
+        <field name="name">SUPPLY CHAIN ACCOUNT</field>
+        <field name="code">supply_chain_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Cash2 GBP -->
+    <record id="compliance_inst_fc_domiciliary_savings_cash2_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Cash2 GBP</field>
+        <field name="code">domiciliary_savings_cash2_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual NGOs GBP -->
+    <record id="compliance_inst_fc_savings_non_individual_ngos_gbp_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual NGOs GBP</field>
+        <field name="code">savings_non_individual_ngos_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual GBP -->
+    <record id="compliance_inst_fc_savings_non_individual_gbp_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual GBP</field>
+        <field name="code">savings_non_individual_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Recurring Deposit Account USD -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_account_usd_subject" model="res.risk.subject">
+        <field name="name">Sterling Recurring Deposit Account USD</field>
+        <field name="code">sterling_recurring_deposit_account_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Business-AMF -->
+    <record id="compliance_inst_fc_business_amf_subject" model="res.risk.subject">
+        <field name="name">Business-AMF</field>
+        <field name="code">business_amf</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Cash GBP -->
+    <record id="compliance_inst_fc_domiciliary_savings_cash_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Cash GBP</field>
+        <field name="code">domiciliary_savings_cash_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Smedan Current Account Scheme -->
+    <record id="compliance_inst_fc_smedan_current_account_scheme_subject" model="res.risk.subject">
+        <field name="name">Smedan Current Account Scheme</field>
+        <field name="code">smedan_current_account_scheme</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Dom Affinity Current -->
+    <record id="compliance_inst_fc_dom_affinity_current_subject" model="res.risk.subject">
+        <field name="name">Dom Affinity Current</field>
+        <field name="code">dom_affinity_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Bridge Account -->
+    <record id="compliance_inst_fc_platinum_bridge_account_subject" model="res.risk.subject">
+        <field name="name">Platinum Bridge Account</field>
+        <field name="code">platinum_bridge_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Utility Variant -->
+    <record id="compliance_inst_fc_sterling_utility_variant_subject" model="res.risk.subject">
+        <field name="name">Sterling Utility Variant</field>
+        <field name="code">sterling_utility_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Transfer GBP -->
+    <record id="compliance_inst_fc_domiciliary_savings_transfer_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Transfer GBP</field>
+        <field name="code">domiciliary_savings_transfer_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual -->
+    <record id="compliance_inst_fc_savings_non_individual_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual</field>
+        <field name="code">savings_non_individual</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Transfer2 GBP -->
+    <record id="compliance_inst_fc_domiciliary_savings_transfer2_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Transfer2 GBP</field>
+        <field name="code">domiciliary_savings_transfer2_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Business- Concession -->
+    <record id="compliance_inst_fc_business_concession_subject" model="res.risk.subject">
+        <field name="name">Business- Concession</field>
+        <field name="code">business_concession</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Hybrid -->
+    <record id="compliance_inst_fc_savings_hybrid_subject" model="res.risk.subject">
+        <field name="name">Savings - Hybrid</field>
+        <field name="code">savings_hybrid</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Classic Current A/C - MFB -->
+    <record id="compliance_inst_fc_classic_current_ac_mfb_subject" model="res.risk.subject">
+        <field name="name">Classic Current A/C - MFB</field>
+        <field name="code">classic_current_ac_mfb</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Transfer2 EUR -->
+    <record id="compliance_inst_fc_domiciliary_savings_transfer2_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Transfer2 EUR</field>
+        <field name="code">domiciliary_savings_transfer2_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Classic current Account - PMI -->
+    <record id="compliance_inst_fc_classic_current_account_pmi_subject" model="res.risk.subject">
+        <field name="name">Classic current Account - PMI</field>
+        <field name="code">classic_current_account_pmi</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings  Non Individual -->
+    <record id="compliance_inst_fc_savings_non_individual_subject" model="res.risk.subject">
+        <field name="name">Savings  Non Individual</field>
+        <field name="code">savings_non_individual</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Agent Banking Current -->
+    <record id="compliance_inst_fc_platinum_agent_banking_current_subject" model="res.risk.subject">
+        <field name="name">Platinum Agent Banking Current</field>
+        <field name="code">platinum_agent_banking_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Pb Current -->
+    <record id="compliance_inst_fc_individual_pb_current_subject" model="res.risk.subject">
+        <field name="name">Individual Pb Current</field>
+        <field name="code">individual_pb_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Premium Business Account Variant 2 -->
+    <record id="compliance_inst_fc_platinum_premium_business_account_variant_2_subject" model="res.risk.subject">
+        <field name="name">Platinum Premium Business Account Variant 2</field>
+        <field name="code">platinum_premium_business_account_variant_2</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Dom Pb Current -->
+    <record id="compliance_inst_fc_dom_pb_current_subject" model="res.risk.subject">
+        <field name="name">Dom Pb Current</field>
+        <field name="code">dom_pb_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Veripay Salary Savings -->
+    <record id="compliance_inst_fc_veripay_salary_savings_subject" model="res.risk.subject">
+        <field name="name">Veripay Salary Savings</field>
+        <field name="code">veripay_salary_savings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Platinum Hysa-Fn -->
+    <record id="compliance_inst_fc_individual_platinum_hysa_fn_subject" model="res.risk.subject">
+        <field name="name">Individual Platinum Hysa-Fn</field>
+        <field name="code">individual_platinum_hysa_fn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Community Banking -->
+    <record id="compliance_inst_fc_community_banking_subject" model="res.risk.subject">
+        <field name="name">Community Banking</field>
+        <field name="code">community_banking</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Forever Sterling Account -->
+    <record id="compliance_inst_fc_forever_sterling_account_subject" model="res.risk.subject">
+        <field name="name">Forever Sterling Account</field>
+        <field name="code">forever_sterling_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Give Account -->
+    <record id="compliance_inst_fc_give_account_subject" model="res.risk.subject">
+        <field name="name">Give Account</field>
+        <field name="code">give_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Investment Account -->
+    <record id="compliance_inst_fc_investment_account_subject" model="res.risk.subject">
+        <field name="name">Investment Account</field>
+        <field name="code">investment_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Agric CACS Funds Due to CBN -->
+    <record id="compliance_inst_fc_agric_cacs_funds_due_to_cbn_subject" model="res.risk.subject">
+        <field name="name">Agric CACS Funds Due to CBN</field>
+        <field name="code">agric_cacs_funds_due_to_cbn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- LC Equity Contribution -->
+    <record id="compliance_inst_fc_lc_equity_contribution_subject" model="res.risk.subject">
+        <field name="name">LC Equity Contribution</field>
+        <field name="code">lc_equity_contribution</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- SUPA Flex -->
+    <record id="compliance_inst_fc_supa_flex_subject" model="res.risk.subject">
+        <field name="name">SUPA Flex</field>
+        <field name="code">supa_flex</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Business-TURNOVER -->
+    <record id="compliance_inst_fc_business_turnover_subject" model="res.risk.subject">
+        <field name="name">Business-TURNOVER</field>
+        <field name="code">business_turnover</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Business- Zero AMF -->
+    <record id="compliance_inst_fc_business_zero_amf_subject" model="res.risk.subject">
+        <field name="name">Business- Zero AMF</field>
+        <field name="code">business_zero_amf</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Public Sector Accounts - Local Govt -->
+    <record id="compliance_inst_fc_public_sector_accounts_local_govt_subject" model="res.risk.subject">
+        <field name="name">Public Sector Accounts - Local Govt</field>
+        <field name="code">public_sector_accounts_local_govt</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling SME Account -->
+    <record id="compliance_inst_fc_sterling_sme_account_subject" model="res.risk.subject">
+        <field name="name">Sterling SME Account</field>
+        <field name="code">sterling_sme_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- REGULATORY RISK RESERVE -->
+    <record id="compliance_inst_fc_regulatory_risk_reserve_subject" model="res.risk.subject">
+        <field name="name">REGULATORY RISK RESERVE</field>
+        <field name="code">regulatory_risk_reserve</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- IDF-Guarantee Inflow -->
+    <record id="compliance_inst_fc_idf_guarantee_inflow_subject" model="res.risk.subject">
+        <field name="name">IDF-Guarantee Inflow</field>
+        <field name="code">idf_guarantee_inflow</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Agric Overdraft Account -->
+    <record id="compliance_inst_fc_sterling_agric_overdraft_account_subject" model="res.risk.subject">
+        <field name="name">Sterling Agric Overdraft Account</field>
+        <field name="code">sterling_agric_overdraft_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- IndividualCR Interest -->
+    <record id="compliance_inst_fc_individual_cr_interest_subject" model="res.risk.subject">
+        <field name="name">Individual-- CR Interest</field>
+        <field name="code">individual_cr_interest</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Health Overdraft Account -->
+    <record id="compliance_inst_fc_sterling_health_overdraft_account_subject" model="res.risk.subject">
+        <field name="name">Sterling Health Overdraft Account</field>
+        <field name="code">sterling_health_overdraft_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - Corp Special GBP -->
+    <record id="compliance_inst_fc_domiciliary_current_corp_special_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - Corp Special GBP</field>
+        <field name="code">domiciliary_current_corp_special_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- E-Payment Account -->
+    <record id="compliance_inst_fc_e_payment_account_subject" model="res.risk.subject">
+        <field name="name">E-Payment Account</field>
+        <field name="code">e_payment_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Cash2 EUR -->
+    <record id="compliance_inst_fc_domiciliary_savings_cash2_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Cash2 EUR</field>
+        <field name="code">domiciliary_savings_cash2_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Public Sector Special -->
+    <record id="compliance_inst_fc_public_sector_special_subject" model="res.risk.subject">
+        <field name="name">Public Sector Special</field>
+        <field name="code">public_sector_special</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Cash EUR -->
+    <record id="compliance_inst_fc_domiciliary_savings_cash_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Cash EUR</field>
+        <field name="code">domiciliary_savings_cash_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- NXP Domiciliary Corporate Account USD -->
+    <record id="compliance_inst_fc_nxp_domiciliary_corporate_account_usd_subject" model="res.risk.subject">
+        <field name="name">NXP Domiciliary Corporate Account USD</field>
+        <field name="code">nxp_domiciliary_corporate_account_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Cash -->
+    <record id="compliance_inst_fc_domiciliary_savings_cash_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Cash</field>
+        <field name="code">domiciliary_savings_cash</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- LC IMPORTS LEGACY CONTRA_NGN -->
+    <record id="compliance_inst_fc_lc_imports_legacy_contra_ngn_subject" model="res.risk.subject">
+        <field name="name">LC IMPORTS LEGACY CONTRA_NGN</field>
+        <field name="code">lc_imports_legacy_contra_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Financial Inclusion-3 -->
+    <record id="compliance_inst_fc_savings_financial_inclusion_3_subject" model="res.risk.subject">
+        <field name="name">Savings - Financial Inclusion-3</field>
+        <field name="code">savings_financial_inclusion_3</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- NXP Domiciliary Corporate Account EUR -->
+    <record id="compliance_inst_fc_nxp_domiciliary_corporate_account_eur_subject" model="res.risk.subject">
+        <field name="name">NXP Domiciliary Corporate Account EUR</field>
+        <field name="code">nxp_domiciliary_corporate_account_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- NXP Domiciliary Corporate Account GBP -->
+    <record id="compliance_inst_fc_nxp_domiciliary_corporate_account_gbp_subject" model="res.risk.subject">
+        <field name="name">NXP Domiciliary Corporate Account GBP</field>
+        <field name="code">nxp_domiciliary_corporate_account_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits IND EUR -->
+    <record id="compliance_inst_fc_call_deposits_ind_eur_subject" model="res.risk.subject">
+        <field name="name">Call Deposits IND EUR</field>
+        <field name="code">call_deposits_ind_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits Corp EUR -->
+    <record id="compliance_inst_fc_call_deposits_corp_eur_subject" model="res.risk.subject">
+        <field name="name">Call Deposits Corp EUR</field>
+        <field name="code">call_deposits_corp_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual NGOs EUR -->
+    <record id="compliance_inst_fc_savings_non_individual_ngos_eur_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual NGOs EUR</field>
+        <field name="code">savings_non_individual_ngos_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual EUR -->
+    <record id="compliance_inst_fc_savings_non_individual_eur_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual EUR</field>
+        <field name="code">savings_non_individual_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Agent Customer Account -->
+    <record id="compliance_inst_fc_agent_customer_account_subject" model="res.risk.subject">
+        <field name="name">Agent Customer Account</field>
+        <field name="code">agent_customer_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Switch Savings Tier3 USD -->
+    <record id="compliance_inst_fc_switch_savings_tier3_usd_subject" model="res.risk.subject">
+        <field name="name">Switch Savings Tier3 USD</field>
+        <field name="code">switch_savings_tier3_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual-AMF N -->
+    <record id="compliance_inst_fc_individual_amf_n_subject" model="res.risk.subject">
+        <field name="name">Individual-AMF N</field>
+        <field name="code">individual_amf_n</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Utility Corporate -->
+    <record id="compliance_inst_fc_sterling_utility_corporate_subject" model="res.risk.subject">
+        <field name="name">Sterling Utility Corporate</field>
+        <field name="code">sterling_utility_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Public Sector Accounts - State Govt -->
+    <record id="compliance_inst_fc_public_sector_accounts_state_govt_subject" model="res.risk.subject">
+        <field name="name">Public Sector Accounts - State Govt</field>
+        <field name="code">public_sector_accounts_state_govt</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Public Sector Accounts - Federal -->
+    <record id="compliance_inst_fc_public_sector_accounts_federal_subject" model="res.risk.subject">
+        <field name="name">Public Sector Accounts - Federal</field>
+        <field name="code">public_sector_accounts_federal</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Specta Current Account -->
+    <record id="compliance_inst_fc_specta_current_account_subject" model="res.risk.subject">
+        <field name="name">Specta Current Account</field>
+        <field name="code">specta_current_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Turnover -->
+    <record id="compliance_inst_fc_individual_turnover_subject" model="res.risk.subject">
+        <field name="name">Individual Turnover</field>
+        <field name="code">individual_turnover</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- COUNTER CHEQUE MODULE -->
+    <record id="compliance_inst_fc_counter_cheque_module_subject" model="res.risk.subject">
+        <field name="name">COUNTER CHEQUE MODULE</field>
+        <field name="code">counter_cheque_module</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- CASH WITHDRAWAL GBP -->
+    <record id="compliance_inst_fc_cash_withdrawal_gbp_subject" model="res.risk.subject">
+        <field name="name">CASH WITHDRAWAL GBP</field>
+        <field name="code">cash_withdrawal_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Customer Collection Account -->
+    <record id="compliance_inst_fc_customer_collection_account_subject" model="res.risk.subject">
+        <field name="name">Customer Collection Account</field>
+        <field name="code">customer_collection_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- WBT NGN 2 -->
+    <record id="compliance_inst_fc_wbt_ngn_2_subject" model="res.risk.subject">
+        <field name="name">WBT NGN 2</field>
+        <field name="code">wbt_ngn_2</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- DISBURSED LOAN USD -->
+    <record id="compliance_inst_fc_disbursed_loan_usd_subject" model="res.risk.subject">
+        <field name="name">DISBURSED LOAN USD</field>
+        <field name="code">disbursed_loan_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Transfer -->
+    <record id="compliance_inst_fc_domiciliary_savings_transfer_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Transfer</field>
+        <field name="code">domiciliary_savings_transfer</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual NGOs -->
+    <record id="compliance_inst_fc_savings_non_individual_ngos_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual NGOs</field>
+        <field name="code">savings_non_individual_ngos</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- SAVINGS OVERDRAFT -->
+    <record id="compliance_inst_fc_savings_overdraft_subject" model="res.risk.subject">
+        <field name="name">SAVINGS OVERDRAFT</field>
+        <field name="code">savings_overdraft</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING AGRIC OVERDRAFT -->
+    <record id="compliance_inst_fc_sterling_agric_overdraft_subject" model="res.risk.subject">
+        <field name="name">STERLING AGRIC OVERDRAFT</field>
+        <field name="code">sterling_agric_overdraft</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING HEALTH OVERDRAFT -->
+    <record id="compliance_inst_fc_sterling_health_overdraft_subject" model="res.risk.subject">
+        <field name="name">STERLING HEALTH OVERDRAFT</field>
+        <field name="code">sterling_health_overdraft</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Matured Deposits CORP USD -->
+    <record id="compliance_inst_fc_matured_deposits_corp_usd_subject" model="res.risk.subject">
+        <field name="name">Matured Deposits CORP USD</field>
+        <field name="code">matured_deposits_corp_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary TIER1 EUR -->
+    <record id="compliance_inst_fc_domiciliary_tier1_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary TIER1 EUR</field>
+        <field name="code">domiciliary_tier1_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits IND USD -->
+    <record id="compliance_inst_fc_call_deposits_ind_usd_subject" model="res.risk.subject">
+        <field name="name">Call Deposits IND USD</field>
+        <field name="code">call_deposits_ind_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Sterling Utility Corporate Variant -->
+    <record id="compliance_inst_fc_sterling_utility_corporate_variant_subject" model="res.risk.subject">
+        <field name="name">Sterling Utility Corporate Variant</field>
+        <field name="code">sterling_utility_corporate_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits IND GBP -->
+    <record id="compliance_inst_fc_call_deposits_ind_gbp_subject" model="res.risk.subject">
+        <field name="name">Call Deposits IND GBP</field>
+        <field name="code">call_deposits_ind_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits Corp GBP -->
+    <record id="compliance_inst_fc_call_deposits_corp_gbp_subject" model="res.risk.subject">
+        <field name="name">Call Deposits Corp GBP</field>
+        <field name="code">call_deposits_corp_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits IND NGN Variant -->
+    <record id="compliance_inst_fc_call_deposits_ind_ngn_variant_subject" model="res.risk.subject">
+        <field name="name">Call Deposits IND NGN Variant</field>
+        <field name="code">call_deposits_ind_ngn_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits IND NGN -->
+    <record id="compliance_inst_fc_call_deposits_ind_ngn_subject" model="res.risk.subject">
+        <field name="name">Call Deposits IND NGN</field>
+        <field name="code">call_deposits_ind_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Overdraft -->
+    <record id="compliance_inst_fc_savings_overdraft_subject" model="res.risk.subject">
+        <field name="name">Savings - Overdraft</field>
+        <field name="code">savings_overdraft</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- CASH WITHDRAWAL EUR -->
+    <record id="compliance_inst_fc_cash_withdrawal_eur_subject" model="res.risk.subject">
+        <field name="name">CASH WITHDRAWAL EUR</field>
+        <field name="code">cash_withdrawal_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- CW NGN 1 -->
+    <record id="compliance_inst_fc_cw_ngn_1_subject" model="res.risk.subject">
+        <field name="name">CW NGN 1</field>
+        <field name="code">cw_ngn_1</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Current - Overdraft Variant -->
+    <record id="compliance_inst_fc_current_overdraft_variant_subject" model="res.risk.subject">
+        <field name="name">Current - Overdraft Variant</field>
+        <field name="code">current_overdraft_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- WBT NGN 1 -->
+    <record id="compliance_inst_fc_wbt_ngn_1_subject" model="res.risk.subject">
+        <field name="name">WBT NGN 1</field>
+        <field name="code">wbt_ngn_1</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- DISBURSED LOAN -->
+    <record id="compliance_inst_fc_disbursed_loan_subject" model="res.risk.subject">
+        <field name="name">DISBURSED LOAN</field>
+        <field name="code">disbursed_loan</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- test -->
+    <record id="compliance_inst_fc_test_subject" model="res.risk.subject">
+        <field name="name">test</field>
+        <field name="code">test</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current Indiv(Special) EUR -->
+    <record id="compliance_inst_fc_domiciliary_current_indiv_special_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current Indiv(Special) EUR</field>
+        <field name="code">domiciliary_current_indiv_special_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits Corp NGN Variant -->
+    <record id="compliance_inst_fc_call_deposits_corp_ngn_variant_subject" model="res.risk.subject">
+        <field name="name">Call Deposits Corp NGN Variant</field>
+        <field name="code">call_deposits_corp_ngn_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- CASH WITHDRAWAL USD -->
+    <record id="compliance_inst_fc_cash_withdrawal_usd_subject" model="res.risk.subject">
+        <field name="name">CASH WITHDRAWAL USD</field>
+        <field name="code">cash_withdrawal_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Prepaid Card USD -->
+    <record id="compliance_inst_fc_visa_prepaid_card_usd_subject" model="res.risk.subject">
+        <field name="name">Visa Prepaid Card USD</field>
+        <field name="code">visa_prepaid_card_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Diaspora Dom Current -->
+    <record id="compliance_inst_fc_diaspora_dom_current_subject" model="res.risk.subject">
+        <field name="name">Diaspora Dom Current</field>
+        <field name="code">diaspora_dom_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Quickpay Mto -->
+    <record id="compliance_inst_fc_quickpay_mto_subject" model="res.risk.subject">
+        <field name="name">Quickpay Mto</field>
+        <field name="code">quickpay_mto</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Mcash -->
+    <record id="compliance_inst_fc_mcash_subject" model="res.risk.subject">
+        <field name="name">Mcash</field>
+        <field name="code">mcash</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Flex Plus (Nysc) -->
+    <record id="compliance_inst_fc_platinum_flex_plus_nysc_subject" model="res.risk.subject">
+        <field name="name">Platinum Flex Plus (Nysc)</field>
+        <field name="code">platinum_flex_plus_nysc</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Staff Product -->
+    <record id="compliance_inst_fc_staff_product_subject" model="res.risk.subject">
+        <field name="name">Staff Product</field>
+        <field name="code">staff_product</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Prepaid Card -->
+    <record id="compliance_inst_fc_visa_prepaid_card_subject" model="res.risk.subject">
+        <field name="name">Visa Prepaid Card</field>
+        <field name="code">visa_prepaid_card</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Matured Deposits CORP GBP -->
+    <record id="compliance_inst_fc_matured_deposits_corp_gbp_subject" model="res.risk.subject">
+        <field name="name">Matured Deposits CORP GBP</field>
+        <field name="code">matured_deposits_corp_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Switch Savings Tier3 EUR -->
+    <record id="compliance_inst_fc_switch_savings_tier3_eur_subject" model="res.risk.subject">
+        <field name="name">Switch Savings Tier3 EUR</field>
+        <field name="code">switch_savings_tier3_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- IDF-Guarantee Inflow USD -->
+    <record id="compliance_inst_fc_idf_guarantee_inflow_usd_subject" model="res.risk.subject">
+        <field name="name">IDF-Guarantee Inflow USD</field>
+        <field name="code">idf_guarantee_inflow_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- IDF-Guarantee Inflow GBP -->
+    <record id="compliance_inst_fc_idf_guarantee_inflow_gbp_subject" model="res.risk.subject">
+        <field name="name">IDF-Guarantee Inflow GBP</field>
+        <field name="code">idf_guarantee_inflow_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- IDF-Guarantee Inflow EUR -->
+    <record id="compliance_inst_fc_idf_guarantee_inflow_eur_subject" model="res.risk.subject">
+        <field name="name">IDF-Guarantee Inflow EUR</field>
+        <field name="code">idf_guarantee_inflow_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Richard Mccall -->
+    <record id="compliance_inst_fc_richard_mccall_subject" model="res.risk.subject">
+        <field name="name">Richard Mccall</field>
+        <field name="code">richard_mccall</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Switch Savings Tier3 GBP -->
+    <record id="compliance_inst_fc_switch_savings_tier3_gbp_subject" model="res.risk.subject">
+        <field name="name">Switch Savings Tier3 GBP</field>
+        <field name="code">switch_savings_tier3_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- INDIVIDUAL CURRENT Variant -->
+    <record id="compliance_inst_fc_individual_current_variant_subject" model="res.risk.subject">
+        <field name="name">INDIVIDUAL CURRENT Variant</field>
+        <field name="code">individual_current_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- INDIVIDUAL CURRENT -->
+    <record id="compliance_inst_fc_individual_current_subject" model="res.risk.subject">
+        <field name="name">INDIVIDUAL CURRENT</field>
+        <field name="code">individual_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual USD -->
+    <record id="compliance_inst_fc_savings_non_individual_usd_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual USD</field>
+        <field name="code">savings_non_individual_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Financial Inclusion-1 variant -->
+    <record id="compliance_inst_fc_savings_financial_inclusion_1_variant_subject" model="res.risk.subject">
+        <field name="name">Savings - Financial Inclusion-1 variant</field>
+        <field name="code">savings_financial_inclusion_1_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- QA Prod -->
+    <record id="compliance_inst_fc_qa_prod_subject" model="res.risk.subject">
+        <field name="name">QA Prod</field>
+        <field name="code">qa_prod</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TA Savings Individual -->
+    <record id="compliance_inst_fc_ta_savings_individual_subject" model="res.risk.subject">
+        <field name="name">TA Savings Individual</field>
+        <field name="code">ta_savings_individual</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TA Savings Corporate -->
+    <record id="compliance_inst_fc_ta_savings_corporate_subject" model="res.risk.subject">
+        <field name="name">TA Savings Corporate</field>
+        <field name="code">ta_savings_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Cash EUR -->
+    <record id="compliance_inst_fc_savings_non_individual_cash_eur_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Cash EUR</field>
+        <field name="code">savings_non_individual_cash_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- CORPORATE CURRENT VARIANT -->
+    <record id="compliance_inst_fc_corporate_current_variant_subject" model="res.risk.subject">
+        <field name="name">CORPORATE CURRENT VARIANT</field>
+        <field name="code">corporate_current_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- CORPORATE CURRENT -->
+    <record id="compliance_inst_fc_corporate_current_subject" model="res.risk.subject">
+        <field name="name">CORPORATE CURRENT</field>
+        <field name="code">corporate_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Transfer USD -->
+    <record id="compliance_inst_fc_savings_non_individual_transfer_usd_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Transfer USD</field>
+        <field name="code">savings_non_individual_transfer_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Master CARD 001 -->
+    <record id="compliance_inst_fc_master_card_001_subject" model="res.risk.subject">
+        <field name="name">Master CARD 001</field>
+        <field name="code">master_card_001</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TT C CARD TEST -->
+    <record id="compliance_inst_fc_tt_c_card_test_subject" model="res.risk.subject">
+        <field name="name">TT C CARD TEST</field>
+        <field name="code">tt_c_card_test</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TA Current Individual -->
+    <record id="compliance_inst_fc_ta_current_individual_subject" model="res.risk.subject">
+        <field name="name">TA Current Individual</field>
+        <field name="code">ta_current_individual</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TA Current Corporate -->
+    <record id="compliance_inst_fc_ta_current_corporate_subject" model="res.risk.subject">
+        <field name="name">TA Current Corporate</field>
+        <field name="code">ta_current_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Switch Savings Tier3 NGN -->
+    <record id="compliance_inst_fc_switch_savings_tier3_ngn_subject" model="res.risk.subject">
+        <field name="name">Switch Savings Tier3 NGN</field>
+        <field name="code">switch_savings_tier3_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Pb Overdraft -->
+    <record id="compliance_inst_fc_individual_pb_overdraft_subject" model="res.risk.subject">
+        <field name="name">Individual Pb Overdraft</field>
+        <field name="code">individual_pb_overdraft</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Interest Bearing Current -->
+    <record id="compliance_inst_fc_interest_bearing_current_subject" model="res.risk.subject">
+        <field name="name">Interest Bearing Current</field>
+        <field name="code">interest_bearing_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Smartcard Current -->
+    <record id="compliance_inst_fc_smartcard_current_subject" model="res.risk.subject">
+        <field name="name">Smartcard Current</field>
+        <field name="code">smartcard_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Healthcare Current -->
+    <record id="compliance_inst_fc_healthcare_current_subject" model="res.risk.subject">
+        <field name="name">Healthcare Current</field>
+        <field name="code">healthcare_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Lpo Finance -->
+    <record id="compliance_inst_fc_lpo_finance_subject" model="res.risk.subject">
+        <field name="name">Lpo Finance</field>
+        <field name="code">lpo_finance</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Prime Variant -->
+    <record id="compliance_inst_fc_prime_variant_subject" model="res.risk.subject">
+        <field name="name">Prime Variant</field>
+        <field name="code">prime_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Salary Advance Scheme -->
+    <record id="compliance_inst_fc_salary_advance_scheme_subject" model="res.risk.subject">
+        <field name="name">Salary Advance Scheme</field>
+        <field name="code">salary_advance_scheme</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Incubator -->
+    <record id="compliance_inst_fc_individual_incubator_subject" model="res.risk.subject">
+        <field name="name">Individual Incubator</field>
+        <field name="code">individual_incubator</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Banca Starter -->
+    <record id="compliance_inst_fc_banca_starter_subject" model="res.risk.subject">
+        <field name="name">Banca Starter</field>
+        <field name="code">banca_starter</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinumbusinees + Starter/Mini -->
+    <record id="compliance_inst_fc_platinumbusinees_starter_mini_subject" model="res.risk.subject">
+        <field name="name">Platinumbusinees + Starter/Mini</field>
+        <field name="code">platinumbusinees_starter_mini</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Transfer EUR -->
+    <record id="compliance_inst_fc_savings_non_individual_transfer_eur_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Transfer EUR</field>
+        <field name="code">savings_non_individual_transfer_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa CreditCard -->
+    <record id="compliance_inst_fc_visa_creditcard_subject" model="res.risk.subject">
+        <field name="name">Visa CreditCard</field>
+        <field name="code">visa_creditcard</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Transfer GBP -->
+    <record id="compliance_inst_fc_savings_non_individual_transfer_gbp_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Transfer GBP</field>
+        <field name="code">savings_non_individual_transfer_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TrybeOne-Savings -->
+    <record id="compliance_inst_fc_trybeone_savings_subject" model="res.risk.subject">
+        <field name="name">TrybeOne-Savings</field>
+        <field name="code">trybeone_savings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Banca Savings -->
+    <record id="compliance_inst_fc_banca_savings_subject" model="res.risk.subject">
+        <field name="name">Banca Savings</field>
+        <field name="code">banca_savings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Signature CreditCard -->
+    <record id="compliance_inst_fc_visa_signature_creditcard_subject" model="res.risk.subject">
+        <field name="name">Visa Signature CreditCard</field>
+        <field name="code">visa_signature_creditcard</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Cash USD -->
+    <record id="compliance_inst_fc_savings_non_individual_cash_usd_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Cash USD</field>
+        <field name="code">savings_non_individual_cash_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Cash GBP -->
+    <record id="compliance_inst_fc_savings_non_individual_cash_gbp_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Cash GBP</field>
+        <field name="code">savings_non_individual_cash_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Financial Inclusion-1 -->
+    <record id="compliance_inst_fc_savings_financial_inclusion_1_subject" model="res.risk.subject">
+        <field name="name">Savings - Financial Inclusion-1</field>
+        <field name="code">savings_financial_inclusion_1</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING B (4YR) NGN -->
+    <record id="compliance_inst_fc_target_saving_b_4yr_ngn_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING B (4YR) NGN</field>
+        <field name="code">target_saving_b_4yr_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa PlatinumCard -->
+    <record id="compliance_inst_fc_visa_platinumcard_subject" model="res.risk.subject">
+        <field name="name">Visa PlatinumCard</field>
+        <field name="code">visa_platinumcard</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Verve Ultra Ruby CreditCard -->
+    <record id="compliance_inst_fc_verve_ultra_ruby_creditcard_subject" model="res.risk.subject">
+        <field name="name">Verve Ultra Ruby CreditCard</field>
+        <field name="code">verve_ultra_ruby_creditcard</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Verve Ultra Bronze CreditCard -->
+    <record id="compliance_inst_fc_verve_ultra_bronze_creditcard_subject" model="res.risk.subject">
+        <field name="name">Verve Ultra Bronze CreditCard</field>
+        <field name="code">verve_ultra_bronze_creditcard</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Prepaid CreditCard USD -->
+    <record id="compliance_inst_fc_visa_prepaid_creditcard_usd_subject" model="res.risk.subject">
+        <field name="name">Visa Prepaid CreditCard USD</field>
+        <field name="code">visa_prepaid_creditcard_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- PREPAID CARD PRODUCT -->
+    <record id="compliance_inst_fc_prepaid_card_product_subject" model="res.risk.subject">
+        <field name="name">PREPAID CARD PRODUCT</field>
+        <field name="code">prepaid_card_product</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Cash USD Variant -->
+    <record id="compliance_inst_fc_savings_non_individual_cash_usd_variant_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Cash USD Variant</field>
+        <field name="code">savings_non_individual_cash_usd_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Transfer GBP Variant -->
+    <record id="compliance_inst_fc_savings_non_individual_transfer_gbp_variant_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Transfer GBP Variant</field>
+        <field name="code">savings_non_individual_transfer_gbp_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Business-Minimum Balance -->
+    <record id="compliance_inst_fc_business_minimum_balance_subject" model="res.risk.subject">
+        <field name="name">Business-Minimum Balance</field>
+        <field name="code">business_minimum_balance</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC 5YR GBP -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_5yr_gbp_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC 5YR GBP</field>
+        <field name="code">sterling_recurring_deposit_ac_5yr_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- WRITTEN OFF NGN -->
+    <record id="compliance_inst_fc_written_off_ngn_subject" model="res.risk.subject">
+        <field name="name">WRITTEN OFF NGN</field>
+        <field name="code">written_off_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Cash GBP Variant -->
+    <record id="compliance_inst_fc_savings_non_individual_cash_gbp_variant_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Cash GBP Variant</field>
+        <field name="code">savings_non_individual_cash_gbp_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING C (5YR) NGN -->
+    <record id="compliance_inst_fc_target_saving_c_5yr_ngn_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING C (5YR) NGN</field>
+        <field name="code">target_saving_c_5yr_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING ACCOUNT 5YR GBP -->
+    <record id="compliance_inst_fc_target_saving_account_5yr_gbp_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING ACCOUNT 5YR GBP</field>
+        <field name="code">target_saving_account_5yr_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- I CAN SAVE GBP -->
+    <record id="compliance_inst_fc_i_can_save_gbp_subject" model="res.risk.subject">
+        <field name="name">I CAN SAVE GBP</field>
+        <field name="code">i_can_save_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING A 3YRS GBP -->
+    <record id="compliance_inst_fc_target_saving_a_3yrs_gbp_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING A 3YRS GBP</field>
+        <field name="code">target_saving_a_3yrs_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- WRITTEN OFF USD -->
+    <record id="compliance_inst_fc_written_off_usd_subject" model="res.risk.subject">
+        <field name="name">WRITTEN OFF USD</field>
+        <field name="code">written_off_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC (6M) NGN -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_6m_ngn_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC (6M) NGN</field>
+        <field name="code">sterling_recurring_deposit_ac_6m_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC (1YR) NGN -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_1yr_ngn_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC (1YR) NGN</field>
+        <field name="code">sterling_recurring_deposit_ac_1yr_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC (5YR) NGN -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_5yr_ngn_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC (5YR) NGN</field>
+        <field name="code">sterling_recurring_deposit_ac_5yr_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC 3YR EUR -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_3yr_eur_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC 3YR EUR</field>
+        <field name="code">sterling_recurring_deposit_ac_3yr_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC (3YR) USD -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_3yr_usd_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC (3YR) USD</field>
+        <field name="code">sterling_recurring_deposit_ac_3yr_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING ACCT 4YR GBP -->
+    <record id="compliance_inst_fc_target_saving_acct_4yr_gbp_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING ACCT 4YR GBP</field>
+        <field name="code">target_saving_acct_4yr_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- I CAN SAVE EUR -->
+    <record id="compliance_inst_fc_i_can_save_eur_subject" model="res.risk.subject">
+        <field name="name">I CAN SAVE EUR</field>
+        <field name="code">i_can_save_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Transfer EUR Variant -->
+    <record id="compliance_inst_fc_savings_non_individual_transfer_eur_variant_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Transfer EUR Variant</field>
+        <field name="code">savings_non_individual_transfer_eur_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Transfer USD Variant -->
+    <record id="compliance_inst_fc_savings_non_individual_transfer_usd_variant_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Transfer USD Variant</field>
+        <field name="code">savings_non_individual_transfer_usd_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC 1YR EUR -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_1yr_eur_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC 1YR EUR</field>
+        <field name="code">sterling_recurring_deposit_ac_1yr_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC (3YR) NGN -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_3yr_ngn_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC (3YR) NGN</field>
+        <field name="code">sterling_recurring_deposit_ac_3yr_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC 6M EUR -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_6m_eur_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC 6M EUR</field>
+        <field name="code">sterling_recurring_deposit_ac_6m_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC 5YR EUR -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_5yr_eur_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC 5YR EUR</field>
+        <field name="code">sterling_recurring_deposit_ac_5yr_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- I CAN SAVE USD -->
+    <record id="compliance_inst_fc_i_can_save_usd_subject" model="res.risk.subject">
+        <field name="name">I CAN SAVE USD</field>
+        <field name="code">i_can_save_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC (5YR) USD -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_5yr_usd_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC (5YR) USD</field>
+        <field name="code">sterling_recurring_deposit_ac_5yr_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING ACCOUNT (5YR) USD -->
+    <record id="compliance_inst_fc_target_saving_account_5yr_usd_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING ACCOUNT (5YR) USD</field>
+        <field name="code">target_saving_account_5yr_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING A (3YRS) USD -->
+    <record id="compliance_inst_fc_target_saving_a_3yrs_usd_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING A (3YRS) USD</field>
+        <field name="code">target_saving_a_3yrs_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING ACCT (4YR) USD -->
+    <record id="compliance_inst_fc_target_saving_acct_4yr_usd_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING ACCT (4YR) USD</field>
+        <field name="code">target_saving_acct_4yr_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC 3YR GBP -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_3yr_gbp_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC 3YR GBP</field>
+        <field name="code">sterling_recurring_deposit_ac_3yr_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING A (3YR) NGN -->
+    <record id="compliance_inst_fc_target_saving_a_3yr_ngn_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING A (3YR) NGN</field>
+        <field name="code">target_saving_a_3yr_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT ACC 5YR EUR -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_acc_5yr_eur_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT ACC 5YR EUR</field>
+        <field name="code">sterling_recurring_deposit_acc_5yr_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings - Non-Individual Cash EUR Variant -->
+    <record id="compliance_inst_fc_savings_non_individual_cash_eur_variant_subject" model="res.risk.subject">
+        <field name="name">Savings - Non-Individual Cash EUR Variant</field>
+        <field name="code">savings_non_individual_cash_eur_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC (6M) USD -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_6m_usd_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC (6M) USD</field>
+        <field name="code">sterling_recurring_deposit_ac_6m_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC (3YR) EUR -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_3yr_eur_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC (3YR) EUR</field>
+        <field name="code">sterling_recurring_deposit_ac_3yr_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- STERLING RECURRING DEPOSIT AC 1YR GBP -->
+    <record id="compliance_inst_fc_sterling_recurring_deposit_ac_1yr_gbp_subject" model="res.risk.subject">
+        <field name="name">STERLING RECURRING DEPOSIT AC 1YR GBP</field>
+        <field name="code">sterling_recurring_deposit_ac_1yr_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING ACCT 4YR EUR -->
+    <record id="compliance_inst_fc_target_saving_acct_4yr_eur_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING ACCT 4YR EUR</field>
+        <field name="code">target_saving_acct_4yr_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- COLLECTIONS FOR MIGRATION_NGN -->
+    <record id="compliance_inst_fc_collections_for_migration_ngn_subject" model="res.risk.subject">
+        <field name="name">COLLECTIONS FOR MIGRATION_NGN</field>
+        <field name="code">collections_for_migration_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Jaac - State Joint Local Govt Acct -->
+    <record id="compliance_inst_fc_jaac_state_joint_local_govt_acct_subject" model="res.risk.subject">
+        <field name="name">Jaac - State Joint Local Govt Acct</field>
+        <field name="code">jaac_state_joint_local_govt_acct</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Local Government Accounts -->
+    <record id="compliance_inst_fc_local_government_accounts_subject" model="res.risk.subject">
+        <field name="name">Local Government Accounts</field>
+        <field name="code">local_government_accounts</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Import Od -->
+    <record id="compliance_inst_fc_import_od_subject" model="res.risk.subject">
+        <field name="name">Import Od</field>
+        <field name="code">import_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Agency Banking Account For Agents (Coporate) -->
+    <record id="compliance_inst_fc_agency_banking_account_for_agents_coporate_subject" model="res.risk.subject">
+        <field name="name">Agency Banking Account For Agents (Coporate)</field>
+        <field name="code">agency_banking_account_for_agents_coporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING A 3YRS EUR -->
+    <record id="compliance_inst_fc_target_saving_a_3yrs_eur_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING A 3YRS EUR</field>
+        <field name="code">target_saving_a_3yrs_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- COLLECTION FOR MIGRATION_USD -->
+    <record id="compliance_inst_fc_collection_for_migration_usd_subject" model="res.risk.subject">
+        <field name="name">COLLECTION FOR MIGRATION_USD</field>
+        <field name="code">collection_for_migration_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- TARGET SAVING ACCOUNT 5YR EUR -->
+    <record id="compliance_inst_fc_target_saving_account_5yr_eur_subject" model="res.risk.subject">
+        <field name="name">TARGET SAVING ACCOUNT 5YR EUR</field>
+        <field name="code">target_saving_account_5yr_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- COLLECTION FOR MIGRATION_GBP -->
+    <record id="compliance_inst_fc_collection_for_migration_gbp_subject" model="res.risk.subject">
+        <field name="name">COLLECTION FOR MIGRATION_GBP</field>
+        <field name="code">collection_for_migration_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Prepaid CreditCard NGN -->
+    <record id="compliance_inst_fc_visa_prepaid_creditcard_ngn_subject" model="res.risk.subject">
+        <field name="name">Visa Prepaid CreditCard NGN</field>
+        <field name="code">visa_prepaid_creditcard_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- SUPA Collection Account EUR -->
+    <record id="compliance_inst_fc_supa_collection_account_eur_subject" model="res.risk.subject">
+        <field name="name">SUPA Collection Account EUR</field>
+        <field name="code">supa_collection_account_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- SUPA Collection Account GBP -->
+    <record id="compliance_inst_fc_supa_collection_account_gbp_subject" model="res.risk.subject">
+        <field name="name">SUPA Collection Account GBP</field>
+        <field name="code">supa_collection_account_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- SUPA Collection Account NGN -->
+    <record id="compliance_inst_fc_supa_collection_account_ngn_subject" model="res.risk.subject">
+        <field name="name">SUPA Collection Account NGN</field>
+        <field name="code">supa_collection_account_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- COLLECTION FOR MIGRATION_EUR -->
+    <record id="compliance_inst_fc_collection_for_migration_eur_subject" model="res.risk.subject">
+        <field name="name">COLLECTION FOR MIGRATION_EUR</field>
+        <field name="code">collection_for_migration_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- SUPA Collection Account USD -->
+    <record id="compliance_inst_fc_supa_collection_account_usd_subject" model="res.risk.subject">
+        <field name="name">SUPA Collection Account USD</field>
+        <field name="code">supa_collection_account_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - Corp Special USD -->
+    <record id="compliance_inst_fc_domiciliary_current_corp_special_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - Corp Special USD</field>
+        <field name="code">domiciliary_current_corp_special_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Customer Collection Account EUR -->
+    <record id="compliance_inst_fc_customer_collection_account_eur_subject" model="res.risk.subject">
+        <field name="name">Customer Collection Account EUR</field>
+        <field name="code">customer_collection_account_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- SUPA Flex IND -->
+    <record id="compliance_inst_fc_supa_flex_ind_subject" model="res.risk.subject">
+        <field name="name">SUPA Flex IND</field>
+        <field name="code">supa_flex_ind</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings Transfer EUR -->
+    <record id="compliance_inst_fc_domiciliary_savings_transfer_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings Transfer EUR</field>
+        <field name="code">domiciliary_savings_transfer_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Customer Collection Account USD -->
+    <record id="compliance_inst_fc_customer_collection_account_usd_subject" model="res.risk.subject">
+        <field name="name">Customer Collection Account USD</field>
+        <field name="code">customer_collection_account_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Customer Collection Account GBP -->
+    <record id="compliance_inst_fc_customer_collection_account_gbp_subject" model="res.risk.subject">
+        <field name="name">Customer Collection Account GBP</field>
+        <field name="code">customer_collection_account_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - Corp Transfer USD -->
+    <record id="compliance_inst_fc_domiciliary_current_corp_transfer_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - Corp Transfer USD</field>
+        <field name="code">domiciliary_current_corp_transfer_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Staff Salary Account -->
+    <record id="compliance_inst_fc_staff_salary_account_subject" model="res.risk.subject">
+        <field name="name">Staff Salary Account</field>
+        <field name="code">staff_salary_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current Indiv Transfer EUR -->
+    <record id="compliance_inst_fc_domiciliary_current_indiv_transfer_eur_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current Indiv Transfer EUR</field>
+        <field name="code">domiciliary_current_indiv_transfer_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Non Oil Export Domiciliary(Special) GBP -->
+    <record id="compliance_inst_fc_non_oil_export_domiciliary_special_gbp_subject" model="res.risk.subject">
+        <field name="name">Non Oil Export Domiciliary(Special) GBP</field>
+        <field name="code">non_oil_export_domiciliary_special_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Non Oil Export Domiciliary(Special) USD -->
+    <record id="compliance_inst_fc_non_oil_export_domiciliary_special_usd_subject" model="res.risk.subject">
+        <field name="name">Non Oil Export Domiciliary(Special) USD</field>
+        <field name="code">non_oil_export_domiciliary_special_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Business CR Interest -->
+    <record id="compliance_inst_fc_business_cr_interest_subject" model="res.risk.subject">
+        <field name="name">Business CR Interest</field>
+        <field name="code">business_cr_interest</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - Corp Transfer GBP -->
+    <record id="compliance_inst_fc_domiciliary_current_corp_transfer_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - Corp Transfer GBP</field>
+        <field name="code">domiciliary_current_corp_transfer_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - Corp Cash GBP -->
+    <record id="compliance_inst_fc_domiciliary_current_corp_cash_gbp_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - Corp Cash GBP</field>
+        <field name="code">domiciliary_current_corp_cash_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current - State Govt USD -->
+    <record id="compliance_inst_fc_domiciliary_current_state_govt_usd_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current - State Govt USD</field>
+        <field name="code">domiciliary_current_state_govt_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Infinite CreditCard USD -->
+    <record id="compliance_inst_fc_visa_infinite_creditcard_usd_subject" model="res.risk.subject">
+        <field name="name">Visa Infinite CreditCard USD</field>
+        <field name="code">visa_infinite_creditcard_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Verve Ultra Bronze Credit Card Corporate -->
+    <record id="compliance_inst_fc_verve_ultra_bronze_credit_card_corporate_subject" model="res.risk.subject">
+        <field name="name">Verve Ultra Bronze Credit Card Corporate</field>
+        <field name="code">verve_ultra_bronze_credit_card_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits Corp USD -->
+    <record id="compliance_inst_fc_call_deposits_corp_usd_subject" model="res.risk.subject">
+        <field name="name">Call Deposits Corp USD</field>
+        <field name="code">call_deposits_corp_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Business CR Interest Variant -->
+    <record id="compliance_inst_fc_business_cr_interest_variant_subject" model="res.risk.subject">
+        <field name="name">Business CR Interest Variant</field>
+        <field name="code">business_cr_interest_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Verve Ultra Ruby Credit Card Corporate -->
+    <record id="compliance_inst_fc_verve_ultra_ruby_credit_card_corporate_subject" model="res.risk.subject">
+        <field name="name">Verve Ultra Ruby Credit Card Corporate</field>
+        <field name="code">verve_ultra_ruby_credit_card_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Gold Credit Card Corporate -->
+    <record id="compliance_inst_fc_visa_gold_credit_card_corporate_subject" model="res.risk.subject">
+        <field name="name">Visa Gold Credit Card Corporate</field>
+        <field name="code">visa_gold_credit_card_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings Non Individual Variant -->
+    <record id="compliance_inst_fc_savings_non_individual_variant_subject" model="res.risk.subject">
+        <field name="name">Savings Non Individual Variant</field>
+        <field name="code">savings_non_individual_variant</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Signature Credit Card Corporate -->
+    <record id="compliance_inst_fc_visa_signature_credit_card_corporate_subject" model="res.risk.subject">
+        <field name="name">Visa Signature Credit Card Corporate</field>
+        <field name="code">visa_signature_credit_card_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Classic Credit Card Corporate -->
+    <record id="compliance_inst_fc_visa_classic_credit_card_corporate_subject" model="res.risk.subject">
+        <field name="name">Visa Classic Credit Card Corporate</field>
+        <field name="code">visa_classic_credit_card_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Platinum Credit Card Corporate -->
+    <record id="compliance_inst_fc_visa_platinum_credit_card_corporate_subject" model="res.risk.subject">
+        <field name="name">Visa Platinum Credit Card Corporate</field>
+        <field name="code">visa_platinum_credit_card_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Infinite Credit Card Dollar Corporate -->
+    <record id="compliance_inst_fc_visa_infinite_credit_card_dollar_corporate_subject" model="res.risk.subject">
+        <field name="name">Visa Infinite Credit Card Dollar Corporate</field>
+        <field name="code">visa_infinite_credit_card_dollar_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- FX BOUGHT CONTRA_USD -->
+    <record id="compliance_inst_fc_fx_bought_contra_usd_subject" model="res.risk.subject">
+        <field name="name">FX BOUGHT CONTRA_USD</field>
+        <field name="code">fx_bought_contra_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- LC IMPORTS LEGACY CONTRA_GBP -->
+    <record id="compliance_inst_fc_lc_imports_legacy_contra_gbp_subject" model="res.risk.subject">
+        <field name="name">LC IMPORTS LEGACY CONTRA_GBP</field>
+        <field name="code">lc_imports_legacy_contra_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Call Deposits Corp NGN -->
+    <record id="compliance_inst_fc_call_deposits_corp_ngn_subject" model="res.risk.subject">
+        <field name="name">Call Deposits Corp NGN</field>
+        <field name="code">call_deposits_corp_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Savings -->
+    <record id="compliance_inst_fc_domiciliary_savings_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Savings</field>
+        <field name="code">domiciliary_savings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- FX BOUGHT CONTRA_GBP -->
+    <record id="compliance_inst_fc_fx_bought_contra_gbp_subject" model="res.risk.subject">
+        <field name="name">FX BOUGHT CONTRA_GBP</field>
+        <field name="code">fx_bought_contra_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- FX BOUGHT CONTRA_EUR -->
+    <record id="compliance_inst_fc_fx_bought_contra_eur_subject" model="res.risk.subject">
+        <field name="name">FX BOUGHT CONTRA_EUR</field>
+        <field name="code">fx_bought_contra_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- LC IMPORTS LEGACY CONTRA_CNY -->
+    <record id="compliance_inst_fc_lc_imports_legacy_contra_cny_subject" model="res.risk.subject">
+        <field name="name">LC IMPORTS LEGACY CONTRA_CNY</field>
+        <field name="code">lc_imports_legacy_contra_cny</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- LC IMPORTS LEGACY CONTRA_USD -->
+    <record id="compliance_inst_fc_lc_imports_legacy_contra_usd_subject" model="res.risk.subject">
+        <field name="name">LC IMPORTS LEGACY CONTRA_USD</field>
+        <field name="code">lc_imports_legacy_contra_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- LC IMPORTS LEGACY CONTRA_EUR -->
+    <record id="compliance_inst_fc_lc_imports_legacy_contra_eur_subject" model="res.risk.subject">
+        <field name="name">LC IMPORTS LEGACY CONTRA_EUR</field>
+        <field name="code">lc_imports_legacy_contra_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- AC CONTINGENT CONTRA_GBP -->
+    <record id="compliance_inst_fc_ac_contingent_contra_gbp_subject" model="res.risk.subject">
+        <field name="name">AC CONTINGENT CONTRA_GBP</field>
+        <field name="code">ac_contingent_contra_gbp</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- AC CONTINGENT CONTRA_USD -->
+    <record id="compliance_inst_fc_ac_contingent_contra_usd_subject" model="res.risk.subject">
+        <field name="name">AC CONTINGENT CONTRA_USD</field>
+        <field name="code">ac_contingent_contra_usd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- AC CONTINGENT CONTRA_NGN -->
+    <record id="compliance_inst_fc_ac_contingent_contra_ngn_subject" model="res.risk.subject">
+        <field name="name">AC CONTINGENT CONTRA_NGN</field>
+        <field name="code">ac_contingent_contra_ngn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- AC CONTINGENT CONTRA_EUR -->
+    <record id="compliance_inst_fc_ac_contingent_contra_eur_subject" model="res.risk.subject">
+        <field name="name">AC CONTINGENT CONTRA_EUR</field>
+        <field name="code">ac_contingent_contra_eur</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Old Sterling Plus -->
+    <record id="compliance_inst_fc_old_sterling_plus_subject" model="res.risk.subject">
+        <field name="name">Old Sterling Plus</field>
+        <field name="code">old_sterling_plus</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Agents Working Capital Account -->
+    <record id="compliance_inst_fc_agents_working_capital_account_subject" model="res.risk.subject">
+        <field name="name">Agents Working Capital Account</field>
+        <field name="code">agents_working_capital_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Freedom Account -->
+    <record id="compliance_inst_fc_freedom_account_subject" model="res.risk.subject">
+        <field name="name">Freedom Account</field>
+        <field name="code">freedom_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Non-Oil Export Stimulation Facility -->
+    <record id="compliance_inst_fc_non_oil_export_stimulation_facility_subject" model="res.risk.subject">
+        <field name="name">Non-Oil Export Stimulation Facility</field>
+        <field name="code">non_oil_export_stimulation_facility</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Salary Saphire -->
+    <record id="compliance_inst_fc_salary_saphire_subject" model="res.risk.subject">
+        <field name="name">Salary Saphire</field>
+        <field name="code">salary_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Agent Banking Corporate -->
+    <record id="compliance_inst_fc_platinum_agent_banking_corporate_subject" model="res.risk.subject">
+        <field name="name">Platinum Agent Banking Corporate</field>
+        <field name="code">platinum_agent_banking_corporate</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Pb Saphire -->
+    <record id="compliance_inst_fc_individual_pb_saphire_subject" model="res.risk.subject">
+        <field name="name">Individual Pb Saphire</field>
+        <field name="code">individual_pb_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Tier 1 Easi Save -->
+    <record id="compliance_inst_fc_tier_1_easi_save_subject" model="res.risk.subject">
+        <field name="name">Tier 1 Easi Save</field>
+        <field name="code">tier_1_easi_save</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Ussd Savings Account -->
+    <record id="compliance_inst_fc_ussd_savings_account_subject" model="res.risk.subject">
+        <field name="name">Ussd Savings Account</field>
+        <field name="code">ussd_savings_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Platinum Hysa -->
+    <record id="compliance_inst_fc_individual_platinum_hysa_subject" model="res.risk.subject">
+        <field name="name">Individual Platinum Hysa</field>
+        <field name="code">individual_platinum_hysa</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Hysa Diaspora -->
+    <record id="compliance_inst_fc_platinum_hysa_diaspora_subject" model="res.risk.subject">
+        <field name="name">Platinum Hysa Diaspora</field>
+        <field name="code">platinum_hysa_diaspora</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Apg and Contract Current -->
+    <record id="compliance_inst_fc_apg_and_contract_current_subject" model="res.risk.subject">
+        <field name="name">Apg and Contract Current</field>
+        <field name="code">apg_and_contract_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Ind Diaspora Current -->
+    <record id="compliance_inst_fc_ind_diaspora_current_subject" model="res.risk.subject">
+        <field name="name">Ind Diaspora Current</field>
+        <field name="code">ind_diaspora_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corp Disaspora Current -->
+    <record id="compliance_inst_fc_corp_disaspora_current_subject" model="res.risk.subject">
+        <field name="name">Corp Disaspora Current</field>
+        <field name="code">corp_disaspora_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum - Individual Diaspora -->
+    <record id="compliance_inst_fc_platinum_individual_diaspora_subject" model="res.risk.subject">
+        <field name="name">Platinum - Individual Diaspora</field>
+        <field name="code">platinum_individual_diaspora</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Diaspora Current -->
+    <record id="compliance_inst_fc_diaspora_current_subject" model="res.risk.subject">
+        <field name="name">Diaspora Current</field>
+        <field name="code">diaspora_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Dbn On-Lending Scheme -->
+    <record id="compliance_inst_fc_dbn_on_lending_scheme_subject" model="res.risk.subject">
+        <field name="name">Dbn On-Lending Scheme</field>
+        <field name="code">dbn_on_lending_scheme</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Otc Futures Margin -->
+    <record id="compliance_inst_fc_otc_futures_margin_subject" model="res.risk.subject">
+        <field name="name">Otc Futures Margin</field>
+        <field name="code">otc_futures_margin</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Customer Fx Suspense -->
+    <record id="compliance_inst_fc_customer_fx_suspense_subject" model="res.risk.subject">
+        <field name="name">Customer Fx Suspense</field>
+        <field name="code">customer_fx_suspense</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Diaspora Fcy Savings -->
+    <record id="compliance_inst_fc_diaspora_fcy_savings_subject" model="res.risk.subject">
+        <field name="name">Diaspora Fcy Savings</field>
+        <field name="code">diaspora_fcy_savings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Diamond 2 -->
+    <record id="compliance_inst_fc_individual_diamond_2_subject" model="res.risk.subject">
+        <field name="name">Individual Diamond 2</field>
+        <field name="code">individual_diamond_2</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Private Banking Kiddies -->
+    <record id="compliance_inst_fc_private_banking_kiddies_subject" model="res.risk.subject">
+        <field name="name">Private Banking Kiddies</field>
+        <field name="code">private_banking_kiddies</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Tier 1 Diamond -->
+    <record id="compliance_inst_fc_tier_1_diamond_subject" model="res.risk.subject">
+        <field name="name">Tier 1 Diamond</field>
+        <field name="code">tier_1_diamond</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Saphire- Fn -->
+    <record id="compliance_inst_fc_individual_saphire_fn_subject" model="res.risk.subject">
+        <field name="name">Individual Saphire- Fn</field>
+        <field name="code">individual_saphire_fn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Dom Overdraft -->
+    <record id="compliance_inst_fc_corporate_dom_overdraft_subject" model="res.risk.subject">
+        <field name="name">Corporate Dom Overdraft</field>
+        <field name="code">corporate_dom_overdraft</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Business + Established / Medium -->
+    <record id="compliance_inst_fc_platinum_business_established_medium_subject" model="res.risk.subject">
+        <field name="name">Platinum Business + Established / Medium</field>
+        <field name="code">platinum_business_established_medium</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Loan Recovery Current -->
+    <record id="compliance_inst_fc_loan_recovery_current_subject" model="res.risk.subject">
+        <field name="name">Loan Recovery Current</field>
+        <field name="code">loan_recovery_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Verve Credit Card -->
+    <record id="compliance_inst_fc_verve_credit_card_subject" model="res.risk.subject">
+        <field name="name">Verve Credit Card</field>
+        <field name="code">verve_credit_card</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Premium Business Account Variant 1 Fn -->
+    <record id="compliance_inst_fc_platinum_premium_business_account_variant_1_fn_subject" model="res.risk.subject">
+        <field name="name">Platinum Premium Business Account Variant 1 Fn</field>
+        <field name="code">platinum_premium_business_account_variant_1_fn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corp Pb Domiciliary -->
+    <record id="compliance_inst_fc_corp_pb_domiciliary_subject" model="res.risk.subject">
+        <field name="name">Corp Pb Domiciliary</field>
+        <field name="code">corp_pb_domiciliary</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Diaspora Vantage Silver -->
+    <record id="compliance_inst_fc_diaspora_vantage_silver_subject" model="res.risk.subject">
+        <field name="name">Diaspora Vantage Silver</field>
+        <field name="code">diaspora_vantage_silver</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Debt Service Reserve -->
+    <record id="compliance_inst_fc_debt_service_reserve_subject" model="res.risk.subject">
+        <field name="name">Debt Service Reserve</field>
+        <field name="code">debt_service_reserve</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum - Basic Individual -->
+    <record id="compliance_inst_fc_platinum_basic_individual_subject" model="res.risk.subject">
+        <field name="name">Platinum - Basic Individual</field>
+        <field name="code">platinum_basic_individual</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domicilary Od -->
+    <record id="compliance_inst_fc_domicilary_od_subject" model="res.risk.subject">
+        <field name="name">Domicilary Od</field>
+        <field name="code">domicilary_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Pb Current -->
+    <record id="compliance_inst_fc_corporate_pb_current_subject" model="res.risk.subject">
+        <field name="name">Corporate Pb Current</field>
+        <field name="code">corporate_pb_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Bridge Account-Fn -->
+    <record id="compliance_inst_fc_platinum_bridge_account_fn_subject" model="res.risk.subject">
+        <field name="name">Platinum Bridge Account-Fn</field>
+        <field name="code">platinum_bridge_account_fn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Int. Bearing Kiddies -->
+    <record id="compliance_inst_fc_int_bearing_kiddies_subject" model="res.risk.subject">
+        <field name="name">Int. Bearing Kiddies</field>
+        <field name="code">int_bearing_kiddies</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Affinity Saphire -->
+    <record id="compliance_inst_fc_individual_affinity_saphire_subject" model="res.risk.subject">
+        <field name="name">Individual Affinity Saphire</field>
+        <field name="code">individual_affinity_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Set Goal (Customer) -->
+    <record id="compliance_inst_fc_set_goal_customer_subject" model="res.risk.subject">
+        <field name="name">Set Goal (Customer)</field>
+        <field name="code">set_goal_customer</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Diamond 3 -->
+    <record id="compliance_inst_fc_individual_diamond_3_subject" model="res.risk.subject">
+        <field name="name">Individual Diamond 3</field>
+        <field name="code">individual_diamond_3</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Platinum Hysa -->
+    <record id="compliance_inst_fc_corporate_platinum_hysa_subject" model="res.risk.subject">
+        <field name="name">Corporate Platinum Hysa</field>
+        <field name="code">corporate_platinum_hysa</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Society Affinity Od -->
+    <record id="compliance_inst_fc_society_affinity_od_subject" model="res.risk.subject">
+        <field name="name">Society Affinity Od</field>
+        <field name="code">society_affinity_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Geep Unregistered Current -->
+    <record id="compliance_inst_fc_geep_unregistered_current_subject" model="res.risk.subject">
+        <field name="name">Geep Unregistered Current</field>
+        <field name="code">geep_unregistered_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Diaspora Od -->
+    <record id="compliance_inst_fc_individual_diaspora_od_subject" model="res.risk.subject">
+        <field name="name">Individual Diaspora Od</field>
+        <field name="code">individual_diaspora_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Staff Diamond -->
+    <record id="compliance_inst_fc_staff_diamond_subject" model="res.risk.subject">
+        <field name="name">Staff Diamond</field>
+        <field name="code">staff_diamond</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Kiddies -->
+    <record id="compliance_inst_fc_platinum_kiddies_subject" model="res.risk.subject">
+        <field name="name">Platinum Kiddies</field>
+        <field name="code">platinum_kiddies</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domiciliary Current -->
+    <record id="compliance_inst_fc_domiciliary_current_subject" model="res.risk.subject">
+        <field name="name">Domiciliary Current</field>
+        <field name="code">domiciliary_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Call Deposit -->
+    <record id="compliance_inst_fc_corporate_call_deposit_subject" model="res.risk.subject">
+        <field name="name">Corporate Call Deposit</field>
+        <field name="code">corporate_call_deposit</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Staff Domiciliary Current -->
+    <record id="compliance_inst_fc_staff_domiciliary_current_subject" model="res.risk.subject">
+        <field name="name">Staff Domiciliary Current</field>
+        <field name="code">staff_domiciliary_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Nirsal Current Scheme -->
+    <record id="compliance_inst_fc_nirsal_current_scheme_subject" model="res.risk.subject">
+        <field name="name">Nirsal Current Scheme</field>
+        <field name="code">nirsal_current_scheme</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Ind Affinity Current -->
+    <record id="compliance_inst_fc_ind_affinity_current_subject" model="res.risk.subject">
+        <field name="name">Ind Affinity Current</field>
+        <field name="code">ind_affinity_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Debit Card -->
+    <record id="compliance_inst_fc_visa_debit_card_subject" model="res.risk.subject">
+        <field name="name">Visa Debit Card</field>
+        <field name="code">visa_debit_card</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Ex-Staff Current -->
+    <record id="compliance_inst_fc_ex_staff_current_subject" model="res.risk.subject">
+        <field name="name">Ex-Staff Current</field>
+        <field name="code">ex_staff_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Current -->
+    <record id="compliance_inst_fc_corporate_current_subject" model="res.risk.subject">
+        <field name="name">Corporate Current</field>
+        <field name="code">corporate_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Incubator Unregistered -->
+    <record id="compliance_inst_fc_incubator_unregistered_subject" model="res.risk.subject">
+        <field name="name">Incubator Unregistered</field>
+        <field name="code">incubator_unregistered</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Cbn Msme Facility -->
+     <record id="compliance_inst_fc_cbn_msme_facility_subject" model="res.risk.subject">
+        <field name="name">Cbn Msme Facility</field>
+        <field name="code">cbn_msme_facility</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+  
+    <!-- Platinum Vintage Account -->
+    <record id="compliance_inst_fc_platinum_vintage_account_subject" model="res.risk.subject">
+        <field name="name">Platinum Vintage Account</field>
+        <field name="code">platinum_vintage_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Ebanking Suspense -->
+    <record id="compliance_inst_fc_ebanking_suspense_subject" model="res.risk.subject">
+        <field name="name">Ebanking Suspense</field>
+        <field name="code">ebanking_suspense</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Interest Bearing Saphire -->
+    <record id="compliance_inst_fc_interest_bearing_saphire_subject" model="res.risk.subject">
+        <field name="name">Interest Bearing Saphire</field>
+        <field name="code">interest_bearing_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Diaspora Kiddies -->
+    <record id="compliance_inst_fc_diaspora_kiddies_subject" model="res.risk.subject">
+        <field name="name">Diaspora Kiddies</field>
+        <field name="code">diaspora_kiddies</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Affinity Premium Student -->
+    <record id="compliance_inst_fc_affinity_premium_student_subject" model="res.risk.subject">
+        <field name="name">Affinity Premium Student</field>
+        <field name="code">affinity_premium_student</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Special Saphire -->
+    <record id="compliance_inst_fc_individual_special_saphire_subject" model="res.risk.subject">
+        <field name="name">Individual Special Saphire</field>
+        <field name="code">individual_special_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Pb Saphire -->
+    <record id="compliance_inst_fc_corporate_pb_saphire_subject" model="res.risk.subject">
+        <field name="name">Corporate Pb Saphire</field>
+        <field name="code">corporate_pb_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Special Public Works Program Of Fgn -->
+    <record id="compliance_inst_fc_special_public_works_program_of_fgn_subject" model="res.risk.subject">
+        <field name="name">Special Public Works Program Of Fgn</field>
+        <field name="code">special_public_works_program_of_fgn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Staff Saphire -->
+    <record id="compliance_inst_fc_staff_saphire_subject" model="res.risk.subject">
+        <field name="name">Staff Saphire</field>
+        <field name="code">staff_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Export Proceeds Domiciliary Account -->
+    <record id="compliance_inst_fc_export_proceeds_domiciliary_account_subject" model="res.risk.subject">
+        <field name="name">Export Proceeds Domiciliary Account</field>
+        <field name="code">export_proceeds_domiciliary_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Joint Affinity Current -->
+    <record id="compliance_inst_fc_joint_affinity_current_subject" model="res.risk.subject">
+        <field name="name">Joint Affinity Current</field>
+        <field name="code">joint_affinity_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum - Corp. Diaspora -->
+    <record id="compliance_inst_fc_platinum_corp_diaspora_subject" model="res.risk.subject">
+        <field name="name">Platinum - Corp. Diaspora</field>
+        <field name="code">platinum_corp_diaspora</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Government Current -->
+    <record id="compliance_inst_fc_government_current_subject" model="res.risk.subject">
+        <field name="name">Government Current</field>
+        <field name="code">government_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Staff Current -->
+    <record id="compliance_inst_fc_staff_current_subject" model="res.risk.subject">
+        <field name="name">Staff Current</field>
+        <field name="code">staff_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Starter/Micro Bus Incubator -->
+    <record id="compliance_inst_fc_starter_micro_bus_incubator_subject" model="res.risk.subject">
+        <field name="name">Starter/Micro Bus Incubator</field>
+        <field name="code">starter_micro_bus_incubator</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Growing/Small Bus Incubator -->
+    <record id="compliance_inst_fc_growing_small_bus_incubator_subject" model="res.risk.subject">
+        <field name="name">Growing/Small Bus Incubator</field>
+        <field name="code">growing_small_bus_incubator</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Business + Growing/Small -->
+    <record id="compliance_inst_fc_platinum_business_growing_small_subject" model="res.risk.subject">
+        <field name="name">Platinum Business + Growing/Small</field>
+        <field name="code">platinum_business_growing_small</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Dom Pb Current-Fn -->
+    <record id="compliance_inst_fc_dom_pb_current_fn_subject" model="res.risk.subject">
+        <field name="name">Dom Pb Current-Fn</field>
+        <field name="code">dom_pb_current_fn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Nuban Internal Account -->
+    <record id="compliance_inst_fc_nuban_internal_account_subject" model="res.risk.subject">
+        <field name="name">Nuban Internal Account</field>
+        <field name="code">nuban_internal_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Loan Recovery Current -->
+    <record id="compliance_inst_fc_individual_loan_recovery_current_subject" model="res.risk.subject">
+        <field name="name">Individual Loan Recovery Current</field>
+        <field name="code">individual_loan_recovery_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Non Checking Saphire -->
+    <record id="compliance_inst_fc_non_checking_saphire_subject" model="res.risk.subject">
+        <field name="name">Non Checking Saphire</field>
+        <field name="code">non_checking_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Government Od -->
+    <record id="compliance_inst_fc_government_od_subject" model="res.risk.subject">
+        <field name="name">Government Od</field>
+        <field name="code">government_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Current - Fn -->
+    <record id="compliance_inst_fc_individual_current_fn_subject" model="res.risk.subject">
+        <field name="name">Individual Current - Fn</field>
+        <field name="code">individual_current_fn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Diamond -->
+    <record id="compliance_inst_fc_individual_diamond_subject" model="res.risk.subject">
+        <field name="name">Individual Diamond</field>
+        <field name="code">individual_diamond</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Saphire -->
+    <record id="compliance_inst_fc_individual_saphire_subject" model="res.risk.subject">
+        <field name="name">Individual Saphire</field>
+        <field name="code">individual_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Ps Operative -->
+    <record id="compliance_inst_fc_ps_operative_subject" model="res.risk.subject">
+        <field name="name">Ps Operative</field>
+        <field name="code">ps_operative</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum - Corp Affinity -->
+    <record id="compliance_inst_fc_platinum_corp_affinity_subject" model="res.risk.subject">
+        <field name="name">Platinum - Corp Affinity</field>
+        <field name="code">platinum_corp_affinity</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Premium Business Account Variant 1 -->
+    <record id="compliance_inst_fc_platinum_premium_business_account_variant_1_subject" model="res.risk.subject">
+        <field name="name">Platinum Premium Business Account Variant 1</field>
+        <field name="code">platinum_premium_business_account_variant_1</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Inv Disc/Rec Fin Factorin -->
+    <record id="compliance_inst_fc_inv_disc_rec_fin_factorin_subject" model="res.risk.subject">
+        <field name="name">Inv Disc/Rec Fin Factorin</field>
+        <field name="code">inv_disc_rec_fin_factorin</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Merchant Acquiring -->
+    <record id="compliance_inst_fc_merchant_acquiring_subject" model="res.risk.subject">
+        <field name="name">Merchant Acquiring</field>
+        <field name="code">merchant_acquiring</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Diaspora Saphire -->
+    <record id="compliance_inst_fc_diaspora_saphire_subject" model="res.risk.subject">
+        <field name="name">Diaspora Saphire</field>
+        <field name="code">diaspora_saphire</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Agency Banking Account For Customers -->
+    <record id="compliance_inst_fc_agency_banking_account_for_customers_subject" model="res.risk.subject">
+        <field name="name">Agency Banking Account For Customers</field>
+        <field name="code">agency_banking_account_for_customers</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Savings Dom For Imto Receivers Re And Diaspora -->
+    <record id="compliance_inst_fc_savings_dom_for_imto_receivers_re_and_diaspora_subject" model="res.risk.subject">
+        <field name="name">Savings Dom For Imto Receivers Re And Diaspora</field>
+        <field name="code">savings_dom_for_imto_receivers_re_and_diaspora</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Affinity Easi Save -->
+    <record id="compliance_inst_fc_affinity_easi_save_subject" model="res.risk.subject">
+        <field name="name">Affinity Easi Save</field>
+        <field name="code">affinity_easi_save</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Online Diamond -->
+    <record id="compliance_inst_fc_online_diamond_subject" model="res.risk.subject">
+        <field name="name">Online Diamond</field>
+        <field name="code">online_diamond</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Pb Diamond -->
+    <record id="compliance_inst_fc_individual_pb_diamond_subject" model="res.risk.subject">
+        <field name="name">Individual Pb Diamond</field>
+        <field name="code">individual_pb_diamond</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Diamond 3 - Fn -->
+    <record id="compliance_inst_fc_individual_diamond_3_fn_subject" model="res.risk.subject">
+        <field name="name">Individual Diamond 3 - Fn</field>
+        <field name="code">individual_diamond_3_fn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <record id="compliance_inst_fc_margin_trading_scheme_subject" model="res.risk.subject">
+        <field name="name">Margin Trading</field>
+        <field name="code">margin_trading_scheme</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Affinity Od -->
+    <record id="compliance_inst_fc_individual_affinity_od_subject" model="res.risk.subject">
+        <field name="name">Individual Affinity Od</field>
+        <field name="code">individual_affinity_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Domicilliary Affinity Od -->
+    <record id="compliance_inst_fc_domicilliary_affinity_od_subject" model="res.risk.subject">
+        <field name="name">Domicilliary Affinity Od</field>
+        <field name="code">domicilliary_affinity_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Fcy Savings -->
+    <record id="compliance_inst_fc_individual_fcy_savings_subject" model="res.risk.subject">
+        <field name="name">Individual Fcy Savings</field>
+        <field name="code">individual_fcy_savings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Fcy Savings -->
+    <record id="compliance_inst_fc_corporate_fcy_savings_subject" model="res.risk.subject">
+        <field name="name">Corporate Fcy Savings</field>
+        <field name="code">corporate_fcy_savings</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Call Deposit -->
+    <record id="compliance_inst_fc_individual_call_deposit_subject" model="res.risk.subject">
+        <field name="name">Individual Call Deposit</field>
+        <field name="code">individual_call_deposit</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Visa Credit Card -->
+    <record id="compliance_inst_fc_visa_credit_card_subject" model="res.risk.subject">
+        <field name="name">Visa Credit Card</field>
+        <field name="code">visa_credit_card</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Disapora Vantage Platinum -->
+    <record id="compliance_inst_fc_diapora_vantage_platinum_subject" model="res.risk.subject">
+        <field name="name">Disapora Vantage Platinum</field>
+        <field name="code">diapora_vantage_platinum</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Platinum Treasure Offer 2 -->
+    <record id="compliance_inst_fc_platinum_treasure_offer_2_subject" model="res.risk.subject">
+        <field name="name">Platinum Treasure Offer 2</field>
+        <field name="code">platinum_treasure_offer_2</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corp Affinity Current -->
+    <record id="compliance_inst_fc_corp_affinity_current_subject" model="res.risk.subject">
+        <field name="name">Corp Affinity Current</field>
+        <field name="code">corp_affinity_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Domiciliary -->
+    <record id="compliance_inst_fc_corporate_domiciliary_subject" model="res.risk.subject">
+        <field name="name">Corporate Domiciliary</field>
+        <field name="code">corporate_domiciliary</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Current -->
+    <record id="compliance_inst_fc_individual_current_subject" model="res.risk.subject">
+        <field name="name">Individual Current</field>
+        <field name="code">individual_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Contract Finance Facility -->
+    <record id="compliance_inst_fc_contract_finance_facility_subject" model="res.risk.subject">
+        <field name="name">Contract Finance Facility</field>
+        <field name="code">contract_finance_facility</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Nirsal Farmers Operative Scheme -->
+    <record id="compliance_inst_fc_nirsal_farmers_operative_scheme_subject" model="res.risk.subject">
+        <field name="name">Nirsal Farmers Operative Scheme</field>
+        <field name="code">nirsal_farmers_operative_scheme</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Individual Current-Fn -->
+    <record id="compliance_inst_fc_individual_current_fn_2_subject" model="res.risk.subject">
+        <field name="name">Individual Current-Fn</field>
+        <field name="code">individual_current_fn_2</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Non Checking Kiddies -->
+    <record id="compliance_inst_fc_non_checking_kiddies_subject" model="res.risk.subject">
+        <field name="name">Non Checking Kiddies</field>
+        <field name="code">non_checking_kiddies</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Set Goal (Staff) -->
+    <record id="compliance_inst_fc_set_goal_staff_subject" model="res.risk.subject">
+        <field name="name">Set Goal (Staff)</field>
+        <field name="code">set_goal_staff</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Int. Bearing Kiddies-Fn -->
+    <record id="compliance_inst_fc_int_bearing_kiddies_fn_subject" model="res.risk.subject">
+        <field name="name">Int. Bearing Kiddies-Fn</field>
+        <field name="code">int_bearing_kiddies_fn</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Affinity Od -->
+    <record id="compliance_inst_fc_corporate_affinity_od_subject" model="res.risk.subject">
+        <field name="name">Corporate Affinity Od</field>
+        <field name="code">corporate_affinity_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Joint Affinity Od -->
+    <record id="compliance_inst_fc_joint_affinity_od_subject" model="res.risk.subject">
+        <field name="name">Joint Affinity Od</field>
+        <field name="code">joint_affinity_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Geep Corporate Current -->
+    <record id="compliance_inst_fc_geep_corporate_current_subject" model="res.risk.subject">
+        <field name="name">Geep Corporate Current</field>
+        <field name="code">geep_corporate_current</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Corporate Diaspora Od -->
+    <record id="compliance_inst_fc_corporate_diaspora_od_subject" model="res.risk.subject">
+        <field name="name">Corporate Diaspora Od</field>
+        <field name="code">corporate_diaspora_od</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Easi Save -->
+    <record id="compliance_inst_fc_easi_save_subject" model="res.risk.subject">
+        <field name="name">Easi Save</field>
+        <field name="code">easi_save</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    <!-- Regular Individual Account -->
+    <record id="compliance_inst_fc_regular_individual_account_subject" model="res.risk.subject">
+        <field name="name">Regular Individual Account</field>
+        <field name="code">regular_individual_account</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+
+    
+</odoo>
