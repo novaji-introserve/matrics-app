@@ -59,6 +59,7 @@
             <field name="overdraft_limit">100000.00</field>
             <field name="customer">02210</field>
             <field name="product_id" ref="compliance_checklist_product_150" />
+            
         </record>
 
         <record id="demo_account_3" model="res.partner.account">
@@ -116,6 +117,7 @@
             <field name="tot_debit_last6m">0.00</field>
             <field name="customer">023</field>
             <field name="product_id" ref="compliance_checklist_product_150" />
+            <field name="category">master_card_001</field>
         </record>
 
         <record id="demo_account_5" model="res.partner.account">
@@ -145,6 +147,7 @@
             <field name="max_debit_daily">10000.00</field>
             <field name="customer">0102</field>
             <field name="product_id" ref="compliance_checklist_product_150" />
+            <field name="category">master_card_001</field>
         </record>
 
         <record id="demo_account_6" model="res.partner.account">

@@ -205,7 +205,7 @@
                 res_partner_account a
             INNER JOIN
                 res_partner r ON r.id = a.customer_id
-            WHERE r.id = %s and a.category = ''tt_c_card_test''
+            WHERE r.id = %s and a.category = 'tt_c_card_test'
         </field>
         <field name="priority">1</field>
         <field name="state">active</field>
