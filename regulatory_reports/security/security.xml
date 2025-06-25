@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_regulatory_report" model="res.groups">
+        <field name="name">Regulatory Reporting</field>
+        <field name="implied_ids"
+            eval="[Command.link(ref('base.group_user')),Command.link(ref('spreadsheet_oca.group_user')),Command.link(ref('group_compliance_compliance_risk_manager'))]" />
+        <field name="comment">Manage regulatory Reports</field>
+        <field name="category_id" ref="compliance_management.module_category_compliance" />
+    </record>
+
+</odoo>

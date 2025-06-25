@@ -29,7 +29,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','compliance_management', 'web', 'report_xlsx'],
+    'depends': ['base','compliance_management', 'web', 'report_xlsx','spreadsheet_oca'],
 
     # always loaded
     'data': [
