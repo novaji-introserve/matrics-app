@@ -77,8 +77,4 @@
         <field name="name">Dashboard</field>
         <field name="tag">owl.compliance_dashboard</field>
     </record>
-
-    <menuitem id="menu_compliance_dashboard" name="Dashboard" action="action_compliance_dashboard"
-        parent="compliance_management.menu_compliance_root" sequence="-1" />
-
 </odoo>

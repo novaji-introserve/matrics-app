@@ -43,16 +43,4 @@
         </form>
     </field>
 </record>
-
-<record id="action_fcra_score_action" model="ir.actions.act_window">
-    <field name="name">Risk Scores</field>
-    <field name="res_model">res.fcra.score</field>
-    <field name="view_mode">tree,form</field>
-    <field name="help" type="html">
-        <p class="oe_view_nocontent_create">
-            Click to add a new Risk Score.
-        </p>
-    </field>
-</record>
-
 </odoo>

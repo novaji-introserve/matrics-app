@@ -2,26 +2,23 @@
     <record id="case_form_view" model="ir.ui.view">
         <field name="name">case.form</field>
         <field name="model">case</field>
+        <field name="type">form</field>
         <field name="arch" type="xml">
-        <header>
-            <button name="action_go_home" 
-                string="Exit" 
-                type="button"
-                class="btn-primary"
-                special="cancel"
-                onclick="
-                    if (confirm('Are you sure you want to exit without saving?')) {
-                        window.location.href='/web#action=case_management.action_owl_case_dashboard';
-                    }
-                    return false;"
-                />
-        </header>
             <form string="Case Manager">
-
-
                 <header>
+                    <button name="action_go_home" 
+                        string="Exit" 
+                        type="button"
+                        class="btn-primary"
+                        special="cancel"
+                        onclick="
+                            if (confirm('Are you sure you want to exit without saving?')) {
+                                window.location.href='/web#action=case_management.action_owl_case_dashboard';
+                            }
+                            return false;"
+                        />
+                
                     <!-- Exit button for new records (no validation required) -->
-
                     <!-- <button name="action_go_home" 
                         string="Exit" 
                         type="button"
@@ -35,8 +32,6 @@
                             return false;"
                         /> -->
 
-
-
                     <!-- <button name="action_go_home" string="Exit" 
                             type="button"
                             class="btn-primary" 
@@ -47,127 +42,129 @@
                                 }
                                 return false;"
                             /> -->
-                <!-- <button string="Exit" 
-                    special="cancel" 
-                    class="btn-primary" 
-                    attrs="{'invisible': [('id', '!=', False)]}"
-                    confirm="Are you sure you want to exit without saving?"/> -->
-                   
-                    <!-- <button string="Save" special="save" class="btn-primary" attrs="{'invisible': [('id', '!=', False)]}"/> -->
-                    <button name="action_go_home" 
-                        string="Exit" 
-                        type="object"
+                    <!-- <button string="Exit" 
+                        special="cancel" 
                         class="btn-primary" 
-                        attrs="{'invisible': [('id', '=', False)]}"
-                        onclick="window.location.href='/web#action=case_management.action_owl_case_dashboard'; return false;"
-                       />
-
-                    
+                        attrs="{'invisible': [('id', '!=', False)]}"
+                        confirm="Are you sure you want to exit without saving?"/> -->
+                       
+                        <!-- <button string="Save" special="save" class="btn-primary" attrs="{'invisible': [('id', '!=', False)]}"/> -->
+                        <button name="action_go_home" 
+                            string="Exit" 
+                            type="object"
+                            class="btn-primary" 
+                            attrs="{'invisible': [('id', '=', False)]}"
+                            onclick="window.location.href='/web#action=case_management.action_owl_case_dashboard'; return false;"
+                           />
                 </header>
-                
-                <sheet>
-                    
-
-                <!-- Add this to your form view, inside the <sheet> tag -->
-                <!-- <div class="alert alert-success" attrs="{'invisible': [('id', '=', False)]}" style="display: none;" id="success_redirect"> -->
-                
-        
-                <div class="oe_title">
-                    <h1 class="text-success">CASE MANAGER</h1>
-                    <div class="alert alert-info" role="alert">
-                        All cases opened must be closed within 48 hours!!!
-                    </div>
-                    <!-- <h1>
-                        <field name="name" readonly="1"/>
-                    </h1> -->
+                <div class="alert alert-info" role="alert">
+                    All cases opened must be closed within 48 hours!!!
                 </div>
-                
-                <group>
-                    <group string="Basic Information">
-                        <field name="title" string="Severity Rating"/>
-                        <field name="status_id" options="{'no_create': True, 'no_edit': True}" invisible="1"/>
-                        <field name="user_id" invisible="1"/>
-                        <field name="created_at" string="Case Creation Date" invisible="1"/>
-                        <field name="event_date"/>
-                        <field name="transaction_id"/>
-                        <!-- <field name="transaction_reference" readonly="1"/> -->
-                        <field name="cases_description" widget="html"/>
-                        <field name="data_source" invisible="1"/>
-                    </group>
-                    <group string="Status and Others">
-                        <field name="new_process_category_id"/>
-                        <field name="new_process_id"/>
-                        <!-- <field name="new_process_category_id" options="{'no_create': True, 'no_open': True}"/>
-                        <field name="new_process_category_num_id" invisible="1"/>
-                        <field name="new_process_id" domain="[('type_id', '=', new_process_category_id)]"/> -->
-
-                        <!-- <field name="new_process_id" options="{'no_create': True, 'no_open': True}" 
-                                   domain="[('type_id', '=', new_process_category_id.num_id)]"/> -->
-                        <!-- <field name="new_process_category_id" widget="selection" options="{'no_create': True, 'no_open': True}"/>
-                        <field name="new_process_id" widget="selection" options="{'no_create': True, 'no_open': True}" context="{'default_process_type_id': new_process_category_id}"/> -->
-                        <!-- <field name="new_process_category_id" widget="many2one" options="{'no_create': True}"/>
-                        <field name="new_process_id" widget="many2one" options="{'no_create': True}"/> -->
-                                                <!-- <field name="process_category_id"/>
-                        <field name="process_id"/> -->
-                        <field name="root_category_id" invisible='1'/>
-                        <field name="root_category_process_id" invisible='1'/>
-                        <field name="customer_id" />
-                    </group>
-                </group>
-                <label for="cases_action"/>
-                <field name="cases_action" placeholder="Recommended Action..." widget="text"/>
-                <group>
-                    <group string="Responsibility">
-                        <field name="rating_id" invisible="1"/>
-                        <field name="staff_id" string="Staff Responsible" options="{'no_create': True, 'no_edit': True}"/>
-                        <field name="team_id" string="Department/Unit" readonly='1'/>
-                        <field name="branch_id"/>
-                        <field name="severity_level" invisible="1"/>
-                    </group>
-                    <group string="Supervisors">
-                        <field name="supervisor_one_id" />
-                        <field name="supervisor_two_id" attrs="{'invisible': [('title', '!=', '2')]}"/>
-                        <field name="supervisor_two_id" attrs="{'invisible': [('title', '!=', '3')]}"/>
-                        <field name="supervisor_three_id" attrs="{'invisible': [('title', '!=', '3')]}"/>
-                    </group>
-                </group>
-                <label for="further_description"/>
-                <field name="further_description" widget="html"/>
-                <notebook>
-                    <page string="Attachments">
-                        <!-- <field name="attachment_ids" widget="many2many_binary"/> -->
-                        <group>
-                            <field name="attachment" filename="filename" 
-                                widget="binary" 
-                                options="{'no_open': False}" />
-                            <field name="filename" invisible="1"/>
+            
+                <sheet>
+                    <!-- Add this to your form view, inside the <sheet> tag -->
+                    <!-- <div class="alert alert-success" attrs="{'invisible': [('id', '=', False)]}" style="display: none;" id="success_redirect"> -->
+                    
+                    <div class="oe_title">
+                        <!--h1 class="text-success">Case Management</h1-->
+                         <h1>
+                            <field name="name" readonly="0"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Basic Information">
+                            <field name="title" string="Severity Rating"/>
+                            <field name="status_id" options="{'no_create': True, 'no_edit': True}" invisible="1"/>
+                            <field name="user_id" invisible="1"/>
+                            <field name="created_at" string="Case Creation Date" invisible="1"/>
+                            <field name="event_date"/>
+                            <field name="transaction_id"/>
+                            <!-- <field name="transaction_reference" readonly="1"/> -->
+                            <field name="data_source" invisible="1"/>
                         </group>
-                    </page>
-                </notebook>
-                <group invisible="1">
-                    <field name="id"/>
-                    <field name="staff_id"/>
-                    <field name="status_name"/>
-                </group>
+                        <group string="Status and Others">
+                            <field name="new_process_category_id"/>
+                            <field name="new_process_id"/>
+                            <!-- <field name="new_process_category_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="new_process_category_num_id" invisible="1"/>
+                            <field name="new_process_id" domain="[('type_id', '=', new_process_category_id)]"/> -->
+
+                            <!-- <field name="new_process_id" options="{'no_create': True, 'no_open': True}" 
+                                       domain="[('type_id', '=', new_process_category_id.num_id)]"/> -->
+                            <!-- <field name="new_process_category_id" widget="selection" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="new_process_id" widget="selection" options="{'no_create': True, 'no_open': True}" context="{'default_process_type_id': new_process_category_id}"/> -->
+                            <!-- <field name="new_process_category_id" widget="many2one" options="{'no_create': True}"/>
+                            <field name="new_process_id" widget="many2one" options="{'no_create': True}"/> -->
+                                                    <!-- <field name="process_category_id"/>
+                            <field name="process_id"/> -->
+                            <field name="root_category_id" invisible="1"/>
+                            <field name="root_category_process_id" invisible="1"/>
+                            <field name="customer_id"/>
+                        </group>
+                    </group>
+                    <label for="cases_description"/>
+                    <field name="cases_description" placeholder="Description" widget="html"/>
+                    <label for="cases_action"/>
+                    <field name="cases_action" placeholder="Recommended Action..." widget="html"/>
+                                        
+                    <notebook>
+                        <page string="Users and Teams">
+                            <group>
+                                <group string="Responsibility">
+                                    <field name="rating_id" invisible="1"/>
+                                    <field name="staff_id" string="Staff Responsible" options="{'no_create': True, 'no_edit': True}"/>
+                                    <field name="team_id" string="Department/Unit" readonly="1"/>
+                                    <field name="branch_id"/>
+                                    <field name="severity_level" invisible="1"/>
+                                </group>
+                                <group string="Supervisors">
+                                    <field name="supervisor_one_id"/>
+                                    <field name="supervisor_two_id" attrs="{'invisible': [('title', '!=', '2')]}"/>
+                                    <field name="supervisor_two_id" attrs="{'invisible': [('title', '!=', '3')]}"/>
+                                    <field name="supervisor_three_id" attrs="{'invisible': [('title', '!=', '3')]}"/>
+                                </group>
+                            </group>
+                        </page>
+                         <page string="Documentation">
+                            <!-- <field name="attachment_ids" widget="many2many_binary"/> -->
+                            <group>
+                                <field name="attachment" filename="filename" 
+                                    widget="binary" 
+                                    options="{'no_open': False}"/>
+                                <field name="filename" invisible="1"/>
+                            </group>
+                        </page>
+                        <page string="Additional Narration">
+                           <field name="further_description" widget="html"/>
+                        </page>
+                       
+                    </notebook>
+                    <group invisible="1">
+                        <field name="id"/>
+                        <field name="staff_id"/>
+                        <field name="status_name"/>
+                    </group>
                 </sheet>
             </form>
         </field>
     </record>
 
-
     <record id="case_status_open" model="case.status">
         <field name="name">open</field>
     </record>
+    
     <record id="case_rating_low" model="case.rating">
         <field name="ref">1</field>
     </record>
+    
     <record id="case_rating_medium" model="case.rating">
         <field name="ref">2</field>
     </record>
+    
     <record id="case_rating_high" model="case.rating">
         <field name="ref">3</field>
     </record>
-
 
     <record id="open_case_manager_form_action" model="ir.actions.act_window">
         <field name="name">New Case</field>
@@ -186,10 +183,8 @@
         <field name="view_ids" eval="[
             (5, 0, 0),
             (0, 0, {'view_mode': 'form', 'view_id': ref('case_management.case_form_view')}),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('case_management.view_cases_tree')})
         ]"/>
     </record>
-
 
     <record id="new_case" model="ir.ui.menu">
         <field name="name">New Case</field>

@@ -91,6 +91,8 @@ class AccountTierMaterialized(models.Model):
             "CREATE INDEX account_tier_mat_level_idx ON account_tier_materialized(tier_level)")
         self._cr.execute(
             "CREATE INDEX account_tier_mat_customer_idx ON account_tier_materialized(customer_id)")
+        self._cr.execute(
+            "CREATE INDEX account_tier_mat_tier_name_idx ON account_tier_materialized(tier_name)")
 
     @api.model
     def refresh_view(self):

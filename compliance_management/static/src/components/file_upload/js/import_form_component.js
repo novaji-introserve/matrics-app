@@ -510,6 +510,364 @@ export class ImportFormComponent extends Component {
         }
     }
 
+
+    async fetchTableColumns(modelId) {
+        if (!modelId) return;
+        
+        this.state.loadingColumns = true;
+        this.state.tableColumns = [];
+        
+        try {
+            if (this.terminal) {
+                this.terminal.addLog(`Fetching columns for table ID ${modelId}...`, "info");
+            }
+            
+            const result = await this.rpc("/csv_import/get_table_columns", {
+                model_id: modelId
+            });
+            
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            this.state.tableColumns = result.columns || [];
+            
+            if (this.terminal) {
+                this.terminal.addLog(`Loaded ${this.state.tableColumns.length} columns for selected table`, "success");
+            }
+        } catch (error) {
+            console.error("Error fetching table columns:", error);
+            this.state.errorMessage = `Failed to fetch table columns: ${error.message}`;
+            
+            if (this.terminal) {
+                this.terminal.addLog(`Error fetching table columns: ${error.message}`, "error");
+            }
+        } finally {
+            this.state.loadingColumns = false;
+        }
+    }
+
+    onDeleteModeChange(ev) {
+        this.state.deleteMode = ev.target.checked;
+        
+        // Reset unique identifier when toggling
+        this.state.selectedUniqueIdentifier = null;
+        
+        if (this.state.deleteMode && this.state.selectedModel) {
+            // Fetch columns when delete mode is enabled and we have a model
+            this.fetchTableColumns(this.state.selectedModel.id);
+        }
+        
+        if (this.terminal) {
+            if (this.state.deleteMode) {
+                this.terminal.addLog("Delete mode enabled - records with matching identifiers will be deleted", "warning");
+            } else {
+                this.terminal.addLog("Delete mode disabled", "info");
+            }
+        }
+    }
+
+    onUniqueIdentifierChange(ev) {
+        this.state.selectedUniqueIdentifier = ev.target.value;
+        
+        if (this.terminal) {
+            const field = this.state.tableColumns.find(col => col.name === this.state.selectedUniqueIdentifier);
+            if (field) {
+                this.terminal.addLog(`Selected "${field.string}" as unique identifier for deletion`, "info");
+            }
+        }
+    }
+
+    /**
+     * Handle file upload success with improved async handling
+     * @param {Object} result - Upload result from server
+     */
+    onUploadSuccess(result) {
+        if (result.mode === 'delete') {
+            // For delete operations
+            this.showMessage(
+                "success", 
+                _t("File Uploaded for Deletion"),
+                _t("Your file has been uploaded and the deletion process has been queued. You can monitor progress in the logs below.")
+            );
+            
+            // Add tracking information to show status
+            if (this.terminal) {
+                this.terminal.addLog(`Delete operation started for import ID: ${result.import_id}`, "info");
+                this.terminal.addLog("The operation will continue in the background and you'll see progress updates here", "info");
+                
+                // Set an interval to check status (every 5 seconds)
+                this.statusCheckInterval = setInterval(() => {
+                    this.checkDeleteStatus(result.import_id);
+                }, 5000);
+                
+                // Store the import ID for status checking
+                this.currentDeleteImportId = result.import_id;
+            }
+        } else {
+            // For regular imports
+            this.showMessage(
+                "success", 
+                _t("Upload Successful"),
+                _t("Your file has been uploaded and is being processed")
+            );
+        }
+        
+        // Reset form in both cases
+        this.resetForm();
+    }
+
+    async fetchTableColumns(modelId) {
+        if (!modelId) return;
+        
+        this.state.loadingColumns = true;
+        this.state.tableColumns = [];
+        
+        try {
+            if (this.terminal) {
+                this.terminal.addLog(`Fetching columns for table ID ${modelId}...`, "info");
+            }
+            
+            const result = await this.rpc("/csv_import/get_table_columns", {
+                model_id: modelId
+            });
+            
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            this.state.tableColumns = result.columns || [];
+            
+            if (this.terminal) {
+                this.terminal.addLog(`Loaded ${this.state.tableColumns.length} columns for selected table`, "success");
+            }
+        } catch (error) {
+            console.error("Error fetching table columns:", error);
+            this.state.errorMessage = `Failed to fetch table columns: ${error.message}`;
+            
+            if (this.terminal) {
+                this.terminal.addLog(`Error fetching table columns: ${error.message}`, "error");
+            }
+        } finally {
+            this.state.loadingColumns = false;
+        }
+    }
+
+    onDeleteModeChange(ev) {
+        this.state.deleteMode = ev.target.checked;
+        
+        // Reset unique identifier when toggling
+        this.state.selectedUniqueIdentifier = null;
+        
+        if (this.state.deleteMode && this.state.selectedModel) {
+            // Fetch columns when delete mode is enabled and we have a model
+            this.fetchTableColumns(this.state.selectedModel.id);
+        }
+        
+        if (this.terminal) {
+            if (this.state.deleteMode) {
+                this.terminal.addLog("Delete mode enabled - records with matching identifiers will be deleted", "warning");
+            } else {
+                this.terminal.addLog("Delete mode disabled", "info");
+            }
+        }
+    }
+
+    onUniqueIdentifierChange(ev) {
+        this.state.selectedUniqueIdentifier = ev.target.value;
+        
+        if (this.terminal) {
+            const field = this.state.tableColumns.find(col => col.name === this.state.selectedUniqueIdentifier);
+            if (field) {
+                this.terminal.addLog(`Selected "${field.string}" as unique identifier for deletion`, "info");
+            }
+        }
+    }
+
+    /**
+     * Handle file upload success with improved async handling
+     * @param {Object} result - Upload result from server
+     */
+    onUploadSuccess(result) {
+        if (result.mode === 'delete') {
+            // For delete operations
+            this.showMessage(
+                "success", 
+                _t("File Uploaded for Deletion"),
+                _t("Your file has been uploaded and the deletion process has been queued. You can monitor progress in the logs below.")
+            );
+            
+            // Add tracking information to show status
+            if (this.terminal) {
+                this.terminal.addLog(`Delete operation started for import ID: ${result.import_id}`, "info");
+                this.terminal.addLog("The operation will continue in the background and you'll see progress updates here", "info");
+                
+                // Set an interval to check status (every 5 seconds)
+                this.statusCheckInterval = setInterval(() => {
+                    this.checkDeleteStatus(result.import_id);
+                }, 5000);
+                
+                // Store the import ID for status checking
+                this.currentDeleteImportId = result.import_id;
+            }
+        } else {
+            // For regular imports
+            this.showMessage(
+                "success", 
+                _t("Upload Successful"),
+                _t("Your file has been uploaded and is being processed")
+            );
+        }
+        
+        // Reset form in both cases
+        this.resetForm();
+    }
+
+    async fetchTableColumns(modelId) {
+        if (!modelId) return;
+        
+        this.state.loadingColumns = true;
+        this.state.tableColumns = [];
+        
+        try {
+            if (this.terminal) {
+                this.terminal.addLog(`Fetching columns for table ID ${modelId}...`, "info");
+            }
+            
+            const result = await this.rpc("/csv_import/get_table_columns", {
+                model_id: modelId
+            });
+            
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            this.state.tableColumns = result.columns || [];
+            
+            if (this.terminal) {
+                this.terminal.addLog(`Loaded ${this.state.tableColumns.length} columns for selected table`, "success");
+            }
+        } catch (error) {
+            console.error("Error fetching table columns:", error);
+            this.state.errorMessage = `Failed to fetch table columns: ${error.message}`;
+            
+            if (this.terminal) {
+                this.terminal.addLog(`Error fetching table columns: ${error.message}`, "error");
+            }
+        } finally {
+            this.state.loadingColumns = false;
+        }
+    }
+
+    onDeleteModeChange(ev) {
+        this.state.deleteMode = ev.target.checked;
+        
+        // Reset unique identifier when toggling
+        this.state.selectedUniqueIdentifier = null;
+        
+        if (this.state.deleteMode && this.state.selectedModel) {
+            // Fetch columns when delete mode is enabled and we have a model
+            this.fetchTableColumns(this.state.selectedModel.id);
+        }
+        
+        if (this.terminal) {
+            if (this.state.deleteMode) {
+                this.terminal.addLog("Delete mode enabled - records with matching identifiers will be deleted", "warning");
+            } else {
+                this.terminal.addLog("Delete mode disabled", "info");
+            }
+        }
+    }
+
+    onUniqueIdentifierChange(ev) {
+        this.state.selectedUniqueIdentifier = ev.target.value;
+        
+        if (this.terminal) {
+            const field = this.state.tableColumns.find(col => col.name === this.state.selectedUniqueIdentifier);
+            if (field) {
+                this.terminal.addLog(`Selected "${field.string}" as unique identifier for deletion`, "info");
+            }
+        }
+    }
+
+    /**
+     * Check the status of a delete operation
+     * @param {number} importId - The import ID to check
+     */
+    async checkDeleteStatus(importId) {
+        if (!importId) return;
+        
+        try {
+            const result = await this.rpc("/web/dataset/call_kw", {
+                model: "import.log",
+                method: "read",
+                args: [[importId], ["delete_progress", "status"]],
+                kwargs: {}
+            });
+            
+            if (!result || !result.length) {
+                // Import not found, stop checking
+                clearInterval(this.statusCheckInterval);
+                this.statusCheckInterval = null;
+                return;
+            }
+            
+            const importData = result[0];
+            
+            // Check if we have delete progress
+            if (importData.delete_progress) {
+                try {
+                    const progress = JSON.parse(importData.delete_progress);
+                    
+                    // Show progress based on status
+                    if (progress.status === 'completed') {
+                        if (this.terminal) {
+                            this.terminal.addLog(`Delete operation completed: ${progress.deleted} records deleted, ${progress.failed} failed`, "success");
+                        }
+                        
+                        // Stop checking
+                        clearInterval(this.statusCheckInterval);
+                        this.statusCheckInterval = null;
+                        
+                    } else if (progress.status === 'failed') {
+                        if (this.terminal) {
+                            this.terminal.addLog(`Delete operation failed: ${progress.error_message || 'Unknown error'}`, "error");
+                        }
+                        
+                        // Stop checking
+                        clearInterval(this.statusCheckInterval);
+                        this.statusCheckInterval = null;
+                        
+                    } else if (progress.status === 'in_progress') {
+                        // Calculate progress percentage
+                        const totalValues = progress.total || 0;
+                        const processedValues = progress.processed || 0;
+                        const percentage = totalValues > 0 ? Math.round((processedValues / totalValues) * 100) : 0;
+                        
+                        // Show progress in terminal (but not too frequently to avoid spam)
+                        if (percentage % 10 === 0 || percentage > 95) {
+                            if (this.terminal) {
+                                this.terminal.addLog(`Delete progress: ${percentage}% (${processedValues}/${totalValues})`, "info");
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error parsing delete progress:", e);
+                }
+            }
+            
+            // Check if import status is completed or failed
+            if (importData.status === 'completed' || importData.status === 'failed') {
+                // Stop checking
+                clearInterval(this.statusCheckInterval);
+                this.statusCheckInterval = null;
+            }
+            
+        } catch (error) {
+            console.error("Error checking delete status:", error);
+        }
+    }
+
     /**
      * Handle file upload success with improved async handling
      * @param {Object} result - Upload result from server

@@ -42,28 +42,4 @@
             </form>
         </field>
     </record>
-
-    <!-- Account Type Action -->
-    <record id="action_compliance_settings" model="ir.actions.act_window">
-        <field name="name">Compliance Settings</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.compliance.settings</field>
-        <field name="view_id" ref="compliance_settings_tree" />
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Add a Setting
-            </p>
-            <p>
-                No data found
-            </p>
-        </field>
-    </record>
-    <menuitem
-    id="menu_compliance_compliance_settings"
-    action="action_compliance_settings"
-    parent="menu_compliance_risk_settings"
-    name="Settings"
-    groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer"
-    sequence="1100" />
-
 </odoo>

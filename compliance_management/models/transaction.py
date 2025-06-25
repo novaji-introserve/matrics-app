@@ -36,31 +36,55 @@ class Transaction(models.Model):
         'new', 'To Review'), ('done', 'Done')], tracking=True, index=True, default='new')
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
     
+    
+    show_create_case_button = fields.Boolean(
+    string="Case Management Installed",
+    compute='_compute_is_case_management_installed',
+    store=False,
+)
 
-    def action_create_case(self):
-        """
-        Opens the case management form with the transaction reference pre-filled
-        """
-        context = {
-            'default_status_id': self.env.ref('case_management.case_status_open').id,
-            'case_created': True,
-            'show_creation_notification': True,
-            #'default_transaction_reference': self.name,
-            'default_transaction_reference': self.id,
-            # Don't set default_transaction_id here since it will be computed
-        }
+    @api.depends('date_created')  
+    def _compute_is_case_management_installed(self):
+        case_management_installed = bool(self.env['ir.module.module'].search([
+            ('name', '=', 'case_management'),
+            ('state', '=', 'installed')
+        ], limit=1))
         
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'New Case',
-            'res_model': 'case',
-            'view_mode': 'form',
-            'view_id': self.env.ref('case_management.case_form_view').id,
-            'target': 'current',
-            'context': context
-        }
+        for record in self:
+            record.show_create_case_button = case_management_installed
         
-        
+    
+
+    # show_create_case_button = fields.Boolean(
+    #     string="Case Management Installed",
+    #     compute='_compute_is_case_management_installed',
+    #     store=False, # No need to store this in the database
+    # )
+
+    # @api.depends() 
+    # def _compute_is_case_management_installed(self):
+    #     for record in self:
+    #         case_management_module = self.env['ir.module.module'].search([
+    #             ('name', '=', 'case_management'),
+    #             ('state', '=', 'installed')
+    #         ], limit=1)
+    #         record.show_create_case_button = bool(case_management_module)
+            
+            
+    @api.model
+    def _is_case_management_available(self):
+        """Cache the module availability check"""
+        if not hasattr(self, '_case_management_available'):
+            self._case_management_available = bool(self.env['ir.module.module'].search([
+                ('name', '=', 'case_management'),
+                ('state', '=', 'installed')
+            ], limit=1))
+        return self._case_management_available
+
+# Then use this method in your button logic or view conditions
+    
+    
+    
     
     
     def action_create_case(self):

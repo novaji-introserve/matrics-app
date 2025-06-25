@@ -73,27 +73,24 @@ class RiskAssessmentLine(models.Model):
 
     @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact','residual_risk_score','residual_risk_probability','residual_risk_score')
     def _compute_risk_score(self):
+        max_score = self.get_control_effectiveness_max_score()
         for record in self:
             probability = self._compute_risk_probability(
                 record.control_effectiveness_score)
-            score = self._compute_residual_risk_score(
-                probability, record.residual_risk_impact)
+            
             record.residual_risk_probability = probability
-            record.residual_risk_score = score
+            record.residual_risk_score = record.inherent_risk_score * (1 - (record.control_effectiveness_score / max_score))
 
+ 
     @api.depends('control_effectiveness_score', 'inherent_risk_score')
     def _compute_residual_risk_impact(self):
+        max_score = self.get_control_effectiveness_max_score()
         for record in self:
             control_effectiveness_score = record.control_effectiveness_score or 0  # Handle None/False values
             inherent_score = record.inherent_risk_score or 0  # Handle None/False values
-            max_score = self.env['res.fcra.score'].max_score
-            max_score = float(max_score)
-            
-            _logger.info(f"The control score is {control_effectiveness_score}")
-            _logger.info(f"Max score is {max_score}")
             
             # Ensure we don't have negative values if control score > max
-            record.residual_risk_impact = max(0, inherent_score - control_effectiveness_score)
+            record.residual_risk_impact = inherent_score * (1 - (control_effectiveness_score / max_score))
             _logger.info(f"Residual risk impact score is {record.residual_risk_impact}")
 
 
@@ -116,17 +113,13 @@ class RiskAssessmentLine(models.Model):
 
     def _compute_risk_probability(self, control_effectiveness_score):
         max_score = self.get_control_effectiveness_max_score()
-        print(f"max score is {max_score}")
         if max_score == 0:
             return 100.0  # Avoid division by zero
         
         score =  (1 - (control_effectiveness_score / max_score))
-        print(f"the score is {score}")
         return score  * 100
 
     def _compute_residual_risk_score(self, probability, impact):
-        print(f"the probability is {probability}")
-        print(f"the impact is {impact}")
         return (probability/100) * impact
 
     def update_aggregate_risk_score(self):

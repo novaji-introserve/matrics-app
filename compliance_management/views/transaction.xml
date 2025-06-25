@@ -24,6 +24,7 @@
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" />
                 <field name="state" widget="badge" decoration-warning="state in ('new')" decoration-success="state in ('done')" />
                 <field name="date_created" optional="show"/>
+                <field name="show_create_case_button" invisible="1"/>
             </tree>
         </field>
     </record>
@@ -34,11 +35,24 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <field name="show_create_case_button" invisible="1"/>
 
                     <button name="action_screen" class="oe_highlight" type="object" string="Run Transaction Screening" groups="compliance_management.group_compliance_compliance_risk_manager" confirm="Run screening rules. All transaction screening rules will be applied. The first exception found will flagged. Are you sure?" />
                     <button name="done" class="oe_highlight" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" attrs="{'invisible': [('state', 'not in',['new'])]}" />
-                    <button name="action_create_case" type="object" string="Create Case" class="btn-primary"/>
 
+    
+                    <button name="action_create_case" 
+                            class="oe_highlight"
+                            string="Create Case" 
+                            type="object" 
+                            attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
+
+                    
+
+
+
+
+                    
                     <field name="state" widget="statusbar" statusbar_visible="new,done" clickable="True" />
 
 
@@ -157,9 +171,4 @@
             action = records.done()
         </field>
     </record>
-    <menuitem id="menu_compliance_transaction_monitoring" parent="menu_compliance_kyc" name="Transaction Monitoring" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
-    <menuitem id="menu_compliance_transactions" action="open_transactions" parent="menu_compliance_transaction_monitoring" name="Transactions To Review" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
-    <menuitem id="menu_compliance_transactions_done" action="open_transactions_done" parent="menu_compliance_transaction_monitoring" name="Transactions Reviewed" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
-    <menuitem id="menu_compliance_transactions_all" action="open_transactions_all" parent="menu_compliance_transaction_monitoring" name="All Transactions" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
-
 </odoo>

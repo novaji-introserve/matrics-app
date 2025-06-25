@@ -14,7 +14,6 @@ from requests.exceptions import RequestException, HTTPError, ConnectionError, Ti
 from odoo.modules.module import get_module_resource
 import base64
 import logging
-from .customer import LOW_RISK_THRESHOLD, MEDIUM_RISK_THRESHOLD, HIGH_RISK_THRESHOLD
 
 
 load_dotenv()
@@ -67,9 +66,9 @@ class AdverseMedia(models.Model):
     @api.depends('partner_risk_score')
     def _compute_risk_score_decoration(self):
         for record in self:
-            if record.partner_risk_score <= 10:  # Match with 'low'
+            if record.partner_risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):  # Match with 'low'
                 record.risk_score_decoration = 'success'
-            elif 10 < record.partner_risk_score <= 19:  # Match with 'medium'
+            elif record.partner_risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):  # Match with 'medium'
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
@@ -299,9 +298,11 @@ class AdverseMedia(models.Model):
 
                 # Determine risk level based on the highest risk score
                 alert_risk_level = None
-                if highest_risk_score <= LOW_RISK_THRESHOLD:
+                if highest_risk_score <= float(
+                        self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                     alert_risk_level = "low"
-                elif highest_risk_score <= MEDIUM_RISK_THRESHOLD:
+                elif highest_risk_score <= float(
+                        self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                     alert_risk_level = "medium"
                 else:
                     alert_risk_level = "high"
@@ -349,8 +350,111 @@ class AdverseMedia(models.Model):
                 f"Error in notification process: {str(e)}", exc_info=True)
             raise ValidationError(f"Failed to send notifications: {str(e)}")
 
+    # def scan_news_articles(self):
+    #     """Main method to scan for news articles with comprehensive error handling"""
+    #     for record in self:
+    #         try:
+    #             if record.monitoring_status != 'active':
+    #                 _logger.info(
+    #                     f"Skipping inactive record for partner: {record.partner_id.name}")
+    #                 continue
+
+    #             _logger.info(
+    #                 f"Starting news scan for partner: {record.partner_id.name}")
+
+    #             response_data = record._fetch_news_articles()
+    #             if not response_data or 'articles' not in response_data:
+    #                 _logger.error(
+    #                     f"No articles found for partner: {record.partner_id.name}")
+    #                 continue
+
+    #             articles_processed = 0
+    #             alerts_created = 0
+    #             new_alerts = self.env['adverse.media.alert']
+
+    #             for article in response_data['articles']:
+    #                 # Create a savepoint for each article to isolate potential database issues
+    #                 with self.env.cr.savepoint():
+    #                     try:
+    #                         articles_processed += 1
+    #                         article_title = article.get('title', 'Unknown')
+
+    #                         # Check for existing alert - wrapped in its own savepoint
+    #                         try:
+    #                             existing_alert = self.env['adverse.media.alert'].search([
+    #                                 ('media_id', '=', record.id),
+    #                                 ('name', '=', article_title)
+    #                             ], limit=1)  # Adding limit=1 for efficiency
+    #                         except Exception as db_error:
+    #                             _logger.error(
+    #                                 f"Database error checking for existing alert '{article_title}': {str(db_error)}")
+    #                             continue  # Skip this article and move to the next one
+
+    #                         if existing_alert:
+    #                             _logger.info(
+    #                                 f"Skipping duplicate article: {article_title}")
+    #                             continue
+
+    #                         # Process article
+    #                         article_text = f"{article_title} {article.get('description', '')} {article.get('content', '')}"
+
+    #                         matched_keywords = [
+    #                             f"{k.name}"
+    #                             for k in record.keyword_id
+    #                             if record.partner_id.name.lower() in article_text.lower() and k.name.lower() in article_text.lower()
+    #                         ]
+
+    #                         _logger.info(
+    #                             f"Matched keywords for '{article_title}': {matched_keywords}")
+
+    #                         if matched_keywords:
+    #                             risk_score = record._calculate_risk_score(
+    #                                 article, matched_keywords)
+    #                             alert = record._create_alert(
+    #                                 article, matched_keywords, risk_score)
+
+    #                             if alert:
+    #                                 new_alerts |= alert
+    #                                 alerts_created += 1
+    #                                 _logger.info(
+    #                                     f"Created alert for article: {article_title}")
+
+    #                     except Exception as e:
+    #                         _logger.error(
+    #                             f"Error processing article '{article.get('title', 'Unknown')}': {str(e)}", exc_info=True)
+    #                         # The savepoint will be rolled back automatically for this article
+    #                         continue
+
+    #             # Update scan date in a separate transaction
+    #             try:
+    #                 with self.env.cr.savepoint():
+    #                     _logger.info(f"Scan completed for {record.partner_id.name}. "
+    #                                  f"Processed {articles_processed} articles, created {alerts_created} alerts.")
+
+    #                     if new_alerts:
+    #                         record._notify_officers(new_alerts)
+    #                         _logger.info(
+    #                             f"Created {len(new_alerts)} new alerts for {record.partner_id.name}")
+
+    #                     # Update the last scan date
+    #                     record.write({
+    #                         'last_scan_date': fields.Datetime.now(),
+    #                         'next_scan_date': fields.Datetime.now() + timedelta(days=1)
+    #                     })
+    #             except Exception as update_error:
+    #                 _logger.error(
+    #                     f"Error updating scan dates for {record.partner_id.name}: {str(update_error)}", exc_info=True)
+
+    #         except Exception as e:
+    #             _logger.error(
+    #                 f"Error scanning news for partner {record.partner_id.name}: {str(e)}", exc_info=True)
+    #             continue
+
     def scan_news_articles(self):
         """Main method to scan for news articles with comprehensive error handling"""
+        all_alerts_created = 0
+        email_notification_success = True
+
         for record in self:
             try:
                 if record.monitoring_status != 'active':
@@ -404,7 +508,7 @@ class AdverseMedia(models.Model):
                             ]
 
                             _logger.info(
-                                f"Matched keywords for '{article_title}': {matched_keywords}")
+                                f"Matched keywords for  {matched_keywords}' :{article_title}'")
 
                             if matched_keywords:
                                 risk_score = record._calculate_risk_score(
@@ -415,6 +519,7 @@ class AdverseMedia(models.Model):
                                 if alert:
                                     new_alerts |= alert
                                     alerts_created += 1
+                                    all_alerts_created += 1
                                     _logger.info(
                                         f"Created alert for article: {article_title}")
 
@@ -428,12 +533,18 @@ class AdverseMedia(models.Model):
                 try:
                     with self.env.cr.savepoint():
                         _logger.info(f"Scan completed for {record.partner_id.name}. "
-                                     f"Processed {articles_processed} articles, created {alerts_created} alerts.")
+                                    f"Processed {articles_processed} articles, created {alerts_created} alerts.")
 
                         if new_alerts:
-                            record._notify_officers(new_alerts)
-                            _logger.info(
-                                f"Created {len(new_alerts)} new alerts for {record.partner_id.name}")
+                            try:
+                                record.with_context(
+                                    news_scan=True)._notify_officers(new_alerts)
+                                _logger.info(
+                                    f"Created {len(new_alerts)} new alerts for {record.partner_id.name}")
+                            except Exception as notify_error:
+                                email_notification_success = False
+                                _logger.error(
+                                    f"Failed to send email notification: {str(notify_error)}", exc_info=True)
 
                         # Update the last scan date
                         record.write({
@@ -449,6 +560,42 @@ class AdverseMedia(models.Model):
                     f"Error scanning news for partner {record.partner_id.name}: {str(e)}", exc_info=True)
                 continue
 
+        # Return appropriate notification based on results
+        if all_alerts_created > 0:
+            if email_notification_success:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': ('Screening Complete'),
+                        'message': ('Potential matches found. Compliance officers have been notified via email. Check the media logs and review'),
+                        'type': 'warning',
+                        'sticky': True,
+                    }
+                }
+            else:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': ('Screening Complete'),
+                        'message': ('Potential matches found, but email notification failed. Please check system logs'),
+                        'type': 'danger',
+                        'sticky': True,  # Make it sticky so user notices the email failure
+                    }
+                }
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': ('Screening Complete'),
+                    'message': ('No matches found.'),
+                    'type': 'success',
+                    'sticky': True,
+                }
+            }
+    
     @api.model
     def scan_adverse_media(self):
         """Cron job method to scan adverse media based on frequency"""
@@ -538,9 +685,11 @@ class AdverseMediaAlert(models.Model):
     @api.depends('risk_score')
     def _compute_risk_score_decoration(self):
         for record in self:
-            if record.risk_score <= 10:  # Match with 'low'
+            if record.risk_score <= float(
+                    self.env['res.compliance.settings'].get_setting('low_risk_threshold')):  # Match with 'low'
                 record.risk_score_decoration = 'success'
-            elif 10 < record.risk_score <= 19:  # Match with 'medium'
+            elif record.risk_score <= float(
+                    self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):  # Match with 'medium'
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
@@ -612,18 +761,22 @@ class MediaKeyword(models.Model):
     @api.depends('risk_score')
     def _compute_risk_score_decoration(self):
         for record in self:
-            if record.risk_score <= 10:  # Match with 'low'
+            if record.risk_score <= float(
+                    self.env['res.compliance.settings'].get_setting('low_risk_threshold')):  # Match with 'low'
                 record.risk_score_decoration = 'success'
-            elif 10 < record.risk_score <= 19:  # Match with 'medium'
+            elif record.risk_score <= float(
+                    self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):  # Match with 'medium'
                 record.risk_score_decoration = 'warning'
             else:  # Match with 'high'
                 record.risk_score_decoration = 'danger'
 
     @api.onchange('risk_score')
     def _onchange_risk_score(self):
-        if self.risk_score <= LOW_RISK_THRESHOLD:
+        if self.risk_score <= float(
+                self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
             self.media_risk_level = "low"
-        elif self.risk_score <= MEDIUM_RISK_THRESHOLD:
+        elif self.risk_score <= float(
+                self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
             self.media_risk_level = "medium"
         else:
             self.media_risk_level = "high"

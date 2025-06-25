@@ -283,30 +283,9 @@
         </field>
     </record>
 
-    <!-- OpenSanctions Job Queue Action -->
-    <record id="action_opensanctions_job_queue" model="ir.actions.act_window">
-        <field name="name">OpenSanctions Jobs</field>
-        <field name="res_model">opensanctions.job.queue</field>
-        <field name="view_mode">tree,form</field>
-        <field name="context">{'search_default_main_jobs': 1, 'search_default_pending': 1}</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create your first OpenSanctions import job
-            </p>
-            <p>
-                Select a PEP source and job type to get started.
-                The system will automatically configure the job based on the selected source.
-            </p>
-        </field>
-    </record>
 
-    <!-- Menu Items -->
-    <menuitem id="menu_opensanctions_jobs"
-        name="OpenSanctions Jobs"
-        parent="menu_pep_configurations"
-        action="action_opensanctions_job_queue"
-        sequence="20" 
-        groups="group_tech_support"/>
+
+
 
     <!-- Add OpenSanctions button to PEP list view -->
     <record id="view_pep_tree_opensanctions" model="ir.ui.view">
