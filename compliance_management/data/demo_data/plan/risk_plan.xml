@@ -58,7 +58,7 @@
 
     <record id="risk_plan_3" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on SanctionList</field>
-        <field name="risk_score">7</field>
+        <field name="risk_score">4</field>
         <field name="code">cust_sanctionlist</field>
         <field name="sql_query">select risk_score from res_partner where id=%s and likely_sanction=true</field>
         <field name="priority">3</field>
@@ -68,7 +68,7 @@
     </record>
     <record id="risk_plan_pep" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on PEPlist</field>
-        <field name="risk_score">4</field>
+        <field name="risk_score">2</field>
         <field name="code">cust_pep</field>
         <field name="sql_query">select risk_score from res_partner where id=%s and is_pep=true</field>
         <field name="priority">4</field>
@@ -88,7 +88,7 @@
     </record> -->
     <record id="risk_plan_watchlist" model="res.compliance.risk.assessment.plan">
         <field name="name">Customers on Watchlist</field>
-        <field name="risk_score">7</field>
+        <field name="risk_score">2</field>
         <field name="code">cust_watchlist</field>
         <field name="sql_query">select risk_score from res_partner where id=%s and is_watchlist=true</field>
         <field name="priority">6</field>
