@@ -28,7 +28,6 @@
             <field name="tot_debit_last6m">240000.00</field>
             <field name="max_debit_daily">35000.00</field>
             <field name="customer">02210</field>
-            <field name="product_id" ref="compliance_checklist_product_150" />
         </record>
 
         <record id="demo_account_2" model="res.partner.account">
@@ -58,7 +57,6 @@
             <field name="max_debit_daily">150000.00</field>
             <field name="overdraft_limit">100000.00</field>
             <field name="customer">02210</field>
-            <field name="product_id" ref="compliance_checklist_product_150" />
         </record>
 
         <record id="demo_account_3" model="res.partner.account">
@@ -87,7 +85,6 @@
             <field name="tot_debit_last6m">50000.00</field>
             <field name="max_debit_daily">15000.00</field>
             <field name="customer">00101</field>
-            <field name="product_id" ref="compliance_checklist_product_150" />
         </record>
 
         <record id="demo_account_4" model="res.partner.account">
@@ -115,7 +112,6 @@
             <field name="max_debit_last6m">0.00</field>
             <field name="tot_debit_last6m">0.00</field>
             <field name="customer">023</field>
-            <field name="product_id" ref="compliance_checklist_product_150" />
         </record>
 
         <record id="demo_account_5" model="res.partner.account">
@@ -144,7 +140,6 @@
             <field name="tot_debit_last6m">0.00</field>
             <field name="max_debit_daily">10000.00</field>
             <field name="customer">0102</field>
-            <field name="product_id" ref="compliance_checklist_product_150" />
         </record>
 
         <record id="demo_account_6" model="res.partner.account">
@@ -174,7 +169,6 @@
             <field name="max_debit_daily">100000.00</field>
             <field name="overdraft_limit">50000.00</field>
             <field name="customer">0102</field>
-            <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_7" model="res.partner.account">
@@ -202,7 +196,6 @@
             <field name="max_debit_last6m">0.00</field>
             <field name="tot_debit_last6m">0.00</field>
             <field name="customer">00101</field>
-            <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_8" model="res.partner.account">
@@ -231,7 +224,6 @@
             <field name="tot_debit_last6m">0.00</field>
             <field name="max_debit_daily">20000.00</field>
             <field name="customer">023</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
         
         <record id="demo_account_9" model="res.partner.account">
@@ -260,7 +252,6 @@
             <field name="tot_debit_last6m">0.00</field>
             <field name="max_debit_daily">20000.00</field>
             <field name="customer">023</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_10" model="res.partner.account">
@@ -290,7 +281,6 @@
             <field name="max_debit_daily">100000.00</field>
             <field name="overdraft_limit">50000.00</field>
             <field name="customer">0102</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_11" model="res.partner.account">
@@ -305,7 +295,7 @@
             <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
             <field name="opening_date" eval="(datetime.now() - timedelta(days=180)).strftime('%Y-%m-%d')"/>
             <field name="currency">NGN</field>
-            <field name="category">master_card_001</field>
+            <field name="category">RETAIL</field>
             <field name="category_description">INDIVIDUAL SAVINGS</field>
             <field name="is_joint_account">False</field>
             <field name="date_created" eval="(datetime.now() - timedelta(days=180)).strftime('%Y-%m-%d')"/>
@@ -331,7 +321,6 @@
             <field name="avg_debit_last1y">37800.00</field>
             <field name="max_debit_last1y">120000.00</field>
             <field name="tot_debit_last1y">2835000.00</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_12" model="res.partner.account">
@@ -346,7 +335,7 @@
             <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
             <field name="opening_date" eval="(datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')"/>
             <field name="currency">NGN</field>
-            <field name="category">master_card_001</field>
+            <field name="category">RETAIL</field>
             <field name="category_description">INDIVIDUAL CURRENT</field>
             <field name="is_joint_account">False</field>
             <field name="date_created" eval="(datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')"/>
@@ -374,7 +363,6 @@
             <field name="avg_debit_last1y">227500.00</field>
             <field name="max_debit_last1y">500000.00</field>
             <field name="tot_debit_last1y">19792500.00</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_13" model="res.partner.account">
@@ -389,7 +377,7 @@
             <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=45)).strftime('%Y-%m-%d')"/>
             <field name="opening_date" eval="(datetime.now() - timedelta(days=210)).strftime('%Y-%m-%d')"/>
             <field name="currency">NGN</field>
-            <field name="category">master_card_001</field>
+            <field name="category">RETAIL</field>
             <field name="category_description">INDIVIDUAL SAVINGS</field>
             <field name="is_joint_account">False</field>
             <field name="date_created" eval="(datetime.now() - timedelta(days=210)).strftime('%Y-%m-%d')"/>
@@ -415,7 +403,6 @@
             <field name="avg_debit_last1y">12250.00</field>
             <field name="max_debit_last1y">25000.00</field>
             <field name="tot_debit_last1y">98000.00</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_14" model="res.partner.account">
@@ -430,7 +417,7 @@
             <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d')"/>
             <field name="opening_date" eval="(datetime.now() - timedelta(days=400)).strftime('%Y-%m-%d')"/>
             <field name="currency">NGN</field>
-            <field name="category">master_card_001</field>
+            <field name="category">RETAIL</field>
             <field name="category_description">INDIVIDUAL CURRENT</field>
             <field name="is_joint_account">False</field>
             <field name="date_created" eval="(datetime.now() - timedelta(days=400)).strftime('%Y-%m-%d')"/>
@@ -457,7 +444,6 @@
             <field name="avg_debit_last1y">63500.00</field>
             <field name="max_debit_last1y">200000.00</field>
             <field name="tot_debit_last1y">3048000.00</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_15" model="res.partner.account">
@@ -472,7 +458,7 @@
             <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
             <field name="opening_date" eval="(datetime.now() - timedelta(days=380)).strftime('%Y-%m-%d')"/>
             <field name="currency">NGN</field>
-            <field name="category">master_card_001</field>
+            <field name="category">RETAIL</field>
             <field name="category_description">JOINT SAVINGS</field>
             <field name="is_joint_account">True</field>
             <field name="date_created" eval="(datetime.now() - timedelta(days=380)).strftime('%Y-%m-%d')"/>
@@ -498,7 +484,6 @@
             <field name="avg_debit_last1y">52500.00</field>
             <field name="max_debit_last1y">150000.00</field>
             <field name="tot_debit_last1y">630000.00</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_16" model="res.partner.account">
@@ -513,7 +498,7 @@
             <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
             <field name="opening_date" eval="(datetime.now() - timedelta(days=500)).strftime('%Y-%m-%d')"/>
             <field name="currency">NGN</field>
-            <field name="category">master_card_001</field>
+            <field name="category">RETAIL</field>
             <field name="category_description">PREMIUM SAVINGS</field>
             <field name="is_joint_account">False</field>
             <field name="date_created" eval="(datetime.now() - timedelta(days=500)).strftime('%Y-%m-%d')"/>
@@ -540,7 +525,6 @@
             <field name="avg_debit_last1y">375000.00</field>
             <field name="max_debit_last1y">1500000.00</field>
             <field name="tot_debit_last1y">15750000.00</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <!-- Create a USD account for demo_partner_5 -->
@@ -556,7 +540,7 @@
             <field name="last_transaction_date" eval="(datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
             <field name="opening_date" eval="(datetime.now() - timedelta(days=450)).strftime('%Y-%m-%d')"/>
             <field name="currency">USD</field>
-            <field name="category">master_card_001</field>
+            <field name="category">RETAIL</field>
             <field name="category_description">DOMICILIARY ACCOUNT</field>
             <field name="is_joint_account">False</field>
             <field name="date_created" eval="(datetime.now() - timedelta(days=450)).strftime('%Y-%m-%d')"/>
@@ -583,7 +567,6 @@
             <field name="avg_debit_last1y">1875.00</field>
             <field name="max_debit_last1y">5000.00</field>
             <field name="tot_debit_last1y">15000.00</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_18" model="res.partner.account">
@@ -612,7 +595,6 @@
             <field name="tot_debit_last6m">96000.00</field>
             <field name="max_debit_daily">25000.00</field>
             <field name="customer">0050</field>
-            <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_19" model="res.partner.account">
@@ -641,7 +623,6 @@
             <field name="tot_debit_last6m">600000.00</field>
             <field name="max_debit_daily">60000.00</field>
             <field name="customer">0505</field>
-            <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_20" model="res.partner.account">
@@ -670,7 +651,6 @@
             <field name="tot_debit_last6m">45000.00</field>
             <field name="max_debit_daily">25000.00</field>
             <field name="customer">0110</field>
-            <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_21" model="res.partner.account">
@@ -699,7 +679,6 @@
             <field name="tot_debit_last6m">200000.00</field>
             <field name="max_debit_daily">35000.00</field>
             <field name="customer">03003</field>
-            <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
           
@@ -729,7 +708,6 @@
             <field name="tot_debit_last6m">90000.00</field>
             <field name="max_debit_daily">30000.00</field>
             <field name="customer">0290</field>
-            <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_23" model="res.partner.account">
@@ -758,7 +736,6 @@
             <field name="tot_debit_last6m">525000.00</field>
             <field name="max_debit_daily">70000.00</field>
             <field name="customer">0621</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_24" model="res.partner.account">
@@ -787,7 +764,6 @@
             <field name="tot_debit_last6m">48000.00</field>
             <field name="max_debit_daily">20000.00</field>
             <field name="customer">0120</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_25" model="res.partner.account">
@@ -816,7 +792,6 @@
             <field name="tot_debit_last6m">160000.00</field>
             <field name="max_debit_daily">35000.00</field>
             <field name="customer">0308</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_26" model="res.partner.account">
@@ -845,7 +820,6 @@
             <field name="tot_debit_last6m">450000.00</field>
             <field name="max_debit_daily">60000.00</field>
             <field name="customer">0031</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_27" model="res.partner.account">
@@ -879,7 +853,6 @@
                 <field name="avg_debit_last1y">16400.00</field>
                 <field name="max_debit_last1y">30000.00</field>
                 <field name="tot_debit_last1y">295200.00</field>
-                 <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_28" model="res.partner.account">
@@ -913,7 +886,6 @@
                 <field name="avg_debit_last1y">156000.00</field>
                 <field name="max_debit_last1y">400000.00</field>
                 <field name="tot_debit_last1y">8424000.00</field>
-                 <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
 
@@ -940,7 +912,6 @@
             <field name="max_debit_last6m">50000.00</field>
             <field name="tot_debit_last6m">200000.00</field>
             <field name="customer">0900</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_30" model="res.partner.account">
@@ -968,7 +939,6 @@
             <field name="max_debit_last6m">80000.00</field>
             <field name="tot_debit_last6m">720000.00</field>
             <field name="customer">0074</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_31" model="res.partner.account">
@@ -995,7 +965,6 @@
             <field name="max_debit_last6m">18000.00</field>
             <field name="tot_debit_last6m">50000.00</field>
             <field name="customer">0317</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_32" model="res.partner.account">
@@ -1024,7 +993,6 @@
             <field name="tot_debit_last6m">2100000.00</field>
             <field name="high_transactions_account">True</field>
             <field name="customer">00120</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_33" model="res.partner.account">
@@ -1051,7 +1019,6 @@
             <field name="max_debit_last6m">30000.00</field>
             <field name="tot_debit_last6m">144000.00</field>
             <field name="customer">02010</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_34" model="res.partner.account">
@@ -1078,7 +1045,6 @@
             <field name="max_debit_last6m">75000.00</field>
             <field name="tot_debit_last6m">480000.00</field>
             <field name="customer">0101</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_35" model="res.partner.account">
@@ -1106,7 +1072,6 @@
             <field name="max_debit_last6m">60000.00</field>
             <field name="tot_debit_last6m">375000.00</field>
             <field name="customer">01996</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_36" model="res.partner.account">
@@ -1135,7 +1100,6 @@
             <field name="tot_debit_last6m">3230000.00</field>
             <field name="high_transactions_account">True</field>
             <field name="customer">01021</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_37" model="res.partner.account">
@@ -1162,7 +1126,6 @@
             <field name="max_debit_last6m">30000.00</field>
             <field name="tot_debit_last6m">120000.00</field>
             <field name="customer">0220</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_38" model="res.partner.account">
@@ -1190,7 +1153,6 @@
             <field name="max_debit_last6m">60000.00</field>
             <field name="tot_debit_last6m">500000.00</field>
             <field name="customer">0330</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_39" model="res.partner.account">
@@ -1216,7 +1178,6 @@
             <field name="max_debit_last6m">0.00</field>
             <field name="tot_debit_last6m">0.00</field>
             <field name="customer">0440</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_40" model="res.partner.account">
@@ -1244,7 +1205,6 @@
             <field name="max_debit_last6m">120000.00</field>
             <field name="tot_debit_last6m">1125000.00</field>
             <field name="customer">0550</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_41" model="res.partner.account">
@@ -1270,7 +1230,6 @@
             <field name="max_debit_last6m">120000.00</field>
             <field name="tot_debit_last6m">1125000.00</field>
             <field name="customer">0550</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_42" model="res.partner.account">
@@ -1294,7 +1253,6 @@
             <field name="max_debit_last6m">120000.00</field>
             <field name="tot_debit_last6m">1125000.00</field>
             <field name="customer">0660</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_43" model="res.partner.account">
@@ -1318,7 +1276,6 @@
             <field name="max_debit_last6m">120000.00</field>
             <field name="tot_debit_last6m">1125000.00</field>
             <field name="customer">0770</field>
-             <field name="product_id" ref="compliance_checklist_product_150" />
         </record>
 
         <record id="demo_account_44" model="res.partner.account">
@@ -1342,7 +1299,6 @@
             <field name="max_debit_last6m">120000.00</field>
             <field name="tot_debit_last6m">1125000.00</field>
             <field name="customer">10001</field>
-             <field name="product_id" ref="compliance_checklist_product_150" />
         </record>
 
         <record id="demo_account_45" model="res.partner.account">
@@ -1366,7 +1322,6 @@
             <field name="max_debit_last6m">120000.00</field>
             <field name="tot_debit_last6m">1125000.00</field>
             <field name="customer">10002</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_46" model="res.partner.account">
@@ -1390,7 +1345,6 @@
             <field name="max_debit_last6m">120000.00</field>
             <field name="tot_debit_last6m">1125000.00</field>
             <field name="customer">10001</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_47" model="res.partner.account">
@@ -1414,7 +1368,6 @@
             <field name="max_debit_last6m">120000.00</field>
             <field name="tot_debit_last6m">1125000.00</field>
             <field name="customer">10002</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
     
         <record id="demo_account_48" model="res.partner.account">
@@ -1430,7 +1383,6 @@
             <field name="state">Active</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="customer">10003</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_49" model="res.partner.account">
@@ -1447,7 +1399,6 @@
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="customer">10004</field>
             <field name="overdraft_limit">200000.00</field>
-             <field name="product_id" ref="compliance_checklist_product_150" />
         </record>
 
         <record id="demo_account_50" model="res.partner.account">
@@ -1463,7 +1414,6 @@
             <field name="state">Active</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="customer">10005</field>
-             <field name="product_id" ref="compliance_checklist_product_151" />
         </record>
 
         <record id="demo_account_51" model="res.partner.account">
@@ -1480,7 +1430,6 @@
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="customer">10006</field>
             <field name="overdraft_limit">500000.00</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_52" model="res.partner.account">
@@ -1496,7 +1445,6 @@
             <field name="state">Active</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="customer">10007</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_53" model="res.partner.account">
@@ -1512,7 +1460,6 @@
             <field name="state">Active</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="customer">10006</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_54" model="res.partner.account">
@@ -1528,7 +1475,6 @@
             <field name="state">Active</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="customer">10004</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_55" model="res.partner.account">
@@ -1545,7 +1491,6 @@
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="customer">10007</field>
             <field name="overdraft_limit">100000.00</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <record id="demo_account_56" model="res.partner.account">
@@ -1561,7 +1506,6 @@
             <field name="state">Dormant</field>
             <field name="branch_id" ref="compliance_management.res_branch_0010001"/>
             <field name="customer">10003</field>
-             <field name="product_id" ref="compliance_inst_fc_new003_product" />
         </record>
 
         <!-- Transaction records for additional accounts -->
