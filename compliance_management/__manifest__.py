@@ -72,6 +72,7 @@
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
         "data/demo_data/risk_assessment/risk_subject.xml",
+        "data/demo_data/risk_assessment/product_service_subject.xml",
         "data/demo_data/risk_assessment/risk_subject_2.xml",
         "data/demo_data/risk_assessment/digital_delivery_channel.xml",
         "data/demo_data/risk_assessment/risk_subject_2.xml",
@@ -108,8 +109,7 @@
         'data/transaction_screening_rule.xml',
         # "data/demo_data/sanction/sanction_screening.xml", # SANCTION SCREENING DATA
         # "data/demo_data/chart/charts.xml", #CHARTS
-        # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
-        # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
+        "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
         # "data/transactions.xml", # TRANSACTION
         # "views/res_users.xml", # USERS
         "views/peplist.xml",
@@ -118,6 +118,7 @@
         'data/demo_data/stat/compliance_stats.xml',
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
+        "data/demo_data/risk_assessment/product_service_assessment.xml",
         'data/demo_data/plan/jurisdiction_plan.xml',
         'data/demo_data/plan/customer_type_plan.xml',
         'data/demo_data/plan/assessment_plan.xml',
@@ -125,6 +126,7 @@
         'data/demo_data/plan/customer_type_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
+        "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
         'data/blacklist.xml',
         "views/customer_screening.xml",
         "views/menu_actions.xml",
