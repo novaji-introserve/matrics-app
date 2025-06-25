@@ -23,11 +23,6 @@ load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
-# LOW_RISK_THRESHOLD = 10
-# MEDIUM_RISK_THRESHOLD =  15
-# HIGH_RISK_THRESHOLD =  16
-
-
 
 class Shareholders(models.Model):
     _name = 'res.partner.shareholders'
@@ -252,7 +247,6 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'context': {'default_partner_id': self.id}
         }
-
     
             
     def action_screen_customer(self):
@@ -678,17 +672,31 @@ class Customer(models.Model):
             self.env.cr.execute(
                 query, (values_list[0]['last_risk_calculation'], self.env.user.id, fields.Datetime.now()))
 
-    
     def _calculate_composite_score(self, composite_plans):
         """
         Calculate composite risk score based on weighted risk universes
-        - Display ALL universes and ALL subjects in the UI
         - Only include universes with violations (universe_score > 0) in the CCR calculation
         - Show all risk plans regardless of match status
+        - Apply dynamic calculation (avg/max/sum) at universe level based on settings
         """
         record_id = self.id
         composite_score = 0.0
 
+        # Get the risk assessment computation setting
+        setting = self.env['res.compliance.settings'].search([
+            ('code', '=', 'risk_composite_computation')
+        ], limit=1)
+
+        # Default to 'avg' if no setting found
+        plan_setting = 'avg'
+        if setting:
+            plan_setting = setting.val.strip().lower()
+
+        # Validate setting, default to 'avg' if invalid
+        if plan_setting not in ['avg', 'max', 'sum']:
+            plan_setting = 'avg'
+
+        _logger.info(f"Using risk calculation method: {plan_setting.upper()}")
 
         # Clear previous composite plan lines
         self.env['res.partner.composite.plan.line'].sudo().search(
@@ -705,7 +713,7 @@ class Customer(models.Model):
         for universe in universes:
             universe_scores[universe.id] = {
                 'universe': universe,
-                # Total universe score (sum of matching subjects)
+                # Total universe score (calculated using dynamic method)
                 'total_score': 0.0,
                 'weight': universe.weight_percentage / 100.0,
                 'name': universe.name,
@@ -760,35 +768,50 @@ class Customer(models.Model):
                         universe_scores[universe_id]['subjects'][subject_id]['score'] += score
 
                 # Create plan line records for ALL plans, whether they match or not
-                self.env['res.partner.composite.plan.line'].sudo().create({
-                    'partner_id': record_id,
-                    'plan_id': plan.id,
-                    'universe_id': universe_id,
-                    'subject_id': subject_id,
-                    'matched': matched,
-                    'risk_score': score,
-                    'assessment_id': plan.risk_assessment.id if plan.risk_assessment else False,
-                })
+                if matched :
+                    self.env['res.partner.composite.plan.line'].sudo().create({
+                        'partner_id': record_id,
+                        'plan_id': plan.id,
+                        'universe_id': universe_id,
+                        'subject_id': subject_id,
+                        'matched': matched,
+                        'risk_score': score,
+                        'assessment_id': plan.risk_assessment.id if plan.risk_assessment else False,
+                    })
 
             except Exception as e:
                 _logger.error(
                     f"Error checking for violations in plan {plan.name}: {str(e)}")
-                # Still create a record for the plan even if there was an error
-                self.env['res.partner.composite.plan.line'].sudo().create({
-                    'partner_id': record_id,
-                    'plan_id': plan.id,
-                    'universe_id': universe_id,
-                    'subject_id': subject_id,
-                    'matched': False,
-                    'risk_score': 0.0,
-                    'assessment_id': plan.risk_assessment.id if plan.risk_assessment else False,
-                })
+                
 
-        # Calculate the total score for each universe by summing all subject scores
+        # Calculate the total score for each universe using dynamic method (avg/max/sum)
         for universe_id, universe_data in universe_scores.items():
+            # Collect all subject scores that are > 0 for this universe
+            subject_scores = []
             for subject_id, subject_data in universe_data['subjects'].items():
                 if subject_data['score'] > 0:
-                    universe_data['total_score'] += subject_data['score']
+                    subject_scores.append(subject_data['score'])
+
+            # Apply dynamic calculation method to get universe total
+            if subject_scores:  # Only calculate if there are scores
+                if plan_setting == 'max':
+                    universe_data['total_score'] = max(subject_scores)
+                elif plan_setting == 'sum':
+                    universe_data['total_score'] = sum(subject_scores)
+                else:  # 'avg' (default)
+                    universe_data['total_score'] = sum(
+                        subject_scores) / len(subject_scores)
+            else:
+                universe_data['total_score'] = 0.0
+
+            # Log the calculation details for debugging
+            if subject_scores:
+                _logger.info(
+                    f"Universe {universe_data['name']}: "
+                    f"Subject scores={subject_scores}, "
+                    f"Method={plan_setting.upper()}, "
+                    f"Universe total={universe_data['total_score']:.2f}"
+                )
 
         # Create records for ALL universes and ALL subjects and calculate composite score
         for universe_id, universe_data in universe_scores.items():
@@ -799,36 +822,10 @@ class Customer(models.Model):
             if universe_data['total_score'] > 0:
                 composite_score += weighted_score
                 _logger.info(
-                    f"Universe {universe_data['name']} : Score={universe_data['total_score']}, "
-                    f"Weight={universe_data['weight']}, Weighted Score={weighted_score}")
+                    f"Universe {universe_data['name']} : Score={universe_data['total_score']:.2f}, "
+                    f"Weight={universe_data['weight']:.2f}, Weighted Score={weighted_score:.2f}")
 
-            # Create universe weight records for ALL subjects in this universe
-            # if universe_data['subjects']:
-            #     for subject_id, subject_data in universe_data['subjects'].items():
-            #         self.env['res.partner.risk.universe.weight'].sudo().create({
-            #             'partner_id': record_id,
-            #             'universe_id': universe_id,
-            #             'weight_percentage': universe_data['universe'].weight_percentage,
-            #             'universe_score': subject_data['score'],
-            #             'weighted_score': subject_data['score'] * universe_data['weight'],
-            #             'assigned_score': subject_data['score'],
-            #             'subject_id': subject_id,
-            #             'assessment_id': subject_data['assessment'].id if subject_data['assessment'] else False,
-            #         })
-            # else:
-            #     # Create at least one record for universes with no subjects
-            #     self.env['res.partner.risk.universe.weight'].sudo().create({
-            #         'partner_id': record_id,
-            #         'universe_id': universe_id,
-            #         'weight_percentage': universe_data['universe'].weight_percentage,
-            #         'universe_score': 0.0,
-            #         'weighted_score': 0.0,
-            #         'assigned_score': 0.0,
-            #         'subject_id': False,
-            #         'assessment_id': False,
-            #     })
-
-        _logger.info(f"Final CCR for customer {record_id}: {composite_score}")
+        _logger.info(f"Final CCR for customer {record_id}: {composite_score:.2f}")
         return round(composite_score, 2)
 
     def action_sync_channels(self):
@@ -1094,132 +1091,132 @@ class Customer(models.Model):
 
     def init(self):
         # Drop the trigger if it exists
-        self.env.cr.execute(
-            "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
-        self.env.cr.execute(
-            "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
+        # self.env.cr.execute(
+        #     "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
+        # self.env.cr.execute(
+        #     "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
 
         # Create index on res_partner which we know exists
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
 
         # Create the trigger
-        self.env.cr.execute("""
-            CREATE OR REPLACE FUNCTION set_partner_defaults_func()
-            RETURNS TRIGGER AS $$
-            BEGIN
+        # self.env.cr.execute("""
+        #     CREATE OR REPLACE FUNCTION set_partner_defaults_func()
+        #     RETURNS TRIGGER AS $$
+        #     BEGIN
 
-                -- Check if this is demo data (origin = 'demo')
-                IF NEW.origin = 'demo' THEN
-                    -- For demo data: Set defaults but preserve certain fields like risk_level
-                    -- Save the original risk_level value if it exists
-                    DECLARE original_risk_level VARCHAR;
-                    BEGIN
-                        original_risk_level := NEW.risk_level;
+        #         -- Check if this is demo data (origin = 'demo')
+        #         IF NEW.origin = 'demo' THEN
+        #             -- For demo data: Set defaults but preserve certain fields like risk_level
+        #             -- Save the original risk_level value if it exists
+        #             DECLARE original_risk_level VARCHAR;
+        #             BEGIN
+        #                 original_risk_level := NEW.risk_level;
                         
-                        -- Set basic defaults
-                        NEW.create_uid = 1;
-                        NEW.write_uid = 1;
-                        NEW.type = 'contact';
-                        NEW.lang = 'en_US';
-                        NEW.color = 0;
-                        NEW.tz = 'Africa/Lagos';
+        #                 -- Set basic defaults
+        #                 NEW.create_uid = 1;
+        #                 NEW.write_uid = 1;
+        #                 NEW.type = 'contact';
+        #                 NEW.lang = 'en_US';
+        #                 NEW.color = 0;
+        #                 NEW.tz = 'Africa/Lagos';
                         
                         
                         
-                        -- Restore the original risk_level if it was set
-                        IF original_risk_level IS NOT NULL THEN
-                            NEW.risk_level := original_risk_level;
-                        END IF;
+        #                 -- Restore the original risk_level if it was set
+        #                 IF original_risk_level IS NOT NULL THEN
+        #                     NEW.risk_level := original_risk_level;
+        #                 END IF;
                         
-                        RETURN NEW;
-                    END;
-                END IF;
+        #                 RETURN NEW;
+        #             END;
+        #         END IF;
 
-                IF NEW.active IS NULL THEN
-                    NEW.active = TRUE;
-                END IF;
+        #         IF NEW.active IS NULL THEN
+        #             NEW.active = TRUE;
+        #         END IF;
                 
-                IF NEW.type IS NULL THEN
-                    NEW.type = 'contact';
-                END IF;
+        #         IF NEW.type IS NULL THEN
+        #             NEW.type = 'contact';
+        #         END IF;
                 
-                IF NEW.lang IS NULL THEN
-                    NEW.lang = 'en_US';
-                END IF;
+        #         IF NEW.lang IS NULL THEN
+        #             NEW.lang = 'en_US';
+        #         END IF;
                 
-                IF NEW.create_uid IS NULL THEN
-                    NEW.create_uid = 1;
-                END IF;
+        #         IF NEW.create_uid IS NULL THEN
+        #             NEW.create_uid = 1;
+        #         END IF;
                 
-                IF NEW.write_uid IS NULL THEN
-                    NEW.write_uid = 1;
-                END IF;
+        #         IF NEW.write_uid IS NULL THEN
+        #             NEW.write_uid = 1;
+        #         END IF;
                     
-                IF NEW.color IS NULL THEN
-                    NEW.color = 0;
-                END IF;
+        #         IF NEW.color IS NULL THEN
+        #             NEW.color = 0;
+        #         END IF;
                 
-                IF NEW.create_date IS NULL THEN
-                    NEW.create_date = NOW();
-                END IF;
+        #         IF NEW.create_date IS NULL THEN
+        #             NEW.create_date = NOW();
+        #         END IF;
                 
-                IF NEW.tz IS NULL THEN
-                    NEW.tz = 'Africa/Lagos';
-                END IF;
+        #         IF NEW.tz IS NULL THEN
+        #             NEW.tz = 'Africa/Lagos';
+        #         END IF;
                 
-                IF NEW.write_date IS NULL THEN
-                    NEW.write_date = NOW();
-                END IF;
+        #         IF NEW.write_date IS NULL THEN
+        #             NEW.write_date = NOW();
+        #         END IF;
                 
-                IF NEW.internal_category IS NULL THEN
-                    NEW.internal_category = 'customer';
-                END IF;
+        #         IF NEW.internal_category IS NULL THEN
+        #             NEW.internal_category = 'customer';
+        #         END IF;
                 
-                IF NEW.commercial_partner_id IS NULL THEN
-                    NEW.commercial_partner_id = NEW.id;
-                END IF;
+        #         IF NEW.commercial_partner_id IS NULL THEN
+        #             NEW.commercial_partner_id = NEW.id;
+        #         END IF;
 
-                IF (NEW.display_name IS NULL OR TRIM(NEW.display_name) = '') AND NEW.name IS NOT NULL THEN
-                    NEW.display_name = NEW.name;
-                END IF;
+        #         IF (NEW.display_name IS NULL OR TRIM(NEW.display_name) = '') AND NEW.name IS NOT NULL THEN
+        #             NEW.display_name = NEW.name;
+        #         END IF;
                 
-                -- Set commercial_partner_id to the record's ID after insert
-                -- This requires a BEFORE INSERT trigger to work properly
-                IF NEW.commercial_partner_id IS NULL THEN
-                    -- Using NEW.id directly in a BEFORE INSERT trigger
-                    -- This will work since the record already has an ID before the trigger
-                    NEW.commercial_partner_id = NEW.id;
-                END IF;
+        #         -- Set commercial_partner_id to the record's ID after insert
+        #         -- This requires a BEFORE INSERT trigger to work properly
+        #         IF NEW.commercial_partner_id IS NULL THEN
+        #             -- Using NEW.id directly in a BEFORE INSERT trigger
+        #             -- This will work since the record already has an ID before the trigger
+        #             NEW.commercial_partner_id = NEW.id;
+        #         END IF;
                 
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
+        #         RETURN NEW;
+        #     END;
+        #     $$ LANGUAGE plpgsql;
             
-            CREATE TRIGGER set_partner_defaults
-            BEFORE INSERT ON res_partner
-            FOR EACH ROW
-            EXECUTE FUNCTION set_partner_defaults_func();
-        """)
+        #     CREATE TRIGGER set_partner_defaults
+        #     BEFORE INSERT ON res_partner
+        #     FOR EACH ROW
+        #     EXECUTE FUNCTION set_partner_defaults_func();
+        # """)
 
         # Create AFTER INSERT trigger for commercial_partner_id
-        self.env.cr.execute("""
-            CREATE OR REPLACE FUNCTION set_partner_defaults_after_func()
-            RETURNS TRIGGER AS $$
-            BEGIN
-                IF NEW.commercial_partner_id IS NULL THEN
-                    UPDATE res_partner SET commercial_partner_id = NEW.id WHERE id = NEW.id;
-                END IF;
+        # self.env.cr.execute("""
+        #     CREATE OR REPLACE FUNCTION set_partner_defaults_after_func()
+        #     RETURNS TRIGGER AS $$
+        #     BEGIN
+        #         IF NEW.commercial_partner_id IS NULL THEN
+        #             UPDATE res_partner SET commercial_partner_id = NEW.id WHERE id = NEW.id;
+        #         END IF;
                 
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
+        #         RETURN NEW;
+        #     END;
+        #     $$ LANGUAGE plpgsql;
             
-            CREATE TRIGGER set_partner_defaults_after
-            AFTER INSERT ON res_partner
-            FOR EACH ROW
-            EXECUTE FUNCTION set_partner_defaults_after_func();
-        """)
+        #     CREATE TRIGGER set_partner_defaults_after
+        #     AFTER INSERT ON res_partner
+        #     FOR EACH ROW
+        #     EXECUTE FUNCTION set_partner_defaults_after_func();
+        # """)
 
         # self.cron_run_risk_assessment()
 
@@ -1789,6 +1786,8 @@ class Customer(models.Model):
             if record.composite_risk_score and record.composite_risk_score >0:
                 composite_risk_score = record.composite_risk_score
                 score = composite_risk_score + score
+            if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
+                score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
 
             # Use ORM write method to update and track changes
             record.sudo().write({

@@ -156,46 +156,52 @@ class CustomerScreeningResult(models.Model):
         if not customer_name and not customer_firstname and not customer_lastname:
             return results
 
-        # Build SQL query for optimized matching
-        query = """
-            SELECT id, name, firstname, lastname
-            FROM pep_list
-            WHERE 1=0
-        """
+        # Build SQL query conditions and parameters
+        conditions = []
         params = []
 
+        # Add condition for full name match
         if customer_name:
-            query = query.replace("1=0", "LOWER(REPLACE(name, ' ', '')) = %s")
+            conditions.append("LOWER(REPLACE(name, ' ', '')) = %s")
             params.append(customer_name)
 
+        # Add condition for first name and last name match
         if customer_firstname and customer_lastname:
-            if params:
-                query = query.replace(
-                    "1=0", "1=0 OR (LOWER(REPLACE(firstname, ' ', '')) = %s AND LOWER(REPLACE(lastname, ' ', '')) = %s)")
-                params.extend([customer_firstname, customer_lastname])
-            else:
-                query = query.replace(
-                    "1=0", "(LOWER(REPLACE(firstname, ' ', '')) = %s AND LOWER(REPLACE(lastname, ' ', '')) = %s)")
-                params.extend([customer_firstname, customer_lastname])
+            conditions.append("(LOWER(REPLACE(firstname, ' ', '')) = %s AND LOWER(REPLACE(lastname, ' ', '')) = %s)")
+            params.extend([customer_firstname, customer_lastname])
 
-        if not params:
+        # If no valid conditions, return empty results
+        if not conditions:
             return results
 
-        self.env.cr.execute(query, tuple(params))
-        pep_records = self.env.cr.dictfetchall()
+        # Build the final query
+        query = f"""
+            SELECT id, name, firstname, lastname
+            FROM pep_list
+            WHERE {' OR '.join(conditions)}
+        """
 
-        for pep in pep_records:
-            results.append({
-                'list_type': 'pep',
-                'match_id': f'pep.list,{pep["id"]}'
-            })
+        try:
+            self.env.cr.execute(query, tuple(params))
+            pep_records = self.env.cr.dictfetchall()
 
-            # Update the likely match for quick reference
-            partner.write({'likely_pep_match_id': pep["id"]})
-            break
+            for pep in pep_records:
+                results.append({
+                    'list_type': 'pep',
+                    'match_id': f'pep.list,{pep["id"]}'
+                })
+
+                # Update the likely match for quick reference
+                partner.write({'likely_pep_match_id': pep["id"]})
+                break
+
+        except Exception as e:
+            _logger.error(f"Error executing PEP screening query: {e}")
+            # Return empty results on error to prevent system crash
+            return []
 
         return results
-
+    
     @api.model
     def _screen_customer_against_watchlist(self, partner):
         """Screen customer against Watchlist using BVN with direct SQL query"""
@@ -255,6 +261,7 @@ class CustomerScreeningResult(models.Model):
 
         return results
 
+
     @api.model
     def _screen_customer_against_sanction(self, partner):
         """Screen customer against Sanction list using optimized SQL query"""
@@ -272,46 +279,52 @@ class CustomerScreeningResult(models.Model):
         if not customer_name and not customer_firstname and not customer_lastname:
             return results
 
-        # Build SQL query for optimized matching
-        query = """
-            SELECT id, name, first_name, surname
-            FROM sanction_list
-            WHERE 1=0
-        """
+        # Build SQL query conditions and parameters
+        conditions = []
         params = []
 
+        # Add condition for full name match
         if customer_name:
-            query = query.replace("1=0", "LOWER(REPLACE(name, ' ', '')) = %s")
+            conditions.append("LOWER(REPLACE(name, ' ', '')) = %s")
             params.append(customer_name)
 
+        # Add condition for first name and surname match
         if customer_firstname and customer_lastname:
-            if params:
-                query = query.replace(
-                    "1=0", "1=0 OR (LOWER(REPLACE(first_name, ' ', '')) = %s AND LOWER(REPLACE(surname, ' ', '')) = %s)")
-                params.extend([customer_firstname, customer_lastname])
-            else:
-                query = query.replace(
-                    "1=0", "(LOWER(REPLACE(first_name, ' ', '')) = %s AND LOWER(REPLACE(surname, ' ', '')) = %s)")
-                params.extend([customer_firstname, customer_lastname])
+            conditions.append("(LOWER(REPLACE(first_name, ' ', '')) = %s AND LOWER(REPLACE(surname, ' ', '')) = %s)")
+            params.extend([customer_firstname, customer_lastname])
 
-        if not params:
+        # If no valid conditions, return empty results
+        if not conditions:
             return results
 
-        self.env.cr.execute(query, tuple(params))
-        sanction_records = self.env.cr.dictfetchall()
+        # Build the final query
+        query = f"""
+            SELECT id, name, first_name, surname
+            FROM sanction_list
+            WHERE {' OR '.join(conditions)}
+        """
 
-        for sanction in sanction_records:
-            results.append({
-                'list_type': 'sanction',
-                'match_id': f'sanction.list,{sanction["id"]}'
-            })
+        try:
+            self.env.cr.execute(query, tuple(params))
+            sanction_records = self.env.cr.dictfetchall()
 
-            # Update the likely match for quick reference
-            partner.write({'likely_sanction_match_id': sanction["id"]})
-            break
+            for sanction in sanction_records:
+                results.append({
+                    'list_type': 'sanction',
+                    'match_id': f'sanction.list,{sanction["id"]}'
+                })
+
+                # Update the likely match for quick reference
+                partner.write({'likely_sanction_match_id': sanction["id"]})
+                break
+
+        except Exception as e:
+            _logger.error(f"Error executing sanction screening query: {e}")
+            # Return empty results on error to prevent system crash
+            return []
 
         return results
-
+    
     @api.model
     def _screen_customer_against_global_pep(self, partner):
         """Screen customer against Global PEP list using optimized SQL query"""
@@ -329,45 +342,52 @@ class CustomerScreeningResult(models.Model):
         if not customer_name and not customer_firstname and not customer_lastname:
             return results
 
-        # Build SQL query for optimized matching
-        query = """
-            SELECT id, name, first_name, surname
-            FROM res_pep
-            WHERE 1=0
-        """
+        # Build SQL query conditions and parameters
+        conditions = []
         params = []
 
+        # Add condition for full name match
         if customer_name:
-            query = query.replace("1=0", "LOWER(REPLACE(name, ' ', '')) = %s")
+            conditions.append("LOWER(REPLACE(name, ' ', '')) = %s")
             params.append(customer_name)
 
+        # Add condition for first name and surname match
         if customer_firstname and customer_lastname:
-            if params:
-                query = query.replace(
-                    "1=0", "1=0 OR (LOWER(REPLACE(first_name, ' ', '')) = %s AND LOWER(REPLACE(surname, ' ', '')) = %s)")
-                params.extend([customer_firstname, customer_lastname])
-            else:
-                query = query.replace(
-                    "1=0", "(LOWER(REPLACE(first_name, ' ', '')) = %s AND LOWER(REPLACE(surname, ' ', '')) = %s)")
-                params.extend([customer_firstname, customer_lastname])
+            conditions.append("(LOWER(REPLACE(first_name, ' ', '')) = %s AND LOWER(REPLACE(surname, ' ', '')) = %s)")
+            params.extend([customer_firstname, customer_lastname])
 
-        if not params:
+        # If no valid conditions, return empty results
+        if not conditions:
             return results
 
-        self.env.cr.execute(query, tuple(params))
-        pep_records = self.env.cr.dictfetchall()
+        # Build the final query
+        query = f"""
+            SELECT id, name, first_name, surname
+            FROM res_pep
+            WHERE {' OR '.join(conditions)}
+        """
 
-        for pep in pep_records:
-            results.append({
-                'list_type': 'global_pep',
-                'match_id': f'res.pep,{pep["id"]}'
-            })
+        try:
+            self.env.cr.execute(query, tuple(params))
+            pep_records = self.env.cr.dictfetchall()
 
-            # Update the likely match for quick reference
-            partner.write({'likely_global_pep_match_id': pep["id"]})
-            break
+            for pep in pep_records:
+                results.append({
+                    'list_type': 'global_pep',
+                    'match_id': f'res.pep,{pep["id"]}'
+                })
+
+                # Update the likely match for quick reference
+                partner.write({'likely_global_pep_match_id': pep["id"]})
+                break
+
+        except Exception as e:
+            _logger.error(f"Error executing global PEP screening query: {e}")
+            # Return empty results on error to prevent system crash
+            return []
 
         return results
+    
 
     def screen_customer(self, partner_id):
         """Screen a customer against all lists"""
@@ -400,60 +420,75 @@ class CustomerScreeningResult(models.Model):
             all_results.extend(self._screen_customer_against_global_pep(partner))
             status.global_pep_status = True
 
-        # Create screening results
+        # Process screening results with proper transaction handling
+        created_results = []
         for result in all_results:
-            # Check if a similar result already exists
-            existing = self.search([
-                ('partner_id', '=', partner.id),
-                ('list_type', '=', result['list_type']),
-                ('active', '=', True)
-            ], limit=1)
+            try:
+                # Use a savepoint for each result to handle individual failures
+                with self.env.cr.savepoint():
+                    # Check if a similar result already exists
+                    existing = self.search([
+                        ('partner_id', '=', partner.id),
+                        ('list_type', '=', result['list_type']),
+                        ('active', '=', True)
+                    ], limit=1)
 
-            # Convert match_id to string for proper comparison
-            match_id_str = result['match_id']
+                    # Convert match_id to string for proper comparison
+                    match_id_str = result['match_id']
 
-            if existing:
-                # Fix: Convert existing.match_id to string for comparison
-                existing_match_id = False
-                if existing.match_id:
-                    existing_match_id = f"{existing.match_id._name},{existing.match_id.id}"
+                    if existing:
+                        # Fix: Convert existing.match_id to string for comparison
+                        existing_match_id = False
+                        if existing.match_id:
+                            existing_match_id = f"{existing.match_id._name},{existing.match_id.id}"
 
-                # Update existing result if the match_id is different
-                if existing_match_id != match_id_str:
-                    try:
-                        existing.write({
+                        # Update existing result if the match_id is different
+                        if existing_match_id != match_id_str:
+                            existing.write({
+                                'match_id': match_id_str,
+                                'state': 'pending',  # Reset to pending since it's a new match
+                                'reviewed_by_id': False,
+                                'review_date': False
+                            })
+                            _logger.info(
+                                f"Updated existing screening result for partner {partner.id} with new match: {match_id_str}")
+                            created_results.append(existing)
+                    else:
+                        # Create new result with mail tracking disabled to avoid follower conflicts
+                        new_result = self.with_context(mail_create_nolog=True, mail_create_nosubscribe=True).create({
+                            'partner_id': partner.id,
+                            'list_type': result['list_type'],
                             'match_id': match_id_str,
-                            'state': 'pending',  # Reset to pending since it's a new match
-                            'reviewed_by_id': False,
-                            'review_date': False
+                            'state': 'pending',
+                            'active': True
                         })
                         _logger.info(
-                            f"Updated existing screening result for partner {partner.id} with new match: {match_id_str}")
-                    except Exception as e:
-                        _logger.error(
-                            f"Error updating existing screening result: {e}")
-            else:
-                # Create new result
-                try:
-                    self.create({
-                        'partner_id': partner.id,
-                        'list_type': result['list_type'],
-                        'match_id': match_id_str,
-                        'state': 'pending',
-                        'active': True
-                    })
-                    _logger.info(
-                        f"Created new screening result for partner {partner.id}: {match_id_str}")
-                except Exception as e:
-                    _logger.error(f"Error creating new screening result: {e}")
+                            f"Created new screening result for partner {partner.id}: {match_id_str}")
+                        created_results.append(new_result)
+
+            except Exception as e:
+                _logger.error(f"Error processing screening result for partner {partner.id}, list_type {result['list_type']}: {e}")
+                # Continue with other results even if one fails
+                continue
 
         # Update last screening date
-        status.write({'last_screening_date': fields.Datetime.now()})
+        try:
+            status.write({'last_screening_date': fields.Datetime.now()})
+        except Exception as e:
+            _logger.error(f"Error updating screening status: {e}")
 
         # If matches found, update risk score and send notification
-        if all_results:
-            partner.action_compute_risk_score_with_plan()
-            email_sent = self._send_screening_notification(partner, all_results)
+        if created_results:
+            try:
+                partner.action_compute_risk_score_with_plan()
+            except Exception as e:
+                _logger.error(f"Error computing risk score: {e}")
+            
+            try:
+                email_sent = self._send_screening_notification(partner, all_results)
+            except Exception as e:
+                _logger.error(f"Error sending screening notification: {e}")
+                email_sent = False
 
             # Return dict with both match status and email status
             return {
@@ -462,7 +497,7 @@ class CustomerScreeningResult(models.Model):
             }
 
         return False  # No matches found
-
+    
     @api.model
     def _send_screening_notification(self, partner, results):
         """Send email notification for screening results
@@ -654,279 +689,6 @@ class CustomerScreeningResult(models.Model):
             _logger.error(
                 f"Error in screening notification process: {e}", exc_info=True)
             return False
-
-    # @api.model
-    # def _send_screening_notification(self, partner, results):
-    #     """Send email notification for screening results"""
-    #     try:
-    #         sc_alert_records = self.env['res.partner.screening.alert'].search([])
-    #         # Collect all users from the alert_officers Many2many field
-    #         officers = sc_alert_records.mapped('sanction_alert_officers')
-    #         if not officers:
-    #             _logger.warning("No officers configured for alerts")
-    #             return
-
-    #         # Get from email with fallbacks
-    #         from_email = self.env['ir.config_parameter'].sudo(
-    #         ).get_param('mail.default.from')
-    #         _logger.info(
-    #             f"Retrieved mail.default.from in ir.config value: '{from_email}'")
-
-    #         if not from_email:
-    #             from_email = "developer@novajii.com"
-    #             _logger.info(f"Using hardcoded fallback email: '{from_email}'")
-
-    #         officers_email = ", ".join(officers.mapped('email')) or ""
-
-    #         template = self.env.ref(
-    #             'compliance_management.email_template_screening_alert', raise_if_not_found=False)
-    #         if not template:
-    #             _logger.warning("Email template for screening alert not found")
-    #             return
-
-    #         # Get company logo safely
-    #         def get_company_logo():
-    #             try:
-    #                 # Try user's company first
-    #                 company = self.env.user.company_id
-    #                 if company and company.logo_web:
-    #                     return company.logo_web.decode('utf-8')
-
-    #                 # Try current company
-    #                 company = self.env.company
-    #                 if company and company.logo_web:
-    #                     return company.logo_web.decode('utf-8')
-
-    #                 # Try first company in system
-    #                 company = self.env['res.company'].sudo().search([], limit=1)
-    #                 if company and company.logo_web:
-    #                     return company.logo_web.decode('utf-8')
-
-    #                 return None
-    #             except Exception as e:
-    #                 _logger.warning(f"Error getting company logo: {e}")
-    #                 return None
-
-    #         # Generate URL for the record
-    #         base_url = self.env['ir.config_parameter'].sudo(
-    #         ).get_param('web.base.url')
-    #         try:
-    #             action = self.env.ref(
-    #                 'compliance_management.action_screening_result_pending')
-    #             record_url = f"{base_url}/web#id={partner.id}&action={action.id}&model=res.partner.screening.result&view_type=tree"
-    #         except Exception as e:
-    #             _logger.warning(f"Could not get action reference: {e}")
-    #             record_url = f"{base_url}/web#id={partner.id}&model=res.partner.screening.result&view_type=form"
-
-    #         domain_url = self.get_partner_filtered_tree_url(partner)
-    #         _logger.warning(f"Domain Link to record : {domain_url}")
-    #         # Format date as string to avoid serialization issues
-    #         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    #         # Safe attribute getter
-    #         def safe_getattr(obj, attr, default='N/A'):
-    #             try:
-    #                 value = getattr(obj, attr, default)
-    #                 return str(value) if value is not None else default
-    #             except Exception:
-    #                 return default
-
-    #         # Prepare context for template - AVOID referencing any specific record object
-    #         ctx = {
-    #             'partner': partner,
-    #             'results': results or [],
-    #             'record_url': record_url,
-    #             'officers_email': officers_email,
-    #             'datetime': current_time,
-    #             'from_email': from_email,
-    #             'name': safe_getattr(partner, 'name', 'Unknown'),
-    #             'bvn': safe_getattr(partner, 'bvn'),
-    #             'risk_score': safe_getattr(partner, 'risk_score'),
-    #             'risk_level': safe_getattr(partner, 'risk_level'),
-    #             'customer_id': safe_getattr(partner, 'customer_id'),
-    #             'company_logo': get_company_logo(),  # Safe logo getter
-    #         }
-
-    #         # Create a minimal mail values dict instead of using a record
-    #         try:
-    #             # Render template manually to avoid record dependency
-    #             mail_values = {
-    #                 'subject': 'Sanction Screening Alert: Potential Match Found!',
-    #                 'email_from': from_email,
-    #                 'email_to': officers_email,
-    #                 'auto_delete': False,
-    #                 'model': 'res.partner',
-    #                 'res_id': partner.id,
-    #             }
-
-    #             # Render the body HTML safely
-    #             try:
-    #                 # Use template rendering without a specific record
-    #                 rendered_body = template.with_context(**ctx)._render_template(
-    #                     template.body_html,
-    #                     template.model,
-    #                     [partner.id],  # Use partner ID instead
-    #                     engine='qweb',
-    #                     add_context=ctx
-    #                 ).get(partner.id, '')
-
-    #                 mail_values['body_html'] = rendered_body
-
-    #             except Exception as render_error:
-    #                 _logger.error(f"Template rendering failed: {render_error}")
-    #                 # Create a simple fallback email body
-
-    #             # Create and send mail
-    #             mail = self.env['mail.mail'].sudo().create(mail_values)
-    #             mail.send()
-
-    #             if mail.state == 'sent':
-    #                 _logger.info(
-    #                     f"Screening notification sent to officers: {officers_email}")
-
-    #                 # Save to alert history
-    #                 try:
-    #                     # Determine risk level
-    #                     partner_risk_score = float(
-    #                         partner.risk_score) if partner.risk_score else 0.0
-    #                     alert_risk_level = "low"  # default
-
-    #                     try:
-    #                         low_threshold = float(
-    #                             self.env['res.compliance.settings'].get_setting('low_risk_threshold'))
-    #                         medium_threshold = float(
-    #                             self.env['res.compliance.settings'].get_setting('medium_risk_threshold'))
-
-    #                         if partner_risk_score <= low_threshold:
-    #                             alert_risk_level = "low"
-    #                         elif partner_risk_score <= medium_threshold:
-    #                             alert_risk_level = "medium"
-    #                         else:
-    #                             alert_risk_level = "high"
-    #                     except Exception as e:
-    #                         _logger.warning(
-    #                             f"Could not determine risk thresholds: {e}")
-
-    #                     self.env['alert.history'].sudo().create({
-    #                         "ref_id": f"res.partner.screening.result,{partner.id}",
-    #                         'html_body': mail_values['body_html'],
-    #                         'attachment_data': None,
-    #                         'attachment_link': None,
-    #                         'last_checked': fields.Datetime.now(),
-    #                         'risk_rating': alert_risk_level,
-    #                         'process_id': None,
-    #                         'source': 'Sanction Screening Alert',
-    #                         'date_created': fields.Datetime.now(),
-    #                         'email': officers_email
-    #                     })
-    #                     _logger.info(
-    #                         f"Alert history record created for partner: {partner.name}")
-
-    #                 except Exception as e:
-    #                     _logger.error(
-    #                         f"Failed to create alert history record: {e}")
-    #             else:
-    #                 _logger.error(f"Mail failed to send. State: {mail.state}")
-
-    #         except Exception as e:
-    #             _logger.error(
-    #                 f"Failed to send screening notification: {e}", exc_info=True)
-
-    #     except Exception as e:
-    #         _logger.error(
-    #             f"Error in screening notification process: {e}", exc_info=True)
-            
-    
-    # def screen_customer(self, partner_id):
-    #     """Screen a customer against all lists"""
-    #     partner = self.env['res.partner'].browse(partner_id)
-    #     if not partner.exists():
-    #         return False
-
-    #     # Get or create screening status
-    #     status = self.env['res.partner.screening.status'].get_status(
-    #         partner_id)
-
-    #     all_results = []
-
-    #     # Get changed lists
-    #     changed_lists = self.check_list_changes()
-
-    #     # Only screen against changed lists
-    #     if 'pep' in changed_lists or not status.pep_status:
-    #         all_results.extend(self._screen_customer_against_pep(partner))
-    #         status.pep_status = True
-
-    #     if 'watchlist' in changed_lists or not status.watchlist_status:
-    #         all_results.extend(
-    #             self._screen_customer_against_watchlist(partner))
-    #         status.watchlist_status = True
-
-    #     if 'sanction' in changed_lists or not status.sanction_status:
-    #         all_results.extend(self._screen_customer_against_sanction(partner))
-    #         status.sanction_status = True
-
-    #     if 'global_pep' in changed_lists or not status.global_pep_status:
-    #         all_results.extend(
-    #             self._screen_customer_against_global_pep(partner))
-    #         status.global_pep_status = True
-
-    #     # Create screening results
-    #     for result in all_results:
-    #         # Check if a similar result already exists
-    #         existing = self.search([
-    #             ('partner_id', '=', partner.id),
-    #             ('list_type', '=', result['list_type']),
-    #             ('active', '=', True)
-    #         ], limit=1)
-
-    #         # Convert match_id to string for proper comparison
-    #         match_id_str = result['match_id']
-
-    #         if existing:
-    #             # Fix: Convert existing.match_id to string for comparison
-    #             existing_match_id = False
-    #             if existing.match_id:
-    #                 existing_match_id = f"{existing.match_id._name},{existing.match_id.id}"
-
-    #             # Update existing result if the match_id is different
-    #             if existing_match_id != match_id_str:
-    #                 try:
-    #                     existing.write({
-    #                         'match_id': match_id_str,
-    #                         'state': 'pending',  # Reset to pending since it's a new match
-    #                         'reviewed_by_id': False,
-    #                         'review_date': False
-    #                     })
-    #                     _logger.info(
-    #                         f"Updated existing screening result for partner {partner.id} with new match: {match_id_str}")
-    #                 except Exception as e:
-    #                     _logger.error(
-    #                         f"Error updating existing screening result: {e}")
-    #         else:
-    #             # Create new result
-    #             try:
-    #                 self.create({
-    #                     'partner_id': partner.id,
-    #                     'list_type': result['list_type'],
-    #                     'match_id': match_id_str,
-    #                     'state': 'pending',
-    #                     'active': True
-    #                 })
-    #                 _logger.info(
-    #                     f"Created new screening result for partner {partner.id}: {match_id_str}")
-    #             except Exception as e:
-    #                 _logger.error(f"Error creating new screening result: {e}")
-
-    #     # Update last screening date
-    #     status.write({'last_screening_date': fields.Datetime.now()})
-
-    #     # If matches found, update risk score
-    #     if all_results:
-    #         partner.action_compute_risk_score_with_plan()
-    #         self._send_screening_notification(partner, all_results)
-
-    #     return bool(all_results)
     
     def get_partner_filtered_tree_url(self, partner):
         """Simple method to get partner-filtered tree view URL"""

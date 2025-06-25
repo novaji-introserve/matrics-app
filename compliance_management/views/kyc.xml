@@ -99,7 +99,7 @@
                             <field name="matched"/>
                             <field name="risk_score"/>
                             <field name="universe_weight_percentage"/>
-                            <field name="weighted_score" />
+                            <!-- <field name="weighted_score" /> -->
 
                         </tree>
                     </field>
