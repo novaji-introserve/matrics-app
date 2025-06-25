@@ -1,0 +1,85 @@
+<odoo>
+    <record id="action_regulatory_report_entity" model="ir.actions.act_window">
+        <field name="name">Regulatory Report Entity</field>
+        <field name="res_model">res.regulatory.report.entity</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first report entity
+            </p>
+
+        </field>
+    </record>
+    <record id="action_regulatory_report_template" model="ir.actions.act_window">
+        <field name="name">Regulatory Report Template</field>
+        <field name="res_model">res.regulatory.report.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first report template
+            </p>
+        </field>
+    </record>
+    <record id="action_regulatory_report_item" model="ir.actions.act_window">
+        <field name="name">Regulatory Report Item</field>
+        <field name="res_model">res.regulatory.report.item</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first report item
+            </p>
+        </field>
+    </record>
+
+    <record id="action_regulatory_report" model="ir.actions.act_window">
+        <field name="name">Regulatory Report</field>
+        <field name="res_model">res.regulatory.report</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first report
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_regulatory_report"
+        name="Regulatory Reports"
+        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="compliance_management.menu_compliance_configuration"
+        sequence="3000" />
+    <menuitem
+        id="menu_regulatory_report_entity"
+        name="Report Entities"
+        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="menu_regulatory_report"
+        action="action_regulatory_report_entity"
+        sequence="5" />
+    <menuitem
+        id="menu_regulatory_report_template"
+        name="Report Templates"
+        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="menu_regulatory_report"
+        action="action_regulatory_report_template"
+        sequence="10" />
+    <menuitem
+        id="menu_regulatory_report_item"
+        name="Report Templates Items"
+        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="menu_regulatory_report"
+        action="action_regulatory_report_item"
+        sequence="20" />
+    <menuitem
+        id="menu_regulatory_report_root"
+        name="Regulatory"
+        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="compliance_management.menu_compliance_root"
+        sequence="1000" />
+    <menuitem
+        id="menu_regulatory_report_report"
+        name="Reports"
+        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="menu_regulatory_report_root"
+        action="action_regulatory_report"
+        sequence="1000" />
+</odoo>
