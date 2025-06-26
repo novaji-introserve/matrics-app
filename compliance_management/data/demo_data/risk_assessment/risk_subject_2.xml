@@ -137,6 +137,21 @@
         <field name="code">NG0020022</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
     </record>
+    <record id="compliance_inst_fc_risk_subject_south_w" model="res.risk.subject">
+        <field name="name">SOUTH WEST</field>
+        <field name="code">NGSOUTH_WEST</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_abj" model="res.risk.subject">
+        <field name="name">ABUJA AND NORTH</field>
+        <field name="code">NG_ABJ_NORTH</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_ss_se" model="res.risk.subject">
+        <field name="name">SOUTH SOUTH AND SOUTH EAST</field>
+        <field name="code">NG_SS_SE</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
 
     <record id="compliance_inst_fc_risk_subject_niger" model="res.risk.subject">
         <field name="name">NIGER</field>
