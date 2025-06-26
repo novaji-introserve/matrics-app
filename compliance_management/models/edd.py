@@ -17,9 +17,9 @@ class CustomerEDD(models.Model):
         string='Status',
         selection=[
             ('draft', 'Draft'),
+            ('submitted', 'Submitted'),
             ('completed', 'Completed'),
             ('approved', 'Approved'),
-            # ('cancelled', 'Cancelled'),
             ('rejected', 'Rejected'),
             # ('deleted', 'Deleted'),
             ('archived', 'Archived')],
@@ -223,7 +223,13 @@ class CustomerEDD(models.Model):
         compute='_compute_is_current_user_approving_officer')
     is_cco = fields.Boolean(compute='_compute_is_cco', store=False,
                             default=lambda self: self._default_is_cco())
+    is_co = fields.Boolean(compute='_compute_is_co', store=False, default=lambda self: self._default_is_co())
+    is_editable_user= fields.Boolean(compute='_compute_is_editable_user',default=lambda self: self._default_is_editable_user(), store=False)
     is_officer_notified = fields.Boolean(string="Officer Notified", default=False)
+    is_relationship_manager = fields.Boolean(compute='_compute_is_relationship_manager',default=lambda self: self._default_is_relationship_manager(), store=False)
+    is_diligence_officer = fields.Boolean(default=lambda self: (self.env.user.has_group('compliance_management.group_compliance_compliance_officer') or
+        self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+    ), store=False)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     reject_reason = fields.Text(string='Reject Reason', tracking =True)
     
@@ -248,6 +254,65 @@ class CustomerEDD(models.Model):
         for record in self:
             record.is_cco = self.env.user.has_group(
                 'compliance_management.group_compliance_chief_compliance_officer')
+            
+    @api.model
+    def _default_is_co(self):
+        """Default method to set is_cco based on the user group."""
+        return self.env.user.has_group('compliance_management.group_compliance_compliance_officer')
+  
+    @api.depends_context('uid')
+    def _compute_is_co(self):
+        """Compute method to update is_cco based on user group when editing records."""
+        for record in self:
+            record.is_co = self.env.user.has_group(
+                'compliance_management.group_compliance_compliance_officer')
+            
+    @api.model
+    def _default_is_editable_user(self):
+        """Allow CO/CCO to create new records"""
+        user = self.env.user
+        is_cco = user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+        is_co = user.has_group('compliance_management.group_compliance_compliance_officer')
+        is_relationship_manager= user.has_group('compliance_management.group_compliance_compliance_risk_manager')
+        return is_cco or is_co or is_relationship_manager 
+            
+    @api.depends_context('uid')
+    def _compute_is_editable_user(self):
+        current_user = self.env.user
+        for record in self:
+            # Check groups once
+            is_cco = current_user.has_group('compliance_management.group_compliance_chief_compliance_officer')
+            is_co = current_user.has_group('compliance_management.group_compliance_compliance_officer')
+            is_relationship_manager= current_user.has_group('compliance_management.group_compliance_compliance_risk_manager')
+            
+            # Handle new vs existing records
+            if not record.id:  # New record (not saved yet)
+                is_creator = True
+                _logger.info(f"[EDD] NEW RECORD - User: {current_user.name} (ID: {current_user.id})")
+            else:  # Existing record
+                is_creator = record.user_id.id == current_user.id if record.user_id else False
+                _logger.info(f"[EDD] EXISTING RECORD - User: {current_user.name} (ID: {current_user.id})")
+                _logger.info(f"[EDD] Record ID: {record.id}, User ID: {record.user_id}")
+            
+            # Calculate editability
+            record.is_editable_user = is_cco or (is_co and is_creator) or (is_relationship_manager and is_creator)
+            
+            # Final logging
+            _logger.info(f"[EDD] Is CCO: {is_cco}, Is CO: {is_co}, Is Creator: {is_creator}")
+            _logger.info(f"[EDD] Editable: {record.is_editable_user}")
+
+
+    @api.model
+    def _default_is_relationship_manager(self):
+        return self.env.user.has_group('compliance_management.group_compliance_compliance_risk_manager')
+  
+    @api.depends_context('uid')
+    def _compute_is_relationship_manager(self):
+        for record in self:
+            record.is_relationship_manager = self.env.user.has_group(
+                'compliance_management.group_compliance_compliance_risk_manager')
+            
+
 
     @api.depends('responsible_id')
     def _compute_is_current_user_responsible(self):
@@ -448,11 +513,12 @@ class CustomerEDD(models.Model):
         if (self.is_current_user_responsible and
             self.status == 'draft' and
             not self.is_cco and
+            not self.is_co and
             not self.attestation_checked):
             raise ValidationError("Attestation must be checked before submission.")
 
         self.write({
-            'status': 'completed',
+            'status': 'submitted',
             'date_reviewed': fields.Date.today()
         })
 
@@ -500,13 +566,41 @@ class CustomerEDD(models.Model):
                 'sticky': False,
             },
         }
+    
+    def action_mark_review_completed(self):
+        self.ensure_one()
+        if (self.is_current_user_approving_officer and
+            self.status == 'submitted' and
+            not self.approving_officer_signature):
+            raise ValidationError("Signature must be uploaded before completing review.")
+        self.write({
+            'status': 'completed',
+        })
+
+        self._send_email_to_officers(
+            "compliance_management.enhanced_due_diligence_approved_template", to_cco_only=False)
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Enhanced Due Diligence'),
+            'res_model': 'res.partner.edd',
+            'view_mode': 'list,form',
+            'view_id': False,
+            'views': [
+                (self.env.ref('compliance_management.edd_tree_view').id, 'list'),
+                (False, 'form')
+            ],
+            'target': 'main',
+            'context': {
+                'message': _('Review Completed.'),
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
 
     def action_approve(self):
         self.ensure_one()
-        if (self.is_current_user_approving_officer and
-            self.status == 'completed' and
-            not self.approving_officer_signature):
-            raise ValidationError("Signature must be uploaded before approval.")
         self.write({
             'status': 'approved',
             'approved_by': self.env.user.id,

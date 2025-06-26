@@ -33,9 +33,9 @@
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
-        # "data/demo_data/branch/res.branch.csv", #BRANCH
-        # "data/demo_data/region/res.partner.region.csv",#REGION
-        # "data/demo_data/industries/customer.industry.csv",#INDUSTRY
+        "data/demo_data/branch/res.branch.csv", #BRANCH
+        "data/demo_data/region/res.partner.region.csv",#REGION
+        "data/demo_data/industries/customer.industry.csv",#INDUSTRY
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -107,7 +107,7 @@
         'data/transaction_screening_rule.xml',
         # "data/demo_data/sanction/sanction_screening.xml", # SANCTION SCREENING DATA
         # "data/demo_data/chart/charts.xml", #CHARTS
-        # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
+        "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
         # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
         # "data/transactions.xml", # TRANSACTION
         # "views/res_users.xml",
