@@ -139,11 +139,8 @@
                             <field name="is_editable_user" invisible="1"/>
                             <field name="is_relationship_manager" invisible="1"/>
                             <field name="is_diligence_officer" invisible="1"/>
-                            <field name="name" attrs="{'readonly': ['|', ('is_editable_user', '=', False), ('status', 'in', ['approved','archived','completed'])], 'required': [('is_editable_user', '=', True)]}"/>
                             <field name="is_officer_notified" invisible="1"/>
-                            <field name="is_editable_user"/>
-                            <field name="status"/>
-                            <field name="is_relationship_manager"/>
+                            <field name="name" attrs="{'readonly': ['|', ('is_editable_user', '=', False), ('status', 'in', ['approved','archived','completed'])], 'required': [('is_editable_user', '=', True)]}"/>
                         </group>
 
                         <group>

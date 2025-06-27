@@ -337,32 +337,54 @@ class CustomerEDD(models.Model):
     
 
     # logic to send email      
-    def _send_email_to_officers(self, template_ref, to_cco_only, officer=None):
+    def _send_email_to_officers(self, template_ref, to_creator_only, officer=None):
+        """
+        Send email notifications for EDD workflow.
+        
+        Args:
+            template_ref: Reference to email template
+            to_creator_only: Boolean - if True, send only to creator
+            officer: Target officer to receive the email (if not to_creator_only)
+        """
         try:
+            # Get email template
             template = self.env.ref(template_ref, raise_if_not_found=False)
             if not template:
                 _logger.error(f"Email template not found: {template_ref}")
                 raise ValidationError("Email template not found")
 
-            # Fetch CCO user group
-            cco_group = self.env.ref(
-                'compliance_management.group_compliance_chief_compliance_officer')
-            cco_users = cco_group.users
+            # Get compliance officer groups
+            compliance_groups = [
+                self.env.ref('compliance_management.group_compliance_chief_compliance_officer'),
+                self.env.ref('compliance_management.group_compliance_compliance_officer'),
+                self.env.ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ]
             
-            # Get the initiating CCO details (user who created the record)
-            initiating_cco = self.create_uid
-            cco_email = initiating_cco.email if initiating_cco in cco_users and initiating_cco.email else None
-            cco_name = initiating_cco.name if cco_email else None
+            # Get all users from compliance groups
+            compliance_users = self.env['res.users']
+            for group in compliance_groups:
+                compliance_users |= group.users
 
-            # Get current user (the officer sending the notification)
+            # Get creator details (user who created the EDD record)
+            creator = self.user_id or self.create_uid
+            creator_email = None
+            creator_name = None
+            
+            if creator and creator in compliance_users and creator.email:
+                creator_email = creator.email
+                creator_name = creator.name
+
+            # Get current user (officer performing the action)
             current_user = self.env.user
-            sending_officer_email = current_user.email if current_user.email else None
+            current_user_email = current_user.email if current_user.email else None
 
+            # Determine target officer
             if officer:
                 _logger.info(f"Using provided officer: {officer.name}")
                 target_officer = officer
             else:
-                target_officer = self.approving_officer_id or officer.responsible_id
+                target_officer = self.approving_officer_id or self.responsible_id
+                _logger.info(f"Using provided officer: {target_officer.name}")
             
             officer = target_officer 
             officer_email = officer.email
@@ -370,43 +392,68 @@ class CustomerEDD(models.Model):
             if officer is None or not officer_email:
                 _logger.warning("No valid officer found or officer has no email.")
                 raise ValidationError("No valid officer to send email to.")
-
+            
+            # Build EDD URL
             base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
             edd_url = f"{base_url}/web#id={self.id}&model=res.partner.edd&view_type=tree"
-            _logger.info(f"EDD URL: {edd_url}")
-
+            
             # Prepare email context
             email_context = {
                 'officer_name': officer.name,
-                'cco': cco_name,
+                'cco': creator_name,
                 'edd_url': edd_url,
+                'record_name': self.name or f"EDD-{self.id}",
             }
-            # Determine email recipients
-            if to_cco_only:
-                primary_email = cco_email
-                email_values = {'email_to': cco_email}
-                # If sending officer is different from CCO, add them to CC
-                if sending_officer_email and sending_officer_email != cco_email:
-                    email_values['email_cc'] = sending_officer_email
-                    
-                _logger.info(f"{template.name} notification sent to {cco_email}")
+
+            # Handle email routing based on to_creator_only flag
+            primary_email = None  # Initialize primary_email variable
+            
+            if to_creator_only:
+                # Send to creator only, CC current user if different
+                if not creator_email:
+                    raise ValidationError("Creator email not found or creator is not a compliance officer.")
+                
+                email_values = {'email_to': creator_email}
+                primary_email = creator_email
+                
+                # Add current user to CC if different from creator
+                if current_user_email and current_user_email != creator_email:
+                    email_values['email_cc'] = current_user_email
+                
+                recipient_info = f"creator ({creator_email})"
+                cc_info = email_values.get('email_cc', 'none')
+                
             else:
-                primary_email = officer_email
+                # Send to target officer, CC creator and current user
+                if not target_officer or not target_officer.email:
+                    raise ValidationError("No valid target officer with email found.")
+                
+                email_values = {'email_to': target_officer.email}
+                primary_email = target_officer.email
+                
                 # Build CC list
                 cc_emails = []
-                if cco_email:
-                    cc_emails.append(cco_email)
-                if sending_officer_email and sending_officer_email != officer_email and sending_officer_email != cco_email:
-                    cc_emails.append(sending_officer_email)
                 
-                email_values = {'email_to': officer_email}
+                # Add creator to CC if exists and different from target
+                if creator_email and creator_email != target_officer.email:
+                    cc_emails.append(creator_email)
                 
-                # Only add CC if there are emails to CC
+                # Add current user to CC if different from target and creator
+                if (current_user_email and 
+                    current_user_email != target_officer.email and 
+                    current_user_email != creator_email):
+                    cc_emails.append(current_user_email)
+                
+                # Set CC if we have any
                 if cc_emails:
                     email_values['email_cc'] = ','.join(cc_emails)
                 
-                _logger.info(f"{template.name} notification sent to {officer.email} with CC to {email_values.get('email_cc', 'none')}")
-                
+                recipient_info = f"target officer ({target_officer.email})"
+                cc_info = email_values.get('email_cc', 'none')
+
+            # Log email details
+            _logger.info(f"Sending {template.name} notification to {recipient_info}, CC: {cc_info}")
+            
             try:
                 template_with_context = template.with_context(**email_context)
                 
@@ -421,7 +468,7 @@ class CustomerEDD(models.Model):
                 _logger.info(f"Email values: {email_values}")
                 
                 if email_result:    
-                    _logger.info(f"Email sent successfully to {primary_email}")
+                    _logger.info(f"Email sent successfully to {email_values}")
                     
                     try:
                         # Get the rendered HTML for history 
@@ -433,7 +480,7 @@ class CustomerEDD(models.Model):
                         )[self.id]
                         
                         # Create alert history record 
-                        alert_history = self.env['alert.history'].sudo(flag=True).create({
+                        alert_history = self.env['alert.history'].sudo().create({
                             "ref_id": f"{self._name},{self.id}",
                             'html_body': rendered_html,
                             'attachment_data': None,
@@ -453,15 +500,20 @@ class CustomerEDD(models.Model):
                         
                     except Exception as history_error:
                         _logger.error(f"Failed to create alert history: {str(history_error)}")
+                        
+                    return email_result
                 else:
                     error_msg = "Email sending returned no mail ID - send may have failed"
                     _logger.error(error_msg)
                     raise ValidationError(f"Failed to send email: {error_msg}")
             
             except Exception as send_error:
-                _logger.error(f"Failed to send email or create history: {str(send_error)}")
+                _logger.error(f"Failed to send email: {str(send_error)}")
                 raise ValidationError(f"Failed to send notification: {str(send_error)}")
             
+        except ValidationError:
+            # Re-raise validation errors
+            raise
         except Exception as e:
             _logger.error(f"{template.name} Failed to send notification: {str(e)}")
             raise ValidationError(f"{template.name} Failed to send notification: {str(e)}")
@@ -473,7 +525,7 @@ class CustomerEDD(models.Model):
         })
         _logger.info(f"Creating EDD record with values: {self}")
         self._send_email_to_officers(
-            'compliance_management.enhanced_due_diligence_assessment_template', to_cco_only=False)
+            'compliance_management.enhanced_due_diligence_assessment_template', to_creator_only=False, officer= self.responsible_id)
         
         return {
             'type': 'ir.actions.act_window',
@@ -523,7 +575,7 @@ class CustomerEDD(models.Model):
         })
 
         self._send_email_to_officers(
-            'compliance_management.enhanced_due_diligence_review_template', to_cco_only=False)
+            'compliance_management.enhanced_due_diligence_review_template', to_creator_only=False)
 
         # try:
         #     template = self.env.ref('compliance_management.enhanced_due_diligence_review_template', raise_if_not_found=False)
@@ -577,8 +629,41 @@ class CustomerEDD(models.Model):
             'status': 'completed',
         })
 
-        self._send_email_to_officers(
-            "compliance_management.enhanced_due_diligence_approved_template", to_cco_only=False)
+
+        for record in self:
+            creator_user = record.user_id
+
+            if creator_user and creator_user.has_group('compliance_management.group_compliance_compliance_risk_manager'):
+                # Notify CCO and CO officers
+                template = self.env.ref("compliance_management.enhanced_due_diligence_approval_reqired_template", raise_if_not_found=False)
+                if not template:
+                    raise ValidationError("Missing email template: enhanced_due_diligence_approval_reqired_template")
+
+                # Get group users
+                cco_group = self.env.ref("compliance_management.group_compliance_chief_compliance_officer")
+                co_group = self.env.ref("compliance_management.group_compliance_compliance_officer")
+
+                officer_users = (cco_group.users | co_group.users).filtered(lambda u: u.email)
+                emails = [user.email for user in officer_users]
+
+                if not emails:
+                    raise ValidationError("No CO/CCO email addresses found.")
+
+                base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                edd_url = f"{base_url}/web#id={record.id}&model=res.partner.edd&view_type=form"
+
+                for officer in officer_users:
+                    template.with_context({
+                        'edd_url': edd_url,
+                        'record_name': record.name,
+                        'officer_name': officer.name, 
+                    }).send_mail(
+                        record.id,
+                        force_send=True,
+                        email_values={'email_to': officer.email}
+                    )
+                
+        self._send_email_to_officers("compliance_management.enhanced_due_diligence_completed_template", to_creator_only=False)
 
         return {
             'type': 'ir.actions.act_window',
@@ -608,7 +693,8 @@ class CustomerEDD(models.Model):
         })
 
         self._send_email_to_officers(
-            "compliance_management.enhanced_due_diligence_approved_template", to_cco_only=False)
+            "compliance_management.enhanced_due_diligence_approved_template", to_creator_only=True)
+            
 
         return {
             'type': 'ir.actions.act_window',
@@ -637,7 +723,7 @@ class CustomerEDD(models.Model):
         })
 
         self._send_email_to_officers(
-            'compliance_management.enhanced_due_diligence_cancellation_template', to_cco_only=True)
+            'compliance_management.enhanced_due_diligence_cancellation_template', to_creator_only=True)
 
         return {
             'type': 'ir.actions.act_window',
@@ -665,7 +751,7 @@ class CustomerEDD(models.Model):
             'date_approved': False,
         })
         self._send_email_to_officers(
-            'compliance_management.enhanced_due_diligence_sent_back_template', to_cco_only=True)
+            'compliance_management.enhanced_due_diligence_sent_back_template', to_creator_only=True)
 
         return {
             'type': 'ir.actions.act_window',
@@ -689,7 +775,7 @@ class CustomerEDD(models.Model):
         self.ensure_one()
 
         self._send_email_to_officers(
-            'compliance_management.enhanced_due_diligence_archived_template', to_cco_only=True)
+            'compliance_management.enhanced_due_diligence_archived_template', to_creator_only=True)
         
         result = super().action_archive()
 
@@ -725,7 +811,7 @@ class CustomerEDD(models.Model):
             'reject_reason': reject_reason or False,
         })
         self._send_email_to_officers(
-            'compliance_management.enhanced_due_diligence_rejected_template', to_cco_only=True)
+            'compliance_management.enhanced_due_diligence_rejected_template', to_creator_only=True)
 
         return {
             'type': 'ir.actions.act_window',
