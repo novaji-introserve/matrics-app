@@ -118,7 +118,7 @@
                             t-att-src="'data:image/png;base64,%s' % object.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
                     </div>
 
-                    <p>Dear <t t-out="ctx.get('officer_name')"></t>,</p>
+                    <p>Dear <t t-out="ctx.get('cco')"></t>,</p>
 
                     <p>
                         An Enhanced Due Diligence has been approved.

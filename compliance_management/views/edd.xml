@@ -125,7 +125,7 @@
                             type="object"
                             class="oe_highlight"
                             groups="compliance_management.group_compliance_branch_compliance_officer"
-                            attrs="{'invisible': [('status', 'not in', ['approved', 'archived', 'completed'])]}" />
+                            attrs="{'invisible': [('status', 'not in', ['approved', 'archived'])]}" />
                    
 
 
