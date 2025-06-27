@@ -23,8 +23,8 @@ class Watchlist(models.Model):
         comodel_name='res.partner', string='Customer', required=False, index=True)
     bvn = fields.Char(string='BVN', index=True)
     source = fields.Char(string='Source', tracking=True, index=True)
-
-
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
     def init(self):
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_watchlist_id_idx ON res_partner_watchlist (id)")
@@ -34,3 +34,4 @@ class Watchlist(models.Model):
             ALTER TABLE res_partner_watchlist
             DROP CONSTRAINT IF EXISTS res_partner_watchlist_watchlist_id
         """)
+        

@@ -25,6 +25,7 @@ class PepCustomer(models.Model):
     unique_id = fields.Char(string='Unique Identifier', tracking=True, default=lambda self: str(uuid.uuid4()), readonly=True,  copy=False)
     position = fields.Text(string='Position', tracking=True)
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute(f"""
@@ -76,3 +77,4 @@ class PepCustomer(models.Model):
     #                 c.action_compute_risk_score_with_plan()
     #             except:
     #                 pass
+    

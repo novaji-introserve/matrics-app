@@ -74,6 +74,8 @@ class Statistic(models.Model):
     )
     last_error_message = fields.Text(string="Last Error Message", readonly=True)
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
     def _prepare_and_validate_query(self, sql_query):
         """Prepare and validate SQL query, ensuring it meets safety requirements.
         Args:
@@ -290,3 +292,4 @@ class Statistic(models.Model):
                     "sticky": False,
                 },
             }
+            

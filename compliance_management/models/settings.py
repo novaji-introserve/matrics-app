@@ -17,6 +17,8 @@ class ComplianceSettings(models.Model):
     val = fields.Char(string='Value')
     narration = fields.Text(string='Narration')
     
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
     @api.model
     def get_setting(self, code):
         """Get a setting value by code"""
@@ -110,3 +112,4 @@ class IrUiMenu(models.Model):
         except Exception as e:
             _logger.error(f"Error in load_menus override: {e}")
         return res
+    

@@ -23,6 +23,9 @@ class Branch(models.Model):
     state_located = fields.Char(string="State Located", required=False)
     town_area = fields.Char(string="Area",  required=False)
     
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
+    
     @api.model
     def create(self, vals_list):
         # Create records
@@ -57,6 +60,3 @@ class Branch(models.Model):
 
         return result
         
-    
-
-    

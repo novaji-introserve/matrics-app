@@ -23,3 +23,5 @@ class AccountAggRiskScore(models.Model):
     high_count = fields.Integer(string="High Risk Count")
     medium_count = fields.Integer(string="Medium Risk Count")
     low_count = fields.Integer(string="Low Risk Count")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

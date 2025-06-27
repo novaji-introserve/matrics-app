@@ -19,4 +19,5 @@ class FcraImplication(models.Model):
         ('medium', 'Medium'),
         ('high', 'High'),
     ], string='Severity',default="high", tracking=True)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
    

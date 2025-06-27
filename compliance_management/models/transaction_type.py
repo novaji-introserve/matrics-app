@@ -13,3 +13,5 @@ class TransactionType(models.Model):
     tranname = fields.Char(string='Transaction Name',  readonly=True, index=True)
     trantype = fields.Char(string='Transaction Type',  readonly=True, index=True)
     transhortname = fields.Char(string='Transaction Shortname',  readonly=True, index=True)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

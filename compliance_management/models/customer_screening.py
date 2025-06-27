@@ -32,6 +32,7 @@ class ScreeningList(models.Model):
     last_screening = fields.Datetime(string='Last Screening', readonly=True)
     record_count = fields.Integer(string='Record Count', readonly=True)
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     def update_metadata(self):
         """Update list metadata"""
         for record in self:
@@ -1003,6 +1004,7 @@ class CustomerScreeningStatus(models.Model):
     fep_status = fields.Boolean(string='FEP Checked', default=False)
 
     # This ensures only one record per partner
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     _sql_constraints = [
         ('unique_partner', 'unique(partner_id)',
          'Only one screening status per customer is allowed')
@@ -1032,3 +1034,4 @@ class CustomerScreeningAlert(models.Model):
         tracking=True,
     )
     active = fields.Boolean(default=True, tracking=True)
+    

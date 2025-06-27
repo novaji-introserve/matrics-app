@@ -10,3 +10,5 @@ class FcraMitigation(models.Model):
     name = fields.Char('Mitigation Name', required=True, tracking=True)
     description = fields.Text('Mitigation Description', tracking=True)
    
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

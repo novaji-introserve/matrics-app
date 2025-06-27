@@ -211,7 +211,8 @@ class CustomerEDD(models.Model):
         help="Add third party document(s) for customer EDD"
     )
     kycc_info = fields.Text(string="What types/nature of clientele/customers does this business provide services/goods to?")
-
+    
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
     
 

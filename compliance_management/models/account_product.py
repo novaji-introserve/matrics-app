@@ -26,3 +26,5 @@ class AccountProduct(models.Model):
     product_type = fields.Char(string='Product Type')
     customer_product_id = fields.Char(string='Account Product')
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

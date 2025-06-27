@@ -16,3 +16,5 @@ class RiskSubject(models.Model):
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string='Code', required=True)
     universe_id = fields.Many2one(comodel_name='res.risk.universe', string='Risk Universe')
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

@@ -33,6 +33,7 @@ class Shareholders(models.Model):
     bvn = fields.Char(string='BVN', tracking=True)
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Partner', ondelete="cascade")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
 
 class PartnerRiskPlanLines(models.Model):
@@ -1863,3 +1864,4 @@ class Partner(models.Model):
 
         _logger.info("Completed removal of unwanted partner actions")
         return True
+    

@@ -16,3 +16,5 @@ class EducationLevel(models.Model):
     risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment',index=True)
     status = fields.Selection(string='Status', selection=[(
         'active', 'Active'), ('inactive', 'Inactive')], default='active',index=True)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

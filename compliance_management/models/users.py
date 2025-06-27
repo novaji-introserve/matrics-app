@@ -21,3 +21,4 @@ class Users(models.Model):
         result = super(Users, self).write(vals)
         return result
     """
+    
