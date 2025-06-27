@@ -11,3 +11,5 @@ class FcraScore(models.Model):
     max_score = fields.Float(default=9, tracking=True)
     min_score = fields.Float(default=0, tracking=True)
     
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

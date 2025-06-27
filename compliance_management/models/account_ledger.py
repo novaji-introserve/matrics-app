@@ -16,5 +16,6 @@ class AccountLedger(models.Model):
 
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string='Code', required=True)
-    user_id = fields.Many2one(comodel_name='res.users', string='User',
-                              required=True, index=True, default=lambda self: self.env.user.id)
+    user_id = fields.Many2one(comodel_name='res.users', string='User', required=True, index=True, default=lambda self: self.env.user.id)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+                             

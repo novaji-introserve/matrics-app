@@ -56,6 +56,8 @@ class AdverseMedia(models.Model):
     alert_ids = fields.One2many(
         'adverse.media.alert', 'media_id', string='Alerts', index=True)
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
     risk_score_decoration = fields.Char(
         compute='_compute_risk_score_decoration')
 
@@ -674,6 +676,8 @@ class AdverseMediaAlert(models.Model):
 
     risk_score_decoration = fields.Char(
         compute='_compute_risk_score_decoration')
+    
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     _sql_constraints = [
         ('name_uniq', 'unique (media_id, name)',
          "Alert title must be unique for each media configuration!"),
@@ -780,3 +784,4 @@ class MediaKeyword(models.Model):
             self.media_risk_level = "medium"
         else:
             self.media_risk_level = "high"
+            

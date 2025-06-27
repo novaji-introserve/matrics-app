@@ -27,6 +27,8 @@ class TransactionScreeningRule(models.Model):
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,default=False)
     risk_level = fields.Selection(string='Risk Level', selection=[('low', 'Low'), ('medium', 'Medium'),('high','High')],default='high',tracking=True)
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
     def action_activate(self):
         for e in self:
             e.write({'state': 'active'})
@@ -34,3 +36,4 @@ class TransactionScreeningRule(models.Model):
     def action_deactivate(self):
         for e in self:
             e.write({'state': 'inactive'})
+            

@@ -20,6 +20,9 @@ class Watchlist(models.Model):
     
     source = fields.Char(string='Source', tracking=True, index=True)
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
     def init(self):
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS sanction_list_id_idx ON sanction_list (id)")
+        

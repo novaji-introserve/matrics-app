@@ -36,9 +36,9 @@ class RiskAssessment(models.Model):
         string='Total Risk Lines', _compute='_compute_total_risk_lines', store=True)
     internal_category = fields.Selection(string='Internal Category', selection=[('inst', 'Institutional'), ('cp', 'Counter Party')],default='inst')
     is_default = fields.Boolean(string='Is Default',tracking=True)
+
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
-
-
     @api.model
     def create(self, vals):
         record = super(RiskAssessment, self).create(vals)
@@ -112,3 +112,4 @@ class RiskAssessment(models.Model):
     def filter_subjects(self):
         for rec in self:
             return {'domain': {'subject_id': [('universe_id', '=', rec.universe_id.id)]}}
+        

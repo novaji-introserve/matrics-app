@@ -28,6 +28,7 @@ class DashboardCache(models.Model):
         string="Refresh In Progress", default=False, index=True
     )
     data_size = fields.Integer(string="Data Size (bytes)", default=0)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     _sql_constraints = [
         (
             "unique_cache_key_user",

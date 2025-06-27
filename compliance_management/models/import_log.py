@@ -1,7 +1,7 @@
+import random
 from odoo import models, fields, api
 import logging
 import os
-import psycopg2
 from datetime import datetime, timedelta
 import math
 import multiprocessing
@@ -110,6 +110,7 @@ class ImportLog(models.Model):
                                         help="Field used to identify records for deletion")
     delete_progress = fields.Text(string="Delete Progress", 
                              help="JSON tracking of delete operation progress")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
     # SQL constraints
     _sql_constraints = [
@@ -1613,6 +1614,381 @@ class ImportLog(models.Model):
             raise ValueError("No interrupted delete operation found to resume")
            
         return self.process_file()
+    
+    def queue_delete_operation(self):
+        """Start archive operation with proper chunking into separate jobs"""
+        self.ensure_one()
+        
+        if not self.delete_mode:
+            raise ValueError("This import is not configured for archive mode")
+            
+        if not self.unique_identifier_field:
+            raise ValueError("No unique identifier field specified for archive operation")
+            
+        if not self.file_path or not os.path.exists(self.file_path):
+            raise ValueError("Import file not found at specified path")
+        
+        # Update status
+        self.write({
+            'status': 'processing',
+            'started_at': fields.Datetime.now()
+        })
+        self.env.cr.commit()
+        
+        # First check if ANY active records exist
+        self.env.cr.execute(f"""
+            SELECT COUNT(*) FROM {self.env[self.model_name]._table}
+            WHERE active IS TRUE
+        """)
+        active_count = self.env.cr.fetchone()[0]
+        
+        if active_count == 0:
+            # No active records at all - return early
+            self.write({
+                'status': 'completed',
+                'completed_at': fields.Datetime.now(),
+                'successful_records': 0
+            })
+            self.env.cr.commit()
+            
+            return {
+                'success': True,
+                'message': f"No active records found in database. All records are already archived.",
+                'archived': 0,
+                'failed': 0
+            }
+        
+        # Load the file to get values
+        try:
+            import pandas as pd
+            
+            # Handle UTF-8 BOM
+            with open(self.file_path, 'rb') as f:
+                raw_data = f.read(3)
+                has_bom = raw_data.startswith(b'\xef\xbb\xbf')
+            
+            encoding = 'utf-8-sig' if has_bom else 'utf-8'
+            
+            # Read CSV file
+            df = pd.read_csv(
+                self.file_path,
+                encoding=encoding,
+                dtype=str,
+                keep_default_na=False,
+                engine='python',
+                on_bad_lines='skip'
+            )
+            
+            if df is None or df.empty:
+                raise ValueError("No data found in file")
+                
+            # Find the column
+            csv_column = None
+            for col in df.columns:
+                clean_col = col.lstrip('\ufeff').strip()
+                if (clean_col == self.unique_identifier_field or 
+                    clean_col.lower() == self.unique_identifier_field.lower()):
+                    csv_column = col
+                    break
+                    
+            if not csv_column:
+                raise ValueError(f"Could not find column matching '{self.unique_identifier_field}'")
+                
+            # Get values
+            raw_values = df[csv_column].dropna().tolist()
+            if not raw_values:
+                raise ValueError(f"No values found in column '{csv_column}'")
+                
+            # Clean values
+            identifier_values = []
+            for v in raw_values:
+                cleaned_val = str(v).strip()
+                if cleaned_val and cleaned_val not in ['', 'None', 'NULL', 'nan']:
+                    identifier_values.append(cleaned_val)
+                    
+            # Remove duplicates
+            unique_identifier_values = list(dict.fromkeys(identifier_values))
+            
+            # IMPORTANT: Check if identifiers actually match active records
+            self._check_identifiers_match_active_records(unique_identifier_values)
+            
+            # Create chunks
+            chunk_size = 1000  # Larger chunks for fewer jobs
+            total_chunks = math.ceil(len(unique_identifier_values) / chunk_size)
+            
+            # Check if queue_job is available
+            use_queue = False
+            try:
+                use_queue = hasattr(self, 'with_delay')
+            except:
+                pass
+                
+            if use_queue:
+                # Create separate jobs for each chunk
+                for i in range(0, len(unique_identifier_values), chunk_size):
+                    chunk = unique_identifier_values[i:i+chunk_size]
+                    
+                    # Create a separate job for this chunk
+                    chunk_job = self.with_delay(
+                        description=f"Archive chunk {i//chunk_size + 1}/{total_chunks} using {self.unique_identifier_field}",
+                        channel="csv_import",
+                        priority=15
+                    ).process_archive_chunk(chunk, i//chunk_size + 1, total_chunks)
+                    
+                self.env.cr.commit()
+                
+                return {
+                    'success': True,
+                    'message': f"Archive operation split into {total_chunks} separate jobs",
+                    'chunks': total_chunks
+                }
+            else:
+                # Process directly in chunks
+                archived_count = 0
+                failed_count = 0
+                
+                for i in range(0, len(unique_identifier_values), chunk_size):
+                    chunk = unique_identifier_values[i:i+chunk_size]
+                    
+                    result = self.process_archive_chunk(chunk, i//chunk_size + 1, total_chunks)
+                    archived_count += result.get('archived', 0)
+                    failed_count += result.get('failed', 0)
+                    
+                return {
+                    'success': True,
+                    'message': f"Archive operation completed directly: {archived_count} archived, {failed_count} failed",
+                    'archived': archived_count,
+                    'failed': failed_count
+                }
+                
+        except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
+            error_message = f"Error preparing archive operation: {str(e)}"
+            
+            _logger.error(error_message)
+            _logger.error(error_trace)
+            
+            # Update status
+            self.write({
+                'status': 'failed',
+                'error_message': error_message,
+                'technical_details': error_trace,
+                'completed_at': fields.Datetime.now()
+            })
+            self.env.cr.commit()
+            
+            return {
+                'success': False,
+                'error': error_message
+            }
+
+    def _check_identifiers_match_active_records(self, identifiers):
+        """Check if identifiers actually match active records - log diagnostics"""
+        if not identifiers:
+            return
+            
+        # Take a sample of identifiers to check
+        sample_size = min(50, len(identifiers))
+        sample_identifiers = random.sample(identifiers, sample_size)
+        
+        # Check if sample identifiers match ANY records (active or inactive)
+        placeholders = ','.join(['%s'] * len(sample_identifiers))
+        self.env.cr.execute(f"""
+            SELECT COUNT(*) 
+            FROM {self.env[self.model_name]._table}
+            WHERE {self.unique_identifier_field} IN ({placeholders})
+        """, tuple(sample_identifiers))
+        
+        any_match_count = self.env.cr.fetchone()[0]
+        
+        # CRITICAL FIX: Check for both TRUE and NULL as active
+        self.env.cr.execute(f"""
+            SELECT COUNT(*) 
+            FROM {self.env[self.model_name]._table}
+            WHERE {self.unique_identifier_field} IN ({placeholders})
+            AND (active IS TRUE OR active IS NULL)
+        """, tuple(sample_identifiers))
+        
+        active_match_count = self.env.cr.fetchone()[0]
+        
+        # Log results
+        _logger.info(f"Identifier matching check: {any_match_count} of {sample_size} sample identifiers match ANY records")
+        _logger.info(f"Identifier matching check: {active_match_count} of {sample_size} sample identifiers match ACTIVE/NULL records")
+        
+        # If nothing matched active, check for NULL vs TRUE values
+        if active_match_count == 0 and any_match_count > 0:
+            # Check for NULL values specifically
+            self.env.cr.execute(f"""
+                SELECT COUNT(*) 
+                FROM {self.env[self.model_name]._table}
+                WHERE {self.unique_identifier_field} IN ({placeholders})
+                AND active IS NULL
+            """, tuple(sample_identifiers))
+            
+            null_match_count = self.env.cr.fetchone()[0]
+            
+            if null_match_count > 0:
+                _logger.info(f"Found {null_match_count} records with NULL active value - these should be considered active!")
+        
+        # Get example records for better debugging
+        self.env.cr.execute(f"""
+            SELECT id, active, {self.unique_identifier_field} 
+            FROM {self.env[self.model_name]._table}
+            WHERE {self.unique_identifier_field} IN ({placeholders})
+            LIMIT 5
+        """, tuple(sample_identifiers))
+        
+        example_records = self.env.cr.fetchall()
+        if example_records:
+            _logger.info(f"Example matching records: {example_records}")
+        
+        # If we matched some records but not active ones, they're likely already archived
+        if active_match_count == 0 and any_match_count > 0:
+            _logger.warning("MATCHED RECORDS EXIST BUT NONE ARE ACTIVE - they may already be archived!")
+            
+    def process_archive_chunk(self, chunk_values, chunk_num, total_chunks):
+        """Process a specific chunk of values for archiving"""
+        self.ensure_one()
+        
+        _logger.info(f"Processing archive chunk {chunk_num}/{total_chunks} with {len(chunk_values)} values")
+        
+        # Update progress
+        self.write({
+            'current_batch': chunk_num,
+            'total_batches': total_chunks
+        })
+        self.env.cr.commit()
+        
+        try:
+            # Get table and field names
+            table_name = self.env[self.model_name]._table
+            field_name = self.unique_identifier_field
+            
+            # Find matching records by identifiers
+            placeholders = ','.join(['%s'] * len(chunk_values))
+            find_query = f"""
+                SELECT id, active 
+                FROM {table_name}
+                WHERE {field_name} IN ({placeholders})
+            """
+            
+            self.env.cr.execute(find_query, tuple(chunk_values))
+            found_records = self.env.cr.fetchall()
+            found_ids = [r[0] for r in found_records]
+            
+            if not found_ids:
+                return {
+                    'success': True,
+                    'archived': 0,
+                    'failed': 0,
+                    'message': "No matching records found for chunk values"
+                }
+                
+            # CRITICAL FIX: Check for both TRUE and NULL values as active
+            # In PostgreSQL, NULL is not TRUE, but records with NULL active are not considered inactive
+            active_ids = []
+            for rec_id, is_active in found_records:
+                # PostgreSQL treats NULL, TRUE and FALSE as three different states
+                # Consider both TRUE and NULL as "active"
+                if is_active is True or is_active is None:
+                    active_ids.append(rec_id)
+            
+            _logger.info(f"Found {len(found_ids)} records, {len(active_ids)} are truly active/null")
+            
+            # Only proceed if we have active records
+            if active_ids:
+                # Standard PostgreSQL boolean update - set FALSE for both TRUE and NULL values
+                update_query = f"""
+                    UPDATE {table_name}
+                    SET active = FALSE
+                    WHERE id IN ({','.join(map(str, active_ids))})
+                """
+                
+                self.env.cr.execute(update_query)
+                
+                # Verify the update worked - checking both TRUE and NULL
+                verify_query = f"""
+                    SELECT COUNT(*) 
+                    FROM {table_name}
+                    WHERE id IN ({','.join(map(str, active_ids))})
+                    AND (active IS TRUE OR active IS NULL)
+                """
+                
+                self.env.cr.execute(verify_query)
+                still_active = self.env.cr.fetchone()[0]
+                
+                if still_active > 0:
+                    _logger.warning(f"{still_active} records are still active/null after SQL update - trying ORM method")
+                    
+                    # Fallback to ORM
+                    records = self.env[self.model_name].browse(active_ids)
+                    records.write({'active': False})
+                    
+                    # Verify again
+                    self.env.cr.execute(verify_query)
+                    still_active_after_orm = self.env.cr.fetchone()[0]
+                    
+                    if still_active_after_orm > 0:
+                        _logger.error(f"Failed to archive {still_active_after_orm} records even with ORM!")
+                        return {
+                            'success': True,
+                            'archived': len(active_ids) - still_active_after_orm,
+                            'failed': still_active_after_orm
+                        }
+                
+                # Success! Commit and return
+                self.env.cr.commit()
+                return {
+                    'success': True,
+                    'archived': len(active_ids),
+                    'failed': 0
+                }
+            else:
+                # No active records found
+                return {
+                    'success': True,
+                    'archived': 0,
+                    'failed': 0,
+                    'message': "No active records found in chunk"
+                }
+                
+        except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
+            error_message = f"Error processing archive chunk: {str(e)}"
+            
+            _logger.error(error_message)
+            _logger.error(error_trace)
+            
+            # Don't leave transaction in error state
+            self.env.cr.rollback()
+            
+            return {
+                'success': False,
+                'archived': 0,
+                'failed': len(chunk_values),
+                'error': error_message
+            }
+        
+    def _update_delete_progress(self, progress):
+        """
+        Update the delete progress in the database
+        """
+        try:
+            import json
+            
+            # Use a separate cursor to avoid transaction conflicts
+            with self.env.registry.cursor() as progress_cr:
+                progress_cr.execute("""
+                    UPDATE import_log
+                    SET delete_progress = %s
+                    WHERE id = %s
+                """, (json.dumps(progress), self.id))
+                progress_cr.commit()
+                
+        except Exception as e:
+            _logger.warning(f"Failed to update delete progress: {str(e)}")
 
 class ImportFieldMapping(models.Model):
     _name = "import.field.mapping"
@@ -1627,3 +2003,5 @@ class ImportFieldMapping(models.Model):
     default_value = fields.Char(string="Default Value")
     required = fields.Boolean(string="Required")
     notes = fields.Text(string="Notes")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

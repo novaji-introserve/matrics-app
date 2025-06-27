@@ -1,4 +1,3 @@
-import base64
 import logging
 import os
 import re
@@ -11,12 +10,8 @@ import string
 import time
 import json
 import math
-from io import BytesIO, StringIO
 from datetime import datetime
-from odoo import _, fields, api
-from odoo.exceptions import UserError
-from contextlib import contextmanager
-
+from odoo import _, api
 _logger = logging.getLogger(__name__)
 
 try:
@@ -288,32 +283,101 @@ class CSVProcessor:
         _logger.debug(f"Discovered {len(self.table_columns)} columns in table {self.table_name}")
     
     def _introspect_model_fields(self):
-        """Get field information from the Odoo model"""
+        """Get field information from the Odoo model with enhanced debugging"""
         # Reset field lists
         self.model_fields = {}
         self.required_fields = []
         
+        _logger.info(f"Introspecting model fields for {self.model_name}")
+        
         # Process all fields in the model
+        total_fields = len(self.model._fields)
+        skipped_fields = []
+        included_fields = []
+        
         for field_name, field in self.model._fields.items():
-            # Skip non-storable or special fields
-            if not field.store or field.type in ['one2many']:
+            # Enhanced field filtering with better logging
+            should_skip = False
+            skip_reason = None
+            
+            # Check if field is storable
+            if not getattr(field, 'store', True):
+                should_skip = True
+                skip_reason = f"not storable (store={getattr(field, 'store', True)})"
+            
+            # Skip certain field types
+            elif field.type in ['one2many']:
+                should_skip = True
+                skip_reason = f"unsupported type ({field.type})"
+            
+            # Skip computed fields without inverse (but allow stored computed fields)
+            elif field.compute and not field.inverse and not getattr(field, 'store', True):
+                should_skip = True
+                skip_reason = f"computed without inverse and not stored"
+            
+            if should_skip:
+                skipped_fields.append(f"{field_name} ({skip_reason})")
                 continue
                 
             # Store field information
             self.model_fields[field_name] = {
                 'name': field_name,
                 'type': field.type,
-                'required': field.required,
-                'readonly': field.readonly,
-                'relation': field.comodel_name if hasattr(field, 'comodel_name') else None,
-                'column_name': field.name,  # Database column name
-                'default': field.default,
-                'compute': bool(field.compute),
+                'required': getattr(field, 'required', False),
+                'readonly': getattr(field, 'readonly', False),
+                'relation': getattr(field, 'comodel_name', None),
+                'column_name': getattr(field, 'name', field_name),  # Database column name
+                'default': getattr(field, 'default', None),
+                'compute': bool(getattr(field, 'compute', False)),
+                'store': getattr(field, 'store', True),
             }
             
+            included_fields.append(field_name)
+            
             # Track required fields
-            if field.required and not field.default and not field.compute:
+            if getattr(field, 'required', False) and not getattr(field, 'default', None) and not getattr(field, 'compute', False):
                 self.required_fields.append(field_name)
+        
+        # Log detailed information for debugging
+        _logger.info(f"Model field introspection complete for {self.model_name}:")
+        _logger.info(f"  Total fields in model: {total_fields}")
+        _logger.info(f"  Included fields: {len(included_fields)}")
+        _logger.info(f"  Skipped fields: {len(skipped_fields)}")
+        _logger.info(f"  Required fields: {len(self.required_fields)}")
+        
+        # Check for any commonly used identifier fields that might have been skipped
+        common_id_fields = ['unique_identifier', 'external_id', 'reference', 'code', 'name']
+        for id_field in common_id_fields:
+            if id_field in self.model._fields and id_field not in self.model_fields:
+                field = self.model._fields[id_field]
+                _logger.warning(f"  ✗ Common identifier field '{id_field}' was skipped! Field details:")
+                _logger.warning(f"    Type: {field.type}")
+                _logger.warning(f"    Store: {getattr(field, 'store', True)}")
+                _logger.warning(f"    Required: {getattr(field, 'required', False)}")
+                _logger.warning(f"    Compute: {getattr(field, 'compute', False)}")
+                _logger.warning(f"    Default: {getattr(field, 'default', None)}")
+                
+                # Force include the field if it was skipped
+                self.model_fields[id_field] = {
+                    'name': id_field,
+                    'type': field.type,
+                    'required': getattr(field, 'required', False),
+                    'readonly': getattr(field, 'readonly', False),
+                    'relation': getattr(field, 'comodel_name', None),
+                    'column_name': getattr(field, 'name', id_field),
+                    'default': getattr(field, 'default', None),
+                    'compute': bool(getattr(field, 'compute', False)),
+                    'store': getattr(field, 'store', True),
+                }
+                _logger.info(f"  ✓ Manually added '{id_field}' field to model_fields")
+        
+        # Log some example fields for debugging (first 5 included fields)
+        if included_fields:
+            _logger.debug(f"  Example included fields: {', '.join(included_fields[:5])}")
+        
+        # Log some example skipped fields for debugging (first 5 skipped fields)
+        if skipped_fields:
+            _logger.debug(f"  Example skipped fields: {', '.join(skipped_fields[:5])}")
     
     def _setup_field_mappings(self):
         """Load existing field mappings or create new ones by sampling the file"""
@@ -632,7 +696,7 @@ class CSVProcessor:
             raise
     
     def _preprocess_dataframe(self, df):
-        """Preprocess the dataframe for database insertion with improved required field handling"""
+        """Preprocess the dataframe for database insertion with improved required field handling and active column management"""
         # Create output dataframe
         result_df = pd.DataFrame()
         
@@ -655,11 +719,15 @@ class CSVProcessor:
         missing_model_fields = set(self.model_fields.keys()) - set(self.field_mappings.values())
         self.missing_columns = missing_model_fields
         
-        # Step 3: Add default values for all missing/unmapped columns
+        # Step 3: Add default values for all missing/unmapped columns with special handling for active field
         for field_name in missing_model_fields:
-            # Add default value for missing field (this ensures COPY will work)
             default_value = self._get_default_value_for_field(field_name)
             result_df[field_name] = default_value
+            
+            # Special handling for active field - ensure it's always True for new records
+            if field_name == 'active':
+                result_df[field_name] = True
+                self._log_message(f"Set active field to True for all {len(result_df)} new records", "info")
         
         # Step 4: Handle required fields specifically (IMPROVED)
         missing_required_counts = {}
@@ -670,7 +738,8 @@ class CSVProcessor:
             # Check if field is missing or has NA values
             if field_name not in result_df.columns:
                 # Add entire column with appropriate default
-                result_df[field_name] = self._get_default_value_for_field(field_name)
+                default_value = self._get_default_value_for_field(field_name)
+                result_df[field_name] = default_value
                 missing_required_counts[field_name] = len(result_df)
             elif result_df[field_name].isna().any() or (result_df[field_name] == '').any():
                 # Fill NA values with default, but keep track of count
@@ -689,12 +758,51 @@ class CSVProcessor:
                     default_value = self._get_default_value_for_field(field_name)
                     result_df[field_name] = result_df[field_name].fillna(default_value)
         
+        # Step 5: Ensure active field is properly handled even if it's in the CSV but has null/empty values
+        if 'active' in result_df.columns:
+            # Count how many active fields are null/empty
+            null_active_count = result_df['active'].isna().sum() + (result_df['active'] == '').sum()
+            
+            if null_active_count > 0:
+                # Fill null/empty active fields with True
+                result_df['active'] = result_df['active'].fillna(True)
+                result_df.loc[result_df['active'] == '', 'active'] = True
+                self._log_message(f"Set {null_active_count} null/empty active fields to True", "info")
+            
+            # Convert any boolean-like strings to proper boolean
+            if result_df['active'].dtype == 'object':
+                result_df['active'] = result_df['active'].map(self._convert_to_boolean)
+        
         # Log how many required fields were filled
         for field_name, count in missing_required_counts.items():
             if count > 0:
                 self._log_message(f"Filled {count} missing values for required field '{field_name}'", "info")
         
         return result_df
+    
+    def _convert_to_boolean(self, value):
+        """Convert various representations to boolean, defaulting to True for active field"""
+        if pd.isna(value) or value == '' or value is None:
+            return True  # Default to True for active field
+        
+        if isinstance(value, bool):
+            return value
+        
+        if isinstance(value, str):
+            value_lower = value.lower().strip()
+            if value_lower in ['true', 'yes', 'y', '1', 'active', 'on']:
+                return True
+            elif value_lower in ['false', 'no', 'n', '0', 'inactive', 'off']:
+                return False
+            else:
+                # For ambiguous values, default to True for active field
+                return True
+        
+        # For numeric values
+        try:
+            return bool(int(value))
+        except (ValueError, TypeError):
+            return True 
     
     def _transform_field_values(self, series, field_type):
         """Transform a pandas Series according to field type"""
@@ -729,7 +837,7 @@ class CSVProcessor:
             return series
     
     def _get_default_value_for_field(self, field_name):
-        """Get appropriate default value for a field"""
+        """Get appropriate default value for a field with enhanced active field handling"""
         field_info = self.model_fields.get(field_name, {})
         field_type = field_info.get('type', 'char')
         
@@ -744,6 +852,10 @@ class CSVProcessor:
             else:
                 return field_default
         
+        # Special handling for active field - always default to True for new records
+        if field_name == 'active':
+            return True
+        
         # Fall back to type-specific defaults
         if field_type == 'boolean':
             return False
@@ -753,8 +865,6 @@ class CSVProcessor:
             return datetime.now().strftime('%Y-%m-%d')
         elif field_type == 'datetime':
             return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        elif field_name == 'active':
-            return True
         elif field_name == 'create_date' or field_name == 'write_date':
             return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         elif field_name == 'create_uid' or field_name == 'write_uid':
@@ -1209,7 +1319,7 @@ class CSVProcessor:
                         odoo_error = %s
                     WHERE {quoted_field} IS NOT NULL
                     AND {quoted_field}::text != ''
-                    AND {quoted_field}::text !~ r'^-?[0-9]*\.[0-9]*$|^-?[0-9]+$'
+                    AND {quoted_field}::text !~ '^-?[0-9]*\.?[0-9]*$'
                     AND odoo_status = 'pending'
                     RETURNING tmp_id
                 """, (error_msg,))
@@ -1427,7 +1537,7 @@ class CSVProcessor:
         return batch_duplicates, existing_duplicates
 
     def _insert_valid_records(self):
-        """Insert all valid records without ANY artificial limits"""
+        """Insert all valid records with enhanced active field handling"""
         # Get valid fields from model
         valid_fields = set()
         
@@ -1435,6 +1545,11 @@ class CSVProcessor:
         for field_name in self.model_fields:
             if field_name in self.inverse_mappings or field_name in self.required_fields:
                 valid_fields.add(field_name)
+        
+        # Always include active field if it exists in the model, even if not mapped
+        if 'active' in self.model_fields:
+            valid_fields.add('active')
+            self._log_message("Including 'active' field in insert to ensure proper record state", "info")
         
         if not valid_fields:
             return 0
@@ -1459,6 +1574,10 @@ class CSVProcessor:
         
         _logger.info(f"Found {pending_count} pending records to insert")
         total_chunks = math.ceil(pending_count / chunk_size)
+        
+        # Ensure active field is set properly in temp table before insertion
+        if 'active' in valid_fields:
+            self._ensure_active_field_in_temp_table()
         
         # Process ALL pending records - no early termination
         chunk_counter = 0
@@ -1633,6 +1752,36 @@ class CSVProcessor:
             _logger.warning(f"Warning: {still_pending} records still pending after processing all chunks")
         
         return inserted_count
+    
+    def _ensure_active_field_in_temp_table(self):
+        """Ensure active field is properly set in temporary table before insertion"""
+        try:
+            # Check if active column exists in temp table and set NULL values to True
+            self.cr.execute(f"""
+                UPDATE {self._quoted_temp_table()}
+                SET active = TRUE
+                WHERE active IS NULL
+                AND odoo_status = 'pending'
+            """)
+            
+            updated_count = self.cr.rowcount
+            if updated_count > 0:
+                self._log_message(f"Set {updated_count} NULL active fields to TRUE in temp table", "info")
+            
+            # Also handle empty string values that might have been mapped
+            self.cr.execute(f"""
+                UPDATE {self._quoted_temp_table()}
+                SET active = TRUE
+                WHERE (active::text = '' OR active::text = 'None')
+                AND odoo_status = 'pending'
+            """)
+            
+            updated_count = self.cr.rowcount
+            if updated_count > 0:
+                self._log_message(f"Set {updated_count} empty active fields to TRUE in temp table", "info")
+                
+        except Exception as e:
+            _logger.warning(f"Error ensuring active field in temp table: {str(e)}")
 
     def _generate_failure_summary(self):
         """Generate a detailed summary of failures by category"""
@@ -1886,267 +2035,225 @@ class CSVProcessor:
         return "An error occurred during the import process. Please contact support for assistance."
 
     def process_delete_mode(self):
-        """Delete records with matching unique identifiers with interruption recovery"""
+        """Archive records with matching unique identifiers"""
         if not self.unique_identifier_field:
-            raise ValueError("Unique identifier field is required for delete mode")
+            raise ValueError("Unique identifier field is required for archive mode")
             
-        self._log_message(f"Processing in delete mode with identifier field: {self.unique_identifier_field}", "info")
+        self._log_message(f"Processing in archive mode with identifier field: {self.unique_identifier_field}", "info")
         
-        # Ensure field exists in the model
-        if self.unique_identifier_field not in self.model_fields:
-            raise ValueError(f"Field '{self.unique_identifier_field}' does not exist in model {self.model_name}")
-        
-        # Find the CSV column mapped to this field - IMPROVED MAPPING LOGIC
-        csv_column = None
-        
-        # Method 1: Check existing field mappings (most reliable)
-        for csv_field, model_field in self.field_mappings.items():
-            if model_field == self.unique_identifier_field:
-                csv_column = csv_field
-                self._log_message(f"Found column '{csv_column}' in field mappings for '{self.unique_identifier_field}'", "info")
-                break
-        
-        # Method 2: If not found in mappings, try case-insensitive search on column names
-        if not csv_column or csv_column not in self.df.columns:
-            # Normalize field name (remove underscores, lowercase)
-            normalized_field = self.unique_identifier_field.lower().replace('_', '')
-            
-            for col in self.df.columns:
-                # Normalize column name the same way
-                normalized_col = col.lower().replace('_', '')
-                
-                # Check if normalized names match
-                if normalized_col == normalized_field:
-                    csv_column = col
-                    self._log_message(f"Found column '{csv_column}' via case-insensitive match for '{self.unique_identifier_field}'", "info")
-                    break
-                    
-        # Method 3: Try partial matching as last resort
-        if not csv_column or csv_column not in self.df.columns:
-            best_match = None
-            best_score = 0
-            
-            for col in self.df.columns:
-                # Convert both to lowercase for comparison
-                col_lower = col.lower()
-                field_lower = self.unique_identifier_field.lower()
-                
-                # Check if one contains the other
-                if field_lower in col_lower or col_lower in field_lower:
-                    # Calculate a simple match score (length of overlap)
-                    score = min(len(col_lower), len(field_lower))
-                    if score > best_score:
-                        best_score = score
-                        best_match = col
-            
-            if best_match:
-                csv_column = best_match
-                self._log_message(f"Found column '{csv_column}' via partial match for '{self.unique_identifier_field}'", "info")
-        
-        # Final verification
-        if not csv_column or csv_column not in self.df.columns:
-            # Generate helpful error message with available columns
-            available_columns = ", ".join(self.df.columns[:10])
-            if len(self.df.columns) > 10:
-                available_columns += f", ... and {len(self.df.columns) - 10} more"
-                
+        # Field existence check
+        if self.unique_identifier_field not in self.model._fields:
+            available_fields = list(self.model._fields.keys())[:10]
             raise ValueError(
-                f"Could not find a column matching unique identifier field '{self.unique_identifier_field}'. "
-                f"Available columns: {available_columns}. "
-                f"Please ensure the unique identifier exists in your CSV file."
+                f"Field '{self.unique_identifier_field}' does not exist in model {self.model_name}. "
+                f"Available fields: {', '.join(available_fields)}"
             )
         
-        self._log_message(f"Using column '{csv_column}' as the unique identifier source", "info")
-        
-        # Check for existing progress
-        processed_values = set()
-        if self.delete_progress and self.delete_progress.get('status') == 'in_progress':
-            if 'processed_values' in self.delete_progress:
-                try:
-                    processed_values = set(self.delete_progress['processed_values'])
-                    self._log_message(f"Resuming delete operation: {len(processed_values)} values already processed", "info")
-                except Exception as e:
-                    _logger.warning(f"Error parsing processed values: {str(e)}")
-        
-        # Get values from the dataframe
-        values = self.df[csv_column].dropna().tolist()
-        if not values:
-            self._log_message("No values found for unique identifier field", "warning")
-            return 0
+        # Load the file
+        if not hasattr(self, 'df') or self.df is None:
+            self._log_message("Loading file for archive operation", "info")
             
-        # Clean values and remove empty strings
-        identifier_values = [str(v).strip() for v in values if str(v).strip()]
-        if not identifier_values:
-            self._log_message("No valid values found for unique identifier field", "warning")
-            return 0
-            
-        # Remove already processed values
-        if processed_values:
-            identifier_values = [v for v in identifier_values if v not in processed_values]
-            
-        if not identifier_values:
-            self._log_message("All values have already been processed", "info")
-            return 0
-        
-        # Log the number of unique values
-        self._log_message(f"Found {len(identifier_values)} unique values for deletion", "info")
-        
-        # Initialize progress tracking without processed values to avoid memory issues
-        # We'll track processed values only in batches
-        if not self.delete_progress:
-            self.delete_progress = {
-                'total': len(identifier_values),
-                'processed': 0,
-                'deleted': 0,
-                'failed': 0,
-                'status': 'in_progress',
-                'processed_values': []
-            }
-        else:
-            self.delete_progress['total'] = self.delete_progress.get('total', 0) + len(identifier_values)
-            self.delete_progress['status'] = 'in_progress'
-            if 'processed_values' not in self.delete_progress:
-                self.delete_progress['processed_values'] = []
-        
-        # Store initial progress
-        self._update_delete_progress()
-        
-        # Process in chunks to avoid memory issues
-        chunk_size = 100  # Smaller chunks for better reliability
-        deleted_count = self.delete_progress.get('deleted', 0)
-        failed_count = self.delete_progress.get('failed', 0)
-        
-        # Process in chunks with independent transactions
-        for i in range(0, len(identifier_values), chunk_size):
-            chunk = identifier_values[i:i+chunk_size]
-            chunk_processed = False
-            retries = 0
-            max_retries = 3
-            
-            # Retry logic for each chunk
-            while not chunk_processed and retries < max_retries:
-                # Use a new cursor for each chunk to isolate transactions
-                with self.env.registry.cursor() as chunk_cr:
-                    try:
-                        # Create environment with new cursor
-                        chunk_env = api.Environment(chunk_cr, self.env.uid, self.env.context)
-                        model_obj = chunk_env[self.model_name]
-                        
-                        # Build the domain for deletion
-                        domain = [(self.unique_identifier_field, 'in', chunk)]
-                        
-                        # Get records to delete
-                        records = model_obj.search(domain)
-                        record_count = len(records)
-                        
-                        if records:
-                            # Store IDs before deletion for confirmation
-                            record_ids = records.ids
-                            
-                            # Delete the records
-                            records.unlink()
-                            
-                            # Verify deletion was successful
-                            remaining = model_obj.search([('id', 'in', record_ids)])
-                            if remaining:
-                                # Some records weren't deleted
-                                failed_ids = remaining.ids
-                                failed_count += len(failed_ids)
-                                deleted_count += (record_count - len(failed_ids))
-                                self._log_message(f"Failed to delete {len(failed_ids)} records", "warning")
-                            else:
-                                # All records were deleted
-                                deleted_count += record_count
-                                self._log_message(f"Deleted {record_count} records", "success")
-                        else:
-                            self._log_message(f"No records found matching {len(chunk)} values", "info")
-                        
-                        # Track current processed batch separately from the main progress
-                        # This avoids serialization errors by keeping batch updates small
-                        batch_progress = {
-                            'total': self.delete_progress['total'],
-                            'processed': self.delete_progress.get('processed', 0) + len(chunk),
-                            'deleted': deleted_count,
-                            'failed': failed_count,
-                            'status': 'in_progress',
-                            'processed_values': chunk  # Only include current chunk
-                        }
-                        
-                        # Store current batch progress
-                        self.delete_progress = batch_progress
-                        self._update_delete_progress()
-                        
-                        # Commit this chunk's transaction
-                        chunk_cr.commit()
-                        chunk_processed = True
-                        
-                        # Log progress
-                        current_position = i + len(chunk)
-                        progress_pct = round(current_position / len(identifier_values) * 100, 1)
-                        self._log_message(f"Processed {current_position} of {len(identifier_values)} values ({progress_pct}% complete)", "info")
-                        
-                    except Exception as e:
-                        # Rollback this chunk
-                        chunk_cr.rollback()
-                        
-                        retries += 1
-                        if retries >= max_retries:
-                            # Mark as failed after max retries
-                            failed_count += len(chunk)
-                            error_msg = f"Error deleting records after {max_retries} attempts: {str(e)}"
-                            self._log_message(error_msg, "error")
-                        else:
-                            # Log retry attempt
-                            self._log_message(f"Retry {retries}/{max_retries} for chunk {i//chunk_size + 1}: {str(e)}", "warning")
-                            time.sleep(1 * retries)  # Increasing delay between retries
-        
-        # Mark as completed with a final update
-        final_progress = {
-            'total': self.delete_progress.get('total', len(identifier_values)),
-            'processed': len(identifier_values),
-            'deleted': deleted_count,
-            'failed': failed_count,
-            'status': 'completed',
-            'processed_values': []  # Don't store all values in the final summary
-        }
-        
-        self.delete_progress = final_progress
-        
-        # Use a separate transaction for the final update
-        with self.env.registry.cursor() as final_cr:
             try:
-                # Create environment with new cursor
-                final_env = api.Environment(final_cr, self.env.uid, self.env.context)
+                import pandas as pd
                 
-                # Store the final progress
-                final_import_log = final_env['import.log'].browse(self.import_log.id)
-                final_import_log.write({
-                    'delete_progress': json.dumps(final_progress)
-                })
+                # Handle UTF-8 BOM
+                with open(self.file_path, 'rb') as f:
+                    raw_data = f.read(3)
+                    has_bom = raw_data.startswith(b'\xef\xbb\xbf')
                 
-                # Store a human-readable summary
-                summary = {
-                    "operation": "delete",
-                    "identifier_field": self.unique_identifier_field,
-                    "values_processed": len(identifier_values),
-                    "records_deleted": deleted_count,
-                    "records_failed": failed_count,
-                    "completion_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }
+                encoding = 'utf-8-sig' if has_bom else 'utf-8'
                 
-                final_import_log.write({
-                    'summary': json.dumps(summary)
-                })
+                # Read CSV file
+                self.df = pd.read_csv(
+                    self.file_path,
+                    encoding=encoding,
+                    dtype=str,
+                    keep_default_na=False,
+                    engine='python',
+                    on_bad_lines='skip'
+                )
                 
-                final_cr.commit()
+                if self.df is None or self.df.empty:
+                    return {"success": False, "message": "No data found in file", "archived": 0}
+                    
+                self._log_message(f"Successfully loaded file: {len(self.df):,} rows, {len(self.df.columns)} columns", "success")
+                
+            except Exception as read_error:
+                return {"success": False, "message": f"Error loading file: {str(read_error)}", "archived": 0}
+        
+        # Find matching column
+        csv_column = None
+        available_columns = list(self.df.columns)
+        
+        # Clean column names and find match
+        cleaned_columns = [col.lstrip('\ufeff').strip() for col in available_columns]
+        column_mapping = dict(zip(available_columns, cleaned_columns))
+        
+        for orig, clean in column_mapping.items():
+            if (clean == self.unique_identifier_field or 
+                clean.lower() == self.unique_identifier_field.lower() or
+                clean.lower().replace('_', '').replace(' ', '') == self.unique_identifier_field.lower().replace('_', '').replace(' ', '')):
+                csv_column = orig
+                self._log_message(f"Found matching column: '{csv_column}' (cleaned: '{clean}')", "info")
+                break
+        
+        if not csv_column:
+            available_str = ", ".join(cleaned_columns[:10])
+            return {"success": False, "message": f"Could not find column matching '{self.unique_identifier_field}'. Available: {available_str}", "archived": 0}
+        
+        # Get values from column
+        raw_values = self.df[csv_column].dropna().tolist()
+        if not raw_values:
+            return {"success": False, "message": f"No values found in column '{csv_column}'", "archived": 0}
+        
+        # Clean values
+        identifier_values = []
+        for v in raw_values:
+            cleaned_val = str(v).strip()
+            if cleaned_val and cleaned_val not in ['', 'None', 'NULL', 'nan']:
+                identifier_values.append(cleaned_val)
+        
+        # Remove duplicates
+        unique_identifier_values = list(dict.fromkeys(identifier_values))
+        
+        self._log_message(f"Found {len(unique_identifier_values)} unique identifier values from CSV", "info")
+        
+        # Process in chunks
+        chunk_size = 100
+        archived_count = 0
+        failed_count = 0
+        
+        for i in range(0, len(unique_identifier_values), chunk_size):
+            chunk = unique_identifier_values[i:i+chunk_size]
+            
+            # Log chunk details
+            self._log_message(f"Processing chunk {i//chunk_size + 1}: {len(chunk)} values", "info")
+            self._log_message(f"First 5 values in this chunk: {chunk[:5]}", "info")
+            
+            try:
+                with self.env.registry.cursor() as chunk_cr:
+                    chunk_env = api.Environment(chunk_cr, self.env.uid, self.env.context)
+                    model_obj = chunk_env[self.model_name]
+                    
+                    # CRITICAL FIX: Get records DIRECTLY via SQL first to verify active status
+                    # This bypasses all ORM active filters
+                    table_name = model_obj._table
+                    field_name = self.unique_identifier_field
+                    
+                    # Use parameterized queries for safety
+                    placeholders = ','.join(['%s'] * len(chunk))
+                    query = f"""
+                        SELECT id, active 
+                        FROM {table_name}
+                        WHERE {field_name} IN ({placeholders})
+                    """
+                    
+                    chunk_cr.execute(query, tuple(chunk))
+                    db_records = chunk_cr.fetchall()
+                    
+                    if db_records:
+                        # Count truly active records (Boolean handling fix)
+                        active_ids = []
+                        for rec_id, is_active in db_records:
+                            # CRITICAL FIX: In PostgreSQL, 't' means true
+                            if is_active is True or is_active == 't':
+                                active_ids.append(rec_id)
+                        
+                        # Log what we found with accurate counts
+                        self._log_message(
+                            f"✅ Found {len(db_records)} records in DB for this chunk "
+                            f"({len(active_ids)} truly active, "
+                            f"{len(db_records) - len(active_ids)} already inactive)",
+                            "success"
+                        )
+                        
+                        # Verify with a DEBUG query the actual active status in the database
+                        chunk_cr.execute(f"""
+                            SELECT count(*) FROM {table_name}
+                            WHERE id IN ({','.join(map(str, [r[0] for r in db_records]))})
+                            AND active IS TRUE
+                        """)
+                        actual_active_count = chunk_cr.fetchone()[0]
+                        self._log_message(f"🔍 SQL verification: {actual_active_count} records are actually active in database", "info")
+                        
+                        # Only archive if we have active records
+                        if active_ids:
+                            # ARCHIVE DIRECTLY with SQL for maximum reliability
+                            update_query = f"""
+                                UPDATE {table_name}
+                                SET active = FALSE
+                                WHERE id IN ({','.join(map(str, active_ids))})
+                            """
+                            chunk_cr.execute(update_query)
+                            
+                            # Verify the update worked
+                            verify_query = f"""
+                                SELECT count(*) FROM {table_name}
+                                WHERE id IN ({','.join(map(str, active_ids))})
+                                AND active IS TRUE
+                            """
+                            chunk_cr.execute(verify_query)
+                            still_active = chunk_cr.fetchone()[0]
+                            
+                            if still_active > 0:
+                                self._log_message(f"⚠️ Warning: {still_active} records are still active after update", "warning")
+                                failed_count += still_active
+                            else:
+                                archived_count += len(active_ids)
+                                self._log_message(f"✅ Successfully archived {len(active_ids)} records", "success")
+                        else:
+                            self._log_message("All found records were already inactive", "info")
+                    else:
+                        # No records found
+                        self._log_message(f"❌ No records found for chunk values", "warning")
+                        
+                        # Test first few values with ILIKE
+                        for test_val in chunk[:3]:
+                            like_query = f"""
+                                SELECT id, active, {field_name} 
+                                FROM {table_name}
+                                WHERE {field_name} ILIKE %s
+                            """
+                            chunk_cr.execute(like_query, (f"%{test_val}%",))
+                            like_results = chunk_cr.fetchall()
+                            
+                            if like_results:
+                                self._log_message(
+                                    f"🔍 Found partial matches for '{test_val}':\n"
+                                    f"   Possible matches: {[r[2] for r in like_results[:5]]}",
+                                    "info"
+                                )
+                    
+                    # Commit this chunk
+                    chunk_cr.commit()
+                    
+                    # Progress update
+                    progress = round((i + len(chunk)) / len(unique_identifier_values) * 100, 1)
+                    if progress % 10 == 0 or progress > 95:
+                        self._log_message(f"Progress: {progress}% complete", "info")
+                    
             except Exception as e:
-                final_cr.rollback()
-                _logger.error(f"Error updating final delete progress: {str(e)}")
+                import traceback
+                failed_count += len(chunk)
+                self._log_message(f"Error processing chunk: {str(e)}", "error")
+                self._log_message(f"Traceback: {traceback.format_exc()}", "error")
         
-        total_summary = f"Delete operation completed: {deleted_count} records deleted, {failed_count} failed"
-        self._log_message(total_summary, "success")
+        # Final summary
+        success = archived_count > 0
+        message = f"Archive operation completed: {archived_count} records archived, {failed_count} failed"
         
-        return deleted_count
+        if archived_count == 0:
+            message += ". No matching active records found - they may already be archived or identifiers don't match."
+        
+        self._log_message(message, "success" if success else "warning")
+        
+        return {
+            "success": True,
+            "message": message,
+            "archived": archived_count,
+            "failed": failed_count,
+            "processed_values": len(unique_identifier_values)
+        }
 
     def _update_delete_progress(self):
         """Update the delete progress in the import log with robust concurrency handling"""
@@ -2251,3 +2358,169 @@ class CSVProcessor:
         except Exception as e:
             _logger.error(f"Error in _update_delete_progress: {str(e)}")
 
+    def _find_matching_csv_column(self, field_name):
+        """Find the best matching column in CSV for a field name"""
+        if not hasattr(self, 'df') or self.df is None or self.df.empty:
+            return None
+            
+        # Method 1: Direct match
+        if field_name in self.df.columns:
+            self._log_message(f"Found exact column match: '{field_name}'", "info")
+            return field_name
+            
+        # Method 2: Case-insensitive match
+        for col in self.df.columns:
+            if col.lower() == field_name.lower():
+                self._log_message(f"Found case-insensitive match: '{col}'", "info")
+                return col
+                
+        # Method 3: Normalized match (remove spaces, underscores)
+        normalized_field = field_name.lower().replace(' ', '').replace('_', '').replace('-', '')
+        for col in self.df.columns:
+            normalized_col = col.lower().replace(' ', '').replace('_', '').replace('-', '')
+            if normalized_col == normalized_field:
+                self._log_message(f"Found normalized match: '{col}'", "info")
+                return col
+                
+        # Method 4: Partial match
+        best_match = None
+        best_score = 0
+        for col in self.df.columns:
+            # Simple scoring: length of common substring
+            field_lower = field_name.lower()
+            col_lower = col.lower()
+            if field_lower in col_lower or col_lower in field_lower:
+                score = min(len(field_lower), len(col_lower))
+                if score > best_score:
+                    best_score = score
+                    best_match = col
+        
+        if best_match:
+            self._log_message(f"Found partial match: '{best_match}'", "info")
+            return best_match
+                
+        # No match found
+        return None
+
+    def _convert_values_for_field_type(self, values, field_type):
+        """Convert a list of values to the appropriate type based on field_type"""
+        if not values:
+            return values
+            
+        converted_values = []
+        
+        for val in values:
+            if val is None:
+                converted_values.append(val)
+                continue
+                
+            try:
+                # Ensure we're working with string values
+                str_val = str(val).strip()
+                
+                if field_type == 'integer':
+                    # For integer fields, try to convert to int
+                    if str_val.isdigit() or (str_val.startswith('-') and str_val[1:].isdigit()):
+                        converted_values.append(int(str_val))
+                    else:
+                        converted_values.append(val)  # Keep original if can't convert
+                        
+                elif field_type in ('float', 'monetary'):
+                    # For float fields, try to convert to float
+                    # Handle different decimal separators
+                    cleaned = str_val.replace(',', '.')
+                    if cleaned.replace('.', '', 1).isdigit() or (cleaned.startswith('-') and cleaned[1:].replace('.', '', 1).isdigit()):
+                        converted_values.append(float(cleaned))
+                    else:
+                        converted_values.append(val)  # Keep original if can't convert
+                        
+                elif field_type == 'boolean':
+                    # Handle boolean conversions
+                    if str_val.lower() in ('true', 'yes', 'y', '1'):
+                        converted_values.append(True)
+                    elif str_val.lower() in ('false', 'no', 'n', '0'):
+                        converted_values.append(False)
+                    else:
+                        converted_values.append(val)
+                        
+                elif field_type == 'date':
+                    # Date fields - keep as string, Odoo will handle conversion
+                    converted_values.append(str_val)
+                    
+                else:
+                    # For all other types, keep as is
+                    converted_values.append(val)
+                    
+            except Exception as e:
+                # If conversion fails, keep original value
+                self._log_message(f"Warning: Failed to convert '{val}' to {field_type}: {str(e)}", "warning")
+                converted_values.append(val)
+                
+        # Show some information about the conversion
+        if len(values) > 0:
+            original_types = set(type(v).__name__ for v in values)
+            converted_types = set(type(v).__name__ for v in converted_values)
+            
+            if original_types != converted_types:
+                self._log_message(
+                    f"Converted values from {original_types} to {converted_types} for field type '{field_type}'",
+                    "info"
+                )
+                
+        return converted_values
+
+    def _debug_individual_values(self, model_obj, test_values):
+        """Test individual values with detailed debugging for troubleshooting"""
+        field_name = self.unique_identifier_field
+        field_info = model_obj._fields.get(field_name)
+        field_type = field_info.type if field_info else 'char'
+        
+        for test_val in test_values:
+            self._log_message(f"🔍 Detailed debugging for value: '{test_val}' ({type(test_val).__name__})", "info")
+            
+            # Test 1: Standard search (with active=True filter)
+            standard_records = model_obj.search([(field_name, '=', test_val)])
+            
+            # Test 2: Search including inactive records
+            inactive_records = model_obj.with_context(active_test=False).search([(field_name, '=', test_val)])
+            
+            # Test 3: Try with 'ilike' for string fields
+            ilike_records = []
+            if field_type in ('char', 'text', 'html'):
+                ilike_records = model_obj.with_context(active_test=False).search([(field_name, 'ilike', test_val)])
+            
+            # Test 4: Try type conversion
+            converted_val = None
+            converted_records = []
+            
+            try:
+                if field_type == 'integer' and not isinstance(test_val, int):
+                    converted_val = int(str(test_val).strip())
+                elif field_type in ('float', 'monetary') and not isinstance(test_val, float):
+                    converted_val = float(str(test_val).strip().replace(',', '.'))
+                    
+                if converted_val is not None:
+                    converted_records = model_obj.with_context(active_test=False).search(
+                        [(field_name, '=', converted_val)]
+                    )
+            except:
+                pass
+                
+            # Report results
+            self._log_message(
+                f"🔍 Testing '{test_val}' ({type(test_val).__name__}) for field '{field_name}' ({field_type}):\n"
+                f"   - Normal search: {len(standard_records)} records\n"
+                f"   - With inactive: {len(inactive_records)} records\n" +
+                (f"   - With ilike: {len(ilike_records)} records\n" if ilike_records else "") +
+                (f"   - Converted to {converted_val} ({type(converted_val).__name__}): {len(converted_records)} records" if converted_val is not None else ""),
+                "info"
+            )
+            
+            # If we found records, display the first one for inspection
+            if inactive_records:
+                first_record = inactive_records[0]
+                record_value = getattr(first_record, field_name)
+                self._log_message(
+                    f"   - Sample record (id={first_record.id}): {field_name}={record_value} ({type(record_value).__name__}), active={first_record.active}",
+                    "info"
+                )

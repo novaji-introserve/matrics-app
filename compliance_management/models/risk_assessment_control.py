@@ -55,4 +55,5 @@ class RiskAssessmentControl(models.Model):
         ('inactive', 'Inactive')
     ], string='Status', default='draft', tracking=True)
     
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')    
    

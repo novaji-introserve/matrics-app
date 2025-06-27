@@ -18,6 +18,7 @@ class HighRiskJurisdiction(models.Model):
     name = fields.Char("Country/Region Name", required=True)
     country_code = fields.Char("Country Code", size=3)
     risk_score = fields.Float("Risk Score", default=0.0)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     risk_level = fields.Selection(
         [
             ("low", "Low Risk"),
@@ -66,6 +67,7 @@ class NewsearchAPISettings(models.Model):
     )
     last_update = fields.Datetime("Last Update")
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     @api.model
     def get_settings(self):
         settings = self.search([], limit=1)
@@ -108,6 +110,7 @@ class RiskProfileUpdate(models.Model):
     )
     result = fields.Text("Result")
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     def construct_newsapi_url(self,country):
         """
             Constructs a NewsAPI.org URL for crime-related news in a specific country.

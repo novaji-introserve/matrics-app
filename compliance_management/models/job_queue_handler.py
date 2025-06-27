@@ -81,6 +81,8 @@ class OpenSanctionsJobQueue(models.Model):
                                     help="Number of chunks completed for the parent job")
     total_records = fields.Integer('Total Records', default=0,
                                  help="Total number of records in the source file")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
     
     @api.onchange('source_id')
     def _onchange_source_id(self):
@@ -795,6 +797,7 @@ class OpenSanctionsJobConfirm(models.TransientModel):
         ('rerun', 'Rerun Job'),
         ('cancel', 'Cancel Job'),
     ], string='Action', required=True)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
     def confirm_action(self):
         """Confirm the selected action"""
@@ -807,3 +810,4 @@ class OpenSanctionsJobConfirm(models.TransientModel):
             return self.job_id.action_run_job()
         elif self.action == 'cancel':
             return self.job_id.action_cancel_job()
+        

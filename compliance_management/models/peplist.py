@@ -20,6 +20,7 @@ class PepCustomer(models.Model):
                             default=lambda self: str(uuid.uuid4()), readonly=True,  copy=False)
     position = fields.Text(string='Position', tracking=True)
     
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     def init(self):
         # Add performance-critical indexes for large datasets
         self.env.cr.execute("""
@@ -32,3 +33,4 @@ class PepCustomer(models.Model):
         """)
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS pep_list_id_idx ON pep_list (id)")
+        

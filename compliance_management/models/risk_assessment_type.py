@@ -15,3 +15,5 @@ class RiskAssessmentType(models.Model):
 
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string='Code', required=True)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

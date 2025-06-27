@@ -14,6 +14,7 @@ class PepScrapingCron(models.Model):
     _name = 'pep.scraping.cron'
     _description = 'PEP Scraping Cron Jobs'
     
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     @api.model
     def cron_fetch_pep_csv_data(self):
         """
@@ -457,3 +458,4 @@ class PepScrapingCron(models.Model):
             'message': f"Import job created for {source.name}",
             'job_id': job.id
         }
+        

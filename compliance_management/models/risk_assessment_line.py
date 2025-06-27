@@ -45,6 +45,8 @@ class RiskAssessmentLine(models.Model):
     residual_risk_score = fields.Float(
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
     
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
     def init(self):
         """
         Override init() to drop constraint if exists.
@@ -126,3 +128,4 @@ class RiskAssessmentLine(models.Model):
         risk_assessment_id = self.risk_assessment_id.id
         self.env.cr.execute('update res_risk_assessment set risk_rating = (SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s) where id =%s',
                             (risk_assessment_id, risk_assessment_id))
+        

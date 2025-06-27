@@ -21,6 +21,7 @@ class StatisticViewRefresher(models.Model):
     view_name = fields.Char(string="View Name", readonly=True)
     last_refresh = fields.Datetime(string="Last Refresh", readonly=True)
     refresh_interval = fields.Integer(string="Refresh Interval (minutes)", default=60)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     _sql_constraints = [
         (
             "unique_stat",

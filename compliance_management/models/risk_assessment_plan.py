@@ -35,6 +35,7 @@ class RiskAssessmentPlan(models.Model):
                                                help="If checked, composite risk calculation will be used")
     universe_id = fields.Many2one(comodel_name='res.risk.universe', string='Risk Universe',
                                   help="Risk Universe associated with this plan")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
             
     @api.onchange('risk_assessment')
