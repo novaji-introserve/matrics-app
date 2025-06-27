@@ -29,10 +29,12 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','compliance_management', 'web', 'report_xlsx','spreadsheet_oca'],
+    'depends': ['base','compliance_management', 'web', 'report_xlsx'],
 
     # always loaded
+    # order of the files is important, declare model id before referencing them
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/report_entity.xml',
         'views/report_template.xml',

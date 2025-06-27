@@ -110,7 +110,7 @@
         # "data/demo_data/chart/charts.xml", #CHARTS
         # "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
         # "data/transactions.xml", # TRANSACTION
-        # "views/res_users.xml", # USERS
+        "views/res_users.xml", # USERS
         "views/peplist.xml",
         'data/gender.xml',
         'data/identification_type.xml',
