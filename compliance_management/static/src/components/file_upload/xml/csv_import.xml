@@ -94,7 +94,6 @@
                             
                             <!-- Delete Mode Option -->
                             <div t-if="state.selectedModel" class="csv-form-group">
-<<<<<<< HEAD
                                 <!-- <div class="csv-checkbox-container"> -->
                                 <div class="form-check">
                                     <input type="checkbox"
@@ -103,15 +102,6 @@
                                         t-att-checked="state.deleteMode"
                                         t-on-change="onDeleteModeChange" />
                                     <label class="form-check-label" for="delete-mode">Delete Mode (delete records with matching identifiers)</label>
-=======
-                                <div class="csv-checkbox-container">
-                                    <input type="checkbox"
-                                        class="csv-checkbox"
-                                        id="delete-mode"
-                                        t-att-checked="state.deleteMode"
-                                        t-on-change="onDeleteModeChange" />
-                                    <label for="delete-mode">Delete Mode (delete records with matching identifiers)</label>
->>>>>>> 9e153fb (feat(import): implement record deletion via file upload using user-selected unique identifier)
                                 </div>
                                 <p t-if="state.deleteMode" class="csv-help-text">
                                     ⚠️ <strong>Warning:</strong> This will permanently delete records in the database 
