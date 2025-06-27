@@ -28,6 +28,19 @@
         </field>
     </record>
 
+    <record id="res_compl_settings_risk_composite_computation" model="res.compliance.settings">
+        <field name="name">Risk Composite Computation</field>
+        <field name="code">risk_composite_computation</field>
+        <field name="val">avg</field>
+        <field name="narration">Deteremines the policy for computing the risk composite from the set
+            of plan
+            Values:
+            avg: use the average Default
+            sum: use the sum total
+            max: use the maximum. 
+        </field>
+    </record>
+
     <record id="res_compl_settings_default_risk_score" model="res.compliance.settings">
         <field name="name">Default Risk Score</field>
         <field name="code">default_risk_score</field>
