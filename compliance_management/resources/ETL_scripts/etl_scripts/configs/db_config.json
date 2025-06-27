@@ -1,0 +1,18 @@
+{
+  "source_postgres": {
+    "connection_string": "dbname='{dbname}' user='{user}' password='{password}' host='{host}' port='{port}'",
+    "dbname": "icomply",
+    "user": "IComplyDueDiligence",
+    "password": "IcomPlyc@23b41",
+    "host": "172.20.160.111",
+    "port": 5432
+  },
+  "target_postgres": {
+    "connection_string": "dbname='{dbname}' user='{user}' password='{password}' host='{host}' port='{port}'",
+    "dbname": "iComply",
+    "user": "icompy_novaji_user",
+    "password": "icompy_novaji1234567",
+    "host": "172.20.160.111",
+    "port": 5432
+  }
+}
