@@ -72,13 +72,13 @@
     <menuitem
         id="menu_regulatory_report_root"
         name="Regulatory"
-        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        groups="group_regulatory_report,base.group_system"
         parent="compliance_management.menu_compliance_root"
         sequence="1000" />
     <menuitem
         id="menu_regulatory_report_report"
         name="Reports"
-        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        groups="group_regulatory_report,base.group_system"
         parent="menu_regulatory_report_root"
         action="action_regulatory_report"
         sequence="1000" />

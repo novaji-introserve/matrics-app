@@ -1,8 +1,40 @@
 from odoo import _, api, fields, models
+import logging
 import base64
 import io
 from openpyxl import load_workbook
 from odoo.exceptions import UserError
+from copy import copy
+from openpyxl.utils.cell import coordinate_from_string
+
+_logger = logging.getLogger(__name__)
+
+
+class ReportRuns(models.Model):
+    _name = 'res.regulatory.report.run'
+    _description = 'Regulatory Report Runs'
+    _order = 'create_date desc'
+    name = fields.Char(string='Name')
+    report_id = fields.Many2one(
+        comodel_name='res.regulatory.report', string='Report',index=True)
+    # Result fields
+    processed_file = fields.Binary(string="Report File", tracking=True)
+    processed_filename = fields.Char(
+        string="Report Filename", tracking=True)
+    changes_count = fields.Integer(
+        string="Number of Changes Made", readonly=True)
+
+    def action_submit_report(self):
+        return {
+            "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params": {
+                        "title": "Operation successful",
+                        "message": 'Report submitted successfully',
+                        "type": "success",
+                        "sticky": True,
+                    }
+        }
 
 
 class Report(models.Model):
@@ -10,16 +42,23 @@ class Report(models.Model):
     _description = 'Regulatory Report'
     _order = 'name, create_date desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    name = fields.Char(string='Name', required=True)
+    name = fields.Char(string='Name', required=True, tracking=True)
     template_id = fields.Many2one(
-        comodel_name='res.regulatory.report.template', string='Report Template', required=True)
-    date_from = fields.Date(string='Period Start', required=True, index=True)
-    date_to = fields.Date(string='Period End', required=True, index=True)
+        comodel_name='res.regulatory.report.template', string='Report Template', required=True, tracking=True,index=True)
+    date_from = fields.Date(string='Period Start',
+                            required=True, index=True, tracking=True)
+    date_to = fields.Date(string='Period End',
+                          required=True, index=True, tracking=True)
+    run_mode = fields.Selection(string='Run Mode', selection=[('auto', 'Automated'), ('manual', 'Manual')],default='auto',index=True)
+    run_frequency = fields.Selection(string='Run Frequency', selection=[('daily', 'Daily'), ('weekly', 'Weekly'),('monthly','Monthly')],default='monthly')
     # Result fields
-    processed_file = fields.Binary(string="Processed File")
-    processed_filename = fields.Char(string="Processed Filename")
+    processed_file = fields.Binary(string="Processed File", tracking=True)
+    processed_filename = fields.Char(
+        string="Processed Filename", tracking=True)
     changes_count = fields.Integer(
         string="Number of Changes Made", readonly=True)
+    run_ids = fields.One2many(
+        'res.regulatory.report.run', 'report_id', string='Report Runs')
 
     def action_process_report(self):
         """
@@ -30,33 +69,30 @@ class Report(models.Model):
 
         try:
             # Decode binary data
-            
-            file_data = base64.b64decode(self.template_id.template_file)
 
+            file_data = base64.b64decode(self.template_id.template_file)
 
             # Create Excel workbook object from binary data
             workbook = load_workbook(io.BytesIO(file_data))
-            changes_count = 1
+            changes_count = 0
             # Perform find and replace
             item_ids = self.template_id.item_ids
             if item_ids:
                 for i in item_ids:
                     changes_count = self._find_replace_in_workbook(
-                    workbook,
-                    i.code,
-                    i.source_value
+                        workbook,
+                        i.code,
+                        i.get_value()
                     )
-
             # Convert back to binary
             processed_binary = self._workbook_to_binary(workbook)
-
-            # Update record with processed file
-            self.write({
+            run = self.env['res.regulatory.report.run'].create({
+                'name': self.name,
                 'processed_file': processed_binary,
-                'processed_filename': f"processed_{self.template_id.template_file_name}",
-                'changes_count': changes_count
+                'processed_filename': f"{self.template_id.entity_id.code}_{self.template_id.code}",
+                'changes_count': 1,
+                'report_id': self.id
             })
-            
 
             return {
                 'type': 'ir.actions.act_window',
@@ -86,11 +122,40 @@ class Report(models.Model):
 
         # Iterate through all worksheets
         for worksheet in workbook.worksheets:
-            changes_count += self._find_replace_in_worksheet(
-                worksheet, find_val, replace_val
-            )
 
-        return changes_count
+            if isinstance(replace_val, dict):
+                pass
+            if isinstance(replace_val, list):
+                cell = worksheet[find_val]
+                col_letter, row_num = coordinate_from_string(find_val)
+                # Get all cells in that row so we can apply styles per cell
+                row_cells = []
+                for col in range(1, worksheet.max_column + 1):
+                    cell = worksheet.cell(row=row_num, column=col)
+                    row_cells.append(cell)
+                start_row = cell.row
+                new_data = replace_val
+                worksheet.insert_rows(start_row, len(new_data))
+                for i, row in enumerate(new_data):
+                    list_row = list(row)
+                    for j, value in enumerate(list_row):
+                        current_col = j+1
+                        new_cell = worksheet.cell(
+                            row=start_row+i, column=current_col, value=value)
+                        copy_cell = row_cells[j]
+                        if copy_cell.has_style:
+                            new_cell.font = copy(copy_cell.font)
+                            new_cell.border = copy(copy_cell.border)
+                            new_cell.fill = copy(copy_cell.fill)
+            else:
+                self._find_replace_in_cell(
+                    worksheet, find_val, replace_val
+                )
+            changes_count = changes_count+1
+            return changes_count
+
+    def _find_replace_in_cell(self, worksheet, find_val, replace_val):
+        worksheet[f"{find_val.upper()}"] = replace_val
 
     def _find_replace_in_worksheet(self, worksheet, find_val, replace_val):
         """
@@ -201,4 +266,3 @@ class Report(models.Model):
                 # Log error but continue with other records
                 _logger.error(f"Error processing record {record.id}: {str(e)}")
                 continue
-
