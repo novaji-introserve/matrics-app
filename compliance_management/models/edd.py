@@ -334,7 +334,42 @@ class CustomerEDD(models.Model):
             # Check if the approved_by matches the current user ID
             record.is_current_user_approving_officer = (
                 record.approving_officer_id.id == self.env.user.id)
+            
     
+    def _create_alert_history_record(self, template_with_context, recipient, template, notification_type, email_values=None):
+        """Create alert history record for sent email"""
+        try:
+            # Get the rendered HTML for history
+            rendered_html = template_with_context._render_template(
+                template_with_context.body_html,
+                template_with_context.model,
+                [self.id],
+                engine='qweb'
+            )[self.id]
+            
+            # Create alert history record
+            alert_history = self.env['alert.history'].sudo().create({
+                "ref_id": f"{self._name},{self.id}",
+                'html_body': rendered_html,
+                'attachment_data': None,
+                'attachment_link': None,
+                'last_checked': fields.Datetime.now(),
+                'risk_rating': 'low',
+                'process_id': None,
+                'source': self._description,
+                'date_created': fields.Datetime.now(),
+                'email': recipient,
+                'email_cc': email_values.get('email_cc', '') if email_values else '',
+                'narration': f"EDD {notification_type} sent via {template.name}",
+                'name': f"EDD-{self.id} {notification_type.title()} Notification to {recipient}"
+            })
+            
+            _logger.info(f"Alert history created with ID: {alert_history.id} for recipient: {recipient}")
+            
+        except Exception as history_error:
+            _logger.error(f"Failed to create alert history for {recipient}: {str(history_error)}")
+            # Don't raise error here - email was sent successfully, history is secondary
+        
 
     # logic to send email      
     def _send_email_to_officers(self, template_ref, to_creator_only, officer=None):
@@ -469,39 +504,7 @@ class CustomerEDD(models.Model):
                 
                 if email_result:    
                     _logger.info(f"Email sent successfully to {email_values}")
-                    
-                    try:
-                        # Get the rendered HTML for history 
-                        rendered_html = template_with_context._render_template(
-                            template.body_html,
-                            template.model,
-                            [self.id],
-                            engine='qweb'
-                        )[self.id]
-                        
-                        # Create alert history record 
-                        alert_history = self.env['alert.history'].sudo().create({
-                            "ref_id": f"{self._name},{self.id}",
-                            'html_body': rendered_html,
-                            'attachment_data': None,
-                            'attachment_link': None,
-                            'last_checked': fields.Datetime.now(),
-                            'risk_rating': 'low',
-                            'process_id': None,
-                            'source': self._description,
-                            'date_created': fields.Datetime.now(),
-                            'email': primary_email,
-                            'email_cc': email_values.get('email_cc', ''),
-                            'narration': f"EDD notification sent via {template.name}",
-                            'name': f"EDD-{self.id} Email Notification"
-                        })
-                        _logger.info(f"Alert history created with ID: {alert_history.id}")
-                        _logger.info(f"EDD notification sent to officers ({primary_email})")   
-                        
-                    except Exception as history_error:
-                        _logger.error(f"Failed to create alert history: {str(history_error)}")
-                        
-                    return email_result
+                    self._create_alert_history_record(template_with_context, primary_email, template, template.name, email_values)
                 else:
                     error_msg = "Email sending returned no mail ID - send may have failed"
                     _logger.error(error_msg)
@@ -517,7 +520,92 @@ class CustomerEDD(models.Model):
         except Exception as e:
             _logger.error(f"{template.name} Failed to send notification: {str(e)}")
             raise ValidationError(f"{template.name} Failed to send notification: {str(e)}")
+        
+    def _send_approval_request_notification(self):
+        # """Send approval request notification when risk manager completes review"""
+        # Get email template for approval request
+        template = self.env.ref("compliance_management.enhanced_due_diligence_approval_reqired_template", raise_if_not_found=False)
+        if not template:
+            raise ValidationError("Missing email template: enhanced_due_diligence_approval_reqired_template")
 
+        # Get compliance officer groups
+        cco_group = self.env.ref("compliance_management.group_compliance_chief_compliance_officer")
+        co_group = self.env.ref("compliance_management.group_compliance_compliance_officer")
+
+        # Get all officers with valid email addresses
+        officer_users = (cco_group.users | co_group.users).filtered(lambda u: u.email and u.email.strip())
+        
+        if not officer_users:
+            raise ValidationError("No CO/CCO users with valid email addresses found.")
+
+        # Send approval request emails
+        self._send_bulk_emails(template, officer_users, "approval request")
+    
+    def _send_bulk_emails(self, template, recipients, notification_type):
+        """Send emails to multiple recipients with proper error handling"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        edd_url = f"{base_url}/web#id={self.id}&model=res.partner.edd&view_type=form"
+
+        # Track email sending results
+        successful_sends = []
+        failed_sends = []
+
+        # Send email to each recipient
+        for recipient in recipients:
+            try:
+                # Store email address for consistent reference
+                recipient_email = recipient.email
+                
+                # Prepare email context
+                email_context = {
+                    'edd_url': edd_url,
+                    'record_name': self.name,
+                    'officer_name': recipient.name,
+                }
+
+                # Prepare email values (can include CC if needed)
+                email_values = {'email_to': recipient_email}
+                # If you need CC, you can add it here:
+                # email_values['email_cc'] = 'cc@example.com'
+
+                # Send email with context
+                template_with_context = template.with_context(**email_context)
+                email_result = template_with_context.send_mail(
+                    self.id,
+                    force_send=True,
+                    email_values=email_values
+                )
+
+                if email_result:
+                    _logger.info(f"Email sent successfully to {recipient_email} with ID: {email_result}")
+                    successful_sends.append(recipient_email)
+                    # Pass email_values to get CC information
+                    self._create_alert_history_record(template_with_context, recipient_email, template, template.name, email_values)
+                    
+                else:
+                    error_msg = f"Email sending to {recipient_email} returned no mail ID"
+                    _logger.error(error_msg)
+                    failed_sends.append(recipient_email)
+
+            except Exception as send_error:
+                # Use recipient_email if available, otherwise fallback to recipient
+                recipient_ref = recipient_email if 'recipient_email' in locals() else str(recipient)
+                error_msg = f"Failed to send email to {recipient_ref}: {str(send_error)}"
+                _logger.error(error_msg)
+                failed_sends.append(recipient_ref)
+
+        # Handle results
+        if successful_sends:
+            _logger.info(f"EDD {notification_type} notifications sent successfully to: {', '.join(successful_sends)}")
+            
+        if failed_sends:
+            error_msg = f"Failed to send EDD {notification_type} notifications to: {', '.join(failed_sends)}"
+            _logger.error(error_msg)
+            
+            if not successful_sends:  # All emails failed
+                raise ValidationError(f"Failed to send any {notification_type} notifications: {error_msg}")
+            else:  # Some succeeded, some failed
+                _logger.warning(f"Partial failure in {notification_type} email sending: {error_msg}")
 
     def action_notify_officer(self):
         self.write({
@@ -577,30 +665,6 @@ class CustomerEDD(models.Model):
         self._send_email_to_officers(
             'compliance_management.enhanced_due_diligence_review_template', to_creator_only=False)
 
-        # try:
-        #     template = self.env.ref('compliance_management.enhanced_due_diligence_review_template', raise_if_not_found=False)
-        #     if not template:
-        #         _logger.error("Email template not found: compliance_management.enhanced_due_diligence_review_template")
-        #         raise ValidationError("Email template not found")
-        #     approving_officer = self.approving_officer_id
-        #     if not approving_officer or not approving_officer.email:
-        #         _logger.warning("No approving officer configured or missing email")
-        #         return
-
-        #     ctx = {
-        #         # "" add a context to the email template
-        #     }
-        #     template.with_context(**ctx).send_mail(
-        #         self.id, force_send=True, email_values={
-        #             'email_to': approving_officer.email,
-        #         }
-        #     )
-        #     _logger.info(f"Review notification sent to {approving_officer.email}")
-        # except Exception as e:
-        #     _logger.error(f"Failed to send review notification: {str(e)}")
-        #     raise ValidationError(f"Failed to send review notification: {str(e)}")
-        #     # end of email logic
-
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),
@@ -621,50 +685,35 @@ class CustomerEDD(models.Model):
     
     def action_mark_review_completed(self):
         self.ensure_one()
+
         if (self.is_current_user_approving_officer and
             self.status == 'submitted' and
             not self.approving_officer_signature):
             raise ValidationError("Signature must be uploaded before completing review.")
-        self.write({
-            'status': 'completed',
-        })
+
+        # Update status
+        self.write({'status': 'completed'})
+
+        # Identify the creator of the record
+        creator = self.create_uid
+
+        is_creator_risk_manager = creator.has_group('compliance_management.group_compliance_compliance_risk_manager')
+        is_creator_compliance_officer = (
+            creator.has_group('compliance_management.group_compliance_chief_compliance_officer') or
+            creator.has_group('compliance_management.group_compliance_compliance_officer')
+        )
+
+        # Creator is Risk Manager
+        if is_creator_risk_manager:
+            self._send_approval_request_notification()
+            self._send_email_to_officers("compliance_management.enhanced_due_diligence_completed_template", to_creator_only=False)
+
+        # Creator is Compliance Officer or CCO
+        elif is_creator_compliance_officer:
+            self._send_email_to_officers("compliance_management.enhanced_due_diligence_completed_template", to_creator_only=False)
 
 
-        for record in self:
-            creator_user = record.user_id
-
-            if creator_user and creator_user.has_group('compliance_management.group_compliance_compliance_risk_manager'):
-                # Notify CCO and CO officers
-                template = self.env.ref("compliance_management.enhanced_due_diligence_approval_reqired_template", raise_if_not_found=False)
-                if not template:
-                    raise ValidationError("Missing email template: enhanced_due_diligence_approval_reqired_template")
-
-                # Get group users
-                cco_group = self.env.ref("compliance_management.group_compliance_chief_compliance_officer")
-                co_group = self.env.ref("compliance_management.group_compliance_compliance_officer")
-
-                officer_users = (cco_group.users | co_group.users).filtered(lambda u: u.email)
-                emails = [user.email for user in officer_users]
-
-                if not emails:
-                    raise ValidationError("No CO/CCO email addresses found.")
-
-                base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-                edd_url = f"{base_url}/web#id={record.id}&model=res.partner.edd&view_type=form"
-
-                for officer in officer_users:
-                    template.with_context({
-                        'edd_url': edd_url,
-                        'record_name': record.name,
-                        'officer_name': officer.name, 
-                    }).send_mail(
-                        record.id,
-                        force_send=True,
-                        email_values={'email_to': officer.email}
-                    )
-                
-        self._send_email_to_officers("compliance_management.enhanced_due_diligence_completed_template", to_creator_only=False)
-
+        
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),
