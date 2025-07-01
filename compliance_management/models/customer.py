@@ -1358,14 +1358,17 @@ class Customer(models.Model):
     @api.model
     def open_customers(self):
         # Check if the current user belongs to the Chief Compliance Officer group
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
-
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
+        if has_compliance_access:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'customer'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -1391,15 +1394,17 @@ class Customer(models.Model):
 
     @api.model
     def open_vendors(self):
-        # Check if the current user belongs to the Chief Compliance Officer group
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
-
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
+        if has_compliance_access:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'vendor'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
