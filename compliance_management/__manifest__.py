@@ -108,10 +108,6 @@
         "views/transaction_screening_rule.xml",
         "data/transaction_type.xml",
         'data/transaction_screening_rule.xml',
-        # "data/demo_data/sanction/sanction_screening.xml", # SANCTION SCREENING DATA
-        # "data/demo_data/chart/charts.xml", #CHARTS
-        "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
-        # "data/transactions.xml", # TRANSACTION
         "views/res_users.xml", # USERS
         "views/peplist.xml",
         'data/gender.xml',
