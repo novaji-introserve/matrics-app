@@ -1,0 +1,147 @@
+ "res_partner": {
+      "source_table": "res_partner",
+      "target_table": "res_partner2",
+      "primary_key": "id",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "name": { "target": "name", "type": "direct" },
+        "branch_id": {
+          "target": "branch_id",
+          "type": "lookup",
+          "lookup_table": "res_branch",
+          "lookup_key": "id",
+          "lookup_value": "id"
+        },
+        "create_uid": { "target": "create_uid", "type": "direct" }
+      }
+    },
+    
+    "res_partner": {
+      "source_table": "res_partner",
+      "target_table": "res_partner",
+      "primary_key": "id",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "name": { "target": "name", "type": "direct" },
+        "id": {
+          "target": "id",
+          "type": "direct"
+        },
+        "comment": {
+          "target": "branch_id",
+          "type": "lookup",
+          "lookup_table": "res_branch",
+          "lookup_key": "code",
+          "lookup_value": "id"
+        }
+      }
+    }
+     "dbname": "compliance",
+    "user": "odoo",
+    "password": "odoo",
+    "host": "localhost",
+    "port": 5432
+
+    "test_edw_dim_accounts_v2": {
+    "source_table": "test_edw_dim_accounts_v2",
+    "target_table": "res_partner_account",
+    "primary_key": "customer_id",
+    "batch_size": 1000,
+    "dependencies": [],
+    "mappings": {
+        "customer_id": {
+          "target": "customer_id",
+          "type": "lookup",
+          "lookup_table": "res_partner",
+          "lookup_key": "customer_id",
+          "lookup_value": "id"
+        },
+        "category": {
+          "target": "category",
+          "type": "direct"
+        },
+        "category_desc": {
+          "target": "category_description",
+          "type": "direct"
+        },
+        "account_title1": {
+          "target": "name",
+          "type": "direct"
+        },
+        "account_title2": {
+          "target": "account_name",
+          "type": "direct"
+        },
+        "currency": {
+          "target": "currency",
+          "type": "direct"
+        },
+        "acct_officer": {
+          "target": "account_officer_id",
+          "type": "lookup",
+          "lookup_table": "account_officers",
+          "lookup_key": "code",
+          "lookup_value": "id"
+        },
+        "account_status": {
+          "target": "account_status",
+          "type": "direct"
+        },
+        "working_balance": {
+          "target": "balance",
+          "type": "direct"
+        },
+        "opening_date": {
+          "target": "opening_date",
+          "type": "direct"
+        },
+        "branch_name": {
+          "target": "branch_id",
+          "type": "lookup",
+          "lookup_table": "res_branch",
+          "lookup_key": "co_code",
+          "lookup_value": "id"
+        },
+        "account_code": {
+          "target": "account_code",
+          "type": "direct"
+        },
+        "date_created": {
+          "target": "date_created",
+          "type": "direct"
+        },
+        "account_type": {
+          "target": "account_type",
+          "type": "direct"
+        },
+        "account_position": {
+          "target": "account_position",
+          "type": "direct"
+        },
+        "is_joint_account": {
+          "target": "is_joint_account",
+          "type": "direct"
+        },
+        "last_transaction_date": {
+          "target": "last_transaction_date",
+          "type": "direct"
+        }
+    }
+  },
+   "test_watchlist_new": {
+      "source_table": "test_watchlist_new",
+      "target_table": "res_partner_watchlist",
+      "primary_key": "sn",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "sn": { "target": "watchlist_id", "type": "direct" },
+        "first_name": { "target": "first_name", "type": "direct" },
+        "last_name": { "target": "surname", "type": "direct" },
+        "middle_name": { "target": "middle_name", "type": "direct" },
+        "nationality_country": { "target": "nationality", "type": "direct" },
+        "bvn": { "target": "bvn", "type": "direct" }
+      }
+    },
