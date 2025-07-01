@@ -414,7 +414,7 @@
 
     <!-- Disapora Vantage Gold -->
     <record id="compliance_inst_fc_disapora_vantage_gold_subject" model="res.risk.subject">
-        <field name="name">Disapora Vantage Gold</field>
+        <field name="name">Diaspora Vantage Gold</field>
         <field name="code">disapora_vantage_gold</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
     </record>
@@ -573,12 +573,6 @@
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
     </record>
 
-    <!-- Savings  Non Individual -->
-    <record id="compliance_inst_fc_savings_non_individual_subject" model="res.risk.subject">
-        <field name="name">Savings  Non Individual</field>
-        <field name="code">savings_non_individual</field>
-        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
-    </record>
 
     <!-- Platinum Agent Banking Current -->
     <record id="compliance_inst_fc_platinum_agent_banking_current_subject" model="res.risk.subject">
