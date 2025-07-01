@@ -1,0 +1,145 @@
+{
+  "tables": {
+
+    "test_watchlist_inhouse": {
+      "source_table": "test_watchlist_inhouse",
+      "target_table": "res_partner_watchlist",
+      "primary_key": "bvn",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "first_name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "middle_name": {
+          "target": "middle_name",
+          "type": "direct"
+        },
+        "surname": {
+          "target": "surname",
+          "type": "direct"
+        },
+        "bvn": {
+          "target": "bvn",
+          "type": "direct"
+        }
+      }
+    },  
+
+    "new_test_watchlist": {
+      "source_table": "new_test_watchlist",
+      "target_table": "sanction_list",
+      "primary_key": "recordid",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "recordid": {
+          "target": "sanction_id",
+          "type": "direct"
+        },
+        "ind_name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "nationality": {
+          "target": "nationality",
+          "type": "direct"
+        },
+        "source": {
+          "target": "source",
+          "type": "direct"
+        }
+      }
+    },
+
+    "new_test_pep_list": {
+      "source_table": "new_test_pep_list",
+      "target_table": "pep_list",
+      "primary_key": "uniqueidentifier",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "uniqueidentifier": {
+          "target": "unique_id",
+          "type": "direct"
+        },
+        "watchname": {
+          "target": "name",
+          "type": "direct"
+        },
+        "firstname": {
+          "target": "firstname",
+          "type": "direct"
+        },
+        "lastname": {
+          "target": "lastname",
+          "type": "direct"
+        },
+        "presentposition": {
+          "target": "position",
+          "type": "direct"
+        }
+      }
+    },
+    "test_edw_sterling_customers_digital_products": {
+      "source_table": "test_edw_sterling_customers_digital_products",
+      "target_table": "customer_digital_product",
+      "primary_key": "customer_id",
+      "batch_size": 1000,
+      "dependencies": [],
+      "mappings": {
+        "customer_segment": {
+          "target": "customer_segment",
+          "type": "direct"
+        },
+        "customer_id": {
+          "target": "customer_id",
+          "type": "direct"
+        },
+        "customer_name": {
+          "target": "customer_name",
+          "type": "direct"
+        },
+        "ussd": {
+          "target": "ussd",
+          "type": "direct"
+        },
+        "onebank": {
+          "target": "onebank",
+          "type": "direct"
+        },
+        "carded_customer": {
+          "target": "carded_customer",
+          "type": "direct"
+        },
+        "altbank": {
+          "target": "alt_bank",
+          "type": "direct"
+        },
+        "sterlingpro": {
+          "target": "sterling_pro",
+          "type": "direct"
+        },
+        "banca": {
+          "target": "banca",
+          "type": "direct"
+        },
+        "doubble": {
+          "target": "doubble",
+          "type": "direct"
+        },
+        "specta": {
+          "target": "specta",
+          "type": "direct"
+        },
+        "switch": {
+          "target": "switch",
+          "type": "direct"
+        }
+      }
+    }
+
+   
+  }
+}

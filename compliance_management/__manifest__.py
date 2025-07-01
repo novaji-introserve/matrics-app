@@ -107,11 +107,7 @@
         "views/transaction_screening_rule.xml",
         "data/transaction_type.xml",
         'data/transaction_screening_rule.xml',
-        # "data/demo_data/sanction/sanction_screening.xml", # SANCTION SCREENING DATA
-        # "data/demo_data/chart/charts.xml", #CHARTS
-        "data/demo_data/partner/res_partner.xml", #RES_PARTNER / CUSTOMER
-        # "data/transactions.xml", # TRANSACTION
-        # "views/res_users.xml", # USERS
+        "views/res_users.xml", # USERS
         "views/peplist.xml",
         'data/gender.xml',
         'data/identification_type.xml',
@@ -125,7 +121,7 @@
         'data/demo_data/plan/customer_type_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
-        "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
+        # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
         'data/blacklist.xml',
         "views/customer_screening.xml",
         "views/menu_actions.xml",
