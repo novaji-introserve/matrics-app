@@ -503,11 +503,7 @@
             <field name="name">digital.delivery.channel.tree</field>
             <field name="model">digital.delivery.channel</field>
             <field name="arch" type="xml">
-                <tree string="Digital Delivery Channels">
-                    <header>
-                        <button name="action_create_dynamic_demo_subscriptions" type="object" string="Create Random Demo Data" class="btn btn-warning mr-2"  help="Creates random YES/NO subscriptions for all channels dynamically"/>
-                    </header>
-        
+                <tree string="Digital Delivery Channels">      
                 
                     <field name="name"/>
                     <field name="code"/>
