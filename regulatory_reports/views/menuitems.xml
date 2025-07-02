@@ -53,7 +53,7 @@
 
     <menuitem
         id="menu_regulatory_report"
-        name="Regulatory Reports"
+        name="Regulatory"
         groups="compliance_management.group_compliance_compliance_officer,base.group_system"
         parent="compliance_management.menu_compliance_configuration"
         sequence="3000" />
