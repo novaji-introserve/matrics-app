@@ -30,7 +30,16 @@
             </p>
         </field>
     </record>
-
+     <record id="action_regulatory_report_template_item" model="ir.actions.act_window">
+        <field name="name">Regulatory Report Template Item</field>
+        <field name="res_model">res.regulatory.report.template.item</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first report template item
+            </p>
+        </field>
+    </record>
     <record id="action_regulatory_report" model="ir.actions.act_window">
         <field name="name">Regulatory Report</field>
         <field name="res_model">res.regulatory.report</field>
@@ -64,10 +73,17 @@
         sequence="10" />
     <menuitem
         id="menu_regulatory_report_item"
-        name="Report Templates Items"
+        name="Report Items"
         groups="compliance_management.group_compliance_compliance_officer,base.group_system"
         parent="menu_regulatory_report"
         action="action_regulatory_report_item"
+        sequence="20" />
+     <menuitem
+        id="menu_regulatory_report_template_item"
+        name="Report Template Items"
+        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="menu_regulatory_report"
+        action="action_regulatory_report_template_item"
         sequence="20" />
     <menuitem
         id="menu_regulatory_report_root"

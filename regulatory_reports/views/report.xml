@@ -40,10 +40,12 @@
                         <notebook>
                             <page name="Report Runs" string="Report Runs">
                                 <field name="run_ids">
-                                    <tree create="false" edit="false" delete="true" context="{'default_report_id': id}">
+                                    <tree create="false" edit="false" delete="true"
+                                        context="{'default_report_id': id}">
                                         <field name="name" />
-                                        <!--  <field name="processed_file" widget="binary" filename="processed_filename"/> -->
-                                        <field name="processed_filename"/>
+                                        <!--  <field name="processed_file" widget="binary"
+                                        filename="processed_filename"/> -->
+                                        <field name="processed_filename" />
                                         <field name="write_uid" />
                                         <field name="write_date" />
                                     </tree>
@@ -73,7 +75,7 @@
                 </tree>
             </field>
         </record>
-          <record id="view_report_run_form" model="ir.ui.view">
+        <record id="view_report_run_form" model="ir.ui.view">
             <field name="name">report.run.form</field>
             <field name="model">res.regulatory.report.run</field>
             <field name="arch" type="xml">
@@ -107,12 +109,31 @@
             <field name="arch" type="xml">
                 <tree string="Regulatory Report Runs">
                     <field name="name" />
-                    <field name="processed_file" widget="binary" filename="processed_filename"/>
+                    <field name="processed_file" widget="binary" filename="processed_filename" />
                     <field name="processed_filename" invisible="1" />
                     <field name="write_uid" />
                     <field name="write_date" />
                 </tree>
             </field>
         </record>
+        <record id="view_regulatory_report_search" model="ir.ui.view">
+            <field name="name">Report Search</field>
+            <field name="model">res.regulatory.report</field>
+            <field name="priority" eval="10" />
+            <field name="arch" type="xml">
+                <search string="Search Template Items">
+                    <field name="name" />
+                    <field name="template_id" />
+                    <separator />
+                    <group expand="0" name="group_by" string="Group By">
+                        <filter name="group_name" string="Name" domain="[]"
+                            context="{'group_by' : 'name'}" />
+                        <filter name="group_template" string="Template"
+                            context="{'group_by': 'template_id'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
     </data>
 </odoo>
