@@ -230,6 +230,7 @@ class CustomerEDD(models.Model):
     is_diligence_officer = fields.Boolean(default=lambda self: (self.env.user.has_group('compliance_management.group_compliance_compliance_officer') or
         self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
     ), store=False)
+    created_by_rm = fields.Boolean(compute='_compute_created_by_rm', store=False)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     reject_reason = fields.Text(string='Reject Reason', tracking =True)
     
@@ -273,7 +274,7 @@ class CustomerEDD(models.Model):
         user = self.env.user
         is_cco = user.has_group('compliance_management.group_compliance_chief_compliance_officer')
         is_co = user.has_group('compliance_management.group_compliance_compliance_officer')
-        is_relationship_manager= user.has_group('compliance_management.group_compliance_compliance_risk_manager')
+        is_relationship_manager= user.has_group('compliance_management.group_compliance_relationship_manager')
         return is_cco or is_co or is_relationship_manager 
             
     @api.depends_context('uid')
@@ -283,7 +284,7 @@ class CustomerEDD(models.Model):
             # Check groups once
             is_cco = current_user.has_group('compliance_management.group_compliance_chief_compliance_officer')
             is_co = current_user.has_group('compliance_management.group_compliance_compliance_officer')
-            is_relationship_manager= current_user.has_group('compliance_management.group_compliance_compliance_risk_manager')
+            is_relationship_manager= current_user.has_group('compliance_management.group_compliance_relationship_manager')
             
             # Handle new vs existing records
             if not record.id:  # New record (not saved yet)
@@ -295,7 +296,7 @@ class CustomerEDD(models.Model):
                 _logger.info(f"[EDD] Record ID: {record.id}, User ID: {record.user_id}")
             
             # Calculate editability
-            record.is_editable_user = is_cco or (is_co and is_creator) or (is_relationship_manager and is_creator)
+            record.is_editable_user = (is_cco and is_creator) or (is_co and is_creator) or (is_relationship_manager and is_creator)
             
             # Final logging
             _logger.info(f"[EDD] Is CCO: {is_cco}, Is CO: {is_co}, Is Creator: {is_creator}")
@@ -304,13 +305,18 @@ class CustomerEDD(models.Model):
 
     @api.model
     def _default_is_relationship_manager(self):
-        return self.env.user.has_group('compliance_management.group_compliance_compliance_risk_manager')
+        return self.env.user.has_group('compliance_management.group_compliance_relationship_manager')
   
     @api.depends_context('uid')
     def _compute_is_relationship_manager(self):
         for record in self:
             record.is_relationship_manager = self.env.user.has_group(
-                'compliance_management.group_compliance_compliance_risk_manager')
+                'compliance_management.group_compliance_relationship_manager')
+            
+    def _compute_created_by_rm(self):
+        rm_group = self.env.ref("compliance_management.group_compliance_relationship_manager")
+        for record in self:
+            record.created_by_rm = (record.create_uid in rm_group.users)
             
 
 
@@ -392,7 +398,7 @@ class CustomerEDD(models.Model):
             compliance_groups = [
                 self.env.ref('compliance_management.group_compliance_chief_compliance_officer'),
                 self.env.ref('compliance_management.group_compliance_compliance_officer'),
-                self.env.ref('compliance_management.group_compliance_compliance_risk_manager'),
+                self.env.ref('compliance_management.group_compliance_relationship_manager'),
             ]
             
             # Get all users from compliance groups
@@ -522,7 +528,6 @@ class CustomerEDD(models.Model):
             raise ValidationError(f"{template.name} Failed to send notification: {str(e)}")
         
     def _send_approval_request_notification(self):
-        # """Send approval request notification when risk manager completes review"""
         # Get email template for approval request
         template = self.env.ref("compliance_management.enhanced_due_diligence_approval_reqired_template", raise_if_not_found=False)
         if not template:
@@ -651,9 +656,7 @@ class CustomerEDD(models.Model):
         self.ensure_one()
         # Perform attestation check before allowing submission
         if (self.is_current_user_responsible and
-            self.status == 'draft' and
-            not self.is_cco and
-            not self.is_co and
+            self.status == 'draft' and 
             not self.attestation_checked):
             raise ValidationError("Attestation must be checked before submission.")
 
@@ -697,14 +700,14 @@ class CustomerEDD(models.Model):
         # Identify the creator of the record
         creator = self.create_uid
 
-        is_creator_risk_manager = creator.has_group('compliance_management.group_compliance_compliance_risk_manager')
+        is_creator_relationship_manager = creator.has_group('compliance_management.group_compliance_relationship_manager')
         is_creator_compliance_officer = (
             creator.has_group('compliance_management.group_compliance_chief_compliance_officer') or
             creator.has_group('compliance_management.group_compliance_compliance_officer')
         )
 
         # Creator is Risk Manager
-        if is_creator_risk_manager:
+        if is_creator_relationship_manager:
             self._send_approval_request_notification()
             self._send_email_to_officers("compliance_management.enhanced_due_diligence_completed_template", to_creator_only=False)
 

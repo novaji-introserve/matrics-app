@@ -66,13 +66,13 @@
                             class="oe_highlight"
                             type="object"
                             string="Submit for Review"
-                            groups="compliance_management.group_compliance_branch_compliance_officer"
+                            groups="compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager"
                             attrs="{'invisible': ['|', ('is_officer_notified', '!=', True), '|', ('status', '!=', 'draft'), ('is_current_user_responsible', '=', False)]}"/>
                     
                     <button name="action_mark_review_completed"
                             class="oe_highlight"
                             type="object"
-                            string="Review Completed"
+                            string="Complete"
                             attrs="{'invisible': ['|', ('status', '!=', 'submitted'), ('is_current_user_approving_officer', '=', False)]}"/>
 
 
@@ -80,28 +80,35 @@
                             class="oe_highlight"
                             type="object"
                             string="Approve"
-                            groups="compliance_management.group_compliance_branch_compliance_officer"
-                            attrs="{'invisible': ['|', ('status', '!=', 'completed'), ('is_diligence_officer', '=', False)]}"/>
+                            groups="compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager"
+                            attrs="{'invisible': ['|', '|', ('status', '!=', 'completed'), ('is_editable_user', '=', False), ('is_diligence_officer', '=', False)]}"/>
+
+                     <button name="action_approve"
+                            class="oe_highlight"
+                            type="object"
+                            string="Approve"
+                            groups="compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager"
+                            attrs="{'invisible': ['|', '|', ('status', '!=', 'completed'), ('created_by_rm', '=', False ), ('is_diligence_officer', '=', False)]}"/>
 
                     <button name="action_cancel"
                             class="oe_highlight"
                             type="object"
                             string="Cancel"
-                            groups="compliance_management.group_compliance_branch_compliance_officer"
+                            groups="compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager"
                             attrs="{'invisible': ['|', ('status', 'in', ['cancelled', 'approved', 'draft','rejected','completed']), ('is_current_user_responsible', '=', False)]}" />
 
                     <button name="action_archive"
                             class="oe_highlight"
                             type="object"
                             string="Archive"
-                            groups="compliance_management.group_compliance_branch_compliance_officer"
+                            groups="compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager"
                             attrs="{'invisible': ['|', ('status', 'not in', ['approved']), ('is_editable_user', '=', False)]}" />
 
                     <button name="action_send_back"
                             class="oe_highlight"
                             type="object"
                             string="Send Back"
-                            groups="compliance_management.group_compliance_branch_compliance_officer"
+                            groups="compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager"
                             attrs="{'invisible': ['|', ('status', '!=', 'rejected'), ('is_editable_user', '=', False)]}"/>
 
                     <!-- First button: for approving officer -->
@@ -109,22 +116,28 @@
                             class="oe_highlight" 
                             type="object" 
                             string="Reject"
-                            groups="compliance_management.group_compliance_branch_compliance_officer" 
-                            attrs="{'invisible': ['|', ('status', 'not in', ['completed', 'submitted']), ('is_current_user_approving_officer', '=', False)]}"/>
+                            groups="compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager" 
+                            attrs="{'invisible': ['|', ('status', '!=','submitted'), ('is_current_user_approving_officer', '=', False)]}"/>
 
-                    <!-- Second button: for diligence officer-->
                     <button name="open_reject_wizard" 
                             class="oe_highlight" 
                             type="object" 
                             string="Reject"
                             groups="compliance_management.group_compliance_compliance_officer" 
-                            attrs="{'invisible': ['|', '|', ('status', '!=', 'completed'), ('is_diligence_officer', '=', False), ('is_current_user_approving_officer', '=', True)]}"/>
+                            attrs="{'invisible': ['|', ('status', '!=', 'completed'), ('is_editable_user', '=', False)]}"/>
+
+                    <button name="open_reject_wizard" 
+                            class="oe_highlight" 
+                            type="object" 
+                            string="Reject"
+                            groups="compliance_management.group_compliance_compliance_officer" 
+                            attrs="{'invisible': ['|', '|', ('status', '!=', 'completed'), ('created_by_rm', '=', False ), ('is_diligence_officer', '=', False)]}"/>
 
                     <button name="action_download_pdf"
                             string="Download Document"
                             type="object"
                             class="oe_highlight"
-                            groups="compliance_management.group_compliance_branch_compliance_officer"
+                            groups="compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager"
                             attrs="{'invisible': [('status', 'not in', ['approved', 'archived'])]}" />
                    
 
@@ -140,6 +153,7 @@
                             <field name="is_relationship_manager" invisible="1"/>
                             <field name="is_diligence_officer" invisible="1"/>
                             <field name="is_officer_notified" invisible="1"/>
+                            <field name="created_by_rm" invisible="1"/>
                             <field name="name" attrs="{'readonly': ['|', ('is_editable_user', '=', False), ('status', 'in', ['approved','archived','completed'])], 'required': [('is_editable_user', '=', True)]}"/>
                         </group>
 
