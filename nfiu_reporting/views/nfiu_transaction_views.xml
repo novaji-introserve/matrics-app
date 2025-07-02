@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="open_transactions" model="ir.actions.server">
+      <field name="name">Open NFIU CTR Transactions</field>
+      <field name="model_id" ref="model_res_customer_transaction" />
+      <field name="type">ir.actions.server</field>
+      <field name="state">code</field>
+      <field name="code">action = model.open_transactions()</field>
+    </record>
+    <record id="other_transactions" model="ir.actions.server">
+      <field name="name">Open NFIU FTR Transactions</field>
+      <field name="model_id" ref="model_res_customer_transaction" />
+      <field name="type">ir.actions.server</field>
+      <field name="state">code</field>
+      <field name="code">action = model.other_transactions()</field>
+    </record>
+    <!-- NFIU Transaction Form View -->
+    <!--
+    <record id="view_nfiu_transaction_form" model="ir.ui.view">
+      <field name="name">nfiu.transaction.form</field>
+      <field name="model">nfiu.transaction</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <group>
+                <field name="transaction_number" />
+                <field name="internal_ref_number" />
+                <field name="transaction_location" />
+                <field name="date_transaction" />
+                <field name="value_date" />
+              </group>
+              <group>
+                <field name="amount_local" />
+                <field name="transmode_code" />
+                <field name="transmode_comment" />
+                <field name="teller" />
+                <field name="authorized" />
+              </group>
+            </group>
+
+            <group>
+              <field name="description" placeholder="Transaction description..." />
+            </group>
+
+            <notebook>
+              <page string="From Party">
+                <group>
+                  <group>
+                    <field name="from_person_id" />
+                    <field name="from_entity_id" />
+                    <field name="from_account_id" />
+                  </group>
+                  <group>
+                    <field name="from_funds_code" />
+                    <field name="from_funds_comment" />
+                    <field name="from_country" />
+                  </group>
+                </group>
+              </page>
+
+              <page string="To Party">
+                <group>
+                  <group>
+                    <field name="to_person_id" />
+                    <field name="to_entity_id" />
+                    <field name="to_account_id" />
+                  </group>
+                  <group>
+                    <field name="to_funds_code" />
+                    <field name="to_funds_comment" />
+                    <field name="to_country" />
+                  </group>
+                </group>
+              </page>
+
+              <page string="Comments">
+                <field name="comments" placeholder="Additional comments..." />
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+  -->
+  </data>
+</odoo>

@@ -35,7 +35,7 @@
                     </group>
                     <notebook>
                         <page name="narration" string="Narration">
-                            <field name="narration" />
+                            <field name="narration" widget="html" />
                         </page>
                     </notebook>
                 </sheet>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_compliance_settings_nfiu_ctr_currency" model="res.compliance.settings">
+            <field name="name">Default Currency for Currency Transactions</field>
+            <field name="code">nfiu_default_ctr_currency</field>
+            <field name="val">NGN</field>
+            <field name="narration">Default currency for foreign transaction</field>
+        </record>
+        <!-- Sequence for NFIU Reports -->
+        <record id="seq_nfiu_report" model="ir.sequence">
+            <field name="name">NFIU Report Sequence</field>
+            <field name="code">nfiu.report</field>
+            <field name="prefix">NFIU</field>
+            <field name="padding">6</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Sample Report Indicators -->
+        <record id="indicator_threshold" model="nfiu.indicator">
+            <field name="name">Threshold Report</field>
+            <field name="code">THRESHOLDREPORT</field>
+            <field name="category">THRESHOLDREPORT</field>
+            <field name="description">Transaction exceeds reporting threshold</field>
+        </record>
+
+        <record id="indicator_cilpa1" model="nfiu.indicator">
+            <field name="name">Customer refuses to provide identification</field>
+            <field name="code">CILPA1</field>
+            <field name="category">CILPA</field>
+            <field name="description">Customer refuses to provide identification or provides
+                suspicious identification</field>
+        </record>
+
+        <record id="indicator_ma1" model="nfiu.indicator">
+            <field name="name">Frequent cash transactions</field>
+            <field name="code">MA1</field>
+            <field name="category">MA</field>
+            <field name="description">Customer conducts frequent cash transactions</field>
+        </record>
+
+
+        <!-- Menu Items -->
+        <menuitem id="menu_nfiu_main" name="NFIU" sequence="3500"
+            parent="regulatory_reports.menu_regulatory_report_root" />
+        <menuitem id="menu_nfiu_ctr_transactions" action="open_transactions" parent="menu_nfiu_main"
+            name="CTR Transactions" sequence="1" />
+        <menuitem id="menu_nfiu_ftr_transactions" action="other_transactions" parent="menu_nfiu_main"
+            name="FTR Transactions" sequence="2" />
+        <menuitem id="menu_nfiu_reports"
+            name="Reports"
+            parent="menu_nfiu_main"
+            action="action_nfiu_report"
+            sequence="10" />
+
+        <!--menuitem id="menu_nfiu_export"
+            name="Export Reports"
+            parent="menu_nfiu_main"
+            action="action_nfiu_export_wizard"
+            sequence="20" /-->
+
+        <menuitem id="menu_nfiu_config" name="NFIU Reports"
+            parent="compliance_management.menu_compliance_configuration" sequence="3500" />
+
+        <menuitem id="menu_nfiu_persons"
+            name="Persons"
+            parent="menu_nfiu_config"
+            action="action_nfiu_person"
+            sequence="10" />
+
+        <menuitem id="menu_nfiu_entities"
+            name="Entities"
+            parent="menu_nfiu_config"
+            action="action_nfiu_entity"
+            sequence="20" />
+        <menuitem id="menu_nfiu_entity_directors"
+            name="Directors"
+            parent="menu_nfiu_config"
+            action="action_nfiu_entity_director"
+            sequence="25" />
+        <menuitem id="menu_nfiu_indicators"
+            name="Report Indicators"
+            parent="menu_nfiu_config"
+            action="action_nfiu_indicator"
+            sequence="30" />
+        <menuitem id="menu_nfiu_currency_threshold"
+            name="Currency Thresholds"
+            parent="menu_nfiu_config"
+            action="action_nfiu_currency_threshold"
+            sequence="40" />
+    </data>
+</odoo>
