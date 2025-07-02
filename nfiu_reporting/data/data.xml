@@ -82,7 +82,10 @@
             <field name="role">E</field>
             <field name="start_date">2020-01-01</field>
         </record>
+<<<<<<< HEAD
         <!--
+=======
+>>>>>>> 816be76 (XML Schema Validator)
         <record id="nfiu_report_1" model="nfiu.report">
             <field name="name">Sample Report/CTR</field>
             <field name="rentity_id">100</field>
@@ -95,6 +98,9 @@
             <field name="action">Generate CTR transactions and submit monthly filing of CTR</field>
             <field name="reporting_person_id" ref="nfiu_person_1"/>
         </record>
+<<<<<<< HEAD
     -->
+=======
+>>>>>>> 816be76 (XML Schema Validator)
     </data>
 </odoo>

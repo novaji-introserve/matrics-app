@@ -45,7 +45,11 @@ def report_transactions():
                     'authorized': 'SYSTEM',
                     'transmode_code': 'E',
                     'transmode_comment': t.narration,
+<<<<<<< HEAD
                     'amount_local': abs(t.amount),
+=======
+                    'amount_local': t.amount,
+>>>>>>> 816be76 (XML Schema Validator)
                     'from_funds_comment': t.narration,
                     'to_funds_comment': t.narration,
                     'comments': t.narration

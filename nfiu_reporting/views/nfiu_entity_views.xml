@@ -9,6 +9,7 @@
                 <tree>
                     <field name="name" />
                     <field name="commercial_name" />
+<<<<<<< HEAD
                     <field name="branch_id" />
                     <field name="identification_id" />
                     <field name="entity_reference" />
@@ -18,6 +19,12 @@
                     <field name="incorporation_legal_form" />
                     <field name="write_uid" optional="show" />
                     <field name="write_date" optional="show" />
+=======
+                    <field name="incorporation_number" />
+                    <field name="incorporation_legal_form" />
+                    <field name="write_uid" />
+                    <field name="write_date" />
+>>>>>>> 816be76 (XML Schema Validator)
                 </tree>
             </field>
         </record>
@@ -35,17 +42,21 @@
                                 <field name="name" placeholder="Name" />
                             </h1>
                         </div>
+<<<<<<< HEAD
                         <div class="oe_title">
                             <label for="company_id" class="oe_edit_only" />
                             <h1>
                                 <field name="company_id" placeholder="Related Company" />
                             </h1>
                         </div>
+=======
+>>>>>>> 816be76 (XML Schema Validator)
 
                         <group>
                             <group>
                                 <field name="commercial_name" />
                                 <field name="incorporation_legal_form" />
+<<<<<<< HEAD
                                 <field name="identification_id" />
                                 <field name="entity_reference" />
                                 <field name="fiu_reference" />
@@ -54,6 +65,12 @@
                                 <field name="incorporation_number" />
                                 <field name="business" />
                                 <field name="incorporation_country_code" />
+=======
+                                <field name="incorporation_number" />
+                                <field name="business" />
+                                <field name="incorporation_country_code" />
+                                <field name="incorporation_date" />
+>>>>>>> 816be76 (XML Schema Validator)
                             </group>
                             <group>
                                 <field name="email" />
@@ -61,7 +78,10 @@
                                 <field name="phone" />
                                 <field name="tax_number" />
                                 <field name="tax_reg_number" />
+<<<<<<< HEAD
                                 <field name="incorporation_date" />
+=======
+>>>>>>> 816be76 (XML Schema Validator)
                             </group>
                         </group>
                         <notebook>

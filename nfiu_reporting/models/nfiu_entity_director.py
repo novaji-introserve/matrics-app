@@ -8,7 +8,11 @@ from datetime import datetime, timedelta
 
 class NFIUEntityDirector(models.Model):
     _name = 'nfiu.entity.director'
+<<<<<<< HEAD
     _description = 'Entity Director'
+=======
+    _description = 'NFIU Entity Director'
+>>>>>>> 816be76 (XML Schema Validator)
     _inherit = ['mail.thread', 'mail.activity.mixin']
     entity_id = fields.Many2one(
         'nfiu.entity', string='Entity', required=True, ondelete='cascade',tracking=True)

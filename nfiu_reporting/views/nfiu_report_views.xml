@@ -9,11 +9,16 @@
         <tree decoration-success="state=='validated'" decoration-warning="state=='generated'"
           decoration-danger="state=='error'">
           <field name="name" />
+<<<<<<< HEAD
           <field name="entity_id" />
           <field name="report_code" />
           <field name="submission_date" />
           <field name="date_from" />
           <field name="date_to" />
+=======
+          <field name="report_code" />
+          <field name="submission_date" />
+>>>>>>> 816be76 (XML Schema Validator)
           <field name="currency_code_local" />
           <field name="state" widget="badge" decoration-danger="state == 'error'" decoration-warning="state in ['generated']" decoration-success="state in ['validated','submitted']" />
           <button name="generate_xml" type="object" string="Generate XML" icon="fa-file-code-o"
@@ -31,8 +36,14 @@
       <field name="arch" type="xml">
         <form>
           <header>
+<<<<<<< HEAD
             <button name="generate_xml" type="object" string="Generate XML" class="btn-info" />
             <button name="set_generated" type="object" string="Set To Generated" class="btn-info"
+=======
+            <button name="generate_xml" type="object" string="Generate XML" class="btn-primary"
+              attrs="{'invisible': [('state', 'not in', ['draft'])]}" />
+            <button name="set_generated" type="object" string="Set To Generated" class="btn-primary"
+>>>>>>> 816be76 (XML Schema Validator)
               attrs="{'invisible': [('state', 'in', ['generated'])]}" />
             <button name="validate_xml" type="object" string="Validate XML" class="btn-success"
               attrs="{'invisible': [('state', 'not in', ['generated'])]}" />
@@ -47,10 +58,13 @@
               <h1>
                 <field name="name" placeholder="Report Name" />
               </h1>
+<<<<<<< HEAD
               <label for="entity_id" class="oe_edit_only" />
               <h1>
                 <field name="entity_id"/>
               </h1>
+=======
+>>>>>>> 816be76 (XML Schema Validator)
             </div>
 
             <group>
@@ -63,8 +77,11 @@
                 <field name="fiu_ref_number" />
               </group>
               <group>
+<<<<<<< HEAD
                 <field name="date_from" />
                 <field name="date_to" />
+=======
+>>>>>>> 816be76 (XML Schema Validator)
                 <field name="submission_date" />
                 <field name="currency_code_local" />
                 <field name="reporting_person_id" />
@@ -146,15 +163,27 @@
 
     <!-- Action for NFIU Reports -->
     <record id="action_nfiu_report" model="ir.actions.act_window">
+<<<<<<< HEAD
       <field name="name">Financial Intelligence Reports</field>
+=======
+      <field name="name">NFIU Reports</field>
+>>>>>>> 816be76 (XML Schema Validator)
       <field name="res_model">nfiu.report</field>
       <field name="view_mode">tree,form</field>
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
+<<<<<<< HEAD
           Create a new Report
         </p>
         <p>
           Generate XML reports for financial intelligence reporting.
+=======
+          Create a new NFIU Report
+        </p>
+        <p>
+          Generate XML reports compliant with NFIU goAML schema for financial intelligence
+          reporting.
+>>>>>>> 816be76 (XML Schema Validator)
         </p>
       </field>
     </record>
