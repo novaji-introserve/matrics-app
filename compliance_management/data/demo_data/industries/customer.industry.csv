@@ -1,265 +1,265 @@
 id,name,code
-industry_clients_executorships,Clients & Executorships,4814
-industry_trustees_fiduciary_accounts,Trustees & Fiduciary Accounts,4816
-industry_logistics,Logistics,4817
-industry_embassy_high_commission,Embassy/High Commission,4819
-industry_supermarket,Supermarket,4820
-industry_restaurant,Restaurant,4821
-industry_retail_computers_software,Retail sale of computers, software,4822
-industry_telemarketing,Telemarketing,4823
-industry_clearing_forwarding,Clearing and Forwarding,4824
-industry_estate_deceased_individuals,Estate (Deceased Individuals),4825
-industry_automotive_parts,Automotive Parts,4901
-industry_domestic_trade,Domestic trade,4902
-industry_jewelry_dealer,Jewelry Dealer,4903
-industry_precious_metal_dealer,Precious Metal Dealer,4904
-industry_automobile_motor_vehicles,"Automobile ,Motor Vehicles",4905
-industry_food_processing,Food Processing,4906
-industry_chemicals_allied_products,Chemicals and Allied Products,4907
-industry_trading_rice,"Trading ,Rice",4908
-industry_trading_cocoa,"Trading ,Cocoa",4909
-industry_generator_sales_services,"Generator set, sales and services",4910
-industry_groundnuts_groundnut_oil,Groundnuts and Groundnut oil,4911
-industry_palm_produce,Palm Produce,4912
-industry_cotton,Cotton,4913
-industry_hides_skins,Hides and Skins,4914
-industry_rubber_rubber_products,Rubber and Rubber Products,4915
-industry_timber_timber_products,Timber and Timber Products,4916
-industry_other_agricultural_exports,Other Agricultural Exports,4917
-industry_non_agricultural_exports,Non Agricultural Exports,4918
-industry_imports,Imports,4919
-industry_retail_merchant,Retail Merchant,4921
-industry_export,Export,4922
-industry_car_boat_plane_dealership,Car/Boat/Plane Dealership,4923
-industry_wholesalers_consumer_electronics,Wholesalers of Consumer Electronics,4924
-industry_luxury_goods,Luxury Goods,4925
-industry_federal_direct,"Federal, Direct",5001
-industry_federal_mdas,"Federal, MDAs",5002
-industry_state_direct,"State, Direct",5003
-industry_state_mdas,"State, MDAs",5004
-industry_local_direct,"Local, Direct",5005
-industry_local_mdas,"Local, MDAs",5006
-industry_human_health_activities,Human health activities,5101
-industry_residential_care_activities,Residential care activities,5102
-industry_social_work_without_accommodation,Social Work without Accommodation,5103
-industry_domestic_care_services,Domestic Care Services,5104
-industry_publishing_activities,Publishing activities,5201
-industry_video_television_programme_production,Video n televisn programe productn,5202
-industry_programming_broadcasting_act,Programming and broadcasting act,5203
-industry_telecommunications,Telecommunications,5204
-industry_programming_consult_related_act,"programing, consult n related act",5205
-industry_information_service_activities,Information service activities,5206
-industry_printing_publishing,Printing and Publishing,5207
-industry_flourmills_bakeries,Flourmills and Bakeries,5301
-industry_food_manufacturing,Food manufacturing,5302
-industry_beverages,Beverages,5303
-industry_aluminium_allied_products,Aluminium and allied products,5304
-industry_basic_metal_products,Basic Metal Products,5305
-industry_breweries,Breweries,5306
-industry_building_materials,Building materials,5307
-industry_cement,Cement,5308
-industry_chemicals_allied_products_5309,Chemicals and Allied products,5309
-industry_footwear,Footwear,5310
-industry_hides_skin,Hides and Skin,5311
-industry_household_equipment,Household Equipment,5312
-industry_pharmaceuticals,Pharmaceuticals,5313
-industry_paints_allied_products,Paints and Allied products,5314
-industry_miscellaneous_manufacturing,Miscellaneous Manufacturing,5315
-industry_paper_paper_products,Paper and Paper products,5316
-industry_printing_publishing_5317,Printing and Publishing,5317
-industry_personal_care,Personal care,5318
-industry_plastics,Plastics,5319
-industry_rubber_allied_products,Rubber and Allied products,5320
-industry_steel_rolling_mills,Steel Rolling Mills,5321
-industry_soft_drinks,Soft Drinks,5322
-industry_cables_mines,Cables and Mines,5323
-industry_textiles_apparel,Textiles and Apparel,5324
-industry_tyre,Tyre,5325
-industry_conglomerate,Conglomerate,5326
-industry_meat_food_process_can_cold_store,"Meat,Food Process,Can n Cold Store",5327
-industry_wood_products_including_furniture,Wood Products including Furniture,5328
-industry_soap_oil_detergent,"Soap, Oil Detergent",5329
-industry_metal_tin_iron_etc,"Metal Tin, Iron, etc",5401
-industry_non_metal_quarrying,Non.metal Quarrying,5402
-industry_coal,Coal,5403
-industry_oil_downstream,Oil . downstream,5501
-industry_oil_upstream,Oil . upstream,5502
-industry_natural_gas,Natural gas,5503
-industry_crude_oil_refining,Crude oil refining,5504
-industry_oil_gas_services,Oil & Gas Services,5505
-industry_independent_power_projects_ipp,"Independent Power Projects ,IPP",5601
-industry_power_generation_power_plants,"Power generation,power plants",5602
-industry_power_transmission,Power transmission,5603
-industry_power_distribution,Power distribution,5604
-industry_legal_accounting_activities,Legal and accounting activities,5701
-industry_act_headoff_mgt_consultancy_act,"Act of headoff, mgt consutancy act",5702
-industry_arch_eng_act_tech_testing_analysis,Arch n eng act tech tstng n anlysis,5703
-industry_scientific_research_dev,Scientific research and dev,5704
-industry_advertising_market_research,Advertising and market research,5705
-industry_oth_prof_scientific_tech_act,"Oth prof, scientific and tech act",5706
-industry_veterinary_activities,Veterinary activities,5707
-industry_sole_practitioners,Sole Practitioners,5708
-industry_tax_consultant,Tax Consultant,5709
-industry_estate_surveyors_valuers,Estate Surveyors and Valuers,5710
-industry_accounting_professionals_services,Accounting Professionals/Services,5711
-industry_utility_private,"Utility, Private",5801
-industry_utility_public,"Utility, Public",5802
-industry_residential_mortgage_loans,Residential Mortgage Loans,5901
-industry_commercial_property,Commercial Property,5902
-industry_home_equity,Home Equity,5903
-industry_real_estate_const_home_developers,Real estate Const. Home Developers,5904
-industry_real_estate_income_producing,"Real Estate, Income.Producing",5905
-industry_high_volatility_comm_real_estate,High.volatility Comm real estate,5906
-industry_non_residential,Non Residential,5907
-industry_owner_occupier_property,Owner.Occupier.Property,5908
-industry_onehome,OneHome,5909
-industry_estate_developer,Estate Developer,5910
-industry_campaign_account,Campaign Account,3101
-industry_political_party,Political Party,3102
-industry_road_transport,Road transport,6001
-industry_water_transport,Water transport,6002
-industry_air_transport,Air transport,6003
-industry_warehouse_support_act_trans,Warehouse n Support act for Trans.,6004
-industry_postal_courier_activities,Postal and courier activities,6005
-industry_rail_transport,Rail Transport,6006
-industry_transportation_storage_individual,Transportation & Storage-Individual,6007
-industry_water_col_treatment_supply,"Water col., treatment and supply",6101
-industry_sewerage,Sewerage,6102
-industry_waste_treatmt_dispo_act_mat_reco,"Waste,treatmt n dispo act mat reco",6103
-industry_remediation_act_oth_waste_mgt_serv,Remediatn act n oth waste mgt serv,6104
-industry_commercial_bank,Commercial bank,6201
-industry_microfinance_bank,Microfinance bank,6202
-industry_development_bank,Development bank,6203
-industry_asset_management,Asset management,6204
-industry_mortgage_institutions,Mortgage institutions,6205
-industry_insurance_companies,Insurance companies,6206
-industry_pension_fund_custodians,Pension Fund custodians,6207
-industry_pension_fund_administrators,Pension Fund administrators,6208
-industry_stock_broking_firms,Stock broking firms,6209
-industry_other_financial_institutions,Other financial institutions,6210
-industry_investment_banks,Investment Banks,6211
-industry_bdc_curr_dealers_money_transmitters,"BDC,curr dealers N money transmters",6212
-industry_investment_broker,Investment Broker,6213
-industry_deposit_broker,Deposit Broker,6214
-industry_portfolio_mgr_admin_accounts,Portfolio MGR N admin Accounts,6215
-industry_store_value_cards,Store Value Cards,6216
-industry_central_bank,Central Bank,6217
-industry_agent_banking,Agent Banking,6218
-industry_fintech,Fintech,6219
-industry_virtual_asset_dealers,Virtual Asset Dealers,6220
-industry_forex_dealers_remittance_services,Forex Dealers and Remittance Servic,6221
-industry_cryptocurrency_dealer,Cryptocurrency Dealer,6222
-industry_cross_border_banking_rlshps,Cross Border Banking and Rlshps,6223
-industry_creative_arts_entertainment_act,"Creative, arts n entertainment act",6301
-industry_library_arch_museum_cultural_act,"Library,arch,museum n cutural act",6302
-industry_gambling_betting_activities,Gambling and betting activities,6303
-industry_sports_amusement_recreation_act,Sports n amusement n recreatn act,6304
-industry_art_antique_dealers,Art and Artique Dealers,6305
-industry_hospital_clinics,Hospital & Clinics,6401
-industry_pharmaceutical_retail,Pharmaceutical (Retail),6402
-industry_pharmaceutical_import_dist,Pharmaceutical (Import & Dist),6403
-industry_diagnostics_laboratories,Diagnostics & Laboratories,6404
-industry_health_equip_manufacturing_supplies,Health Equip Manufacturing/Supplies,6405
-industry_health_practitioners,Health Practitioners,6406
-industry_health_association_unions_boards,Health Association/Unions/Boards,6407
-industry_health_financing_hmos,Health Financing/HMOs,6408
-industry_health_consultants,Health Consultants,6409
-industry_health_government,Health - Government,6410
-industry_health_individual,Health - Individual,6411
-industry_technical_business_advisory,Technical/Business Advisory,6417
-industry_embassy_high_commission_6501,EMBASSY/HIGH COMMISSION,6501
-industry_solar_energy,Solar Energy,6502
-industry_biomass_energy,Biomass Energy,6503
-industry_geothermal_energy,Geothermal Energy,6504
-industry_wind,Wind,6505
-industry_captive_markets,Captive Markets,4020
-industry_act_extraterritorial_org_bodies,Act of Xtrateritorial Org n Bodies,4101
-industry_rental_leasing_activities,Rental and leasing activities,4201
-industry_employment_activities,Employment activities,4202
-industry_travel_ag_tour_oper_reservation_serv,"Travel ag,tour oper,reservatn serv",4203
-industry_security_investigation_act,Security and investigation act.,4204
-industry_servs_buildings_landscape_act,Servs to buildings n landscape act,4205
-industry_office_admin_business_support_act,Office Admin n Business Support Act,4206
-industry_tourism,Tourism,4207
-industry_workplace_banking,Workplace Banking,4208
-industry_crop_production,Crop Production,4301
-industry_poultry_livestock,Poultry and livestock,4302
-industry_fishing,Fishing,4303
-industry_plantation,Plantation,4304
-industry_agro_services,Agro Services,4305
-industry_cash_crop_eg_cotton_cocoa_rubber,"Cash Crop eg Cotton, Cocoa, Rubber",4306
-industry_forestry,Forestry,4307
-industry_oth_food_crop_eg_tuber_citrus_veg,"Oth.Food crop e.g Tuber,Citrus,Veg",4308
-industry_food_crops_grains,"Food Crops ,grains",4309
-industry_agriculture_individual,Agriculture - Individual,4310
-industry_dealers_mechanized_farming,Dealers in Mechanized Farming,4311
-industry_dealers_mechanized_farming_equip,Dealers Mechanized Farming & Equip,4312
-industry_margin_lending,Margin lending,4401
-industry_proprietary_trading,Proprietary trading,4402
-industry_share_loans,Share loans,4403
-industry_share_underwriting,Share underwriting,4404
-industry_bonds_debt_obligations,"Bonds, debt obligations",4405
-industry_civil_engineering,Civil engineering,4501
-industry_specialized_construction_act,Specialized construction act.,4502
-industry_pre_primary_primary_education,Pre Primary and primary education,4601
-industry_post_primary_education,Post primary education,4602
-industry_tertiary_education,Tertiary education,4603
-industry_other_education,Other education,4604
-industry_educational_support_services,Educational support services,4605
-industry_edu_swess,EDU-SWESS,4606
-industry_education_individual,Education - Individual,4607
-industry_religious_churches,Religious (Churches),4701
-industry_religious_mosques,Religious (Mosques),4702
-industry_religious_others,Religious (Others),4703
-industry_non_governmental_organisations,Non Governmental Organisations,4704
-industry_hotel_leisure,Hotel and Leisure,4801
-industry_individual_clergy,Individual . Clergy,4802
-industry_individual_entrepreneur,Individual . Entrepreneur,4803
-industry_ind_private_sector_employee,Ind . Private Sector Employee,4804
-industry_ind_public_sector_employee,Ind . Public Sector Employee,4805
-industry_individual_self_employed,Individual . Self Employed,4806
-industry_individual_military_police,"Individual . Military , Police",4807
-industry_individual_student_minor,"Individual . Student , Minor",4808
-industry_special_purpose_entities,Special Purpose Entities,4813
-industry_nominees,Nominees,4815
-industry_wholesale_merchant,Wholesale Merchant,4920
-industry_renewable_energy_individual,Renewable Energy - Individual,6506
-industry_cooperatives,Cooperatives,6601
-industry_residential_estate_cooperatives,Residential Estate Cooperatives,6602
-industry_associations_union_registered,Associations/Union registered,6603
-industry_other_ass_unions_not_registered,Other Ass/Unions not Registered,6604
-industry_cooperative_individual,Cooperative Individual,6605
-industry_cooperative_societies,Cooperative Societies,6606
-industry_fashion_business_entrepreneur,Fashion Business Entrepreneur,7001
-industry_fashion_school,Fashion school,7002
-industry_accessories_making,Accessories making,7003
-industry_fashion_services,Fashion services,7004
-industry_vocational_craft,Vocational craft,7005
-industry_other_state_private_agencies,Other State and private Agencies,7101
-industry_distributors,Distributors,7201
-industry_consumers,Consumers,7202
-industry_suppliers,Suppliers,7203
-industry_value_chain_staff,Value Chain (Staff),7204
-industry_nigerian_army,Nigerian Army,7701
-industry_navy,Navy,7702
-industry_airforce,Airforce,7703
-industry_police,Police,7704
-industry_department_state_services_dss,DEPARTMENT OF STATE SERVICES(DSS),7705
-industry_nscdc,NSCDC,7706
-industry_frsc,FRSC,7707
-industry_customs,Customs,7708
-industry_immigration,Immigration,7709
-industry_prison_services,Prison Services,7710
-industry_efcc,EFCC,7711
-industry_federal_fire_service,Federal Fire Service,7712
-industry_ndlea,NDLEA,7713
-industry_nigerian_intelligence_agency,Nigerian Intelligence Agency,7714
-industry_directorate_military_intelligence,Directorate Military Intelligence,7715
-industry_icpc,ICPC,7716
-industry_manufacturers_military_vechicles,Manufacturers of military Vechicles,7717
-industry_manufacturers_military_amunition,Manufacturers of Military Amunition,7718
-industry_religious_churches_4809,Religious . Churches,4809
-industry_religious_mosques_4810,Religious . Mosques,4810
-industry_religious_others_4811,Religious . Others,4811
-industry_cooperative_societies_4812,Co.operative Societies,4812
-industry_non_govtal_org_not_for_profit_org,Non.Govtal Org Not for Profit Org,4818
+industry_clients_executorships,Clients & Executorships,04814
+industry_trustees_fiduciary_accounts,Trustees & Fiduciary Accounts,04816
+industry_logistics,Logistics,04817
+industry_embassy_high_commission,Embassy/High Commission,04819
+industry_supermarket,Supermarket,04820
+industry_restaurant,Restaurant,04821
+industry_retail_computers_software,Retail sale of computers, software,04822
+industry_telemarketing,Telemarketing,04823
+industry_clearing_forwarding,Clearing and Forwarding,04824
+industry_estate_deceased_individuals,Estate (Deceased Individuals),04825
+industry_automotive_parts,Automotive Parts,04901
+industry_domestic_trade,Domestic trade,04902
+industry_jewelry_dealer,Jewelry Dealer,04903
+industry_precious_metal_dealer,Precious Metal Dealer,04904
+industry_automobile_motor_vehicles,"Automobile ,Motor Vehicles",04905
+industry_food_processing,Food Processing,04906
+industry_chemicals_allied_products,Chemicals and Allied Products,04907
+industry_trading_rice,"Trading ,Rice",04908
+industry_trading_cocoa,"Trading ,Cocoa",04909
+industry_generator_sales_services,"Generator set, sales and services",04910
+industry_groundnuts_groundnut_oil,Groundnuts and Groundnut oil,04911
+industry_palm_produce,Palm Produce,04912
+industry_cotton,Cotton,04913
+industry_hides_skins,Hides and Skins,04914
+industry_rubber_rubber_products,Rubber and Rubber Products,04915
+industry_timber_timber_products,Timber and Timber Products,04916
+industry_other_agricultural_exports,Other Agricultural Exports,04917
+industry_non_agricultural_exports,Non Agricultural Exports,04918
+industry_imports,Imports,04919
+industry_retail_merchant,Retail Merchant,04921
+industry_export,Export,04922
+industry_car_boat_plane_dealership,Car/Boat/Plane Dealership,04923
+industry_wholesalers_consumer_electronics,Wholesalers of Consumer Electronics,04924
+industry_luxury_goods,Luxury Goods,04925
+industry_federal_direct,"Federal, Direct",05001
+industry_federal_mdas,"Federal, MDAs",05002
+industry_state_direct,"State, Direct",05003
+industry_state_mdas,"State, MDAs",05004
+industry_local_direct,"Local, Direct",05005
+industry_local_mdas,"Local, MDAs",05006
+industry_human_health_activities,Human health activities,05101
+industry_residential_care_activities,Residential care activities,05102
+industry_social_work_without_accommodation,Social Work without Accommodation,05103
+industry_domestic_care_services,Domestic Care Services,05104
+industry_publishing_activities,Publishing activities,05201
+industry_video_television_programme_production,Video n televisn programe productn,05202
+industry_programming_broadcasting_act,Programming and broadcasting act,05203
+industry_telecommunications,Telecommunications,05204
+industry_programming_consult_related_act,"programing, consult n related act",05205
+industry_information_service_activities,Information service activities,05206
+industry_printing_publishing,Printing and Publishing,05207
+industry_flourmills_bakeries,Flourmills and Bakeries,05301
+industry_food_manufacturing,Food manufacturing,05302
+industry_beverages,Beverages,05303
+industry_aluminium_allied_products,Aluminium and allied products,05304
+industry_basic_metal_products,Basic Metal Products,05305
+industry_breweries,Breweries,05306
+industry_building_materials,Building materials,05307
+industry_cement,Cement,05308
+industry_chemicals_allied_products_5309,Chemicals and Allied products,05309
+industry_footwear,Footwear,05310
+industry_hides_skin,Hides and Skin,05311
+industry_household_equipment,Household Equipment,05312
+industry_pharmaceuticals,Pharmaceuticals,05313
+industry_paints_allied_products,Paints and Allied products,05314
+industry_miscellaneous_manufacturing,Miscellaneous Manufacturing,05315
+industry_paper_paper_products,Paper and Paper products,05316
+industry_printing_publishing_5317,Printing and Publishing,05317
+industry_personal_care,Personal care,05318
+industry_plastics,Plastics,05319
+industry_rubber_allied_products,Rubber and Allied products,05320
+industry_steel_rolling_mills,Steel Rolling Mills,05321
+industry_soft_drinks,Soft Drinks,05322
+industry_cables_mines,Cables and Mines,05323
+industry_textiles_apparel,Textiles and Apparel,05324
+industry_tyre,Tyre,05325
+industry_conglomerate,Conglomerate,05326
+industry_meat_food_process_can_cold_store,"Meat,Food Process,Can n Cold Store",05327
+industry_wood_products_including_furniture,Wood Products including Furniture,05328
+industry_soap_oil_detergent,"Soap, Oil Detergent",05329
+industry_metal_tin_iron_etc,"Metal Tin, Iron, etc",05401
+industry_non_metal_quarrying,Non.metal Quarrying,05402
+industry_coal,Coal,05403
+industry_oil_downstream,Oil . downstream,05501
+industry_oil_upstream,Oil . upstream,05502
+industry_natural_gas,Natural gas,05503
+industry_crude_oil_refining,Crude oil refining,05504
+industry_oil_gas_services,Oil & Gas Services,05505
+industry_independent_power_projects_ipp,"Independent Power Projects ,IPP",05601
+industry_power_generation_power_plants,"Power generation,power plants",05602
+industry_power_transmission,Power transmission,05603
+industry_power_distribution,Power distribution,05604
+industry_legal_accounting_activities,Legal and accounting activities,05701
+industry_act_headoff_mgt_consultancy_act,"Act of headoff, mgt consutancy act",05702
+industry_arch_eng_act_tech_testing_analysis,Arch n eng act tech tstng n anlysis,05703
+industry_scientific_research_dev,Scientific research and dev,05704
+industry_advertising_market_research,Advertising and market research,05705
+industry_oth_prof_scientific_tech_act,"Oth prof, scientific and tech act",05706
+industry_veterinary_activities,Veterinary activities,05707
+industry_sole_practitioners,Sole Practitioners,05708
+industry_tax_consultant,Tax Consultant,05709
+industry_estate_surveyors_valuers,Estate Surveyors and Valuers,05710
+industry_accounting_professionals_services,Accounting Professionals/Services,05711
+industry_utility_private,"Utility, Private",05801
+industry_utility_public,"Utility, Public",05802
+industry_residential_mortgage_loans,Residential Mortgage Loans,05901
+industry_commercial_property,Commercial Property,05902
+industry_home_equity,Home Equity,05903
+industry_real_estate_const_home_developers,Real estate Const. Home Developers,05904
+industry_real_estate_income_producing,"Real Estate, Income.Producing",05905
+industry_high_volatility_comm_real_estate,High.volatility Comm real estate,05906
+industry_non_residential,Non Residential,05907
+industry_owner_occupier_property,Owner.Occupier.Property,05908
+industry_onehome,OneHome,05909
+industry_estate_developer,Estate Developer,05910
+industry_campaign_account,Campaign Account,03101
+industry_political_party,Political Party,03102
+industry_road_transport,Road transport,06001
+industry_water_transport,Water transport,06002
+industry_air_transport,Air transport,06003
+industry_warehouse_support_act_trans,Warehouse n Support act for Trans.,06004
+industry_postal_courier_activities,Postal and courier activities,06005
+industry_rail_transport,Rail Transport,06006
+industry_transportation_storage_individual,Transportation & Storage-Individual,06007
+industry_water_col_treatment_supply,"Water col., treatment and supply",06101
+industry_sewerage,Sewerage,06102
+industry_waste_treatmt_dispo_act_mat_reco,"Waste,treatmt n dispo act mat reco",06103
+industry_remediation_act_oth_waste_mgt_serv,Remediatn act n oth waste mgt serv,06104
+industry_commercial_bank,Commercial bank,06201
+industry_microfinance_bank,Microfinance bank,06202
+industry_development_bank,Development bank,06203
+industry_asset_management,Asset management,06204
+industry_mortgage_institutions,Mortgage institutions,06205
+industry_insurance_companies,Insurance companies,06206
+industry_pension_fund_custodians,Pension Fund custodians,06207
+industry_pension_fund_administrators,Pension Fund administrators,06208
+industry_stock_broking_firms,Stock broking firms,06209
+industry_other_financial_institutions,Other financial institutions,06210
+industry_investment_banks,Investment Banks,06211
+industry_bdc_curr_dealers_money_transmitters,"BDC,curr dealers N money transmters",06212
+industry_investment_broker,Investment Broker,06213
+industry_deposit_broker,Deposit Broker,06214
+industry_portfolio_mgr_admin_accounts,Portfolio MGR N admin Accounts,06215
+industry_store_value_cards,Store Value Cards,06216
+industry_central_bank,Central Bank,06217
+industry_agent_banking,Agent Banking,06218
+industry_fintech,Fintech,06219
+industry_virtual_asset_dealers,Virtual Asset Dealers,06220
+industry_forex_dealers_remittance_services,Forex Dealers and Remittance Servic,06221
+industry_cryptocurrency_dealer,Cryptocurrency Dealer,06222
+industry_cross_border_banking_rlshps,Cross Border Banking and Rlshps,06223
+industry_creative_arts_entertainment_act,"Creative, arts n entertainment act",06301
+industry_library_arch_museum_cultural_act,"Library,arch,museum n cutural act",06302
+industry_gambling_betting_activities,Gambling and betting activities,06303
+industry_sports_amusement_recreation_act,Sports n amusement n recreatn act,06304
+industry_art_antique_dealers,Art and Artique Dealers,06305
+industry_hospital_clinics,Hospital & Clinics,06401
+industry_pharmaceutical_retail,Pharmaceutical (Retail),06402
+industry_pharmaceutical_import_dist,Pharmaceutical (Import & Dist),06403
+industry_diagnostics_laboratories,Diagnostics & Laboratories,06404
+industry_health_equip_manufacturing_supplies,Health Equip Manufacturing/Supplies,06405
+industry_health_practitioners,Health Practitioners,06406
+industry_health_association_unions_boards,Health Association/Unions/Boards,06407
+industry_health_financing_hmos,Health Financing/HMOs,06408
+industry_health_consultants,Health Consultants,06409
+industry_health_government,Health - Government,06410
+industry_health_individual,Health - Individual,06411
+industry_technical_business_advisory,Technical/Business Advisory,06417
+industry_embassy_high_commission_6501,EMBASSY/HIGH COMMISSION,06501
+industry_solar_energy,Solar Energy,06502
+industry_biomass_energy,Biomass Energy,06503
+industry_geothermal_energy,Geothermal Energy,06504
+industry_wind,Wind,06505
+industry_captive_markets,Captive Markets,04020
+industry_act_extraterritorial_org_bodies,Act of Xtrateritorial Org n Bodies,04101
+industry_rental_leasing_activities,Rental and leasing activities,04201
+industry_employment_activities,Employment activities,04202
+industry_travel_ag_tour_oper_reservation_serv,"Travel ag,tour oper,reservatn serv",04203
+industry_security_investigation_act,Security and investigation act.,04204
+industry_servs_buildings_landscape_act,Servs to buildings n landscape act,04205
+industry_office_admin_business_support_act,Office Admin n Business Support Act,04206
+industry_tourism,Tourism,04207
+industry_workplace_banking,Workplace Banking,04208
+industry_crop_production,Crop Production,04301
+industry_poultry_livestock,Poultry and livestock,04302
+industry_fishing,Fishing,04303
+industry_plantation,Plantation,04304
+industry_agro_services,Agro Services,04305
+industry_cash_crop_eg_cotton_cocoa_rubber,"Cash Crop eg Cotton, Cocoa, Rubber",04306
+industry_forestry,Forestry,04307
+industry_oth_food_crop_eg_tuber_citrus_veg,"Oth.Food crop e.g Tuber,Citrus,Veg",04308
+industry_food_crops_grains,"Food Crops ,grains",04309
+industry_agriculture_individual,Agriculture - Individual,04310
+industry_dealers_mechanized_farming,Dealers in Mechanized Farming,04311
+industry_dealers_mechanized_farming_equip,Dealers Mechanized Farming & Equip,04312
+industry_margin_lending,Margin lending,04401
+industry_proprietary_trading,Proprietary trading,04402
+industry_share_loans,Share loans,04403
+industry_share_underwriting,Share underwriting,04404
+industry_bonds_debt_obligations,"Bonds, debt obligations",04405
+industry_civil_engineering,Civil engineering,04501
+industry_specialized_construction_act,Specialized construction act.,04502
+industry_pre_primary_primary_education,Pre Primary and primary education,04601
+industry_post_primary_education,Post primary education,04602
+industry_tertiary_education,Tertiary education,04603
+industry_other_education,Other education,04604
+industry_educational_support_services,Educational support services,04605
+industry_edu_swess,EDU-SWESS,04606
+industry_education_individual,Education - Individual,04607
+industry_religious_churches,Religious (Churches),04701
+industry_religious_mosques,Religious (Mosques),04702
+industry_religious_others,Religious (Others),04703
+industry_non_governmental_organisations,Non Governmental Organisations,04704
+industry_hotel_leisure,Hotel and Leisure,04801
+industry_individual_clergy,Individual . Clergy,04802
+industry_individual_entrepreneur,Individual . Entrepreneur,04803
+industry_ind_private_sector_employee,Ind . Private Sector Employee,04804
+industry_ind_public_sector_employee,Ind . Public Sector Employee,04805
+industry_individual_self_employed,Individual . Self Employed,04806
+industry_individual_military_police,"Individual . Military , Police",04807
+industry_individual_student_minor,"Individual . Student , Minor",04808
+industry_special_purpose_entities,Special Purpose Entities,04813
+industry_nominees,Nominees,04815
+industry_wholesale_merchant,Wholesale Merchant,04920
+industry_renewable_energy_individual,Renewable Energy - Individual,06506
+industry_cooperatives,Cooperatives,06601
+industry_residential_estate_cooperatives,Residential Estate Cooperatives,06602
+industry_associations_union_registered,Associations/Union registered,06603
+industry_other_ass_unions_not_registered,Other Ass/Unions not Registered,06604
+industry_cooperative_individual,Cooperative Individual,06605
+industry_cooperative_societies,Cooperative Societies,06606
+industry_fashion_business_entrepreneur,Fashion Business Entrepreneur,07001
+industry_fashion_school,Fashion school,07002
+industry_accessories_making,Accessories making,07003
+industry_fashion_services,Fashion services,07004
+industry_vocational_craft,Vocational craft,07005
+industry_other_state_private_agencies,Other State and private Agencies,07101
+industry_distributors,Distributors,07201
+industry_consumers,Consumers,07202
+industry_suppliers,Suppliers,07203
+industry_value_chain_staff,Value Chain (Staff),07204
+industry_nigerian_army,Nigerian Army,07701
+industry_navy,Navy,07702
+industry_airforce,Airforce,07703
+industry_police,Police,07704
+industry_department_state_services_dss,DEPARTMENT OF STATE SERVICES(DSS),07705
+industry_nscdc,NSCDC,07706
+industry_frsc,FRSC,07707
+industry_customs,Customs,07708
+industry_immigration,Immigration,07709
+industry_prison_services,Prison Services,07710
+industry_efcc,EFCC,07711
+industry_federal_fire_service,Federal Fire Service,07712
+industry_ndlea,NDLEA,07713
+industry_nigerian_intelligence_agency,Nigerian Intelligence Agency,07714
+industry_directorate_military_intelligence,Directorate Military Intelligence,07715
+industry_icpc,ICPC,07716
+industry_manufacturers_military_vechicles,Manufacturers of military Vechicles,07717
+industry_manufacturers_military_amunition,Manufacturers of Military Amunition,07718
+industry_religious_churches_4809,Religious . Churches,04809
+industry_religious_mosques_4810,Religious . Mosques,04810
+industry_religious_others_4811,Religious . Others,04811
+industry_cooperative_societies_4812,Co.operative Societies,04812
+industry_non_govtal_org_not_for_profit_org,Non.Govtal Org Not for Profit Org,04818

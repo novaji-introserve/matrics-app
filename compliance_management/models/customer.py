@@ -1090,135 +1090,11 @@ class Customer(models.Model):
         }
 
     def init(self):
-        # Drop the trigger if it exists
-        # self.env.cr.execute(
-        #     "DROP TRIGGER IF EXISTS set_partner_defaults ON res_partner;")
-        # self.env.cr.execute(
-        #     "DROP TRIGGER IF EXISTS set_partner_defaults_after ON res_partner;")
-
-        # Create index on res_partner which we know exists
+        
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
 
-        # Create the trigger
-        # self.env.cr.execute("""
-        #     CREATE OR REPLACE FUNCTION set_partner_defaults_func()
-        #     RETURNS TRIGGER AS $$
-        #     BEGIN
 
-        #         -- Check if this is demo data (origin = 'demo')
-        #         IF NEW.origin = 'demo' THEN
-        #             -- For demo data: Set defaults but preserve certain fields like risk_level
-        #             -- Save the original risk_level value if it exists
-        #             DECLARE original_risk_level VARCHAR;
-        #             BEGIN
-        #                 original_risk_level := NEW.risk_level;
-                        
-        #                 -- Set basic defaults
-        #                 NEW.create_uid = 1;
-        #                 NEW.write_uid = 1;
-        #                 NEW.type = 'contact';
-        #                 NEW.lang = 'en_US';
-        #                 NEW.color = 0;
-        #                 NEW.tz = 'Africa/Lagos';
-                        
-                        
-                        
-        #                 -- Restore the original risk_level if it was set
-        #                 IF original_risk_level IS NOT NULL THEN
-        #                     NEW.risk_level := original_risk_level;
-        #                 END IF;
-                        
-        #                 RETURN NEW;
-        #             END;
-        #         END IF;
-
-        #         IF NEW.active IS NULL THEN
-        #             NEW.active = TRUE;
-        #         END IF;
-                
-        #         IF NEW.type IS NULL THEN
-        #             NEW.type = 'contact';
-        #         END IF;
-                
-        #         IF NEW.lang IS NULL THEN
-        #             NEW.lang = 'en_US';
-        #         END IF;
-                
-        #         IF NEW.create_uid IS NULL THEN
-        #             NEW.create_uid = 1;
-        #         END IF;
-                
-        #         IF NEW.write_uid IS NULL THEN
-        #             NEW.write_uid = 1;
-        #         END IF;
-                    
-        #         IF NEW.color IS NULL THEN
-        #             NEW.color = 0;
-        #         END IF;
-                
-        #         IF NEW.create_date IS NULL THEN
-        #             NEW.create_date = NOW();
-        #         END IF;
-                
-        #         IF NEW.tz IS NULL THEN
-        #             NEW.tz = 'Africa/Lagos';
-        #         END IF;
-                
-        #         IF NEW.write_date IS NULL THEN
-        #             NEW.write_date = NOW();
-        #         END IF;
-                
-        #         IF NEW.internal_category IS NULL THEN
-        #             NEW.internal_category = 'customer';
-        #         END IF;
-                
-        #         IF NEW.commercial_partner_id IS NULL THEN
-        #             NEW.commercial_partner_id = NEW.id;
-        #         END IF;
-
-        #         IF (NEW.display_name IS NULL OR TRIM(NEW.display_name) = '') AND NEW.name IS NOT NULL THEN
-        #             NEW.display_name = NEW.name;
-        #         END IF;
-                
-        #         -- Set commercial_partner_id to the record's ID after insert
-        #         -- This requires a BEFORE INSERT trigger to work properly
-        #         IF NEW.commercial_partner_id IS NULL THEN
-        #             -- Using NEW.id directly in a BEFORE INSERT trigger
-        #             -- This will work since the record already has an ID before the trigger
-        #             NEW.commercial_partner_id = NEW.id;
-        #         END IF;
-                
-        #         RETURN NEW;
-        #     END;
-        #     $$ LANGUAGE plpgsql;
-            
-        #     CREATE TRIGGER set_partner_defaults
-        #     BEFORE INSERT ON res_partner
-        #     FOR EACH ROW
-        #     EXECUTE FUNCTION set_partner_defaults_func();
-        # """)
-
-        # Create AFTER INSERT trigger for commercial_partner_id
-        # self.env.cr.execute("""
-        #     CREATE OR REPLACE FUNCTION set_partner_defaults_after_func()
-        #     RETURNS TRIGGER AS $$
-        #     BEGIN
-        #         IF NEW.commercial_partner_id IS NULL THEN
-        #             UPDATE res_partner SET commercial_partner_id = NEW.id WHERE id = NEW.id;
-        #         END IF;
-                
-        #         RETURN NEW;
-        #     END;
-        #     $$ LANGUAGE plpgsql;
-            
-        #     CREATE TRIGGER set_partner_defaults_after
-        #     AFTER INSERT ON res_partner
-        #     FOR EACH ROW
-        #     EXECUTE FUNCTION set_partner_defaults_after_func();
-        # """)
-
-        # self.cron_run_risk_assessment()
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -1482,14 +1358,17 @@ class Customer(models.Model):
     @api.model
     def open_customers(self):
         # Check if the current user belongs to the Chief Compliance Officer group
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
-
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
+        if has_compliance_access:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'customer'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -1515,15 +1394,17 @@ class Customer(models.Model):
 
     @api.model
     def open_vendors(self):
-        # Check if the current user belongs to the Chief Compliance Officer group
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
-
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
+        if has_compliance_access:
             # Chief Compliance Officers see all customers
             domain = [('internal_category', '=', 'vendor'),
                       ('origin', 'in', ['demo', 'test', 'prod'])]
@@ -1821,151 +1702,6 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'context': {'default_customer_id': self.customer_id}
         }
-
-  
-
-    # @api.model
-    # def _compute_is_branch_compliance(self):
-    #     # Check if the current user belongs to the Chief Compliance Officer group
-    #     # coo_group = self.env.ref(
-    #     #     'compliance_management.group_compliance_chief_compliance_officer')
-
-    #     is_branch_compliance_officer = self.env.ref(
-    #         'compliance_management.group_compliance_branch_compliance_officer')
-    #     # Set domain based on user group
-    #     for record in self:
-    #         record.is_branch_compliance = is_branch_compliance_officer
-
-    # @api.depends('customer_phone')
-    # def _compute_formatted_phone(self):
-    #     for record in self:
-    #         if record.customer_phone and '^' in record.customer_phone:
-    #             record.formatted_phone = record.customer_phone.replace(
-    #                 '^', ', ')
-    #         else:
-    #             record.formatted_phone = record.customer_phone
-
-    # def _compute_risk_scores(self):
-    #     """Cron job to precompute and store weighted average risk scores."""
-    #     # Clear existing records
-    #     self.env['customer.agg.risk.score'].search([]).unlink()
-
-    #     # Group customers by branch_id
-    #     customers = self.search([['internal_category', '=', 'customer'], ['origin', 'in', ['demo', 'test', 'prod']]])
-
-    #     grouped_data = {}
-    #     for record in customers:
-    #         group_key = record.branch_id
-    #         group_key_value = group_key.display_name if group_key else 'No Branch'
-    #         if group_key_value not in grouped_data:
-    #             grouped_data[group_key_value] = []
-    #         grouped_data[group_key_value].append(record)
-
-    #     # Compute and store weighted averages
-    #     for key, group_records in grouped_data.items():
-    #         total_customers = len(group_records)
-    #         formatted_key = f"{key}({total_customers})" if total_customers > 0 else key
-
-    #         if total_customers == 0:
-    #             weighted_avg = 0.0
-
-    #         else:
-    #             risk_counts = {'low': 0, 'medium': 0, 'high': 0}
-    #             risk_scores = {'low': 0, 'medium': 0, 'high': 0}
-    #             for rec in group_records:
-    #                 risk_level = rec.risk_level.lower() if rec.risk_level else 'low'
-    #                 risk_counts[risk_level] = risk_counts.get(risk_level, 0) + 1
-    #                 risk_scores[risk_level] += rec.risk_score or 0.0
-    #             _logger.info("start of each branch calculation")
-    #             _logger.info(f"the risk_count is {risk_counts}")
-    #             _logger.info(f"the risk_scores is {risk_scores}")
-
-    #             # Compute mean average per risk level
-    #             mean_avg_low = risk_scores['low'] / risk_counts['low'] if risk_counts['low'] > 0 else 0.0
-    #             mean_avg_medium = risk_scores['medium'] / risk_counts['medium'] if risk_counts['medium'] > 0 else 0.0
-    #             mean_avg_high = risk_scores['high'] / risk_counts['high'] if risk_counts['high'] > 0 else 0.0
-
-    #             _logger.info(f"the mean avg is {mean_avg_low} | {mean_avg_medium} | {mean_avg_high}")
-    #             _logger.info(f"total customer is {total_customers}")
-
-    #             weighted_avg = ((risk_counts['low'] * mean_avg_low) +
-    #                         (risk_counts['medium'] * mean_avg_medium) +
-    #                         (risk_counts['high'] * mean_avg_high)) / total_customers if total_customers > 0 else 0.0
-
-    #             _logger.info(f"for low risk level customer is {risk_counts['low']} and avg = {mean_avg_low} sum up to  {(risk_counts['low'] * mean_avg_low)}")
-    #             _logger.info(f"for medium risk level customer is {risk_counts['medium']} and avg = {mean_avg_medium} sum up to {(risk_counts['medium'] * mean_avg_medium)}")
-    #             _logger.info(f"for high risk level customer is {risk_counts['high']} and avg = {mean_avg_high} sum up to {(risk_counts['high'] * mean_avg_high)}")
-
-    #             _logger.info(f"the weighted avg is {weighted_avg}")
-    #             _logger.info("end of each branch calculation")
-
-    #         # Store in customer.risk.score
-    #         branch = self.env['res.branch'].search([('name', '=', key)], limit=1)
-    #         self.env['customer.agg.risk.score'].create({
-    #             'branch_id': branch.id if branch else False,
-    #             'weighted_avg_risk_score': weighted_avg,
-    #             'total_customers': total_customers,
-    #             'formatted_name': formatted_key
-    #         })
-
-    # def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-    #     if not any(f in fields for f in ['risk_score']):
-    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-
-    #     result = []
-    #     groupby_field = groupby[0] if groupby else None
-
-    #     if groupby_field == 'branch_id':
-    #         # Parse the orderby parameter to determine sorting
-    #         order_field = 'branch_id'  # Default order field
-    #         order_direction = 'ASC'    # Default direction
-
-    #         if orderby:
-    #             # Handle multiple orderby fields separated by comma
-    #             orderby_parts = orderby.split(',')
-    #             for part in orderby_parts:
-    #                 part = part.strip()
-    #                 if 'risk_score' in part:
-    #                     order_field = 'weighted_avg_risk_score'
-    #                     order_direction = 'DESC' if 'DESC' in part.upper() else 'ASC'
-    #                     break
-    #                 elif 'branch_id' in part:
-    #                     order_field = 'branch_id'
-    #                     order_direction = 'DESC' if 'DESC' in part.upper() else 'ASC'
-    #                     break
-
-    #         # Build the order string for the search
-    #         order_str = f"{order_field} {order_direction}"
-
-    #         # Fetch precomputed data with pagination
-    #         risk_scores = self.env['customer.agg.risk.score'].search(
-    #             [], order=order_str, offset=offset, limit=limit
-    #         )
-
-    #         # Get total count for pagination info
-    #         total_count = self.env['customer.agg.risk.score'].search_count([])
-
-    #         for risk_score in risk_scores:
-    #             group_result = {
-    #                 'branch_id': risk_score.branch_id.display_name if risk_score.branch_id else False,
-    #                 'branch_id_count': risk_score.total_customers,
-    #                 'branch_id:formatted': risk_score.formatted_name,
-    #                 'risk_score': risk_score.weighted_avg_risk_score,
-    #                 '__count': risk_score.total_customers,
-    #                 '__domain': [('branch_id', '=', risk_score.branch_id.id if risk_score.branch_id else False)] + domain
-    #             }
-    #             # Only include requested fields
-    #             result.append(group_result)
-
-    #         # Add pagination metadata if needed
-    #         if hasattr(result, '__dict__'):
-    #             result.__dict__['total_count'] = total_count
-
-    #         return result
-    #     else:
-    #         # Fallback to super if grouping by a different field
-    #         return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
-
 
 
 class Partner(models.Model):

@@ -40,8 +40,17 @@ class Transaction(models.Model):
     show_create_case_button = fields.Boolean(
     string="Case Management Installed",
     compute='_compute_is_case_management_installed',
-    store=False,
-)
+    store=False,)
+    account_officer_id = fields.Many2one(
+        comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
+    trans_code = fields.Char(string='Transaction Code')
+    currency = fields.Char(string='Currency')
+    inputter = fields.Char(string='Inputter')
+    authorizer = fields.Char(string='Authorizer')
+    transaction_type = fields.Selection(selection=[(
+        'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
+    active = fields.Boolean(default=True, readonly=True)
+    branch_code = fields.Char(string="Branch Code")
 
     @api.depends('date_created')  
     def _compute_is_case_management_installed(self):
@@ -54,23 +63,7 @@ class Transaction(models.Model):
             record.show_create_case_button = case_management_installed
         
     
-
-    # show_create_case_button = fields.Boolean(
-    #     string="Case Management Installed",
-    #     compute='_compute_is_case_management_installed',
-    #     store=False, # No need to store this in the database
-    # )
-
-    # @api.depends() 
-    # def _compute_is_case_management_installed(self):
-    #     for record in self:
-    #         case_management_module = self.env['ir.module.module'].search([
-    #             ('name', '=', 'case_management'),
-    #             ('state', '=', 'installed')
-    #         ], limit=1)
-    #         record.show_create_case_button = bool(case_management_module)
-            
-            
+    
     @api.model
     def _is_case_management_available(self):
         """Cache the module availability check"""
@@ -79,11 +72,7 @@ class Transaction(models.Model):
                 ('name', '=', 'case_management'),
                 ('state', '=', 'installed')
             ], limit=1))
-        return self._case_management_available
-
-# Then use this method in your button logic or view conditions
-    
-    
+        return self._case_management_available    
     
     
     
@@ -114,16 +103,7 @@ class Transaction(models.Model):
             'context': context
         }
 
-    account_officer_id = fields.Many2one(
-        comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
-    trans_code = fields.Char(string='Transaction Code')
-    currency = fields.Char(string='Currency')
-    inputter = fields.Char(string='Inputter')
-    authorizer = fields.Char(string='Authorizer')
-    transaction_type = fields.Selection(selection=[(
-        'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
-    active = fields.Boolean(default=True, readonly=True)
-    branch_code = fields.Char(string="Branch Code")
+    
 
 
     def init(self):
@@ -167,14 +147,18 @@ class Transaction(models.Model):
 
     @api.model
     def open_transactions(self):
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
         
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
+        if has_compliance_access:
             # Chief Compliance Officers see all customers
             domain = [('state', '=', 'new')]
         else:
@@ -195,14 +179,18 @@ class Transaction(models.Model):
 
     @api.model
     def open_transactions_done(self):
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
         
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
+        if has_compliance_access :
             # Chief Compliance Officers see all customers
             domain = [('state', '=', 'done')]
         else:
@@ -222,15 +210,18 @@ class Transaction(models.Model):
 
     @api.model
     def open_transactions_all(self):
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
         
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
-            # Chief Compliance Officers see all customers
+        if has_compliance_access:
             domain = []
         else:
             # Regular users only see customers in their assigned branches

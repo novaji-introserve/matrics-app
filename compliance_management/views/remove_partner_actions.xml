@@ -52,26 +52,5 @@ action = result
         </field>
     </record>
 
-    <record id="action_server_create_demo_data" model="ir.actions.server">
-        <field name="name">Create Random Demo Data</field>
-        <field name="model_id" ref="model_digital_delivery_channel"/>
-        <field name="state">code</field>
-        <field name="code">
-# Get any channel record to call the method
-channel = env['digital.delivery.channel'].search([], limit=1)
-if channel:
-    result = channel.action_create_dynamic_demo_subscriptions()
-else:
-    result = {
-        'type': 'ir.actions.client',
-        'tag': 'display_notification',
-        'params': {
-            'title': 'Error',
-            'message': 'No delivery channels found. Please create channels first.',
-            'type': 'danger',
-        }
-    }
-action = result
-        </field>
-    </record>
+  
 </odoo>

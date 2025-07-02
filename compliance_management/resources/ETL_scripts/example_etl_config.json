@@ -1,0 +1,589 @@
+{
+  "tables": {
+    "test_ods_sb_productdb_products": {
+      "source_table": "test_ods_sb_productdb_products",
+      "target_table": "res_partner_account_product",
+      "primary_key": "product_id",
+      "batch_size": 1000,
+      "dependencies": [],
+      "mappings": {
+        "code": {
+          "target": "code",
+          "type": "direct"
+        },
+        "product_id": {
+          "target": "product_id",
+          "type": "direct"
+        },
+        "name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "product_category": {
+          "target": "product_category",
+          "type": "direct"
+        },
+        "description": {
+          "target": "description",
+          "type": "direct"
+        },
+        "product_type_name": {
+          "target": "product_type",
+          "type": "direct"
+        }
+      }
+    },
+
+    "test_ods_dimindustries": {
+      "source_table": "test_ods_dimindustries",
+      "target_table": "customer_industry",
+      "primary_key": "code",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "code": { "target": "code", "type": "direct" },
+        "description": { "target": "name", "type": "direct" }
+      }
+    },
+
+    "test_ods_account_officers": {
+      "source_table": "test_ods_account_officers",
+      "target_table": "account_officers",
+      "primary_key": "dept_acct_off_code",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "dept_acct_off_code": {
+          "target": "code",
+          "type": "direct"
+        },
+        "name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "area": {
+          "target": "area",
+          "type": "direct"
+        }
+      }
+    },
+
+    "test_ods_sectors": {
+      "source_table": "test_ods_sectors",
+      "target_table": "res_partner_sector",
+      "primary_key": "code",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "code": {
+          "target": "code",
+          "type": "direct"
+        },
+        "description": {
+          "target": "name",
+          "type": "direct"
+        }
+      }
+    },
+
+    "test_ods_branches": {
+      "source_table": "test_ods_branches",
+      "target_table": "res_branch",
+      "primary_key": "branch_name",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "branch_code": {
+          "target": "code",
+          "type": "direct"
+        },
+        "branch_name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "zone": {
+          "target": "zone",
+          "type": "direct"
+        },
+        "address": {
+          "target": "address",
+          "type": "direct"
+        },
+        "state_located": {
+          "target": "state_located",
+          "type": "direct"
+        },
+        "town_area": {
+          "target": "town_area",
+          "type": "direct"
+        },
+        "region": {
+          "target": "region",
+          "type": "direct"
+        }
+      }
+    },
+
+    "test_ods_customers": {
+      "source_table": "test_ods_customers",
+      "target_table": "res_partner",
+      "primary_key": "customer_id",
+      "batch_size": 1000,
+      "dependencies": [],
+      "mappings": {
+        "customer_id": {
+          "target": "customer_id",
+          "type": "direct"
+        },
+        "name_1": {
+          "target": "name",
+          "type": "direct"
+        },
+        "customer_since": {
+          "target": "registration_date",
+          "type": "direct"
+        },
+        "street": {
+          "target": "street",
+          "type": "direct"
+        },
+        "address": {
+          "target": "address",
+          "type": "direct"
+        },
+        "town_country": {
+          "target": "town",
+          "type": "direct"
+        },
+        "given_names": {
+          "target": "firstname",
+          "type": "direct"
+        },
+        "family_name": {
+          "target": "lastname",
+          "type": "direct"
+        },
+        "date_of_birth": {
+          "target": "dob",
+          "type": "direct"
+        },
+        "marital_status": {
+          "target": "marital_status",
+          "type": "direct"
+        },
+        "phone_1": {
+          "target": "phone",
+          "type": "direct"
+        },
+        "email_1": {
+          "target": "email",
+          "type": "direct"
+        },
+        "sms_1": {
+          "target": "customer_phone",
+          "type": "direct"
+        },
+        "employment_status": {
+          "target": "employment_status",
+          "type": "direct"
+        },
+        "pep": {
+          "target": "pep",
+          "type": "direct"
+        },
+        "state_residence": {
+          "target": "state_residence",
+          "type": "direct"
+        },
+        "gender": {
+          "target": "gender",
+          "type": "direct"
+        },
+        "middle_name": {
+          "target": "middlename",
+          "type": "direct"
+        },
+        "bvn": {
+          "target": "bvn",
+          "type": "direct"
+        },
+        "title": {
+          "target": "customer_title",
+          "type": "direct"
+        },
+        "nin": {
+          "target": "nin",
+          "type": "direct"
+        },
+        "customer_rating": {
+          "target": "customer_rating",
+          "type": "direct"
+        },
+        "sector": {
+          "target": "sector_id",
+          "type": "lookup",
+          "lookup_table": "res_partner_sector",
+          "lookup_key": "code",
+          "lookup_value": "id"
+        },
+        "account_officer": {
+          "target": "account_officer_id",
+          "type": "lookup",
+          "lookup_table": "account_officers",
+          "lookup_key": "name",
+          "lookup_value": "id"
+        },
+        "industry": {
+          "target": "customer_industry_id",
+          "type": "lookup",
+          "lookup_table": "customer_industry",
+          "lookup_key": "code",
+          "lookup_value": "id"
+        }
+      }
+    },
+
+    "test_edw_dim_accounts_v2": {
+      "source_table": "test_edw_dim_accounts_v2",
+      "target_table": "res_partner_account",
+      "primary_key": "account_id",
+      "batch_size": 1000,
+      "dependencies": [],
+      "mappings": {
+        "customer": {
+          "target": "customer_id",
+          "type": "lookup",
+          "lookup_table": "res_partner",
+          "lookup_key": "customer_id",
+          "lookup_value": "id"
+        },
+        "category": {
+          "target": "category",
+          "type": "direct"
+        },
+        "account_id": {
+          "target": "name",
+          "type": "direct"
+        },
+        "category_desc": {
+          "target": "category_description",
+          "type": "direct"
+        },
+        "account_title1": {
+          "target": "account_name",
+          "type": "direct"
+        },
+        "currency": {
+          "target": "currency",
+          "type": "direct"
+        },
+        "acct_officer": {
+          "target": "account_officer_id",
+          "type": "lookup",
+          "lookup_table": "account_officers",
+          "lookup_key": "code",
+          "lookup_value": "id"
+        },
+        "account_status": {
+          "target": "account_status",
+          "type": "direct"
+        },
+        "working_balance": {
+          "target": "balance",
+          "type": "direct"
+        },
+        "opening_date": {
+          "target": "opening_date",
+          "type": "direct"
+        },
+        "co_code": {
+          "target": "branch_id",
+          "type": "lookup",
+          "lookup_table": "res_branch",
+          "lookup_key": "code",
+          "lookup_value": "id"
+        },
+        "account_code": {
+          "target": "account_code",
+          "type": "direct"
+        },
+        "date_created": {
+          "target": "date_created",
+          "type": "direct"
+        },
+        "account_type": {
+          "target": "account_type",
+          "type": "direct"
+        },
+        "account_position": {
+          "target": "account_position",
+          "type": "direct"
+        },
+        "is_joint_account": {
+          "target": "is_joint_account",
+          "type": "direct"
+        },
+        "last_transaction_date": {
+          "target": "last_transaction_date",
+          "type": "direct"
+        },
+        "max_daily_debit": {
+          "target": "max_debit_daily",
+          "type": "direct"
+        },
+        "overdraft_limit": {
+          "target": "overdraft_limit",
+          "type": "direct"
+        },
+        "uncleared_balance": {
+          "target": "uncleared_balance",
+          "type": "direct"
+        },
+        "start_year_bal": {
+          "target": "start_year_balance",
+          "type": "direct"
+        },
+        "date_last_cr_cust": {
+          "target": "date_last_credit_customer",
+          "type": "direct"
+        },
+        "amnt_last_cr_cust": {
+          "target": "amount_last_credit_customer",
+          "type": "direct"
+        },
+        "date_last_dr_cust": {
+          "target": "date_last_debit_customer",
+          "type": "direct"
+        },
+        "sta_code": {
+          "target": "state",
+          "type": "direct"
+        },
+        "product_id": {
+          "target": "product_id",
+          "type": "lookup",
+          "lookup_table": "res_partner_account_product",
+          "lookup_key": "product_id",
+          "lookup_value": "id"
+        }
+      }
+    },
+    "new_test_watchlist": {
+      "source_table": "new_test_watchlist",
+      "target_table": "res_partner_watchlist",
+      "primary_key": "recordid",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "recordid": {
+          "target": "watchlist_id",
+          "type": "direct"
+        },
+        "ind_name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "nationality": {
+          "target": "nationality",
+          "type": "direct"
+        },
+        "source": {
+          "target": "source",
+          "type": "direct"
+        }
+      }
+    },
+    "new_test_pep_list": {
+      "source_table": "new_test_pep_list",
+      "target_table": "pep_list",
+      "primary_key": "uniqueidentifier",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "uniqueidentifier": {
+          "target": "unique_id",
+          "type": "direct"
+        },
+        "watchname": {
+          "target": "name",
+          "type": "direct"
+        },
+        "firstname": {
+          "target": "firstname",
+          "type": "direct"
+        },
+        "lastname": {
+          "target": "lastname",
+          "type": "direct"
+        },
+        "presentposition": {
+          "target": "position",
+          "type": "direct"
+        }
+      }
+    },
+    "test_edw_sterling_customers_digital_products": {
+      "source_table": "test_edw_sterling_customers_digital_products",
+      "target_table": "customer_digital_product",
+      "primary_key": "customer_id",
+      "batch_size": 1000,
+      "dependencies": [],
+      "mappings": {
+        "customer_segment": {
+          "target": "customer_segment",
+          "type": "direct"
+        },
+        "customer_id": {
+          "target": "customer_id",
+          "type": "direct"
+        },
+        "customer_name": {
+          "target": "customer_name",
+          "type": "direct"
+        },
+        "ussd": {
+          "target": "ussd",
+          "type": "direct"
+        },
+        "onebank": {
+          "target": "onebank",
+          "type": "direct"
+        },
+        "carded_customer": {
+          "target": "carded_customer",
+          "type": "direct"
+        },
+        "altbank": {
+          "target": "alt_bank",
+          "type": "direct"
+        },
+        "sterlingpro": {
+          "target": "sterling_pro",
+          "type": "direct"
+        },
+        "banca": {
+          "target": "banca",
+          "type": "direct"
+        },
+        "doubble": {
+          "target": "doubble",
+          "type": "direct"
+        },
+        "specta": {
+          "target": "specta",
+          "type": "direct"
+        },
+        "switch": {
+          "target": "switch",
+          "type": "direct"
+        }
+      }
+    },
+    "test_watchlist_inhouse": {
+      "source_table": "test_watchlist_inhouse",
+      "target_table": "res_partner_watchlist",
+      "primary_key": "bvn",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "first_name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "middle_name": {
+          "target": "middle_name",
+          "type": "direct"
+        },
+        "surname": {
+          "target": "surname",
+          "type": "direct"
+        },
+        "bvn": {
+          "target": "bvn",
+          "type": "direct"
+        }
+      }
+    },
+    {
+      "tables": {
+        "test_fact_stmt_transactions": {
+          "source_table": "test_fact_stmt_transactions",
+          "target_table": "res_customer_transaction",
+          "primary_key": "trans_reference",
+          "batch_size": 1000,
+          "dependencies": [],
+          "mappings": {
+            "trans_reference": {
+              "target": "name",
+              "type": "direct"
+            },
+            "account_officer": {
+              "target": "account_officer_id",
+              "type": "lookup",
+              "lookup_table": "account_officers",
+              "lookup_key": "code",
+              "lookup_value": "id"
+            },
+            "customer_id": {
+              "target": "customer_id",
+              "type": "lookup",
+              "lookup_table": "res_partner",
+              "lookup_key": "customer_id",
+              "lookup_value": "id"
+            },
+            "narrative": {
+              "target": "narration",
+              "type": "direct"
+            },
+            "transaction_code": {
+              "target": "trans_code",
+              "type": "direct"
+            },
+            "company_code": {
+              "target": "branch_code",
+              "type": "direct"
+            },
+            "company_code": {
+              "target": "branch_id",
+              "type": "lookup",
+              "lookup_table": "res_branch",
+              "lookup_key": "code",
+              "lookup_value": "id"
+            },
+            "account_number": {
+              "target": "account_id",
+              "type": "lookup",
+              "lookup_table": "res_partner_account",
+              "lookup_key": "name",
+              "lookup_value": "id"
+            },
+            "amount_lcy_sign": {
+              "target": "amount",
+              "type": "direct"
+            },
+            "inputter_id": {
+              "target": "inputter",
+              "type": "direct"
+            },
+            "authorizer_id": {
+              "target": "authorizer",
+              "type": "direct"
+            },
+            "deb_cre_ind": {
+              "target": "transaction_type",
+              "type": "direct"
+            },
+            "trans_timestamp": {
+              "target": "date_created",
+              "type": "direct"
+            },
+            "currency": {
+              "target": "currency",
+              "type": "direct"
+            }
+          }
+        }
+      }
+    }
+  }
+}

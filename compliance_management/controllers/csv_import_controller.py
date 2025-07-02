@@ -408,7 +408,11 @@ class CSVImportController(http.Controller):
                 content_type = (
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-
+            
+            # Create import log record
+            import_log_id = None
+            
+            # Get delete mode parameters
             delete_mode = request.httprequest.headers.get("X-Delete-Mode") == "true"
             unique_identifier_field = request.httprequest.headers.get("X-Unique-Identifier", "")
 
@@ -417,6 +421,7 @@ class CSVImportController(http.Controller):
             # Get delete mode parameters
             delete_mode = request.httprequest.headers.get("X-Delete-Mode") == "true"
             unique_identifier_field = request.httprequest.headers.get("X-Unique-Identifier", "")
+            
             
             with request.env.registry.cursor() as new_cr:
                 try:
@@ -439,6 +444,7 @@ class CSVImportController(http.Controller):
                                 "batch_folder": batch_folder,
                                 "file_path": final_path,
                                 "uploaded_by": request.env.user.id,
+                                # Delete mode parameters
                                 "delete_mode": delete_mode,
                                 "unique_identifier_field": unique_identifier_field if delete_mode else False,
                             }
