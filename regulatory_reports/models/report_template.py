@@ -34,5 +34,4 @@ class ReportTemplate(models.Model):
         help='Type of report this template is designed for.',
         index=True
     )
-    item_ids = fields.Many2many(
-        'res.regulatory.report.item', 'res_report_template_items_rel', 'template_id', 'item_id', string='Report Items' ,required=False)
+    item_ids = fields.One2many('res.regulatory.report.template.item', 'template_id', string='Report Items' ,required=True)

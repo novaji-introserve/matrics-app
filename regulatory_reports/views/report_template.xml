@@ -39,11 +39,11 @@
               </group>
             </group>
             <notebook>
+              <page name="Report Items" string="Report Items">
+                <field name="item_ids" domain="[('template_id','=',id)]"/>
+              </page>
               <page name="narration" string="Narration">
                 <field name="description" widget="html" />
-              </page>
-              <page name="Report Items" string="Report Items">
-                <field name="item_ids"/>
               </page>
             </notebook>
           </sheet>

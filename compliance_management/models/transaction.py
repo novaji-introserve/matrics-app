@@ -147,14 +147,18 @@ class Transaction(models.Model):
 
     @api.model
     def open_transactions(self):
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
         
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
+        if has_compliance_access:
             # Chief Compliance Officers see all customers
             domain = [('state', '=', 'new')]
         else:
@@ -175,14 +179,18 @@ class Transaction(models.Model):
 
     @api.model
     def open_transactions_done(self):
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
         
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
+        if has_compliance_access :
             # Chief Compliance Officers see all customers
             domain = [('state', '=', 'done')]
         else:
@@ -202,15 +210,18 @@ class Transaction(models.Model):
 
     @api.model
     def open_transactions_all(self):
-        is_chief_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_chief_compliance_officer')
         
-        is_compliance_officer = self.env.user.has_group(
-            'compliance_management.group_compliance_compliance_officer')
+        user = self.env.user
+        compliance_groups = [
+            'compliance_management.group_compliance_chief_compliance_officer',
+            'compliance_management.group_compliance_compliance_officer',
+            'compliance_management.group_compliance_transaction_monitoring_team'
+        ]
+        has_compliance_access = any(user.has_group(group)
+                                    for group in compliance_groups)
 
         # Set domain based on user group
-        if is_chief_compliance_officer or is_compliance_officer:
-            # Chief Compliance Officers see all customers
+        if has_compliance_access:
             domain = []
         else:
             # Regular users only see customers in their assigned branches

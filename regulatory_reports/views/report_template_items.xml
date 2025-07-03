@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_regulatory_report_template_item_tree" model="ir.ui.view">
+        <field name="name">regulatory.report.template.item.tree</field>
+        <field name="model">res.regulatory.report.template.item</field>
+        <field name="arch" type="xml">
+            <tree string="Report Templates">
+                <field name="name" />
+                <field name="template_id" />
+                <field name="item_id" />
+                <field name="write_uid" />
+                <field name="write_date" />
+            </tree>
+        </field>
+    </record>
+    <record id="view_regulatory_report_template_item_form" model="ir.ui.view">
+        <field name="name">regulatory.report.template.item.form</field>
+        <field name="model">res.regulatory.report.template.item</field>
+        <field name="arch" type="xml">
+            <form string="Report Template Item">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe-edit-only" />
+                        <h1>
+                            <field name="name" placeholder="A1" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="template_id" />
+                            <field name="item_id" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="narration" string="Narration">
+                            <field name="description" widget="html" />
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="view_regulatory_report_template_item_search" model="ir.ui.view">
+        <field name="name">Report Template Items Search</field>
+        <field name="model">res.regulatory.report.template.item</field>
+        <field name="priority" eval="10" />
+        <field name="arch" type="xml">
+            <search string="Search Template Items">
+                <field name="name" />
+                <field name="template_id" />
+                <field name="item_id" />
+                <separator />
+                <group expand="0" name="group_by" string="Group By">
+                    <filter name="group_name" string="Cell Reference" domain="[]"
+                        context="{'group_by' : 'name'}" />
+                    <filter name="group_template" string="Template"
+                        context="{'group_by': 'template_id'}" />
+                    <filter name="group_item" string="Item" context="{'group_by': 'item_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

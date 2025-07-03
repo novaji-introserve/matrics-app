@@ -152,7 +152,7 @@ class DigitalDeliveryChannel(models.Model):
         _logger.info("Starting index creation and migration setup...")
 
         try:
-            # Step 1: Create all indexes (this is what was slow)
+            # Step 1: Create all indexes 
             self._create_all_performance_indexes()
 
             # Step 2: Setup for migration
@@ -212,7 +212,7 @@ class DigitalDeliveryChannel(models.Model):
             except Exception as e:
                 _logger.warning(f"❌ Index {idx_name} failed: {e}")
 
-        # Critical composite indexes for performance
+        # composite indexes for performance
         composite_indexes = [
             ('customer_channel_subscription_customer_channel_idx',
              'customer_channel_subscription', ['customer_id', 'channel_id']),

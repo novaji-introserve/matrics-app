@@ -21,7 +21,14 @@ import os
 
 def setup_logging():
     # log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ETL.log')
-    log_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ETL.log')
+    # log_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ETL.log')
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    etl_scripts_dir = os.path.dirname(script_dir)
+    log_dir = os.path.join(etl_scripts_dir, 'Logs')
+    # Ensure the Logs directory exists
+    os.makedirs(log_dir, exist_ok=True)
+    log_file = os.path.join(log_dir, 'ETL.log')
     # Check if file exists and exceeds size limit
     if os.path.exists(log_file) and os.path.getsize(log_file) >= 30 * 1024 * 1024:
         # Empty the file

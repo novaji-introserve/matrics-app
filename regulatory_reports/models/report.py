@@ -81,8 +81,8 @@ class Report(models.Model):
                 for i in item_ids:
                     changes_count = self._find_replace_in_workbook(
                         workbook,
-                        i.code,
-                        i.get_value()
+                        i.name.strip().upper(),
+                        i.item_id.get_value()
                     )
             # Convert back to binary
             processed_binary = self._workbook_to_binary(workbook)

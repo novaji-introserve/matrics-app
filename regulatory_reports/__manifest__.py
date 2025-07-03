@@ -39,6 +39,7 @@
         'views/report_entity.xml',
         'views/report_template.xml',
         'views/report_item.xml',
+        'views/report_template_items.xml',
         'views/report.xml',
         'views/menuitems.xml',
         'data/report_entity_data.xml',
