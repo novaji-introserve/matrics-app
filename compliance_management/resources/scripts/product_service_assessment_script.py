@@ -2,8 +2,8 @@ import xml.etree.ElementTree as ET
 import os
 
 # Specify the file path for the input and output XML (replace with your actual file path)
-INPUT_XML_FILE_PATH = "product_service_subject.xml"
-OUTPUT_XML_FILE_PATH = "product_service_assessments.xml"
+INPUT_XML_FILE_PATH = "./../../data/demo_data/risk_assessment/product_service_subject.xml"
+OUTPUT_XML_FILE_PATH = "./../../data/demo_data/risk_assessment/product_service_assessments.xml"
 
 def fix_typos(subject):
     """Fix known typos in the name field."""
