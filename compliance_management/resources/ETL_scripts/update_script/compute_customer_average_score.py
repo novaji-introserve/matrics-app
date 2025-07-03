@@ -17,7 +17,13 @@ DEFAULT_CONFIG_FILE = "/data/odoo/ETL_script/update_script/settings.conf"
 
 # Configure logging
 def setup_logging():
-    log_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    etl_scripts_dir = os.path.dirname(script_dir)
+    log_dir = os.path.join(etl_scripts_dir, 'Logs')
+
+    # Ensure the Logs directory exists
+    os.makedirs(log_dir, exist_ok=True)
+
     log_file = os.path.join(log_dir, 'UpdateScript.log')
     
     # Check if file exists and exceeds size limit (30MB)
