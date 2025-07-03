@@ -34,9 +34,9 @@ class ReportItem(models.Model):
         return self.source_value
     
     def validate_select_statement(self):
-        query = self.source_sql.strip().lower()
-        if not query:
+        if not self.source_sql:
             raise ValidationError(f'Missing or Empty SQL Statement')
+        query = self.source_sql.strip().lower()            
         try:
             parsed_statements = sqlparse.parse(query)
             if not parsed_statements:
