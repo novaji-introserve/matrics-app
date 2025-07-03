@@ -1,4 +1,4 @@
-custom_addons/icomply_odoo/compliance_management/resources/ETL_scripts/update_script/csv_data
-custom_addons/icomply_odoo/compliance_management/resources/ETL_scripts/UpdateScript.log
-custom_addons/icomply_odoo/compliance_management/resources/ETL_scripts/ETL.log
-custom_addons/icomply_odoo/compliance_management/resources/ETL_scripts/cron_execution.log
+ETL_scripts/update_script/csv_data
+ETL_scripts/UpdateScript.log
+ETL_scripts/ETL.log
+ETL_scripts/cron_execution.log
