@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Ultra-Optimized Database Migration Script with Multi-Worker Support
-Converts customer channel subscription data with performance optimizations.
-"""
 
 import os
 import sys
