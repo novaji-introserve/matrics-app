@@ -30,11 +30,11 @@ def create_dynamic_demo_subscriptions():
     load_dotenv()
 
     # Get database credentials from .env file
-    db_host = os.getenv("HOST", "localhost")
+    db_host = os.getenv("DB_HOST", "localhost")
     db_port = os.getenv("DB_PORT", "5432")
     db_name = os.getenv("DB")  # DATABASE NAME
-    db_user = os.getenv("USERNAME")  # DATABASE USERNAME
-    db_password = os.getenv("PASSWORD")
+    db_user = os.getenv("DB_USERNAME")  # DATABASE USERNAME
+    db_password = os.getenv("DB_PASSWORD")
 
     # Validate that required credentials are present
     if not all([db_name, db_user, db_password]):
