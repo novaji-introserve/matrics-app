@@ -3,7 +3,7 @@
     "test_fact_stmt_transactions": {
       "source_table": "test_fact_stmt_transactions",
       "target_table": "res_customer_transaction",
-      "primary_key": "trans_reference",
+      "target_primary_key": "trans_reference",
       "batch_size": 1000,
       "dependencies": [],
       "mappings": {
