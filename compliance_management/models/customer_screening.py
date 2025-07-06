@@ -529,28 +529,6 @@ class CustomerScreeningResult(models.Model):
                 _logger.warning("Email template for screening alert not found")
                 return False
 
-            # Get company logo safely
-            def get_company_logo():
-                try:
-                    # Try user's company first
-                    company = self.env.user.company_id
-                    if company and company.logo_web:
-                        return company.logo_web.decode('utf-8')
-
-                    # Try current company
-                    company = self.env.company
-                    if company and company.logo_web:
-                        return company.logo_web.decode('utf-8')
-
-                    # Try first company in system
-                    company = self.env['res.company'].sudo().search([], limit=1)
-                    if company and company.logo_web:
-                        return company.logo_web.decode('utf-8')
-
-                    return None
-                except Exception as e:
-                    _logger.warning(f"Error getting company logo: {e}")
-                    return None
 
             # Generate URL for the record
             base_url = self.env['ir.config_parameter'].sudo(
@@ -590,7 +568,7 @@ class CustomerScreeningResult(models.Model):
                 'risk_score': safe_getattr(partner, 'risk_score'),
                 'risk_level': safe_getattr(partner, 'risk_level'),
                 'customer_id': safe_getattr(partner, 'customer_id'),
-                'company_logo': get_company_logo(),  # Safe logo getter
+                'company_logo': self.get_company_logo(base_url),  # Safe logo getter
             }
 
             # Create a minimal mail values dict instead of using a record
@@ -689,6 +667,11 @@ class CustomerScreeningResult(models.Model):
             _logger.error(
                 f"Error in screening notification process: {e}", exc_info=True)
             return False
+        
+    def get_company_logo(self, base_url):
+        company = self.env.user.company_id
+        logo_url = f"{base_url}/web/image/res.company/{company.id}/logo_web"
+        return logo_url
     
     def get_partner_filtered_tree_url(self, partner):
         """Simple method to get partner-filtered tree view URL"""
