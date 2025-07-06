@@ -72,7 +72,7 @@ class DateTimeEncoder(json.JSONEncoder):
 class TableConfig:
     source_table: str
     target_table: str
-    primary_key: str  # Source primary key column name (lowercase)
+    target_primary_key: str  # Source primary key column name (lowercase)
     batch_size: int
     dependencies: List[str]
     mappings: Dict[str, Dict[str, Any]]
@@ -81,7 +81,7 @@ class TableConfig:
         # Normalize names to lowercase for consistency
         self.source_table = self.source_table.lower()
         self.target_table = self.target_table.lower()
-        self.primary_key = self.primary_key.lower()
+        self.target_primary_key = self.target_primary_key.lower()
         self.dependencies = [dep.lower() for dep in self.dependencies]
 
         normalized_mappings = {}
@@ -94,12 +94,12 @@ class TableConfig:
     def get_target_primary_key(self) -> str:
         """Gets the corresponding target primary key column name."""
         for source_col, mapping in self.mappings.items():
-            if source_col == self.primary_key:
+            if source_col == self.target_primary_key:
                 return mapping['target']
         # Fallback if PK mapping isn't explicitly defined (assuming same name)
         logger.warning(
-            f"Primary key '{self.primary_key}' not explicitly mapped for {self.source_table}. Assuming target PK has the same name.")
-        return self.primary_key
+            f"Primary key '{self.target_primary_key}' not explicitly mapped for {self.source_table}. Assuming target PK has the same name.")
+        return self.target_primary_key
 
 
 class DatabaseError(Exception):
@@ -954,7 +954,7 @@ class ETLManager:
                         f"[{table_name}] No valid mapped columns found after checking source.")
 
                 # Ensure source primary key is selected (needed for context/logging even if not target PK)
-                source_pk_col = config.primary_key
+                source_pk_col = config.target_primary_key
                 if source_pk_col not in columns_to_select:
                     if source_pk_col in available_source_columns:
                         columns_to_select.append(source_pk_col)

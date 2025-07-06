@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_case_settings_overdue" model="case.settings">
+        <field name="name">Case Overdue Period</field>
+        <field name="code">case_overdue_period</field>
+        <field name="date_val">48</field>
+        <field name="date_unit">hours</field>
+        <field name="narration">Deteremines the Period when a case becomes overdue
+        </field>
+    </record>
+
+    <record id="res_case_settings_archive" model="case.settings">
+        <field name="name">Case Archive Period</field>
+        <field name="code">case_archive_period</field>
+        <field name="date_val">180</field>
+        <field name="date_unit">days</field>
+        <field name="narration">Deteremines the Period when a case is Archived
+        </field>
+    </record>
+
+</odoo>

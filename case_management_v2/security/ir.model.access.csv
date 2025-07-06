@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_case_management_v2_case_management_v2,case_management_v2.case_management_v2,model_case_manager,base.group_user,1,1,1,0
+access_case_response,case_response,model_case_response_,base.group_user,1,1,1,0
+access_case_exception_cat,case_exception_cat,model_exception_category_,base.group_user,1,1,1,0
+access_case_exception_process,case_exception_process,model_exception_process_,base.group_user,1,1,1,0
+access_case_settings,case_settings,model_case_settings,base.group_user,1,1,1,0
