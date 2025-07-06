@@ -18,6 +18,7 @@ class alert_history(models.Model):
         ('adverse.media', 'Adverse Media'),
         ('res.partner.edd', 'EDD'),
         ('case.management', 'Case'),
+        ('case.manager', 'Case'),
         ('res.partner.screening.result', 'Sanction Screening'),
         ],
         string='Alert Source'

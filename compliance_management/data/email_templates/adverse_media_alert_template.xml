@@ -37,13 +37,13 @@
             <field name="subject">New Adverse Media Alerts Detected</field>
             <field name="email_from">${ctx.get('email_from')}</field>
             <field name="body_html" type="html">
-              
+
                 <!-- <div style="margin: 0px 12px; padding: 0px; font-family: Arial, sans-serif;"> -->
                 <div style="margin: 10px 12px 0px 12px; padding: 0px; font-family: Arial, sans-serif;">
 
                     <!-- Header with Logo -->
                     <div style="padding: 8px; text-align: left; margin-bottom: 45px;">
-                        <img t-att-src="'/compliance_management/static/img/alt_bank_logo_.png'" class="h-6" alt="Alt Bank logo"/>
+                        <img t-att-src="ctx.get('company_logo')" alt="Company Logo" class="h-6"/>
                     </div>
 
 
@@ -61,7 +61,7 @@
                     <p style="line-height: 1.4;">
                         <strong style="color: #2c3e50;font-size: 1.17em;">Date and Time Entry:
                         </strong>
-                       <t t-esc="ctx.get('datetime')"/>
+                        <t t-esc="ctx.get('datetime')"/>
                     </p>
 
                     <p>
