@@ -81,8 +81,9 @@ class Report(models.Model):
                 for i in item_ids:
                     changes_count = self._find_replace_in_workbook(
                         workbook,
+                        i.worksheet_id.name,
                         i.name.strip().upper(),
-                        i.item_id.get_value()
+                        i.item_id.get_value(),
                     )
             # Convert back to binary
             processed_binary = self._workbook_to_binary(workbook)
@@ -106,7 +107,7 @@ class Report(models.Model):
         except Exception as e:
             raise UserError(f"Error processing file: {str(e)}")
 
-    def _find_replace_in_workbook(self, workbook, find_val, replace_val):
+    def _find_replace_in_workbook(self, workbook,worksheet_name,find_val, replace_val):
         """
         Find and replace values in all worksheets of the workbook
 
@@ -121,8 +122,9 @@ class Report(models.Model):
         changes_count = 0
 
         # Iterate through all worksheets
-        for worksheet in workbook.worksheets:
-
+        #for worksheet in workbook.worksheets:
+        worksheet = workbook[worksheet_name]
+        if worksheet:
             if isinstance(replace_val, dict):
                 pass
             if isinstance(replace_val, list):
