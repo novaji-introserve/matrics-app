@@ -80,6 +80,8 @@
         "data/demo_data/risk_assessment/delivery_channel.xml",
         "data/demo_data/risk_assessment/product_services.xml",
         "data/demo_data/risk_assessment/product_service_subject.xml",
+        'data/demo_data/risk_assessment/product_service_assessments.xml',
+        'data/demo_data/risk_assessment/product_plans.xml',
         "data/demo_data/risk_assessment/compliance_history.xml",
         "data/demo_data/risk_assessment/data_quality.xml",
         "data/demo_data/risk_assessment/transaction_behavior.xml",
@@ -121,7 +123,8 @@
         'data/demo_data/plan/customer_type_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
-        "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
+        "data/demo_data/partner/res_partner.xml",
+        # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
         'data/blacklist.xml',
         "views/customer_screening.xml",
         "views/menu_actions.xml",
