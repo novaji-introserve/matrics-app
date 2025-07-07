@@ -1,4 +1,4 @@
-<odoo>
+<data>
     <record id="compliance_inst_fc_sterling_alumni_account_cur012_subject" model="res.risk.subject">
         <field name="name">STERLING ALUMNI ACCOUNT</field>
         <field name="code">CUR012</field>
@@ -24,7 +24,7 @@
         <field name="code">CUR018</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_priority_current_a_c_indiv_regular__cur019_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_priority_current_a_c_indiv_regular_cur019_subject" model="res.risk.subject">
         <field name="name">PRIORITY CURRENT A/C-INDIV(REGULAR)</field>
         <field name="code">CUR019</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
@@ -34,7 +34,7 @@
         <field name="code">CUR021</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_premier_current_a_c_indiv_regular__cur023_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_premier_current_a_c_indiv_regular_cur023_subject" model="res.risk.subject">
         <field name="name">PREMIER CURRENT A/C- INDIV(REGULAR)</field>
         <field name="code">CUR023</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
@@ -179,9 +179,9 @@
         <field name="code">SAV016</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_established_medium_incubator_established/medium_incubator_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_established_medium_incubator_established_medium_incubator_subject" model="res.risk.subject">
         <field name="name">ESTABLISHED/MEDIUM INCUBATOR</field>
-        <field name="code">established/medium_incubator</field>
+        <field name="code">established_medium_incubator</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_platinum_flex_platinum_flex_subject" model="res.risk.subject">
@@ -289,9 +289,9 @@
         <field name="code">corporate_pb_overdraft</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_incubator_m_incubator-m_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_incubator_m_incubator_m_subject" model="res.risk.subject">
         <field name="name">INCUBATOR-M</field>
-        <field name="code">incubator-m</field>
+        <field name="code">incubator_m</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_disapora_vantage_gold_disapora_vantage_gold_subject" model="res.risk.subject">
@@ -439,9 +439,9 @@
         <field name="code">veripay_salary_savings</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_individual_platinum_hysa_fn_individual_platinum_hysa-fn_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_individual_platinum_hysa_fn_individual_platinum_hysa_fn_subject" model="res.risk.subject">
         <field name="name">INDIVIDUAL PLATINUM HYSA-FN</field>
-        <field name="code">individual_platinum_hysa-fn</field>
+        <field name="code">individual_platinum_hysa_fn</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_community_banking_cur097_subject" model="res.risk.subject">
@@ -799,9 +799,9 @@
         <field name="code">mcash</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_platinum_flex_plus_nysc__platinum_flex_plus_(nysc)_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_platinum_flex_plus_nysc_platinum_flex_plus_nysc_subject" model="res.risk.subject">
         <field name="name">PLATINUM FLEX PLUS (NYSC)</field>
-        <field name="code">platinum_flex_plus_(nysc)</field>
+        <field name="code">platinum_flex_plus_nysc</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_staff_product_cur140_subject" model="res.risk.subject">
@@ -974,9 +974,9 @@
         <field name="code">SAV158</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_platinumbusinees_starter_mini_platinumbusinees_+_starter/mini_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_platinumbusinees_starter_mini_platinumbusinees_starter_mini_subject" model="res.risk.subject">
         <field name="name">PLATINUMBUSINEES + STARTER/MINI</field>
-        <field name="code">platinumbusinees_+_starter/mini</field>
+        <field name="code">platinumbusinees_starter_mini</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_savings_non_individual_transfer_eur_sav176_subject" model="res.risk.subject">
@@ -1244,9 +1244,9 @@
         <field name="code">COL001</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_jaac_state_joint_local_govt_acct_jaac_-_state_joint_local_govt_acct_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_jaac_state_joint_local_govt_acct_jaac_state_joint_local_govt_acct_subject" model="res.risk.subject">
         <field name="name">JAAC - STATE JOINT LOCAL GOVT ACCT</field>
-        <field name="code">jaac_-_state_joint_local_govt_acct</field>
+        <field name="code">jaac_state_joint_local_govt_acct</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_local_government_accounts_local_government_accounts_subject" model="res.risk.subject">
@@ -1259,9 +1259,9 @@
         <field name="code">import_od</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_agency_banking_account_for_agents_coporate__agency_banking_account_for_agents_(coporate)_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_agency_banking_account_for_agents_coporate_agency_banking_account_for_agents_coporate_subject" model="res.risk.subject">
         <field name="name">AGENCY BANKING ACCOUNT FOR AGENTS (COPORATE)</field>
-        <field name="code">agency_banking_account_for_agents_(coporate)</field>
+        <field name="code">agency_banking_account_for_agents_coporate</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_target_saving_a_3yrs_eur_sav119_subject" model="res.risk.subject">
@@ -1524,9 +1524,9 @@
         <field name="code">SAV015</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_non_oil_export_stimulation_facility_non-oil_export_stimulation_facility_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_non_oil_export_stimulation_facility_non_oil_export_stimulation_facility_subject" model="res.risk.subject">
         <field name="name">NON-OIL EXPORT STIMULATION FACILITY</field>
-        <field name="code">non-oil_export_stimulation_facility</field>
+        <field name="code">non_oil_export_stimulation_facility</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_salary_saphire_salary_saphire_subject" model="res.risk.subject">
@@ -1579,9 +1579,9 @@
         <field name="code">corp_disaspora_current</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_platinum_individual_diaspora_platinum_-__individual_diaspora_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_platinum_individual_diaspora_platinum_individual_diaspora_subject" model="res.risk.subject">
         <field name="name">PLATINUM - INDIVIDUAL DIASPORA</field>
-        <field name="code">platinum_-__individual_diaspora</field>
+        <field name="code">platinum_individual_diaspora</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_diaspora_current_diaspora_current_subject" model="res.risk.subject">
@@ -1589,9 +1589,9 @@
         <field name="code">diaspora_current</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_dbn_on_lending_scheme_dbn_on-lending_scheme_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_dbn_on_lending_scheme_dbn_on_lending_scheme_subject" model="res.risk.subject">
         <field name="name">DBN ON-LENDING SCHEME</field>
-        <field name="code">dbn_on-lending_scheme</field>
+        <field name="code">dbn_on_lending_scheme</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_otc_futures_margin_otc_futures_margin_subject" model="res.risk.subject">
@@ -1624,9 +1624,9 @@
         <field name="code">tier_1_diamond</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_individual_saphire_fn_individual_saphire-_fn_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_individual_saphire_fn_individual_saphire_fn_subject" model="res.risk.subject">
         <field name="name">INDIVIDUAL SAPHIRE- FN</field>
-        <field name="code">individual_saphire-_fn</field>
+        <field name="code">individual_saphire_fn</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_corporate_dom_overdraft_corporate_dom_overdraft_subject" model="res.risk.subject">
@@ -1634,9 +1634,9 @@
         <field name="code">corporate_dom_overdraft</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_platinum_business_established_medium_platinum_business_+_established_/_medium_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_platinum_business_established_medium_platinum_business_established_medium_subject" model="res.risk.subject">
         <field name="name">PLATINUM BUSINESS + ESTABLISHED / MEDIUM</field>
-        <field name="code">platinum_business_+_established_/_medium</field>
+        <field name="code">platinum_business_established_medium</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_loan_recovery_current_loan_recovery_current_subject" model="res.risk.subject">
@@ -1669,9 +1669,9 @@
         <field name="code">debt_service_reserve</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_platinum_basic_individual_platinum_-_basic_individual_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_platinum_basic_individual_platinum_basic_individual_subject" model="res.risk.subject">
         <field name="name">PLATINUM - BASIC INDIVIDUAL</field>
-        <field name="code">platinum_-_basic_individual</field>
+        <field name="code">platinum_basic_individual</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_domicilary_od_domicilary_od_subject" model="res.risk.subject">
@@ -1684,14 +1684,14 @@
         <field name="code">corporate_pb_current</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_platinum_bridge_account_fn_platinum_bridge_account-fn_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_platinum_bridge_account_fn_platinum_bridge_account_fn_subject" model="res.risk.subject">
         <field name="name">PLATINUM BRIDGE ACCOUNT-FN</field>
-        <field name="code">platinum_bridge_account-fn</field>
+        <field name="code">platinum_bridge_account_fn</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_int_bearing_kiddies_int._bearing_kiddies_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_int_bearing_kiddies_int_bearing_kiddies_subject" model="res.risk.subject">
         <field name="name">INT. BEARING KIDDIES</field>
-        <field name="code">int._bearing_kiddies</field>
+        <field name="code">int_bearing_kiddies</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_individual_affinity_saphire_individual_affinity_saphire_subject" model="res.risk.subject">
@@ -1699,9 +1699,9 @@
         <field name="code">individual_affinity_saphire</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_set_goal_customer__set_goal_(customer)_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_set_goal_customer_set_goal_customer_subject" model="res.risk.subject">
         <field name="name">SET GOAL (CUSTOMER)</field>
-        <field name="code">set_goal_(customer)</field>
+        <field name="code">set_goal_customer</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_individual_diamond_3_individual_diamond_3_subject" model="res.risk.subject">
@@ -1769,13 +1769,13 @@
         <field name="code">visa_debit_card</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_ex_staff_current_ex-staff_current_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_ex_staff_current_ex_staff_current_subject" model="res.risk.subject">
         <field name="name">EX-STAFF CURRENT</field>
-        <field name="code">ex-staff_current</field>
+        <field name="code">ex_staff_current</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_corporate_current_corporate_current_subject" model="res.risk.subject">
-        <field name="name">CORPORATE CURRENT</field>
+        <field name="name">CORPORATE CURRENT 2</field>
         <field name="code">corporate_current</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
@@ -1844,9 +1844,9 @@
         <field name="code">joint_affinity_current</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_platinum_corp_diaspora_platinum_-__corp._diaspora_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_platinum_corp_diaspora_platinum_corp_diaspora_subject" model="res.risk.subject">
         <field name="name">PLATINUM - CORP. DIASPORA</field>
-        <field name="code">platinum_-__corp._diaspora</field>
+        <field name="code">platinum_corp_diaspora</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_government_current_government_current_subject" model="res.risk.subject">
@@ -1859,24 +1859,24 @@
         <field name="code">staff_current</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_starter_micro_bus_incubator_starter/micro_bus_incubator_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_starter_micro_bus_incubator_starter_micro_bus_incubator_subject" model="res.risk.subject">
         <field name="name">STARTER/MICRO BUS INCUBATOR</field>
-        <field name="code">starter/micro_bus_incubator</field>
+        <field name="code">starter_micro_bus_incubator</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_growing_small_bus_incubator_growing/small_bus_incubator_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_growing_small_bus_incubator_growing_small_bus_incubator_subject" model="res.risk.subject">
         <field name="name">GROWING/SMALL BUS INCUBATOR</field>
-        <field name="code">growing/small_bus_incubator</field>
+        <field name="code">growing_small_bus_incubator</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_platinum_business_growing_small_platinum_business_+_growing/small_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_platinum_business_growing_small_platinum_business_growing_small_subject" model="res.risk.subject">
         <field name="name">PLATINUM BUSINESS + GROWING/SMALL</field>
-        <field name="code">platinum_business_+_growing/small</field>
+        <field name="code">platinum_business_growing_small</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_dom_pb_current_fn_dom_pb_current-fn_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_dom_pb_current_fn_dom_pb_current_fn_subject" model="res.risk.subject">
         <field name="name">DOM PB CURRENT-FN</field>
-        <field name="code">dom_pb_current-fn</field>
+        <field name="code">dom_pb_current_fn</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_nuban_internal_account_nuban_internal_account_subject" model="res.risk.subject">
@@ -1899,9 +1899,9 @@
         <field name="code">government_od</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_individual_current_fn_individual_current_-_fn_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_individual_current_fn_individual_current_fn_subject" model="res.risk.subject">
         <field name="name">INDIVIDUAL CURRENT - FN</field>
-        <field name="code">individual_current_-_fn</field>
+        <field name="code">individual_current_fn</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_individual_diamond_individual_diamond_subject" model="res.risk.subject">
@@ -1919,9 +1919,9 @@
         <field name="code">ps_operative</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_platinum_corp_affinity_platinum_-_corp_affinity_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_platinum_corp_affinity_platinum_corp_affinity_subject" model="res.risk.subject">
         <field name="name">PLATINUM - CORP AFFINITY</field>
-        <field name="code">platinum_-_corp_affinity</field>
+        <field name="code">platinum_corp_affinity</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_platinum_premium_business_account_variant_1_platinum_premium_business_account_variant_1_subject" model="res.risk.subject">
@@ -1929,9 +1929,9 @@
         <field name="code">platinum_premium_business_account_variant_1</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_inv_disc_rec_fin_factorin_inv_disc/rec_fin_factorin_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_inv_disc_rec_fin_factorin_inv_disc_rec_fin_factorin_subject" model="res.risk.subject">
         <field name="name">INV DISC/REC FIN FACTORIN</field>
-        <field name="code">inv_disc/rec_fin_factorin</field>
+        <field name="code">inv_disc_rec_fin_factorin</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_merchant_acquiring_merchant_acquiring_subject" model="res.risk.subject">
@@ -1969,9 +1969,9 @@
         <field name="code">individual_pb_diamond</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_individual_diamond_3_fn_individual_diamond_3_-_fn_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_individual_diamond_3_fn_individual_diamond_3_fn_subject" model="res.risk.subject">
         <field name="name">INDIVIDUAL DIAMOND 3 - FN</field>
-        <field name="code">individual_diamond_3_-_fn</field>
+        <field name="code">individual_diamond_3_fn</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_margin_trading_scheme_margin_trading_scheme_subject" model="res.risk.subject">
@@ -2030,7 +2030,7 @@
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_individual_current_individual_current_subject" model="res.risk.subject">
-        <field name="name">INDIVIDUAL CURRENT</field>
+        <field name="name">INDIVIDUAL CURRENT 2</field>
         <field name="code">individual_current</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
@@ -2044,9 +2044,9 @@
         <field name="code">nirsal_farmers_operative_scheme</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_individual_current_fn_individual_current-fn_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_individual_current_fn_individual_current_fn_subject" model="res.risk.subject">
         <field name="name">INDIVIDUAL CURRENT-FN</field>
-        <field name="code">individual_current-fn</field>
+        <field name="code">individual_current_fn</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_non_checking_kiddies_non_checking_kiddies_subject" model="res.risk.subject">
@@ -2054,14 +2054,14 @@
         <field name="code">non_checking_kiddies</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_set_goal_staff__set_goal_(staff)_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_set_goal_staff_set_goal_staff_subject" model="res.risk.subject">
         <field name="name">SET GOAL (STAFF)</field>
-        <field name="code">set_goal_(staff)</field>
+        <field name="code">set_goal_staff</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-    <record id="compliance_inst_fc_int_bearing_kiddies_fn_int._bearing_kiddies-fn_subject" model="res.risk.subject">
+    <record id="compliance_inst_fc_int_bearing_kiddies_fn_int_bearing_kiddies_fn_subject" model="res.risk.subject">
         <field name="name">INT. BEARING KIDDIES-FN</field>
-        <field name="code">int._bearing_kiddies-fn</field>
+        <field name="code">int_bearing_kiddies_fn</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
     <record id="compliance_inst_fc_corporate_affinity_od_corporate_affinity_od_subject" model="res.risk.subject">
@@ -2094,4 +2094,4 @@
         <field name="code">regular_individual_account</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_22"/>
     </record>
-</odoo>
+</data>
