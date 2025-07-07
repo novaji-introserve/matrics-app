@@ -3,3 +3,4 @@
 from . import models
 from . import case
 from . import exception
+from . import alert

@@ -51,6 +51,59 @@ class Transaction(models.Model):
         'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
     active = fields.Boolean(default=True, readonly=True)
     branch_code = fields.Char(string="Branch Code")
+    
+    show_create_case= fields.Boolean(
+        string="Case Management_v2 Installed",
+        compute='_compute_is_case_manager_installed',
+        store=False,)
+
+    def action_create_transaction_case(self):
+        self.ensure_one()
+        # Prepare action to open case form
+        action = self.env.ref(
+            'case_management_v2.action_create_case').read()[0]
+
+        # Prepare default values from transaction
+        context = {
+            'default_case_status': 'open',
+            'default_transaction_id': self.id,
+        }
+
+        # Add customer if available
+        if self.customer_id:
+            context['default_customer_id'] = self.customer_id.id
+
+        # Set risk level
+        if self.risk_level:
+            context['default_case_rating'] = self.risk_level
+
+        # Add transaction details to narration
+        narration = f"Transaction Reference: {self.name or ''}\n"
+        narration += f"Amount: {self.amount or 0.0} {self.currency or ''}\n"
+        narration += f"Date: {self.date_created or ''}\n"
+
+        if self.narration:
+            narration += f"\nTransaction Narration: {self.narration}"
+
+        context['default_narration'] = narration
+
+        # Add branch if available
+        if hasattr(self, 'branch_id') and self.branch_id:
+            context['default_department_id'] = self.branch_id.id
+
+        action['context'] = context
+        return action
+    
+    @api.depends('customer_id')
+    def _compute_is_case_manager_installed(self):
+        for record in self:
+            case_model = bool(self.env['ir.module.module'].search([
+                ('name', '=', 'case_management_v2'),
+                ('state', '=', 'installed')
+            ], limit=1))
+            record.show_create_case = bool(case_model)
+
+
 
     @api.depends('date_created')  
     def _compute_is_case_management_installed(self):
@@ -76,6 +129,9 @@ class Transaction(models.Model):
     
     
     
+            
+    
+
     def action_create_case(self):
         """
         Opens the case management form with the transaction reference pre-filled
@@ -102,8 +158,8 @@ class Transaction(models.Model):
             'target': 'current',
             'context': context
         }
-
-    
+        
+        
 
 
     def init(self):
