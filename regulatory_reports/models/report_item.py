@@ -1,5 +1,6 @@
 from odoo import _, api, fields, models
-
+from odoo.exceptions import ValidationError
+import sqlparse
 
 class ReportItem(models.Model):
     _name = 'res.regulatory.report.item'
@@ -31,3 +32,25 @@ class ReportItem(models.Model):
             if recs is not None:
                 return recs
         return self.source_value
+    
+    def validate_select_statement(self):
+        if not self.source_sql:
+            raise ValidationError(f'Missing or Empty SQL Statement')
+        query = self.source_sql.strip().lower()            
+        try:
+            parsed_statements = sqlparse.parse(query)
+            if not parsed_statements:
+                raise ValidationError(f'Unable to parse SQL Statement')
+            first_statement = parsed_statements[0]
+            if first_statement.get_type() == 'SELECT':
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params":{
+                        "message": "SQL Query validated successfully",
+                        "type": "success"
+                    }
+            }
+            raise ValidationError(f'Invalid SELECT Statement')
+        except Exception as e:
+                raise ValidationError(f'{str(e)}')

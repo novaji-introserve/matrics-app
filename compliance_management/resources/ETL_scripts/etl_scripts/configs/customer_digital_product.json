@@ -4,7 +4,7 @@
     "test_watchlist_inhouse": {
       "source_table": "test_watchlist_inhouse",
       "target_table": "res_partner_watchlist",
-      "primary_key": "bvn",
+      "target_primary_key": "bvn",
       "batch_size": 5000,
       "dependencies": [],
       "mappings": {
@@ -30,7 +30,7 @@
     "new_test_watchlist": {
       "source_table": "new_test_watchlist",
       "target_table": "sanction_list",
-      "primary_key": "recordid",
+      "target_primary_key": "recordid",
       "batch_size": 5000,
       "dependencies": [],
       "mappings": {
@@ -56,7 +56,7 @@
     "new_test_pep_list": {
       "source_table": "new_test_pep_list",
       "target_table": "pep_list",
-      "primary_key": "uniqueidentifier",
+      "target_primary_key": "uniqueidentifier",
       "batch_size": 5000,
       "dependencies": [],
       "mappings": {
@@ -85,7 +85,7 @@
     "test_edw_sterling_customers_digital_products": {
       "source_table": "test_edw_sterling_customers_digital_products",
       "target_table": "customer_digital_product",
-      "primary_key": "customer_id",
+      "target_primary_key": "customer_id",
       "batch_size": 1000,
       "dependencies": [],
       "mappings": {

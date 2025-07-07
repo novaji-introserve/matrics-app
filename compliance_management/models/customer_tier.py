@@ -64,35 +64,73 @@ class AccountTierMaterialized(models.Model):
 
     def init(self):
         """Initialize the materialized view with indexes"""
-
-        # Drop and recreate the materialized view
-        self._cr.execute(
-            "DROP MATERIALIZED VIEW IF EXISTS account_tier_materialized")
         self._cr.execute("""
-            CREATE MATERIALIZED VIEW account_tier_materialized AS (
-                SELECT 
-                    a.id,
-                    a.id as account_id,
-                    a.name,
-                    a.customer_id,
-                    a.category,
-                    COALESCE(t.tier_level, '3') as tier_level,
-                    COALESCE(t.name, 'Tier 3') as tier_name
-                FROM res_partner_account a 
-                LEFT JOIN res_partner_tier t ON 
-                    a.category = t.code AND t.status = 'active'
-            )
-        """)
+        SELECT EXISTS (
+            SELECT 1 FROM pg_matviews 
+            WHERE schemaname = 'public' 
+            AND matviewname = 'account_tier_materialized'
+        )
+    """)
+        view_exists = self._cr.fetchone()[0]
 
-        # Create indexes on the materialized view for fast lookups
-        self._cr.execute(
-            "CREATE INDEX account_tier_mat_id_idx ON account_tier_materialized(id)")
-        self._cr.execute(
-            "CREATE INDEX account_tier_mat_level_idx ON account_tier_materialized(tier_level)")
-        self._cr.execute(
-            "CREATE INDEX account_tier_mat_customer_idx ON account_tier_materialized(customer_id)")
-        self._cr.execute(
-            "CREATE INDEX account_tier_mat_tier_name_idx ON account_tier_materialized(tier_name)")
+        if not view_exists:
+            # Create the materialized view
+            self._cr.execute("""
+                CREATE MATERIALIZED VIEW account_tier_materialized AS (
+                    SELECT
+                        a.id,
+                        a.id as account_id,
+                        a.name,
+                        a.customer_id,
+                        a.category,
+                        COALESCE(t.tier_level, '3') as tier_level,
+                        COALESCE(t.name, 'Tier 3') as tier_name
+                    FROM res_partner_account a
+                    LEFT JOIN res_partner_tier t ON
+                        a.category = t.code AND t.status = 'active'
+                )
+            """)
+
+        # Define indexes to create
+        indexes = [
+            {
+                'name': 'account_tier_mat_id_idx',
+                'column': 'id',
+                'query': "CREATE INDEX account_tier_mat_id_idx ON account_tier_materialized(id)"
+            },
+            {
+                'name': 'account_tier_mat_level_idx',
+                'column': 'tier_level',
+                'query': "CREATE INDEX account_tier_mat_level_idx ON account_tier_materialized(tier_level)"
+            },
+            {
+                'name': 'account_tier_mat_customer_idx',
+                'column': 'customer_id',
+                'query': "CREATE INDEX account_tier_mat_customer_idx ON account_tier_materialized(customer_id)"
+            },
+            {
+                'name': 'account_tier_mat_tier_name_idx',
+                'column': 'tier_name',
+                'query': "CREATE INDEX account_tier_mat_tier_name_idx ON account_tier_materialized(tier_name)"
+            }
+        ]
+
+        # Create indexes only if they don't exist
+        for index in indexes:
+            self._cr.execute("""
+                SELECT EXISTS (
+                    SELECT 1 FROM pg_indexes 
+                    WHERE schemaname = 'public' 
+                    AND tablename = 'account_tier_materialized'
+                    AND indexname = %s
+                )
+            """, (index['name'],))
+            index_exists = self._cr.fetchone()[0]
+
+            if not index_exists:
+                self._cr.execute(index['query'])
+
+        
 
     @api.model
     def refresh_view(self):

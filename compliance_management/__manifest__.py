@@ -175,7 +175,6 @@
 
             'compliance_management/static/src/img/logov.png',
             'compliance_management/static/img/alt_bank_logo.png',
-            'compliance_management/static/img/alt_bank_logo_.png',
         ]
     },
 }

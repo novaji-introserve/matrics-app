@@ -1,7 +1,7 @@
  "res_partner": {
       "source_table": "res_partner",
       "target_table": "res_partner2",
-      "primary_key": "id",
+      "target_primary_key": "id",
       "batch_size": 5000,
       "dependencies": [],
       "mappings": {
@@ -20,7 +20,7 @@
     "res_partner": {
       "source_table": "res_partner",
       "target_table": "res_partner",
-      "primary_key": "id",
+      "target_primary_key": "id",
       "batch_size": 5000,
       "dependencies": [],
       "mappings": {
@@ -47,7 +47,7 @@
     "test_edw_dim_accounts_v2": {
     "source_table": "test_edw_dim_accounts_v2",
     "target_table": "res_partner_account",
-    "primary_key": "customer_id",
+    "target_primary_key": "customer_id",
     "batch_size": 1000,
     "dependencies": [],
     "mappings": {
@@ -133,7 +133,7 @@
    "test_watchlist_new": {
       "source_table": "test_watchlist_new",
       "target_table": "res_partner_watchlist",
-      "primary_key": "sn",
+      "target_primary_key": "sn",
       "batch_size": 5000,
       "dependencies": [],
       "mappings": {

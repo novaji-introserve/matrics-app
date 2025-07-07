@@ -11,16 +11,10 @@
             <field name="body_html" type="html">
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
 
-                    <!-- Header with Logo - Safe approach -->
                     <div style="text-align: left; padding-bottom: 20px;">
-                        <!-- Use company logo from context (safest option) -->
-                        <t t-if="ctx.get('company_logo')">
-                            <img t-att-src="'data:image/png;base64,%s' % ctx.get('company_logo')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
-                        </t>
-                        <!-- Fallback to user's company logo -->
-                        <t t-elif="user and user.company_id and user.company_id.logo_web">
-                            <img t-att-src="'data:image/png;base64,%s' % user.company_id.logo_web.decode('utf-8')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
-                        </t>
+                        
+                        <img t-att-src="ctx.get('company_logo')" alt="Company Logo" style="max-width: 80px; height: auto;"/>
+
                     </div>
 
                     <p>Dear Compliance Officer, </p>

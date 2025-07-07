@@ -3,7 +3,7 @@
     "test_edw_dim_accounts_v2": {
       "source_table": "test_edw_dim_accounts_v2",
       "target_table": "res_partner_account",
-      "primary_key": "account_id",
+      "target_primary_key": "account_id",
       "batch_size": 1000,
       "dependencies": [],
       "mappings": {

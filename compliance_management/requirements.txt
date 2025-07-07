@@ -203,3 +203,5 @@ zeep
 zipp
 zope.event
 zope.interface
+openpyexcel
+sqlparse
