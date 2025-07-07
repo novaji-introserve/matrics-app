@@ -70,6 +70,8 @@
             <xpath expr="//sheet" position="before">
                 <header>
                     <field name="show_create_case_button" invisible="1"/>
+                    <field name="show_create_case" invisible="1"/>
+
                     <button name="action_initiate_edd" class="oe_highlight" type="object" string="Initiate EDD" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="This will trigger a request to carry out EDD on this customer. Are you sure?" />
 
                     <button name="action_add_pep" class="oe_highlight" type="object" string="Add to PEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to PEP List. Are you sure?" attrs="{'invisible': [('is_pep', '=',True)]}" />
@@ -109,12 +111,16 @@
 
 
 
-                    <!-- Create case button with visibility based on case installation -->
-                    <button name="action_create_case" 
-                            class="oe_highlight"
+                
+<button name="action_create_case" class="oe_highlight" string="Create Case" type="object" attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
+
+
+                    <button 
+                            name="action_create_customer_case" 
+                            class="oe_highlight" 
                             string="Create Case" 
                             type="object" 
-                            attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
+                            attrs="{'invisible': ['|', ('id', '=', False), ('show_create_case', '=', False)]}"/>
 
                 </header>
             </xpath>

@@ -234,6 +234,57 @@ class Customer(models.Model):
         'res.partner.composite.plan.line', 'partner_id',
         string='Composite Risk Plan Lines')
     
+    show_create_case= fields.Boolean(
+        string="Case Management_v2 Installed",
+        compute='_compute_is_case_manager_installed',
+        store=False,)
+    
+    
+    @api.depends('customer_id')  
+    def _compute_is_case_manager_installed(self):
+        module = self.env['ir.module.module'].sudo().search([
+            ('name', '=', 'case_management_v2'),
+            ('state', '=', 'installed')
+        ], limit=1)
+
+        has_module = bool(module)
+
+        for record in self:
+            record.show_create_case = has_module
+            # Debug logging
+            _logger.info(
+                f"Case module installed: {has_module} for customer {record.name or record.id}")
+            
+    def action_create_customer_case(self):
+        self.ensure_one()
+        # Prepare action to open case form
+        action = self.env.ref('case_management_v2.action_create_case').read()[0]
+
+        # Prepare default values from customer
+        context = {
+            'default_customer_id': self.id,
+            'default_case_status': 'open',
+        }
+
+        # Add customer rating if available
+        if hasattr(self, 'risk_level'):
+            # Map customer rating to case rating
+            rating_mapping = {
+                'high': 'high',
+                'medium': 'medium',
+                'low': 'low',
+            }
+            customer_rating = self.risk_level or 'medium'
+            context['default_case_rating'] = rating_mapping.get(
+                customer_rating.lower(), 'medium')
+
+        # Add risk level if available
+        if hasattr(self, 'risk_level') and self.risk_level:
+            context['default_case_rating'] = self.risk_level
+
+        action['context'] = context
+        return action
+
 
 
     def action_view_screening_results(self):
@@ -914,6 +965,36 @@ class Customer(models.Model):
             'context': context
         }
 
+    def action_open_case_form(self):
+        self.ensure_one()
+
+        # Get customer information
+        customer_data = {
+            'customer_id': self.id,
+            # Assuming customer has a rating field
+            'case_rating': self.risk_level if hasattr(self, 'risk_level') else 'low',
+        }
+
+        # If transaction_id exists on customer model
+        if hasattr(self, 'transaction_id'):
+            customer_data['transaction_id'] = self.transaction_id.id
+
+        # Create action to open case form
+        action = self.env.ref(
+            'case_management_v2.action_create_case').read()[0]
+        action['context'] = {
+            'default_customer_id': self.id,
+            'default_case_status': 'open',
+        }
+
+        # Add any other default values you want to pre-populate
+        if hasattr(self, 'rating'):
+            action['context']['default_case_rating'] = self.risk_level
+        if hasattr(self, 'transaction_id'):
+            action['context']['default_transaction_id'] = self.transaction_id.id
+
+        return action
+    
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
         for record in self:
@@ -1153,21 +1234,7 @@ class Customer(models.Model):
             new_ctx = dict(self.env.context, computing_risk=True)
             self = self.with_context(new_ctx)
 
-            # # Update risk score and level for all records
-            # for record in self:
-            #     score = record._get_risk_score_from_plan()
-            #     risk_level = record.compute_risk_level()
-
-            #     # Use direct SQL update to avoid triggering write() again
-            #     self.env.cr.execute(
-            #         """UPDATE %s SET risk_score = %%s, risk_level = %%s
-            #         WHERE id = %%s""" % self._table,
-            #         (score, risk_level, record.id)
-            #     )
-
-            #     # Invalidate cache for these fields
-            #     record.invalidate_recordset(['risk_score', 'risk_level'])
-            # record.invalidate_cache(['risk_score', 'risk_level'])
+           
 
         return result
 

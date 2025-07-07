@@ -22,7 +22,8 @@
         'views/exception.xml',
         'views/settings.xml',
         'data/sequence/case_sequence.xml',
-        'data/emails/case_template.xml'
+        'data/emails/case_template.xml',
+        'data/schedules/case_schedules.xml'
     ],
     # only loaded in demonstration mode
     'demo': [],
@@ -30,4 +31,13 @@
     'application': True,
     'license': 'LGPL-3',
     'icon': 'case_management_v2/static/description/icon.png',
+    "assets": {"web.assets_backend": [
+        'case_management_v2/static/src/components/case_dashboard/dashboard.xml',
+        'case_management_v2/static/src/components/case_dashboard/dashboard.js',
+        'case_management_v2/static/src/components/chart_renderer/chart_renderer.js',
+        'case_management_v2/static/src/components/chart_renderer/chart_renderer.xml',
+        'case_management_v2/static/src/components/kpi_card/kpi_card.js',
+        'case_management_v2/static/src/components/kpi_card/kpi_card.xml',
+
+    ]},
 }

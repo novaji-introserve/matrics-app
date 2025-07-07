@@ -87,9 +87,7 @@ class alert_history(models.Model):
     @api.depends('email', 'email_cc')
     def _compute_user_in_emails(self):
         for rec in self:
-            if self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer'):  # Replace with your group's XML ID
-                rec.user_in_emails = True  # Chief Compliance Officer sees all
-            else:
+            
                 current_user_email = self.env.user.email
                 rec.user_in_emails = current_user_email and (current_user_email in (rec.email or "").split(',')) or (current_user_email and current_user_email in (rec.email_cc or "").split(',')) or False
 
