@@ -123,8 +123,6 @@
         'data/demo_data/plan/customer_type_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
-        "data/demo_data/partner/res_partner.xml",
-        # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
         'data/blacklist.xml',
         "views/customer_screening.xml",
         "views/menu_actions.xml",

@@ -5,7 +5,7 @@
         <field name="name">alert.history.tree</field>
         <field name="model">alert.history</field>
         <field name="arch" type="xml">
-            <tree string="Alert History List" create="false" >
+            <tree string="Alert History List" create="false" delete="False">
                 <field name="alert_id" string="Alert Reference" />
                 <field name="risk_rating" />
                 <!-- <field name="narration" /> -->
