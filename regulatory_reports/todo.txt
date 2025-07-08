@@ -1,3 +1,1 @@
-- allow multiple worksheet
-- allow automatic generation of report based on schedule: daily, weekly, monthly
-- sql validation
+- setup automatic generation of report based on schedule: daily, weekly, monthly

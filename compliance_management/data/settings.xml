@@ -15,7 +15,7 @@
     <record id="res_compl_settings_default_risk_score" model="res.compliance.settings">
         <field name="name">Default Risk Score</field>
         <field name="code">default_risk_score</field>
-        <field name="val">7.5</field>
+        <field name="val">1</field>
         <field name="narration">Default Risk Score</field>
     </record>
     <function model="ir.config_parameter" name="set_param"

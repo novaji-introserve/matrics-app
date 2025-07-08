@@ -7,6 +7,7 @@
             <tree string="Report Templates">
                 <field name="name" />
                 <field name="template_id" />
+                <field name="worksheet_id" />
                 <field name="item_id" />
                 <field name="write_uid" />
                 <field name="write_date" />
@@ -29,6 +30,7 @@
                         <group>
                             <field name="template_id" />
                             <field name="item_id" />
+                             <field name="worksheet_id" />
                         </group>
                     </group>
                     <notebook>

@@ -151,6 +151,12 @@ class CaseManager(models.Model):
         compute='_compute_show_closure_fields',
         store=False
     )
+    
+    overdue_alert_message = fields.Html(
+        string="Overdue Alert",
+        compute="_compute_overdue_alert_message",
+        store=False
+    )
 
     @api.depends('document', 'write_date')  # Add write_date dependency
     def _compute_document_url(self):
@@ -642,6 +648,130 @@ class CaseManager(models.Model):
                 record.case_status not in ['closed', 'archived']
             )
 
+    @api.model
+    def _check_overdue_cases(self):
+        """
+        Cron job to automatically set open cases to overdue
+        based on case settings
+        """
+        # Get overdue period setting
+        setting = self.env['case.settings'].search(
+            [('code', '=', 'case_overdue_period')], limit=1)
+        if not setting or not setting.date_val or not setting.date_unit:
+            _logger.error(
+                "Case overdue period setting not found or incomplete using default")
+            setting.date_val= 48
+            setting.date_unit='hours'
+            
+
+        # Calculate the cutoff date
+        time_delta = self._calculate_time_delta(
+            setting.date_val, setting.date_unit)
+        cutoff_date = fields.Datetime.now() - time_delta
+        _logger.info(f"Cutoff date! {cutoff_date}")
+
+        # Find open cases without response older than the cutoff date
+        open_cases = self.search([
+            ('case_status', '=', 'open'),
+            ('response_ids', '=', False),
+            ('create_date', '<', cutoff_date)
+        ])
+
+        # Update their status to overdue
+        if open_cases:
+            _logger.info(f"Setting {len(open_cases)} cases to overdue status")
+            open_cases.write({'case_status': 'overdue'})
+
+        return True
+
+    @api.model
+    def _archive_old_closed_cases(self):
+        """
+        Cron job to automatically archive closed cases 
+        based on case settings
+        """
+        # Get archive period setting
+        setting = self.env['case.settings'].search(
+            [('code', '=', 'case_archive_period')], limit=1)
+        if not setting or not setting.date_val or not setting.date_unit:
+            _logger.error(
+                "Case archive period setting not found using default")
+            setting.date_val = 180
+            setting.date_unit = 'days'
+
+        # Calculate the cutoff date
+        time_delta = self._calculate_time_delta(
+            setting.date_val, setting.date_unit)
+        cutoff_date = fields.Datetime.now() - time_delta
+
+        # Find cases that have been closed for longer than the cutoff period
+        closed_cases = self.search([
+            ('case_status', '=', 'closed'),
+            ('write_date', '<', cutoff_date)
+        ])
+
+        # Update their status to archived
+        if closed_cases:
+            _logger.info(f"Archiving {len(closed_cases)} old closed cases")
+            for case in closed_cases:
+                case.write({
+                    'case_status': 'archived',
+                    'active': False
+                })
+
+        return True
+
+    def _calculate_time_delta(self, value, unit):
+        """
+        Helper method to convert a time value and unit to a timedelta
+        """
+        if unit == 'seconds':
+            return relativedelta(seconds=value)
+        elif unit == 'minutes':
+            return relativedelta(minutes=value)
+        elif unit == 'hours':
+            return relativedelta(hours=value)
+        elif unit == 'days':
+            return relativedelta(days=value)
+        elif unit == 'weeks':
+            return relativedelta(weeks=value)
+        elif unit == 'months':
+            return relativedelta(months=value)
+        elif unit == 'years':
+            return relativedelta(years=value)
+        else:
+            return relativedelta(days=0)
+        
+    @api.model
+    def _compute_overdue_alert_message(self):
+        setting = self.env['case.settings'].search(
+            [('code', '=', 'case_overdue_period')], limit=1)
+
+        if setting and setting.date_val and setting.date_unit:
+            # Format the period text (e.g., "48 hours", "3 days")
+            unit_label = setting.date_unit
+            if setting.date_val == 1:  # Handle singular case
+                unit_label = unit_label[:-1]  # Remove 's' from the end
+
+            period_text = f"{setting.date_val} {unit_label}"
+            message = f"""
+                <div class="alert alert-info" role="alert">
+                    All opened cases not responded to after <strong>{period_text}</strong> will become overdue!
+                </div>
+            """
+        else:
+            # Fallback message if setting not found
+            message = """
+                <div class="alert alert-info" role="alert">
+                    All cases opened will become overdue after 48 hours!
+                    All opened cases not responded to after 48 hours will become overdue!
+                </div>
+            """
+
+        for record in self:
+            record.overdue_alert_message = message
+            
+            
 class CaseResponse(models.Model):
     _name = 'case.response.'
     _description = 'Case Responses'

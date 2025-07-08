@@ -6,7 +6,7 @@
     'author': 'Novaji',
     'website': 'https://novajii.com',
     "category": "iComply",
-    'depends': ['base', 'web', 'mail', 'alert_management', 'compliance_management'],
+    'depends': ['base', 'web', 'mail',],
     'data': [
         'data/exception_processes/exception_process_type_data.xml',
         'data/exception_processes/exception_process_data.xml',

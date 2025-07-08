@@ -16,6 +16,8 @@
                     <field name="case_status" widget="statusbar" options="{'readonly': '1'}" statusbar_visible="open,closed,overdue,archived"/>
                 </header>
 
+
+
                 <div class="oe_title" style="margin-left:15px!important;margin-top:15px;" attrs="{'invisible': [('id', '=', False)]}">
                     <h1>
                         <field name="case_ref" readonly="1" class="oe_inline"/>
@@ -38,8 +40,8 @@
                             <field name="case_rating" attrs="{'readonly': [('id', '!=', False)]}" decoration-success="case_rating == 'low'" decoration-danger="case_rating == 'high'" decoration-warning="case_rating == 'medium'" />
                         </group>
                         <group>
-                            <field name="process_category" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
-                            <field name="process" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="process_category" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="process" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [('id', '!=', False)]}"/>
                             <field name="supervisors" widget="many2many_tags" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
                             <field name="create_uid" readonly="1" string="Created By"/>
                             <field name="create_date" readonly="1" string="Created On"/>
