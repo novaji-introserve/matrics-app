@@ -79,9 +79,11 @@
         "data/demo_data/risk_assessment/jurisdiction.xml",
         "data/demo_data/risk_assessment/delivery_channel.xml",
         "data/demo_data/risk_assessment/product_services.xml",
-        "data/demo_data/risk_assessment/product_service_subject.xml",
-        'data/demo_data/risk_assessment/product_service_assessments.xml',
-        'data/demo_data/risk_assessment/product_plans.xml',
+        # product service demo data
+        "demo/product_service_data/01_product_service_subject.xml",
+        'demo/product_service_data/02_product_service_assessments.xml',
+        'demo/product_service_data/03_product_plans.xml',
+
         "data/demo_data/risk_assessment/compliance_history.xml",
         "data/demo_data/risk_assessment/data_quality.xml",
         "data/demo_data/risk_assessment/transaction_behavior.xml",

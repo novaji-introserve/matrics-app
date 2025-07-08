@@ -30,13 +30,13 @@ class CustomerTier(models.Model):
     def create(self, vals_list):
         records = super(CustomerTier, self).create(vals_list)
         # Refresh the materialized view when tiers change
-        self.env['account.tier.materialized'].refresh_view()
+        # self.env['account.tier.materialized'].refresh_view()
         return records
 
     def write(self, vals):
         result = super(CustomerTier, self).write(vals)
         # Refresh the materialized view when tiers change
-        self.env['account.tier.materialized'].refresh_view()
+        # self.env['account.tier.materialized'].refresh_view()
         return result
     
         

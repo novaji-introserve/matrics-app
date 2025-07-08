@@ -23,7 +23,19 @@
             <field name="model_id" ref="model_customer_digital_product_mat"/>
             <field name="state">code</field>
             <field name="code">model.refresh_view()</field>
-            <field name="interval_number">6</field>
+            <field name="interval_number">3</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active" eval="True"/>
+            </record>
+
+        <record id="ir_cron_refresh_acct_tier_mat_view" model="ir.cron">
+            <field name="name">Refresh Account Tier Materialized View</field>
+            <field name="model_id" ref="model_account_tier_materialized"/>
+            <field name="state">code</field>
+            <field name="code">model.refresh_view()</field>
+            <field name="interval_number">4</field>
             <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
