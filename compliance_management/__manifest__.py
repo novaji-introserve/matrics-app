@@ -49,7 +49,6 @@
 
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
-        'data/email_templates/case_alert_template.xml',
         "data/email_templates/customer_screening_template.xml",
 
 
