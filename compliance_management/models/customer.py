@@ -17,11 +17,8 @@ import time
 from datetime import datetime, timedelta
 
 
-
-
 load_dotenv()
 _logger = logging.getLogger(__name__)
-
 
 
 class Shareholders(models.Model):
@@ -48,6 +45,19 @@ class PartnerRiskPlanLines(models.Model):
     risk_score = fields.Float(string='Risk Score', digits=(10, 2))
 
 
+class CustomerStatus(models.Model):
+    _name = 'customer.status'
+    _sql_constraints = [
+        ('uniq_customer_status', 'unique(customer_status)',
+         "customer status already exists. Value must be unique!"),
+    ]
+
+    customer_status = fields.Char(string='Customer Status', index=True)
+    desc = fields.Char(string='Description')
+    slug = fields.Char(string='Short Description')
+    name = fields.Char(string='Customer Type', index=True)
+
+
 class Customer(models.Model):
     _inherit = 'res.partner'
     _sql_constraints = [
@@ -61,9 +71,6 @@ class Customer(models.Model):
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True,
         tracking=True, readonly=True, store=True)
-    # branch_id = fields.Many2one(
-    #     comodel_name='res.branch', string='Branch', index=True,
-    #     tracking=True, readonly=True,compute='_compute_branch',store=True,)
 
     education_level_id = fields.Many2one(
         comodel_name='res.education.level', string='Education Level', index=True, tracking=True, readonly=True)
@@ -184,36 +191,35 @@ class Customer(models.Model):
     formatted_phone = fields.Char(
         string='Phone Number(s)', index=True, compute='_compute_formatted_phone')
 
-    likely_sanction = fields.Boolean(string='Is Sanctioned',tracking=True)
+    likely_sanction = fields.Boolean(string='Is Sanctioned', tracking=True)
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code", index=True)
-   
-    formatted_gender=fields.Char(string='Gender', compute='_compute_gender')
-    
+
+    formatted_gender = fields.Char(string='Gender', compute='_compute_gender')
+
     digital_product_view_ids = fields.One2many(
-        'res.partner.digital.product.view', 'partner_id', 
+        'res.partner.digital.product.view', 'partner_id',
         string='Digital Products', readonly=True, auto_join=True)
-    
+
     channel_subscription_ids = fields.One2many(
         'customer.channel.subscription', 'partner_id',
         string='Channel Subscriptions', readonly=True)
-    
+
     composite_risk_score = fields.Float(
         string='Composite Risk Score', digits=(10, 2))
-    
+
     last_risk_calculation = fields.Datetime(string='Last Risk Calculation', readonly=True,
                                             help="When the risk score was last calculated")
-    
+
     # universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
     #                                       string='Universe Weights')
-    
 
     show_create_case_button = fields.Boolean(
         string="Case Management Installed",
         compute='_compute_is_case_management_installed',
         store=False,
     )
-    
+
     screening_ids = fields.One2many(
         'res.partner.screening.result', 'partner_id',
         string='Screening Results', domain=[('active', '=', True)])
@@ -233,8 +239,61 @@ class Customer(models.Model):
     composite_plan_line_ids = fields.One2many(
         'res.partner.composite.plan.line', 'partner_id',
         string='Composite Risk Plan Lines')
-    
 
+    show_create_case = fields.Boolean(
+        string="Case Management_v2 Installed",
+        compute='_compute_is_case_manager_installed',
+        store=False,)
+
+    customer_status = fields.Many2one(
+        'customer.status',
+        string='Customer Status', readonly=True)
+
+    @api.depends('customer_id')
+    def _compute_is_case_manager_installed(self):
+        module = self.env['ir.module.module'].sudo().search([
+            ('name', '=', 'case_management_v2'),
+            ('state', '=', 'installed')
+        ], limit=1)
+
+        has_module = bool(module)
+
+        for record in self:
+            record.show_create_case = has_module
+            # Debug logging
+            _logger.info(
+                f"Case module installed: {has_module}")
+
+    def action_create_customer_case(self):
+        self.ensure_one()
+        # Prepare action to open case form
+        action = self.env.ref(
+            'case_management_v2.action_create_case').read()[0]
+
+        # Prepare default values from customer
+        context = {
+            'default_customer_id': self.id,
+            'default_case_status': 'open',
+        }
+
+        # Add customer rating if available
+        if hasattr(self, 'risk_level'):
+            # Map customer rating to case rating
+            rating_mapping = {
+                'high': 'high',
+                'medium': 'medium',
+                'low': 'low',
+            }
+            customer_rating = self.risk_level or 'medium'
+            context['default_case_rating'] = rating_mapping.get(
+                customer_rating.lower(), 'medium')
+
+        # Add risk level if available
+        if hasattr(self, 'risk_level') and self.risk_level:
+            context['default_case_rating'] = self.risk_level
+
+        action['context'] = context
+        return action
 
     def action_view_screening_results(self):
         """View screening results for this customer"""
@@ -247,8 +306,7 @@ class Customer(models.Model):
             'type': 'ir.actions.act_window',
             'context': {'default_partner_id': self.id}
         }
-    
-            
+
     def action_screen_customer(self):
         """Screen customer against all lists"""
         self.ensure_one()
@@ -292,16 +350,15 @@ class Customer(models.Model):
                 }
             }
 
-    @api.depends('registration_date')  
+    @api.depends('registration_date')
     def _compute_is_case_management_installed(self):
         case_management_installed = bool(self.env['ir.module.module'].search([
             ('name', '=', 'case_management'),
             ('state', '=', 'installed')
         ], limit=1))
-        
+
         for record in self:
             record.show_create_case_button = case_management_installed
-
 
     def _get_risk_score_from_plan(self):
         """
@@ -419,7 +476,6 @@ class Customer(models.Model):
         self.risk_score = risk_score
         return risk_score
 
-    
     def calculate_risk_batch(self, batch_size=1000):
         """
         Optimized method to calculate risk for the current recordset in batches
@@ -768,7 +824,7 @@ class Customer(models.Model):
                         universe_scores[universe_id]['subjects'][subject_id]['score'] += score
 
                 # Create plan line records for ALL plans, whether they match or not
-                if matched :
+                if matched:
                     self.env['res.partner.composite.plan.line'].sudo().create({
                         'partner_id': record_id,
                         'plan_id': plan.id,
@@ -782,7 +838,6 @@ class Customer(models.Model):
             except Exception as e:
                 _logger.error(
                     f"Error checking for violations in plan {plan.name}: {str(e)}")
-                
 
         # Calculate the total score for each universe using dynamic method (avg/max/sum)
         for universe_id, universe_data in universe_scores.items():
@@ -816,7 +871,8 @@ class Customer(models.Model):
         # Create records for ALL universes and ALL subjects and calculate composite score
         for universe_id, universe_data in universe_scores.items():
             # Calculate weighted score for the universe
-            weighted_score = universe_data['total_score'] * universe_data['weight']
+            weighted_score = universe_data['total_score'] * \
+                universe_data['weight']
 
             # Only add to CCR if there's a violation (score > 0)
             if universe_data['total_score'] > 0:
@@ -825,7 +881,8 @@ class Customer(models.Model):
                     f"Universe {universe_data['name']} : Score={universe_data['total_score']:.2f}, "
                     f"Weight={universe_data['weight']:.2f}, Weighted Score={weighted_score:.2f}")
 
-        _logger.info(f"Final CCR for customer {record_id}: {composite_score:.2f}")
+        _logger.info(
+            f"Final CCR for customer recordid: {record_id} score: {composite_score:.2f}")
         return round(composite_score, 2)
 
     def action_sync_channels(self):
@@ -871,8 +928,7 @@ class Customer(models.Model):
                 'default_partner_id': self.id,
             }
         }
-        
-    
+
     @api.depends('gender')
     def _compute_gender(self):
         for record in self:
@@ -913,6 +969,36 @@ class Customer(models.Model):
             'target': 'current',
             'context': context
         }
+
+    def action_open_case_form(self):
+        self.ensure_one()
+
+        # Get customer information
+        customer_data = {
+            'customer_id': self.id,
+            # Assuming customer has a rating field
+            'case_rating': self.risk_level if hasattr(self, 'risk_level') else 'low',
+        }
+
+        # If transaction_id exists on customer model
+        if hasattr(self, 'transaction_id'):
+            customer_data['transaction_id'] = self.transaction_id.id
+
+        # Create action to open case form
+        action = self.env.ref(
+            'case_management_v2.action_create_case').read()[0]
+        action['context'] = {
+            'default_customer_id': self.id,
+            'default_case_status': 'open',
+        }
+
+        # Add any other default values you want to pre-populate
+        if hasattr(self, 'rating'):
+            action['context']['default_case_rating'] = self.risk_level
+        if hasattr(self, 'transaction_id'):
+            action['context']['default_transaction_id'] = self.transaction_id.id
+
+        return action
 
     @api.depends('customer_phone')
     def _compute_formatted_phone(self):
@@ -1090,11 +1176,9 @@ class Customer(models.Model):
         }
 
     def init(self):
-        
+
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
-
-
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -1121,7 +1205,8 @@ class Customer(models.Model):
 
             # Use direct SQL update to avoid triggering write()
             if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
-                score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
+                score = float(self.env['res.compliance.settings'].get_setting(
+                    'maximum_risk_threshold'))
             self.env.cr.execute(
                 """UPDATE %s SET risk_score = %%s, risk_level = %%s 
                 WHERE id = %%s""" % self._table,
@@ -1152,22 +1237,6 @@ class Customer(models.Model):
             # Create a new context to mark that we're computing risk
             new_ctx = dict(self.env.context, computing_risk=True)
             self = self.with_context(new_ctx)
-
-            # # Update risk score and level for all records
-            # for record in self:
-            #     score = record._get_risk_score_from_plan()
-            #     risk_level = record.compute_risk_level()
-
-            #     # Use direct SQL update to avoid triggering write() again
-            #     self.env.cr.execute(
-            #         """UPDATE %s SET risk_score = %%s, risk_level = %%s
-            #         WHERE id = %%s""" % self._table,
-            #         (score, risk_level, record.id)
-            #     )
-
-            #     # Invalidate cache for these fields
-            #     record.invalidate_recordset(['risk_score', 'risk_level'])
-            # record.invalidate_cache(['risk_score', 'risk_level'])
 
         return result
 
@@ -1217,11 +1286,11 @@ class Customer(models.Model):
             try:
                 if record.risk_score is None:
                     return 'low'
-                if record.risk_score <=  float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
+                if record.risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
                     return 'low'
                 if record.risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                     return 'medium'
-                else :
+                else:
                     return 'high'
             except:
                 return 'low'
@@ -1234,7 +1303,7 @@ class Customer(models.Model):
                 return 'low'
             if score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
                 return 'medium'
-            else :
+            else:
                 return 'high'
         except:
             return 'low'
@@ -1598,7 +1667,7 @@ class Customer(models.Model):
     def _onchange_risk_score(self):
         if self.risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
             self.risk_level = "low"
-        elif self.risk_score <=  float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
+        elif self.risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
             self.risk_level = "medium"
         else:
             self.risk_level = "high"
@@ -1631,9 +1700,10 @@ class Customer(models.Model):
                 if key not in groups:
                     groups[key] = self.env[self._name]
                 groups[key] |= record
-                
+
                 if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
-                    score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
+                    score = float(self.env['res.compliance.settings'].get_setting(
+                        'maximum_risk_threshold'))
 
             # Use ORM write for each group of records with same values
             for (score, risk_level), records in groups.items():
@@ -1663,12 +1733,13 @@ class Customer(models.Model):
             # Calculate the risk score and level
             score = record._get_risk_score_from_plan()
             risk_level = self.compute_customer_rating(score)
-            
-            if record.composite_risk_score and record.composite_risk_score >0:
+
+            if record.composite_risk_score and record.composite_risk_score > 0:
                 composite_risk_score = record.composite_risk_score
                 score = composite_risk_score + score
             if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
-                score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
+                score = float(self.env['res.compliance.settings'].get_setting(
+                    'maximum_risk_threshold'))
 
             # Use ORM write method to update and track changes
             record.sudo().write({
@@ -1677,7 +1748,6 @@ class Customer(models.Model):
             })
 
         return True
-
 
     def action_greylist(self):
         for e in self:
@@ -1688,10 +1758,9 @@ class Customer(models.Model):
         for e in self:
             e.write({'is_greylist': False})
             e.action_compute_risk_score_with_plan()
-            
-    
-    
+
     # Smart button method to show customer's channels
+
     def action_view_channel_subscriptions(self):
         self.ensure_one()
         return {

@@ -1,5 +1,6 @@
 from odoo import _, api, fields, models
-
+from odoo.exceptions import ValidationError
+import sqlparse
 
 class ReportItem(models.Model):
     _name = 'res.regulatory.report.item'
@@ -7,7 +8,7 @@ class ReportItem(models.Model):
     _order = 'name'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     name = fields.Char(string='Name', required=True)
-    code = fields.Char(string='Cell Reference', required=True, unique=True,help="Cell location to place the value. eg A1",tracking=True)
+    code = fields.Char(string='Code', required=True, unique=True,help="Tracking code",tracking=True)
     description = fields.Text(string='Description')
     source = fields.Selection(string='Source', selection=[('static', 'Static From Field'), (
         'sql_single', 'SQL Query returning single value'),('sql_multi','SQL Query returning multiple rows')], default='static', help='Source of the report item data.',tracking=True)
@@ -16,8 +17,6 @@ class ReportItem(models.Model):
     source_sql = fields.Text(string='Source SQL', help='SQL query to retrieve the data for this report item. The query should return a single value.',tracking=True)
     status = fields.Selection(string='State', selection=[('active', 'Active'), (
         'inactive', 'Inactive')], default='active', help='Indicates whether the report item is active or inactive.',tracking=True)
-    report_template_ids = fields.Many2many(
-        'res.regulatory.report.template', 'res_report_template_items_rel', 'item_id', 'template_id',string='Report Templates', required=False)
     
     
     def get_value(self):
@@ -33,3 +32,25 @@ class ReportItem(models.Model):
             if recs is not None:
                 return recs
         return self.source_value
+    
+    def validate_select_statement(self):
+        if not self.source_sql:
+            raise ValidationError(f'Missing or Empty SQL Statement')
+        query = self.source_sql.strip().lower()            
+        try:
+            parsed_statements = sqlparse.parse(query)
+            if not parsed_statements:
+                raise ValidationError(f'Unable to parse SQL Statement')
+            first_statement = parsed_statements[0]
+            if first_statement.get_type() == 'SELECT':
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params":{
+                        "message": "SQL Query validated successfully",
+                        "type": "success"
+                    }
+            }
+            raise ValidationError(f'Invalid SELECT Statement')
+        except Exception as e:
+                raise ValidationError(f'{str(e)}')

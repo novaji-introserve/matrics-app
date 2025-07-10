@@ -8,11 +8,9 @@
 
                 <form string="Report Item">
                     <header>
+                        <button name="validate_select_statement" string="Validate SQL Query" class="btn btn-primary" type="object" />
                         <field name="status" widget="statusbar" options="{'clickable':'1'}" />
                     </header>
-                    <div class="alert alert-info" role="alert" name="test_warning">
-                        Enter cell reference to place value. Example: A1
-                    </div>
                     <sheet>
 
                         <div class="oe_title">
@@ -25,8 +23,6 @@
                             <field name="code" />
                             <field name="source" />
                             <field name="source_value" />
-                            <field name="report_template_ids" string="Related Templates"
-                                widget="many2many_tags" />
                         </group>
                         <notebook>
                             <page name="Description" string="Description">

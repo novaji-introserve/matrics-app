@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View for Case Manager -->
+    <record id="view_case_manager_form" model="ir.ui.view">
+        <field name="name">case.manager.form</field>
+        <field name="model">case.manager</field>
+        <field name="arch" type="xml">
+            <form string="Case">
+                <header>
+                    <button name="action_close_case" class="oe_highlight" string="Close Case" type="object" attrs="{'invisible': [('can_close_case', '=', False)]}" confirm="Are you sure you want to close this case?"/>
+
+
+                    <button name="action_archive_case" class="oe_highlight" string="Archive Case" type="object" attrs="{'invisible': [('case_status', '!=', 'closed')]}" confirm="Are you sure you want to archive this case?" />
+
+                    <field name="case_status" widget="statusbar" options="{'readonly': '1'}" statusbar_visible="open,closed,overdue,archived"/>
+                </header>
+
+
+
+                <div class="oe_title" style="margin-left:15px!important;margin-top:15px;" attrs="{'invisible': [('id', '=', False)]}">
+                    <h1>
+                        <field name="case_ref" readonly="1" class="oe_inline"/>
+                    </h1>
+                </div>
+
+
+                <sheet>
+                    <field name="is_responsible" invisible="1"/>
+                    <field name="id" invisible="1"/>
+                    <field name="can_close_case" invisible="1"/>
+
+                    <group>
+                        <group>
+                            <field name="event_date" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="officer_responsible" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="department_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="customer_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="transaction_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="case_rating" attrs="{'readonly': [('id', '!=', False)]}" decoration-success="case_rating == 'low'" decoration-danger="case_rating == 'high'" decoration-warning="case_rating == 'medium'" />
+                        </group>
+                        <group>
+                            <field name="process_category" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="process" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="supervisors" widget="many2many_tags" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="create_uid" readonly="1" string="Created By"/>
+                            <field name="create_date" readonly="1" string="Created On"/>
+                        </group>
+                    </group>
+
+                    <field name="new_response" string="Respond" placeholder="Add your response here..." attrs="{'invisible': ['|', '|', ('is_responsible', '=', False), ('id', '=', False), ('case_status', '=', 'closed')]}"/>
+
+                    <group string="Case Closure" attrs="{'invisible': [('show_closure_fields', '=', False)]}">
+                        <field name="show_closure_fields" invisible="1"/>
+                        <field name="close_remarks" attrs="{'required': [('show_closure_fields', '=', True)]}"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Case Details">
+                            <group>
+                                <field name="cases_action" placeholder="Specify the required action..." attrs="{'readonly': [('id', '!=', False)]}"/>
+                                <field name="narration" placeholder="Enter brief narration about the case..." attrs="{'readonly': [('id', '!=', False)]}"/>
+                                <field name="description" placeholder="Enter detailed description..." attrs="{'readonly': [('id', '!=', False)]}"/>
+                            </group>
+                        </page>
+                        <page string="Documentation" name="document_page">
+                            <group>
+                                <field name="document" filename="document_filename" attrs="{'readonly': [('id', '!=', False)]}"/>
+                                <field name="document_filename" invisible="1"/>
+                                <field name="document_url" invisible="1"/>
+                                <div attrs="{'invisible': [('document', '=', False)]}">
+                                    <button name="action_view_document" type="object" class="btn btn-link">
+                                        <i class="fa fa-eye"/>
+ View Document
+                                    </button>
+                                </div>
+                            </group>
+                        </page>
+                        <page string="Responses" name="responses_page" attrs="{'invisible': [('id', '=', False)]}">
+                            <!-- Display existing responses in read-only mode -->
+                            <field name="response_ids" readonly="1">
+                                <tree>
+                                    <field name="create_uid" string="Responder"/>
+                                    <field name="create_date" string="Response Date"/>
+                                    <field name="response"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="response" readonly="1"/>
+                                        <field name="create_uid" readonly="1" options="{'no_open': True, 'no_create': True}"/>
+                                        <field name="create_date" readonly="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                <!-- Add footer with action buttons for new records -->
+                <footer attrs="{'invisible': [('id', '!=', False)]}">
+                    <button string="Create" type="object" name="action_save_and_stay" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+
+
+    <!-- Tree View for Case Manager -->
+    <record id="view_case_manager_tree" model="ir.ui.view">
+        <field name="name">case.manager.tree</field>
+        <field name="model">case.manager</field>
+        <field name="arch" type="xml">
+            <tree string="Cases" create="false">
+                <field name="case_ref" />
+                <field name="create_date" string="Created On"/>
+                <field name="event_date"/>
+                <field name="process"/>
+                <field name="officer_responsible"/>
+                <field name="case_rating" widget="badge" decoration-success="case_rating == 'low'" decoration-danger="case_rating == 'high'" decoration-warning="case_rating == 'medium'" />
+                <field name="case_status" widget="badge" decoration-success="case_status == 'closed'" decoration-danger="case_status == 'overdue'" decoration-info="case_status == 'open'" decoration-muted="case_status == 'archived'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View for Case Manager -->
+    <record id="view_case_manager_search" model="ir.ui.view">
+        <field name="name">case.manager.search</field>
+        <field name="model">case.manager</field>
+        <field name="arch" type="xml">
+            <search string="Search Cases">
+                <field name="case_ref"/>
+                <field name="customer_id"/>
+                <field name="process"/>
+                <field name="process_category"/>
+                <field name="officer_responsible"/>
+                <field name="narration"/>
+                <field name="cases_action"/>
+                <separator/>
+                <filter string="High Priority" name="high_priority" domain="[('case_rating', '=', 'high')]"/>
+                <filter string="Medium Priority" name="medium_priority" domain="[('case_rating', '=', 'medium')]"/>
+                <filter string="Low Priority" name="low_priority" domain="[('case_rating', '=', 'low')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'case_status'}"/>
+                    <filter string="Officer" name="group_by_officer" context="{'group_by': 'officer_responsible'}"/>
+                    <filter string="Department" name="group_by_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Customer" name="group_by_customer" context="{'group_by': 'customer_id'}"/>
+                    <filter string="Process Category" name="group_by_category" context="{'group_by': 'process_category'}"/>
+                    <filter string="Process" name="group_by_process" context="{'group_by': 'process'}"/>
+                    <filter string="Event Date" name="group_by_date" context="{'group_by': 'event_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+
+
+</odoo>

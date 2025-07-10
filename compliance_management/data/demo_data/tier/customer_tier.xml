@@ -57,30 +57,3 @@
        
     </data>
 </odoo>
-
-
-    <!-- <odoo>
-    
-        <record id="res_partner_tier_1" model="res.partner.tier">
-            <field name="name">Tier 1 - Individual</field>
-            <field name="code">tier_1</field>
-            <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
-        </record>
-    
-    
-        <record id="res_partner_tier_2" model="res.partner.tier">
-            <field name="name">Tier 2 - Corporate</field>
-            <field name="code">tier_2</field>
-            <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
-        </record>
-    
-    
-        <record id="res_partner_tier_3" model="res.partner.tier">
-            <field name="name">Tier 3 - Corporate</field>
-            <field name="code">tier_3</field>
-            <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
-        </record>
-    
-    
-    
-    </odoo> -->

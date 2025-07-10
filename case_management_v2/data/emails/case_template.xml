@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Case Creation Alert Email Template -->
+    <record id="case_creation_alert_template" model="mail.template">
+        <field name="name">Case Management: Case Creation Alert</field>
+        <field name="model_id" ref="model_case_manager"/>
+        <field name="subject">New Case Alert</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+            <div style="padding: 15px; background-color: #FFFFFF; font-family: Arial, sans-serif; margin: 0; border: none; color: #000000;">
+                <div style="background-color: #FFFFFF; color: #000000; padding: 10px 15px;">
+
+                    <table width="100%" cellspacing="0" cellpadding="10">
+                        <tr>
+                            <td style="text-align: left; padding-left: 0; max-width:60px; object-fit:cover; padding-bottom: 15px;">
+                               <img t-att-src="ctx.get('company_logo')" alt="Company Logo" style="max-height: 60px; max-width:60px; object-fit:cover;"/>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="border-bottom: 1px solid #eee; padding-bottom: 20px;word-wrap: break-word;">
+                                <i>The exception below was raised on a transaction you processed or an activity within your scope of responsibility.</i>
+                                <br/>
+                                <i>Please respond to the exception immediately, explaining the reason(s) behind it as well as what you are doing to prevent re-occurrence.</i>
+                                <br/>
+                                <i>
+                                    <b>NOTE</b>: The exception will remain open and therefore count against you unless resolved.</i>
+                                <br/>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+
+                <div style="padding: 15px; background-color: white;">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Date Time Entry:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('datetime')"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Event Date:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('event_date')"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Reference:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('case_ref')" />
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Alert ID:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('alert_id')" />
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Department:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('department_id')" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Severity:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('case_rating')" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Status:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('case_status')" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Category:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('exception_category')" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('exception_process')" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Recommended Action:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('case_action')" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Additional Details:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('description')" />
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 20px;">
+                        <h3 style="color: #000000; margin-bottom: 10px;">
+                            <b>Required Action</b>
+                        </h3>
+                        <p style="margin: 0 0 10px 0;">
+                            <i>Please review and ensure compliance.</i>
+                        </p>
+                        <p style="margin: 0;">
+                            <i>Please ensure 100% review of this exception.</i>
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 25px; text-align: left;">
+                        <a t-att-href="ctx.get('record_url', '#')" style="background-color: #000000; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Respond</a>
+                    </div>
+                </div>
+
+                <div style="padding: 10px 15px; background-color: #FFFFFF; font-size: 12px; color: #B78C00; text-align: left;">
+                    <p>This is an automated notification from your Case Management System.</p>
+                </div>
+            </div>
+        </field>
+    </record>
+
+    <!-- Case Response Alert Email Template -->
+    <record id="case_response_alert_template" model="mail.template">
+        <field name="name">Case Management: Case Response Alert</field>
+        <field name="model_id" ref="model_case_manager"/>
+        <field name="subject">New Response To Case</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+            <div style="padding: 15px; background-color: #FFFFFF; font-family: Arial, sans-serif; margin: 0; border: none; color: #000000;">
+                <div style="background-color: #FFFFFF; color: #000000; padding: 10px 15px;">
+
+                    <table width="100%" cellspacing="0" cellpadding="10">
+                        <tr>
+                            <td style="text-align: left; padding-left: 0; max-width:60px; object-fit:cover; padding-bottom: 15px;">
+                                <img t-att-src="ctx.get('company_logo')" alt="Company Logo" style="max-height: 60px; max-width:60px; object-fit:cover;"/>
+
+                            </td>
+
+                            <tr>
+                                <td colspan="2" style="border-bottom: 1px solid #eee; padding-bottom: 20px;word-wrap: break-word;">
+                                    <i>An exception initiated by <t t-esc="ctx.get('creator_name')"/>
+ (                                    <t t-esc="ctx.get('creator_email')"/>
+) has been responded to by <br/>
+                                <t t-esc="ctx.get('responder_name')"/>
+ (                                <t t-esc="ctx.get('responder_email')"/>
+)
+                                <b>SEE </b>Details below:</i>
+                            <br/>
+                        </td>
+                    </tr>
+                </tr>
+            </table>
+        </div>
+
+        <div style="padding: 15px; background-color: white;">
+
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Date Time Entry:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('datetime')"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Event Date:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('event_date')"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold; width: 35%;">Case reference:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('case_ref')"/>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Severity:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('case_rating')"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Department:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('department_id')"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Status:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('case_tatus')"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Category:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('process_category')"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('process')"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Recommended Action:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('case_action')"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Response Details:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('response')"/>
+                    </td>
+                </tr>
+            </table>
+
+
+            <div style="margin-top: 20px;">
+
+                <h3 style="color: #000000; margin-bottom: 10px;">
+                    <b>Required Action</b>
+                </h3>
+                <p style="margin: 0 0 10px 0;">
+                    <i>Please review and ensure compliance.</i>
+                </p>
+                <p style="margin: 0;">
+                    <i>Please ensure 100% review of this exception.</i>
+                </p>
+            </div>
+
+            <div style="margin-top: 25px; text-align: left;">
+                <a t-att-href="ctx.get('record_url', '#')" style="background-color: #000000; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Review</a>
+            </div>
+
+        </div>
+
+        <div style="padding: 10px 15px; background-color: #FFFFFF; font-size: 12px; color: rgb(114, 98, 6); text-align: left; border-top: 1px solid #DDDDDD;">
+            <p>This is an automated notification from your Case Management System. Please do not reply directly to this email.</p>
+        </div>
+    </div>
+</field>
+</record>
+
+<!-- Case Closure Alert Email Template -->
+<record id="case_closure_alert_template" model="mail.template">
+<field name="name">Case Management: Case Closure Alert</field>
+<field name="model_id" ref="model_case_manager"/>
+<field name="subject">Case Closed</field>
+<field name="auto_delete" eval="False"/>
+<field name="body_html" type="html">
+    <div style="padding: 15px; background-color: #FFFFFF; font-family: Arial, sans-serif; margin: 0; border: none; color: #000000;">
+        <div style="background-color: #FFFFFF; color: #000000; padding: 10px 15px;">
+            <table width="100%" cellspacing="0" cellpadding="10">
+                <tr>
+                    <td style="text-align: left; padding-left: 0; max-width:60px; object-fit:cover; padding-bottom: 15px;">
+                        
+                        <img t-att-src="ctx.get('company_logo')" alt="Company Logo" style="max-height: 60px; max-width:60px; object-fit:cover;"/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="border-bottom: 1px solid #eee; padding-bottom: 20px;word-wrap: break-word;">
+                        <i>An exception initiated by <t t-esc="ctx.get('creator_name')"/>
+ (                        <t t-esc="ctx.get('creator_email')"/>
+)
+                                has been closed. SEE details below:</i>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="padding: 15px; background-color: #FFFFFF;">
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Date Time Entry:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('datetime')"/>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Event Date:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('event_date')"/>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold; width: 35%;">Case reference:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('case_ref')"/>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Severity:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('case_rating')"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Department:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('department_id')"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Status:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('case_status')"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Category:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('process_category')"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Exception Process:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('process')"/>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Creator:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('creator_name')"/>
+ (                    <t t-esc="ctx.get('creator_email')"/>
+)</td>
+            </tr>
+
+
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Closing Remarks:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('close_remarks')"/>
+                </td>
+            </tr>
+        </table>
+
+
+        <div style="margin-top: 20px;">
+
+            <h3 style="color: #000000; margin-bottom: 10px;">
+                <b>Required Action</b>
+            </h3>
+            <p style="margin: 0 0 10px 0;">
+                <i>Please review and ensure compliance.</i>
+            </p>
+            <p style="margin: 0;">
+                <i>Please ensure 100% review of this exception.</i>
+            </p>
+        </div>
+
+        <div style="margin-top: 25px; text-align: left;">
+            <a t-att-href="ctx.get('record_url', '#')" style="background-color: #000000; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">View Details</a>
+        </div>
+    </div>
+
+    <div style="padding: 10px 15px; background-color: #FFFFFF; font-size: 12px; color: rgb(114, 98, 6); text-align: left; border-top: 1px solid #DDDDDD;">
+        <p>This is an automated notification from your Case Management System. Case records will be archived according to system retention policies.</p>
+    </div>
+</div>
+
+</field>
+
+</record>
+
+</odoo>

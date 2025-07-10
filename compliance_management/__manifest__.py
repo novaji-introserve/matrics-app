@@ -49,7 +49,6 @@
 
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
-        'data/email_templates/case_alert_template.xml',
         "data/email_templates/customer_screening_template.xml",
 
 
@@ -79,8 +78,11 @@
         "data/demo_data/risk_assessment/jurisdiction.xml",
         "data/demo_data/risk_assessment/delivery_channel.xml",
         "data/demo_data/risk_assessment/product_services.xml",
-        "data/demo_data/risk_assessment/product_service_subject.xml",
-        "data/demo_data/risk_assessment/product_service_assessment.xml",
+        # product service demo data
+        "demo/product_service_data/01_product_service_subject.xml",
+        'demo/product_service_data/02_product_service_assessments.xml',
+        'demo/product_service_data/03_product_plans.xml',
+
         "data/demo_data/risk_assessment/compliance_history.xml",
         "data/demo_data/risk_assessment/data_quality.xml",
         "data/demo_data/risk_assessment/transaction_behavior.xml",
@@ -122,7 +124,6 @@
         'data/demo_data/plan/customer_type_plan.xml',
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
-        # "data/demo_data/account/res_partner_accounts.xml", # CUSTOMER ACCOUNT
         'data/blacklist.xml',
         "views/customer_screening.xml",
         "views/menu_actions.xml",
@@ -173,7 +174,6 @@
 
             'compliance_management/static/src/img/logov.png',
             'compliance_management/static/img/alt_bank_logo.png',
-            'compliance_management/static/img/alt_bank_logo_.png',
         ]
     },
 }

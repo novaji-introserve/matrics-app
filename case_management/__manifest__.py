@@ -6,7 +6,7 @@
     'author': 'Novaji',
     'website': 'https://novajii.com',
     "category": "iComply",
-    'depends': ['base', 'web', 'mail', 'alert_management', 'compliance_management'],
+    'depends': ['base', 'web', 'mail',],
     'data': [
         'data/exception_processes/exception_process_type_data.xml',
         'data/exception_processes/exception_process_data.xml',
@@ -22,7 +22,7 @@
        # 'views/case_form_inherit_disable_save_discard.xml', 
        # 'views/message_alert_views.xml',
         'views/all_cases_views.xml',
-        'views/my_alerts_views.xml',
+        # 'views/my_alerts_views.xml',
         'views/case_dashboard.xml',# Load menus first
         #'views/case_form_inherit.xml',
         'data/overdue_cronJob/cron.xml',

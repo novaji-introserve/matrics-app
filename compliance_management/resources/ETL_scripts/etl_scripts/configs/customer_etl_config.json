@@ -3,7 +3,7 @@
     "test_ods_sb_productdb_products": {
       "source_table": "test_ods_sb_productdb_products",
       "target_table": "res_partner_account_product",
-      "primary_key": "product_id",
+      "target_primary_key": "product_id",
       "batch_size": 1000,
       "dependencies": [],
       "mappings": {
@@ -37,7 +37,7 @@
     "test_ods_dimindustries": {
       "source_table": "test_ods_dimindustries",
       "target_table": "customer_industry",
-      "primary_key": "code",
+      "target_primary_key": "code",
       "batch_size": 1000,
       "dependencies": [],
       "mappings": {
@@ -49,7 +49,7 @@
     "test_ods_account_officers": {
       "source_table": "test_ods_account_officers",
       "target_table": "account_officers",
-      "primary_key": "dept_acct_off_code",
+      "target_primary_key": "dept_acct_off_code",
       "batch_size": 5000,
       "dependencies": [],
       "mappings": {
@@ -71,7 +71,7 @@
     "test_ods_sectors": {
       "source_table": "test_ods_sectors",
       "target_table": "res_partner_sector",
-      "primary_key": "code",
+      "target_primary_key": "code",
       "batch_size": 5000,
       "dependencies": [],
       "mappings": {
@@ -89,7 +89,7 @@
     "test_ods_branches": {
       "source_table": "test_ods_branches",
       "target_table": "res_branch",
-      "primary_key": "branch_name",
+      "target_primary_key": "branch_name",
       "batch_size": 1000,
       "dependencies": [],
       "mappings": {
@@ -126,7 +126,7 @@
     "test_ods_customers": {
       "source_table": "test_ods_customers",
       "target_table": "res_partner",
-      "primary_key": "customer_id",
+      "target_primary_key": "customer_id",
       "batch_size": 1000,
       "dependencies": [],
       "mappings": {
