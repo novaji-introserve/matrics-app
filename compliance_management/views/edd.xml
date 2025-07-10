@@ -173,31 +173,12 @@
                         <group>
                             <field name="approving_officer_id" attrs="{'readonly': ['|', ('is_editable_user', '=', False), ('status', 'in', ['approved','archived','completed'])], 'required': [('is_editable_user', '=', True)]}"/>
                             <field name="is_current_user_approving_officer" invisible="1"/>
-                            <field name = "approving_signature_filename" invisible="1"/>
-                            <field name="approving_officer_signature"  
-                            filename="approving_signature_filename"
-                            attrs="{
-                                    'readonly': ['|', ('is_current_user_approving_officer', '=', False), ('status', '!=', 'submitted')],
-                                    'invisible': [('status', '=', 'draft')]
-                                }"/>
                             <field name="reject_reason" invisible="1"/>
                         </group>
 
                         <group>
                             <field name="responsible_id" string="Officer in Charge" attrs="{'readonly': ['|', ('is_editable_user', '=', False), ('status', 'in', ['approved','archived','completed'])], 'required': [('is_editable_user', '=', True)]}"/>
-                            <field name="is_current_user_responsible" invisible="1"/>
-                            <field name="responsible_signature_filename" invisible="1"/>
-                            <field name="responsible_officer_signature"
-                                filename="responsible_signature_filename"
-                                attrs="{
-                                    'invisible': [('is_officer_notified', '=', False)],
-                                    'readonly': ['|', ('is_current_user_responsible', '=', False), ('status', '!=', 'draft')],
-                                    'required': ['&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_officer_notified', '=', True)]
-                                }"/>
-                            <field name="risk_score" widget="risk_slider" options="{'step': 1, 'show_value': true, 'reverse_colors': false, 'readonly': false}" 
-                                        attrs="{'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected','completed']), '&amp;', ('is_current_user_responsible', '=', False), ('is_editable_user', '=', False)]}"/>
-
-                            
+                            <field name="is_current_user_responsible" invisible="1"/>       
                             <field name="is_current_user_responsible" invisible="1"/>
                         </group>
 
@@ -475,7 +456,28 @@
                                         attrs="{'required': [('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_editable_user', '=', False)], 
                                                 'readonly': ['|', ('status', 'in', ['approved', 'archived','rejected','completed']), '&amp;', ('is_current_user_responsible', '=', False), ('is_editable_user', '=', False)]}"/>    
                                 </group>
-                           </group>
+                        </group>
+                        <group string="Signatures">
+                            <group>
+                                <field name = "approving_signature_filename" invisible="1"/>
+                                <field name="approving_officer_signature"  
+                                filename="approving_signature_filename"
+                                attrs="{
+                                        'readonly': ['|', ('is_current_user_approving_officer', '=', False), ('status', '!=', 'submitted')],
+                                        'invisible': [('status', '=', 'draft')]
+                                    }"/>
+                            </group>
+                            <group>
+                                <field name="responsible_signature_filename" invisible="1"/>
+                                <field name="responsible_officer_signature"
+                                    filename="responsible_signature_filename"
+                                    attrs="{
+                                        'invisible': [('is_officer_notified', '=', False)],
+                                        'readonly': ['|', ('is_current_user_responsible', '=', False), ('status', '!=', 'draft')],
+                                        'required': ['&amp;', ('is_current_user_responsible', '=', True), ('status', '=', 'draft'), ('is_officer_notified', '=', True)]
+                                    }"/>
+                            </group>
+                        </group>
                     </page>         
                    </notebook>
              </sheet>
