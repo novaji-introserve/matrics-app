@@ -139,3 +139,11 @@
 .d-flex.flex-nowrap.overflow-auto::-webkit-scrollbar {
     display: none;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-default {
+    cursor: default;
+}

@@ -7,7 +7,7 @@ import { ChartRenderer } from "../../chart/js/chart";
 const { Component, useState, useEffect, useRef, onWillStart, onWillUnmount } = owl;
 
 // Debug mode - set to false for production
-const DEBUG = false;
+const DEBUG = true;
 function logDebug(...args) {
   if (DEBUG) console.log(...args);
 }
@@ -561,6 +561,11 @@ export class ComplianceDashboard extends Component {
    */
   async displayOdooView(category, query, branch_filter, branch_field, title) {
     try {
+      if (!query) {
+            logDebug("No query provided for displayOdooView, skipping action");
+            return;
+        }
+
       const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${encodeURIComponent(query)}_${this.state.uniqueId}`;
       let response = await this.serverCache.getCache(cacheKey);
       
@@ -600,6 +605,9 @@ export class ComplianceDashboard extends Component {
           }
           return item;
         });
+      } else {
+            logDebug("No valid domain in response, skipping navigation");
+            return;
       }
 
       this.navigate.doAction({

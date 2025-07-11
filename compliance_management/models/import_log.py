@@ -1,3 +1,4 @@
+import base64
 from odoo import models, fields, api
 import logging
 import os
