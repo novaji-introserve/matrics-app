@@ -9,7 +9,7 @@ class CronCaller(models.Model):
     
     _name = 'res.materialized.views'
     _description = 'Cron Caller for Materialized Views'
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    # active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
     @api.model
     def run_all_materialized_views_cron_tasks(self, low_priority=False):
