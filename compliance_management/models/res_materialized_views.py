@@ -1,4 +1,4 @@
-from odoo import models, api
+from odoo import models, api,fields
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -9,7 +9,8 @@ class CronCaller(models.Model):
     
     _name = 'res.materialized.views'
     _description = 'Cron Caller for Materialized Views'
-
+    # active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
     @api.model
     def run_all_materialized_views_cron_tasks(self, low_priority=False):
         """Execute cron tasks to refresh all materialized views.
@@ -28,3 +29,4 @@ class CronCaller(models.Model):
         self.env['dashboard.stats.view.refresher'].refresh_stat_views(low_priority=low_priority)
 
         _logger.info("Finished materialized views cron task")
+        

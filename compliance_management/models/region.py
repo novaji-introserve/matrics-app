@@ -17,3 +17,5 @@ class CustomerRegion(models.Model):
     status = fields.Selection(string='Status', selection=[(
         'active', 'Active'), ('inactive', 'Inactive')], default='active',index=True)
     risk_rating = fields.Float(string='Risk Score', digits=(10,2),related='risk_assessment.risk_rating')
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

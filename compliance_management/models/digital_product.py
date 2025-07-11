@@ -36,6 +36,7 @@ class CustomerDigitalProduct(models.Model):
     switch = fields.Char(string='Has Switch', readonly=True)
 
   
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     def init(self):
         # Minimal initialization for fast loading
         self.env.cr.execute("""
@@ -79,6 +80,7 @@ class PartnerDigitalProductView(models.Model):
     customer_segment = fields.Char(string='Customer Segment', readonly=True)
 
     
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     def init(self):
         """Defer view creation to avoid slow loading"""
         _logger.info(
@@ -105,6 +107,7 @@ class DigitalDeliveryChannel(models.Model):
         ('active', 'Active'),
         ('inactive', 'Inactive')
     ], default='active', index=True)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
                         
 
@@ -1010,6 +1013,7 @@ class CustomerChannelSubscription(models.Model):
     subscription_date = fields.Date(string='Subscription Date')
     last_updated = fields.Datetime(
         string='Last Updated', default=fields.Datetime.now, index=True)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
 
     @api.model_create_multi
@@ -1046,6 +1050,7 @@ class CustomerDigitalProductMaterialized(models.Model):
     specta = fields.Char(string='Has Specta', readonly=True)
     switch = fields.Char(string='Has Switch', readonly=True)
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     def init(self):
         """Minimal initialization - no heavy operations"""
         _logger.info("Materialized view model initialized (deferred creation)")
@@ -1061,4 +1066,3 @@ class CustomerDigitalProductMaterialized(models.Model):
             _logger.error(f"Failed to refresh materialized view: {e}")
             return False
         
-  

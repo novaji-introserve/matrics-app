@@ -65,6 +65,7 @@ class PepSource(models.Model):
     import_message = fields.Text(string="Import Message", readonly=True)
     last_update = fields.Datetime(string="Last Update", readonly=True)
 
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     @api.onchange('source_format')
     def _onchange_source_format(self):
         """Handle source format change to ensure CSV and API aren't used together"""
@@ -629,6 +630,7 @@ class PepOpenSanctions(models.Model):
     opensanctions_dataset = fields.Char('OpenSanctions Dataset')
     opensanctions_last_change = fields.Datetime('Last Changed in OpenSanctions')
     
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     def fetch_opensanctions_data(self):
         """
         Button action to fetch OpenSanctions data for all sources
@@ -695,3 +697,4 @@ class PepOpenSanctions(models.Model):
                 'type': 'success',
             }
         }
+        

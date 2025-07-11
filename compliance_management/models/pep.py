@@ -105,6 +105,7 @@ class Pep(models.Model):
                                help="Indicates if biography data was successfully retrieved")
     sanctions_added = fields.Boolean(string="Sanctions Added", default=False,
                                 help="Indicates if sanctions data was successfully retrieved")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
 
     def init(self):
@@ -979,3 +980,4 @@ class Pep(models.Model):
                     new_cr.close()
             except:
                 pass
+            

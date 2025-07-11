@@ -21,6 +21,7 @@ class RiskUniverse(models.Model):
                                      help="Weight percentage used in composite risk calculation")
     is_included_in_composite = fields.Boolean(string='Include in Composite', default=True,
                                               help="If checked, this risk universe will be included in composite risk calculations")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
  
 class PartnerCompositePlanLine(models.Model):
     _name = 'res.partner.composite.plan.line'
@@ -46,6 +47,8 @@ class PartnerCompositePlanLine(models.Model):
                                               string='Universe Weight %', store=False, readonly=True)
     weighted_score = fields.Float(string='Weighted Score', digits=(10, 2),
                                   compute='_compute_weighted_score', store=False)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
 
     @api.depends('risk_score', 'universe_id.weight_percentage')
     def _compute_weighted_score(self):
@@ -56,4 +59,3 @@ class PartnerCompositePlanLine(models.Model):
             else:
                 record.weighted_score = 0.0
         
-

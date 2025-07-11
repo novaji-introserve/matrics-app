@@ -1,8 +1,7 @@
-import base64
+import random
 from odoo import models, fields, api
 import logging
 import os
-import psycopg2
 from datetime import datetime, timedelta
 import math
 import multiprocessing
@@ -111,6 +110,7 @@ class ImportLog(models.Model):
                                         help="Field used to identify records for deletion")
     delete_progress = fields.Text(string="Delete Progress", 
                              help="JSON tracking of delete operation progress")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
     # SQL constraints
     _sql_constraints = [
@@ -1434,7 +1434,7 @@ class ImportLog(models.Model):
             return False
             
     # ---------- Action Methods ----------
-            
+                              
     def retry_import(self):
         """Retry the import process from where it left off"""
         self.ensure_one()
@@ -1614,448 +1614,397 @@ class ImportLog(models.Model):
             raise ValueError("No interrupted delete operation found to resume")
            
         return self.process_file()
-
+    
     def queue_delete_operation(self):
-        """Queue a delete operation as a background job to prevent timeout issues"""
-        if not self.delete_mode or not self.unique_identifier_field:
-            raise ValueError("Delete mode and unique identifier field must be specified")
-            
-        self._log_message("Queuing delete operation as background job...", "info")
+        """Start archive operation with proper chunking into separate jobs"""
+        self.ensure_one()
         
-        # Check if queue_job is available
-        if hasattr(self, 'with_delay'):
-            # Create a job with appropriate description and channel
-            self.with_delay(
-                description=f"Delete records from {self.model_name} using {self.unique_identifier_field}",
-                channel="csv_import",
-                priority=15  # Higher priority than normal imports
-            ).execute_delete_operation()
+        if not self.delete_mode:
+            raise ValueError("This import is not configured for delete mode")
             
-            self._log_message("Delete operation queued successfully", "success")
-            return True
-        else:
-            # Fall back to direct execution with warning
-            self._log_message(
-                "Queue job module not available, running delete operation directly (may timeout)", 
-                "warning"
-            )
-            return self.execute_delete_operation()
-
-    def execute_delete_operation(self):
-        """Execute the delete operation using the file's unique identifiers"""
-        if not self.delete_mode or not self.unique_identifier_field:
-            raise ValueError("Delete mode and unique identifier field must be specified")
+        if not self.unique_identifier_field:
+            raise ValueError("No unique identifier field specified for delete operation")
             
-        # Initialize progress tracking
-        if not self.delete_progress:
-            self.delete_progress = json.dumps({
-                'total': 0,
-                'processed': 0,
-                'deleted': 0,
-                'failed': 0,
-                'status': 'initializing',
-                'start_time': fields.Datetime.now().isoformat(),
-                'processed_values': []
-            })
-            # Commit progress immediately
-            self.env.cr.commit()
-        
-        self._log_message(f"Starting delete operation using field: {self.unique_identifier_field}", "info")
-        
-        try:
-            # Process in manageable chunks to avoid timeouts
-            chunk_size = 5000  # Process 5000 records per transaction
-            
-            # Get all values from the file in batches to avoid memory issues
-            deleted_count = 0
-            failed_count = 0
-            total_count = 0
-            processed_values = set()
-            
-            # Read and process the file in smaller batches
-            with self._get_file_reader() as reader:
-                # Get column index of the unique identifier
-                header = next(reader)
-                
-                # Find the column that matches our unique identifier field (case-insensitive)
-                col_index = -1
-                normalized_field = self.unique_identifier_field.lower().replace('_', '')
-                
-                for i, col_name in enumerate(header):
-                    normalized_col = col_name.lower().replace('_', '')
-                    if normalized_col == normalized_field or col_name.lower() == self.unique_identifier_field.lower():
-                        col_index = i
-                        self._log_message(f"Found unique identifier in column: {col_name}", "info")
-                        break
-                
-                if col_index == -1:
-                    available_cols = ", ".join(header[:10])
-                    if len(header) > 10:
-                        available_cols += f", ... and {len(header) - 10} more"
-                    
-                    raise ValueError(
-                        f"Could not find column matching '{self.unique_identifier_field}' in file. "
-                        f"Available columns: {available_cols}"
-                    )
-                
-                # Process the file in batches
-                batch_num = 0
-                unique_values = set()
-                
-                # Get the current progress to resume if needed
-                progress = json.loads(self.delete_progress) if self.delete_progress else {}
-                if progress.get('status') == 'in_progress' and 'processed_values' in progress:
-                    processed_values = set(progress.get('processed_values', []))
-                    self._log_message(f"Resuming from previous run, {len(processed_values)} values already processed", "info")
-                
-                # Update status to in_progress
-                self._update_delete_status('in_progress')
-                
-                # Process the file row by row to minimize memory usage
-                for i, row in enumerate(reader):
-                    if i % 10000 == 0:
-                        self._log_message(f"Reading file: processed {i:,} rows...", "info")
-                    
-                    # Skip header or empty rows
-                    if i == 0 or not row or len(row) <= col_index:
-                        continue
-                    
-                    # Get value and add to batch if not empty
-                    value = row[col_index]
-                    if value and str(value).strip():
-                        unique_values.add(str(value).strip())
-                    
-                    # Process batch when size threshold reached
-                    if len(unique_values) >= chunk_size:
-                        batch_num += 1
-                        self._log_message(f"Processing batch {batch_num}: {len(unique_values):,} values", "info")
-                        
-                        # Process this batch
-                        batch_deleted, batch_failed = self._delete_records_batch(
-                            unique_values, processed_values
-                        )
-                        
-                        # Update counts
-                        deleted_count += batch_deleted
-                        failed_count += batch_failed
-                        total_count += len(unique_values)
-                        
-                        # Update progress after each batch with commit
-                        self._update_delete_progress(deleted_count, failed_count, total_count, unique_values)
-                        
-                        # Add to processed values
-                        processed_values.update(unique_values)
-                        
-                        # Reset batch
-                        unique_values = set()
-                
-                # Process any remaining values
-                if unique_values:
-                    batch_num += 1
-                    self._log_message(f"Processing final batch {batch_num}: {len(unique_values):,} values", "info")
-                    
-                    # Process final batch
-                    batch_deleted, batch_failed = self._delete_records_batch(
-                        unique_values, processed_values
-                    )
-                    
-                    # Update counts
-                    deleted_count += batch_deleted
-                    failed_count += batch_failed
-                    total_count += len(unique_values)
-                    
-                    # Update progress
-                    self._update_delete_progress(deleted_count, failed_count, total_count, unique_values)
-            
-            # Mark as completed
-            self._update_delete_status('completed', deleted_count, failed_count, total_count)
-            
-            # Log summary
-            self._log_message(
-                f"Delete operation completed: {deleted_count:,} records deleted, {failed_count:,} failed", 
-                "success"
-            )
-            
-            return True
-            
-        except Exception as e:
-            # Handle errors
-            self._log_message(f"Error in delete operation: {str(e)}", "error")
-            
-            # Mark as failed
-            self._update_delete_status('failed', error_message=str(e))
-            
-            # Raise the exception for the job queue to handle
-            raise
-
-    def _get_file_reader(self):
-        """Get an appropriate file reader based on file type"""
-        import csv
-        import tempfile
-        import xlrd
-        import openpyxl
-        from io import BytesIO
-        
         if not self.file_path or not os.path.exists(self.file_path):
-            if not self.file:
-                raise ValueError("No file to process")
+            raise ValueError("Import file not found at specified path")
+        
+        # Update status
+        self.write({
+            'status': 'processing',
+            'started_at': fields.Datetime.now()
+        })
+        self.env.cr.commit()
+        
+        self._log_message("🗑️ Starting deletion process...", "info")
+        self._log_message("📄 Analyzing file and preparing deletion operations", "info")
+        
+        # First check if ANY active records exist
+        self.env.cr.execute(f"""
+            SELECT COUNT(*) FROM {self.env[self.model_name]._table}
+            WHERE active IS TRUE
+        """)
+        active_count = self.env.cr.fetchone()[0]
+        
+        if active_count == 0:
+            # No active records at all - return early
+            self.write({
+                'status': 'completed',
+                'completed_at': fields.Datetime.now(),
+                'successful_records': 0
+            })
+            self.env.cr.commit()
+            
+            self._log_message("No active records found in database. All records are already deleted.", "warning")
+            
+            return {
+                'success': True,
+                'message': f"No active records found in database. All records are already archived.",
+                'archived': 0,
+                'failed': 0
+            }
+        
+        # Load the file to get values
+        try:
+            self._log_message("Reading file and extracting identifiers...", "info")
+            import pandas as pd
+            
+            # Handle UTF-8 BOM
+            with open(self.file_path, 'rb') as f:
+                raw_data = f.read(3)
+                has_bom = raw_data.startswith(b'\xef\xbb\xbf')
+            
+            encoding = 'utf-8-sig' if has_bom else 'utf-8'
+            
+            # Read CSV file
+            df = pd.read_csv(
+                self.file_path,
+                encoding=encoding,
+                dtype=str,
+                keep_default_na=False,
+                engine='python',
+                on_bad_lines='skip'
+            )
+            
+            if df is None or df.empty:
+                raise ValueError("No data found in file")
+            
+            self._log_message(f"✅ Successfully loaded file: {len(df):,} rows found", "success")
                 
-            # Create a temporary file from the binary data
-            file_data = base64.b64decode(self.file)
-            temp_file = tempfile.NamedTemporaryFile(delete=False)
-            temp_file.write(file_data)
-            temp_file.close()
-            self.file_path = temp_file.name
-        
-        # Determine file type
-        file_path = self.file_path
-        file_extension = os.path.splitext(file_path)[1].lower()
-        
-        if file_extension in ('.xlsx'):
-            # Excel XLSX reader
-            workbook = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
-            sheet = workbook.active
+            # Find the column
+            csv_column = None
+            for col in df.columns:
+                clean_col = col.lstrip('\ufeff').strip()
+                if (clean_col == self.unique_identifier_field or 
+                    clean_col.lower() == self.unique_identifier_field.lower()):
+                    csv_column = col
+                    break
+                    
+            if not csv_column:
+                raise ValueError(f"Could not find column matching '{self.unique_identifier_field}'")
             
-            # Create a generator that yields rows
-            def xlsx_reader():
-                for row in sheet.iter_rows(values_only=True):
-                    yield [str(cell) if cell is not None else "" for cell in row]
-            
-            return xlsx_reader()
-            
-        elif file_extension in ('.xls'):
-            # Excel XLS reader
-            workbook = xlrd.open_workbook(file_path)
-            sheet = workbook.sheet_by_index(0)
-            
-            # Create a generator that yields rows
-            def xls_reader():
-                for i in range(sheet.nrows):
-                    yield [str(cell.value) if cell.value is not None else "" for cell in sheet.row(i)]
-            
-            return xls_reader()
-            
-        else:
-            # Default to CSV reader
-            # Try to detect encoding
-            with open(file_path, 'rb') as f:
-                sample = f.read(min(10000, os.path.getsize(file_path)))
+            self._log_message(f"Found identifier column: '{csv_column}'", "info")
                 
-            import chardet
-            result = chardet.detect(sample)
-            encoding = result['encoding'] or 'utf-8'
-            
-            # Try different separators
-            for sep in [',', ';', '\t', '|']:
-                try:
-                    # Open file with detected encoding
-                    f = open(file_path, 'r', encoding=encoding)
-                    reader = csv.reader(f, delimiter=sep)
+            # Get values
+            raw_values = df[csv_column].dropna().tolist()
+            if not raw_values:
+                raise ValueError(f"No values found in column '{csv_column}'")
+                
+            # Clean values
+            identifier_values = []
+            for v in raw_values:
+                cleaned_val = str(v).strip()
+                if cleaned_val and cleaned_val not in ['', 'None', 'NULL', 'nan']:
+                    identifier_values.append(cleaned_val)
                     
-                    # Read the first row to test if it parses correctly
-                    first_row = next(reader)
-                    if len(first_row) > 1:  # We have multiple columns - seems valid
-                        # Reset file pointer
-                        f.seek(0)
-                        
-                        # Create a wrapper to ensure file gets closed
-                        class FileWrapper:
-                            def __init__(self, file, reader):
-                                self.file = file
-                                self.reader = reader
-                                
-                            def __iter__(self):
-                                return self.reader
-                                
-                            def __next__(self):
-                                return next(self.reader)
-                                
-                            def __enter__(self):
-                                return self.reader
-                                
-                            def __exit__(self, exc_type, exc_val, exc_tb):
-                                self.file.close()
-                        
-                        return FileWrapper(f, reader)
-                except Exception as e:
-                    # Try next separator
-                    try:
-                        f.close()
-                    except:
-                        pass
-                    
-            # If we get here, none of the separators worked
-            raise ValueError(f"Could not determine file format for {file_path}")
-
-    def _delete_records_batch(self, values, already_processed=None):
-        """Delete a batch of records and return counts of deleted and failed"""
-        if not values:
-            return 0, 0
+            # Remove duplicates
+            unique_identifier_values = list(dict.fromkeys(identifier_values))
             
-        # Skip values that were already processed
-        if already_processed:
-            values = [v for v in values if v not in already_processed]
+            self._log_message(f"Extracted {len(unique_identifier_values):,} unique identifiers for deletion", "info")
             
-        if not values:
-            return 0, 0
-        
-        # Create a new cursor for this operation
-        with self.env.registry.cursor() as cr:
-            env = api.Environment(cr, self.env.uid, self.env.context)
-            model_obj = env[self.model_name]
+            # IMPORTANT: Check if identifiers actually match active records
+            self._check_identifiers_match_active_records(unique_identifier_values)
             
+            # Create chunks
+            chunk_size = 1000  # Larger chunks for fewer jobs
+            total_chunks = math.ceil(len(unique_identifier_values) / chunk_size)
+            
+            self._log_message(f"Processing deletion in {total_chunks} chunks...", "info")
+            
+            # Check if queue_job is available
+            use_queue = False
             try:
-                # Find records to delete
-                domain = [(self.unique_identifier_field, 'in', list(values))]
-                records = model_obj.search(domain)
+                use_queue = hasattr(self, 'with_delay')
+            except:
+                pass
                 
-                if not records:
-                    self._log_message(f"No records found matching {len(values)} values", "info")
-                    return 0, 0
+            if use_queue:
+                # Create separate jobs for each chunk
+                for i in range(0, len(unique_identifier_values), chunk_size):
+                    chunk = unique_identifier_values[i:i+chunk_size]
                     
-                # Store IDs for verification
-                record_ids = records.ids
-                count_before = len(record_ids)
-                
-                # Delete records
-                records.unlink()
-                
-                # Verify deletion
-                remaining = model_obj.search([('id', 'in', record_ids)])
-                failed_count = len(remaining)
-                deleted_count = count_before - failed_count
-                
-                # Log results
-                if deleted_count > 0:
-                    self._log_message(f"Deleted {deleted_count} records", "success")
+                    # Create a separate job for this chunk
+                    chunk_job = self.with_delay(
+                        description=f"Delete chunk {i//chunk_size + 1}/{total_chunks} using {self.unique_identifier_field}",
+                        channel="csv_import",
+                        priority=15
+                    ).process_archive_chunk(chunk, i//chunk_size + 1, total_chunks)
                     
-                if failed_count > 0:
-                    self._log_message(f"Failed to delete {failed_count} records", "warning")
+                self.env.cr.commit()
+                
+                self._log_message(f"❌ Error: {str(e)}", "error")
+                
+                return {
+                    'success': True,
+                    'message': f"Delete operation split into {total_chunks} separate jobs",
+                    'chunks': total_chunks
+                }
+            else:
+                # Process directly in chunks
+                archived_count = 0
+                failed_count = 0
+                
+                for i in range(0, len(unique_identifier_values), chunk_size):
+                    chunk = unique_identifier_values[i:i+chunk_size]
                     
-                # Commit this batch
-                cr.commit()
-                
-                return deleted_count, failed_count
-                
-            except Exception as e:
-                # Roll back and log error
-                cr.rollback()
-                self._log_message(f"Error deleting batch: {str(e)}", "error")
-                
-                # Return all as failed
-                return 0, len(values)
-
-    def _update_delete_progress(self, deleted_count, failed_count, total_count, batch_values=None):
-        """Update delete progress with atomic transaction"""
-        try:
-            # Get current progress
-            progress = json.loads(self.delete_progress) if self.delete_progress else {}
-            
-            # Update counts
-            progress['deleted'] = deleted_count
-            progress['failed'] = failed_count
-            progress['total'] = total_count
-            progress['processed'] = deleted_count + failed_count
-            progress['status'] = 'in_progress'
-            
-            # Update time
-            progress['updated_at'] = fields.Datetime.now().isoformat()
-            
-            # Add batch values to processed values (without storing the full list in the log)
-            if 'processed_values' not in progress:
-                progress['processed_values'] = []
-                
-            if batch_values:
-                # Convert batch values to list and extend the processed values
-                batch_list = list(batch_values)
-                progress['processed_values'].extend(batch_list)
-                
-                # To avoid memory issues, just store a count in the database
-                progress_copy = progress.copy()
-                progress_copy['processed_value_count'] = len(progress['processed_values'])
-                del progress_copy['processed_values']
-                
-                # Update the progress in the database
-                with self.env.registry.cursor() as new_cr:
-                    # Use pg_advisory_xact_lock to ensure atomic update
-                    new_cr.execute("SELECT pg_advisory_xact_lock(%s)", (self.id,))
+                    result = self.process_archive_chunk(chunk, i//chunk_size + 1, total_chunks)
+                    archived_count += result.get('archived', 0)
+                    failed_count += result.get('failed', 0)
                     
-                    # Update the progress
-                    new_cr.execute("""
-                        UPDATE import_log
-                        SET delete_progress = %s
-                        WHERE id = %s
-                    """, (json.dumps(progress_copy), self.id))
-                    
-                    new_cr.commit()
-            
-            # Update the local progress
-            self.delete_progress = json.dumps(progress)
-            
+                return {
+                    'success': True,
+                    'message': f"Delete operation completed directly: {archived_count} delete, {failed_count} failed",
+                    'archived': archived_count,
+                    'failed': failed_count
+                }
+                
         except Exception as e:
-            _logger.error(f"Error updating delete progress: {str(e)}")
-
-    def _update_delete_status(self, status, deleted_count=0, failed_count=0, total_count=0, error_message=None):
-        """Update the status of the delete operation"""
-        try:
-            # Get current progress
-            progress = json.loads(self.delete_progress) if self.delete_progress else {}
+            import traceback
+            error_trace = traceback.format_exc()
+            error_message = f"Error preparing archive operation: {str(e)}"
+            
+            _logger.error(error_message)
+            _logger.error(error_trace)
             
             # Update status
-            progress['status'] = status
+            self.write({
+                'status': 'failed',
+                'error_message': error_message,
+                'technical_details': error_trace,
+                'completed_at': fields.Datetime.now()
+            })
+            self.env.cr.commit()
             
-            if status == 'completed':
-                progress['completed_at'] = fields.Datetime.now().isoformat()
-                progress['deleted'] = deleted_count
-                progress['failed'] = failed_count
-                progress['total'] = total_count
-                progress['processed'] = deleted_count + failed_count
-            elif status == 'failed':
-                progress['error_message'] = error_message
-                progress['failed_at'] = fields.Datetime.now().isoformat()
+            return {
+                'success': False,
+                'error': error_message
+            }
+
+    def _check_identifiers_match_active_records(self, identifiers):
+        """Check if identifiers actually match active records - log diagnostics"""
+        if not identifiers:
+            return
             
-            # Create a copy for database storage (without the potentially large processed_values)
-            progress_copy = progress.copy()
-            if 'processed_values' in progress_copy:
-                progress_copy['processed_value_count'] = len(progress_copy['processed_values'])
-                del progress_copy['processed_values']
+        # Take a sample of identifiers to check
+        sample_size = min(50, len(identifiers))
+        sample_identifiers = random.sample(identifiers, sample_size)
+        
+        # Check if sample identifiers match ANY records (active or inactive)
+        placeholders = ','.join(['%s'] * len(sample_identifiers))
+        self.env.cr.execute(f"""
+            SELECT COUNT(*) 
+            FROM {self.env[self.model_name]._table}
+            WHERE {self.unique_identifier_field} IN ({placeholders})
+        """, tuple(sample_identifiers))
+        
+        any_match_count = self.env.cr.fetchone()[0]
+        
+        # CRITICAL FIX: Check for both TRUE and NULL as active
+        self.env.cr.execute(f"""
+            SELECT COUNT(*) 
+            FROM {self.env[self.model_name]._table}
+            WHERE {self.unique_identifier_field} IN ({placeholders})
+            AND (active IS TRUE OR active IS NULL)
+        """, tuple(sample_identifiers))
+        
+        active_match_count = self.env.cr.fetchone()[0]
+        
+        # Log results
+        _logger.info(f"Identifier matching check: {any_match_count} of {sample_size} sample identifiers match ANY records")
+        _logger.info(f"Identifier matching check: {active_match_count} of {sample_size} sample identifiers match ACTIVE/NULL records")
+        
+        # If nothing matched active, check for NULL vs TRUE values
+        if active_match_count == 0 and any_match_count > 0:
+            # Check for NULL values specifically
+            self.env.cr.execute(f"""
+                SELECT COUNT(*) 
+                FROM {self.env[self.model_name]._table}
+                WHERE {self.unique_identifier_field} IN ({placeholders})
+                AND active IS NULL
+            """, tuple(sample_identifiers))
             
-            # Update the progress in the database
-            with self.env.registry.cursor() as new_cr:
-                # Use pg_advisory_xact_lock to ensure atomic update
-                new_cr.execute("SELECT pg_advisory_xact_lock(%s)", (self.id,))
+            null_match_count = self.env.cr.fetchone()[0]
+            
+            if null_match_count > 0:
+                _logger.info(f"Found {null_match_count} records with NULL active value - these should be considered active!")
+        
+        # Get example records for better debugging
+        self.env.cr.execute(f"""
+            SELECT id, active, {self.unique_identifier_field} 
+            FROM {self.env[self.model_name]._table}
+            WHERE {self.unique_identifier_field} IN ({placeholders})
+            LIMIT 5
+        """, tuple(sample_identifiers))
+        
+        example_records = self.env.cr.fetchall()
+        if example_records:
+            _logger.info(f"Example matching records: {example_records}")
+        
+        # If we matched some records but not active ones, they're likely already archived
+        if active_match_count == 0 and any_match_count > 0:
+            _logger.warning("MATCHED RECORDS EXIST BUT NONE ARE ACTIVE - they may already be archived!")
+            
+    def process_archive_chunk(self, chunk_values, chunk_num, total_chunks):
+        """Process a specific chunk of values for archiving"""
+        self.ensure_one()
+        
+        _logger.info(f"Processing archive chunk {chunk_num}/{total_chunks} with {len(chunk_values)} values")
+        
+        # Update progress
+        self.write({
+            'current_batch': chunk_num,
+            'total_batches': total_chunks
+        })
+        self.env.cr.commit()
+        
+        try:
+            # Get table and field names
+            table_name = self.env[self.model_name]._table
+            field_name = self.unique_identifier_field
+            
+            # Find matching records by identifiers
+            placeholders = ','.join(['%s'] * len(chunk_values))
+            find_query = f"""
+                SELECT id, active 
+                FROM {table_name}
+                WHERE {field_name} IN ({placeholders})
+            """
+            
+            self.env.cr.execute(find_query, tuple(chunk_values))
+            found_records = self.env.cr.fetchall()
+            found_ids = [r[0] for r in found_records]
+            
+            if not found_ids:
+                return {
+                    'success': True,
+                    'archived': 0,
+                    'failed': 0,
+                    'message': "No matching records found for chunk values"
+                }
                 
-                # Update the progress
-                new_cr.execute("""
+            # CRITICAL FIX: Check for both TRUE and NULL values as active
+            # In PostgreSQL, NULL is not TRUE, but records with NULL active are not considered inactive
+            active_ids = []
+            for rec_id, is_active in found_records:
+                # PostgreSQL treats NULL, TRUE and FALSE as three different states
+                # Consider both TRUE and NULL as "active"
+                if is_active is True or is_active is None:
+                    active_ids.append(rec_id)
+            
+            _logger.info(f"Found {len(found_ids)} records, {len(active_ids)} are truly active/null")
+            
+            # Only proceed if we have active records
+            if active_ids:
+                # Standard PostgreSQL boolean update - set FALSE for both TRUE and NULL values
+                update_query = f"""
+                    UPDATE {table_name}
+                    SET active = FALSE
+                    WHERE id IN ({','.join(map(str, active_ids))})
+                """
+                
+                self.env.cr.execute(update_query)
+                
+                # Verify the update worked - checking both TRUE and NULL
+                verify_query = f"""
+                    SELECT COUNT(*) 
+                    FROM {table_name}
+                    WHERE id IN ({','.join(map(str, active_ids))})
+                    AND (active IS TRUE OR active IS NULL)
+                """
+                
+                self.env.cr.execute(verify_query)
+                still_active = self.env.cr.fetchone()[0]
+                
+                if still_active > 0:
+                    _logger.warning(f"{still_active} records are still active/null after SQL update - trying ORM method")
+                    
+                    # Fallback to ORM
+                    records = self.env[self.model_name].browse(active_ids)
+                    records.write({'active': False})
+                    
+                    # Verify again
+                    self.env.cr.execute(verify_query)
+                    still_active_after_orm = self.env.cr.fetchone()[0]
+                    
+                    if still_active_after_orm > 0:
+                        _logger.error(f"Failed to archive {still_active_after_orm} records even with ORM!")
+                        return {
+                            'success': True,
+                            'archived': len(active_ids) - still_active_after_orm,
+                            'failed': still_active_after_orm
+                        }
+                
+                # Success! Commit and return
+                self.env.cr.commit()
+                return {
+                    'success': True,
+                    'archived': len(active_ids),
+                    'failed': 0
+                }
+            else:
+                # No active records found
+                return {
+                    'success': True,
+                    'archived': 0,
+                    'failed': 0,
+                    'message': "No active records found in chunk"
+                }
+                
+        except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
+            error_message = f"Error processing archive chunk: {str(e)}"
+            
+            _logger.error(error_message)
+            _logger.error(error_trace)
+            
+            # Don't leave transaction in error state
+            self.env.cr.rollback()
+            
+            return {
+                'success': False,
+                'archived': 0,
+                'failed': len(chunk_values),
+                'error': error_message
+            }
+        
+    def _update_delete_progress(self, progress):
+        """
+        Update the delete progress in the database
+        """
+        try:
+            import json
+            
+            # Use a separate cursor to avoid transaction conflicts
+            with self.env.registry.cursor() as progress_cr:
+                progress_cr.execute("""
                     UPDATE import_log
                     SET delete_progress = %s
                     WHERE id = %s
-                """, (json.dumps(progress_copy), self.id))
+                """, (json.dumps(progress), self.id))
+                progress_cr.commit()
                 
-                # Store summary for completed operations
-                if status == 'completed':
-                    summary = {
-                        "operation": "delete",
-                        "identifier_field": self.unique_identifier_field,
-                        "total_values": total_count,
-                        "records_deleted": deleted_count,
-                        "records_failed": failed_count,
-                        "completion_time": fields.Datetime.now().isoformat()
-                    }
-                    
-                    new_cr.execute("""
-                        UPDATE import_log
-                        SET summary = %s
-                        WHERE id = %s
-                    """, (json.dumps(summary), self.id))
-                
-                new_cr.commit()
-            
-            # Update the local progress
-            self.delete_progress = json.dumps(progress)
-            
         except Exception as e:
-            _logger.error(f"Error updating delete status: {str(e)}")
+            _logger.warning(f"Failed to update delete progress: {str(e)}")
 
 class ImportFieldMapping(models.Model):
     _name = "import.field.mapping"
@@ -2070,3 +2019,5 @@ class ImportFieldMapping(models.Model):
     default_value = fields.Char(string="Default Value")
     required = fields.Boolean(string="Required")
     notes = fields.Text(string="Notes")
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    

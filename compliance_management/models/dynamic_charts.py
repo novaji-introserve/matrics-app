@@ -143,6 +143,7 @@ class ResCharts(models.Model):
     materialized_view_last_refresh = fields.Datetime(
         string="Last View Refresh", readonly=True
     )
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
     @api.constrains("query")
     def _check_query_safety(self):
@@ -431,3 +432,4 @@ class ResCharts(models.Model):
                     "sticky": False,
                 },
             }
+            

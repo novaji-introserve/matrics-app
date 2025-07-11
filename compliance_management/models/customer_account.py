@@ -710,6 +710,8 @@ class CustomerAccountDetails(models.Model):
     is_collection_account = fields.Boolean(string="Is Collection Account")
     high_transaction_account = fields.Boolean(
         string="Is High Transaction Account")
+    
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
     def init(self):
 
@@ -728,3 +730,4 @@ class CustomerAccountDetails(models.Model):
                 CREATE INDEX IF NOT EXISTS customer_account_details_id_idx
                 ON customer_account_details (id)
             """)
+            

@@ -21,3 +21,6 @@ class CustomerAccountType(models.Model):
 
     status = fields.Selection(string='Status', selection=[(
         'active', 'Active'), ('inactive', 'Inactive')], default='active',index=True)
+    
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+     
