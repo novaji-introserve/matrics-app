@@ -45,11 +45,12 @@
                                     <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
                                         <div class="mx-2">
                                             <Card 
-                                                onClick="() => displayOdooView(stat.scope, stat.query, null, null, stat.name)" 
+                                                onClick="() => stat.query ? displayOdooView(stat.scope, stat.query, null, null, stat.name) : null"
                                                 title="stat.name" 
                                                 scope="stat.scope" 
                                                 total="stat.val" 
-                                                bgcolor="stat.scope_color" 
+                                                bgcolor="stat.scope_color"
+                                                isClickable="stat.query and stat.name !== 'Avg. Customer Risk Score'" 
                                             />
                                         </div>
                                     </t>

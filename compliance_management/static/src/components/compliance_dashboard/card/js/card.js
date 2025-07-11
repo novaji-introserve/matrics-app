@@ -10,5 +10,6 @@ Card.props = {
     title: { optional: true },
     scope: { optional: true },
     total: { optional: true },
-    bgcolor: { optional: true }
+    bgcolor: { optional: true },
+    isClickable: { type: Boolean, optional: true }
 };
