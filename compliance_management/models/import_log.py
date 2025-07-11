@@ -1620,10 +1620,10 @@ class ImportLog(models.Model):
         self.ensure_one()
         
         if not self.delete_mode:
-            raise ValueError("This import is not configured for archive mode")
+            raise ValueError("This import is not configured for delete mode")
             
         if not self.unique_identifier_field:
-            raise ValueError("No unique identifier field specified for archive operation")
+            raise ValueError("No unique identifier field specified for delete operation")
             
         if not self.file_path or not os.path.exists(self.file_path):
             raise ValueError("Import file not found at specified path")
@@ -1634,6 +1634,9 @@ class ImportLog(models.Model):
             'started_at': fields.Datetime.now()
         })
         self.env.cr.commit()
+        
+        self._log_message("🗑️ Starting deletion process...", "info")
+        self._log_message("📄 Analyzing file and preparing deletion operations", "info")
         
         # First check if ANY active records exist
         self.env.cr.execute(f"""
@@ -1651,6 +1654,8 @@ class ImportLog(models.Model):
             })
             self.env.cr.commit()
             
+            self._log_message("No active records found in database. All records are already deleted.", "warning")
+            
             return {
                 'success': True,
                 'message': f"No active records found in database. All records are already archived.",
@@ -1660,6 +1665,7 @@ class ImportLog(models.Model):
         
         # Load the file to get values
         try:
+            self._log_message("Reading file and extracting identifiers...", "info")
             import pandas as pd
             
             # Handle UTF-8 BOM
@@ -1681,6 +1687,8 @@ class ImportLog(models.Model):
             
             if df is None or df.empty:
                 raise ValueError("No data found in file")
+            
+            self._log_message(f"✅ Successfully loaded file: {len(df):,} rows found", "success")
                 
             # Find the column
             csv_column = None
@@ -1693,6 +1701,8 @@ class ImportLog(models.Model):
                     
             if not csv_column:
                 raise ValueError(f"Could not find column matching '{self.unique_identifier_field}'")
+            
+            self._log_message(f"Found identifier column: '{csv_column}'", "info")
                 
             # Get values
             raw_values = df[csv_column].dropna().tolist()
@@ -1709,12 +1719,16 @@ class ImportLog(models.Model):
             # Remove duplicates
             unique_identifier_values = list(dict.fromkeys(identifier_values))
             
+            self._log_message(f"Extracted {len(unique_identifier_values):,} unique identifiers for deletion", "info")
+            
             # IMPORTANT: Check if identifiers actually match active records
             self._check_identifiers_match_active_records(unique_identifier_values)
             
             # Create chunks
             chunk_size = 1000  # Larger chunks for fewer jobs
             total_chunks = math.ceil(len(unique_identifier_values) / chunk_size)
+            
+            self._log_message(f"Processing deletion in {total_chunks} chunks...", "info")
             
             # Check if queue_job is available
             use_queue = False
@@ -1730,16 +1744,18 @@ class ImportLog(models.Model):
                     
                     # Create a separate job for this chunk
                     chunk_job = self.with_delay(
-                        description=f"Archive chunk {i//chunk_size + 1}/{total_chunks} using {self.unique_identifier_field}",
+                        description=f"Delete chunk {i//chunk_size + 1}/{total_chunks} using {self.unique_identifier_field}",
                         channel="csv_import",
                         priority=15
                     ).process_archive_chunk(chunk, i//chunk_size + 1, total_chunks)
                     
                 self.env.cr.commit()
                 
+                self._log_message(f"❌ Error: {str(e)}", "error")
+                
                 return {
                     'success': True,
-                    'message': f"Archive operation split into {total_chunks} separate jobs",
+                    'message': f"Delete operation split into {total_chunks} separate jobs",
                     'chunks': total_chunks
                 }
             else:
@@ -1756,7 +1772,7 @@ class ImportLog(models.Model):
                     
                 return {
                     'success': True,
-                    'message': f"Archive operation completed directly: {archived_count} archived, {failed_count} failed",
+                    'message': f"Delete operation completed directly: {archived_count} delete, {failed_count} failed",
                     'archived': archived_count,
                     'failed': failed_count
                 }

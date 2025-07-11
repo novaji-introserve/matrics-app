@@ -2037,9 +2037,9 @@ class CSVProcessor:
     def process_delete_mode(self):
         """Archive records with matching unique identifiers"""
         if not self.unique_identifier_field:
-            raise ValueError("Unique identifier field is required for archive mode")
+            raise ValueError("Unique identifier field is required for delete mode")
             
-        self._log_message(f"Processing in archive mode with identifier field: {self.unique_identifier_field}", "info")
+        self._log_message(f"Processing in delete mode with identifier field: {self.unique_identifier_field}", "info")
         
         # Field existence check
         if self.unique_identifier_field not in self.model._fields:
@@ -2051,7 +2051,7 @@ class CSVProcessor:
         
         # Load the file
         if not hasattr(self, 'df') or self.df is None:
-            self._log_message("Loading file for archive operation", "info")
+            self._log_message("Reading and analyzing file...", "info")
             
             try:
                 import pandas as pd
@@ -2074,12 +2074,12 @@ class CSVProcessor:
                 )
                 
                 if self.df is None or self.df.empty:
-                    return {"success": False, "message": "No data found in file", "archived": 0}
+                    return {"success": False, "message": "No data found in file", "deleted": 0}
                     
                 self._log_message(f"Successfully loaded file: {len(self.df):,} rows, {len(self.df.columns)} columns", "success")
                 
             except Exception as read_error:
-                return {"success": False, "message": f"Error loading file: {str(read_error)}", "archived": 0}
+                return {"success": False, "message": f"Error loading file: {str(read_error)}", "deleted": 0}
         
         # Find matching column
         csv_column = None
@@ -2099,12 +2099,12 @@ class CSVProcessor:
         
         if not csv_column:
             available_str = ", ".join(cleaned_columns[:10])
-            return {"success": False, "message": f"Could not find column matching '{self.unique_identifier_field}'. Available: {available_str}", "archived": 0}
+            return {"success": False, "message": f"Could not find column matching '{self.unique_identifier_field}'. Available: {available_str}", "deleted": 0}
         
         # Get values from column
         raw_values = self.df[csv_column].dropna().tolist()
         if not raw_values:
-            return {"success": False, "message": f"No values found in column '{csv_column}'", "archived": 0}
+            return {"success": False, "message": f"No values found in column '{csv_column}'", "deleted": 0}
         
         # Clean values
         identifier_values = []
@@ -2200,7 +2200,7 @@ class CSVProcessor:
                                 failed_count += still_active
                             else:
                                 archived_count += len(active_ids)
-                                self._log_message(f"✅ Successfully archived {len(active_ids)} records", "success")
+                                self._log_message(f"✅ Successfully delete {len(active_ids)} records", "success")
                         else:
                             self._log_message("All found records were already inactive", "info")
                     else:
@@ -2240,10 +2240,10 @@ class CSVProcessor:
         
         # Final summary
         success = archived_count > 0
-        message = f"Archive operation completed: {archived_count} records archived, {failed_count} failed"
+        message = f"Deletion operation completed: {archived_count} records delete, {failed_count} failed"
         
         if archived_count == 0:
-            message += ". No matching active records found - they may already be archived or identifiers don't match."
+            message += ". No matching active records found - they may already be deleted or identifiers don't match."
         
         self._log_message(message, "success" if success else "warning")
         
