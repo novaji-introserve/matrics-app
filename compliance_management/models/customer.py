@@ -44,19 +44,7 @@ class PartnerRiskPlanLines(models.Model):
     plan_line_id = fields.Many2one(
         'res.compliance.risk.assessment.plan', string='Plan Line', index=True)
     risk_score = fields.Float(string='Risk Score', digits=(10, 2))
-
-
-class CustomerStatus(models.Model):
-    _name = 'customer.status'
-    _sql_constraints = [
-        ('uniq_customer_status', 'unique(customer_status)',
-         "customer status already exists. Value must be unique!"),
-    ]
-
-    customer_status = fields.Char(string='Customer Status', index=True)
-    desc = fields.Char(string='Description')
-    slug = fields.Char(string='Short Description')
-    name = fields.Char(string='Customer Type', index=True)
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
 
 class Customer(models.Model):

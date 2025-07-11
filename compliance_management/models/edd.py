@@ -918,17 +918,4 @@ class CustomerEDD(models.Model):
             'url': f'{base_url}/compliance/pdf_report/{self.id}',
             'target': 'new',
         }
-
-
-class EDDRrejectWizard(models.TransientModel):
-    _name = 'res.partner.edd.reject.wizard'
-    _description = 'EDD Reject Reason Wizard'
-
-    edd_id = fields.Many2one('res.partner.edd', string='EDD', required=True)
-    reject_reason = fields.Text(string='Reject Reason', required=True)
-
-    def action_confirm_reject(self):
-        self.edd_id.action_reject(self.reject_reason)
-        return {'type': 'ir.actions.act_window_close'}
-    
-    
+            
