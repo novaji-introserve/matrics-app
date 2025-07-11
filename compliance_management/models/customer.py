@@ -33,7 +33,6 @@ class Shareholders(models.Model):
     bvn = fields.Char(string='BVN', tracking=True)
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Partner', ondelete="cascade")
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
 
 class PartnerRiskPlanLines(models.Model):
@@ -44,7 +43,19 @@ class PartnerRiskPlanLines(models.Model):
     plan_line_id = fields.Many2one(
         'res.compliance.risk.assessment.plan', string='Plan Line', index=True)
     risk_score = fields.Float(string='Risk Score', digits=(10, 2))
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+
+
+class CustomerStatus(models.Model):
+    _name = 'customer.status'
+    _sql_constraints = [
+        ('uniq_customer_status', 'unique(customer_status)',
+         "customer status already exists. Value must be unique!"),
+    ]
+
+    customer_status = fields.Char(string='Customer Status', index=True)
+    desc = fields.Char(string='Description')
+    slug = fields.Char(string='Short Description')
+    name = fields.Char(string='Customer Type', index=True)
 
 
 class Customer(models.Model):
@@ -1852,4 +1863,3 @@ class Partner(models.Model):
 
         _logger.info("Completed removal of unwanted partner actions")
         return True
-    
