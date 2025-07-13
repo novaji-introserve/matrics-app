@@ -1,5 +1,5 @@
 {
-    'name': 'Case Management',
+    'name': 'Case Management (old version)',
     'version': '1.0',
     'summary': 'A module for managing cases',
     'description': """This module helps in managing cases.""",
