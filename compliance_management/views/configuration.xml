@@ -103,16 +103,16 @@
                                 <field name="name" readonly="1"/>
                             </h1>
                         </div>
-                        <group string="Details">
+                        <group string="Details" attrs="{'readonly': [('id', '!=', False)]}">
 
                             <group >
-                                <field name="product_type" readonly="1" />
-                                <field name="product_category" readonly="1" />
+                                <field name="product_type"  />
+                                <field name="product_category" />
                             </group>
 
                             <group>
-                                <field name="code" string="Product Code" readonly="1" />
-                                <field name="description" readonly="1" />
+                                <field name="code" string="Product Code" />
+                                <field name="description" />
                             </group>
 
                         </group>

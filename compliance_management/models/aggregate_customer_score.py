@@ -17,5 +17,4 @@ class AggregateCustomerRiskScore(models.Model):
         string='Formatted Name', store=True
     )
     
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     

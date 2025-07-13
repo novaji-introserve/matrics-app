@@ -25,7 +25,6 @@ class CustomerTier(models.Model):
         ('active', 'Active'),
         ('inactive', 'Inactive')
     ], default='active', index=True)
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -63,7 +62,6 @@ class AccountTierMaterialized(models.Model):
     ], string="Tier Level", readonly=True)
     tier_name = fields.Char(string="Account Tier", readonly=True)
 
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
     def init(self):
         """Initialize the materialized view with indexes"""
