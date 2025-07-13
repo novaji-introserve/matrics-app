@@ -1179,6 +1179,8 @@ class Customer(models.Model):
 
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
+        
+        self.create_customer_trigger()
 
     @api.model_create_multi
     def create(self, vals_list):
