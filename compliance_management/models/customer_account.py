@@ -207,46 +207,64 @@ class CustomerAccount(models.Model):
         string="Account Tier", compute='_compute_tier_info', store=False)
 
    
-
-    
-
     def init(self):
         """Initialize database triggers when module is installed/updated"""
-    
-        # Drop existing trigger if it exists
-        self.env.cr.execute(
-            "DROP TRIGGER IF EXISTS update_customer_id_field ON res_partner_account;")
 
+        # Create index on res_partner_account (only if it doesn't exist)
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")
 
-        # Create new trigger
+        # Check if the trigger exists
         self.env.cr.execute("""
-            CREATE OR REPLACE FUNCTION update_customer_id_field_func()
-            RETURNS TRIGGER AS $$
-            BEGIN
-                -- Check if customer field is empty and customer_id is set
-                IF (NEW.customer IS NULL OR TRIM(NEW.customer) = '') AND NEW.customer_id IS NOT NULL THEN
-                    -- Set customer field to the ID value from customer_id
-                    NEW.customer = NEW.customer_id::TEXT;                    
-                END IF;
-                
-                IF NEW.active IS NULL THEN
-                    -- Set active field to True
-                    NEW.active = True;
-                END IF;
-                
-                
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-            
-            -- Create the trigger
-            CREATE TRIGGER update_customer_id_field
-            BEFORE INSERT OR UPDATE ON res_partner_account
-            FOR EACH ROW
-            EXECUTE FUNCTION update_customer_id_field_func();
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.triggers 
+                WHERE trigger_name = 'update_customer_id_field' 
+                AND event_object_table = 'res_partner_account'
+            )
         """)
+        trigger_exists = self.env.cr.fetchone()[0]
+
+        # Check if the function exists
+        self.env.cr.execute("""
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.routines 
+                WHERE routine_name = 'update_customer_id_field_func'
+                AND routine_type = 'FUNCTION'
+            )
+        """)
+        function_exists = self.env.cr.fetchone()[0]
+
+        # Only create the function if it doesn't exist
+        if not function_exists:
+            self.env.cr.execute("""
+                CREATE FUNCTION update_customer_id_field_func()
+                RETURNS TRIGGER AS $$
+                BEGIN
+                    -- Check if customer field is empty and customer_id is set
+                    IF (NEW.customer IS NULL OR TRIM(NEW.customer) = '') AND NEW.customer_id IS NOT NULL THEN
+                        -- Set customer field to the ID value from customer_id
+                        NEW.customer = NEW.customer_id::TEXT;                    
+                    END IF;
+                
+                    IF NEW.active IS NULL THEN
+                        -- Set active field to True
+                        NEW.active = True;
+                    END IF;
+                
+                
+                    RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;
+            """)
+
+        # Only create the trigger if it doesn't exist
+        if not trigger_exists:
+            self.env.cr.execute("""
+                CREATE TRIGGER update_customer_id_field
+                BEFORE INSERT OR UPDATE ON res_partner_account
+                FOR EACH ROW
+                EXECUTE FUNCTION update_customer_id_field_func();
+            """)
 
         # Update existing records with empty customer field
         self.env.cr.execute("""
@@ -255,6 +273,7 @@ class CustomerAccount(models.Model):
             WHERE (customer IS NULL OR TRIM(customer) = '')
             AND customer_id IS NOT NULL;
         """)
+
         # Update existing records where active field is NULL
         self.env.cr.execute("""
             UPDATE res_partner_account
@@ -262,7 +281,6 @@ class CustomerAccount(models.Model):
             WHERE active IS NULL;
         """)
 
-        # self.compute_aggregate_risk_scores()
 
     @api.model
     def open_accounts(self):

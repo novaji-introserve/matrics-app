@@ -1772,6 +1772,174 @@ class Customer(models.Model):
             'context': {'default_customer_id': self.customer_id}
         }
 
+    def create_customer_trigger(self):
+
+        self.env.cr.execute("""
+        SELECT EXISTS (
+            SELECT 1 FROM information_schema.triggers 
+            WHERE trigger_name = 'set_partner_defaults' 
+            AND event_object_table = 'res_partner'
+        )
+        """)
+        trigger_exists = self.env.cr.fetchone()[0]
+
+        # Check if the function exists
+        self.env.cr.execute("""
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.routines 
+                WHERE routine_name = 'set_partner_defaults_func'
+                AND routine_type = 'FUNCTION'
+            )
+        """)
+        function_exists = self.env.cr.fetchone()[0]
+
+        # Only create the function and trigger if they don't exist
+        if not function_exists:
+            self.env.cr.execute("""
+                CREATE FUNCTION set_partner_defaults_func()
+                RETURNS TRIGGER AS $$
+                BEGIN
+
+                    -- Check if this is demo data (origin = 'demo')
+                    IF NEW.origin = 'demo' THEN
+                        -- For demo data: Set defaults but preserve certain fields like risk_level
+                        -- Save the original risk_level value if it exists
+                        DECLARE original_risk_level VARCHAR;
+                        BEGIN
+                            original_risk_level := NEW.risk_level;
+                            
+                            -- Set basic defaults
+                            NEW.create_uid = 1;
+                            NEW.write_uid = 1;
+                            NEW.type = 'contact';
+                            NEW.lang = 'en_US';
+                            NEW.color = 0;
+                            NEW.tz = 'Africa/Lagos';
+                                                        
+                            
+                            -- Restore the original risk_level if it was set
+                            IF original_risk_level IS NOT NULL THEN
+                                NEW.risk_level := original_risk_level;
+                            END IF;
+                            
+                            RETURN NEW;
+                        END;
+                    END IF;
+
+                    IF NEW.active IS NULL THEN
+                        NEW.active = TRUE;
+                    END IF;
+                    
+                    IF NEW.type IS NULL THEN
+                        NEW.type = 'contact';
+                    END IF;
+                    
+                    IF NEW.lang IS NULL THEN
+                        NEW.lang = 'en_US';
+                    END IF;
+                    
+                    IF NEW.create_uid IS NULL THEN
+                        NEW.create_uid = 1;
+                    END IF;
+                    
+                    IF NEW.write_uid IS NULL THEN
+                        NEW.write_uid = 1;
+                    END IF;
+                        
+                    IF NEW.color IS NULL THEN
+                        NEW.color = 0;
+                    END IF;
+                    
+                    IF NEW.create_date IS NULL THEN
+                        NEW.create_date = NOW();
+                    END IF;
+                    
+                    IF NEW.tz IS NULL THEN
+                        NEW.tz = 'Africa/Lagos';
+                    END IF;
+                    
+                    IF NEW.write_date IS NULL THEN
+                        NEW.write_date = NOW();
+                    END IF;
+                    
+                    IF NEW.internal_category IS NULL THEN
+                        NEW.internal_category = 'customer';
+                    END IF;
+                    
+                    IF NEW.commercial_partner_id IS NULL THEN
+                        NEW.commercial_partner_id = NEW.id;
+                    END IF;
+
+                    IF (NEW.display_name IS NULL OR TRIM(NEW.display_name) = '') AND NEW.name IS NOT NULL THEN
+                        NEW.display_name = NEW.name;
+                    END IF;
+                    
+                    -- Set commercial_partner_id to the record's ID after insert
+                    -- This requires a BEFORE INSERT trigger to work properly
+                    IF NEW.commercial_partner_id IS NULL THEN
+                        -- Using NEW.id directly in a BEFORE INSERT trigger
+                        -- This will work since the record already has an ID before the trigger
+                        NEW.commercial_partner_id = NEW.id;
+                    END IF;
+                    
+                    RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;
+            """)
+
+        if not trigger_exists:
+            self.env.cr.execute("""
+                CREATE TRIGGER set_partner_defaults
+                BEFORE INSERT ON res_partner
+                FOR EACH ROW
+                EXECUTE FUNCTION set_partner_defaults_func();
+            """)
+
+        # Check if the AFTER INSERT trigger exists
+        self.env.cr.execute("""
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.triggers 
+                WHERE trigger_name = 'set_partner_defaults_after' 
+                AND event_object_table = 'res_partner'
+            )
+        """)
+        after_trigger_exists = self.env.cr.fetchone()[0]
+
+        # Check if the after function exists
+        self.env.cr.execute("""
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.routines 
+                WHERE routine_name = 'set_partner_defaults_after_func'
+                AND routine_type = 'FUNCTION'
+            )
+        """)
+        after_function_exists = self.env.cr.fetchone()[0]
+
+        # Only create the AFTER INSERT function and trigger if they don't exist
+        if not after_function_exists:
+            self.env.cr.execute("""
+                CREATE FUNCTION set_partner_defaults_after_func()
+                RETURNS TRIGGER AS $$
+                BEGIN
+                    IF NEW.commercial_partner_id IS NULL THEN
+                        UPDATE res_partner SET commercial_partner_id = NEW.id WHERE id = NEW.id;
+                    END IF;
+                    
+                    RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;
+            """)
+
+        if not after_trigger_exists:
+            self.env.cr.execute("""
+                CREATE TRIGGER set_partner_defaults_after
+                AFTER INSERT ON res_partner
+                FOR EACH ROW
+                EXECUTE FUNCTION set_partner_defaults_after_func();
+            """)
+
+
+
 
 class Partner(models.Model):
     _inherit = 'res.partner'
