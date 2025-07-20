@@ -291,6 +291,7 @@
 
                     </td>
                 </tr>
+                
                 <tr>
                     <td colspan="2" style="border-bottom: 1px solid #eee; padding-bottom: 20px;word-wrap: break-word;">
                         <i>An exception initiated by <t t-esc="ctx.get('creator_name')"/>
