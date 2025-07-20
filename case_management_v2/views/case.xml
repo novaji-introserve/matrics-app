@@ -55,10 +55,15 @@
 
                     <field name="new_response" string="Respond" placeholder="Add your response here..." attrs="{'invisible': ['|', '|', ('is_responsible', '=', False), ('id', '=', False), ('case_status', '=', 'closed')]}"/>
 
-                    <group string="Case Closure" attrs="{'invisible': [('show_closure_fields', '=', False)]}">
+                    <!-- <group string="Case Closure" attrs="{'invisible': [('show_closure_fields', '=', False)]}">
                         <field name="show_closure_fields" invisible="1"/>
-                        <field name="close_remarks" />
-                        <!-- <field name="close_remarks" attrs="{'required': [('show_closure_fields', '=', True)]}"/> -->
+                        <field name="close_remarks" string="Reason For Closure"/>
+                    </group> -->
+                    <group string="Case Closure" attrs="{'invisible': ['&amp;', ('show_closure_fields', '=', False), ('close_remarks', '=', False)]}">
+
+                        <field name="show_closure_fields" invisible="1"/>
+
+                        <field name="close_remarks" string="Reason For Closure" attrs="{'readonly': ['|', ('case_status', '=', 'closed'), ('show_closure_fields', '=', False)]}"/>
                     </group>
 
                     <notebook>

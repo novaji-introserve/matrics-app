@@ -275,7 +275,7 @@ class CaseManager(models.Model):
         if self.create_uid.id == self.env.user.id:
             if not self.close_remarks or not self.close_remarks.strip():
                 raise UserError(
-                    "Closure remarks are required when closing a case.")
+                    "Reason For Closure is required when closing a case.")
 
         self.case_status = 'closed'
         self._send_case_closure_alert()
