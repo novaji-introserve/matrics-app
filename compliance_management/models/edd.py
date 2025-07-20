@@ -233,7 +233,16 @@ class CustomerEDD(models.Model):
     created_by_rm = fields.Boolean(compute='_compute_created_by_rm', store=False)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     reject_reason = fields.Text(string='Reject Reason', tracking =True)
-    
+    approving_officer_name = fields.Char(string="Approving Officer Name", compute='_compute_officer_names', store=True, tracking=True)
+    responsible_officer_name = fields.Char(string="Responsible Officer Name", compute='_compute_officer_names', store=True, tracking=True)
+
+
+    @api.depends('approving_officer_id', 'responsible_id')
+    def _compute_officer_names(self):
+        for record in self:
+            record.approving_officer_name = record.approving_officer_id.name if record.approving_officer_id else False
+            record.responsible_officer_name = record.responsible_id.name if record.responsible_id else False
+        
 
     _sql_constraints = [
     ('unique_name', 'UNIQUE(name)', 'The EDD name must be unique.')]
