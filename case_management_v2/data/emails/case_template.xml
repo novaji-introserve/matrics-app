@@ -55,13 +55,7 @@
                             </td>
 
                         </tr>
-                        <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Alert ID:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
-                                <t t-esc="ctx.get('alert_id')" />
-                            </td>
-
-                        </tr>
+                       
                         <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Department:</td>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
