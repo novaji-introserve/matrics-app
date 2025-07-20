@@ -37,6 +37,7 @@
                         <!-- Cards row -->
                         <div class="row">
                             <KpiCard onClick.bind="viewAllCases" name="'All Cases'" value="state.allCases.value" percentage="state.allCases.percentage" />
+                            <KpiCard onClick.bind="viewDraftCases" name="'Draft Cases'" value="state.draftCases.value" percentage="state.draftCases.percentage" />
                             <KpiCard onClick.bind="viewOpenCases" name="'Open Cases'" value="state.openCases.value" percentage="state.openCases.percentage" />
                             <KpiCard onClick.bind="viewOverdueCases" name="'Overdue Cases'" value="state.overdueCases.value" percentage="state.overdueCases.percentage" />
                             <KpiCard onClick.bind="viewClosedCases" name="'Closed Cases'" value="state.closedCases.value" percentage="state.closedCases.percentage" />

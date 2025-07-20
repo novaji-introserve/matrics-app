@@ -4,7 +4,7 @@
 
     <!-- Main Case Manager Action -->
     <record id="action_case_manager" model="ir.actions.act_window">
-        <field name="name">All Cases</field>
+        <field name="name">My Cases</field>
         <field name="res_model">case.manager</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[
@@ -26,13 +26,30 @@
 
 
     <!-- Action for Create New Case - Using Dialog -->
-    <record id="action_create_case" model="ir.actions.act_window">
+    <!-- <record id="action_create_case" model="ir.actions.act_window">
         <field name="name">Create Case</field>
         <field name="res_model">case.manager</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>        <!-- This opens in a dialog -->
-        <field name="context">{'default_case_status': 'open'}</field>
+        <field name="view_mode">tree,form</field>
+        <field name="target">new</field>       
+        <field name="context">{'default_case_status': 'draft'}</field>
         <field name="view_id" ref="view_case_manager_form"/>
+    </record> -->
+
+    <!-- Action for Draft Cases -->
+    <record id="action_draft_cases" model="ir.actions.act_window">
+        <field name="name">Draft Cases</field>
+        <field name="res_model">case.manager</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[
+        '&amp;',
+        ('case_status', '=', 'draft'),
+        '|', '|',
+        ('create_uid', '=', uid),
+        ('officer_responsible', '=', uid),
+        ('supervisors', 'in', [uid])
+               ]
+        </field>
+        <field name="context">{'search_default_draft_cases': 1}</field>
     </record>
 
     <!-- Action for Open Cases -->
@@ -193,16 +210,19 @@
     <menuitem id="menu_case_management" name="Cases" parent="menu_case_management_root" sequence="10"/>
 
     <!-- Create Case Menu -->
-    <menuitem id="menu_create_case" name="Create Case" parent="menu_case_management" action="action_create_case" sequence="10"/>
+    <!-- <menuitem id="menu_create_case" name="Create Case" parent="menu_case_management" action="action_create_case" sequence="10"/> -->
 
     <!-- All Cases Menu -->
-    <menuitem id="menu_all_cases" name="All Cases" parent="menu_case_management" action="action_case_manager" sequence="50"/>
+    <menuitem id="menu_all_cases" name="My Cases" parent="menu_case_management" action="action_case_manager" sequence="8"/>
 
     <!-- My Cases Menu -->
     <menuitem id="menu_my_cases" name="Assigned To Me" parent="menu_case_management" action="action_my_cases" sequence="35"/>
 
     <!-- Cases Created By Me Menu -->
     <menuitem id="menu_cases_created_by_me" name="Created By Me" parent="menu_case_management" action="action_cases_created_by_me" sequence="40"/>
+
+    <!-- Open Draft Menu -->
+    <menuitem id="menu_draft_cases" name="Draft Cases" parent="menu_case_management" action="action_draft_cases" sequence="9"/>
 
     <!-- Open Cases Menu -->
     <menuitem id="menu_open_cases" name="Open Cases" parent="menu_case_management" action="action_open_cases" sequence="10"/>

@@ -26,7 +26,7 @@ class CaseManager(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     case_ref = fields.Char(string="Case Reference",
-                           required=True, index=True, default=lambda self: 'New')
+                           required=True, index=True, default=lambda self: 'New', copy=False)
 
     active = fields.Boolean(string='Active', default=True, tracking=True)
 
@@ -48,6 +48,7 @@ class CaseManager(models.Model):
 
     case_status = fields.Selection(
         [
+            ("draft", "Draft"),
             ("open", "Open"),
             ("closed", "Closed"),
             ("overdue", "OverDue"),
@@ -59,7 +60,7 @@ class CaseManager(models.Model):
         copy=False,
         index=True,
         required=True,
-        default='open',
+        default='draft',
     )
 
     case_rating = fields.Selection(
@@ -74,6 +75,10 @@ class CaseManager(models.Model):
         index=True,
         required=True
     )
+
+    case_score = fields.Float(
+        string='Risk Score',
+        digits=(10, 2), )
 
     supervisors = fields.Many2many(
         'res.users',  # Assuming you are linking to the res.users model
@@ -138,7 +143,7 @@ class CaseManager(models.Model):
         compute='_compute_can_close_case',
         store=False
     )
-    
+
     close_remarks = fields.Text(
         string='Closure Remarks',
         tracking=True,
@@ -151,7 +156,7 @@ class CaseManager(models.Model):
         compute='_compute_show_closure_fields',
         store=False
     )
-    
+
     overdue_alert_message = fields.Html(
         string="Overdue Alert",
         compute="_compute_overdue_alert_message",
@@ -178,19 +183,22 @@ class CaseManager(models.Model):
             else:
                 record.document_url = False
 
-    @api.model
-    def create(self, vals):
-        if vals.get('case_ref', 'New') == 'New':
-            vals['case_ref'] = self.env['ir.sequence'].next_by_code(
-                'case.manager')
-            if not vals['case_ref']:
-                raise ValueError(
-                    "Sequence 'case.manager' is not configured correctly.")
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Create a new case record"""
+        for vals in vals_list:            
+            if vals.get('case_ref', 'New') == 'New':
+                vals['case_ref'] = self.env['ir.sequence'].next_by_code(
+                    'case.manager')
+                if not vals['case_ref']:
+                    raise ValueError(
+                        "Sequence 'case.manager' is not configured correctly.")
 
-        record = super(CaseManager, self).create(vals)
-        record._send_case_creation_alert()
-        return record
+        result = super().create(vals_list)
 
+        return result
+
+    
     def write(self, vals):
         # Check if new_response has content and user is responsible
         if 'new_response' in vals and vals.get('new_response') and self.is_responsible and self.case_status != 'closed':
@@ -205,8 +213,10 @@ class CaseManager(models.Model):
             vals['new_response'] = False
             self._send_case_response_alert(response_content)
 
-        return super(CaseManager, self).write(vals)
+        result= super(CaseManager, self).write(vals)
 
+        return result
+    
     def action_view_document(self):
         self.ensure_one()
         if not self.document:
@@ -261,14 +271,23 @@ class CaseManager(models.Model):
         self.ensure_one()
         if not self.response_ids:
             raise UserError("Cannot close case without any responses.")
-        
+
         if self.create_uid.id == self.env.user.id:
-            if not self.close_remarks:
+            if not self.close_remarks or not self.close_remarks.strip():
                 raise UserError(
                     "Closure remarks are required when closing a case.")
 
         self.case_status = 'closed'
         self._send_case_closure_alert()
+
+        return True
+
+    def action_open_case(self):
+        """Open a the case - only available when case is in draft"""
+        self.ensure_one()
+
+        self.case_status = 'open'
+        self._send_case_creation_alert()
 
         return True
 
@@ -322,9 +341,7 @@ class CaseManager(models.Model):
             record_url = f"{base_url}/web#id={self.id}&action={action.id}&model=case.manager&view_type=form"
         except Exception as e:
             _logger.warning(f"Could not get action reference: {e}")
-            record_url = f"{base_url}/web#id={self.id}&model=res.partner.screening.result&view_type=form"
-
-        
+            # record_url = f"{base_url}/web#id={self.id}&model=res.partner.screening.result&view_type=form"
 
         # Prepare email values
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -336,6 +353,7 @@ class CaseManager(models.Model):
             'department_id': self.department_id.name if self.department_id else '',
             'case_rating': self.case_rating,
             'case_status': self.case_status,
+            'case_score': self.case_score,
             'exception_category': self.process_category.name if self.process_category else '',
             'exception_process': self.process.name if self.process else '',
             'case_action': self.cases_action,
@@ -347,6 +365,14 @@ class CaseManager(models.Model):
         }
 
         # Prepare mail values - to officer responsible, CC creator & supervisors
+        if not self.officer_responsible or not self.officer_responsible.email:
+            _logger.warning(
+                f"Officer responsible {self.officer_responsible.name} has no email address")
+
+            raise UserError(
+                _("Officer responsible {self.officer_responsible.name} has no email address"))
+
+        # Prepare mail values - to officer responsible, CC creator & supervisors
         mail_values = {
             'email_to': self.officer_responsible.email,
             'email_cc': '',
@@ -354,15 +380,22 @@ class CaseManager(models.Model):
             'attachment_ids': []
         }
 
-        # Add creator to CC if not the officer responsible
+        # Add creator to CC if not the officer responsible and has email
         cc_emails = []
-        if self.create_uid.id != self.officer_responsible.id:
+        if (self.create_uid and
+            self.create_uid.id != self.officer_responsible.id and
+                self.create_uid.email):  # Check all conditions before append
             cc_emails.append(self.create_uid.email)
 
         # Add supervisors to CC
         for supervisor in self.supervisors:
-            if supervisor.id != self.officer_responsible.id and supervisor.email not in cc_emails:
+            if (supervisor.id != self.officer_responsible.id and
+                supervisor.email and  # Check email exists and is not False
+                    supervisor.email not in cc_emails):
                 cc_emails.append(supervisor.email)
+
+        # Filter out any False/None values just in case
+        cc_emails = [email for email in cc_emails if email]
 
         if cc_emails:
             mail_values['email_cc'] = ','.join(cc_emails)
@@ -451,6 +484,7 @@ class CaseManager(models.Model):
             'process': self.process.name if self.process else '',
             'case_action': self.cases_action,
             'response': response_content,
+            'case_score': self.case_score,
             'creator_name': creator.name,
             'creator_email': creator.email,
             'responder_name': responder.name,
@@ -469,11 +503,22 @@ class CaseManager(models.Model):
 
         }
 
-        # Add supervisors to CC
+        # Add creator to CC if not the officer responsible and has email
         cc_emails = []
+        if (self.create_uid and
+            self.create_uid.id != self.officer_responsible.id and
+                self.create_uid.email):  # Check all conditions before append
+            cc_emails.append(self.create_uid.email)
+
+        # Add supervisors to CC
         for supervisor in self.supervisors:
-            if supervisor.id != creator.id and supervisor.email not in cc_emails:
+            if (supervisor.id != self.officer_responsible.id and
+                supervisor.email and  # Check email exists and is not False
+                    supervisor.email not in cc_emails):
                 cc_emails.append(supervisor.email)
+
+        # Filter out any False/None values just in case
+        cc_emails = [email for email in cc_emails if email]
 
         if cc_emails:
             mail_values['email_cc'] = ','.join(cc_emails)
@@ -508,7 +553,8 @@ class CaseManager(models.Model):
         self.ensure_one()
 
         # Get email template
-        template = self.env.ref('case_management_v2.case_closure_alert_template')
+        template = self.env.ref(
+            'case_management_v2.case_closure_alert_template')
         if not template:
             return
 
@@ -537,10 +583,8 @@ class CaseManager(models.Model):
             _logger.warning(f"Could not get action reference: {e}")
             record_url = f"{base_url}/web#id={self.id}&model=case.manager&view_type=form"
 
-
         # Prepare email values
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
 
         # Prepare email values
         ctx = {
@@ -553,12 +597,14 @@ class CaseManager(models.Model):
             'process': self.process.name if self.process else '',
             'creator_name': creator.name,
             'creator_email': creator.email,
+            'case_score': self.case_score,
             'user_name': closer.name,
             'user_email': closer.email,
             'close_remarks': self.close_remarks,
             'record_url': record_url,
             'datetime': current_time,
-            'company_logo': self.get_company_logo(base_url),  # Safe logo getter
+            # Safe logo getter
+            'company_logo': self.get_company_logo(base_url),
 
         }
 
@@ -570,18 +616,26 @@ class CaseManager(models.Model):
 
         }
 
-        # Add creator to CC if not the officer responsible
+        # Add creator to CC if not the officer responsible and has email
         cc_emails = []
-        if creator.id != self.officer_responsible.id:
+        if (creator and
+            creator.id != self.officer_responsible.id and
+                creator.email):  # Check all conditions before append
             cc_emails.append(creator.email)
 
         # Add supervisors to CC
         for supervisor in self.supervisors:
-            if supervisor.id != self.officer_responsible.id and supervisor.email not in cc_emails:
+            if (supervisor.id != self.officer_responsible.id and
+                supervisor.email and  # Check email exists and is not False
+                    supervisor.email not in cc_emails):
                 cc_emails.append(supervisor.email)
+
+        # Filter out any False/None values just in case
+        cc_emails = [email for email in cc_emails if email]
 
         if cc_emails:
             mail_values['email_cc'] = ','.join(cc_emails)
+            # ---------
 
         # Render the email content
         template_id = template.with_context(**ctx)
@@ -632,7 +686,7 @@ class CaseManager(models.Model):
                     'last_checked': fields.Datetime.now()
                 })
 
-    def get_company_logo(self,base_url):
+    def get_company_logo(self, base_url):
         company = self.env.user.company_id
         logo_url = f"{base_url}/web/image/res.company/{company.id}/logo_web"
         return logo_url
@@ -660,9 +714,8 @@ class CaseManager(models.Model):
         if not setting or not setting.date_val or not setting.date_unit:
             _logger.error(
                 "Case overdue period setting not found or incomplete using default")
-            setting.date_val= 48
-            setting.date_unit='hours'
-            
+            setting.date_val = 48
+            setting.date_unit = 'hours'
 
         # Calculate the cutoff date
         time_delta = self._calculate_time_delta(
@@ -741,8 +794,9 @@ class CaseManager(models.Model):
             return relativedelta(years=value)
         else:
             return relativedelta(days=0)
-        
-    @api.model
+
+    # @api.model
+    @api.depends('event_date')
     def _compute_overdue_alert_message(self):
         setting = self.env['case.settings'].search(
             [('code', '=', 'case_overdue_period')], limit=1)
@@ -763,15 +817,61 @@ class CaseManager(models.Model):
             # Fallback message if setting not found
             message = """
                 <div class="alert alert-info" role="alert">
-                    All cases opened will become overdue after 48 hours!
                     All opened cases not responded to after 48 hours will become overdue!
                 </div>
             """
 
         for record in self:
             record.overdue_alert_message = message
+
+    
+    @api.onchange('case_rating')
+    def _onchange_case_rating(self):
+        """Update case_score when case_rating changes in the UI"""
+        _logger.info(
+            f"Onchange fired: case_rating={self.case_rating}, case_score={self.case_score}")
+
+        # Check if this case was created from customer form
+        from_customer = self.env.context.get('from_customer_form', False)
+
+        if from_customer and self.case_score:
+            _logger.info(
+                "Skipping onchange - case created from customer with existing score")
+            return
+
+        if not from_customer and self.case_score and self._origin.id:
+            _logger.info("Allowing onchange for existing record not from customer")
+
+        if not self.case_rating:
+            self.case_score = 0.0  # Explicitly set to 0 when no rating
+            return
+
+        # Update score based on rating
+        settings = self.env['case.settings']
+        try:
+            thresholds = {
+                'low': float(settings.get_setting('low_risk_threshold') or 3.9),
+                'medium': float(settings.get_setting('medium_risk_threshold') or 6.9),
+                'high': float(settings.get_setting('high_risk_threshold') or 9.0)
+            }
+
+            new_score = thresholds.get(self.case_rating, 0.0)
+            self.case_score = new_score
+
+            _logger.info(
+                f"Set case_score to {self.case_score} based on rating {self.case_rating}")
             
+            _logger.info(f"returned case score {new_score} ")
+
             
+        except Exception as e:
+            _logger.error(f"Error setting default case score: {e}")
+            
+
+           
+    
+    
+   
 class CaseResponse(models.Model):
     _name = 'case.response.'
     _description = 'Case Responses'
@@ -799,7 +899,7 @@ class CaseSettings(models.Model):
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string='Code', required=True, index=True)
     narration = fields.Text(string='Narration')
-    val = fields.Char(string='Narration')
+    val = fields.Char(string='Value')
     date_val = fields.Integer(string='Date Value')
     date_unit = fields.Selection(
         [

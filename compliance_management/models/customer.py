@@ -268,13 +268,21 @@ class Customer(models.Model):
         self.ensure_one()
         # Prepare action to open case form
         action = self.env.ref(
-            'case_management_v2.action_create_case').read()[0]
+            'case_management_v2.action_case_manager').read()[0]
+        
+        form_view = self.env.ref('case_management_v2.view_case_manager_form')
+        action['views'] = [(form_view.id, 'form')]
+        action['target'] = 'current'
+        action['flags'] = {'initial_mode': 'edit'}
 
         # Prepare default values from customer
         context = {
             'default_customer_id': self.id,
-            'default_case_status': 'open',
+            'default_case_status': 'draft',
+            'from_customer_form': True,
+
         }
+
 
         # Add customer rating if available
         if hasattr(self, 'risk_level'):
@@ -291,6 +299,9 @@ class Customer(models.Model):
         # Add risk level if available
         if hasattr(self, 'risk_level') and self.risk_level:
             context['default_case_rating'] = self.risk_level
+            
+        if hasattr(self, 'risk_score') and self.risk_score:
+            context['default_case_score'] = self.risk_score
 
         action['context'] = context
         return action

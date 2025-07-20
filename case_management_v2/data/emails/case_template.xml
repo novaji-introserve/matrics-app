@@ -75,6 +75,12 @@
                             </td>
                         </tr>
                         <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Risk Score:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                                <t t-esc="ctx.get('case_score')"/>
+                            </td>
+                        </tr>
+                        <tr>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Status:</td>
                             <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
                                 <t t-esc="ctx.get('case_status')" />
@@ -194,6 +200,12 @@
                     <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Severity:</td>
                     <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
                         <t t-esc="ctx.get('case_rating')"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Risk Score:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                        <t t-esc="ctx.get('case_score')"/>
                     </td>
                 </tr>
                 <tr>
@@ -321,6 +333,12 @@
                 <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Case Severity:</td>
                 <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
                     <t t-esc="ctx.get('case_rating')"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE; font-weight: bold;">Risk Score:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #EEEEEE;">
+                    <t t-esc="ctx.get('case_score')"/>
                 </td>
             </tr>
             <tr>
