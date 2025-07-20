@@ -14,6 +14,10 @@ export class CaseDashboard extends Component {
         value: 0,
         percentage: 0,
       },
+      draftCases: {
+        value: 0,
+        percentage: 0,
+      },
       openCases: {
         value: 0,
         percentage: 0,
@@ -48,6 +52,7 @@ export class CaseDashboard extends Component {
         // Execute these in parallel using Promise.all for better performance
         await Promise.all([
           this.getAllCases(),
+          this.getDraftCases(),
           this.getOpenCases(),
           this.getOverdueCases(),
           this.getClosedCases(),
@@ -100,6 +105,7 @@ export class CaseDashboard extends Component {
       // Execute these in parallel for better performance
       await Promise.all([
         this.getAllCases(),
+        this.getDraftCases(),
         this.getOpenCases(),
         this.getOverdueCases(),
         this.getClosedCases(),
@@ -128,14 +134,7 @@ export class CaseDashboard extends Component {
         domain.push(["create_date", ">", current_date]);
       }
 
-      // Define context to include inactive (archived) records
-      // const context = { active_test: false };
-
-      // // Pass the context to the searchCount method
-      // const data = await this.orm.searchCount("case.manager", domain, {
-      //   context,
-      // });
-      // this.state.allCases.value = data;
+     
       const context = {
         active_test: false,
         // Add additional performance optimization flags
@@ -178,6 +177,46 @@ export class CaseDashboard extends Component {
     }
   }
 
+  // Get Draft Cases
+  async getDraftCases() {
+    try {
+      const current_date = this.state.current_date;
+      const period = this.state.period;
+      const previous_date = this.state.previous_date;
+
+      // Apply base domain with case_status filter
+      const domain = this.getBaseDomain();
+      domain.push(["case_status", "=", "draft"]);
+
+      if (period > 0) {
+        domain.push(["create_date", ">", current_date]);
+      }
+
+      const data = await this.orm.searchCount("case.manager", domain);
+      this.state.draftCases.value = data;
+
+      // Apply base domain to previous period as well
+      const prev_domain = this.getBaseDomain();
+      prev_domain.push(["case_status", "=", "draft"]);
+
+      if (period > 0) {
+        prev_domain.push(
+          ["create_date", ">", previous_date],
+          ["create_date", "<=", current_date]
+        );
+      }
+
+      const prev_data = await this.orm.searchCount("case.manager", prev_domain);
+      const percentage = prev_data ? ((data - prev_data) / prev_data) * 100 : 0;
+      this.state.draftCases.percentage = isFinite(percentage)
+        ? percentage.toFixed(2)
+        : "0.00";
+    } catch (error) {
+      console.error("Error fetching draft cases:", error);
+      this.state.draftCases.value = 0;
+      this.state.draftCases.percentage = "0.00";
+    }
+  }
   // Get Open Cases
   async getOpenCases() {
     try {
@@ -371,6 +410,7 @@ export class CaseDashboard extends Component {
 
       // Initialize data structure with all possible statuses
       const statusCounts = {
+        draft: 0,
         open: 0,
         closed: 0,
         overdue: 0,
@@ -403,8 +443,9 @@ export class CaseDashboard extends Component {
       statusCounts.archived = archivedCount;
 
       // ALWAYS include all statuses in consistent order for the chart
-      const labels = ["Open", "Closed", "Overdue", "Archived"];
+      const labels = ["Draft","Open", "Closed", "Overdue", "Archived"];
       const counts = [
+        statusCounts.draft,
         statusCounts.open,
         statusCounts.closed,
         statusCounts.overdue,
@@ -415,6 +456,7 @@ export class CaseDashboard extends Component {
       console.log("Status counts:", statusCounts);
 
       const backgroundColors = [
+        "rgba(142, 142, 142, 0.7)", //  - Yellow
         "rgba(255,172,0,0.7)", //  - Yellow
         "rgba(40,167,69,0.7)", //  - Green
         "rgba(220,53,69,0.7)", //  - Red
@@ -422,6 +464,7 @@ export class CaseDashboard extends Component {
       ];
 
       const borderColors = [
+        "rgb(142, 142, 142)", //  - Yellow
         "rgb(255,172,0)", //  - Yellow
         "rgb(40,167,69)", //  - Green
         "rgb(220,53,69)", //  - Red
@@ -636,6 +679,9 @@ export class CaseDashboard extends Component {
     this.actionService.doAction("case_management_v2.action_case_manager");
   }
 
+  async viewDraftCases() {
+    this.actionService.doAction("case_management_v2.action_draft_cases");
+  }
   async viewOpenCases() {
     this.actionService.doAction("case_management_v2.action_open_cases");
   }
@@ -675,6 +721,7 @@ export class CaseDashboard extends Component {
     }
 
     const statusMap = {
+      Draft: "case_management_v2.action_draft_cases",
       Open: "case_management_v2.action_open_cases",
       Closed: "case_management_v2.action_closed_cases",
       Overdue: "case_management_v2.action_overdue_cases",

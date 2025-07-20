@@ -6,22 +6,24 @@
         <field name="name">case.manager.form</field>
         <field name="model">case.manager</field>
         <field name="arch" type="xml">
-            <form string="Case">
+            <form string="Case" duplicate="false">
                 <header>
+                    <button name="action_open_case" class="oe_highlight" string="Open Case" type="object" attrs="{'invisible': ['|', ('id', '=', False), ('case_status', '!=', 'draft')]}" confirm="Are you sure you want to open this case?"/>
+
                     <button name="action_close_case" class="oe_highlight" string="Close Case" type="object" attrs="{'invisible': [('can_close_case', '=', False)]}" confirm="Are you sure you want to close this case?"/>
 
 
                     <button name="action_archive_case" class="oe_highlight" string="Archive Case" type="object" attrs="{'invisible': [('case_status', '!=', 'closed')]}" confirm="Are you sure you want to archive this case?" />
 
-                    <field name="case_status" widget="statusbar" options="{'readonly': '1'}" statusbar_visible="open,closed,overdue,archived"/>
+                    <field name="case_status" widget="statusbar" options="{'readonly': '1'}" statusbar_visible="draft,open,closed,overdue,archived"/>
                 </header>
-
-
+                
+                <field name="overdue_alert_message" attrs="{'invisible': [('id', '!=', False)]}"/>
 
                 <div class="oe_title" style="margin-left:15px!important;margin-top:15px;" attrs="{'invisible': [('id', '=', False)]}">
-                    <h1>
+                    <h2>
                         <field name="case_ref" readonly="1" class="oe_inline"/>
-                    </h1>
+                    </h2>
                 </div>
 
 
@@ -32,19 +34,22 @@
 
                     <group>
                         <group>
-                            <field name="event_date" attrs="{'readonly': [('id', '!=', False)]}"/>
-                            <field name="officer_responsible" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
-                            <field name="department_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
-                            <field name="customer_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
-                            <field name="transaction_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
-                            <field name="case_rating" attrs="{'readonly': [('id', '!=', False)]}" decoration-success="case_rating == 'low'" decoration-danger="case_rating == 'high'" decoration-warning="case_rating == 'medium'" />
+                            <field name="event_date" attrs="{'readonly': [('case_status', '!=', 'draft')]}"/>
+                            <field name="officer_responsible" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('case_status', '!=', 'draft')]}"/>
+                            <field name="department_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': True}"/>
+                            <field name="customer_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
+                            <field name="transaction_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
+                            <field name="case_rating" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}" decoration-success="case_rating == 'low'" decoration-danger="case_rating == 'high'" decoration-warning="case_rating == 'medium'" />
                         </group>
                         <group>
-                            <field name="process_category" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [('id', '!=', False)]}"/>
-                            <field name="process" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [('id', '!=', False)]}"/>
-                            <field name="supervisors" widget="many2many_tags" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="process_category" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [('case_status', '!=', 'draft')]}"/>
+                            <field name="process" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
+                            <field name="supervisors" widget="many2many_tags" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
                             <field name="create_uid" readonly="1" string="Created By"/>
                             <field name="create_date" readonly="1" string="Created On"/>
+                            <!-- <field name="case_score" widget="risk_slider" options="{'step': 1, 'show_value': true, 'reverse_colors': false, 'readonly': True}"  attrs="{'invisible': ['|' ('transaction_id', '=', False),('customer_id', '=', False)]}"  /> -->
+                            <field name="case_score" widget="risk_slider" options="{'step': 1, 'show_value': true, 'reverse_colors': false}" attrs="{'readonly': [('case_status', '!=', 'draft')]}"  />
+
                         </group>
                     </group>
 
@@ -52,20 +57,21 @@
 
                     <group string="Case Closure" attrs="{'invisible': [('show_closure_fields', '=', False)]}">
                         <field name="show_closure_fields" invisible="1"/>
-                        <field name="close_remarks" attrs="{'required': [('show_closure_fields', '=', True)]}"/>
+                        <field name="close_remarks" />
+                        <!-- <field name="close_remarks" attrs="{'required': [('show_closure_fields', '=', True)]}"/> -->
                     </group>
 
                     <notebook>
                         <page string="Case Details">
                             <group>
-                                <field name="cases_action" placeholder="Specify the required action..." attrs="{'readonly': [('id', '!=', False)]}"/>
-                                <field name="narration" placeholder="Enter brief narration about the case..." attrs="{'readonly': [('id', '!=', False)]}"/>
-                                <field name="description" placeholder="Enter detailed description..." attrs="{'readonly': [('id', '!=', False)]}"/>
+                                <field name="cases_action" placeholder="Specify the required action..." attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
+                                <field name="narration" placeholder="Enter brief narration about the case..." attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
+                                <field name="description" placeholder="Enter detailed description..." attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
                             </group>
                         </page>
                         <page string="Documentation" name="document_page">
                             <group>
-                                <field name="document" filename="document_filename" attrs="{'readonly': [('id', '!=', False)]}"/>
+                                <field name="document" filename="document_filename" attrs="{'readonly': [('case_status', '!=', 'draft')]}"/>
                                 <field name="document_filename" invisible="1"/>
                                 <field name="document_url" invisible="1"/>
                                 <div attrs="{'invisible': [('document', '=', False)]}">
@@ -76,7 +82,7 @@
                                 </div>
                             </group>
                         </page>
-                        <page string="Responses" name="responses_page" attrs="{'invisible': [('id', '=', False)]}">
+                        <page string="Responses" name="responses_page" attrs="{'invisible': ['|', ('id', '=', False), ('case_status', '=', 'draft')]}">
                             <!-- Display existing responses in read-only mode -->
                             <field name="response_ids" readonly="1">
                                 <tree>
@@ -96,15 +102,11 @@
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <!-- <field name="message_follower_ids" widget="mail_followers"/> -->
                     <field name="activity_ids" widget="mail_activity"/>
                     <field name="message_ids" widget="mail_thread"/>
                 </div>
-                <!-- Add footer with action buttons for new records -->
-                <footer attrs="{'invisible': [('id', '!=', False)]}">
-                    <button string="Create" type="object" name="action_save_and_stay" class="btn-primary"/>
-                    <button string="Cancel" special="cancel" class="btn-secondary"/>
-                </footer>
+                
             </form>
         </field>
     </record>
@@ -117,14 +119,14 @@
         <field name="name">case.manager.tree</field>
         <field name="model">case.manager</field>
         <field name="arch" type="xml">
-            <tree string="Cases" create="false">
+            <tree string="Cases" create="true" duplicate="false">
                 <field name="case_ref" />
-                <field name="create_date" string="Created On"/>
-                <field name="event_date"/>
                 <field name="process"/>
                 <field name="officer_responsible"/>
                 <field name="case_rating" widget="badge" decoration-success="case_rating == 'low'" decoration-danger="case_rating == 'high'" decoration-warning="case_rating == 'medium'" />
-                <field name="case_status" widget="badge" decoration-success="case_status == 'closed'" decoration-danger="case_status == 'overdue'" decoration-info="case_status == 'open'" decoration-muted="case_status == 'archived'"/>
+                <field name="case_status" widget="badge" decoration-muted="case_status == 'draft'" decoration-success="case_status == 'closed'" decoration-danger="case_status == 'overdue'" decoration-info="case_status == 'open'" decoration-warning="case_status == 'archived'"/>
+                <field name="event_date"/>
+                <field name="create_date" string="Created On"/>
             </tree>
         </field>
     </record>

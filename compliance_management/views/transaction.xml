@@ -57,6 +57,9 @@
                             <span>Risk <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" />
                             </span>
                         </button>
+                        <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
+                            <field string="Risk Score" name="risk_score" widget="statinfo"/>
+                        </button>
                     </div>
 
                     <div class="oe_title">

@@ -32,12 +32,12 @@
                             <field name="code" attrs="{'readonly': [('id', '!=', False)]}"/>
                         </group>
                         <group>
+                            <field name="val" />
+                        </group>
+                        <group>
                             <field name="date_val" />
 
                             <field name="date_unit" />
-                        </group>
-                        <group>
-                            <field name="val" />
                         </group>
                     </group>
                     <notebook>

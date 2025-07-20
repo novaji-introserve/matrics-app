@@ -30,8 +30,14 @@ class Transaction(models.Model):
     batch_code = fields.Char(string='Batch Code', index=True)
     rule_id = fields.Many2one(comodel_name='res.transaction.screening.rule',
                               string='Exception Rule', tracking=True, index=True)
-    risk_level = fields.Selection(string='Risk Level', selection=[(
-        'low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='low', tracking=True)
+    # risk_level = fields.Selection(string='Risk Level', selection=[(
+    #     'low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='low', tracking=True)
+    
+    risk_score = fields.Float(string='Risk Score', digits=(
+        10, 2), related="customer_id.risk_score")
+    risk_level = fields.Char(string='Risk Rating',
+                             related="customer_id.risk_level")
+    
     state = fields.Selection(string='Status', selection=[(
         'new', 'To Review'), ('done', 'Done')], tracking=True, index=True, default='new')
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
@@ -61,12 +67,17 @@ class Transaction(models.Model):
         self.ensure_one()
         # Prepare action to open case form
         action = self.env.ref(
-            'case_management_v2.action_create_case').read()[0]
+            'case_management_v2.action_case_manager').read()[0]
 
-        # Prepare default values from transaction
+        form_view = self.env.ref('case_management_v2.view_case_manager_form')
+        action['views'] = [(form_view.id, 'form')]
+        action['target'] = 'current'
+        action['flags'] = {'initial_mode': 'edit'}
+
+        # Prepare default values from customer
         context = {
-            'default_case_status': 'open',
-            'default_transaction_id': self.id,
+            'default_customer_id': self.id,
+            'default_case_status': 'draft',
         }
 
         # Add customer if available
@@ -76,6 +87,9 @@ class Transaction(models.Model):
         # Set risk level
         if self.risk_level:
             context['default_case_rating'] = self.risk_level
+            
+        if self.risk_score:
+            context['default_case_score'] = self.risk_score
 
         # Add transaction details to narration
         narration = f"Transaction Reference: {self.name or ''}\n"
@@ -293,3 +307,6 @@ class Transaction(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
+
+    def get_risk_score(self):
+        return self.risk_score

@@ -19,4 +19,29 @@
         </field>
     </record>
 
+    <record id="res_settings_low_risk_threshold" model="case.settings">
+        <field name="name">Low Risk Threshold</field>
+        <field name="code">low_risk_threshold</field>
+        <field name="val">3.9</field>
+        <field name="narration">Low Risk Threshold</field>
+    </record>
+    <record id="res_settings_medium_risk_threshold" model="case.settings">
+        <field name="name">Medium Risk Threshold</field>
+        <field name="code">medium_risk_threshold</field>
+        <field name="val">6.9</field>
+        <field name="narration">Medium Risk Threshold</field>
+    </record>
+    <record id="res_settings_high_risk_threshold" model="case.settings">
+        <field name="name">High Risk Threshold</field>
+        <field name="code">high_risk_threshold</field>
+        <field name="val">9</field>
+        <field name="narration">High Risk Threshold</field>
+    </record>
+    <record id="res_settings_max_risk_score" model="case.settings">
+        <field name="name">Maximum Risk Threshold</field>
+        <field name="code">maximum_risk_threshold</field>
+        <field name="val">9</field>
+        <field name="narration">Maximum Risk Threshold</field>
+    </record>
+
 </odoo>
