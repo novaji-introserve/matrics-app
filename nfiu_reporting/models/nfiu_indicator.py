@@ -9,10 +9,14 @@ from datetime import datetime, timedelta
 class NFIUIndicator(models.Model):
     _name = 'nfiu.indicator'
 <<<<<<< HEAD
+<<<<<<< HEAD
     _description = 'Report Indicator'
 =======
     _description = 'NFIU Report Indicator'
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+    _description = 'Report Indicator'
+>>>>>>> b75258c (Suspicious Transaction history)
     _inherit = ['mail.thread', 'mail.activity.mixin']
     name = fields.Char(string='Indicator Name', required=True,tracking=True)
     code = fields.Char(string='Indicator Code', required=True,tracking=True)

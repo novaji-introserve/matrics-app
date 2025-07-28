@@ -9,10 +9,14 @@ from datetime import datetime, timedelta
 class NFIUAddress(models.Model):
     _name = 'nfiu.address'
 <<<<<<< HEAD
+<<<<<<< HEAD
     _description = 'Address'
 =======
     _description = 'NFIU Address'
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+    _description = 'Address'
+>>>>>>> b75258c (Suspicious Transaction history)
     
     name = fields.Char(string='Name',required=True)
     person_id = fields.Many2one('nfiu.person', string='Person')

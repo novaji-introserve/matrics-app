@@ -46,10 +46,14 @@ def report_transactions():
                     'transmode_code': 'E',
                     'transmode_comment': t.narration,
 <<<<<<< HEAD
+<<<<<<< HEAD
                     'amount_local': abs(t.amount),
 =======
                     'amount_local': t.amount,
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+                    'amount_local': abs(t.amount),
+>>>>>>> b75258c (Suspicious Transaction history)
                     'from_funds_comment': t.narration,
                     'to_funds_comment': t.narration,
                     'comments': t.narration

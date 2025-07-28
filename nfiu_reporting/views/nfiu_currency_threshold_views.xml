@@ -9,9 +9,13 @@
                 <tree>
                     <field name="name" />
 <<<<<<< HEAD
+<<<<<<< HEAD
                     <field name="shortname"/>
 =======
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+                    <field name="shortname"/>
+>>>>>>> b75258c (Suspicious Transaction history)
                     <field name="currency_id" />
                     <field name="threshold" />
                     <field name="write_uid" />
@@ -38,10 +42,14 @@
                             <group>
                                 <field name="currency_id" />
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 <field name="shortname"/>
 =======
                                 
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+                                <field name="shortname"/>
+>>>>>>> b75258c (Suspicious Transaction history)
                             </group>
                             <group>
                                 <field name="threshold" />

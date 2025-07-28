@@ -10,15 +10,21 @@
           decoration-danger="state=='error'">
           <field name="name" />
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b75258c (Suspicious Transaction history)
           <field name="entity_id" />
           <field name="report_code" />
           <field name="submission_date" />
           <field name="date_from" />
           <field name="date_to" />
+<<<<<<< HEAD
 =======
           <field name="report_code" />
           <field name="submission_date" />
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+>>>>>>> b75258c (Suspicious Transaction history)
           <field name="currency_code_local" />
           <field name="state" widget="badge" decoration-danger="state == 'error'" decoration-warning="state in ['generated']" decoration-success="state in ['validated','submitted']" />
           <button name="generate_xml" type="object" string="Generate XML" icon="fa-file-code-o"
@@ -37,6 +43,7 @@
         <form>
           <header>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <button name="generate_xml" type="object" string="Generate XML" class="btn-info" />
             <button name="set_generated" type="object" string="Set To Generated" class="btn-info"
 =======
@@ -44,6 +51,10 @@
               attrs="{'invisible': [('state', 'not in', ['draft'])]}" />
             <button name="set_generated" type="object" string="Set To Generated" class="btn-primary"
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+            <button name="generate_xml" type="object" string="Generate XML" class="btn-info" />
+            <button name="set_generated" type="object" string="Set To Generated" class="btn-info"
+>>>>>>> b75258c (Suspicious Transaction history)
               attrs="{'invisible': [('state', 'in', ['generated'])]}" />
             <button name="validate_xml" type="object" string="Validate XML" class="btn-success"
               attrs="{'invisible': [('state', 'not in', ['generated'])]}" />
@@ -59,12 +70,18 @@
                 <field name="name" placeholder="Report Name" />
               </h1>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b75258c (Suspicious Transaction history)
               <label for="entity_id" class="oe_edit_only" />
               <h1>
                 <field name="entity_id"/>
               </h1>
+<<<<<<< HEAD
 =======
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+>>>>>>> b75258c (Suspicious Transaction history)
             </div>
 
             <group>
@@ -78,10 +95,15 @@
               </group>
               <group>
 <<<<<<< HEAD
+<<<<<<< HEAD
                 <field name="date_from" />
                 <field name="date_to" />
 =======
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+                <field name="date_from" />
+                <field name="date_to" />
+>>>>>>> b75258c (Suspicious Transaction history)
                 <field name="submission_date" />
                 <field name="currency_code_local" />
                 <field name="reporting_person_id" />
@@ -164,14 +186,19 @@
     <!-- Action for NFIU Reports -->
     <record id="action_nfiu_report" model="ir.actions.act_window">
 <<<<<<< HEAD
+<<<<<<< HEAD
       <field name="name">Financial Intelligence Reports</field>
 =======
       <field name="name">NFIU Reports</field>
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+      <field name="name">Financial Intelligence Reports</field>
+>>>>>>> b75258c (Suspicious Transaction history)
       <field name="res_model">nfiu.report</field>
       <field name="view_mode">tree,form</field>
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
+<<<<<<< HEAD
 <<<<<<< HEAD
           Create a new Report
         </p>
@@ -184,6 +211,12 @@
           Generate XML reports compliant with NFIU goAML schema for financial intelligence
           reporting.
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+          Create a new Report
+        </p>
+        <p>
+          Generate XML reports for financial intelligence reporting.
+>>>>>>> b75258c (Suspicious Transaction history)
         </p>
       </field>
     </record>

@@ -39,9 +39,13 @@ def create_currency_thresholds():
                 'currency_id': rec.id,
                 'threshold': 25.00 if rec.name == 'NGN' else 1.00
 <<<<<<< HEAD
+<<<<<<< HEAD
                 'shortname': rec.name[:2].upper(),
 =======
 >>>>>>> 816be76 (XML Schema Validator)
+=======
+                'shortname': rec.name[:2].upper(),
+>>>>>>> b75258c (Suspicious Transaction history)
             })
             print(f"Created account: {rec.name} with ID: {new_rec}")
             tot_created+=1
