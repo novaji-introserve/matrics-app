@@ -22,6 +22,7 @@ class ResConfigSettings(models.TransientModel):
         selection=[
             ('normal', 'Normal'),
             ('sided', 'Sided'),
+            ('bottom', 'Bottom'),
         ],
         string="Default Chatter Position")
     

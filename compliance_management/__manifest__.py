@@ -80,7 +80,7 @@
         # product service demo data
         "demo/product_service_data/01_product_service_subject.xml",
         'demo/product_service_data/02_product_service_assessments.xml',
-        'demo/product_service_data/03_product_plans.xml',
+        'demo/product_service_data/03_sterling_product_risk_plan.xml',
 
         "data/demo_data/risk_assessment/compliance_history.xml",
         "data/demo_data/risk_assessment/data_quality.xml",

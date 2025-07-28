@@ -1276,21 +1276,7 @@ class Customer(models.Model):
             new_ctx = dict(self.env.context, computing_risk=True)
             self = self.with_context(new_ctx)
 
-            # # Update risk score and level for all records
-            # for record in self:
-            #     score = record._get_risk_score_from_plan()
-            #     risk_level = record.compute_risk_level()
-
-            #     # Use direct SQL update to avoid triggering write() again
-            #     self.env.cr.execute(
-            #         """UPDATE %s SET risk_score = %%s, risk_level = %%s
-            #         WHERE id = %%s""" % self._table,
-            #         (score, risk_level, record.id)
-            #     )
-
-            #     # Invalidate cache for these fields
-            #     record.invalidate_recordset(['risk_score', 'risk_level'])
-            # record.invalidate_cache(['risk_score', 'risk_level'])
+            
 
         return result
 

@@ -8,26 +8,28 @@
         <field name="arch" type="xml">
             <form string="Case" duplicate="false">
                 <header>
-                    <button name="action_open_case" class="oe_highlight" string="Open Case" type="object" attrs="{'invisible': ['|', ('id', '=', False), ('case_status', '!=', 'draft')]}" confirm="Are you sure you want to open this case?"/>
+                    <button name="action_open_case" class="btn btn-success" string="Open Case" type="object" attrs="{'invisible': ['|', ('id', '=', False), ('case_status', '!=', 'draft')]}" confirm="Are you sure you want to open this case?"/>
 
-                    <button name="action_close_case" class="oe_highlight" string="Close Case" type="object" attrs="{'invisible': [('can_close_case', '=', False)]}" confirm="Are you sure you want to close this case?"/>
+                    <button name="action_close_case" class="btn btn-primary" string="Close Case" type="object" attrs="{'invisible': [('can_close_case', '=', False)]}" confirm="Are you sure you want to close this case?"/>
 
 
-                    <button name="action_archive_case" class="oe_highlight" string="Archive Case" type="object" attrs="{'invisible': [('case_status', '!=', 'closed')]}" confirm="Are you sure you want to archive this case?" />
+                    <button name="action_archive_case" class="btn btn-info" string="Archive Case" type="object" attrs="{'invisible': [('case_status', '!=', 'closed')]}" confirm="Are you sure you want to archive this case?" />
 
                     <field name="case_status" widget="statusbar" options="{'readonly': '1'}" statusbar_visible="draft,open,closed,overdue,archived"/>
                 </header>
                 
                 <field name="overdue_alert_message" attrs="{'invisible': [('id', '!=', False)]}"/>
 
-                <div class="oe_title" style="margin-left:15px!important;margin-top:15px;" attrs="{'invisible': [('id', '=', False)]}">
-                    <h2>
-                        <field name="case_ref" readonly="1" class="oe_inline"/>
-                    </h2>
-                </div>
-
-
+                
+                
                 <sheet>
+
+                    <div class="oe_title" attrs="{'invisible': [('id', '=', False)]}">
+                        <h1>
+                            <field name="case_ref" readonly="1" class="oe_inline"/>
+                        </h1>
+                    </div>
+
                     <field name="is_responsible" invisible="1"/>
                     <field name="id" invisible="1"/>
                     <field name="can_close_case" invisible="1"/>
@@ -42,7 +44,7 @@
                             <field name="case_rating" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}" decoration-success="case_rating == 'low'" decoration-danger="case_rating == 'high'" decoration-warning="case_rating == 'medium'" />
                         </group>
                         <group>
-                            <field name="process_category" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [('case_status', '!=', 'draft')]}"/>
+                            <field name="process_category" sting='Exception Category' options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [('case_status', '!=', 'draft')]}"/>
                             <field name="process" options="{'no_open': False, 'no_create': False}" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
                             <field name="supervisors" widget="many2many_tags" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
                             <field name="create_uid" readonly="1" string="Created By"/>

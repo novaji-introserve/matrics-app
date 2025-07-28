@@ -29,9 +29,9 @@
     <!-- <record id="action_create_case" model="ir.actions.act_window">
         <field name="name">Create Case</field>
         <field name="res_model">case.manager</field>
-        <field name="view_mode">tree,form</field>
-        <field name="target">new</field>       
-        <field name="context">{'default_case_status': 'draft'}</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>       
+        <field name="context">{}</field>
         <field name="view_id" ref="view_case_manager_form"/>
     </record> -->
 
@@ -49,7 +49,7 @@
         ('supervisors', 'in', [uid])
                ]
         </field>
-        <field name="context">{'search_default_draft_cases': 1}</field>
+        <field name="context">{'search_default_draft_cases': 1,'create': False}</field>
     </record>
 
     <!-- Action for Open Cases -->
@@ -66,7 +66,7 @@
         ('supervisors', 'in', [uid])
                ]
         </field>
-        <field name="context">{'search_default_open_cases': 1}</field>
+        <field name="context">{'search_default_open_cases': 1,'create': False}</field>
     </record>
 
     <!-- Action for Closed Cases -->
@@ -83,7 +83,7 @@
             ('supervisors', 'in', [uid])
         ]
         </field>
-        <field name="context">{'search_default_closed_cases': 1}</field>
+        <field name="context">{'search_default_closed_cases': 1,'create': False}</field>
     </record>
 
     <!-- Action for Overdue Cases -->
@@ -100,7 +100,7 @@
             ('supervisors', 'in', [uid])
         ]</field>
 
-        <field name="context">{'search_default_overdue_cases': 1}</field>
+        <field name="context">{'search_default_overdue_cases': 1,'create': False}</field>
     </record>
 
     <record id="action_archived_cases" model="ir.actions.act_window">
@@ -117,7 +117,7 @@
             ('officer_responsible', '=', uid),
             ('supervisors', 'in', [uid])
         ]</field>
-        <field name="context">{'search_default_archived_cases': 1, 'active_test': False}</field>
+        <field name="context">{'search_default_archived_cases': 1, 'active_test': False,'create': False}</field>
     </record>
 
     <!-- Action for My Cases -->
@@ -126,7 +126,7 @@
         <field name="res_model">case.manager</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('officer_responsible', '=', uid)]</field>
-        <field name="context">{'search_default_my_cases': 1}</field>
+        <field name="context">{'search_default_my_cases': 1,'create': False}</field>
     </record>
 
     <!-- Action for Cases Created By Me -->
@@ -135,7 +135,7 @@
         <field name="res_model">case.manager</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('create_uid', '=', uid)]</field>
-        <field name="context">{'search_default_created_by_me': 1}</field>
+        <field name="context">{'search_default_created_by_me': 1,'create': False}</field>
     </record>
     
 
@@ -210,9 +210,9 @@
     <menuitem id="menu_case_management" name="Cases" parent="menu_case_management_root" sequence="10"/>
 
     <!-- Create Case Menu -->
-    <!-- <menuitem id="menu_create_case" name="Create Case" parent="menu_case_management" action="action_create_case" sequence="10"/> -->
+    <!-- <menuitem id="menu_create_case" name="Create Case" parent="menu_case_management" action="action_create_case" sequence="2"/> -->
 
-    <!-- All Cases Menu -->
+    <!-- All Cases Menu / Create Case -->
     <menuitem id="menu_all_cases" name="My Cases" parent="menu_case_management" action="action_case_manager" sequence="8"/>
 
     <!-- My Cases Menu -->
