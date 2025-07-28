@@ -24,7 +24,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','compliance_management','regulatory_reports'],
+    'depends': ['base','compliance_management','regulatory_reports','hr'],
 
     # always loaded
     'data': [

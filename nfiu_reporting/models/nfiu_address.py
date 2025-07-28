@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 class NFIUAddress(models.Model):
     _name = 'nfiu.address'
-    _description = 'NFIU Address'
+    _description = 'Address'
     
     name = fields.Char(string='Name',required=True)
     person_id = fields.Many2one('nfiu.person', string='Person')

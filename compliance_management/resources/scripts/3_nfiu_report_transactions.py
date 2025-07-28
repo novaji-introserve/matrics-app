@@ -45,7 +45,7 @@ def report_transactions():
                     'authorized': 'SYSTEM',
                     'transmode_code': 'E',
                     'transmode_comment': t.narration,
-                    'amount_local': t.amount,
+                    'amount_local': abs(t.amount),
                     'from_funds_comment': t.narration,
                     'to_funds_comment': t.narration,
                     'comments': t.narration

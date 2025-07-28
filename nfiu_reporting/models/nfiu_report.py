@@ -11,13 +11,14 @@ REPORTING_DAYS_PAST = 1095
 
 class NFIUReport(models.Model):
     _name = 'nfiu.report'
-    _description = 'NFIU Report'
+    _description = 'Financial Intelligence Report'
     _order = 'submission_date desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string='Report Name', required=True)
-    rentity_id = fields.Integer(string='Reporting Entity ID', required=True,tracking=True)
-    rentity_branch = fields.Char(string='Reporting Entity Branch', size=255,tracking=True)
+    entity_id = fields.Many2one(comodel_name='nfiu.entity', string='Reporting Entity', required=True, tracking=True)
+    rentity_id = fields.Integer(string='Reporting Entity ID', related='entity_id.identification_id',required=True,tracking=True)
+    rentity_branch = fields.Char(string='Reporting Entity Branch',related='entity_id.branch_id.name',size=255,tracking=True)
     submission_code = fields.Selection([
         ('E', 'Electronic'),
         ('M', 'Manual')
@@ -35,8 +36,8 @@ class NFIUReport(models.Model):
         ('UTR', 'Unusual Transaction Report'),
     ], string='Report Code', required=True,tracking=True)
     
-    entity_reference = fields.Char(string='Entity Reference', size=255,tracking=True)
-    fiu_ref_number = fields.Char(string='FIU Reference Number', size=255,tracking=True)
+    entity_reference = fields.Char(string='Entity Reference',related='entity_id.entity_reference', size=255,tracking=True)
+    fiu_ref_number = fields.Char(string='FIU Reference Number',related='entity_id.fiu_reference', size=255,tracking=True)
     submission_date = fields.Datetime(string='Submission Date', required=True, default=fields.Datetime.now)
     currency_code_local = fields.Selection([
         ('NGN', 'Naira'),
@@ -45,7 +46,7 @@ class NFIUReport(models.Model):
         ('GBP', 'British Pound'),
         ('CAD', 'Canadian Dollars'),
         ('CNY', 'Chinese Yen'),
-    ], string='Local Currency Code', required=True, default='NGN',tracking=True)
+    ], string='Reporting Currency', required=True, default='NGN',tracking=True)
     
     reason = fields.Text(string='Reason', size=4000)
     action = fields.Text(string='Action', size=4000)
@@ -58,7 +59,7 @@ class NFIUReport(models.Model):
     #transaction_ids = fields.One2many('nfiu.transaction', 'report_id', string='Transactions')
     
     # Report indicators
-    indicator_ids = fields.Many2many('nfiu.indicator', string='Report Indicators',tracking=True)
+    indicator_ids = fields.Many2many('nfiu.indicator', string='Report Indicators',required=True,tracking=True)
     
     # XML generation
     xml_content = fields.Text(string='Generated XML')
@@ -72,7 +73,10 @@ class NFIUReport(models.Model):
         ('submitted', 'Submitted'),
         ('error', 'Error')
     ], string='State', default='draft',tracking=True)
-    
+    date_from = fields.Date(string='Period Start',
+                            required=True, index=True, tracking=True)
+    date_to = fields.Date(string='Period End',
+                          required=True, index=True, tracking=True)
     validation_message = fields.Text(string='Validation Message',tracking=True)
 
     @api.model
@@ -113,7 +117,7 @@ class NFIUReport(models.Model):
         
         # Add reporting person
         reporting_person = ET.SubElement(root, 'reporting_person')
-        self._add_person_xml(reporting_person, self.reporting_person_id)
+        self._add_reporting_person_xml(reporting_person, self.reporting_person_id)
         
         # Add location if present
         if self.location_id:
@@ -125,11 +129,15 @@ class NFIUReport(models.Model):
             ET.SubElement(root, 'reason').text = self.reason
         if self.action:
             ET.SubElement(root, 'action').text = self.action
-        
+        currencies= self.env['res.currency'].search([('name', '=', self.currency_code_local)], limit=1)
+        for c in currencies:
+            currency_id = c.id
         # Add transactions
-        #for transaction in self.transaction_ids:
-        #    trans_elem = ET.SubElement(root, 'transaction')
-        #    self._add_transaction_xml(trans_elem, transaction)
+        
+        transactions = self.env['res.customer.transaction'].search([('currency_id', '=', currency_id), ('report_nfiu', '=', True), ('date_created', '>=', self.date_from), ('date_created', '<=', self.date_to)])
+        for transaction in transactions:
+            trans_elem = ET.SubElement(root, 'transaction')
+            self._add_transaction_xml(trans_elem, transaction)
         
         # Add report indicators
         if self.indicator_ids:
@@ -144,7 +152,7 @@ class NFIUReport(models.Model):
         # Update record
         self.xml_content = xml_string
         self.xml_file = base64.b64encode(xml_string.encode('utf-8'))
-        self.xml_filename = f"nfiu_report_{self.name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xml"
+        self.xml_filename = f"FIU_Report_{self.name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xml"
         self.state = 'generated'
         
         return True
@@ -236,29 +244,94 @@ class NFIUReport(models.Model):
         
         return True
 
-    def _add_person_xml(self, parent, person):
+    def _add_reporting_person_xml(self, parent, person):
         """Add person XML elements"""
         if not person:
             return
-            
+        # Add basic person details   
         ET.SubElement(parent, 'gender').text = person.gender or '-'
         if person.title:
-            ET.SubElement(parent, 'title').text = person.title
-        ET.SubElement(parent, 'first_name').text = person.first_name
+            ET.SubElement(parent, 'title').text = person.title or ''
+        ET.SubElement(parent, 'first_name').text = person.first_name or ''
         if person.middle_name:
             ET.SubElement(parent, 'middle_name').text = person.middle_name
+        # Add prefix if available
         if person.prefix:
             ET.SubElement(parent, 'prefix').text = person.prefix
         ET.SubElement(parent, 'last_name').text = person.last_name
         
         if person.birthdate:
             ET.SubElement(parent, 'birthdate').text = person.birthdate.strftime('%Y-%m-%dT%H:%M:%S')
+        # Add birth place if available
         if person.birth_place:
             ET.SubElement(parent, 'birth_place').text = person.birth_place
+        # Add mother's name if available
         if person.mothers_name:
             ET.SubElement(parent, 'mothers_name').text = person.mothers_name
+        # Add alias and SSN if available
         if person.alias:
             ET.SubElement(parent, 'alias').text = person.alias
+        # Add SSN if available
+        if person.ssn:
+            ET.SubElement(parent, 'ssn').text = person.ssn
+            
+        # Add passport info
+        if person.passport_number:
+            ET.SubElement(parent, 'passport_number').text = person.passport_number
+            if person.passport_country:
+                ET.SubElement(parent, 'passport_country').text = person.passport_country
+        
+        if person.id_number:
+            ET.SubElement(parent, 'id_number').text = person.id_number
+            
+        # Add nationalities and residence
+        if person.nationality1:
+            ET.SubElement(parent, 'nationality1').text = person.nationality1
+        if person.nationality2:
+            ET.SubElement(parent, 'nationality2').text = person.nationality2
+        if person.nationality3:
+            ET.SubElement(parent, 'nationality3').text = person.nationality3
+        if person.residence:
+            ET.SubElement(parent, 'residence').text = person.residence
+            
+        # Add occupation and employer
+        if person.occupation:
+            ET.SubElement(parent, 'occupation').text = person.occupation
+        if person.employer_name:
+            ET.SubElement(parent, 'employer_name').text = person.employer_name
+            
+        # Add source of wealth
+        if person.source_of_wealth:
+            ET.SubElement(parent, 'source_of_wealth').text = person.source_of_wealth
+
+    def _add_person_xml(self, parent, person):
+        """Add person XML elements"""
+        if not person:
+            return
+        # Add basic person details   
+        ET.SubElement(parent, 'gender').text = person.gender or '-'
+        if person.title:
+            ET.SubElement(parent, 'title').text = person.title or ''
+        ET.SubElement(parent, 'first_name').text = person.firstname or ''
+        if person.middlename:
+            ET.SubElement(parent, 'middle_name').text = person.middlename
+        # Add prefix if available
+        if person.prefix:
+            ET.SubElement(parent, 'prefix').text = person.prefix
+        ET.SubElement(parent, 'last_name').text = person.lastname
+        
+        if person.dob:
+            ET.SubElement(parent, 'birthdate').text = person.dob.strftime('%Y-%m-%dT%H:%M:%S')
+        # Add birth place if available
+        if person.birth_place:
+            ET.SubElement(parent, 'birth_place').text = person.birth_place
+        # Add mother's name if available
+        if person.mothers_name:
+            ET.SubElement(parent, 'mothers_name').text = person.mothers_name
+        # Add alias and SSN if available
+        if person.alias:
+            ET.SubElement(parent, 'alias').text = person.alias
+        # Add SSN if available
         if person.ssn:
             ET.SubElement(parent, 'ssn').text = person.ssn
             
@@ -313,8 +386,8 @@ class NFIUReport(models.Model):
         if transaction.internal_ref_number:
             ET.SubElement(parent, 'internal_ref_number').text = transaction.internal_ref_number
         ET.SubElement(parent, 'transaction_location').text = transaction.transaction_location or ''
-        ET.SubElement(parent, 'transaction_description').text = transaction.description or ''
-        ET.SubElement(parent, 'date_transaction').text = transaction.date_transaction.strftime('%Y-%m-%dT%H:%M:%S')
+        ET.SubElement(parent, 'transaction_description').text = transaction.narration or ''
+        ET.SubElement(parent, 'date_transaction').text = transaction.date_created.strftime('%Y-%m-%dT%H:%M:%S')
         
         if transaction.teller:
             ET.SubElement(parent, 'teller').text = transaction.teller
@@ -328,9 +401,18 @@ class NFIUReport(models.Model):
         if transaction.transmode_comment:
             ET.SubElement(parent, 'transmode_comment').text = transaction.transmode_comment
             
-        ET.SubElement(parent, 'amount_local').text = str(transaction.amount_local)
+        ET.SubElement(parent, 'amount_local').text = str(abs(transaction.amount_local))
+        default_entity = self.env.ref('nfiu_reporting.nfiu_entity_1')
+        # Add parties (from/to), we need to resolve the customer to person or entity
+        if transaction.transaction_type == 'C':
+            transaction.from_person_id = transaction.customer_id
+            transaction.to_person_id = transaction.customer_id
+            transaction.to_entity_id = default_entity      
+        else:
+            transaction.to_person_id = transaction.customer_id
+            transaction.from_person_id = transaction.customer_id
+            transaction.to_entity_id = default_entity
         
-        # Add parties (from/to)
         if transaction.from_person_id:
             from_elem = ET.SubElement(parent, 't_from')
             ET.SubElement(from_elem, 'from_funds_code').text = transaction.from_funds_code or 'A'

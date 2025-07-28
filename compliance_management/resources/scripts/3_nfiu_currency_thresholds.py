@@ -38,6 +38,7 @@ def create_currency_thresholds():
             new_rec = threshold.create({
                 'currency_id': rec.id,
                 'threshold': 25.00 if rec.name == 'NGN' else 1.00
+                'shortname': rec.name[:2].upper(),
             })
             print(f"Created account: {rec.name} with ID: {new_rec}")
             tot_created+=1

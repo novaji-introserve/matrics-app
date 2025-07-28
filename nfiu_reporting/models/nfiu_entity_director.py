@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 class NFIUEntityDirector(models.Model):
     _name = 'nfiu.entity.director'
-    _description = 'NFIU Entity Director'
+    _description = 'Entity Director'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     entity_id = fields.Many2one(
         'nfiu.entity', string='Entity', required=True, ondelete='cascade',tracking=True)

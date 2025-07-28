@@ -114,10 +114,10 @@ def create_transactions():
     account_tier = get_customer_tier('tier_1')
     num = tran.search_count([])
     print(f"Total existing transactions: {num}")
-    if num > 1:
-        print("There are existing transactions, skipping transactions creation.")
-        return None
-    print("No existing transactions found, proceeding with transaction creation.")
+    #if num > 1:
+    #    print("There are existing transactions, skipping transactions creation.")
+    #    return None
+    #print("No existing transactions found, proceeding with transaction creation.")
     accnts = get_accounts()
     tot_created = 0
     print(f"Found {len(accnts)} accounts to process")
@@ -133,7 +133,6 @@ def create_transactions():
             officer = get_account_officer(ac.account_officer_id.id) if ac.account_officer_id else get_authorizer_id()
             authorizer = officer.code
             tran_code = f"{transaction_type.trancode}{date_created.replace('-','')}" if transaction_type else None
-            #print(f"Creating transaction for {ac.name} with Tran ID: {name}")
             print(f"Account ID: {ac.id}, Amount: {amount}, Currency: {ac.currency}")
             tran_data = {
                 'customer_id': ac.customer_id.id,
@@ -155,7 +154,6 @@ def create_transactions():
             }
             try:
              
-                #print(tran_data)
                 new_id =  tran.create(tran_data)
                 print(f"Created transaction: {name} with ID: {new_id}")
                 tot_created += 1

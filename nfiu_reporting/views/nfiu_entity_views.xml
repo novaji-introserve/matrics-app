@@ -9,10 +9,15 @@
                 <tree>
                     <field name="name" />
                     <field name="commercial_name" />
+                    <field name="branch_id" />
+                    <field name="identification_id" />
+                    <field name="entity_reference" />
+                    <field name="fiu_reference" />
+                    <field name="local_currency" />
                     <field name="incorporation_number" />
                     <field name="incorporation_legal_form" />
-                    <field name="write_uid" />
-                    <field name="write_date" />
+                    <field name="write_uid" optional="show" />
+                    <field name="write_date" optional="show" />
                 </tree>
             </field>
         </record>
@@ -30,15 +35,25 @@
                                 <field name="name" placeholder="Name" />
                             </h1>
                         </div>
+                        <div class="oe_title">
+                            <label for="company_id" class="oe_edit_only" />
+                            <h1>
+                                <field name="company_id" placeholder="Related Company" />
+                            </h1>
+                        </div>
 
                         <group>
                             <group>
                                 <field name="commercial_name" />
                                 <field name="incorporation_legal_form" />
+                                <field name="identification_id" />
+                                <field name="entity_reference" />
+                                <field name="fiu_reference" />
+                                <field name="branch_id" />
+                                <field name="local_currency" />
                                 <field name="incorporation_number" />
                                 <field name="business" />
                                 <field name="incorporation_country_code" />
-                                <field name="incorporation_date" />
                             </group>
                             <group>
                                 <field name="email" />
@@ -46,6 +61,7 @@
                                 <field name="phone" />
                                 <field name="tax_number" />
                                 <field name="tax_reg_number" />
+                                <field name="incorporation_date" />
                             </group>
                         </group>
                         <notebook>
