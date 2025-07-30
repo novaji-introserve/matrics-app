@@ -22,37 +22,75 @@
       <field name="state">code</field>
       <field name="code">action = model.open_suspicious_transactions()</field>
     </record>
+    <record model="ir.actions.server" id="action_create_transaction_case">
+        <field name="name">Create Case</field>
+        <field name="model_id" ref="model_res_customer_transaction"/>
+        <field name="binding_model_id" ref="model_res_customer_transaction"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_create_transaction_case()
+        </field>
+    </record>
     <record id="customer_transaction_view_inherited_form" model="ir.ui.view">
       <field name="name">compliance.transaction.form.inherit</field>
       <field name="model">res.customer.transaction</field>
       <field name="inherit_id" ref="compliance_management.compliance_transaction_form" />
+      <field name="priority">100</field>
       <field name="arch" type="xml">
         <xpath expr="//field[@name='likely_fraud']" position="after">
           <field name="suspicious_transaction" readonly="True" />
         </xpath>
         <!-- Add button to header area -->
         <xpath expr="//header" position="inside">
-          <button name="action_mark_as_suspicious" string="Mark Suspicious Transaction"
+          <button name="action_mark_unusual" string="Mark Unusual"
+            type="object" class="btn-info"
+            attrs="{'invisible': [('state', '=', 'unusual')]}"
+            groups="regulatory_reports.group_regulatory_report,base.group_system" />
+          <button name="action_mark_as_suspicious" string="Mark Suspicious"
             type="object" class="btn-warning"
             attrs="{'invisible': [('suspicious_transaction', '=', True)]}"
             groups="regulatory_reports.group_regulatory_report,base.group_system" />
-          <button name="action_unmark_as_suspicious" string="Unmark Suspicious Transaction"
+          <button name="action_unmark_as_suspicious" string="Not Suspicious"
             type="object" class="btn-info"
-            attrs="{'invisible': [('suspicious_transaction', '=', False)]}"
+            attrs="{'invisible': [('state', 'in', ['new'])]}"
             groups="regulatory_reports.group_regulatory_report,base.group_system" />
         </xpath>
+        <xpath expr="//page[@name='internal_notes']" position="before">
+          <page name="suspicious_transaction_history" string="Suspicious Transaction History">
+            <!-- Simplified view without problematic fields -->
+            <field name="suspicious_transaction_history_ids"
+              context="{'default_transaction_id': id}">
+              <tree edit="false" create="false" delete="false">
+                <field name="name" />
+                <field name="customer_id" />
+                <field name="account_id" />
+                <field name="date_reported" />
+                <field name="reported_by" />
+              </tree>
+            </field>
+          </page>
+        </xpath>
+        <xpath expr="//field[@name='state']" position="attributes">
+               <attribute name="statusbar_visible">new,unusual,awaiting_approval,suspicious,done</attribute>
+               <attribute name="clickable">False</attribute>
+        </xpath>
+         <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object" name="action_transaction_cases" icon="fa-gavel">          
+                    <field name="total_cases" widget="statinfo"/>
+                </button>               
+            </xpath>
       </field>
     </record>
     <record id="customer_transaction_view_inherited_tree" model="ir.ui.view">
-    <field name="name">compliance.transaction.tree.inherit</field>
-    <field name="model">res.customer.transaction</field>
-    <field name="inherit_id" ref="compliance_management.compliance_transaction_tree"/>
-    <field name="arch" type="xml">
+      <field name="name">compliance.transaction.tree.inherit</field>
+      <field name="model">res.customer.transaction</field>
+      <field name="inherit_id" ref="compliance_management.compliance_transaction_tree" />
+      <field name="arch" type="xml">
         <xpath expr="//field[@name='likely_fraud']" position="after">
           <field name="suspicious_transaction" optional="show" />
         </xpath>
-    </field>
-</record>
+      </field>
+    </record>
   </data>
 
 </odoo>

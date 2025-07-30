@@ -39,7 +39,7 @@
                     <field name="show_create_case" invisible="1"/>
 
                     <button name="action_screen" class="btn-info" type="object" string="Run Risk Analysis" groups="compliance_management.group_compliance_compliance_risk_manager,compliance_management.group_compliance_transaction_monitoring_team" confirm="Run screening rules. All transaction screening rules will be applied. The first exception found will flagged. Are you sure?" />
-                    <button name="done" class="btn-info" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer,compliance_management.group_compliance_transaction_monitoring_team" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" attrs="{'invisible': [('state', 'not in',['new'])]}" />
+                    <button name="done" class="btn-info" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer,compliance_management.group_compliance_transaction_monitoring_team" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" attrs="{'invisible': [('state', 'in',['done'])]}" />
 
 
                     <button name="action_create_case" class="btn-info" string="Create Case" type="object" attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
@@ -65,13 +65,13 @@
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" />
                         <h1>
-                            <field name="name" readonly="0" />
+                            <field name="name" readonly="1" />
                         </h1>
                     </div>
                     <div class="oe_title">
                         <label for="amount" class="oe_edit_only" />
                         <h1>
-                            <field name="amount" readonly="0" />
+                            <field name="amount" readonly="1" />
                         </h1>
                     </div>
 

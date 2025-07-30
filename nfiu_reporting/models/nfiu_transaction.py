@@ -12,11 +12,18 @@ class SuspiciousTransactionHistory(models.Model):
 
     transaction_id = fields.Many2one(
         'res.customer.transaction', string='Transaction', required=True, ondelete='cascade',index=True)
+    name = fields.Char(string='Name',related='transaction_id.name')
+    account_id = fields.Many2one(comodel_name='res.partner.account',related='transaction_id.account_id', string='Account',ondelete='cascade',index=True)
+    customer_id = fields.Many2one(
+        comodel_name='res.partner', string='Customer', related='transaction_id.customer_id',
+        ondelete='cascade', index=True)
     date_reported = fields.Datetime(
         string='Date Reported', default=fields.Datetime.now)
     reported_by = fields.Many2one(
         'res.users', string='Reported By', default=lambda self: self.env.user)
     comments = fields.Text(string='Comments')
+    
+
 
     def action_view_transaction(self):
         return {
@@ -28,6 +35,21 @@ class SuspiciousTransactionHistory(models.Model):
             'target': 'current',
         }
 
+
+class Case(models.Model):
+    _inherit = 'case.manager'
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        result = super(Case, self).create(vals_list)
+        for vals in vals_list:
+            if 'transaction_id' in vals and vals['transaction_id']:
+                transaction = self.env['res.customer.transaction'].browse(vals['transaction_id'])
+                if transaction:
+                    transaction.write({
+                        'state': 'awaiting_approval',  })
+        return result
+        
 
 class NFIUTransaction(models.Model):
     _description = 'Reporting Transaction'
@@ -109,6 +131,13 @@ class NFIUTransaction(models.Model):
     comments = fields.Text(string='Comments', size=4000)
     suspicious_transaction_history_ids = fields.One2many(
         'nfiu.suspicious.transaction.hist', 'transaction_id', string='Suspicious Transaction History')
+    
+    state = fields.Selection(string='Status', selection=[(
+        'new', 'To Review'),('unusual','Unusual'),('awaiting_approval','Under Investigation'),('suspicious','Suspicious'), ('done', 'Done')], tracking=True, index=True, default='new')
+    case_ids = fields.One2many(
+        comodel_name='case.manager', index=True, inverse_name='transaction_id', string='Cases', readonly=True)
+    total_cases = fields.Integer(
+        string='Cases', compute='transaction_total_cases', index=True, store=False)
 
     @api.depends('date_created')
     def _compute_date(self):
@@ -122,14 +151,30 @@ class NFIUTransaction(models.Model):
 
     def action_mark_as_suspicious(self):
         for record in self:
+            self.env['nfiu.suspicious.transaction.hist'].create({
+                'transaction_id': record.id,
+                'name': record.name,
+                'comments': record.comments,
+                'reported_by': self.env.user.id,
+            })
             record.write({
-                'suspicious_transaction': True
+                'suspicious_transaction': True,
+                'state': 'suspicious',
+                'report_nfiu': True,
             })
 
     def action_unmark_as_suspicious(self):
         for record in self:
             record.write({
-                'suspicious_transaction': False
+                'suspicious_transaction': False,
+                'state': 'new',
+            })
+            
+    def action_mark_unusual(self):
+        for record in self:
+            record.write({
+                'suspicious_transaction': False,
+                'state': 'unusual',
             })
 
     def report_fiu(self):
@@ -211,3 +256,19 @@ class NFIUTransaction(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1, 'search_default_group_currency': 1}
         }
+    
+    @api.depends('case_ids')
+    def transaction_total_cases(self):
+        for e in self:
+            e.total_cases = len(e.case_ids)
+
+    def action_transaction_cases(self):
+        return {
+            'name': _('Cases'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'case.manager',
+            'view_mode': 'tree,form',
+            'domain': [('transaction_id.id', 'in', [self.id])],
+            'context': {'search_default_group_state': 1}
+        }
+        

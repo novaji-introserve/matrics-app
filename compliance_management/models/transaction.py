@@ -76,8 +76,9 @@ class Transaction(models.Model):
 
         # Prepare default values from customer
         context = {
-            'default_customer_id': self.id,
+            'default_customer_id': self.customer_id.id if self.customer_id else False,
             'default_case_status': 'draft',
+            'default_transaction_id': self.id,
         }
 
         # Add customer if available
