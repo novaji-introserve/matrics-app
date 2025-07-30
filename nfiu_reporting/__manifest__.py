@@ -24,15 +24,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-<<<<<<< HEAD
-<<<<<<< HEAD
     'depends': ['base','compliance_management','regulatory_reports','hr','case_management_v2'],
-=======
-    'depends': ['base','compliance_management','regulatory_reports'],
->>>>>>> 816be76 (XML Schema Validator)
-=======
-    'depends': ['base','compliance_management','regulatory_reports','hr'],
->>>>>>> b75258c (Suspicious Transaction history)
 
     # always loaded
     'data': [

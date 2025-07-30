@@ -7,8 +7,5 @@ access_nfiu_account,nfiu.account,model_nfiu_account,base.group_user,1,1,1,1
 access_nfiu_entity_director,nfiu.entity.director,model_nfiu_entity_director,base.group_user,1,1,1,1
 access_nfiu_indicator,nfiu.indicator,model_nfiu_indicator,base.group_user,1,1,1,1
 access_nfiu_currency_threshold_user,nfiu.currency.threshold,model_nfiu_currency_threshold,base.group_user,1,1,1,1
-<<<<<<< HEAD
 access_nfiu_suspicious_transaction_hist_user,nfiu.suspicious.transaction.hist,model_nfiu_suspicious_transaction_hist,base.group_user,1,1,1,1
-=======
->>>>>>> 816be76 (XML Schema Validator)
 access_nfiu_export_wizard,nfiu.export.wizard,model_nfiu_export_wizard,base.group_user,1,1,1,1

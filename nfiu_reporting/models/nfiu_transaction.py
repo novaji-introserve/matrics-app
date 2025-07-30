@@ -16,24 +16,18 @@ class SuspiciousTransactionHistory(models.Model):
 
     transaction_id = fields.Many2one(
         'res.customer.transaction', string='Transaction', required=True, ondelete='cascade',index=True)
-<<<<<<< HEAD
     name = fields.Char(string='Name',related='transaction_id.name')
     account_id = fields.Many2one(comodel_name='res.partner.account',related='transaction_id.account_id', string='Account',ondelete='cascade',index=True)
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', related='transaction_id.customer_id',
         ondelete='cascade', index=True)
-=======
->>>>>>> b75258c (Suspicious Transaction history)
     date_reported = fields.Datetime(
         string='Date Reported', default=fields.Datetime.now)
     reported_by = fields.Many2one(
         'res.users', string='Reported By', default=lambda self: self.env.user)
     comments = fields.Text(string='Comments')
-<<<<<<< HEAD
     
 
-=======
->>>>>>> b75258c (Suspicious Transaction history)
 
     def action_view_transaction(self):
         return {
@@ -46,7 +40,6 @@ class SuspiciousTransactionHistory(models.Model):
         }
 
 
-<<<<<<< HEAD
 class Case(models.Model):
     _inherit = 'case.manager'
     
@@ -219,21 +212,11 @@ class NFIUTransaction(models.Model):
     total_cases = fields.Integer(
         string='Cases', compute='transaction_total_cases', index=True, store=False)
 
-=======
-    
->>>>>>> 816be76 (XML Schema Validator)
-=======
-    suspicious_transaction_history_ids = fields.One2many(
-        'nfiu.suspicious.transaction.hist', 'transaction_id', string='Suspicious Transaction History')
-
->>>>>>> b75258c (Suspicious Transaction history)
     @api.depends('date_created')
     def _compute_date(self):
         for rec in self:
             rec.date_transaction = rec.date_created
             rec.value_date = rec.date_created
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     value_date = fields.Datetime(string='Value Date', compute=_compute_date)
     date_transaction = fields.Datetime(
@@ -267,32 +250,6 @@ class NFIUTransaction(models.Model):
                 'state': 'unusual',
             })
 
-=======
-            
-    value_date = fields.Datetime(string='Value Date',compute=_compute_date)
-    date_transaction = fields.Datetime(
-       string='Transaction Date', required=True,compute=_compute_date)
-    
->>>>>>> 816be76 (XML Schema Validator)
-=======
-
-    value_date = fields.Datetime(string='Value Date', compute=_compute_date)
-    date_transaction = fields.Datetime(
-        string='Transaction Date', required=True, compute=_compute_date)
-
-    def action_mark_as_suspicious(self):
-        for record in self:
-            record.write({
-                'suspicious_transaction': True
-            })
-
-    def action_unmark_as_suspicious(self):
-        for record in self:
-            record.write({
-                'suspicious_transaction': False
-            })
-
->>>>>>> b75258c (Suspicious Transaction history)
     def report_fiu(self):
         self.write({
             'report_nfiu': True,
@@ -439,72 +396,4 @@ class NFIUTransaction(models.Model):
             'domain': [('transaction_id.id', 'in', [self.id])],
             'context': {'search_default_group_state': 1}
         }
-=======
-    
-    @api.model
-    def other_transactions(self):
-        # show only nfiu transactions
-        setting = self.env['res.compliance.settings'].search([('code', '=', 'nfiu_default_ctr_currency')], limit=1)
-        # Default value if no settings found
-        currency = 'NGN'
-        for e in setting:
-            currency = e.val.strip()
-        currency_ids = self.env['res.currency'].search([('name','=',currency.upper())])
-        for i in currency_ids:
-            currency_id = i.id
-        domain = [('report_nfiu', '=', True),('currency_id','!=',currency_id)]
-        return {
-            'name': _('NFIU FTR Transactions'),
-=======
-            'name': _('Local Currency Transactions'),
->>>>>>> b75258c (Suspicious Transaction history)
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'view_mode': 'tree,form',
-            'domain': domain,
-            'context': {'search_default_group_branch': 1}
-        }
-
-<<<<<<< HEAD
->>>>>>> 816be76 (XML Schema Validator)
         
-=======
-    @api.model
-    def open_foreign_transactions(self):
-        # show only nfiu transactions
-        setting = self.env['res.compliance.settings'].search(
-            [('code', '=', 'nfiu_default_ctr_currency')], limit=1)
-        # Default value if no settings found
-        currency = 'NGN'
-        for e in setting:
-            currency = e.val.strip()
-        currency_ids = self.env['res.currency'].search(
-            [('name', '=', currency.upper())])
-        for i in currency_ids:
-            currency_id = i.id
-        domain = [('report_nfiu', '=', True),
-                  ('currency_id', '!=', currency_id)]
-        return {
-            'name': _('Foreign Currency Transactions'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'view_mode': 'tree,form',
-            'domain': domain,
-            'context': {'search_default_group_branch': 1}
-        }
-
-    @api.model
-    def open_suspicious_transactions(self):
-        # show only nfiu transactions
-        setting = self.env['res.compliance.settings'].search(
-            [('code', '=', 'nfiu_default_ctr_currency')], limit=1)
-        domain = [('suspicious_transaction', '=', True)]
-        return {
-            'name': _('Suspicious Transactions'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'res.customer.transaction',
-            'view_mode': 'tree,form',
-            'domain': domain,
-            'context': {'search_default_group_branch': 1, 'search_default_group_currency': 1}
-        }
->>>>>>> b75258c (Suspicious Transaction history)
