@@ -6,10 +6,6 @@ import base64
 from datetime import datetime, timedelta
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b75258c (Suspicious Transaction history)
 class SuspiciousTransactionHistory(models.Model):
     _name = 'nfiu.suspicious.transaction.hist'
     _description = 'Suspicious Transaction History'
@@ -63,18 +59,6 @@ class NFIUTransaction(models.Model):
     _description = 'Reporting Transaction'
     _inherit = 'res.customer.transaction'
 
-=======
-=======
->>>>>>> b75258c (Suspicious Transaction history)
-class NFIUTransaction(models.Model):
-    _description = 'Reporting Transaction'
-    _inherit = 'res.customer.transaction'
-<<<<<<< HEAD
-    
->>>>>>> 816be76 (XML Schema Validator)
-=======
-
->>>>>>> b75258c (Suspicious Transaction history)
     report_id = fields.Many2one(
         'nfiu.report', string='Report', required=True, ondelete='cascade')
     transaction_number = fields.Char(
@@ -82,8 +66,6 @@ class NFIUTransaction(models.Model):
     internal_ref_number = fields.Char(
         string='Internal Reference Number', size=50)
     transaction_location = fields.Char(string='Transaction Location', size=255)
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     teller = fields.Char(string='Teller', size=50)
     authorized = fields.Char(string='Authorized By', size=50)
@@ -92,24 +74,6 @@ class NFIUTransaction(models.Model):
         string='NFIU Reported', default=False, index=True)
     suspicious_transaction = fields.Boolean(
         string='Suspicious Transaction', default=False, index=True, tracking=True)
-=======
-    
-
-    teller = fields.Char(string='Teller', size=50)
-    authorized = fields.Char(string='Authorized By', size=50)
-    
-    report_nfiu = fields.Boolean(string='NFIU Reported',default=False, index=True)
->>>>>>> 816be76 (XML Schema Validator)
-=======
-
-    teller = fields.Char(string='Teller', size=50)
-    authorized = fields.Char(string='Authorized By', size=50)
-
-    report_nfiu = fields.Boolean(
-        string='NFIU Reported', default=False, index=True)
-    suspicious_transaction = fields.Boolean(
-        string='Suspicious Transaction', default=False, index=True, tracking=True)
->>>>>>> b75258c (Suspicious Transaction history)
     transmode_code = fields.Selection([
         ('A', 'Cash'),
         ('B', 'Check'),
@@ -118,8 +82,6 @@ class NFIUTransaction(models.Model):
         ('k', 'Other'),
         ('T', 'Wire Transfer'),
     ], string='Transaction Mode Code', required=True, default='E')
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     transmode_comment = fields.Char(string='Transaction Mode Comment', size=50)
     amount_local = fields.Float(
@@ -130,24 +92,6 @@ class NFIUTransaction(models.Model):
     from_account_id = fields.Many2one('nfiu.account', string='From Account')
     '''
     from_entity_id = fields.Many2one('nfiu.entity', string='From Entity')
-=======
-    
-=======
-
->>>>>>> b75258c (Suspicious Transaction history)
-    transmode_comment = fields.Char(string='Transaction Mode Comment', size=50)
-    amount_local = fields.Float(
-        string='Amount (Local Currency)', digits=(10, 2), required=True)
-    from_person_id = fields.Many2one('res.partner', string='From Person')
-    '''
-    # From party details
-    from_account_id = fields.Many2one('nfiu.account', string='From Account')
-    '''
-<<<<<<< HEAD
->>>>>>> 816be76 (XML Schema Validator)
-=======
-    from_entity_id = fields.Many2one('nfiu.entity', string='From Entity')
->>>>>>> b75258c (Suspicious Transaction history)
     from_funds_code = fields.Selection([
         ('A', 'Account'),
         ('B', 'Bearer Bonds'),
@@ -165,27 +109,12 @@ class NFIUTransaction(models.Model):
     ], string='From Funds Code', default='F')
     from_funds_comment = fields.Char(string='From Funds Comment', size=255)
     from_country = fields.Char(string='From Country', size=2, default='NG')
-<<<<<<< HEAD
-<<<<<<< HEAD
     to_person_id = fields.Many2one('res.partner', string='To Person')
     '''
     # To party details   
     to_account_id = fields.Many2one('nfiu.account', string='To Account')
     '''
     to_entity_id = fields.Many2one('nfiu.entity', string='To Entity')
-=======
-=======
-    to_person_id = fields.Many2one('res.partner', string='To Person')
->>>>>>> b75258c (Suspicious Transaction history)
-    '''
-    # To party details   
-    to_account_id = fields.Many2one('nfiu.account', string='To Account')
-    '''
-<<<<<<< HEAD
->>>>>>> 816be76 (XML Schema Validator)
-=======
-    to_entity_id = fields.Many2one('nfiu.entity', string='To Entity')
->>>>>>> b75258c (Suspicious Transaction history)
     to_funds_code = fields.Selection([
         ('A', 'Account'),
         ('B', 'Bearer Bonds'),
@@ -204,8 +133,6 @@ class NFIUTransaction(models.Model):
     to_funds_comment = fields.Char(string='To Funds Comment', size=255)
     to_country = fields.Char(string='To Country', size=2, default='NG')
     comments = fields.Text(string='Comments', size=4000)
-<<<<<<< HEAD
-<<<<<<< HEAD
     suspicious_transaction_history_ids = fields.One2many(
         'nfiu.suspicious.transaction.hist', 'transaction_id', string='Suspicious Transaction History')
     
@@ -258,34 +185,16 @@ class NFIUTransaction(models.Model):
         self.write({
             'report_nfiu': True,
             'transaction_number': self.name,
-<<<<<<< HEAD
-<<<<<<< HEAD
             'internal_ref_number': self.name,
             'transaction_location': self.branch_id.name,
             'teller': 'SYSTEM',
             'authorized': 'SYSTEM',
             'transmode_code': 'E',
-=======
-            'internal_ref_number':self.name,
-            'transaction_location':self.branch_id.name,
-            'teller': 'SYSTEM',
-            'authorized': 'SYSTEM',
-            'transmode_code':'E',
->>>>>>> 816be76 (XML Schema Validator)
-=======
-            'internal_ref_number': self.name,
-            'transaction_location': self.branch_id.name,
-            'teller': 'SYSTEM',
-            'authorized': 'SYSTEM',
-            'transmode_code': 'E',
->>>>>>> b75258c (Suspicious Transaction history)
             'transmode_comment': self.narration,
             'amount_local': self.amount,
             'from_funds_comment': self.narration,
             'to_funds_comment': self.narration,
             'comments': self.narration
-<<<<<<< HEAD
-<<<<<<< HEAD
 
         })
 
@@ -294,29 +203,10 @@ class NFIUTransaction(models.Model):
         # show only nfiu transactions
         setting = self.env['res.compliance.settings'].search(
             [('code', '=', 'nfiu_default_ctr_currency')], limit=1)
-=======
-            
-=======
-
->>>>>>> b75258c (Suspicious Transaction history)
-        })
-
-    @api.model
-    def open_local_transactions(self):
-        # show only nfiu transactions
-<<<<<<< HEAD
-        setting = self.env['res.compliance.settings'].search([('code', '=', 'nfiu_default_ctr_currency')], limit=1)
->>>>>>> 816be76 (XML Schema Validator)
-=======
-        setting = self.env['res.compliance.settings'].search(
-            [('code', '=', 'nfiu_default_ctr_currency')], limit=1)
->>>>>>> b75258c (Suspicious Transaction history)
         # Default value if no settings found
         currency = 'NGN'
         for e in setting:
             currency = e.val.strip()
-<<<<<<< HEAD
-<<<<<<< HEAD
         currency_ids = self.env['res.currency'].search(
             [('name', '=', currency.upper())])
         for i in currency_ids:
@@ -325,27 +215,12 @@ class NFIUTransaction(models.Model):
                   ('currency_id', '=', currency_id)]
         return {
             'name': _('Local Currency Transactions'),
-=======
-        currency_ids = self.env['res.currency'].search([('name','=',currency.upper())])
-=======
-        currency_ids = self.env['res.currency'].search(
-            [('name', '=', currency.upper())])
->>>>>>> b75258c (Suspicious Transaction history)
-        for i in currency_ids:
-            currency_id = i.id
-        domain = [('report_nfiu', '=', True),
-                  ('currency_id', '=', currency_id)]
-        return {
-<<<<<<< HEAD
-            'name': _('NFIU CTR Transactions'),
->>>>>>> 816be76 (XML Schema Validator)
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-<<<<<<< HEAD
 
     @api.model
     def open_foreign_transactions(self):

@@ -2,8 +2,6 @@
 <odoo>
   <data>
     <record id="open_transactions" model="ir.actions.server">
-<<<<<<< HEAD
-<<<<<<< HEAD
       <field name="name">Open Local Currency Transactions</field>
       <field name="model_id" ref="model_res_customer_transaction" />
       <field name="type">ir.actions.server</field>
