@@ -25,13 +25,13 @@
       <field name="code">action = model.open_suspicious_transactions()</field>
     </record>
     <record model="ir.actions.server" id="action_create_transaction_case">
-        <field name="name">Create Case</field>
-        <field name="model_id" ref="model_res_customer_transaction"/>
-        <field name="binding_model_id" ref="model_res_customer_transaction"/>
-        <field name="state">code</field>
-        <field name="code">
-            action = records.action_create_transaction_case()
-        </field>
+      <field name="name">Create Case</field>
+      <field name="model_id" ref="model_res_customer_transaction" />
+      <field name="binding_model_id" ref="model_res_customer_transaction" />
+      <field name="state">code</field>
+      <field name="code">
+        action = records.action_create_transaction_case()
+      </field>
     </record>
     <record id="customer_transaction_view_inherited_form" model="ir.ui.view">
       <field name="name">compliance.transaction.form.inherit</field>
@@ -73,14 +73,15 @@
           </page>
         </xpath>
         <xpath expr="//field[@name='state']" position="attributes">
-               <attribute name="statusbar_visible">new,unusual,awaiting_approval,suspicious,done</attribute>
-               <attribute name="clickable">False</attribute>
+          <attribute name="statusbar_visible">new,unusual,awaiting_approval,suspicious,done</attribute>
+          <attribute name="clickable">False</attribute>
         </xpath>
-         <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" type="object" name="action_transaction_cases" icon="fa-gavel">          
-                    <field name="total_cases" widget="statinfo"/>
-                </button>               
-            </xpath>
+        <xpath expr="//div[@name='button_box']" position="inside">
+          <button class="oe_stat_button" type="object" name="action_transaction_cases"
+            icon="fa-gavel">
+            <field name="total_cases" widget="statinfo" />
+          </button>
+        </xpath>
       </field>
     </record>
     <record id="customer_transaction_view_inherited_tree" model="ir.ui.view">
@@ -93,6 +94,29 @@
         </xpath>
       </field>
     </record>
+    <record id="compliance_transaction_screening_rule_form" model="ir.ui.view">
+      <field name="name">compliance.transaction.screening.rule.form.inherit</field>
+      <field name="model">res.transaction.screening.rule</field>
+      <field name="inherit_id"
+        ref="compliance_management.compliance_transaction_screening_rule_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//sheet//group" position="inside">
+          <group>
+            <field name="transaction_flag" />
+          </group>
+        </xpath>
+      </field>
+    </record>
+    <record id="compliance_transaction_screening_rule_tree_inherit" model="ir.ui.view">
+      <field name="name">compliance_transaction_screening_rule_tree_inherit</field>
+      <field name="model">res.transaction.screening.rule</field>
+      <field name="inherit_id"
+        ref="compliance_management.compliance_transaction_screening_rule_tree" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='likely_fraud']" position="after">
+          <field name="transaction_flag" optional="show" />
+        </xpath>
+      </field>
+    </record>
   </data>
-
 </odoo>

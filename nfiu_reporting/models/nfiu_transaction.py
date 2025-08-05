@@ -53,7 +53,11 @@ class Case(models.Model):
                     transaction.write({
                         'state': 'awaiting_approval',  })
         return result
-        
+
+
+class TransactionScreeningRule(models.Model):
+    _inherit= 'res.transaction.screening.rule'
+    transaction_flag = fields.Selection(string='Flag Transactions As', selection=[('unusual', 'Unusual'), ('suspicious', 'Suspicious')],tracking=True,help='Flag transactions as Unusual or Suspicious based on the rule. This will be used to set the state of the transaction when the rule is applied.')
 
 class NFIUTransaction(models.Model):
     _description = 'Reporting Transaction'
@@ -394,6 +398,6 @@ class NFIUTransaction(models.Model):
             'res_model': 'case.manager',
             'view_mode': 'tree,form',
             'domain': [('transaction_id.id', 'in', [self.id])],
-            'context': {'search_default_group_state': 1}
+            'context': {'search_default_group_by_status': 1}
         }
         
