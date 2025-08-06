@@ -236,7 +236,6 @@ class Transaction(models.Model):
                         self.rule_id = rule
                         risk_levels.append(rule.risk_level)
             
-            print(risk_levels)
             if 'high' in risk_levels:
                 self.risk_level = 'high'
                 return
