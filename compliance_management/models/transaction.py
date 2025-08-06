@@ -63,6 +63,28 @@ class Transaction(models.Model):
         compute='_compute_is_case_manager_installed',
         store=False,)
 
+    rule_ids = fields.One2many(
+        'res.transaction.screening.history', 'transaction_id',
+        string='Screening Rules')
+    
+    total_rules = fields.Integer(
+        string='Rules', compute='transaction_total_rules', index=True, store=False)
+
+    @api.depends('rule_ids')
+    def transaction_total_rules(self):
+        for e in self:
+            e.total_rules = len(e.rule_ids)
+
+    def action_view_transaction_screening_rules(self):
+        return {
+            'name': _('Transaction Screening Rules'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.transaction.screening.history',
+            'view_mode': 'tree,form',
+            'domain': [('transaction_id.id', 'in', [self.id])],
+            'context': {'search_default_group_rule_id': 1}
+        }
+
     def action_create_transaction_case(self):
         self.ensure_one()
         # Prepare action to open case form
@@ -141,11 +163,6 @@ class Transaction(models.Model):
                 ('state', '=', 'installed')
             ], limit=1))
         return self._case_management_available    
-    
-    
-    
-            
-    
 
     def action_create_case(self):
         """
@@ -193,6 +210,7 @@ class Transaction(models.Model):
             [('state', '=', 'active')], order='priority')
 
         if rules:
+            risk_levels = []
             for rule in rules:
                 # try:
                     query = rule.sql_query
@@ -211,9 +229,22 @@ class Transaction(models.Model):
                    
                     rec = self.env.cr.fetchone()
                     if rec is not None:
+                        history_id: int = self.env['res.transaction.screening.history'].create({
+                            'transaction_id': self.id,
+                            'rule_id': rule.id
+                        })
                         self.rule_id = rule
-                        self.risk_level = rule.risk_level
-                        return
+                        risk_levels.append(rule.risk_level)
+            
+            print(risk_levels)
+            if 'high' in risk_levels:
+                self.risk_level = 'high'
+                return
+            if 'medium' in risk_levels:
+                self.risk_level = 'medium'
+                return
+            self.risk_level = 'low'
+            return
                 
 
     @api.model

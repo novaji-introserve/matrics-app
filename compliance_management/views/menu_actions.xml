@@ -511,6 +511,20 @@
         </field>
     </record>
 
+     <!-- Action transaction Screening History-->
+    <record id="action_list_transaction_screening_history" model="ir.actions.act_window">
+        <field name="name">Transaction Screening History</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.transaction.screening.history</field>
+        <field name="view_id" ref="transaction_screening_history_view_tree" />
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                No records yet
+            </p>
+        </field>
+    </record>
+
 
     <!-- Action -->
     <record id="action_media_keyword" model="ir.actions.act_window">
@@ -897,6 +911,7 @@
     <menuitem id="menu_compliance_transactions" action="open_transactions" parent="menu_compliance_transaction_monitoring" name="Transactions To Review" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="10" />
     <menuitem id="menu_compliance_transactions_done" action="open_transactions_done" parent="menu_compliance_transaction_monitoring" name="Transactions Reviewed" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="20" />
     <menuitem id="menu_compliance_transactions_all" action="open_transactions_all" parent="menu_compliance_transaction_monitoring" name="All Transactions" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="30" />
+    <menuitem id="menu_compliance_transaction_screening_history" action="open_transaction_screening_history" parent="menu_compliance_transaction_monitoring" name="Transaction Screening History" groups="group_compliance_compliance_officer,group_compliance_transaction_monitoring_team" sequence="40" />
 
     <!-- <menuitem id="menu_adverse_media" name="Monitoring Configuration" parent="menu_adverse_media_root" action="action_adverse_media" sequence="10"/> -->
     <!-- <menuitem id="menu_icomply_config" action="action_newsearch_settings" name="News API" parent="menu_fcra_risk" sequence="30" /> -->

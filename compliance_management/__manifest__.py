@@ -123,8 +123,8 @@
         'data/demo_data/partner/sectors.xml',
         'data/blacklist.xml',
         "views/customer_screening.xml",
+        'views/transaction_screening_history.xml',
         "views/menu_actions.xml",
-
     ],
     # only loaded in demonstration mode
     "demo": [
