@@ -21,19 +21,19 @@ class TransactionScreeningHistory(models.Model):
     name = fields.Char(string='Name', required=True,
                        readonly=True, related='transaction_id.name')
     customer_id = fields.Many2one(
-        string='Customer', related='transaction_id.customer_id', readonly=True)
+        string='Customer', related='transaction_id.customer_id',store=True)
     account_id = fields.Many2one(
-        string='Account', related='transaction_id.account_id', readonly=True)
+        string='Account', related='transaction_id.account_id',store=True)
     branch_id = fields.Many2one(
         'res.branch', string='Branch',
-        related='transaction_id.branch_id', readonly=True)
+        related='transaction_id.branch_id',store=True)
     risk_level = fields.Selection(
         [('low', 'Low'),
          ('medium', 'Medium'),
          ('high', 'High')],
         string='Risk Level',
         required=True,
-        readonly=True,
+        store=True,
         related='rule_id.risk_level')
 
     @api.model

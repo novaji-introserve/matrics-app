@@ -76,7 +76,7 @@
                     domain="[('risk_level', '=', 'low')]" />
                 <separator />
                 <group expand="0" name="group_by" string="Group By">
-                    <filter name="group_branch_id" string="Rule" domain="[]"
+                    <filter name="group_branch_id" string="Branch" domain="[]"
                         context="{'group_by' : 'branch_id'}" />
                     <filter name="group_rule_id" string="Rule" domain="[]"
                         context="{'group_by' : 'rule_id'}" />
