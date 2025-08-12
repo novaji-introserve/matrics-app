@@ -213,6 +213,28 @@ class Transaction(models.Model):
             risk_levels = []
             for rule in rules:
                 # try:
+                if rule.condition_select == 'python':
+                    localdict = {
+                        'result': None,
+                        'transaction': self,
+                        'customer': self.customer_id,
+                        'branch': self.branch_id,
+                        'account': self.account_id,
+                        'currency': self.currency_id,
+                        'env': self.env
+                    }
+                    if rule._satisfy_condition(localdict) == True:
+                        history_id = self.env['res.transaction.screening.history'].create({
+                            'transaction_id': self.id,
+                            'rule_id': rule.id,
+                            'risk_level': rule.risk_level
+                        })
+                        self.rule_id = rule
+                        risk_levels.append(rule.risk_level)
+                        if rule.transaction_flag =='suspicious':
+                            self.action_mark_as_suspicious()
+                            
+                if rule.condition_select == 'sql':
                     query = rule.sql_query
                     char_to_replace = {'#AMOUNT#': f"{self.amount}",
                                     '#ACCOUNT_ID#': f"{self.account_id.id}",
@@ -226,15 +248,17 @@ class Transaction(models.Model):
                         query = query.replace(key, value)
                         
                     self.env.cr.execute(query)
-                   
                     rec = self.env.cr.fetchone()
                     if rec is not None:
                         history_id: int = self.env['res.transaction.screening.history'].create({
                             'transaction_id': self.id,
-                            'rule_id': rule.id
+                            'rule_id': rule.id,
+                            'risk_level': rule.risk_level
                         })
                         self.rule_id = rule
                         risk_levels.append(rule.risk_level)
+                        if rule.transaction_flag =='suspicious':
+                            self.action_mark_as_suspicious()
             
             if 'high' in risk_levels:
                 self.risk_level = 'high'

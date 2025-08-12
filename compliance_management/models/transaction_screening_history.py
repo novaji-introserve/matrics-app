@@ -31,10 +31,7 @@ class TransactionScreeningHistory(models.Model):
         [('low', 'Low'),
          ('medium', 'Medium'),
          ('high', 'High')],
-        string='Risk Level',
-        required=True,
-        store=True,
-        related='rule_id.risk_level')
+        string='Risk Level')
 
     @api.model
     def open_transaction_screening_history(self):

@@ -12,7 +12,7 @@
             <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
-            <field name="active" eval="True"/>
+            <field name="active" eval="False"/>
             <!-- Add a small delay to avoid exact hourly overlap with cache cleaning -->
             <field name="nextcall" eval="(datetime.now() + timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')"/>
         </record>
@@ -27,7 +27,7 @@
             <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
-            <field name="active" eval="True"/>
+            <field name="active" eval="False"/>
             </record>
 
         <record id="ir_cron_refresh_acct_tier_mat_view" model="ir.cron">
@@ -39,7 +39,7 @@
             <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
-            <field name="active" eval="True"/>
+            <field name="active" eval="False"/>
             </record>
     </data>
 
