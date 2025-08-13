@@ -69,6 +69,13 @@ class Transaction(models.Model):
     
     total_rules = fields.Integer(
         string='Rules', compute='transaction_total_rules', index=True, store=False)
+    
+    @api.model
+    def create(self,vals_list):
+        records = super(Transaction, self).create(vals_list)
+        for rec in records:
+            rec.action_screen()
+        return records
 
     @api.depends('rule_ids')
     def transaction_total_rules(self):
@@ -204,11 +211,19 @@ class Transaction(models.Model):
     def done(self):
         for e in self:
             e.write({'state': 'done'})
+            
+    def multi_screen(self):
+        for e in self:
+            try:
+                e.action_screen()
+            except Exception as ex:
+                print(f"Error screening transaction {e.name}: {ex}")
 
     def action_screen(self):
+        self.ensure_one()
         rules = self.env['res.transaction.screening.rule'].search(
             [('state', '=', 'active')], order='priority')
-
+        
         if rules:
             risk_levels = []
             for rule in rules:
@@ -236,7 +251,9 @@ class Transaction(models.Model):
                             
                 if rule.condition_select == 'sql':
                     query = rule.sql_query
-                    char_to_replace = {'#AMOUNT#': f"{self.amount}",
+                    char_to_replace = {
+                                    '#TRANSACTION_ID#': f"{self.id}",
+                                    '#AMOUNT#': f"{self.amount}",
                                     '#ACCOUNT_ID#': f"{self.account_id.id}",
                                     "#CUSTOMER_ID#": f"{self.customer_id.id}",
                                     "#TRAN_DATE#": f"{self.date_created}",
@@ -250,7 +267,7 @@ class Transaction(models.Model):
                     self.env.cr.execute(query)
                     rec = self.env.cr.fetchone()
                     if rec is not None:
-                        history_id: int = self.env['res.transaction.screening.history'].create({
+                        history_id = self.env['res.transaction.screening.history'].create({
                             'transaction_id': self.id,
                             'rule_id': rule.id,
                             'risk_level': rule.risk_level
@@ -285,12 +302,12 @@ class Transaction(models.Model):
         # Set domain based on user group
         if has_compliance_access:
             # Chief Compliance Officers see all customers
-            domain = [('state', '=', 'new')]
+            domain = [('state', '!=', 'done')]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
-                 e.id for e in self.env.user.branches_id]), ('state', '=', 'new')]
+                 e.id for e in self.env.user.branches_id]), ('state', '!=', 'done')]
             
         return {
             'name': _('Transactions To Review'),
