@@ -6,9 +6,15 @@ import { useDebounced } from "@web/core/utils/timing";
 import { browser } from "@web/core/browser/browser";
 import { TerminalComponent } from "./terminal_component"; 
 
+// Debug mode - set to false for production
+const DEBUG = false;
+function logDebug(...args) {
+  if (DEBUG) console.log(...args);
+}
+
 export class ImportFormComponent extends Component {
     setup() {
-        console.log("ImportFormComponent setup starting...");
+        logDebug("ImportFormComponent setup starting...");
         // Initialize hooks
         this.state = useState({
             selectedFile: null,
@@ -60,7 +66,7 @@ export class ImportFormComponent extends Component {
             if (this.terminal) {
                 this.terminal.addLog("CSV Import form initialized", "info");
             } else {
-                console.log("CSV Import form initialized (terminal service not available)");
+                logDebug("CSV Import form initialized (terminal service not available)");
             }
 
             // Load models
@@ -79,7 +85,7 @@ export class ImportFormComponent extends Component {
                 this.statusCheckInterval = null;
             }
         });
-        console.log("ImportFormComponent setup complete");
+        logDebug("ImportFormComponent setup complete");
     }
 
     /**
@@ -95,16 +101,16 @@ export class ImportFormComponent extends Component {
             try {
                 this.terminal = useService("terminal");
             } catch (e) {
-                console.warn("Terminal service not available, using fallback");
+                logDebug("Terminal service not available, using fallback");
                 this.terminal = {
                     addLog: (message, type) => {
-                        console.log(`[${type.toUpperCase()}] ${message}`);
+                        logDebug(`[${type.toUpperCase()}] ${message}`);
                     },
                     onLog: () => () => { },
                     getLogs: () => [],
                     clearLogs: () => { },
                     sendLog: (message, type) => {
-                        console.log(`[${type.toUpperCase()}] ${message}`);
+                        logDebug(`[${type.toUpperCase()}] ${message}`);
                     }
                 };
             }
@@ -112,7 +118,7 @@ export class ImportFormComponent extends Component {
             try {
                 this.chunkedUploader = useService("chunkedUploader");
             } catch (e) {
-                console.warn("ChunkedUploader service not available, using fallback");
+                logDebug("ChunkedUploader service not available, using fallback");
                 this.chunkedUploader = {
                     createUploader: () => ({
                         abort: () => { },
@@ -124,7 +130,7 @@ export class ImportFormComponent extends Component {
                 };
             }
         } catch (e) {
-            console.error("Error initializing services:", e);
+            logDebug("Error initializing services:", e);
             this.state.errorMessage = "Failed to initialize required services. Please refresh the page or contact your administrator.";
         }
     }
@@ -134,7 +140,7 @@ export class ImportFormComponent extends Component {
      */
     async loadModels() {
         try {
-            console.log("Loading models...");
+            logDebug("Loading models...");
             this.state.errorMessage = null;
 
             // Show loading message
@@ -158,12 +164,12 @@ export class ImportFormComponent extends Component {
             this.state.models = result.models || [];
             this.state.filteredModels = [...this.state.models];
 
-            console.log(`Loaded ${this.state.models.length} models`);
+            logDebug(`Loaded ${this.state.models.length} models`);
             if (this.terminal) {
                 this.terminal.addLog(`Loaded ${this.state.models.length} available models for import`, "info");
             }
         } catch (error) {
-            console.error("Error loading models:", error);
+            logDebug("Error loading models:", error);
 
             // More helpful error message
             const errorMsg = `Failed to load models: ${error.message || 'Unknown error'}. Check server logs for details.`;
@@ -203,7 +209,7 @@ export class ImportFormComponent extends Component {
 
             this.state.filteredModels = result.models || [];
         } catch (error) {
-            console.error("Error searching models:", error);
+            logDebug("Error searching models:", error);
             if (this.notification) {
                 this.notification.add(_t("Search failed"), {
                     type: "warning",
@@ -320,7 +326,7 @@ export class ImportFormComponent extends Component {
         const modelId = parseInt(ev.target.value, 10);
         
         if (isNaN(modelId) || modelId <= 0) {
-            console.log("No valid model selected");
+            logDebug("No valid model selected");
             this.state.selectedModel = null;
             return;
         }
@@ -330,16 +336,16 @@ export class ImportFormComponent extends Component {
         
         // If not found in filtered models, check in the full models array
         if (!model) {
-            console.log(`Model ${modelId} not found in filtered models, checking full list`);
+            logDebug(`Model ${modelId} not found in filtered models, checking full list`);
             model = this.state.models.find(m => m.id === modelId);
         }
         
         if (model) {
-            console.log("Selected model:", model);
+            logDebug("Selected model:", model);
             
             // Add a description if missing
             if (!model.description) {
-                console.log("Adding default description for model");
+                logDebug("Adding default description for model");
                 model = { 
                     ...model, 
                     description: `Import data into ${model.name} (${model.model_name}). Please ensure your file has the required fields.` 
@@ -361,7 +367,7 @@ export class ImportFormComponent extends Component {
             // Force UI update by setting a key property
             this.state.selectedModelKey = Date.now();
         } else {
-            console.error(`Model with ID ${modelId} not found in any model list`);
+            logDebug(`Model with ID ${modelId} not found in any model list`);
             this.state.selectedModel = null;
         }
     }
@@ -420,7 +426,7 @@ export class ImportFormComponent extends Component {
                 this.terminal.addLog("All selected templates downloaded successfully", "success");
             }
         } catch (error) {
-            console.error("Error downloading templates:", error);
+            logDebug("Error downloading templates:", error);
             if (this.terminal) {
                 this.terminal.addLog(`Error downloading templates: ${error.message}`, "error");
             }
@@ -574,7 +580,7 @@ export class ImportFormComponent extends Component {
                 this.terminal.addLog(`Loaded ${this.state.tableColumns.length} columns for selected table`, "success");
             }
         } catch (error) {
-            console.error("Error fetching table columns:", error);
+            logDebug("Error fetching table columns:", error);
             this.state.errorMessage = `Failed to fetch table columns: ${error.message}`;
             
             if (this.terminal) {
@@ -680,7 +686,7 @@ export class ImportFormComponent extends Component {
                 this.terminal.addLog(`Loaded ${this.state.tableColumns.length} columns for selected table`, "success");
             }
         } catch (error) {
-            console.error("Error fetching table columns:", error);
+            logDebug("Error fetching table columns:", error);
             this.state.errorMessage = `Failed to fetch table columns: ${error.message}`;
             
             if (this.terminal) {
@@ -786,7 +792,7 @@ export class ImportFormComponent extends Component {
                 this.terminal.addLog(`Loaded ${this.state.tableColumns.length} columns for selected table`, "success");
             }
         } catch (error) {
-            console.error("Error fetching table columns:", error);
+            logDebug("Error fetching table columns:", error);
             this.state.errorMessage = `Failed to fetch table columns: ${error.message}`;
             
             if (this.terminal) {
@@ -890,7 +896,7 @@ export class ImportFormComponent extends Component {
                         }
                     }
                 } catch (e) {
-                    console.error("Error parsing delete progress:", e);
+                    logDebug("Error parsing delete progress:", e);
                 }
             }
             
@@ -902,7 +908,7 @@ export class ImportFormComponent extends Component {
             }
             
         } catch (error) {
-            console.error("Error checking delete status:", error);
+            logDebug("Error checking delete status:", error);
         }
     }
 
@@ -968,7 +974,7 @@ export class ImportFormComponent extends Component {
                         }
                     }
                 } catch (e) {
-                    console.error("Error parsing delete progress:", e);
+                    logDebug("Error parsing delete progress:", e);
                 }
             }
             
@@ -980,7 +986,7 @@ export class ImportFormComponent extends Component {
             }
             
         } catch (error) {
-            console.error("Error checking delete status:", error);
+            logDebug("Error checking delete status:", error);
         }
     }
 

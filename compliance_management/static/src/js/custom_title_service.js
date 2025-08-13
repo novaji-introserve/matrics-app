@@ -10,7 +10,7 @@ odoo.define('compliance_management/static/src/js/custom_title_service', function
     const customTitleService = {
         dependencies: [],
         start(env) {
-            console.log("Starting custom title service with direct DOM monitoring");
+            // console.log("Starting custom title service with direct DOM monitoring");
             
             // Function to update the title
             function updateTitle() {
@@ -29,7 +29,7 @@ odoo.define('compliance_management/static/src/js/custom_title_service', function
                 // Set our custom title
                 const newTitle = "iComply - " + currentTitle;
                 document.title = newTitle;
-                console.log("Title updated to:", newTitle);
+                // console.log("Title updated to:", newTitle);
             }
             
             // Initialize title
@@ -59,7 +59,7 @@ odoo.define('compliance_management/static/src/js/custom_title_service', function
                 const titleElement = document.querySelector('title');
                 if (titleElement) {
                     titleObserver.observe(titleElement, config);
-                    console.log("Title observer attached");
+                    // console.log("Title observer attached");
                 }
             }, 500);
             
