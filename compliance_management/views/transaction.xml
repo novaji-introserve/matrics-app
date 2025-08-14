@@ -7,10 +7,7 @@
         <field name="arch" type="xml">
             <tree string="Transactions" create="false">
                 <header>
-
-
                     <button name="done" class="oe_highlight" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" />
-
                 </header>
                 <field name="name" string="Reference Number" />
                 <field name="customer_id" optional="show" />
@@ -19,7 +16,7 @@
                 <field name="currency" optional="show" />
                 <field name="amount" optional="show"/>
                 <field name="transaction_type" optional="show"/>
-                <field name="rule_id" optional="show"/>
+                <field name="total_rules" string="Exceptions" optional="show"/>
                 <field name="likely_fraud" widget="boolean_toggle" readonly="1" optional="show"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" />
                 <field name="state" widget="badge" decoration-warning="state in ('new')" decoration-success="state in ('done')" />
@@ -165,6 +162,15 @@
         <field name="state">code</field>
         <field name="code">
             action = records.done()
+        </field>
+    </record>
+    <record model="ir.actions.server" id="action_multi_screen">
+        <field name="name">Run Analysis</field>
+        <field name="model_id" ref="model_res_customer_transaction"/>
+        <field name="binding_model_id" ref="model_res_customer_transaction"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.multi_screen()
         </field>
     </record>
 </odoo>

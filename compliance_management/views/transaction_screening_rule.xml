@@ -70,6 +70,7 @@
                                 placeholder="SQL Query returning a single value..." />
                             <div class="alert alert-info" role="alert" name="test_warning"> 
                                 You can use the following placeholders in the SQL query: <ul>
+                                    <li><code>#TRANSACTION_ID#</code> - (Internal) Transaction ID</li>
                                     <li><code>#AMOUNT#</code> - Transaction Amount</li>
                                     <li><code>#ACCOUNT_ID#</code> - Account ID</li>
                                     <li><code>#BRANCH_ID#</code> - Branch ID</li>

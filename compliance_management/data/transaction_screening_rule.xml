@@ -2,14 +2,11 @@
 <odoo>
     <data noupdate="1">
         <record id="transaction_screening_rule_sample" model="res.transaction.screening.rule">
-            <field name="name">USD Transactions Above 1.5</field>
-            <field name="code">usd_tran_above_15</field>
+            <field name="name">USD Transactions Above $1000</field>
+            <field name="code">usd_tran_above_1000</field>
             <field name="narration">High value dollar transactions are candidates for FIU reporting</field>
             <field name="risk_level">high</field>
-            <field name="sql_query"><![CDATA[select t.name refno,t.amount,batch_code,t.currency,t.inputter,t.authorizer,
-t.date_created tran_date,t.tran_type,a.name account_number,a.account_name
-from res_customer_transaction t left join res_partner_account a on t.account_id=a.id
-where t.amount >= 1.8 and t.currency='USD' and a.id=#ACCOUNT_ID#]]>
+            <field name="sql_query"><![CDATA[select name from res_customer_transaction t where ((t.amount > 1000 and t.transaction_type='C') or (t.amount < -1000 and t.transaction_type='D')) and t.currency='USD' and t.id=#TRANSACTION_ID#]]>
 </field> 
         </record>
         

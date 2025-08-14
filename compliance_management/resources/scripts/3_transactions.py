@@ -127,7 +127,7 @@ def create_transactions():
             name = generate_custom_id(prefix="TRN")
             amount = round(random.uniform(-1.5, 2.0), 2) if ac.currency == 'USD' else round(random.uniform(-50.0, 50.0), 2)
             narration = f"Transaction for {ac.name} with Tran ID: {name}"
-            date_created = get_random_date(1, 3).strftime('%Y-%m-%d')
+            date_created = get_random_date(1, 2).strftime('%Y-%m-%d')
             transaction_type = get_transaction_type('DEP') if amount > 0 else get_transaction_type('WDR')
             inputter ='SYSTEM'
             officer = get_account_officer(ac.account_officer_id.id) if ac.account_officer_id else get_authorizer_id()
@@ -139,7 +139,7 @@ def create_transactions():
                 'account_id': ac.id,
                 'currency_id': ac.currency_id.id if ac.currency_id else None,
                 'currency': ac.currency,
-                'amount': amount,
+                'amount': (amount * 1025),
                 'narration': narration,
                 'date_created': date_created,
                 'name': name,
