@@ -6,6 +6,8 @@ import psycopg2
 import re
 import logging
 import time
+import sqlparse
+from ..services.security_service import SecurityService
 
 _logger = logging.getLogger(__name__)
 
@@ -145,9 +147,195 @@ class ResCharts(models.Model):
     )
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
+    def _validate_sql_query_structure(self, parsed_query):
+        """Validate the structure of a parsed SQL query to prevent injection attacks.
+        
+        Args:
+            parsed_query: A sqlparse.sql.Statement object
+            
+        Raises:
+            ValidationError: If the query contains dangerous constructs
+        """
+        dangerous_functions = [
+            'pg_sleep', 'sleep', 'waitfor', 'delay', 'benchmark',
+            'current_database', 'version', 'user', 'current_user',
+            'session_user', 'system_user', 'pg_backend_pid',
+            'inet_server_addr', 'inet_server_port', 'pg_postmaster_start_time',
+            'extractvalue', 'updatexml', 'load_file', 'into_outfile',
+            'xp_cmdshell', 'sp_executesql', 'openrowset', 'opendatasource'
+        ]
+        
+        dangerous_keywords = [
+            'drop', 'delete', 'insert', 'update', 'alter', 'create',
+            'truncate', 'grant', 'revoke', 'execute', 'exec', 'xp_',
+            'sp_', 'declare', 'cursor', 'procedure', 'function',
+            'backup', 'restore', 'dump'
+        ]
+        
+        # First check for CASE WHEN constructs in the entire query
+        query_text = str(parsed_query).lower()
+        if re.search(r'\bcase\b.*\bwhen\b', query_text, re.DOTALL):
+            raise exceptions.ValidationError(
+                "CASE WHEN statements are not allowed for security reasons. "
+                "Please use simpler SELECT queries."
+            )
+        
+        def check_token_recursively(token):
+            """Recursively check all tokens in the SQL statement."""
+            if hasattr(token, 'tokens'):
+                for sub_token in token.tokens:
+                    check_token_recursively(sub_token)
+            else:
+                token_value = str(token).lower().strip()
+                if not token_value:
+                    return
+                    
+                # Check for dangerous functions (with word boundaries to avoid false positives)
+                for func in dangerous_functions:
+                    # Use word boundary matching to avoid blocking legitimate table names
+                    pattern = r'\b' + re.escape(func) + r'\b'
+                    if re.search(pattern, token_value):
+                        raise exceptions.ValidationError(
+                            f"Dangerous function '{func}' detected in SQL query. "
+                            f"This function is not allowed for security reasons."
+                        )
+                
+                # Check for dangerous keywords
+                for keyword in dangerous_keywords:
+                    if token_value.startswith(keyword) and (
+                        len(token_value) == len(keyword) or 
+                        not token_value[len(keyword)].isalnum()
+                    ):
+                        raise exceptions.ValidationError(
+                            f"Dangerous SQL keyword '{keyword}' detected. "
+                            f"Only SELECT statements are allowed."
+                        )
+                
+                # Check for time-based functions and constructs
+                time_patterns = [
+                    'pg_sleep', 'sleep', 'waitfor', 'delay', 'benchmark',
+                    'extract(epoch', 'now()', 'current_timestamp'
+                ]
+                for pattern in time_patterns:
+                    if pattern in token_value:
+                        raise exceptions.ValidationError(
+                            f"Time-based function '{pattern}' detected. "
+                            f"These functions are not allowed to prevent timing attacks."
+                        )
+        
+        check_token_recursively(parsed_query)
+
+    def _prepare_and_validate_query(self, sql_query):
+        """Prepare and validate SQL query using sqlparse for comprehensive security.
+        
+        Args:
+            sql_query (str): The SQL query to validate.
+            
+        Returns:
+            tuple: The original and processed query.
+            
+        Raises:
+            ValidationError: If the query is invalid or contains unsafe operations.
+        """
+        if not sql_query:
+            return None
+            
+        # Get current user info for security logging
+        current_user = self.env.user
+        user_info = f"User: {current_user.name} (ID: {current_user.id}, Login: {current_user.login})"
+        remote_addr = self.env.context.get('remote_addr', 'Unknown IP')
+        
+        # Log all SQL query attempts for security auditing
+        _logger.info(f"Chart SQL Query Attempt - {user_info} from {remote_addr}")
+        _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
+            
+        try:
+            # Clean and normalize the query
+            original_query = sql_query.strip()
+            
+            # Remove trailing semicolons
+            if original_query.endswith(";"):
+                original_query = original_query[:-1].strip()
+            
+            # Parse the SQL query using sqlparse
+            try:
+                parsed_statements = sqlparse.parse(original_query)
+            except Exception as parse_error:
+                # Log parsing errors as potential obfuscation attempts
+                _logger.warning(f"Chart SQL Parse Error - {user_info} from {remote_addr}")
+                _logger.warning(f"Parse Error: {str(parse_error)}")
+                _logger.warning(f"Malformed Query: {sql_query}")
+                raise exceptions.ValidationError(
+                    f"Unable to parse SQL statement: {str(parse_error)}\n"
+                    f"Please check your SQL syntax."
+                )
+            
+            if not parsed_statements:
+                _logger.warning(f"Empty Chart SQL Statement - {user_info} from {remote_addr}")
+                raise exceptions.ValidationError("Empty SQL statement provided.")
+            
+            if len(parsed_statements) > 1:
+                # Log multiple statement injection attempts
+                _logger.warning(f"CHART SQL INJECTION ATTEMPT - Multiple Statements - {user_info} from {remote_addr}")
+                _logger.warning(f"SECURITY ALERT: Found {len(parsed_statements)} statements in query")
+                _logger.warning(f"Suspicious Query: {sql_query}")
+                raise exceptions.ValidationError(
+                    "Multiple SQL statements detected. "
+                    "Only single SELECT statements are allowed."
+                )
+            
+            parsed_query = parsed_statements[0]
+            
+            # Validate that it's a SELECT statement
+            first_token = None
+            for token in parsed_query.tokens:
+                if not token.is_whitespace:
+                    first_token = token
+                    break
+            
+            if not first_token or str(first_token).upper().strip() != 'SELECT':
+                # Log non-SELECT statement attempts
+                _logger.warning(f"CHART SQL INJECTION ATTEMPT - Non-SELECT Statement - {user_info} from {remote_addr}")
+                _logger.warning(f"SECURITY ALERT: Attempted {str(first_token).upper()} statement")
+                _logger.warning(f"Malicious Query: {sql_query}")
+                raise exceptions.ValidationError(
+                    "Only SELECT statements are allowed. "
+                    f"Found: {str(first_token)}"
+                )
+            
+            # Perform deep security validation
+            try:
+                self._validate_sql_query_structure(parsed_query)
+            except exceptions.ValidationError as ve:
+                # Log specific security violations
+                _logger.warning(f"CHART SQL INJECTION ATTEMPT - Security Violation - {user_info} from {remote_addr}")
+                _logger.warning(f"SECURITY ALERT: {str(ve)}")
+                _logger.warning(f"Dangerous Query: {sql_query}")
+                raise
+            
+            # Log successful validation
+            _logger.info(f"Chart SQL Query Validated Successfully - {user_info}")
+            _logger.info(f"Final Query: {original_query}")
+            
+            return original_query, original_query.lower()
+            
+        except exceptions.ValidationError as ve:
+            # Security violations are already logged above, just re-raise
+            raise
+        except Exception as e:
+            # Log unexpected errors as potential attack attempts
+            _logger.error(f"UNEXPECTED CHART SQL VALIDATION ERROR - {user_info} from {remote_addr}")
+            _logger.error(f"Error: {str(e)}")
+            _logger.error(f"Query: {sql_query}")
+            self.env.cr.rollback()
+            raise exceptions.ValidationError(
+                f"SQL validation failed: {str(e)}\n"
+                f"Please contact your system administrator."
+            )
+
     @api.constrains("query")
     def _check_query_safety(self):
-        """Validate the query for safety using an isolated transaction.
+        """Validate the query for safety using comprehensive validation including sqlparse.
 
         Raises:
             ValidationError: If the query contains unsafe operations or invalid fields.
@@ -155,36 +343,51 @@ class ResCharts(models.Model):
         for chart in self:
             if not chart.query:
                 continue
-            dangerous_patterns = [
-                r"\b(CREATE|DROP|ALTER|TRUNCATE)\s+(TABLE|DATABASE|INDEX|VIEW)\b",
-                r"\bINSERT\s+INTO\b",
-                r"\bUPDATE\s+\w+\s+SET\b",
-                r"\bDELETE\s+FROM\b",
-                r"pg_\w+",
-                r"information_schema\.\w+",
-                r"/\*.*\*/",
-                r"--.*$",
-            ]
-            for pattern in dangerous_patterns:
-                if re.search(pattern, chart.query, re.IGNORECASE):
-                    raise exceptions.ValidationError(
-                        "Query contains potentially unsafe operations. Pattern detected: %s"
-                        % pattern
-                    )
+            
+            # First use comprehensive SecurityService validation
+            security_service = SecurityService()
+            is_safe, error_msg = security_service.validate_sql_query(chart.query)
+            if not is_safe:
+                security_service.log_security_event(
+                    "CHART_MODEL_SQL_VALIDATION_FAILED",
+                    f"Chart {chart.id} query validation failed: {error_msg} - Query: {chart.query[:200]}..."
+                )
+                raise exceptions.ValidationError("Query validation failed. Please check your SQL syntax and ensure it contains only safe operations.")
+            
+            # Then use sqlparse for deeper validation
+            try:
+                validated_query, query_lower = chart._prepare_and_validate_query(chart.query)
+                if not validated_query:
+                    raise exceptions.ValidationError("Query validation failed.")
+            except exceptions.ValidationError:
+                raise
+            except Exception as e:
+                _logger.error(f"Chart sqlparse validation error: {str(e)}")
+                raise exceptions.ValidationError("Query validation failed. Please check your SQL syntax.")
             registry = self.env.registry
             with registry.cursor() as cr:
                 try:
                     original_query = chart.query.strip()
                     if original_query.endswith(";"):
                         original_query = original_query[:-1]
-                    cr.execute("SET LOCAL statement_timeout = 120000;")
-                    _logger.info(
-                        f"Validating query for chart {chart.id}: {original_query}"
+                    
+                    # Use secure query execution
+                    security_service = SecurityService()
+                    success, results, error_msg = security_service.secure_execute_query(
+                        cr, original_query, timeout=120000
                     )
-                    cr.execute(original_query)
-                    results = cr.dictfetchall()
-                    if results and chart.x_axis_field and chart.y_axis_field:
-                        column_names = list(results[0].keys())
+                    
+                    if not success:
+                        raise exceptions.ValidationError(f"Query execution failed: {error_msg}")
+                        
+                    # Convert results to dict format for validation
+                    if results and cr.description:
+                        column_names = [desc[0] for desc in cr.description]
+                        dict_results = [dict(zip(column_names, row)) for row in results] if results else []
+                    else:
+                        dict_results = []
+                    if dict_results and chart.x_axis_field and chart.y_axis_field:
+                        column_names = list(dict_results[0].keys())
                         if (
                             chart.x_axis_field not in column_names
                             and "." in chart.x_axis_field
@@ -251,13 +454,24 @@ class ResCharts(models.Model):
                 if original_query.endswith(";"):
                     original_query = original_query[:-1]
                 start_time = time.time()
-                cr.execute("SET LOCAL statement_timeout = 120000;")
-                _logger.info(
-                    f"Executing test query for chart {self.id}: {original_query}"
+                
+                # Use secure query execution for test queries
+                security_service = SecurityService()
+                success, raw_results, error_msg = security_service.secure_execute_query(
+                    cr, original_query, timeout=120000
                 )
-                cr.execute(original_query)
-                results = cr.dictfetchall()
+                
                 execution_time = (time.time() - start_time) * 1000
+                
+                if not success:
+                    raise exceptions.ValidationError(f"Query execution failed: {error_msg}")
+                
+                # Convert results to dict format
+                if raw_results and cr.description:
+                    column_names = [desc[0] for desc in cr.description]
+                    results = [dict(zip(column_names, row)) for row in raw_results]
+                else:
+                    results = []
                 with registry.cursor() as write_cr:
                     env = api.Environment(write_cr, self.env.uid, self.env.context)
                     chart = env["res.dashboard.charts"].browse(self.id)

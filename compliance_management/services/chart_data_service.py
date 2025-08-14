@@ -225,6 +225,24 @@ class ChartDataService:
                 
             query += " LIMIT 100"
             
+            # Validate the dynamically built materialized view query
+            is_safe, error_msg = security_service.validate_sql_query(query)
+            if not is_safe:
+                security_service.log_security_event(
+                    "CHART_DATA_SERVICE_DYNAMIC_QUERY_BLOCKED",
+                    f"Chart data service dynamic query blocked: {error_msg} - Query: {query[:200]}..."
+                )
+                _logger.error(f"Unsafe chart data service query blocked: {error_msg}")
+                return {
+                    "id": chart.id,
+                    "title": chart.name,
+                    "type": chart.chart_type,
+                    "error": "Request validation failed",
+                    "labels": [],
+                    "datasets": [{"data": [], "backgroundColor": []}],
+                }
+            
+            
             success, results, _ = db_service.execute_query_with_timeout(query, timeout=30000)
             if not success or not results:
                 _logger.error(f"Error executing materialized view query for chart {chart.id}")
@@ -291,6 +309,22 @@ class ChartDataService:
             _logger.info(f"Direct query for chart {chart.id} - cco: {cco}, branches_id: {branches_id}")
             _logger.info(f"Secured query: {secured_query[:200]}...")
             
+            # Additional validation of the secured query
+            is_safe, error_msg = security_service.validate_sql_query(secured_query)
+            if not is_safe:
+                security_service.log_security_event(
+                    "CHART_DIRECT_QUERY_SQL_INJECTION",
+                    f"Unsafe secured query: {error_msg} - Query: {secured_query[:200]}..."
+                )
+                return {
+                    "id": chart.id,
+                    "title": chart.name,
+                    "type": chart.chart_type,
+                    "error": "Request validation failed",
+                    "labels": [],
+                    "datasets": [{"data": [], "backgroundColor": []}],
+                }
+            
             success, results, execution_time = db_service.execute_query_with_timeout(secured_query, timeout=15000)
             
             if success and results:
@@ -306,7 +340,7 @@ class ChartDataService:
                     "id": chart.id,
                     "title": chart.name,
                     "type": chart.chart_type,
-                    "error": results,
+                    "error": "Request validation failed",
                     "labels": [],
                     "datasets": [{"data": [], "backgroundColor": []}],
                 }
@@ -316,7 +350,7 @@ class ChartDataService:
                 "id": chart.id,
                 "title": chart.name,
                 "type": chart.chart_type,
-                "error": str(e),
+                "error": "Request validation failed",
                 "labels": [],
                 "datasets": [{"data": [], "backgroundColor": []}],
             }

@@ -59,9 +59,38 @@ class DynamicChartController(http.Controller):
             dict: A dictionary containing chart data or an error message.
         """
         try:
+            # Validate all input parameters
+            try:
+                # Sanitize and validate input parameters
+                sanitized_data = self.security_service.validate_and_sanitize_request_data({
+                    'chart_type': chart_type,
+                    'query': query,
+                    'x_axis_field': x_axis_field,
+                    'y_axis_field': y_axis_field,
+                    'color_scheme': color_scheme
+                })
+                chart_type = sanitized_data.get('chart_type', chart_type)
+                query = sanitized_data.get('query', query)
+                x_axis_field = sanitized_data.get('x_axis_field', x_axis_field)
+                y_axis_field = sanitized_data.get('y_axis_field', y_axis_field)
+                color_scheme = sanitized_data.get('color_scheme', color_scheme)
+            except Exception as e:
+                self.security_service.log_security_event(
+                    "CHART_PREVIEW_INPUT_VALIDATION_FAILED",
+                    f"Chart preview endpoint input validation failed: {str(e)}"
+                )
+                return {"error": "Request validation failed"}
+            # Use SecurityService for comprehensive SQL validation
+            security_service = SecurityService()
+            is_safe, error_msg = security_service.validate_sql_query(query)
+            if not is_safe:
+                security_service.log_security_event(
+                    "CHART_SQL_INJECTION_ATTEMPT",
+                    f"Blocked dangerous chart query: {error_msg} - Query: {query[:200]}..."
+                )
+                return {"error": "Request validation failed"}
+                
             chart_data_service = ChartDataService(request.env)
-            if not chart_data_service._is_safe_query(query):
-                return {"error": "Query contains unsafe operations"}
                 
             chart = request.env["res.dashboard.charts"].new(
                 {
@@ -86,7 +115,15 @@ class DynamicChartController(http.Controller):
             
             secured_query = self.security_service.secure_chart_query(chart, cco, [])
             
+            # Use secure query execution
+            security_service = SecurityService()
             db_service = DatabaseService(request.env)
+            
+            # Additional validation for the secured query
+            is_query_safe, query_error = security_service.validate_sql_query(secured_query)
+            if not is_query_safe:
+                return {"error": "Request validation failed"}
+            
             success, results, execution_time = db_service.execute_query_with_timeout(
                 secured_query, timeout=10000
             )
@@ -99,10 +136,10 @@ class DynamicChartController(http.Controller):
                 return chart_data
             else:
                 _logger.error(f"Error in preview_chart: {results}")
-                return {"error": results}
+                return {"error": "Request validation failed"}
         except Exception as e:
             _logger.error(f"Error in preview_chart: {e}")
-            return {"error": str(e)}
+            return {"error": "Request validation failed"}
 
     @http.route("/dashboard/dynamic_chart_page/", type="json", auth="user")
     def get_chart_page(
@@ -123,12 +160,35 @@ class DynamicChartController(http.Controller):
         if branches_id is None:
             branches_id = []
             
+        # Validate all input parameters
+        try:
+            # Sanitize and validate input parameters
+            sanitized_data = self.security_service.validate_and_sanitize_request_data({
+                'chart_id': chart_id,
+                'page': page,
+                'page_size': page_size,
+                'cco': cco,
+                'branches_id': branches_id,
+                **kw
+            })
+            chart_id = sanitized_data.get('chart_id', chart_id)
+            page = sanitized_data.get('page', page)
+            page_size = sanitized_data.get('page_size', page_size)
+            cco = sanitized_data.get('cco', cco)
+            branches_id = sanitized_data.get('branches_id', branches_id)
+        except Exception as e:
+            self.security_service.log_security_event(
+                "CHART_PAGE_INPUT_VALIDATION_FAILED",
+                f"Chart page endpoint input validation failed: {str(e)}"
+            )
+            return {"error": "Request validation failed"}
+            
         try:
             chart_id = int(chart_id)
             page = max(0, int(page))
             page_size = min(100, max(1, int(page_size)))
         except (ValueError, TypeError):
-            return {"error": "Invalid parameters"}
+            return {"error": "Request validation failed"}
             
         if not isinstance(cco, bool):
             cco = str(cco).lower() == "true"
@@ -208,9 +268,9 @@ class DynamicChartController(http.Controller):
                 time.sleep(wait_time)
             except Exception as e:
                 _logger.error(f"Error in get_chart_with_retries: {e}")
-                return {"error": str(e)}
+                return {"error": "Request validation failed"}
                 
-        return {"error": "Failed after multiple retries"}
+        return {"error": "Request validation failed"}
 
     def _get_chart_from_materialized_view(
         self, chart, page, page_size, cco, branches_id, cache_key, user_id
@@ -318,13 +378,43 @@ class DynamicChartController(http.Controller):
                                     query += f" WHERE {branch_col} IN {tuple(effective_branches)}"
                             elif branch_col:
                                 query += " WHERE 1=0"
+                        
+                        # Validate the dynamically built query before execution
+                        security_service = SecurityService()
+                        is_safe, error_msg = security_service.validate_sql_query(query)
+                        if not is_safe:
+                            security_service.log_security_event(
+                                "CHART_DYNAMIC_QUERY_BLOCKED",
+                                f"Dynamically built query blocked: {error_msg} - Query: {query[:200]}..."
+                            )
+                            _logger.error(f"Unsafe dynamically built query blocked: {error_msg}")
+                            return {"error": "Request validation failed"}
                                 
-                        cr.execute(f"SELECT COUNT(*) FROM ({query}) AS count_query")
+                        count_query = f"SELECT COUNT(*) FROM ({query}) AS count_query"
+                        # Validate count query as well
+                        is_count_safe, count_error = security_service.validate_sql_query(count_query)
+                        if not is_count_safe:
+                            security_service.log_security_event(
+                                "CHART_COUNT_QUERY_BLOCKED",
+                                f"Count query blocked: {count_error}"
+                            )
+                            return {"error": "Request validation failed"}
+                            
+                        cr.execute(count_query)
                         total_count = cr.fetchone()[0]
                         
                         if sort_col:
                             query += f" ORDER BY {sort_col} DESC"
                         query += f" LIMIT {page_size} OFFSET {page * page_size}"
+                        
+                        # Validate final query with pagination
+                        is_final_safe, final_error = security_service.validate_sql_query(query)
+                        if not is_final_safe:
+                            security_service.log_security_event(
+                                "CHART_PAGINATED_QUERY_BLOCKED",
+                                f"Paginated query blocked: {final_error}"
+                            )
+                            return {"error": "Request validation failed"}
                         
                         timeout = int(retry_params.get_param("chart.view.query_timeout", default=30000))
                         cr.execute(f"SET LOCAL statement_timeout = {timeout}")
@@ -416,7 +506,7 @@ class DynamicChartController(http.Controller):
                 "id": chart.id,
                 "title": chart.name,
                 "type": chart.chart_type,
-                "error": str(e),
+                "error": "Request validation failed",
                 "labels": [],
                 "datasets": [{"data": [], "backgroundColor": []}],
                 "pagination": {
@@ -439,6 +529,23 @@ class DynamicChartController(http.Controller):
             list: A list of dictionaries containing chart data or an error message.
         """
         try:
+            # Validate all input parameters
+            try:
+                # Sanitize and validate input parameters
+                sanitized_data = self.security_service.validate_and_sanitize_request_data({
+                    'cco': cco,
+                    'branches_id': branches_id,
+                    **kw
+                })
+                cco = sanitized_data.get('cco', cco)
+                branches_id = sanitized_data.get('branches_id', branches_id)
+            except Exception as e:
+                self.security_service.log_security_event(
+                    "CHARTS_DATA_INPUT_VALIDATION_FAILED",
+                    f"Charts data endpoint input validation failed: {str(e)}"
+                )
+                return []
+                
             if not isinstance(cco, bool):
                 cco = str(cco).lower() == "true"
                 
@@ -514,7 +621,7 @@ class DynamicChartController(http.Controller):
                             "id": chart.id,
                             "title": chart.name,
                             "type": chart.chart_type,
-                            "error": str(e),
+                            "error": "Request validation failed",
                             "labels": [],
                             "datasets": [{"data": [], "backgroundColor": []}],
                         }

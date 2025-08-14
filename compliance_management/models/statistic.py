@@ -4,6 +4,8 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import re
 import logging
+import sqlparse
+from sqlparse import sql, tokens as T, keywords as K
 
 _logger = logging.getLogger(__name__)
 
@@ -76,35 +78,186 @@ class Statistic(models.Model):
 
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
+    def _validate_sql_query_structure(self, parsed_query):
+        """Validate the structure of a parsed SQL query to prevent injection attacks.
+        
+        Args:
+            parsed_query: A sqlparse.sql.Statement object
+            
+        Raises:
+            ValidationError: If the query contains dangerous constructs
+        """
+        dangerous_functions = [
+            'pg_sleep', 'sleep', 'waitfor', 'delay', 'benchmark',
+            'current_database', 'version', 'user', 'current_user',
+            'session_user', 'system_user', 'pg_backend_pid',
+            'inet_server_addr', 'inet_server_port', 'pg_postmaster_start_time'
+        ]
+        
+        dangerous_keywords = [
+            'drop', 'delete', 'insert', 'update', 'alter', 'create',
+            'truncate', 'grant', 'revoke', 'execute', 'exec', 'xp_',
+            'sp_', 'declare', 'cursor', 'procedure', 'function'
+        ]
+        
+        # First check for CASE WHEN constructs in the entire query
+        query_text = str(parsed_query).lower()
+        if re.search(r'\bcase\b.*\bwhen\b', query_text, re.DOTALL):
+            raise ValidationError(
+                "CASE WHEN statements are not allowed for security reasons. "
+                "Please use simpler SELECT queries."
+            )
+        
+        def check_token_recursively(token):
+            """Recursively check all tokens in the SQL statement."""
+            if hasattr(token, 'tokens'):
+                for sub_token in token.tokens:
+                    check_token_recursively(sub_token)
+            else:
+                token_value = str(token).lower().strip()
+                if not token_value:
+                    return
+                    
+                # Check for dangerous functions (with word boundaries to avoid false positives)
+                for func in dangerous_functions:
+                    # Use word boundary matching to avoid blocking legitimate table names
+                    import re
+                    pattern = r'\b' + re.escape(func) + r'\b'
+                    if re.search(pattern, token_value):
+                        raise ValidationError(
+                            f"Dangerous function '{func}' detected in SQL query. "
+                            f"This function is not allowed for security reasons."
+                        )
+                
+                # Check for dangerous keywords
+                for keyword in dangerous_keywords:
+                    if token_value.startswith(keyword) and (
+                        len(token_value) == len(keyword) or 
+                        not token_value[len(keyword)].isalnum()
+                    ):
+                        raise ValidationError(
+                            f"Dangerous SQL keyword '{keyword}' detected. "
+                            f"Only SELECT statements are allowed."
+                        )
+                
+                # Check for time-based functions and constructs
+                time_patterns = [
+                    'pg_sleep', 'sleep', 'waitfor', 'delay', 'benchmark',
+                    'extract(epoch', 'now()', 'current_timestamp'
+                ]
+                for pattern in time_patterns:
+                    if pattern in token_value:
+                        raise ValidationError(
+                            f"Time-based function '{pattern}' detected. "
+                            f"These functions are not allowed to prevent timing attacks."
+                        )
+        
+        check_token_recursively(parsed_query)
+
     def _prepare_and_validate_query(self, sql_query):
-        """Prepare and validate SQL query, ensuring it meets safety requirements.
+        """Prepare and validate SQL query using sqlparse for comprehensive security.
+        
         Args:
             sql_query (str): The SQL query to validate.
+            
         Returns:
             tuple: The original and processed query.
+            
         Raises:
             ValidationError: If the query is invalid or contains unsafe operations.
         """
         if not sql_query:
             return None
-        pattern = r"\bres_partner\b"
+            
+        # Get current user info for security logging
+        current_user = self.env.user
+        user_info = f"User: {current_user.name} (ID: {current_user.id}, Login: {current_user.login})"
+        remote_addr = self.env.context.get('remote_addr', 'Unknown IP')
+        
+        # Log all SQL query attempts for security auditing
+        _logger.info(f"SQL Query Attempt - {user_info} from {remote_addr}")
+        _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
+            
         try:
+            # Clean and normalize the query
             original_query = sql_query.strip()
-            query = original_query.lower()
-            if not query.startswith("select"):
-                raise ValidationError("Query not supported.\nHint: Start with SELECT")
-            if re.search(pattern, query, re.IGNORECASE):
-                if query.endswith(";"):
-                    query = query[:-1]
-                    original_query = original_query[:-1]
-                has_where = bool(re.search(r"\bwhere\b", query))
+            
+            # Remove trailing semicolons
+            if original_query.endswith(";"):
+                original_query = original_query[:-1].strip()
+            
+            # Parse the SQL query using sqlparse
+            try:
+                parsed_statements = sqlparse.parse(original_query)
+            except Exception as parse_error:
+                # Log parsing errors as potential obfuscation attempts
+                _logger.warning(f"SQL Parse Error - {user_info} from {remote_addr}")
+                _logger.warning(f"Parse Error: {str(parse_error)}")
+                _logger.warning(f"Malformed Query: {sql_query}")
+                raise ValidationError(
+                    f"Unable to parse SQL statement: {str(parse_error)}\n"
+                    f"Please check your SQL syntax."
+                )
+            
+            if not parsed_statements:
+                _logger.warning(f"Empty SQL Statement - {user_info} from {remote_addr}")
+                raise ValidationError("Empty SQL statement provided.")
+            
+            if len(parsed_statements) > 1:
+                # Log multiple statement injection attempts
+                _logger.warning(f"SQL INJECTION ATTEMPT - Multiple Statements - {user_info} from {remote_addr}")
+                _logger.warning(f"SECURITY ALERT: Found {len(parsed_statements)} statements in query")
+                _logger.warning(f"Suspicious Query: {sql_query}")
+                raise ValidationError(
+                    "Multiple SQL statements detected. "
+                    "Only single SELECT statements are allowed."
+                )
+            
+            parsed_query = parsed_statements[0]
+            
+            # Validate that it's a SELECT statement
+            first_token = None
+            for token in parsed_query.tokens:
+                if not token.is_whitespace:
+                    first_token = token
+                    break
+            
+            if not first_token or str(first_token).upper().strip() != 'SELECT':
+                # Log non-SELECT statement attempts
+                _logger.warning(f"SQL INJECTION ATTEMPT - Non-SELECT Statement - {user_info} from {remote_addr}")
+                _logger.warning(f"SECURITY ALERT: Attempted {str(first_token).upper()} statement")
+                _logger.warning(f"Malicious Query: {sql_query}")
+                raise ValidationError(
+                    "Only SELECT statements are allowed. "
+                    f"Found: {str(first_token)}"
+                )
+            
+            # Perform deep security validation
+            try:
+                self._validate_sql_query_structure(parsed_query)
+            except ValidationError as ve:
+                # Log specific security violations
+                _logger.warning(f"SQL INJECTION ATTEMPT - Security Violation - {user_info} from {remote_addr}")
+                _logger.warning(f"SECURITY ALERT: {str(ve)}")
+                _logger.warning(f"Dangerous Query: {sql_query}")
+                raise
+            
+            # Additional validation for res_partner table access
+            query_lower = original_query.lower()
+            pattern = r"\bres_partner\b"
+            
+            if re.search(pattern, query_lower, re.IGNORECASE):
+                # Apply origin filtering for res_partner queries
+                has_where = bool(re.search(r"\bwhere\b", query_lower))
                 condition = (
                     " AND origin IN ('demo','test','prod')"
                     if has_where
                     else " WHERE origin IN ('demo','test','prod')"
                 )
+                
+                # Find the right place to insert the condition
                 for clause in ["group by", "order by", "limit", "offset", "having"]:
-                    clause_pos = query.find(" " + clause + " ")
+                    clause_pos = query_lower.find(" " + clause + " ")
                     if clause_pos > -1:
                         original_query = (
                             original_query[:clause_pos]
@@ -114,10 +267,28 @@ class Statistic(models.Model):
                         break
                 else:
                     original_query += condition
-            return original_query, query
+                
+                _logger.info(f"Applied security filter for res_partner query - {user_info}")
+            
+            # Log successful validation
+            _logger.info(f"SQL Query Validated Successfully - {user_info}")
+            _logger.info(f"Final Query: {original_query}")
+            
+            return original_query, query_lower
+            
+        except ValidationError as ve:
+            # Security violations are already logged above, just re-raise
+            raise
         except Exception as e:
+            # Log unexpected errors as potential attack attempts
+            _logger.error(f"UNEXPECTED SQL VALIDATION ERROR - {user_info} from {remote_addr}")
+            _logger.error(f"Error: {str(e)}")
+            _logger.error(f"Query: {sql_query}")
             self.env.cr.rollback()
-            raise ValidationError(f"Invalid SQL query:\n{str(e)}")
+            raise ValidationError(
+                f"SQL validation failed: {str(e)}\n"
+                f"Please contact your system administrator."
+            )
 
     def _execute_query_and_get_value(self, original_query, query):
         """Execute the SQL query and return the calculated value.
