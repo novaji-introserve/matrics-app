@@ -1,6 +1,12 @@
 /** @odoo-module */
 import { registry } from "@web/core/registry";
 
+// Debug mode - set to false for production
+const DEBUG = false;
+function logDebug(...args) {
+  if (DEBUG) console.log(...args);
+}
+
 /**
  * Service for interacting with server-side dashboard cache (user-specific)
  * @class ServerCacheService
@@ -25,25 +31,25 @@ export class ServerCacheService {
     
     if (this.memoryCache[memKey] && this.memoryCache[memKey].expiry > Date.now()) {
       const timeLeft = Math.round((this.memoryCache[memKey].expiry - Date.now()) / 1000);
-      console.log(`Cache hit for ${key} (memory) - ${timeLeft}s left before expiry`);
+      logDebug(`Cache hit for ${key} (memory) - ${timeLeft}s left before expiry`);
       return this.memoryCache[memKey].data;
     }
     
     try {
-      console.log(`Checking server cache for ${key}...`);
+      logDebug(`Checking server cache for ${key}...`);
       const response = await this.rpc('/dashboard/cache/get', { key });
       if (response.success && response.data) {
-        console.log(`Cache hit for ${key} (server) - triggered background refresh`);
+        logDebug(`Cache hit for ${key} (server) - triggered background refresh`);
         this.memoryCache[memKey] = {
           data: response.data,
           expiry: Date.now() + (40 * 60 * 1000) // 40 minutes
         };
         return response.data;
       }
-      console.log(`Cache miss for ${key}`);
+      logDebug(`Cache miss for ${key}`);
       return null;
     } catch (error) {
-      console.error('Error fetching server cache:', error);
+      logDebug('Error fetching server cache:', error);
       return null;
     }
   }
@@ -59,7 +65,7 @@ export class ServerCacheService {
     try {
       const response = await this.rpc('/dashboard/cache/set', { key, data });
       if (response.success) {
-        console.log(`Cache set for ${key}`);
+        logDebug(`Cache set for ${key}`);
         this.memoryCache[memKey] = {
           data: data,
           expiry: Date.now() + (40 * 60 * 1000) // 40 minutes
@@ -68,7 +74,7 @@ export class ServerCacheService {
       }
       return false;
     } catch (error) {
-      console.error('Error setting server cache:', error);
+      logDebug('Error setting server cache:', error);
       return false;
     }
   }
@@ -84,16 +90,16 @@ export class ServerCacheService {
       if (response.success) {
         if (key) {
           delete this.memoryCache[`${key}`];
-          console.log(`Cache invalidated for ${key}`);
+          logDebug(`Cache invalidated for ${key}`);
         } else {
           this.memoryCache = {};
-          console.log('All cache invalidated');
+          logDebug('All cache invalidated');
         }
         return true;
       }
       return false;
     } catch (error) {
-      console.error('Error invalidating cache:', error);
+      logDebug('Error invalidating cache:', error);
       return false;
     }
   }

@@ -85,7 +85,7 @@ export class RiskSliderField extends Component {
         }
         this.state.readonly = props.readonly || parsedOptions.readonly === true;
       } catch (e) {
-        console.error("Error parsing options:", e);
+        // console.error("Error parsing options:", e);
       }
     } else {
       if (props.name !== 'control_effectiveness_score') {

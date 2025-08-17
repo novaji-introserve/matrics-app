@@ -7,7 +7,7 @@ import { ChartRenderer } from "../../chart/js/chart";
 const { Component, useState, useEffect, useRef, onWillStart, onWillUnmount } = owl;
 
 // Debug mode - set to false for production
-const DEBUG = true;
+const DEBUG = false;
 function logDebug(...args) {
   if (DEBUG) console.log(...args);
 }
@@ -85,7 +85,7 @@ export class ComplianceDashboard extends Component {
         await this.getCurrentUser();
         this._loadDataProgressively();
       } catch (error) {
-        console.error("Error in component initialization:", error);
+        logDebug("Error in component initialization:", error);
         this._clearLoadingStates();
       }
     });
@@ -164,7 +164,7 @@ export class ComplianceDashboard extends Component {
       try {
         await this.filterByDate(true);
       } catch (error) {
-        console.error("Error refreshing dashboard:", error);
+        logDebug("Error refreshing dashboard:", error);
       }
     }
   }
@@ -194,7 +194,7 @@ export class ComplianceDashboard extends Component {
       // After stats are loaded, load charts with a small delay
       setTimeout(() => {
         this.fetchDashboardCharts().catch(error => {
-          console.error("Error loading charts:", error);
+          logDebug("Error loading charts:", error);
         });
       }, 100);
     });
@@ -252,7 +252,7 @@ export class ComplianceDashboard extends Component {
       }
       return result;
     } catch (error) {
-      console.error("Error fetching current user:", error);
+      logDebug("Error fetching current user:", error);
       return null;
     }
   }
@@ -281,7 +281,7 @@ export class ComplianceDashboard extends Component {
         }
       }
     } catch (error) {
-      console.error("Error clearing stale cache:", error);
+      logDebug("Error clearing stale cache:", error);
     }
   }
 
@@ -359,7 +359,7 @@ export class ComplianceDashboard extends Component {
       this.state.loadingStates.stats = false;
       return result;
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      logDebug("Error fetching stats:", error);
       this.state.loadingStates.stats = false;
       this.state.stats = [];
       this.state.totalstat = 0;
@@ -425,7 +425,7 @@ export class ComplianceDashboard extends Component {
       this.state.loadingStates.stats = false;
       return result;
     } catch (error) {
-      console.error("Error fetching category stats:", error);
+      logDebug("Error fetching category stats:", error);
       this.state.loadingStates.stats = false;
       this.state.stats = [];
       this.state.totalstat = 0;
@@ -484,7 +484,7 @@ export class ComplianceDashboard extends Component {
       this.state.loadingStates.charts = false;
       return result;
     } catch (error) {
-      console.error("Error fetching charts:", error);
+      logDebug("Error fetching charts:", error);
       this.state.loadingStates.charts = false;
       this.state.dynamic_chart = [];
       return null;
@@ -509,16 +509,16 @@ export class ComplianceDashboard extends Component {
       ]);
       
       if (statsResult.status === 'rejected') {
-        console.error('Stats loading failed:', statsResult.reason);
+        logDebug('Stats loading failed:', statsResult.reason);
       }
       
       if (chartsResult.status === 'rejected') {
-        console.error('Charts loading failed:', chartsResult.reason);
+        logDebug('Charts loading failed:', chartsResult.reason);
       }
       
       return true;
     } catch (error) {
-      console.error("Error in filterByDate:", error);
+      logDebug("Error in filterByDate:", error);
       this._clearLoadingStates();
       return false;
     }
@@ -532,7 +532,7 @@ export class ComplianceDashboard extends Component {
       await this.rpc("/dashboard/cache/invalidate", {});
       logDebug('Cleared all user cache');
     } catch (error) {
-      console.error("Error clearing all user cache:", error);
+      logDebug("Error clearing all user cache:", error);
     }
   }
 
@@ -551,7 +551,7 @@ export class ComplianceDashboard extends Component {
       
       return true;
     } catch (error) {
-      console.error("Error in displayByCategory:", error);
+      logDebug("Error in displayByCategory:", error);
       return false;
     }
   }
@@ -581,7 +581,7 @@ export class ComplianceDashboard extends Component {
       }
       
       if (!response || response.error) {
-        console.error("Error in dynamic_sql response:", response?.error);
+        logDebug("Error in dynamic_sql response:", response?.error);
         return;
       }
 
@@ -621,7 +621,7 @@ export class ComplianceDashboard extends Component {
         ],
       });
     } catch (error) {
-      console.error("Error in displayOdooView:", error);
+      logDebug("Error in displayOdooView:", error);
     }
   }
 }

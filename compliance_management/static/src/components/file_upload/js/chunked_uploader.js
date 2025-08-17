@@ -3,6 +3,12 @@ import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
 import { session } from "@web/session";
 
+// Debug mode - set to false for production
+const DEBUG = false;
+function logDebug(...args) {
+  if (DEBUG) console.log(...args);
+}
+
 /**
  * ChunkedUploader - Service for handling file uploads in chunks
  * 
@@ -73,7 +79,7 @@ class ChunkedUploader {
         if (typeof this.options.onLog === 'function') {
             this.options.onLog(message, type);
         }
-        console.log(`[${type.toUpperCase()}] ${message}`);
+        logDebug(`[${type.toUpperCase()}] ${message}`);
     }
 
     /**
@@ -138,7 +144,7 @@ class ChunkedUploader {
                     xhr.setRequestHeader('X-CSRFToken', csrf_token);
                 } else {
                     // console.warn('CSRF token not found - request may fail');
-                    console.debug('CSRF token not found, but route has csrf=False so this is ok');
+                    logDebug('CSRF token not found, but route has csrf=False so this is ok');
                 }
 
                 // Track progress
