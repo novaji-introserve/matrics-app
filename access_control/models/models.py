@@ -247,7 +247,6 @@ class ViewAccessRule(models.Model):
                     # Set menu groups to match rule's allowed groups
                     menu.write({'groups_id': [(6, 0, rule.group_ids.ids)]})
 
-
 class ViewAccessModelList(models.TransientModel):
     _name = 'view.access.model.list'
     _description = 'Available Models for Access Control'
@@ -281,8 +280,7 @@ class ViewAccessModelList(models.TransientModel):
     def get_available_groups(self):
         groups = self.env['res.groups'].search([])
         return [{'id': group.id, 'name': group.name, 'category': group.category_id.name} for group in groups]
-    
-    
+        
 class IrUiMenuInherit(models.Model):
     _inherit = 'ir.ui.menu'
 
@@ -295,7 +293,6 @@ class IrUiMenuInherit(models.Model):
         readonly=True
     )
     
-
 # Inherit server actions to integrate with your system
 class IrActionsServerInherit(models.Model):
     _inherit = 'ir.actions.server'

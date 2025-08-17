@@ -113,13 +113,293 @@ class ViewSecurityController(http.Controller):
 
         return False
 
+    # @http.route('/web', type='http', auth="user", website=False)
+    # def web_client_security(self, s_action=None, **kw):
+    #     """Block access to specific management views via URLs"""
+    #     action_id = kw.get('action')
+    #     menu_id = kw.get('menu_id')
+    #     user = request.env.user
+
+    #     if menu_id:
+    #         try:
+    #             menu_id = int(menu_id)
+    #             if not self._check_menu_access(user, menu_id):
+    #                 menu_name = f"Menu #{menu_id}"
+    #                 try:
+    #                     menu = request.env['ir.ui.menu'].sudo().browse(menu_id)
+    #                     if menu.exists():
+    #                         menu_name = menu.name
+    #                 except:
+    #                     pass
+    #                 return request.render('web.access_denied', {
+    #                     'message': f'You are not authorized to access "{menu_name}".'
+    #                 })
+    #         except (ValueError, TypeError):
+    #             pass
+
+    #     if action_id:
+    #         try:
+    #             action_id = int(action_id)
+    #             has_access, action_type = self._check_action_type_and_access(
+    #                 user, action_id)
+
+    #             if not has_access:
+    #                 action_name = "action"
+    #                 try:
+    #                     if action_type == 'window':
+    #                         action = request.env['ir.actions.act_window'].sudo().browse(
+    #                             action_id)
+    #                         if action.exists():
+    #                             action_name = action.name
+    #                     elif action_type == 'client':
+    #                         action = request.env['ir.actions.client'].sudo().browse(
+    #                             action_id)
+    #                         if action.exists():
+    #                             action_name = action.name
+    #                     elif action_type == 'server':
+    #                         action = request.env['ir.actions.server'].sudo().browse(
+    #                             action_id)
+    #                         if action.exists():
+    #                             action_name = action.name
+    #                 except:
+    #                     pass
+
+    #                 return request.render('web.access_denied', {
+    #                     'message': f'You are not authorized to access "{action_name}".'
+    #                 })
+    #         except (ValueError, TypeError):
+    #             pass
+
+
+    #     return Home().web_client(s_action, **kw)
+
+    # @http.route('/web/dataset/call_kw/<path:path>', type='json', auth="user")
+    # def call_kw_security(self, model, method, args, kwargs, path=None):
+    #     """Block model access based on dynamic rules"""
+    #     user = request.env.user
+    #     restricted_models = request.env['view.access.rule'].get_restricted_models(
+    #     )
+
+    #     if model in restricted_models:
+    #         context = kwargs.get('context', {})
+    #         current_action_id = None
+    #         if context and context.get('params') and context['params'].get('action'):
+    #             current_action_id = context['params']['action']
+
+    #         is_main_view = not context.get('from_related_field')
+
+    #         if is_main_view and (method == 'get_views' or method == 'web_search_read'):
+    #             if not self._check_access_for_action(user, model, current_action_id):
+    #                 model_name = model
+    #                 action_name = ""
+
+    #                 try:
+    #                     ir_model = request.env['ir.model'].sudo().search(
+    #                         [('model', '=', model)], limit=1)
+    #                     if ir_model:
+    #                         model_name = ir_model.name
+
+    #                     if current_action_id:
+    #                         action_type = request.env['view.access.rule'].get_action_type(
+    #                             current_action_id)
+    #                         if action_type == 'window':
+    #                             action = request.env['ir.actions.act_window'].sudo().browse(
+    #                                 current_action_id)
+    #                             if action.exists():
+    #                                 action_name = f" ({action.name})"
+    #                         elif action_type == 'client':
+    #                             action = request.env['ir.actions.client'].sudo().browse(
+    #                                 current_action_id)
+    #                             if action.exists():
+    #                                 action_name = f" ({action.name})"
+    #                         elif action_type == 'server':
+    #                             action = request.env['ir.actions.server'].sudo().browse(
+    #                                 current_action_id)
+    #                             if action.exists():
+    #                                 action_name = f" ({action.name})"
+    #                 except Exception as e:
+    #                     _logger.error(f"Error fetching names: {e}")
+
+    #                 if method == 'get_views':
+    #                     raise AccessError(
+    #                         f'Access denied to {model_name} view{action_name}. Contact your administrator for access.')
+    #                 elif method == 'web_search_read':
+    #                     raise AccessError(
+    #                         f'Access denied to {model_name} listing{action_name}. Contact your administrator for access.')
+
+
+    #     return DataSet().call_kw(model, method, args, kwargs, path)
+
+
+    @http.route('/web/dataset/call_kw/<path:path>', type='json', auth="user")
+    def call_kw_security(self, model, method, args, kwargs, path=None):
+        """Block model access based on dynamic rules - SIMPLE approach: block direct access without context"""
+        user = request.env.user
+        restricted_models = request.env['view.access.rule'].get_restricted_models()
+
+        if model in restricted_models:
+            context = kwargs.get('context', {})
+
+            # Extract current action ID and menu ID from context
+            current_action_id = None
+            current_menu_id = None
+
+            if context and context.get('params'):
+                current_action_id = context['params'].get('action')
+                current_menu_id = context['params'].get('menu_id')
+
+            # Check if this is a main view access (not a related field or popup)
+            is_main_view = not context.get('from_related_field')
+
+            # Block these methods for direct record access
+            restricted_methods = [
+                'get_views', 'web_search_read', 'read', 'write', 'create', 'unlink',
+                'search_read', 'name_search', 'name_get', 'copy', 'default_get'
+            ]
+
+            # SIMPLE FIX: Block direct access without proper context
+            if is_main_view and method in restricted_methods:
+
+                # If no action or menu context, block access
+                if not current_action_id and not current_menu_id:
+                    _logger.warning(
+                        f"BLOCKING direct access to {model} for user {user.name} - no context (method: {method})")
+
+                    # Different error messages based on the method
+                    if method == 'read':
+                        raise AccessError(
+                            f'Direct access to {model} records is not allowed. Please access through the proper menu.')
+                    elif method in ['write', 'create', 'unlink']:
+                        raise AccessError(
+                            f'Direct modification of {model} records is not allowed. Please access through the proper menu.')
+                    elif method == 'get_views':
+                        raise AccessError(
+                            f'Direct access to {model} views is not allowed. Please access through the proper menu.')
+                    elif method == 'web_search_read':
+                        raise AccessError(
+                            f'Direct access to {model} data is not allowed. Please access through the proper menu.')
+                    else:
+                        raise AccessError(
+                            f'Direct access to {model} is not allowed. Please access through the proper menu.')
+
+                # If we have context, proceed with existing access checks
+                else:
+                    # Check action access if action ID is available
+                    has_action_access = True
+                    if current_action_id:
+                        has_action_access = self._check_access_for_action(
+                            user, model, current_action_id)
+
+                    # Check menu access if menu ID is available
+                    has_menu_access = True
+                    if current_menu_id:
+                        try:
+                            menu_id_int = int(current_menu_id)
+                            has_menu_access = self._check_menu_access(
+                                user, menu_id_int)
+                        except (ValueError, TypeError):
+                            pass
+
+                    # Deny access if either check fails
+                    if not has_action_access or not has_menu_access:
+                        model_name = model
+                        access_info = ""
+
+                        try:
+                            ir_model = request.env['ir.model'].sudo().search(
+                                [('model', '=', model)], limit=1)
+                            if ir_model:
+                                model_name = ir_model.name
+
+                            # Add context about what was being accessed
+                            if current_action_id:
+                                action_type = request.env['view.access.rule'].get_action_type(
+                                    current_action_id)
+                                if action_type == 'window':
+                                    action = request.env['ir.actions.act_window'].sudo().browse(
+                                        current_action_id)
+                                    if action.exists():
+                                        access_info = f" via {action.name}"
+                                elif action_type == 'server':
+                                    action = request.env['ir.actions.server'].sudo().browse(
+                                        current_action_id)
+                                    if action.exists():
+                                        access_info = f" via {action.name}"
+
+                            elif current_menu_id:
+                                menu = request.env['ir.ui.menu'].sudo().browse(
+                                    int(current_menu_id))
+                                if menu.exists():
+                                    access_info = f" via {menu.name} menu"
+
+                        except Exception as e:
+                            _logger.error(f"Error fetching names: {e}")
+
+                        # Log the blocked access attempt
+                        _logger.warning(
+                            f"Blocked {method} access to {model} for user {user.name}{access_info}")
+
+                        # Different error messages based on the method
+                        if method == 'read':
+                            raise AccessError(
+                                f'Access denied to {model_name} record{access_info}. Contact your administrator for access.')
+                        elif method in ['write', 'create', 'unlink']:
+                            raise AccessError(
+                                f'Access denied to modify {model_name} records{access_info}. Contact your administrator for access.')
+                        elif method == 'get_views':
+                            raise AccessError(
+                                f'Access denied to {model_name} view{access_info}. Contact your administrator for access.')
+                        elif method == 'web_search_read':
+                            raise AccessError(
+                                f'Access denied to {model_name} listing{access_info}. Contact your administrator for access.')
+                        else:
+                            raise AccessError(
+                                f'Access denied to {model_name}{access_info}. Contact your administrator for access.')
+
+        return DataSet().call_kw(model, method, args, kwargs, path)
+    
+    @http.route('/web/dataset/search_read', type='json', auth="user")
+    def search_read_security(self, model, fields, offset=0, limit=None, order=None, domain=None, **kwargs):
+        """Block direct search_read access"""
+        user = request.env.user
+        restricted_models = request.env['view.access.rule'].get_restricted_models()
+
+        if model in restricted_models:
+            context = kwargs.get('context', {})
+            current_action_id = context.get('params', {}).get(
+                'action') if context else None
+            current_menu_id = context.get('params', {}).get(
+                'menu_id') if context else None
+
+            # Check access
+            has_access = True
+            if current_action_id:
+                has_access = self._check_access_for_action(
+                    user, model, current_action_id)
+            elif current_menu_id:
+                try:
+                    has_access = self._check_menu_access(
+                        user, int(current_menu_id))
+                except (ValueError, TypeError):
+                    pass
+
+            if not has_access:
+                _logger.warning(
+                    f"Blocked search_read access to {model} for user {user.name}")
+                raise AccessError(
+                    f'Access denied to {model} records. Contact your administrator for access.')
+
+        return DataSet().search_read(model, fields, offset, limit, order, domain, **kwargs)
+
     @http.route('/web', type='http', auth="user", website=False)
     def web_client_security(self, s_action=None, **kw):
         """Block access to specific management views via URLs"""
         action_id = kw.get('action')
         menu_id = kw.get('menu_id')
+        model = kw.get('model')  # NEW: Check model parameter
         user = request.env.user
 
+        # Existing menu check...
         if menu_id:
             try:
                 menu_id = int(menu_id)
@@ -137,98 +417,48 @@ class ViewSecurityController(http.Controller):
             except (ValueError, TypeError):
                 pass
 
+        # Existing action check...
         if action_id:
             try:
                 action_id = int(action_id)
                 has_access, action_type = self._check_action_type_and_access(
                     user, action_id)
-
                 if not has_access:
-                    action_name = "action"
-                    try:
-                        if action_type == 'window':
-                            action = request.env['ir.actions.act_window'].sudo().browse(
-                                action_id)
-                            if action.exists():
-                                action_name = action.name
-                        elif action_type == 'client':
-                            action = request.env['ir.actions.client'].sudo().browse(
-                                action_id)
-                            if action.exists():
-                                action_name = action.name
-                        elif action_type == 'server':
-                            action = request.env['ir.actions.server'].sudo().browse(
-                                action_id)
-                            if action.exists():
-                                action_name = action.name
-                    except:
-                        pass
-
+                    # ... existing logic
                     return request.render('web.access_denied', {
                         'message': f'You are not authorized to access "{action_name}".'
                     })
             except (ValueError, TypeError):
                 pass
 
+        # NEW: Check direct model access
+        if model and not action_id:
+            restricted_models = request.env['view.access.rule'].get_restricted_models(
+            )
+            if model in restricted_models:
+                # If accessing a restricted model without a specific action, check menu access
+                has_access = True
+                if menu_id:
+                    try:
+                        has_access = self._check_menu_access(user, int(menu_id))
+                    except (ValueError, TypeError):
+                        has_access = False
 
-        return Home().web_client(s_action, **kw)
-
-    @http.route('/web/dataset/call_kw/<path:path>', type='json', auth="user")
-    def call_kw_security(self, model, method, args, kwargs, path=None):
-        """Block model access based on dynamic rules"""
-        user = request.env.user
-        restricted_models = request.env['view.access.rule'].get_restricted_models(
-        )
-
-        if model in restricted_models:
-            context = kwargs.get('context', {})
-            current_action_id = None
-            if context and context.get('params') and context['params'].get('action'):
-                current_action_id = context['params']['action']
-
-            is_main_view = not context.get('from_related_field')
-
-            if is_main_view and (method == 'get_views' or method == 'web_search_read'):
-                if not self._check_access_for_action(user, model, current_action_id):
+                if not has_access:
                     model_name = model
-                    action_name = ""
-
                     try:
                         ir_model = request.env['ir.model'].sudo().search(
                             [('model', '=', model)], limit=1)
                         if ir_model:
                             model_name = ir_model.name
+                    except:
+                        pass
 
-                        if current_action_id:
-                            action_type = request.env['view.access.rule'].get_action_type(
-                                current_action_id)
-                            if action_type == 'window':
-                                action = request.env['ir.actions.act_window'].sudo().browse(
-                                    current_action_id)
-                                if action.exists():
-                                    action_name = f" ({action.name})"
-                            elif action_type == 'client':
-                                action = request.env['ir.actions.client'].sudo().browse(
-                                    current_action_id)
-                                if action.exists():
-                                    action_name = f" ({action.name})"
-                            elif action_type == 'server':
-                                action = request.env['ir.actions.server'].sudo().browse(
-                                    current_action_id)
-                                if action.exists():
-                                    action_name = f" ({action.name})"
-                    except Exception as e:
-                        _logger.error(f"Error fetching names: {e}")
+                    return request.render('web.access_denied', {
+                        'message': f'You are not authorized to access "{model_name}" records.'
+                    })
 
-                    if method == 'get_views':
-                        raise AccessError(
-                            f'Access denied to {model_name} view{action_name}. Contact your administrator for access.')
-                    elif method == 'web_search_read':
-                        raise AccessError(
-                            f'Access denied to {model_name} listing{action_name}. Contact your administrator for access.')
-
-
-        return DataSet().call_kw(model, method, args, kwargs, path)
+        return Home().web_client(s_action, **kw)
 
     @http.route('/web/action/load', type='json', auth="user")
     def load_action_security(self, action_id, additional_context=None):
