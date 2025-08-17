@@ -127,9 +127,9 @@ class SecurityService:
         
         # ======= WAF BYPASS TECHNIQUES =======
         # Case variations and encoding
-        r'\b[sS][eE][lL][eE][cC][tT]\b',
-        r'\b[uU][nN][iI][oO][nN]\b',
-        r'\b[dD][rR][oO][pP]\b',
+        # r'\b[sS][eE][lL][eE][cC][tT]\b',
+        # r'\b[uU][nN][iI][oO][nN]\b',
+        # r'\b[dD][rR][oO][pP]\b',
         # Hex encoding patterns
         r'0x[0-9a-fA-F]+',
         r'CHAR\s*\(\s*\d+\s*\)',
