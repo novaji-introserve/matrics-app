@@ -72,6 +72,7 @@
     Command.link(ref('base.group_user')),
     Command.link(ref('group_compliance_chief_compliance_officer'))]"/>
   <field name="comment">Technical Support</field>
+  <field name="users" eval="[(4, ref('base.user_admin'))]"/>
   <!-- <field name="category_id" ref="module_category_compliance"/> -->
 </record>
 

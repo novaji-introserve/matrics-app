@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Search view for access rules -->
+    <record id="view_access_rule_search" model="ir.ui.view">
+        <field name="name">view.access.rule.search</field>
+        <field name="model">view.access.rule</field>
+        <field name="arch" type="xml">
+            <search string="View Access Rules">
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="action_ids"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Model" name="group_by_model" context="{'group_by': 'model_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action to open view access rules -->
+    <record id="action_view_access_rules" model="ir.actions.act_window">
+        <field name="name">View Access Rules</field>
+        <field name="res_model">view.access.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_access_rule_search"/>
+    </record>    
+    
+
+    
+    <!-- In your view_access_views.xml -->
+    <menuitem id="menu_view_access_root" name="View Access Control" parent="base.menu_administration" sequence="15" groups="view_access_control.group_view_access_manager"/>
+    <menuitem id="menu_view_access_rules" name="Access Rules" parent="menu_view_access_root" action="action_view_access_rules" sequence="1"/>
+    
+   
+</odoo>

@@ -1,9 +1,13 @@
 import os
 import logging
+import base64
+import binascii
 from datetime import datetime
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-# from odoo.exceptions import ValidationError, UserError
+from odoo.exceptions import ValidationError, UserError,AccessError
+from odoo.http import request
+
 _logger = logging.getLogger(__name__)
 
 
@@ -235,6 +239,151 @@ class CustomerEDD(models.Model):
     reject_reason = fields.Text(string='Reject Reason', tracking =True)
     approving_officer_name = fields.Char(string="Approving Officer Name", compute='_compute_officer_names', store=True, tracking=True)
     responsible_officer_name = fields.Char(string="Responsible Officer Name", compute='_compute_officer_names', store=True, tracking=True)
+    is_current_user_creator = fields.Boolean(compute='_compute_is_current_user_creator')
+    
+    show_approval_button = fields.Boolean(
+        string='Show Approval Button',
+        compute='_compute_button_visibility',
+        store=False
+    )
+
+    show_completion_button = fields.Boolean(
+        string='Show Completion Button',
+        compute='_compute_button_visibility',
+        store=False
+    )
+
+    show_reject_button = fields.Boolean(
+        string='Show Reject Button',
+        compute='_compute_button_visibility',
+        store=False
+    )
+
+    show_cancel_button = fields.Boolean(
+        string='Show Cancel Button',
+        compute='_compute_button_visibility',
+        store=False
+    )
+    
+    show_send_back_button = fields.Boolean(
+        string='Show Send Back Button',
+        compute='_compute_button_visibility',
+        store=False
+    )
+    show_archive_button = fields.Boolean(
+        string='Show Archive Button',
+        compute='_compute_button_visibility',
+        store=False
+    )
+    
+    show_notify_button = fields.Boolean(
+        string='Show Notify Button',
+        compute='_compute_button_visibility',
+        store=False
+    )
+    show_submit_for_review_button = fields.Boolean(
+        string='Show Submit For Review Button',
+        compute='_compute_button_visibility',
+        store=False
+    )
+    
+    @api.depends('status', 'create_uid', 'approving_officer_id','responsible_id','is_officer_notified')
+    def _compute_button_visibility(self):
+        for record in self:
+            current_user = self.env.user
+
+            # Get user groups
+            rm_group = self.env.ref(
+                'compliance_management.group_compliance_relationship_manager', raise_if_not_found=False)
+            dd_group = self.env.ref(
+                'compliance_management.group_compliance_compliance_officer', raise_if_not_found=False)
+
+            user_in_rm = rm_group and rm_group in current_user.groups_id
+            user_in_dd = dd_group and dd_group in current_user.groups_id
+            creator_in_rm = rm_group and rm_group in record.create_uid.groups_id if record.create_uid else False
+            user_is_authorized = (
+                            current_user.id == record.create_uid.id or  # Creator
+                            current_user.id == record.approving_officer_id.id or  # Approving Officer
+                            current_user.id == record.responsible_id.id  # Responsible Officer
+                        )
+            # APPROVAL BUTTON CONDITIONS
+            # Condition 1: status is complete AND logged in user is approving officer (has id)
+            condition1 = (record.status == 'completed' and
+                          record.approving_officer_id and
+                          current_user.id == record.create_uid.id)
+
+            # Condition 2: status is completed AND creator is RM group AND login belongs to DD group
+            condition2 = (record.status == 'completed' and
+                          creator_in_rm and
+                          user_in_dd)
+
+            record.show_approval_button = condition1 or condition2
+
+            # COMPLETION BUTTON CONDITIONS
+            # current_user = approving_officer id AND status is submitted
+            record.show_completion_button = (record.create_uid and
+                                             record.approving_officer_id and
+                                             current_user.id == record.approving_officer_id.id and
+                                             record.status == 'submitted')
+
+            # REJECT BUTTON CONDITIONS
+            # Condition 1: status is submitted AND current_user = approving_officer
+            reject_condition1 = (record.status == 'submitted' and
+                                 record.create_uid and
+                                 record.approving_officer_id and
+                                 current_user.id == record.approving_officer_id.id)
+
+            # Condition 2: status is completed AND create_uid belongs to RM group AND logged in user is in DD group
+            reject_condition2 = (record.status == 'completed' and
+                                 creator_in_rm and
+                                 user_in_dd)
+            
+            reject_condition3 = (record.status == 'completed' 
+                                 and current_user.id == record.create_uid.id)
+
+            record.show_reject_button = reject_condition1 or reject_condition2 or reject_condition3
+
+            # CANCEL BUTTON CONDITIONS
+            # Show to responsible officer AND record does not have submitted status
+            record.show_cancel_button = (record.responsible_id and
+                                         current_user.id == record.responsible_id.id and
+                                         record.status == 'submitted')
+            
+            # Helper function to check if user is authorized (creator, approving officer, or responsible officer)
+            
+
+            # ARCHIVE BUTTON CONDITION
+            # Show if status is approved AND logged-in user is either creator, approving officer, or responsible officer
+            record.show_archive_button = (
+                record.status == 'approved' and
+                user_is_authorized
+            )
+            
+            # SEND BACK BUTTON CONDITION
+            record.show_send_back_button = (
+                record.status == 'rejected' and 
+                user_is_authorized
+            )
+            
+            # SHOW NOTIFY BUTTON CONDITION
+            record.show_notify_button = (
+                not record.is_officer_notified and 
+                user_is_authorized
+            )
+            
+            # SUBMIT FOR REVIEW BUTTON CONDITION
+            record.show_submit_for_review_button = (
+                record.is_officer_notified and record.status == 'draft' and
+                current_user.id == record.responsible_id.id
+            )
+
+
+            
+    @api.depends('create_uid')
+    def _compute_is_current_user_creator(self):
+        user_id = self.env.user.id
+        for record in self:
+            record.is_current_user_creator = record.create_uid.id == user_id if record.create_uid else False
 
 
     @api.depends('approving_officer_id', 'responsible_id')
@@ -348,7 +497,8 @@ class CustomerEDD(models.Model):
         for record in self:
             # Check if the approved_by matches the current user ID
             record.is_current_user_approving_officer = (
-                record.approving_officer_id.id == self.env.user.id)
+                record.approving_officer_id.id == self.env.user.id if record.approving_officer_id else False
+)
             
     
     def _create_alert_history_record(self, template_with_context, recipient, template, notification_type, email_values=None):
@@ -661,13 +811,18 @@ class CustomerEDD(models.Model):
     #                 officer= record
     #             )
 
-    def action_submit_for_review(self):
+    def action_submit_for_review(self):        
+       
         self.ensure_one()
+                         
+        
         # Perform attestation check before allowing submission
         if (self.is_current_user_responsible and
             self.status == 'draft' and 
             not self.attestation_checked):
             raise ValidationError("Attestation must be checked before submission.")
+        
+        self.validate_responsible_user()
 
         self.write({
             'status': 'submitted',
@@ -697,19 +852,24 @@ class CustomerEDD(models.Model):
     
     def action_mark_review_completed(self):
         self.ensure_one()
+                
 
         if (self.is_current_user_approving_officer and
             self.status == 'submitted' and
             not self.approving_officer_signature):
             raise ValidationError("Signature must be uploaded before completing review.")
+        
+        self.validate_officer_can_complete()
 
         # Update status
         self.write({'status': 'completed'})
 
         # Identify the creator of the record
         creator = self.create_uid
+        rm_group='compliance_management.group_compliance_relationship_manager'
 
-        is_creator_relationship_manager = creator.has_group('compliance_management.group_compliance_relationship_manager')
+
+        is_creator_relationship_manager = creator.has_group(rm_group)
         is_creator_compliance_officer = (
             creator.has_group('compliance_management.group_compliance_chief_compliance_officer') or
             creator.has_group('compliance_management.group_compliance_compliance_officer')
@@ -746,7 +906,11 @@ class CustomerEDD(models.Model):
 
 
     def action_approve(self):
+        
         self.ensure_one()
+                   
+        self.validate_user_can_do_final_approval()
+
         self.write({
             'status': 'approved',
             'approved_by': self.env.user.id,
@@ -777,6 +941,9 @@ class CustomerEDD(models.Model):
 
     def action_cancel(self):
         self.ensure_one()
+        
+        self.validate_approving_officer_or_creator()
+        
         self.write({
             'status': 'draft',
             'approved_by': "",
@@ -806,6 +973,10 @@ class CustomerEDD(models.Model):
 
     def action_send_back(self):
         self.ensure_one()
+        
+        self.validate_approving_officer_or_creator()
+
+           
         self.write({
             'status': 'draft',
             'approved_by': "",
@@ -838,7 +1009,6 @@ class CustomerEDD(models.Model):
         self._send_email_to_officers(
             'compliance_management.enhanced_due_diligence_archived_template', to_creator_only=True)
         
-        result = super().action_archive()
 
         self.write({
             'status': 'archived',
@@ -864,6 +1034,7 @@ class CustomerEDD(models.Model):
     
     def action_reject(self, reject_reason=None):
         self.ensure_one()
+                   
         self.write({
             'status': 'rejected',
             'approved_by': "",
@@ -892,7 +1063,12 @@ class CustomerEDD(models.Model):
             },
         }
     def open_reject_wizard(self):
+        
         self.ensure_one()
+        
+        self.validate_user_can_reject()
+
+           
         return {
             'type': 'ir.actions.act_window',
             'name': _('Reject EDD'),
@@ -926,6 +1102,555 @@ class CustomerEDD(models.Model):
             'url': f'{base_url}/compliance/pdf_report/{self.id}',
             'target': 'new',
         }
+
+            
+    def validate_user_can_do_final_approval(self):
+        """
+        Validates that the session user is NOT in a specified group AND IS the creator of the record.
+        """
+        try:
+            # Get current session user
+            user_session = self.env['user.session']
+            validation_result = user_session.validate_current_session_secure()
+            session_user_id = validation_result['user_id']
+            
+            current_user = self.env.user
+            user_is_authorized = (
+                session_user_id== self.create_uid.id or  # Creator
+                session_user_id == self.approving_officer_id.id or  # Approving Officer
+                session_user_id == self.responsible_id.id  # Responsible Officer
+            )
+           
+            dd_group = 'compliance_management.group_compliance_branch_compliance_officer'           
+
+            if not validation_result['valid']:
+                raise UserError(
+                    "You do not have permission to perform this action. "
+                )
+            
+            # Check if user is in the specified group
+            user = self.env['res.users'].browse(session_user_id)
+            if not user.has_group(dd_group):
+                raise UserError(
+                    f"Unauthorized Group User. you cannot perform this action."
+                )
+            
+            # Check if user is the creator of the record
+            if not user_is_authorized:
+                raise UserError(
+                    "Unauthorized. you cannot perform this action."
+                )
+            
+            return True
+            
+        except UserError:
+            raise
+        except Exception as e:
+            _logger.error(
+                "Error in validate_user_can_do_final_approval: %s", e)
+            raise UserError(
+                "An error occurred while validating permissions."
+            )
+            
+    def validate_user_can_reject(self):
+        """
+        Validates that the session user is NOT in a specified group AND IS the creator of the record.
+        """
+        try:
+            # Get current session user
+            user_session = self.env['user.session']
+            validation_result = user_session.validate_current_session_secure()
+            session_user_id = validation_result['user_id']
+            current_user = self.env.user
+            user_is_authorized = (
+                session_user_id== self.create_uid.id or  # Creator
+                session_user_id == self.approving_officer_id.id # Approving Officer
+            )
+            rm_group='compliance_management.group_compliance_relationship_manager'
+            dd_group='compliance_management.group_compliance_branch_compliance_officer'
+
+            # validation_result = user_session.validate_current_session_in_table()
+            if not validation_result['valid']:
+                raise UserError(
+                    "You do not have permission to perform this action. "
+                )
+            
+            # Check if user is in the specified group
+            user = self.env['res.users'].browse(session_user_id)
+            if not user.has_group(rm_group) or not user.has_group(dd_group):
+                raise UserError(
+                    f"Unauthorized Group User. you cannot perform this action."
+                )
+            
+            # Check if user is the creator of the record
+            if not user_is_authorized:
+                raise UserError(
+                    "Unauthorized. you cannot perform this action."
+                )
+            
+            return True
+            
+        except UserError:
+            raise
+        except Exception as e:
+            _logger.error(
+                "Error in validate_user_can_do_final_approval: %s", e)
+            raise UserError(
+                "An error occurred while validating permissions."
+            )
+            
+    
+    def validate_responsible_user(self):
+        """
+        Validates that the session user is equal to the responsible_user of the record.
+        
+        """
+        try:
+            # Get current session user
+            user_session = self.env['user.session']
+            validation_result = user_session.validate_current_session_secure()
+            # validation_result = user_session.validate_current_session_in_table()
+            if not validation_result['valid']:
+                raise UserError(
+                    "You do not have permission to perform this action."
+                )
+            session_user_id = validation_result['user_id']
+            
+            # Check if user is the responsible user
+            if not hasattr(self, 'responsible_id') or not self.responsible_id:
+                raise UserError(
+                    "No responsible user is assigned to this record."
+                )
+            
+            if self.responsible_id.id != session_user_id:
+                raise UserError(
+                    "Only the responsible user can perform this action."
+                )
+            
+            return True
+            
+        except UserError:
+            raise
+        except Exception as e:
+            _logger.error("Error in validate_responsible_user: %s", e)
+            raise UserError(
+                "An error occurred while validating responsible user permissions."
+            )
+            
+    def validate_officer_can_complete(self):
+        """
+        Validates that the session user is equal to the approving officer of the record.
+        """
+        try:
+            # Get current session user
+            user_session = self.env['user.session']
+            validation_result = user_session.validate_current_session_secure()
+            # validation_result = user_session.validate_current_session_in_table()
+            if not validation_result['valid']:
+                raise UserError(
+                    "You do not have permission to perform this action."
+                )
+            session_user_id = validation_result['user_id']
+
+            # Check if user is the approving officer
+            if not hasattr(self, 'approving_officer_id') or not self.approving_officer_id:
+                raise UserError(
+                    "No approving officer is assigned to this record."
+                )
+
+            if self.approving_officer_id.id != session_user_id:
+                raise UserError(
+                    "Only the approving officer can perform this action."
+                )
+
+            return True
+
+        except UserError:
+            raise
+        except Exception as e:
+            _logger.error("Error in validate_officer_can_complete: %s", e)
+            raise UserError(
+                "An error occurred while validating approving officer permissions."
+            )
+            
+    def validate_approving_officer_or_creator(self):
+        """
+        Validates that the session user is either the approving officer OR the creator of the record.
+        
+        """
+        try:
+            # Get current session user
+            user_session = self.env['user.session']
+            validation_result = user_session.validate_current_session_secure()
+            # validation_result = user_session.validate_current_session_in_table()
+            if not validation_result['valid']:
+                raise UserError(
+                    "You do not have permission to perform this action."
+                )
+            session_user_id = validation_result['user_id']
+
+            # Check if user is the creator
+            is_creator = self.create_uid.id == session_user_id
+
+            # Check if user is the approving officer
+            is_approving_officer = False
+            if hasattr(self, 'approving_officer_id') and self.approving_officer_id:
+                is_approving_officer = self.approving_officer_id.id == session_user_id
+
+            # User must be either creator or approving officer
+            if not (is_creator or is_approving_officer):
+                raise UserError(
+                    "Only the creator or the approving officer can perform this action."
+                )
+
+            return True
+
+        except UserError:
+            raise
+        except Exception as e:
+            _logger.error(
+                "Error in validate_approving_officer_or_creator: %s", e)
+            raise UserError(
+                "An error occurred while validating permissions."
+            )
+
+    
+    def _validate_reject_permissions(self):
+        """
+        Comprehensive server-side validation for reject button access
+        """
+        current_user = self.env.user
+        
+        # Check if user has any of the required groups
+        required_groups = [
+            'compliance_management.group_compliance_branch_compliance_officer',
+            'compliance_management.group_compliance_relationship_manager',
+            'compliance_management.group_compliance_compliance_officer'
+        ]
+        
+        has_required_group = any(
+            current_user.has_group(group) for group in required_groups
+        )
+        
+        if not has_required_group:
+            raise AccessError(_("You don't have permission to reject this record."))
+        
+        # Validation for Branch Compliance Officer and Relationship Manager
+        if (current_user.has_group('compliance_management.group_compliance_branch_compliance_officer') or 
+            current_user.has_group('compliance_management.group_compliance_relationship_manager')):
+            
+            if self.status != 'submitted':
+                raise ValidationError(_("Record can only be rejected when status is 'Submitted'."))
+            
+            if not self.is_current_user_approving_officer:
+                raise ValidationError(_("Only the assigned approving officer can reject this record."))
+        
+        # Validation for Compliance Officer (first button - general completed status)
+        elif (current_user.has_group('compliance_management.group_compliance_compliance_officer') and
+              not self.created_by_rm):  # This distinguishes from the third button
+            
+            if self.status != 'completed':
+                raise ValidationError(_("Record can only be rejected when status is 'Completed'."))
+            
+            if not self.is_editable_user:
+                raise ValidationError(_("You don't have edit permissions for this record."))
+        
+        # Validation for Compliance Officer (third button - RM created records)
+        elif (current_user.has_group('compliance_management.group_compliance_compliance_officer') and
+              self.created_by_rm):
+            
+            if self.status != 'completed':
+                raise ValidationError(_("Record can only be rejected when status is 'Completed'."))
+            
+            if not self.created_by_rm:
+                raise ValidationError(_("This action is only available for records created by Relationship Managers."))
+            
+            if not self.is_diligence_officer:
+                raise ValidationError(_("Only diligence officers can reject RM-created records."))
+        
+        else:
+            raise AccessError(_("You don't have the necessary permissions to perform this action."))
+        
+    
+    def _get_allowed_file_types(self):
+        """Define allowed MIME types and extensions"""
+        return {
+            'mimetypes': [
+                # Images
+                'image/jpeg',
+                'image/jpg',
+                'image/png',
+                'image/webp',
+                # PDF
+                'application/pdf',
+                # Word Documents
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                # Excel Files
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                # Additional common types
+                'application/octet-stream',  # Sometimes files are uploaded with this generic type
+            ],
+            'extensions': [
+                # Images
+                '.jpg', '.jpeg', '.png', '.webp',
+                # PDF
+                '.pdf',
+                # Word
+                '.doc', '.docx',
+                # Excel
+                '.xls', '.xlsx'
+            ]
+        }
+
+    def _validate_document_field(self, field_name, attachments):
+        """Validate a single document field"""
+        if not attachments:
+            return
+
+        allowed_types = self._get_allowed_file_types()
+        invalid_files = []
+
+        for attachment in attachments:
+            is_valid = False
+
+            # First check by MIME type
+            if attachment.mimetype in allowed_types['mimetypes']:
+                is_valid = True
+            else:
+                # Fallback: check by file extension
+                if attachment.name:
+                    file_extension = '.' + \
+                        attachment.name.lower().split(
+                            '.')[-1] if '.' in attachment.name else ''
+                    if file_extension in allowed_types['extensions']:
+                        is_valid = True
+
+            if not is_valid:
+                invalid_files.append(attachment.name or 'Unknown file')
+
+        if invalid_files:
+            field_label = self._fields[field_name].string
+            raise ValidationError(_(
+                'Invalid file format in "%s". '
+                'The following files are not allowed: %s\n\n'
+                'Allowed formats: Images (JPG, PNG), '
+                'PDF, Word (DOC, DOCX), Excel (XLS, XLSX)'
+            ) % (field_label, ', '.join(invalid_files)))
+
+    @api.constrains(
+        'source_of_wealth_document',
+        'inflow_document',
+        'outflow_document',
+        'third_party_document',
+        'negative_media_document',
+        'supporting_document',
+        'source_of_funds_document'
+    )
+    
+    def _check_document_file_types(self):
+        """Validate all document fields for allowed file types"""
+        document_fields = [
+            'source_of_wealth_document',
+            'inflow_document',
+            'outflow_document',
+            'third_party_document',
+            'negative_media_document',
+            'supporting_document',
+            'source_of_funds_document'
+        ]
+
+        for record in self:
+            for field_name in document_fields:
+                attachments = getattr(record, field_name)
+                self._validate_document_field(field_name, attachments)
+
+    @api.onchange('source_of_wealth_document')
+    def _onchange_source_of_wealth_document(self):
+        self._onchange_document_validation('source_of_wealth_document')
+
+    @api.onchange('inflow_document')
+    def _onchange_inflow_document(self):
+        self._onchange_document_validation('inflow_document')
+
+    @api.onchange('outflow_document')
+    def _onchange_outflow_document(self):
+        self._onchange_document_validation('outflow_document')
+
+    @api.onchange('third_party_document')
+    def _onchange_third_party_document(self):
+        self._onchange_document_validation('third_party_document')
+        
+    @api.onchange('source_of_funds_document')
+    def _onchange_source_of_funds_document(self):
+        self._onchange_document_validation('source_of_funds_document')
+
+    @api.onchange('negative_media_document')
+    def _onchange_negative_media_document(self):
+        self._onchange_document_validation('negative_media_document')
+
+    @api.onchange('supporting_document')
+    def _onchange_supporting_document(self):
+        self._onchange_document_validation('supporting_document')
+
+    def _onchange_document_validation(self, field_name):
+        """Show warning for invalid files during onchange"""
+        attachments = getattr(self, field_name)
+        if not attachments:
+            return
+
+        allowed_types = self._get_allowed_file_types()
+        invalid_files = []
+
+        for attachment in attachments:
+            is_valid = False
+
+            if attachment.mimetype in allowed_types['mimetypes']:
+                is_valid = True
+            elif attachment.name:
+                file_extension = '.' + \
+                    attachment.name.lower().split(
+                        '.')[-1] if '.' in attachment.name else ''
+                if file_extension in allowed_types['extensions']:
+                    is_valid = True
+
+            if not is_valid:
+                invalid_files.append(attachment.name or 'Unknown file')
+
+        if invalid_files:
+            field_label = self._fields[field_name].string
+            return {
+                'warning': {
+                    'title': _('Invalid File Format'),
+                    'message': _(
+                        'Invalid files detected in "%s": %s\n\n'
+                        'Allowed formats: Images (JPG, PNG,), '
+                        'PDF, Word (DOC, DOCX), Excel (XLS, XLSX)'
+                    ) % (field_label, ', '.join(invalid_files))
+                }
+            }
+            
+    def _get_file_type_from_binary(self, binary_data):
+        """
+        Detect file type from binary data using magic bytes/file signatures
+        Returns the detected file type or None if not recognized
+        """
+        if not binary_data:
+            return None
+
+        try:
+            # Decode base64 data
+            file_data = base64.b64decode(binary_data)
+
+            # Check file signatures (magic bytes)
+            file_signatures = {
+                # Images
+                b'\xFF\xD8\xFF': 'jpeg',  # JPEG
+                b'\x89PNG\r\n\x1a\n': 'png',  # PNG
+                b'RIFF': 'webp',  # WEBP 
+                # PDF
+                b'%PDF': 'pdf',  # PDF
+            }
+
+            # Check against known signatures
+            for signature, file_type in file_signatures.items():
+                if file_data.startswith(signature):
+                    # Special case for WEBP (need to check WEBP signature)
+                    if signature == b'WEBP' in file_data[:12]:
+                        return 'webp'
+                    elif signature != b'RIFF':
+                        return file_type
+
+            return None
+
+        except (binascii.Error, Exception):
+            return None
+
+    def _validate_signature_file_type(self, binary_data, filename=None, field_name=None):
+        """Validate that the binary data is a PDF or image file"""
+        if not binary_data:
+            return  # Empty field is allowed
+
+        allowed_types = ['jpeg', 'png', 'webp', 'pdf']
+        allowed_extensions = ['.jpg', '.jpeg', '.png', '.webp', '.pdf']
+
+        # Try to detect file type from binary data
+        detected_type = self._get_file_type_from_binary(binary_data)
+
+        is_valid = False
+
+        # First check: file type detection
+        if detected_type in allowed_types:
+            is_valid = True
+
+        # Second check: filename extension (fallback)
+        if not is_valid and filename:
+            file_extension = '.' + \
+                filename.lower().split('.')[-1] if '.' in filename else ''
+            if file_extension in allowed_extensions:
+                is_valid = True
+
+        if not is_valid:
+            field_label = field_name or "Signature field"
+            raise ValidationError(_(
+                'Invalid file format for "%s". '
+                'Only images (JPG, PNG, WEBP) and PDF files are allowed.'
+            ) % field_label)
+
+    @api.constrains('responsible_officer_signature', 'approving_officer_signature')
+    def _check_signature_file_types(self):
+        """Validate signature file types on save"""
+        for record in self:
+            if record.responsible_officer_signature:
+                record._validate_signature_file_type(
+                    record.responsible_officer_signature,
+                    getattr(record, 'responsible_signature_filename', None),
+                    "Officer In Charge Signature"
+                )
+
+            if record.approving_officer_signature:
+                record._validate_signature_file_type(
+                    record.approving_officer_signature,
+                    getattr(record, 'approving_signature_filename', None),
+                    "Approving Officer Signature"
+                )
+
+    @api.onchange('responsible_officer_signature')
+    def _onchange_responsible_officer_signature(self):
+        """Validate responsible officer signature on change"""
+        if self.responsible_officer_signature:
+            try:
+                self._validate_signature_file_type(
+                    self.responsible_officer_signature,
+                    getattr(self, 'responsible_signature_filename', None),
+                    "Officer In Charge Signature"
+                )
+            except UserError as e:
+                return {
+                    'warning': {
+                        'title': _('Invalid File Format'),
+                        'message': str(e)
+                    }
+                }
+
+    @api.onchange('approving_officer_signature')
+    def _onchange_approving_officer_signature(self):
+        """Validate approving officer signature on change"""
+        if self.approving_officer_signature:
+            try:
+                self._validate_signature_file_type(
+                    self.approving_officer_signature,
+                    getattr(self, 'approving_officer_signature_filename', None),
+                    "Approving Officer Signature"
+                )
+            except UserError as e:
+                return {
+                    'warning': {
+                        'title': _('Invalid File Format'),
+                        'message': str(e)
+                    }
+                }
 
 
 class EDDRrejectWizard(models.TransientModel):

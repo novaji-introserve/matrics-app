@@ -9,6 +9,11 @@ from odoo import fields
 from .sanction_scraper import SanctionScraper
 from .data_processor import DataProcessor
 from .pep_importer import PepImporter
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+
 
 _logger = logging.getLogger(__name__)
 
@@ -67,8 +72,9 @@ class PepService:
             }
 
             json_data = {"contents": [{"parts": [{"text": name}]}]}
-
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+            
+            gemini_url = os.getenv("GEMINI_API_URL")
+            url = f"{gemini_url}{api_key}"
             response = requests.post(
                 url, data=json.dumps(json_data), headers=headers, timeout=30
             )
@@ -129,8 +135,9 @@ class PepService:
             }
             
             # Make the request
+            match_url = os.getenv("OPEN_SANCTION_MATCH")
             response = requests.post(
-                "https://api.opensanctions.org/match/default",
+                match_url,
                 headers=headers,
                 json=query,
                 timeout=30,
@@ -567,7 +574,8 @@ class PepService:
             # APPROACH 4: Get entity data to extract relationships
             if entity_id:
                 try:
-                    entity_url = f"https://api.opensanctions.org/entities/{entity_id}"
+                    url = os.getenv("OPEN_SANCTION_URL")
+                    entity_url = f"{url}{entity_id}"
                     entity_response = requests.get(entity_url, headers=headers, timeout=30)
                     entity_response.raise_for_status()
                     
