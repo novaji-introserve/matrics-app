@@ -207,13 +207,16 @@ class UserSession(models.Model):
                         'error': 'No session_id provided and no request context'
                     }
                 session_id = request.session.sid
+            user_id = request.env.user.id
 
             # Search for session_id in the table
             user_session = self.sudo().search([
-                ('session_id', '=', session_id)
+                ('session_id', '=', session_id),
+                ('active', '=', True),
+                ('user_id', '=', user_id)
             ], limit=1)
 
-            if user_session:
+            if user_session and session_id == user_id:
                 return {
                     'exists': True,
                     'user_id': user_session.user_id.id,
