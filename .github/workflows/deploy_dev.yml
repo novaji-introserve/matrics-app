@@ -26,23 +26,6 @@ jobs:
           
           # Pull latest changes
           git pull origin main
-          
-          # Install/update dependencies (uncomment as needed)
-          # npm install
-          # composer install --no-dev --optimize-autoloader
-          # pip install -r requirements.txt
-          
-          # Build assets (uncomment as needed)
-          # npm run build
-          # npm run production
-          
-          # Set proper permissions
-          # chmod -R 755 storage bootstrap/cache
-          
-          # Restart services (uncomment as needed)
-          # sudo systemctl restart nginx
-          # sudo systemctl restart php8.1-fpm
-          # pm2 restart all
-          # sudo supervisorctl restart all
-          
+          # Update compliance_management module
+          /home/ubuntu/python3.12-env/bin/python /home/ubuntu/odoo/odoo-bin -c /home/ubuntu/odoo/debian/odoo.conf -d compliance_dev -i compliance_management --stop-after-init  
           echo "Deployment completed successfully!"
