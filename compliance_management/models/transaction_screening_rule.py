@@ -100,7 +100,6 @@ class TransactionScreeningRule(models.Model):
         self.ensure_one()
         try:
             safe_eval(self.condition_python, localdict, mode='exec', nocopy=True)
-            print(localdict)
             if 'result' in localdict and localdict['result'] is not None:
                 return localdict['result']
             return False

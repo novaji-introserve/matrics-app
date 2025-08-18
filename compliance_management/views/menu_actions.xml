@@ -345,7 +345,7 @@
 
     <!-- Action -->
     <record id="action_list_risk_assessment_plan" model="ir.actions.act_window">
-        <field name="name">Risk Analysis</field>
+        <field name="name">Customer Risk Analysis</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.compliance.risk.assessment.plan</field>
         <field name="view_id" ref="compliance_risk_assessment_plan_tree" />
@@ -828,7 +828,7 @@
     <menuitem id="menu_compliance_risk_assessment_cp" action="action_list_risk_assessment_cp" parent="menu_fcra_risk" name="Counter Party" groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" sequence="20" />
     
     <!-- Menu -->
-    <menuitem id="menu_compliance_risk_assessment_plan" action="action_list_risk_assessment_plan" parent="menu_risk_assessment" name="Risk Analysis" groups="group_compliance_compliance_risk_manager" sequence="100" />
+    <menuitem id="menu_compliance_risk_assessment_plan" action="action_list_risk_assessment_plan" parent="menu_risk_assessment" name="Customer Risk Analysis" groups="group_compliance_compliance_risk_manager" sequence="100" />
 
     <!-- Menu -->
 
