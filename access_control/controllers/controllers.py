@@ -120,10 +120,15 @@ class ViewSecurityController(http.Controller):
         restricted_models = request.env['view.access.rule'].get_restricted_models(
         )
         
-        user_session = self.env['user.session']
+        user_session = request.env['user.session']
         validation_result = user_session.validate_current_session_secure()
-        if not validation_result['valid']:
-            raise UserError("You do not have permission to perform this action.")
+        if not validation_result['valid'] and method in ['search_read', 'write', 'create', 'unlink',]:
+            _logger.info(f"You do not have permission to perform this action.{validation_result}")
+            raise UserError(
+                "You do not have permission to perform this action."
+
+            )
+
 
         if model in restricted_models:
             context = kwargs.get('context', {})

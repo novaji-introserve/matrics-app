@@ -1124,8 +1124,10 @@ class CustomerEDD(models.Model):
             dd_group = 'compliance_management.group_compliance_branch_compliance_officer'           
 
             if not validation_result['valid']:
+                _logger.info(f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
-                    "You do not have permission to perform this action. "
+                    "You do not have permission to perform this action."
+
                 )
             
             # Check if user is in the specified group
@@ -1171,9 +1173,12 @@ class CustomerEDD(models.Model):
 
             # validation_result = user_session.validate_current_session_in_table()
             if not validation_result['valid']:
+                _logger.info(f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
-                    "You do not have permission to perform this action. "
+                    "You do not have permission to perform this action."
+
                 )
+
             
             # Check if user is in the specified group
             user = self.env['res.users'].browse(session_user_id)
@@ -1211,9 +1216,12 @@ class CustomerEDD(models.Model):
             validation_result = user_session.validate_current_session_secure()
             # validation_result = user_session.validate_current_session_in_table()
             if not validation_result['valid']:
+                _logger.info(f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
                     "You do not have permission to perform this action."
+
                 )
+
             session_user_id = validation_result['user_id']
             
             # Check if user is the responsible user
@@ -1247,9 +1255,12 @@ class CustomerEDD(models.Model):
             validation_result = user_session.validate_current_session_secure()
             # validation_result = user_session.validate_current_session_in_table()
             if not validation_result['valid']:
+                _logger.info(f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
                     "You do not have permission to perform this action."
+
                 )
+
             session_user_id = validation_result['user_id']
 
             # Check if user is the approving officer
@@ -1284,8 +1295,10 @@ class CustomerEDD(models.Model):
             validation_result = user_session.validate_current_session_secure()
             # validation_result = user_session.validate_current_session_in_table()
             if not validation_result['valid']:
+                _logger.info(f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
                     "You do not have permission to perform this action."
+
                 )
             session_user_id = validation_result['user_id']
 

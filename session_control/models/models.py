@@ -206,8 +206,9 @@ class UserSession(models.Model):
                         'is_active': False,
                         'error': 'No session_id provided and no request context'
                     }
-                session_id = request.session.sid
             user_id = request.env.user.id
+            session_id = request.session.sid
+            session_userid = request.session.uid
 
             # Search for session_id in the table
             user_session = self.sudo().search([
@@ -216,7 +217,7 @@ class UserSession(models.Model):
                 ('user_id', '=', user_id)
             ], limit=1)
 
-            if user_session and session_id == user_id:
+            if user_session and session_userid == user_id:
                 return {
                     'exists': True,
                     'user_id': user_session.user_id.id,
@@ -231,9 +232,10 @@ class UserSession(models.Model):
                 return {
                     'exists': False,
                     'user_id': False,
-                    'session_record': False,
+                    'session_record': {'user_id': user_id, 'session_user_id': session_userid},
                     'is_active': False,
-                    'error': f'Session ID {session_id} not found in table'
+                    'info': False,
+                    'error': f'Session ID {session_id} not found in table',
                 }
 
         except Exception as e:
@@ -390,7 +392,7 @@ class UserSession(models.Model):
             table_result = self.get_user_by_session_id(current_session_id)
 
             if not table_result['exists']:
-                return {'valid': False, 'error': 'Session not found in table'}
+                return {'valid': False, 'error': 'Session not found in table', 'info': f'{table_result}'}
 
             session_record = table_result['session_record']
 
