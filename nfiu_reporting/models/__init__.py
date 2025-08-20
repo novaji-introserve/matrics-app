@@ -12,3 +12,8 @@ from . import nfiu_currency_threshold
 
 # wizard/__init__.py
 from . import nfiu_export_wizard
+
+# bank transactions
+from . import bank_person
+from . import bank_account
+from . import bank_transaction

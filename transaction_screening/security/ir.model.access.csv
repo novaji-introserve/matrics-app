@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_transaction_screening_transaction_screening,transaction_screening.transaction_screening,model_transaction_screening_transaction_screening,base.group_user,1,1,1,1
