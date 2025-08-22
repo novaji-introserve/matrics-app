@@ -1518,7 +1518,7 @@
     </record>
 
     <record id="compliance_inst_fc_risk_subject_218" model="res.risk.subject">
-        <field name="name">Individual . Self Employed</field>
+        <field name="name">Individual . Self Employed </field>
         <field name="code">4806</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_24"/>
     </record>
