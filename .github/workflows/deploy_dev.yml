@@ -27,5 +27,5 @@ jobs:
           # Pull latest changes
           git pull origin main
           # Update compliance_management module
-          /home/ubuntu/python3.12-env/bin/python /home/ubuntu/odoo/odoo-bin -c /home/ubuntu/odoo/debian/odoo.conf -d compliance_dev -i compliance_management --stop-after-init  
+          # /home/ubuntu/python3.12-env/bin/python /home/ubuntu/odoo/odoo-bin -c /home/ubuntu/odoo/debian/odoo.conf -d compliance_dev -i compliance_management --stop-after-init  
           echo "Deployment completed successfully!"
