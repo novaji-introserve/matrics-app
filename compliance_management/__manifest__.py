@@ -23,7 +23,7 @@
         'utm',
         'contacts',
         'mail',
-        'survey'],
+        'survey','session_control','access_control'],
 
     # always loaded
     'data': [
