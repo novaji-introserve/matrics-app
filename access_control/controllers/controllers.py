@@ -179,15 +179,15 @@ class ViewSecurityController(http.Controller):
                     _logger.warning(
                         f"BLOCKING direct data access to {model} for user {user.name} - no context (method: {method})")
 
-                    if method in ['write', 'create', 'unlink']:
-                        raise AccessError(
-                            f'Direct modification of {model} records is not allowed. Please access through the proper menu.')
-                    elif method == 'search_read':
-                        raise AccessError(
-                            f'Direct search access to {model} is not allowed. Please access through the proper menu.')
-                    else:
-                        raise AccessError(
-                            f'Direct access to {model} is not allowed. Please access through the proper menu.')
+                    # if method in ['write', 'create', 'unlink']:
+                    #     raise AccessError(
+                    #         f'Direct modification of {model} records is not allowed. Please access through the proper menu.')
+                    # elif method == 'search_read':
+                    #     raise AccessError(
+                    #         f'Direct search access to {model} is not allowed. Please access through the proper menu.')
+                    # else:
+                    #     raise AccessError(
+                    #         f'Direct access to {model} is not allowed. Please access through the proper menu.')
 
             # ALLOW VIEW METHODS for users with ANY access to the model
             elif is_main_view and method in view_methods:
