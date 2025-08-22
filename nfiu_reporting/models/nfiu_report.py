@@ -48,9 +48,9 @@ class NFIUReport(models.Model):
         ('CNY', 'Chinese Yen'),
     ], string='Reporting Currency', required=True, default='NGN',tracking=True)
     
-    reason = fields.Text(string='Reason', size=4000)
-    action = fields.Text(string='Action', size=4000)
-    
+    reason = fields.Text(string='Reason',)
+    action = fields.Text(string='Action')
+
     # Reporting person details
     reporting_person_id = fields.Many2one('nfiu.person', string='Reporting Person', required=True,tracking=True)
     location_id = fields.Many2one('nfiu.address', string='Location',tracking=True)

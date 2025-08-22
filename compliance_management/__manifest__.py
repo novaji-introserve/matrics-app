@@ -18,12 +18,12 @@
     "version": "0.3",
     # any module necessary for this one to work correctly
     
-    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification','project',
+    'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'gamification', 'hide_powered_by_odoo','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification','project',
         'mass_mailing',
         'utm',
         'contacts',
         'mail',
-        'survey','session_control','access_control'],
+        'survey','kg_hide_menu'],
 
     # always loaded
     'data': [
@@ -131,6 +131,7 @@
         # 'demo/demo.xml',
     ],
     "installable": True,
+    'license': 'LGPL-3',
     "application": True,
     "auto_install": False,
     'post_init_hook': 'post_init_hook',

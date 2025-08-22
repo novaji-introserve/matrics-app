@@ -86,7 +86,7 @@ class NFIUPerson(models.Model):
     address_ids = fields.One2many(
         'nfiu.address', 'person_id', string='Addresses')
 
-    comments = fields.Text(string='Comments', size=4000)
+    comments = fields.Text(string='Comments')
     employee_id = fields.Many2one(
         'hr.employee', string='Related Employee', ondelete='set null', tracking=True)
 

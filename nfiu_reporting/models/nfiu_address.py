@@ -27,7 +27,7 @@ class NFIUAddress(models.Model):
         string='Country Code', required=True, size=2, default='NG')
     state = fields.Char(string='State', size=255)
 
-    comments = fields.Text(string='Comments', size=4000)
+    comments = fields.Text(string='Comments')
     
     @api.depends('name')
     def _compute_address(self):

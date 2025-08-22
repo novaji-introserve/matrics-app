@@ -41,7 +41,7 @@ class NFIUEntity(models.Model):
         'nfiu.address', 'entity_id', string='Addresses',tracking=True)
     director_ids = fields.One2many(
         'nfiu.entity.director', 'entity_id', string='Directors',tracking=True)
-    comments = fields.Text(string='Comments', size=4000,tracking=True)
+    comments = fields.Text(string='Comments',tracking=True)
     company_id = fields.Many2one(
         'res.company', string='Company', required=True, default=lambda self: self.env.company, tracking=True)
     
