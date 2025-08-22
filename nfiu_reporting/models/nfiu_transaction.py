@@ -132,7 +132,7 @@ class NFIUTransaction(models.Model):
     ], string='To Funds Code', default='F')
     to_funds_comment = fields.Char(string='To Funds Comment', size=255)
     to_country = fields.Char(string='To Country', size=2, default='NG')
-    comments = fields.Text(string='Comments', size=4000)
+    comments = fields.Text(string='Comments')
     suspicious_transaction_history_ids = fields.One2many(
         'nfiu.suspicious.transaction.hist', 'transaction_id', string='Suspicious Transaction History')
     

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Menu Items -->
+        <menuitem id="menu_nfiu_main" name="Financial Intelligence" sequence="3500"
+            parent="regulatory_reports.menu_regulatory_report_root" />
+        <menuitem id="menu_nfiu_ctr_transactions" action="open_transactions" parent="menu_nfiu_main"
+            name="Local Currency Transactions" sequence="1" />
+        <menuitem id="menu_nfiu_ftr_transactions" action="other_transactions"
+            parent="menu_nfiu_main"
+            name="Foreign Currency Transactions" sequence="2" />
+        <menuitem id="menu_nfiu_suspicious_transactions" action="suspicious_transactions"
+            parent="menu_nfiu_main"
+            name="Suspicious Transactions" sequence="3" />
+        <menuitem id="menu_nfiu_reports"
+            name="Financial Intelligence Reports"
+            parent="menu_nfiu_main"
+            action="action_nfiu_report"
+            sequence="10" />
+
+        <!--menuitem
+        id="menu_nfiu_export"
+            name="Export Reports"
+            parent="menu_nfiu_main"
+            action="action_nfiu_export_wizard"
+            sequence="20" /-->
+
+        <menuitem id="menu_nfiu_config" name="Financial Intelligence"
+            parent="compliance_management.menu_compliance_configuration" sequence="3500" />
+
+        <menuitem id="menu_nfiu_persons"
+            name="Reporting Persons"
+            parent="menu_nfiu_config"
+            action="action_nfiu_person"
+            sequence="10" />
+
+        <menuitem id="menu_nfiu_entities"
+            name="Reporting Entities"
+            parent="menu_nfiu_config"
+            action="action_nfiu_entity"
+            sequence="20" />
+        <menuitem id="menu_nfiu_entity_directors"
+            name="Directors"
+            parent="menu_nfiu_config"
+            action="action_nfiu_entity_director"
+            sequence="25" />
+        <menuitem id="menu_nfiu_indicators"
+            name="Report Indicators"
+            parent="menu_nfiu_config"
+            action="action_nfiu_indicator"
+            sequence="30" />
+        <menuitem id="menu_nfiu_currency_threshold"
+            name="Currency Thresholds"
+            parent="menu_nfiu_config"
+            action="action_nfiu_currency_threshold"
+            sequence="40" />
+             <!-- Main Menu -->
+    <menuitem id="menu_bank_transactions_main"
+        name="Bank Transactions"
+        web_icon="bank_transactions,static/description/icon.png"
+        sequence="10" />
+
+    <!-- Sub Menus -->
+    <menuitem id="menu_bank_transactions"
+        name="Transactions"
+        parent="menu_bank_transactions_main"
+        action="action_bank_transaction"
+        sequence="10" />
+
+    <menuitem id="menu_bank_accounts"
+        name="Accounts"
+        parent="menu_bank_transactions_main"
+        action="action_bank_account"
+        sequence="20" />
+
+    <menuitem id="menu_bank_persons"
+        name="Persons"
+        parent="menu_bank_transactions_main"
+        action="action_bank_person"
+        sequence="30" />
+
+    </data>
+</odoo>

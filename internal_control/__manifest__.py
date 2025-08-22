@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "internal_control",
+    'name': "Transaction Monitoring",
 
     'summary': """
-        Internal Control Monitoring For Financial Institutions""",
+        Transaction Monitoring For Financial Institutions""",
 
     'description': """
            For Transaction monitoring    """,

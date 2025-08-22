@@ -59,7 +59,7 @@ class NFIUAccount(models.Model):
 
     beneficiary = fields.Char(string='Beneficiary', size=50)
     beneficiary_comment = fields.Char(string='Beneficiary Comment', size=255)
-    comments = fields.Text(string='Comments', size=4000)
+    comments = fields.Text(string='Comments')
 
     @api.depends('institution_name', 'account')
     def _compute_name(self):

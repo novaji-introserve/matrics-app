@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- BANK TRANSACTION VIEWS -->
+
+    <!-- Bank Transaction Tree View -->
+    <record id="view_bank_transaction_tree" model="ir.ui.view">
+        <field name="name">bank.transaction.tree</field>
+        <field name="model">bank.transaction</field>
+        <field name="arch" type="xml">
+            <tree string="Bank Transactions">
+                <field name="transaction_number" />
+                <field name="date_transaction" />
+                <field name="amount_local" />
+                <field name="currency_code" />
+                <field name="from_account_id" />
+                <field name="to_account_id" />
+                <field name="transaction_description" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Bank Transaction Form View -->
+    <record id="view_bank_transaction_form" model="ir.ui.view">
+        <field name="name">bank.transaction.form</field>
+        <field name="model">bank.transaction</field>
+        <field name="arch" type="xml">
+            <form string="Bank Transaction">
+                <header>
+                    <button name="action_view_from_account" string="View From Account" type="object"
+                        class="btn-primary" />
+                    <button name="action_view_to_account" string="View To Account" type="object"
+                        class="btn-primary" />
+                </header>
+                <sheet>
+                    <group>
+                        <group name="transaction_info">
+                            <field name="transaction_number" />
+                            <field name="internal_ref_number" />
+                            <field name="transaction_location" />
+                            <field name="date_transaction" />
+                            <field name="value_date" />
+                        </group>
+                        <group name="amount_info">
+                            <field name="amount_local" />
+                            <field name="currency_code" />
+                            <field name="transmode_code" />
+                            <field name="late_deposit" />
+                        </group>
+                    </group>
+                    <group>
+                        <group name="system_info">
+                            <field name="teller" />
+                            <field name="authorized" />
+                        </group>
+                        <group name="location_info">
+                            <field name="from_country" />
+                            <field name="to_country" />
+                            <field name="from_funds_code" />
+                            <field name="to_funds_code" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Account Information">
+                            <group>
+                                <group name="from_account">
+                                    <field name="from_account_id" />
+                                </group>
+                                <group name="to_account">
+                                    <field name="to_account_id" />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Description">
+                            <field name="transaction_description" nolabel="1" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- BANK ACCOUNT VIEWS -->
+
+    <!-- Bank Account Tree View -->
+    <record id="view_bank_account_tree" model="ir.ui.view">
+        <field name="name">bank.account.tree</field>
+        <field name="model">bank.account</field>
+        <field name="arch" type="xml">
+            <tree string="Bank Accounts">
+                <field name="account_number" />
+                <field name="account_name" />
+                <field name="institution_name" />
+                <field name="balance" />
+                <field name="currency_code" />
+                <field name="status_code" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Bank Account Form View -->
+    <record id="view_bank_account_form" model="ir.ui.view">
+        <field name="name">bank.account.form</field>
+        <field name="model">bank.account</field>
+        <field name="arch" type="xml">
+            <form string="Bank Account">
+                <sheet>
+                    <group>
+                        <group name="account_info">
+                            <field name="account_number" />
+                            <field name="account_name" />
+                            <field name="beneficiary" />
+                            <field name="client_number" />
+                            <field name="personal_account_type" />
+                        </group>
+                        <group name="financial_info">
+                            <field name="balance" />
+                            <field name="currency_code" />
+                            <field name="opened" />
+                            <field name="status_code" />
+                        </group>
+                    </group>
+                    <group>
+                        <group name="institution_info">
+                            <field name="institution_name" />
+                            <field name="institution_code" />
+                            <field name="swift_code" />
+                            <field name="branch" />
+                            <field name="non_bank_institution" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Signatories">
+                            <field name="signatory_ids">
+                                <tree>
+                                    <field name="person_id" />
+                                    <field name="is_primary" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Incoming Transactions">
+                            <field name="incoming_transactions">
+                                <tree>
+                                    <field name="transaction_number" />
+                                    <field name="date_transaction" />
+                                    <field name="amount_local" />
+                                    <field name="from_account_id" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Outgoing Transactions">
+                            <field name="outgoing_transactions">
+                                <tree>
+                                    <field name="transaction_number" />
+                                    <field name="date_transaction" />
+                                    <field name="amount_local" />
+                                    <field name="to_account_id" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- BANK PERSON VIEWS -->
+
+    <!-- Bank Person Tree View -->
+    <record id="view_bank_person_tree" model="ir.ui.view">
+        <field name="name">bank.person.tree</field>
+        <field name="model">bank.person</field>
+        <field name="arch" type="xml">
+            <tree string="Bank Persons">
+                <field name="full_name" />
+                <field name="title" />
+                <field name="gender" />
+                <field name="birthdate" />
+                <field name="nationality1" />
+                <field name="occupation" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Bank Person Form View -->
+    <record id="view_bank_person_form" model="ir.ui.view">
+        <field name="name">bank.person.form</field>
+        <field name="model">bank.person</field>
+        <field name="arch" type="xml">
+            <form string="Bank Person">
+                <sheet>
+                    <group>
+                        <group name="personal_info">
+                            <field name="title" />
+                            <field name="first_name" />
+                            <field name="last_name" />
+                            <field name="full_name" />
+                            <field name="gender" />
+                            <field name="birthdate" />
+                        </group>
+                        <group name="nationality_info">
+                            <field name="nationality1" />
+                            <field name="nationality2" />
+                            <field name="residence" />
+                        </group>
+                    </group>
+                    <group>
+                        <group name="professional_info">
+                            <field name="occupation" />
+                            <field name="source_of_wealth" />
+                        </group>
+                        <group name="tax_info">
+                            <field name="tax_number" />
+                            <field name="tax_reg_number" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Contact Information">
+                            <group>
+                                <group name="phones">
+                                    <field name="phone_ids" nolabel="1">
+                                        <tree editable="bottom">
+                                            <field name="contact_type" />
+                                            <field name="communication_type" />
+                                            <field name="country_prefix" />
+                                            <field name="phone_number" />
+                                            <field name="full_number" />
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group name="addresses">
+                                    <field name="address_ids" nolabel="1">
+                                        <tree>
+                                            <field name="address_type" />
+                                            <field name="address" />
+                                            <field name="city" />
+                                            <field name="state" />
+                                            <field name="country_code" />
+                                        </tree>
+                                    </field>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Identification">
+                            <field name="identification_ids">
+                                <tree editable="bottom">
+                                    <field name="identification_type" />
+                                    <field name="number" />
+                                    <field name="issue_date" />
+                                    <field name="expiry_date" />
+                                    <field name="issue_country" />
+                                    <field name="issuing_authority" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Account Signatories">
+                            <field name="signatory_ids">
+                                <tree>
+                                    <field name="account_id" />
+                                    <field name="is_primary" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+ 
+    <!-- ACTIONS -->
+
+    <!-- Bank Transaction Action -->
+    <record id="action_bank_transaction" model="ir.actions.act_window">
+        <field name="name">Bank Transactions</field>
+        <field name="res_model">bank.transaction</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_bank_transaction_tree" />
+    </record>
+
+    <!-- Bank Account Action -->
+    <record id="action_bank_account" model="ir.actions.act_window">
+        <field name="name">Bank Accounts</field>
+        <field name="res_model">bank.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_bank_account_tree" />
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <!-- Bank Person Action -->
+    <record id="action_bank_person" model="ir.actions.act_window">
+        <field name="name">Bank Persons</field>
+        <field name="res_model">bank.person</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_bank_person_tree" />
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <!-- SECURITY RULES -->
+
+    <!-- Bank Transaction Security -->
+    <record id="access_bank_transaction_user" model="ir.model.access">
+        <field name="name">bank.transaction.user</field>
+        <field name="model_id" ref="model_bank_transaction" />
+        <field name="group_id" ref="base.group_user" />
+        <field name="perm_read" eval="1" />
+        <field name="perm_write" eval="1" />
+        <field name="perm_create" eval="1" />
+        <field name="perm_unlink" eval="1" />
+    </record>
+
+    <!-- Bank Account Security -->
+    <record id="access_bank_account_user" model="ir.model.access">
+        <field name="name">bank.account.user</field>
+        <field name="model_id" ref="model_bank_account" />
+        <field name="group_id" ref="base.group_user" />
+        <field name="perm_read" eval="1" />
+        <field name="perm_write" eval="1" />
+        <field name="perm_create" eval="1" />
+        <field name="perm_unlink" eval="1" />
+    </record>
+
+    <!-- Bank Person Security -->
+    <record id="access_bank_person_user" model="ir.model.access">
+        <field name="name">bank.person.user</field>
+        <field name="model_id" ref="model_bank_person" />
+        <field name="group_id" ref="base.group_user" />
+        <field name="perm_read" eval="1" />
+        <field name="perm_write" eval="1" />
+        <field name="perm_create" eval="1" />
+        <field name="perm_unlink" eval="1" />
+    </record>
+
+    <!-- Additional model access rules would go here -->
+
+</odoo>

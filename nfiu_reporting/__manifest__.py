@@ -38,10 +38,13 @@
         'views/nfiu_export_wizard_views.xml',
         'views/nfiu_transaction_views.xml',
         'views/nfiu_data.xml',
-        'data/data.xml'
+        'data/data.xml',
+        'views/bank_transaction_views.xml',
+        'views/menuitems.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+    'license': 'LGPL-3',
 }

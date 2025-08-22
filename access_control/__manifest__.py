@@ -15,6 +15,7 @@
     ],
     'qweb': [],
     'installable': True,
+    'license': 'LGPL-3',
     'application': False,
     'auto_install': False,
     'assets': {

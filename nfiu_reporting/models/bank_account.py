@@ -10,7 +10,7 @@ class BankAccount(models.Model):
     account_number = fields.Char(string='Account Number', required=True)
     account_name = fields.Char(string='Account Name', required=True)
     name = fields.Char(string='Account Name', related='account_number')
-    currency_code = fields.Char(string='Currency Code', default='NGN')
+    currency_code = fields.Char(string='Currency Code', default='NGN',index=True)
     balance = fields.Float(string='Balance', digits=(16, 2))
 
     # Bank Information
