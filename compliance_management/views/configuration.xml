@@ -95,31 +95,31 @@
             <field name="name">res.partner.account.product.form</field>
             <field name="model">res.partner.account.product</field>
             <field name="arch" type="xml">
-                <form class="o_form_document" delete="False">
+                <form class="o_form_document" delete="False" edit="false">
                     <sheet>
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only" />
                             <h1>
-                                <field name="name" readonly="1"/>
+                                <field name="name" />
                             </h1>
                         </div>
-                        <group string="Details" attrs="{'readonly': [('id', '!=', False)]}">
+                        <group string="Details" >
 
                             <group >
-                                <field name="product_type"  />
-                                <field name="product_category" />
+                                <field name="product_type" />
+                                <field name="product_category"  />
                             </group>
 
-                            <group>
-                                <field name="code" string="Product Code" />
-                                <field name="description" />
+                            <group >
+                                <field name="code" string="Product Code"  />
+                                <field name="description"/>
                             </group>
 
                         </group>
 
 
                         <group string="Risk Assessment">
-                            <field name="risk_assessment" readonly="1" />
+                            <field name="risk_assessment" />
                         </group>
                     </sheet>
                 </form>

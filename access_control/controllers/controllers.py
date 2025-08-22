@@ -115,12 +115,15 @@ class ViewSecurityController(http.Controller):
 
     @http.route('/web/dataset/call_kw/<path:path>', type='json', auth="user")
     def call_kw_security(self, model, method, args, kwargs, path=None):
-        """Block model access based on dynamic rules - REFINED approach"""
+        """Block model access"""
         user = request.env.user
         restricted_models = request.env['view.access.rule'].get_restricted_models(
         )
         
         user_session = request.env['user.session']
+        
+        cookies_session=request.httprequest.cookies
+        
         validation_result = user_session.validate_current_session_secure()
         if not validation_result['valid'] and method in ['search_read', 'write', 'create', 'unlink',]:
             _logger.info(f"You do not have permission to perform this action.{validation_result}")
@@ -128,6 +131,9 @@ class ViewSecurityController(http.Controller):
                 "You do not have permission to perform this action."
 
             )
+        contextt = kwargs.get('context', {})
+        _logger.info(
+            f"URL CONTEXT {contextt}.. MODEL {model}... ARGS {args}... Cookies {cookies_session}")
 
 
         if model in restricted_models:
@@ -162,6 +168,7 @@ class ViewSecurityController(http.Controller):
                 'name_search',         # Name search (for dropdowns, etc.)
                 'name_get',            # Get display names
                 'default_get',         # Get default values
+                'onchange',         # Get default values
             ]
 
             # BLOCK CRITICAL DATA METHODS without context
