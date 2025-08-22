@@ -133,7 +133,7 @@ class ViewSecurityController(http.Controller):
             )
         contextt = kwargs.get('context', {})
         _logger.info(
-            f"URL CONTEXT {contextt}.. MODEL {model}... ARGS {args}... Cookies {cookies_session}")
+            f"URL CONTEXT {contextt}.. MODEL {model}... Cookies {cookies_session}")
 
 
         if model in restricted_models:
