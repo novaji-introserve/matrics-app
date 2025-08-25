@@ -1403,7 +1403,6 @@ class CustomerEDD(models.Model):
                 'application/vnd.ms-excel',
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 # Additional common types
-                'application/octet-stream',  # Sometimes files are uploaded with this generic type
             ],
             'extensions': [
                 # Images
