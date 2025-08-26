@@ -23,7 +23,7 @@
         'utm',
         'contacts',
         'mail',
-        'survey','kg_hide_menu','legion_hide_odoo'],
+        'survey','legion_hide_odoo'],
 
     # always loaded
     'data': [
