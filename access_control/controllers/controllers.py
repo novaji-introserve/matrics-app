@@ -166,7 +166,7 @@ class ViewSecurityController(http.Controller):
                 'get_views',
                 'web_search_read',     # Needed to populate list views
                 'read',                # MOVED HERE - needed to open records from list
-                'name_search',         # Name search (for dropdowns, etc.)
+                # 'name_search',         # Name search (for dropdowns, etc.)
                 'name_get',            # Get display names
                 'default_get',         # Get default values
                 'onchange',         # Get default values
@@ -599,3 +599,21 @@ class ViewSecurityController(http.Controller):
     @http.route('/view_access/get_available_groups', type='json', auth='user')
     def get_available_groups(self):
         return request.env['view.access.model.list'].get_available_groups()
+    
+    @http.route('/web/dataset/call_button', type='json', auth="user")
+    def call_button_security(self, model, method, args, kwargs, context_id=None):
+        """Block button method access"""
+                
+        user_session = request.env['user.session']
+        validation_result = user_session.validate_current_session_secure()
+        
+        if not validation_result['valid']:
+            _logger.info(f"Unauthorized button call blocked: {model}.{method} - {validation_result}")
+            raise UserError("You do not have permission to perform this action.")
+        else :
+           _logger.info(f"authorized button call allowed: {model}.{method} - {validation_result}")
+        
+        # Call the original method if validation passes
+        return DataSet().call_button(model, method, args, kwargs)
+
+    
