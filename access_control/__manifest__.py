@@ -6,7 +6,7 @@
     'author': 'Novaji',
     'website': 'https://novajii.com',
     "category": "iComply",
-    'depends': ['base', 'web'],
+    'depends': ['base', 'web','session_control'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

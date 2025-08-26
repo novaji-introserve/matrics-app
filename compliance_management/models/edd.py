@@ -1493,42 +1493,6 @@ class CustomerEDD(models.Model):
             }
         }
 
-    # def _validate_document_field(self, field_name, attachments):
-    #     """Validate a single document field"""
-    #     if not attachments:
-    #         return
-
-    #     allowed_types = self._get_allowed_file_types()
-    #     invalid_files = []
-
-    #     for attachment in attachments:
-    #         is_valid = False
-
-    #         # First check by MIME type
-    #         if attachment.mimetype in allowed_types['mimetypes']:
-    #             is_valid = True
-    #         if attachment.extensions in allowed_types['extensions']:
-    #             is_valid = True
-    #         else:
-    #             # Fallback: check by file extension
-    #             if attachment.name:
-    #                 file_extension = '.' + \
-    #                     attachment.name.lower().split(
-    #                         '.')[-1] if '.' in attachment.name else ''
-    #                 if file_extension in allowed_types['extensions']:
-    #                     is_valid = True
-
-    #         if not is_valid:
-    #             invalid_files.append(attachment.name or 'Unknown file')
-
-    #     if invalid_files:
-    #         field_label = self._fields[field_name].string
-    #         raise ValidationError(_(
-    #             'Invalid file format in "%s". '
-    #             'The following files are not allowed: %s\n\n'
-    #             'Allowed formats: Images (JPG, PNG), '
-    #             'PDF, Word (DOC, DOCX), Excel (XLS, XLSX)'
-    #         ) % (field_label, ', '.join(invalid_files)))
 
     def _validate_document_field(self, field_name, attachments):
         """Validate a single document field"""
