@@ -132,9 +132,6 @@ class ViewSecurityController(http.Controller):
                 "You do not have permission to perform this action."
 
             )
-        contextt = kwargs.get('context', {})
-        _logger.info(
-            f"URL CONTEXT {contextt}.. MODEL {model}... Cookies {cookies_session}")
 
 
         if model in restricted_models:
