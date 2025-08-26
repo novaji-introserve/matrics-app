@@ -125,8 +125,9 @@ class ViewSecurityController(http.Controller):
         cookies_session=request.httprequest.cookies
         
         validation_result = user_session.validate_current_session_secure()
-        if not validation_result['valid'] and method in ['search_read', 'write', 'create','read', 'unlink','get_formview_action','onchange']:
-            _logger.info(f"You do not have permission to perform this action.{validation_result}")
+        if not validation_result['valid'] and method in ['name_get', 'name_search', 'get_views', 'search_read', 'write', 'create', 'read', 'unlink', 'get_formview_action', 'onchange']:
+            _logger.info(
+                f"You do not have permission to perform this action.{validation_result}")
             raise UserError(
                 "You do not have permission to perform this action."
 

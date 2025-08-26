@@ -5,7 +5,7 @@ import binascii
 from datetime import datetime
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-from odoo.exceptions import ValidationError, UserError,AccessError
+from odoo.exceptions import ValidationError, UserError, AccessError
 from odoo.http import request
 
 _logger = logging.getLogger(__name__)
@@ -15,6 +15,8 @@ class CustomerEDD(models.Model):
     _name = 'res.partner.edd'
     _description = 'Enhanced Due Diligence'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _sql_constraints = [
+        ('unique_name', 'UNIQUE(name)', 'The EDD name must be unique.')]
 
     name = fields.Char(string="Name", tracking=True)
     status = fields.Selection(
@@ -100,16 +102,21 @@ class CustomerEDD(models.Model):
         string="Is Current From Normal", tracking=True)
     does_business_support_volume = fields.Boolean(
         string="Does Business Support Volume", tracking=True)
-    
+
     customer_type = fields.Selection(selection=[
                                     ('individual', 'Individual'),
-                                    ('corporate', 'Corporate') ], string="EDD Type", required=True, default='individual', tracking=True)
+                                    ('corporate', 'Corporate')], string="EDD Type", required=True, default='individual', tracking=True)
 
-    brief_customer_profile = fields.Text(string="Please give a brief profile of the subject customer", tracking=True)
-    nature_of_business = fields.Text(string="What is the specific nature of the customers business/occupation/employment?", tracking=True)
-    employment_position = fields.Text(string="Employment Position", tracking=True)
-    employer_name = fields.Text(string= "Name of employer/company", tracking=True)
-    expected_source_of_funds = fields.Text(string="What is the expected source of funds into the customers account?", tracking=True)
+    brief_customer_profile = fields.Text(
+        string="Please give a brief profile of the subject customer", tracking=True)
+    nature_of_business = fields.Text(
+        string="What is the specific nature of the customers business/occupation/employment?", tracking=True)
+    employment_position = fields.Text(
+        string="Employment Position", tracking=True)
+    employer_name = fields.Text(
+        string="Name of employer/company", tracking=True)
+    expected_source_of_funds = fields.Text(
+        string="What is the expected source of funds into the customers account?", tracking=True)
     source_of_funds_document = fields.Many2many(
         'ir.attachment',
         'res_partner_source_of_funds_document_rel',
@@ -118,7 +125,8 @@ class CustomerEDD(models.Model):
         string="Kindly provide documentary evidence if available",
         help="Add source of wealth document(s) for customer EDD"
     )
-    source_of_wealth = fields.Text(string="What is the source of wealth of the customer (e.g., inheritance, business revenue, investment income)?")
+    source_of_wealth = fields.Text(
+        string="What is the source of wealth of the customer (e.g., inheritance, business revenue, investment income)?")
     source_of_wealth_document = fields.Many2many(
         'ir.attachment',
         'res_partner_source_of_wealth_document_rel',
@@ -138,12 +146,15 @@ class CustomerEDD(models.Model):
         'partner_id',
         'country_id',
         string="Residential Countries",
-        help = "Kindly list the countries as applicable"
+        help="Kindly list the countries as applicable"
 
     )
-    is_customer_pep = fields.Boolean(string="Is the customer a Politically Exposed Person (PEP) or associated to a PEP?", tracking=True)
-    relationship_with_pep = fields.Text(string="If “Yes”, state Designation/Position/relationship with PEP)", tracking=True)
-    cross_border_transaction = fields.Boolean(string="Is the customer expected to engage in transactions involving cross-border fund transfers or transactions?", tracking=True)
+    is_customer_pep = fields.Boolean(
+        string="Is the customer a Politically Exposed Person (PEP) or associated to a PEP?", tracking=True)
+    relationship_with_pep = fields.Text(
+        string="If “Yes”, state Designation/Position/relationship with PEP)", tracking=True)
+    cross_border_transaction = fields.Boolean(
+        string="Is the customer expected to engage in transactions involving cross-border fund transfers or transactions?", tracking=True)
     cross_border_jurisdictions = fields.Many2many(
         'res.country',
         'res_partner_crossborder_country_rel',
@@ -151,9 +162,12 @@ class CustomerEDD(models.Model):
         'country_id',
         string="If “Yes,” specify the jurisdictions involved."
     )
-    expected_monthly_income = fields.Float(string="What is the expected monthly income/inflow of the customer? (State in Naira - NGN)",tracking=True)
-    estimated_net_worth = fields.Text(string="What is the estimated total net worth of the customer? (State in Naira or USD)", tracking=True)
-    inflow_purpose = fields.Text(string="What would be the purpose of the inflows routed into the customer’s account?", tracking=True)
+    expected_monthly_income = fields.Float(
+        string="What is the expected monthly income/inflow of the customer? (State in Naira - NGN)", tracking=True)
+    estimated_net_worth = fields.Text(
+        string="What is the estimated total net worth of the customer? (State in Naira or USD)", tracking=True)
+    inflow_purpose = fields.Text(
+        string="What would be the purpose of the inflows routed into the customer’s account?", tracking=True)
     inflow_document = fields.Many2many(
         'ir.attachment',
         'res_partner_inflow_document_rel',
@@ -162,7 +176,8 @@ class CustomerEDD(models.Model):
         string="(Provide supporting documents if applicable)",
         help="Add inflow document(s) for customer EDD"
     )
-    outflow_purpose = fields.Text(string="What would be the expected purpose of the outflows from the account?", tracking=True)
+    outflow_purpose = fields.Text(
+        string="What would be the expected purpose of the outflows from the account?", tracking=True)
     outflow_document = fields.Many2many(
         'ir.attachment',
         'res_partner_outflow_document_rel',
@@ -173,39 +188,51 @@ class CustomerEDD(models.Model):
     )
     has_negative_media = fields.Boolean(
         string="Is there any negative news (Including on the internet) about the customer or the customers activities?", tracking=True)
-    negative_media_details = fields.Text(string="provide details", tracking=True)
+    negative_media_details = fields.Text(
+        string="provide details", tracking=True)
     negative_media_document = fields.Many2many(
         'ir.attachment',
         string="Attach evidence",
         help="Add negative media document(s) for customer EDD"
     )
     other_comments = fields.Text(string="Any Other Comments", tracking=True)
-    attestation_checked = fields.Boolean(string="I hereby attest that the information provided above and in the enclosed documents is accurate to the best of my knowledge. I understand that providing false or incomplete information may result in disciplinary action.", tracking=True)
+    attestation_checked = fields.Boolean(
+        string="I hereby attest that the information provided above and in the enclosed documents is accurate to the best of my knowledge. I understand that providing false or incomplete information may result in disciplinary action.", tracking=True)
     responsible_officer_signature = fields.Binary(
         string="Officer In Charge Signature", tracking=True)
     responsible_signature_filename = fields.Char(tracking=True)
     approving_officer_signature = fields.Binary(
         string="Approving Officer Signature", tracking=True)
     approving_signature_filename = fields.Char(tracking=True)
-    dual_citizenship_info = fields.Text(string="Do any signatories/directors/shareholders hold dual citizenship or residence in other jurisdictions?", tracking=True)
+    dual_citizenship_info = fields.Text(
+        string="Do any signatories/directors/shareholders hold dual citizenship or residence in other jurisdictions?", tracking=True)
     citizenship_country_ids = fields.Many2many(
         'res.country',
         'res_partner_country_rel',
         'partner_id',
         'country_id',
         string="Citizenship Countries",
-        help = "Kindly list the countries as applicable"
+        help="Kindly list the countries as applicable"
 
     )
-    customer_address = fields.Char(string='Address',related='customer_id.street',store=True,readonly=False, tracking=True)
-    company_registration_number = fields.Char(string='Company Registration Number (RC/BN)',help='Company Registration Number or Business Number', tracking = True)
-    signatories_details = fields.Text(string='Signatories Details (Names)',help='List the names of authorized signatories', tracking=True)
-    beneficial_owner_details = fields.Text(string='Beneficial Owner Details', help='List the names of the Directors/Shareholders/Person of Significant Control')
-    high_risk_industries = fields.Text(string="Does the customer have any direct or indirect link to high-risk industries (e.g. Crypto, Financial Services, DNFBPs)?", tracking=True)
-    pep_association = fields.Boolean(string="Is any Director/Shareholder/Signatory a Politically Exposed Person (PEP) or associated with a PEP?", tracking=True)
-    pep_relationship_details = fields.Text(string="If Yes, state Designation/Position/relationship with PEP", tracking=True)
-    third_party_involvement = fields.Boolean(string="Are there any third-party, proxies, nominees or legal reps managing the entity/account?",tracking=True)
-    third_party_details = fields.Text(string="If Yes, provide details & documentation", tracking=True)
+    customer_address = fields.Char(
+        string='Address', related='customer_id.street', store=True, readonly=False, tracking=True)
+    company_registration_number = fields.Char(
+        string='Company Registration Number (RC/BN)', help='Company Registration Number or Business Number', tracking=True)
+    signatories_details = fields.Text(
+        string='Signatories Details (Names)', help='List the names of authorized signatories', tracking=True)
+    beneficial_owner_details = fields.Text(
+        string='Beneficial Owner Details', help='List the names of the Directors/Shareholders/Person of Significant Control')
+    high_risk_industries = fields.Text(
+        string="Does the customer have any direct or indirect link to high-risk industries (e.g. Crypto, Financial Services, DNFBPs)?", tracking=True)
+    pep_association = fields.Boolean(
+        string="Is any Director/Shareholder/Signatory a Politically Exposed Person (PEP) or associated with a PEP?", tracking=True)
+    pep_relationship_details = fields.Text(
+        string="If Yes, state Designation/Position/relationship with PEP", tracking=True)
+    third_party_involvement = fields.Boolean(
+        string="Are there any third-party, proxies, nominees or legal reps managing the entity/account?", tracking=True)
+    third_party_details = fields.Text(
+        string="If Yes, provide details & documentation", tracking=True)
     third_party_document = fields.Many2many(
         'ir.attachment',
         'res_partner_third_party_document_rel',
@@ -214,10 +241,8 @@ class CustomerEDD(models.Model):
         string="Documentation",
         help="Add third party document(s) for customer EDD"
     )
-    kycc_info = fields.Text(string="What types/nature of clientele/customers does this business provide services/goods to?")
-
-
-    
+    kycc_info = fields.Text(
+        string="What types/nature of clientele/customers does this business provide services/goods to?")
 
     is_current_user_responsible = fields.Boolean(
         compute='_compute_is_current_user_responsible')
@@ -227,20 +252,30 @@ class CustomerEDD(models.Model):
         compute='_compute_is_current_user_approving_officer')
     is_cco = fields.Boolean(compute='_compute_is_cco', store=False,
                             default=lambda self: self._default_is_cco())
-    is_co = fields.Boolean(compute='_compute_is_co', store=False, default=lambda self: self._default_is_co())
-    is_editable_user= fields.Boolean(compute='_compute_is_editable_user',default=lambda self: self._default_is_editable_user(), store=False)
-    is_officer_notified = fields.Boolean(string="Officer Notified", default=False)
-    is_relationship_manager = fields.Boolean(compute='_compute_is_relationship_manager',default=lambda self: self._default_is_relationship_manager(), store=False)
+    is_co = fields.Boolean(compute='_compute_is_co', store=False,
+                           default=lambda self: self._default_is_co())
+    is_editable_user = fields.Boolean(compute='_compute_is_editable_user',
+                                      default=lambda self: self._default_is_editable_user(), store=False)
+    is_officer_notified = fields.Boolean(
+        string="Officer Notified", default=False)
+    is_relationship_manager = fields.Boolean(
+        compute='_compute_is_relationship_manager', default=lambda self: self._default_is_relationship_manager(), store=False)
     is_diligence_officer = fields.Boolean(default=lambda self: (self.env.user.has_group('compliance_management.group_compliance_compliance_officer') or
-        self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
-    ), store=False)
-    created_by_rm = fields.Boolean(compute='_compute_created_by_rm', store=False)
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
-    reject_reason = fields.Text(string='Reject Reason', tracking =True)
-    approving_officer_name = fields.Char(string="Approving Officer Name", compute='_compute_officer_names', store=True, tracking=True)
-    responsible_officer_name = fields.Char(string="Responsible Officer Name", compute='_compute_officer_names', store=True, tracking=True)
-    is_current_user_creator = fields.Boolean(compute='_compute_is_current_user_creator')
-    
+                                                                self.env.user.has_group(
+                                                                    'compliance_management.group_compliance_chief_compliance_officer')
+                                                                ), store=False)
+    created_by_rm = fields.Boolean(
+        compute='_compute_created_by_rm', store=False)
+    company_id = fields.Many2one(
+        'res.company', string='Company', default=lambda self: self.env.company)
+    reject_reason = fields.Text(string='Reject Reason', tracking=True)
+    approving_officer_name = fields.Char(
+        string="Approving Officer Name", compute='_compute_officer_names', store=True, tracking=True)
+    responsible_officer_name = fields.Char(
+        string="Responsible Officer Name", compute='_compute_officer_names', store=True, tracking=True)
+    is_current_user_creator = fields.Boolean(
+        compute='_compute_is_current_user_creator')
+
     show_approval_button = fields.Boolean(
         string='Show Approval Button',
         compute='_compute_button_visibility',
@@ -264,7 +299,7 @@ class CustomerEDD(models.Model):
         compute='_compute_button_visibility',
         store=False
     )
-    
+
     show_send_back_button = fields.Boolean(
         string='Show Send Back Button',
         compute='_compute_button_visibility',
@@ -275,7 +310,7 @@ class CustomerEDD(models.Model):
         compute='_compute_button_visibility',
         store=False
     )
-    
+
     show_notify_button = fields.Boolean(
         string='Show Notify Button',
         compute='_compute_button_visibility',
@@ -286,8 +321,8 @@ class CustomerEDD(models.Model):
         compute='_compute_button_visibility',
         store=False
     )
-    
-    @api.depends('status', 'create_uid', 'approving_officer_id','responsible_id','is_officer_notified')
+
+    @api.depends('status', 'create_uid', 'approving_officer_id', 'responsible_id', 'is_officer_notified')
     def _compute_button_visibility(self):
         for record in self:
             current_user = self.env.user
@@ -302,10 +337,10 @@ class CustomerEDD(models.Model):
             user_in_dd = dd_group and dd_group in current_user.groups_id
             creator_in_rm = rm_group and rm_group in record.create_uid.groups_id if record.create_uid else False
             user_is_authorized = (
-                            current_user.id == record.create_uid.id or  # Creator
-                            current_user.id == record.approving_officer_id.id or  # Approving Officer
-                            current_user.id == record.responsible_id.id  # Responsible Officer
-                        )
+                current_user.id == record.create_uid.id or  # Creator
+                current_user.id == record.approving_officer_id.id or  # Approving Officer
+                current_user.id == record.responsible_id.id  # Responsible Officer
+            )
             # APPROVAL BUTTON CONDITIONS
             # Condition 1: status is complete AND logged in user is approving officer (has id)
             condition1 = (record.status == 'completed' and
@@ -337,8 +372,8 @@ class CustomerEDD(models.Model):
             reject_condition2 = (record.status == 'completed' and
                                  creator_in_rm and
                                  user_in_dd)
-            
-            reject_condition3 = (record.status == 'completed' 
+
+            reject_condition3 = (record.status == 'completed'
                                  and current_user.id == record.create_uid.id)
 
             record.show_reject_button = reject_condition1 or reject_condition2 or reject_condition3
@@ -348,9 +383,8 @@ class CustomerEDD(models.Model):
             record.show_cancel_button = (record.responsible_id and
                                          current_user.id == record.responsible_id.id and
                                          record.status == 'submitted')
-            
+
             # Helper function to check if user is authorized (creator, approving officer, or responsible officer)
-            
 
             # ARCHIVE BUTTON CONDITION
             # Show if status is approved AND logged-in user is either creator, approving officer, or responsible officer
@@ -358,49 +392,43 @@ class CustomerEDD(models.Model):
                 record.status == 'approved' and
                 user_is_authorized
             )
-            
+
             # SEND BACK BUTTON CONDITION
             record.show_send_back_button = (
-                record.status == 'rejected' and 
+                record.status == 'rejected' and
                 user_is_authorized
             )
-            
+
             # SHOW NOTIFY BUTTON CONDITION
             record.show_notify_button = (
-                not record.is_officer_notified and 
+                not record.is_officer_notified and
                 user_is_authorized
             )
-            
+
             # SUBMIT FOR REVIEW BUTTON CONDITION
             record.show_submit_for_review_button = (
                 record.is_officer_notified and record.status == 'draft' and
                 current_user.id == record.responsible_id.id
             )
 
-
-            
     @api.depends('create_uid')
     def _compute_is_current_user_creator(self):
         user_id = self.env.user.id
         for record in self:
             record.is_current_user_creator = record.create_uid.id == user_id if record.create_uid else False
 
-
     @api.depends('approving_officer_id', 'responsible_id')
     def _compute_officer_names(self):
         for record in self:
             record.approving_officer_name = record.approving_officer_id.name if record.approving_officer_id else False
             record.responsible_officer_name = record.responsible_id.name if record.responsible_id else False
-        
-
-    _sql_constraints = [
-    ('unique_name', 'UNIQUE(name)', 'The EDD name must be unique.')]
 
     @api.constrains('name')
     def _check_unique_name(self):
         for record in self:
             if self.search_count([('name', '=', record.name), ('id', '!=', record.id)]):
-                raise ValidationError("An EDD record with this name already exists.")
+                raise ValidationError(
+                    "An EDD record with this name already exists.")
 
     @api.model
     def _default_is_cco(self):
@@ -413,70 +441,79 @@ class CustomerEDD(models.Model):
         for record in self:
             record.is_cco = self.env.user.has_group(
                 'compliance_management.group_compliance_chief_compliance_officer')
-            
+
     @api.model
     def _default_is_co(self):
         """Default method to set is_cco based on the user group."""
         return self.env.user.has_group('compliance_management.group_compliance_compliance_officer')
-  
+
     @api.depends_context('uid')
     def _compute_is_co(self):
         """Compute method to update is_cco based on user group when editing records."""
         for record in self:
             record.is_co = self.env.user.has_group(
                 'compliance_management.group_compliance_compliance_officer')
-            
+
     @api.model
     def _default_is_editable_user(self):
         """Allow CO/CCO to create new records"""
         user = self.env.user
-        is_cco = user.has_group('compliance_management.group_compliance_chief_compliance_officer')
-        is_co = user.has_group('compliance_management.group_compliance_compliance_officer')
-        is_relationship_manager= user.has_group('compliance_management.group_compliance_relationship_manager')
-        return is_cco or is_co or is_relationship_manager 
-            
+        is_cco = user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+        is_co = user.has_group(
+            'compliance_management.group_compliance_compliance_officer')
+        is_relationship_manager = user.has_group(
+            'compliance_management.group_compliance_relationship_manager')
+        return is_cco or is_co or is_relationship_manager
+
     @api.depends_context('uid')
     def _compute_is_editable_user(self):
         current_user = self.env.user
         for record in self:
             # Check groups once
-            is_cco = current_user.has_group('compliance_management.group_compliance_chief_compliance_officer')
-            is_co = current_user.has_group('compliance_management.group_compliance_compliance_officer')
-            is_relationship_manager= current_user.has_group('compliance_management.group_compliance_relationship_manager')
-            
+            is_cco = current_user.has_group(
+                'compliance_management.group_compliance_chief_compliance_officer')
+            is_co = current_user.has_group(
+                'compliance_management.group_compliance_compliance_officer')
+            is_relationship_manager = current_user.has_group(
+                'compliance_management.group_compliance_relationship_manager')
+
             # Handle new vs existing records
             if not record.id:  # New record (not saved yet)
                 is_creator = True
-                _logger.info(f"[EDD] NEW RECORD - User: {current_user.name} (ID: {current_user.id})")
+                _logger.info(
+                    f"[EDD] NEW RECORD - User: {current_user.name} (ID: {current_user.id})")
             else:  # Existing record
                 is_creator = record.user_id.id == current_user.id if record.user_id else False
-                _logger.info(f"[EDD] EXISTING RECORD - User: {current_user.name} (ID: {current_user.id})")
-                _logger.info(f"[EDD] Record ID: {record.id}, User ID: {record.user_id}")
-            
-            # Calculate editability
-            record.is_editable_user = (is_cco and is_creator) or (is_co and is_creator) or (is_relationship_manager and is_creator)
-            
-            # Final logging
-            _logger.info(f"[EDD] Is CCO: {is_cco}, Is CO: {is_co}, Is Creator: {is_creator}")
-            _logger.info(f"[EDD] Editable: {record.is_editable_user}")
+                _logger.info(
+                    f"[EDD] EXISTING RECORD - User: {current_user.name} (ID: {current_user.id})")
+                _logger.info(
+                    f"[EDD] Record ID: {record.id}, User ID: {record.user_id}")
 
+            # Calculate editability
+            record.is_editable_user = (is_cco and is_creator) or (
+                is_co and is_creator) or (is_relationship_manager and is_creator)
+
+            # Final logging
+            _logger.info(
+                f"[EDD] Is CCO: {is_cco}, Is CO: {is_co}, Is Creator: {is_creator}")
+            _logger.info(f"[EDD] Editable: {record.is_editable_user}")
 
     @api.model
     def _default_is_relationship_manager(self):
         return self.env.user.has_group('compliance_management.group_compliance_relationship_manager')
-  
+
     @api.depends_context('uid')
     def _compute_is_relationship_manager(self):
         for record in self:
             record.is_relationship_manager = self.env.user.has_group(
                 'compliance_management.group_compliance_relationship_manager')
-            
+
     def _compute_created_by_rm(self):
-        rm_group = self.env.ref("compliance_management.group_compliance_relationship_manager")
+        rm_group = self.env.ref(
+            "compliance_management.group_compliance_relationship_manager")
         for record in self:
             record.created_by_rm = (record.create_uid in rm_group.users)
-            
-
 
     @api.depends('responsible_id')
     def _compute_is_current_user_responsible(self):
@@ -498,9 +535,8 @@ class CustomerEDD(models.Model):
             # Check if the approved_by matches the current user ID
             record.is_current_user_approving_officer = (
                 record.approving_officer_id.id == self.env.user.id if record.approving_officer_id else False
-)
-            
-    
+            )
+
     def _create_alert_history_record(self, template_with_context, recipient, template, notification_type, email_values=None):
         """Create alert history record for sent email"""
         try:
@@ -511,7 +547,7 @@ class CustomerEDD(models.Model):
                 [self.id],
                 engine='qweb'
             )[self.id]
-            
+
             # Create alert history record
             alert_history = self.env['alert.history'].sudo().create({
                 "ref_id": f"{self._name},{self.id}",
@@ -528,15 +564,17 @@ class CustomerEDD(models.Model):
                 'narration': f"EDD {notification_type} sent via {template.name}",
                 'name': f"EDD-{self.id} {notification_type.title()} Notification to {recipient}"
             })
-            
-            _logger.info(f"Alert history created with ID: {alert_history.id} for recipient: {recipient}")
-            
-        except Exception as history_error:
-            _logger.error(f"Failed to create alert history for {recipient}: {str(history_error)}")
-            # Don't raise error here - email was sent successfully, history is secondary
-        
 
-    # logic to send email      
+            _logger.info(
+                f"Alert history created with ID: {alert_history.id} for recipient: {recipient}")
+
+        except Exception as history_error:
+            _logger.error(
+                f"Failed to create alert history for {recipient}: {str(history_error)}")
+            # Don't raise error here - email was sent successfully, history is secondary
+
+    # logic to send email
+
     def _send_email_to_officers(self, template_ref, to_creator_only, officer=None):
         """
         Send email notifications for EDD workflow.
@@ -555,11 +593,14 @@ class CustomerEDD(models.Model):
 
             # Get compliance officer groups
             compliance_groups = [
-                self.env.ref('compliance_management.group_compliance_chief_compliance_officer'),
-                self.env.ref('compliance_management.group_compliance_compliance_officer'),
-                self.env.ref('compliance_management.group_compliance_relationship_manager'),
+                self.env.ref(
+                    'compliance_management.group_compliance_chief_compliance_officer'),
+                self.env.ref(
+                    'compliance_management.group_compliance_compliance_officer'),
+                self.env.ref(
+                    'compliance_management.group_compliance_relationship_manager'),
             ]
-            
+
             # Get all users from compliance groups
             compliance_users = self.env['res.users']
             for group in compliance_groups:
@@ -569,7 +610,7 @@ class CustomerEDD(models.Model):
             creator = self.user_id or self.create_uid
             creator_email = None
             creator_name = None
-            
+
             if creator and creator in compliance_users and creator.email:
                 creator_email = creator.email
                 creator_name = creator.name
@@ -585,18 +626,20 @@ class CustomerEDD(models.Model):
             else:
                 target_officer = self.approving_officer_id or self.responsible_id
                 _logger.info(f"Using provided officer: {target_officer.name}")
-            
-            officer = target_officer 
+
+            officer = target_officer
             officer_email = officer.email
 
             if officer is None or not officer_email:
-                _logger.warning("No valid officer found or officer has no email.")
+                _logger.warning(
+                    "No valid officer found or officer has no email.")
                 raise ValidationError("No valid officer to send email to.")
-            
+
             # Build EDD URL
-            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            base_url = self.env['ir.config_parameter'].sudo(
+            ).get_param('web.base.url')
             edd_url = f"{base_url}/web#id={self.id}&model=res.partner.edd&view_type=tree"
-            
+
             # Prepare email context
             email_context = {
                 'officer_name': officer.name,
@@ -607,107 +650,121 @@ class CustomerEDD(models.Model):
 
             # Handle email routing based on to_creator_only flag
             primary_email = None  # Initialize primary_email variable
-            
+
             if to_creator_only:
                 # Send to creator only, CC current user if different
                 if not creator_email:
-                    raise ValidationError("Creator email not found or creator is not a compliance officer.")
-                
+                    raise ValidationError(
+                        "Creator email not found or creator is not a compliance officer.")
+
                 email_values = {'email_to': creator_email}
                 primary_email = creator_email
-                
+
                 # Add current user to CC if different from creator
                 if current_user_email and current_user_email != creator_email:
                     email_values['email_cc'] = current_user_email
-                
+
                 recipient_info = f"creator ({creator_email})"
                 cc_info = email_values.get('email_cc', 'none')
-                
+
             else:
                 # Send to target officer, CC creator and current user
                 if not target_officer or not target_officer.email:
-                    raise ValidationError("No valid target officer with email found.")
-                
+                    raise ValidationError(
+                        "No valid target officer with email found.")
+
                 email_values = {'email_to': target_officer.email}
                 primary_email = target_officer.email
-                
+
                 # Build CC list
                 cc_emails = []
-                
+
                 # Add creator to CC if exists and different from target
                 if creator_email and creator_email != target_officer.email:
                     cc_emails.append(creator_email)
-                
+
                 # Add current user to CC if different from target and creator
-                if (current_user_email and 
-                    current_user_email != target_officer.email and 
-                    current_user_email != creator_email):
+                if (current_user_email and
+                    current_user_email != target_officer.email and
+                        current_user_email != creator_email):
                     cc_emails.append(current_user_email)
-                
+
                 # Set CC if we have any
                 if cc_emails:
                     email_values['email_cc'] = ','.join(cc_emails)
-                
+
                 recipient_info = f"target officer ({target_officer.email})"
                 cc_info = email_values.get('email_cc', 'none')
 
             # Log email details
-            _logger.info(f"Sending {template.name} notification to {recipient_info}, CC: {cc_info}")
-            
+            _logger.info(
+                f"Sending {template.name} notification to {recipient_info}, CC: {cc_info}")
+
             try:
                 template_with_context = template.with_context(**email_context)
-                
+
                 # Send the email with the context
                 email_result = template_with_context.send_mail(
                     self.id,
                     force_send=True,
                     email_values=email_values
                 )
-                
+
                 _logger.info(f"Email sent with ID: {email_result}")
                 _logger.info(f"Email values: {email_values}")
-                
-                if email_result:    
+
+                if email_result:
                     _logger.info(f"Email sent successfully to {email_values}")
-                    self._create_alert_history_record(template_with_context, primary_email, template, template.name, email_values)
+                    self._create_alert_history_record(
+                        template_with_context, primary_email, template, template.name, email_values)
                 else:
                     error_msg = "Email sending returned no mail ID - send may have failed"
                     _logger.error(error_msg)
                     raise ValidationError(f"Failed to send email: {error_msg}")
-            
+
             except Exception as send_error:
                 _logger.error(f"Failed to send email: {str(send_error)}")
-                raise ValidationError(f"Failed to send notification: {str(send_error)}")
-            
+                raise ValidationError(
+                    f"Failed to send notification: {str(send_error)}")
+
         except ValidationError:
             # Re-raise validation errors
             raise
         except Exception as e:
-            _logger.error(f"{template.name} Failed to send notification: {str(e)}")
-            raise ValidationError(f"{template.name} Failed to send notification: {str(e)}")
-        
+            _logger.error(
+                f"{template.name} Failed to send notification: {str(e)}")
+            raise ValidationError(
+                f"{template.name} Failed to send notification: {str(e)}")
+
     def _send_approval_request_notification(self):
         # Get email template for approval request
-        template = self.env.ref("compliance_management.enhanced_due_diligence_approval_reqired_template", raise_if_not_found=False)
+        template = self.env.ref(
+            "compliance_management.enhanced_due_diligence_approval_reqired_template", raise_if_not_found=False)
         if not template:
-            raise ValidationError("Missing email template: enhanced_due_diligence_approval_reqired_template")
+            raise ValidationError(
+                "Missing email template: enhanced_due_diligence_approval_reqired_template")
 
         # Get compliance officer groups
-        cco_group = self.env.ref("compliance_management.group_compliance_chief_compliance_officer")
-        co_group = self.env.ref("compliance_management.group_compliance_compliance_officer")
+        cco_group = self.env.ref(
+            "compliance_management.group_compliance_chief_compliance_officer")
+        co_group = self.env.ref(
+            "compliance_management.group_compliance_compliance_officer")
 
         # Get all officers with valid email addresses
-        officer_users = (cco_group.users | co_group.users).filtered(lambda u: u.email and u.email.strip())
-        
+        officer_users = (cco_group.users | co_group.users).filtered(
+            lambda u: u.email and u.email.strip())
+
         if not officer_users:
-            raise ValidationError("No CO/CCO users with valid email addresses found.")
+            raise ValidationError(
+                "No CO/CCO users with valid email addresses found.")
 
         # Send approval request emails
         self._send_bulk_emails(template, officer_users, "approval request")
-    
+
     def _send_bulk_emails(self, template, recipients, notification_type):
         """Send emails to multiple recipients with proper error handling"""
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo(
+        ).get_param('web.base.url')
         edd_url = f"{base_url}/web#id={self.id}&model=res.partner.edd&view_type=form"
 
         # Track email sending results
@@ -719,7 +776,7 @@ class CustomerEDD(models.Model):
             try:
                 # Store email address for consistent reference
                 recipient_email = recipient.email
-                
+
                 # Prepare email context
                 email_context = {
                     'edd_url': edd_url,
@@ -741,11 +798,13 @@ class CustomerEDD(models.Model):
                 )
 
                 if email_result:
-                    _logger.info(f"Email sent successfully to {recipient_email} with ID: {email_result}")
+                    _logger.info(
+                        f"Email sent successfully to {recipient_email} with ID: {email_result}")
                     successful_sends.append(recipient_email)
                     # Pass email_values to get CC information
-                    self._create_alert_history_record(template_with_context, recipient_email, template, template.name, email_values)
-                    
+                    self._create_alert_history_record(
+                        template_with_context, recipient_email, template, template.name, email_values)
+
                 else:
                     error_msg = f"Email sending to {recipient_email} returned no mail ID"
                     _logger.error(error_msg)
@@ -760,25 +819,28 @@ class CustomerEDD(models.Model):
 
         # Handle results
         if successful_sends:
-            _logger.info(f"EDD {notification_type} notifications sent successfully to: {', '.join(successful_sends)}")
-            
+            _logger.info(
+                f"EDD {notification_type} notifications sent successfully to: {', '.join(successful_sends)}")
+
         if failed_sends:
             error_msg = f"Failed to send EDD {notification_type} notifications to: {', '.join(failed_sends)}"
             _logger.error(error_msg)
-            
+
             if not successful_sends:  # All emails failed
-                raise ValidationError(f"Failed to send any {notification_type} notifications: {error_msg}")
+                raise ValidationError(
+                    f"Failed to send any {notification_type} notifications: {error_msg}")
             else:  # Some succeeded, some failed
-                _logger.warning(f"Partial failure in {notification_type} email sending: {error_msg}")
+                _logger.warning(
+                    f"Partial failure in {notification_type} email sending: {error_msg}")
 
     def action_notify_officer(self):
         self.write({
-            'is_officer_notified':True
+            'is_officer_notified': True
         })
         _logger.info(f"Creating EDD record with values: {self}")
         self._send_email_to_officers(
-            'compliance_management.enhanced_due_diligence_assessment_template', to_creator_only=False, officer= self.responsible_id)
-        
+            'compliance_management.enhanced_due_diligence_assessment_template', to_creator_only=False, officer=self.responsible_id)
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),
@@ -811,17 +873,17 @@ class CustomerEDD(models.Model):
     #                 officer= record
     #             )
 
-    def action_submit_for_review(self):        
-       
+    def action_submit_for_review(self):
+
         self.ensure_one()
-                         
-        
+
         # Perform attestation check before allowing submission
         if (self.is_current_user_responsible and
-            self.status == 'draft' and 
-            not self.attestation_checked):
-            raise ValidationError("Attestation must be checked before submission.")
-        
+            self.status == 'draft' and
+                not self.attestation_checked):
+            raise ValidationError(
+                "Attestation must be checked before submission.")
+
         self.validate_responsible_user()
 
         self.write({
@@ -849,16 +911,16 @@ class CustomerEDD(models.Model):
                 'sticky': False,
             },
         }
-    
+
     def action_mark_review_completed(self):
         self.ensure_one()
-                
 
         if (self.is_current_user_approving_officer and
             self.status == 'submitted' and
-            not self.approving_officer_signature):
-            raise ValidationError("Signature must be uploaded before completing review.")
-        
+                not self.approving_officer_signature):
+            raise ValidationError(
+                "Signature must be uploaded before completing review.")
+
         self.validate_officer_can_complete()
 
         # Update status
@@ -866,26 +928,26 @@ class CustomerEDD(models.Model):
 
         # Identify the creator of the record
         creator = self.create_uid
-        rm_group='compliance_management.group_compliance_relationship_manager'
-
+        rm_group = 'compliance_management.group_compliance_relationship_manager'
 
         is_creator_relationship_manager = creator.has_group(rm_group)
         is_creator_compliance_officer = (
             creator.has_group('compliance_management.group_compliance_chief_compliance_officer') or
-            creator.has_group('compliance_management.group_compliance_compliance_officer')
+            creator.has_group(
+                'compliance_management.group_compliance_compliance_officer')
         )
 
         # Creator is Risk Manager
         if is_creator_relationship_manager:
             self._send_approval_request_notification()
-            self._send_email_to_officers("compliance_management.enhanced_due_diligence_completed_template", to_creator_only=False)
+            self._send_email_to_officers(
+                "compliance_management.enhanced_due_diligence_completed_template", to_creator_only=False)
 
         # Creator is Compliance Officer or CCO
         elif is_creator_compliance_officer:
-            self._send_email_to_officers("compliance_management.enhanced_due_diligence_completed_template", to_creator_only=False)
+            self._send_email_to_officers(
+                "compliance_management.enhanced_due_diligence_completed_template", to_creator_only=False)
 
-
-        
         return {
             'type': 'ir.actions.act_window',
             'name': _('Enhanced Due Diligence'),
@@ -904,11 +966,10 @@ class CustomerEDD(models.Model):
             },
         }
 
-
     def action_approve(self):
-        
+
         self.ensure_one()
-                   
+
         self.validate_user_can_do_final_approval()
 
         self.write({
@@ -919,7 +980,6 @@ class CustomerEDD(models.Model):
 
         self._send_email_to_officers(
             "compliance_management.enhanced_due_diligence_approved_template", to_creator_only=True)
-            
 
         return {
             'type': 'ir.actions.act_window',
@@ -941,9 +1001,9 @@ class CustomerEDD(models.Model):
 
     def action_cancel(self):
         self.ensure_one()
-        
+
         self.validate_approving_officer_or_creator()
-        
+
         self.write({
             'status': 'draft',
             'approved_by': "",
@@ -973,10 +1033,9 @@ class CustomerEDD(models.Model):
 
     def action_send_back(self):
         self.ensure_one()
-        
+
         self.validate_approving_officer_or_creator()
 
-           
         self.write({
             'status': 'draft',
             'approved_by': "",
@@ -1008,7 +1067,6 @@ class CustomerEDD(models.Model):
 
         self._send_email_to_officers(
             'compliance_management.enhanced_due_diligence_archived_template', to_creator_only=True)
-        
 
         self.write({
             'status': 'archived',
@@ -1031,10 +1089,10 @@ class CustomerEDD(models.Model):
                 'sticky': False,
             },
         }
-    
+
     def action_reject(self, reject_reason=None):
         self.ensure_one()
-                   
+
         self.write({
             'status': 'rejected',
             'approved_by': "",
@@ -1062,13 +1120,13 @@ class CustomerEDD(models.Model):
                 'sticky': False,
             },
         }
+
     def open_reject_wizard(self):
-        
+
         self.ensure_one()
-        
+
         self.validate_user_can_reject()
 
-           
         return {
             'type': 'ir.actions.act_window',
             'name': _('Reject EDD'),
@@ -1093,17 +1151,17 @@ class CustomerEDD(models.Model):
             except (ValueError, TypeError):
                 # If conversion fails, set a default value
                 record.risk_score = 1.0
-    
+
     def action_download_pdf(self):
         self.ensure_one()
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo(
+        ).get_param('web.base.url')
         return {
             'type': 'ir.actions.act_url',
             'url': f'{base_url}/compliance/pdf_report/{self.id}',
             'target': 'new',
         }
 
-            
     def validate_user_can_do_final_approval(self):
         """
         Validates that the session user is NOT in a specified group AND IS the creator of the record.
@@ -1113,38 +1171,39 @@ class CustomerEDD(models.Model):
             user_session = self.env['user.session']
             validation_result = user_session.validate_current_session_secure()
             session_user_id = validation_result['user_id']
-            
+
             current_user = self.env.user
             user_is_authorized = (
-                session_user_id== self.create_uid.id or  # Creator
+                session_user_id == self.create_uid.id or  # Creator
                 session_user_id == self.approving_officer_id.id or  # Approving Officer
                 session_user_id == self.responsible_id.id  # Responsible Officer
             )
-           
-            dd_group = 'compliance_management.group_compliance_branch_compliance_officer'           
+
+            dd_group = 'compliance_management.group_compliance_branch_compliance_officer'
 
             if not validation_result['valid']:
-                _logger.info(f"You do not have permission to perform this action.{validation_result}")
+                _logger.info(
+                    f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
                     "You do not have permission to perform this action."
 
                 )
-            
+
             # Check if user is in the specified group
             user = self.env['res.users'].browse(session_user_id)
             if not user.has_group(dd_group):
                 raise UserError(
                     f"Unauthorized Group User. you cannot perform this action."
                 )
-            
+
             # Check if user is the creator of the record
             if not user_is_authorized:
                 raise UserError(
                     "Unauthorized. you cannot perform this action."
                 )
-            
+
             return True
-            
+
         except UserError:
             raise
         except Exception as e:
@@ -1153,7 +1212,7 @@ class CustomerEDD(models.Model):
             raise UserError(
                 "An error occurred while validating permissions."
             )
-            
+
     def validate_user_can_reject(self):
         """
         Validates that the session user is NOT in a specified group AND IS the creator of the record.
@@ -1165,36 +1224,36 @@ class CustomerEDD(models.Model):
             session_user_id = validation_result['user_id']
             current_user = self.env.user
             user_is_authorized = (
-                session_user_id== self.create_uid.id or  # Creator
-                session_user_id == self.approving_officer_id.id # Approving Officer
+                session_user_id == self.create_uid.id or  # Creator
+                session_user_id == self.approving_officer_id.id  # Approving Officer
             )
-            rm_group='compliance_management.group_compliance_relationship_manager'
-            dd_group='compliance_management.group_compliance_branch_compliance_officer'
+            rm_group = 'compliance_management.group_compliance_relationship_manager'
+            dd_group = 'compliance_management.group_compliance_branch_compliance_officer'
 
             # validation_result = user_session.validate_current_session_in_table()
             if not validation_result['valid']:
-                _logger.info(f"You do not have permission to perform this action.{validation_result}")
+                _logger.info(
+                    f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
                     "You do not have permission to perform this action."
 
                 )
 
-            
             # Check if user is in the specified group
             user = self.env['res.users'].browse(session_user_id)
             if not user.has_group(rm_group) or not user.has_group(dd_group):
                 raise UserError(
                     f"Unauthorized Group User. you cannot perform this action."
                 )
-            
+
             # Check if user is the creator of the record
             if not user_is_authorized:
                 raise UserError(
                     "Unauthorized. you cannot perform this action."
                 )
-            
+
             return True
-            
+
         except UserError:
             raise
         except Exception as e:
@@ -1203,8 +1262,7 @@ class CustomerEDD(models.Model):
             raise UserError(
                 "An error occurred while validating permissions."
             )
-            
-    
+
     def validate_responsible_user(self):
         """
         Validates that the session user is equal to the responsible_user of the record.
@@ -1216,27 +1274,28 @@ class CustomerEDD(models.Model):
             validation_result = user_session.validate_current_session_secure()
             # validation_result = user_session.validate_current_session_in_table()
             if not validation_result['valid']:
-                _logger.info(f"You do not have permission to perform this action.{validation_result}")
+                _logger.info(
+                    f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
                     "You do not have permission to perform this action."
 
                 )
 
             session_user_id = validation_result['user_id']
-            
+
             # Check if user is the responsible user
             if not hasattr(self, 'responsible_id') or not self.responsible_id:
                 raise UserError(
                     "No responsible user is assigned to this record."
                 )
-            
+
             if self.responsible_id.id != session_user_id:
                 raise UserError(
                     "Only the responsible user can perform this action."
                 )
-            
+
             return True
-            
+
         except UserError:
             raise
         except Exception as e:
@@ -1244,7 +1303,7 @@ class CustomerEDD(models.Model):
             raise UserError(
                 "An error occurred while validating responsible user permissions."
             )
-            
+
     def validate_officer_can_complete(self):
         """
         Validates that the session user is equal to the approving officer of the record.
@@ -1255,7 +1314,8 @@ class CustomerEDD(models.Model):
             validation_result = user_session.validate_current_session_secure()
             # validation_result = user_session.validate_current_session_in_table()
             if not validation_result['valid']:
-                _logger.info(f"You do not have permission to perform this action.{validation_result}")
+                _logger.info(
+                    f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
                     "You do not have permission to perform this action."
 
@@ -1283,7 +1343,7 @@ class CustomerEDD(models.Model):
             raise UserError(
                 "An error occurred while validating approving officer permissions."
             )
-            
+
     def validate_approving_officer_or_creator(self):
         """
         Validates that the session user is either the approving officer OR the creator of the record.
@@ -1295,7 +1355,8 @@ class CustomerEDD(models.Model):
             validation_result = user_session.validate_current_session_secure()
             # validation_result = user_session.validate_current_session_in_table()
             if not validation_result['valid']:
-                _logger.info(f"You do not have permission to perform this action.{validation_result}")
+                _logger.info(
+                    f"You do not have permission to perform this action.{validation_result}")
                 raise UserError(
                     "You do not have permission to perform this action."
 
@@ -1327,71 +1388,77 @@ class CustomerEDD(models.Model):
                 "An error occurred while validating permissions."
             )
 
-    
     def _validate_reject_permissions(self):
         """
         Comprehensive server-side validation for reject button access
         """
         current_user = self.env.user
-        
+
         # Check if user has any of the required groups
         required_groups = [
             'compliance_management.group_compliance_branch_compliance_officer',
             'compliance_management.group_compliance_relationship_manager',
             'compliance_management.group_compliance_compliance_officer'
         ]
-        
+
         has_required_group = any(
             current_user.has_group(group) for group in required_groups
         )
-        
+
         if not has_required_group:
-            raise AccessError(_("You don't have permission to reject this record."))
-        
+            raise AccessError(
+                _("You don't have permission to reject this record."))
+
         # Validation for Branch Compliance Officer and Relationship Manager
-        if (current_user.has_group('compliance_management.group_compliance_branch_compliance_officer') or 
-            current_user.has_group('compliance_management.group_compliance_relationship_manager')):
-            
+        if (current_user.has_group('compliance_management.group_compliance_branch_compliance_officer') or
+                current_user.has_group('compliance_management.group_compliance_relationship_manager')):
+
             if self.status != 'submitted':
-                raise ValidationError(_("Record can only be rejected when status is 'Submitted'."))
-            
+                raise ValidationError(
+                    _("Record can only be rejected when status is 'Submitted'."))
+
             if not self.is_current_user_approving_officer:
-                raise ValidationError(_("Only the assigned approving officer can reject this record."))
-        
+                raise ValidationError(
+                    _("Only the assigned approving officer can reject this record."))
+
         # Validation for Compliance Officer (first button - general completed status)
         elif (current_user.has_group('compliance_management.group_compliance_compliance_officer') and
               not self.created_by_rm):  # This distinguishes from the third button
-            
+
             if self.status != 'completed':
-                raise ValidationError(_("Record can only be rejected when status is 'Completed'."))
-            
+                raise ValidationError(
+                    _("Record can only be rejected when status is 'Completed'."))
+
             if not self.is_editable_user:
-                raise ValidationError(_("You don't have edit permissions for this record."))
-        
+                raise ValidationError(
+                    _("You don't have edit permissions for this record."))
+
         # Validation for Compliance Officer (third button - RM created records)
         elif (current_user.has_group('compliance_management.group_compliance_compliance_officer') and
               self.created_by_rm):
-            
+
             if self.status != 'completed':
-                raise ValidationError(_("Record can only be rejected when status is 'Completed'."))
-            
+                raise ValidationError(
+                    _("Record can only be rejected when status is 'Completed'."))
+
             if not self.created_by_rm:
-                raise ValidationError(_("This action is only available for records created by Relationship Managers."))
-            
+                raise ValidationError(
+                    _("This action is only available for records created by Relationship Managers."))
+
             if not self.is_diligence_officer:
-                raise ValidationError(_("Only diligence officers can reject RM-created records."))
-        
+                raise ValidationError(
+                    _("Only diligence officers can reject RM-created records."))
+
         else:
-            raise AccessError(_("You don't have the necessary permissions to perform this action."))
-        
-    
+            raise AccessError(
+                _("You don't have the necessary permissions to perform this action."))
+
     def _get_allowed_file_types(self):
-        """Define allowed MIME types and extensions"""
+        """Define allowed MIME types and extensions with mapping"""
         return {
             'mimetypes': [
                 # Images
                 'image/jpeg',
-                'image/jpg',
                 'image/png',
                 'image/webp',
                 # PDF
@@ -1402,7 +1469,6 @@ class CustomerEDD(models.Model):
                 # Excel Files
                 'application/vnd.ms-excel',
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                # Additional common types
             ],
             'extensions': [
                 # Images
@@ -1413,8 +1479,56 @@ class CustomerEDD(models.Model):
                 '.doc', '.docx',
                 # Excel
                 '.xls', '.xlsx'
-            ]
+            ],
+            # Mapping to ensure MIME type and extension consistency
+            'mime_extension_map': {
+                'image/jpeg': ['.jpg', '.jpeg'],
+                'image/png': ['.png'],
+                'image/webp': ['.webp'],
+                'application/pdf': ['.pdf'],
+                'application/msword': ['.doc'],
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+                'application/vnd.ms-excel': ['.xls'],
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+            }
         }
+
+    # def _validate_document_field(self, field_name, attachments):
+    #     """Validate a single document field"""
+    #     if not attachments:
+    #         return
+
+    #     allowed_types = self._get_allowed_file_types()
+    #     invalid_files = []
+
+    #     for attachment in attachments:
+    #         is_valid = False
+
+    #         # First check by MIME type
+    #         if attachment.mimetype in allowed_types['mimetypes']:
+    #             is_valid = True
+    #         if attachment.extensions in allowed_types['extensions']:
+    #             is_valid = True
+    #         else:
+    #             # Fallback: check by file extension
+    #             if attachment.name:
+    #                 file_extension = '.' + \
+    #                     attachment.name.lower().split(
+    #                         '.')[-1] if '.' in attachment.name else ''
+    #                 if file_extension in allowed_types['extensions']:
+    #                     is_valid = True
+
+    #         if not is_valid:
+    #             invalid_files.append(attachment.name or 'Unknown file')
+
+    #     if invalid_files:
+    #         field_label = self._fields[field_name].string
+    #         raise ValidationError(_(
+    #             'Invalid file format in "%s". '
+    #             'The following files are not allowed: %s\n\n'
+    #             'Allowed formats: Images (JPG, PNG), '
+    #             'PDF, Word (DOC, DOCX), Excel (XLS, XLSX)'
+    #         ) % (field_label, ', '.join(invalid_files)))
 
     def _validate_document_field(self, field_name, attachments):
         """Validate a single document field"""
@@ -1427,17 +1541,21 @@ class CustomerEDD(models.Model):
         for attachment in attachments:
             is_valid = False
 
-            # First check by MIME type
-            if attachment.mimetype in allowed_types['mimetypes']:
-                is_valid = True
-            else:
-                # Fallback: check by file extension
-                if attachment.name:
-                    file_extension = '.' + \
-                        attachment.name.lower().split(
-                            '.')[-1] if '.' in attachment.name else ''
-                    if file_extension in allowed_types['extensions']:
-                        is_valid = True
+            # Extract file extension from filename
+            file_extension = None
+            if attachment.name and '.' in attachment.name:
+                file_extension = '.' + attachment.name.lower().split('.')[-1]
+
+            # Check if both MIME type and extension are allowed and match
+            if (attachment.mimetype in allowed_types['mimetypes'] and
+                    file_extension in allowed_types['extensions']):
+
+                # Verify MIME type and extension consistency
+                mime_to_ext = allowed_types['mime_extension_map']
+                expected_extensions = mime_to_ext.get(attachment.mimetype, [])
+
+                if file_extension in expected_extensions:
+                    is_valid = True
 
             if not is_valid:
                 invalid_files.append(attachment.name or 'Unknown file')
@@ -1447,8 +1565,9 @@ class CustomerEDD(models.Model):
             raise ValidationError(_(
                 'Invalid file format in "%s". '
                 'The following files are not allowed: %s\n\n'
-                'Allowed formats: Images (JPG, PNG), '
-                'PDF, Word (DOC, DOCX), Excel (XLS, XLSX)'
+                'Allowed formats: Images (JPG, PNG, WEBP), '
+                'PDF, Word (DOC, DOCX), Excel (XLS, XLSX). '
+                'Both file extension and content type must match.'
             ) % (field_label, ', '.join(invalid_files)))
 
     @api.constrains(
@@ -1460,7 +1579,6 @@ class CustomerEDD(models.Model):
         'supporting_document',
         'source_of_funds_document'
     )
-    
     def _check_document_file_types(self):
         """Validate all document fields for allowed file types"""
         document_fields = [
@@ -1493,7 +1611,7 @@ class CustomerEDD(models.Model):
     @api.onchange('third_party_document')
     def _onchange_third_party_document(self):
         self._onchange_document_validation('third_party_document')
-        
+
     @api.onchange('source_of_funds_document')
     def _onchange_source_of_funds_document(self):
         self._onchange_document_validation('source_of_funds_document')
@@ -1542,7 +1660,7 @@ class CustomerEDD(models.Model):
                     ) % (field_label, ', '.join(invalid_files))
                 }
             }
-            
+
     def _get_file_type_from_binary(self, binary_data):
         """
         Detect file type from binary data using magic bytes/file signatures
@@ -1560,7 +1678,7 @@ class CustomerEDD(models.Model):
                 # Images
                 b'\xFF\xD8\xFF': 'jpeg',  # JPEG
                 b'\x89PNG\r\n\x1a\n': 'png',  # PNG
-                b'RIFF': 'webp',  # WEBP 
+                b'RIFF': 'webp',  # WEBP
                 # PDF
                 b'%PDF': 'pdf',  # PDF
             }
@@ -1675,5 +1793,3 @@ class EDDRrejectWizard(models.TransientModel):
     def action_confirm_reject(self):
         self.edd_id.action_reject(self.reject_reason)
         return {'type': 'ir.actions.act_window_close'}
-    
-    
