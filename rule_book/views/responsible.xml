@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Responsible View -->
+    <record id="view_responsible_tree" model="ir.ui.view">
+        <field name="name">responsible.tree</field>
+        <field name="model">rulebook.responsible</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="officer_responsible" />
+                <field name="email" />
+                <field name="cc" />
+                <field name="bc" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_responsible_form" model="ir.ui.view">
+        <field name="name">responsible.form</field>
+        <field name="model">rulebook.responsible</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name" />
+                    <field name="officer_responsible" />
+                    <field name="email" />
+                    <field name="cc" />
+                    <field name="bc" />
+                </group>
+            </form>
+        </field>
+    </record>
+
+    
+
+</odoo>
