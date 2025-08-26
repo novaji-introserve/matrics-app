@@ -859,19 +859,7 @@ class CustomerEDD(models.Model):
             },
         }
 
-    # @api.model
-    # def cron_send_for_assessment(self):
-    #     records = self.search([
-    #             ('status', '=', 'draft'),
-    #             ('responsible_id', '!=', False),
-    #             ('create_date', '!=', False)
-    #         ])
-    #     for record in records:
-    #             self._send_email_to_officers(
-    #                 'compliance_management.enhanced_due_diligence_assessment_template',
-    #                 to_cco_only=False,
-    #                 officer= record
-    #             )
+   
 
     def action_submit_for_review(self):
 
@@ -884,7 +872,7 @@ class CustomerEDD(models.Model):
             raise ValidationError(
                 "Attestation must be checked before submission.")
 
-        self.validate_responsible_user()
+        self.call_session_method('validate_responsible_user')
 
         self.write({
             'status': 'submitted',
@@ -921,7 +909,7 @@ class CustomerEDD(models.Model):
             raise ValidationError(
                 "Signature must be uploaded before completing review.")
 
-        self.validate_officer_can_complete()
+        self.call_session_method('validate_officer_can_complete')
 
         # Update status
         self.write({'status': 'completed'})
@@ -970,7 +958,7 @@ class CustomerEDD(models.Model):
 
         self.ensure_one()
 
-        self.validate_user_can_do_final_approval()
+        self.call_session_method('validate_user_can_do_final_approval')
 
         self.write({
             'status': 'approved',
@@ -1002,7 +990,7 @@ class CustomerEDD(models.Model):
     def action_cancel(self):
         self.ensure_one()
 
-        self.validate_approving_officer_or_creator()
+        self.call_session_method('validate_approving_officer_or_creator')
 
         self.write({
             'status': 'draft',
@@ -1034,7 +1022,7 @@ class CustomerEDD(models.Model):
     def action_send_back(self):
         self.ensure_one()
 
-        self.validate_approving_officer_or_creator()
+        self.call_session_method('validate_approving_officer_or_creator')
 
         self.write({
             'status': 'draft',
@@ -1125,7 +1113,7 @@ class CustomerEDD(models.Model):
 
         self.ensure_one()
 
-        self.validate_user_can_reject()
+        self.call_session_method('validate_user_can_reject')
 
         return {
             'type': 'ir.actions.act_window',
