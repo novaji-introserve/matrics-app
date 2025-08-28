@@ -106,7 +106,7 @@
         "views/transaction_screening_rule.xml",
         "data/transaction_type.xml",
         'data/transaction_screening_rule.xml',
-        "views/res_users.xml", # USERS
+        # "views/res_users.xml", # USERS
         "views/peplist.xml",
         'data/gender.xml',
         'data/identification_type.xml',
