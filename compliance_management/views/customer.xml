@@ -149,12 +149,14 @@
                 <!-- <attribute name="invisible">1</attribute> -->
             </xpath>
 
+         
             <xpath expr="//field[@name='street']" position="after">
-                <field name="region_id" invisible="0" />
+                <field name="region_id" attrs="{'invisible': ['|', ('region_id', '=', False), ('region_id', '=', '')]}" readonly="1"/>
             </xpath>
 
-            <xpath expr="//field[@name='region_id']" position="after">
-                <field name="state_residence" invisible="0" />
+
+            <xpath expr="//field[@name='title']" position="after">
+                <field name="state_residence" attrs="{'invisible': ['|', ('state_residence', '=', False), ('state_residence', '=', '')]}" />
             </xpath>
 
             <xpath expr="//field[@name='function']" position="replace">
@@ -208,7 +210,12 @@
             </xpath>
 
             <xpath expr="//div[@class='o_address_format']" position="after">
-                <field name="street" invisible="0" readonly="1"/>
+                <field name="address"  attrs="{'invisible': [('address', '=', False)]}" readonly="1"/>
+
+            </xpath>
+
+            <xpath expr="//div[@class='o_address_format']" position="after">
+                <field name="street"  attrs="{'invisible': [('street', '=', False)]}" readonly="1"/>
 
             </xpath>
 
@@ -223,12 +230,12 @@
 
             <!-- Hide identification_type_id -->
             <xpath expr="//field[@name='identification_type_id']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
             </xpath>
 
             <!-- Hide identification_number -->
             <xpath expr="//field[@name='identification_number']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
             </xpath>
 
             <!-- Hide identification_expiry_date -->
@@ -253,13 +260,14 @@
 
             <xpath expr="//field[@name='branch_id']" position="attributes">
                 <attribute name="readonly">1</attribute>
+                <attribute name="attrs">{'invisible': [('branch_id', '=', False)]}</attribute>
             </xpath>
 
             <!--  -->
 
             <xpath expr="//field[@name='vat']" position="attributes">
-                <!-- <attribute name="readonly">1</attribute> -->
-                <attribute name="invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
+                <!-- <attribute name="invisible">0</attribute> -->
             </xpath>
 
 
@@ -285,14 +293,21 @@
                 <field name="formatted_phone" readonly="1"/>
             </xpath>
 
-            <xpath expr="//field[@name='vat']" position="replace">
+
+            <xpath expr="//div[@class='o_address_format']" position="after">
                 <field name="customer_industry_id" readonly="1"/>
             </xpath>
 
 
             <xpath expr="//field[@name='title']" position="attributes">
                 <attribute name="readonly">1</attribute>
+                <attribute name="attrs">{'invisible': [('title', '=', False)]}</attribute>
             </xpath>
+
+            <xpath expr="//field[@name='title']" position="after">
+                <field name="customer_title" readonly="1"  attrs="{'invisible': [('customer_title', '=', False)]}"/>
+            </xpath>
+
             <xpath expr="//field[@id='individual']" position="attributes">
                 <attribute name="readonly">1</attribute>
             </xpath>
@@ -307,16 +322,19 @@
         <field name="arch" type="xml">
             <xpath expr="//search" position="replace">
                 <search string="Search Customer">
-                    <field name="name" filter_domain="['|', '|', '|', '|', ('display_name', 'ilike', self), ('ref', 'ilike', self), ('email', 'ilike', self), ('vat', 'ilike', self), ('company_registry', 'ilike', self)]"/>
-                    <field name="parent_id" domain="[('is_company', '=', True)]" operator="child_of"/>
+                    <field name="name" filter_domain="['|', ('display_name', 'ilike', self), ('name', 'ilike', self)]"/>
+                    <field name="firstname" filter_domain="[('firstname', 'ilike', self)]"/>
+                    <field name="lastname" filter_domain="[('lastname', 'ilike', self)]"/>
+                    <field name="middlename" filter_domain="[('middlename', 'ilike', self)]"/>
                     <field name="email" filter_domain="[('email', 'ilike', self)]"/>
-                    <field name="phone" filter_domain="['|', ('phone', 'ilike', self), ('mobile', 'ilike', self)]"/>
+                    <field name="phone" filter_domain="['|','|', ('phone', 'ilike', self), ('mobile', 'ilike', self),('customer_phone', 'ilike', self),]"/>
+                    <field name="customer_id" filter_domain="[('customer_id', '=', self)]"/>
                     <field name="category_id" string="Tag" operator="child_of"/>
-                    <field name="customer_id" filter_domain="[('customer_id', 'ilike', self)]"/>
+                    <field name="parent_id" domain="[('is_company', '=', True)]" operator="child_of"/>
                     <separator/>
                     <filter string="Customers" name="type_customer" domain="[('internal_category', '=', 'customer')]"/>
-                    <filter string="Without BVN" name="bvn" domain="['|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]"/>
-                    <filter string="Without Phone No." name="customer_phone" domain="[('customer_phone', '=', False)]"/>
+                    <filter string="Without BVN" name="bvn" domain="['|','|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%'),('bvn', '=', ''),]"/>
+                    <filter string="Without Phone No." name="customer_phone" domain="['|','|','|', ('customer_phone', '=', False),('customer_phone', '=', ''),('phone', '=', False),('mobile', '=', False)]"/>
 
                     <!-- <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
                     <filter string="Partners" name="type_partner" domain="[('internal_category', '=', 'partner')]"/>

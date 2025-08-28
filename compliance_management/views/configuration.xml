@@ -82,7 +82,7 @@
             <field name="name">res.partner.account.product.tree</field>
             <field name="model">res.partner.account.product</field>
             <field name="arch" type="xml">
-                <tree string="Account Products" delete="False">
+                <tree string="Account Products"  create="False" delete="False">
                     <field name="name" string="Name" />
                     <field name="code" string="Code" />
                     <field name="risk_assessment" string="Risk Assessment" />
@@ -95,7 +95,7 @@
             <field name="name">res.partner.account.product.form</field>
             <field name="model">res.partner.account.product</field>
             <field name="arch" type="xml">
-                <form class="o_form_document" delete="False">
+                <form class="o_form_document" create="False" delete="False">
                     <sheet>
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only" />

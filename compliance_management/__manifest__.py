@@ -33,9 +33,8 @@
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
-        "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/region/res.partner.region.csv",#REGION
-        "data/demo_data/industries/customer.industry.csv",#INDUSTRY
+
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -89,10 +88,8 @@
         "data/demo_data/account/account_type.xml",
         "data/demo_data/education/educational_level.xml",
         "data/demo_data/tier/customer_tier.xml",
-        "data/demo_data/customer/sector.xml",
-        "data/demo_data/customer/products.xml",
         "data/demo_data/customer/region.xml",
-        "data/demo_data/customer/account_officers.xml",
+
         "views/risk_assessment.xml",
         "views/sanction_screening.xml",
         "views/open_sanctions.xml",
@@ -119,8 +116,6 @@
         'data/demo_data/plan/jurisdiction_plan.xml',
         'data/demo_data/plan/customer_type_plan.xml',
         'data/demo_data/plan/assessment_plan.xml',
-        'data/demo_data/account/customer_product.xml',
-        'data/demo_data/partner/sectors.xml',
         'data/blacklist.xml',
         "views/customer_screening.xml",
         "views/menu_actions.xml",
