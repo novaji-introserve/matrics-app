@@ -21,7 +21,7 @@
 
 <record id="group_compliance_compliance_officer" model="res.groups">
   <field name="name">Compliance Officer</field>
-  <field name="implied_ids" eval="[Command.link(ref('base.group_user')),Command.link(ref('group_compliance_branch_compliance_officer'))]"/>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
   <field name="comment">Reports to CCO not limited to branch activities</field>
   <field name="category_id" ref="module_category_compliance"/>
 </record>
@@ -50,10 +50,7 @@
   Command.link(ref('base.group_system')),
   Command.link(ref('base.group_erp_manager')),
   Command.link(ref('base.group_user')),
-  Command.link(ref('group_compliance_compliance_officer')),
-  Command.link(ref('group_compliance_transaction_monitoring_team')),
-  Command.link(ref('group_compliance_relationship_manager')),
-  Command.link(ref('group_compliance_compliance_risk_manager'))]"/>
+  Command.link(ref('group_compliance_compliance_officer'))]"/>
   <field name="comment">CCO oversees all branch compliance officers</field>
   <field name="category_id" ref="module_category_compliance"/>
 </record>
@@ -72,6 +69,7 @@
     Command.link(ref('base.group_user')),
     Command.link(ref('group_compliance_chief_compliance_officer'))]"/>
   <field name="comment">Technical Support</field>
+  <field name="users" eval="[(4, ref('base.user_admin'))]"/>
   <!-- <field name="category_id" ref="module_category_compliance"/> -->
 </record>
 

@@ -5,52 +5,5 @@
         <function model="res.partner" name="remove_unwanted_partner_actions"/>
     </data>
 
-    <!-- Server Actions for Always-Visible Buttons -->
-    <record id="action_server_setup_indexes" model="ir.actions.server">
-        <field name="name">Setup Indexes &amp; Migration</field>
-        <field name="model_id" ref="model_digital_delivery_channel"/>
-        <field name="state">code</field>
-        <field name="code">
-# Get any channel record to call the method
-channel = env['digital.delivery.channel'].search([], limit=1)
-if channel:
-    result = channel.action_setup_indexes_and_migration()
-else:
-    result = {
-        'type': 'ir.actions.client',
-        'tag': 'display_notification',
-        'params': {
-            'title': 'Error',
-            'message': 'No delivery channels found. Please create channels first.',
-            'type': 'danger',
-        }
-    }
-action = result
-        </field>
-    </record>
-
-    <record id="action_server_run_migration" model="ir.actions.server">
-        <field name="name">Run Migration</field>
-        <field name="model_id" ref="model_digital_delivery_channel"/>
-        <field name="state">code</field>
-        <field name="code">
-# Get any channel record to call the method
-channel = env['digital.delivery.channel'].search([], limit=1)
-if channel:
-    result = channel.action_run_full_migration()
-else:
-    result = {
-        'type': 'ir.actions.client',
-        'tag': 'display_notification',
-        'params': {
-            'title': 'Error',
-            'message': 'No delivery channels found. Please create channels first.',
-            'type': 'danger',
-        }
-    }
-action = result
-        </field>
-    </record>
-
   
 </odoo>

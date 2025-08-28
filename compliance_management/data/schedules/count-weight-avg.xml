@@ -8,6 +8,6 @@
         <field name="doall" eval="False"/>
         <field name="state">code</field>
         <field name="code">model.compute_aggregate_risk_scores()</field>
-        <field name="active" eval="True"/>
+        <field name="active" eval="False"/>
     </record>
 </odoo>

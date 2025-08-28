@@ -77,7 +77,7 @@
                 <field name="last_month_balance" string="Last Month Balance" optional="hide"/>
                 <field name="lien" string="Lien" optional="hide"/>
                 <field name="source_account_id" string="Source Account ID" optional="hide"/>
-                <field name="Status" widget="boolean" string="Status" optional="hide"/>
+                <field name="status" widget="boolean" string="Status" optional="hide"/>
             </tree>
         </field>
     </record> 

@@ -11,6 +11,8 @@ from odoo import http
 from odoo.http import request
 import logging
 from datetime import datetime
+from ..services.security_service import SecurityService
+from ..decorators.security_decorators import log_access
 
 _logger = logging.getLogger(__name__)
 
@@ -18,6 +20,7 @@ class CacheController(http.Controller):
     """Controller for handling cache operations"""
 
     @http.route("/dashboard/cache/get", type="json", auth="user")
+    @log_access
     def get_cache(self, key, **kw):
         """Get data from cache for the current user.
 
@@ -28,6 +31,21 @@ class CacheController(http.Controller):
             dict: A response indicating success or failure, along with the cached data if available.
         """
         try:
+            # Validate and sanitize input parameters
+            security_service = SecurityService()
+            
+            # Validate key parameter
+            if not key or not isinstance(key, str):
+                security_service.log_security_event(
+                    "CACHE_INVALID_KEY",
+                    f"Invalid cache key parameter: {key}"
+                )
+                return {"success": False, "message": "Request validation failed"}
+            
+            # Sanitize key parameter
+            key = security_service.sanitize_sql_parameter(key)
+            
+            # Log access attempt
             user_id = request.env.user.id
             _logger.debug(f"Cache GET for key: {key}")
 
@@ -40,9 +58,10 @@ class CacheController(http.Controller):
 
         except Exception as e:
             _logger.error(f"Error in cache get: {str(e)}")
-            return {"success": False, "message": f"Error: {str(e)}"}
+            return {"success": False, "message": "Request validation failed"}
 
     @http.route("/dashboard/cache/set", type="json", auth="user")
+    @log_access
     def set_cache(self, key, data, **kw):
         """Set data in cache for the current user with explicit TTL.
 
@@ -55,8 +74,31 @@ class CacheController(http.Controller):
             dict: A response indicating success or failure of the cache set operation.
         """
         try:
+            # Validate and sanitize input parameters
+            security_service = SecurityService()
+            
+            # Validate key parameter
+            if not key or not isinstance(key, str):
+                security_service.log_security_event(
+                    "CACHE_INVALID_KEY",
+                    f"Invalid cache key parameter: {key}"
+                )
+                return {"success": False, "message": "Request validation failed"}
+            
+            # Sanitize parameters
+            key = security_service.sanitize_sql_parameter(key)
+            data = security_service.sanitize_sql_parameter(data)
+            
             user_id = request.env.user.id
             ttl = kw.get("ttl", 2400)
+            
+            # Validate TTL parameter
+            if not isinstance(ttl, (int, float)) or ttl <= 0:
+                security_service.log_security_event(
+                    "CACHE_INVALID_TTL",
+                    f"Invalid TTL parameter: {ttl}"
+                )
+                return {"success": False, "message": "Request validation failed"}
 
             _logger.debug(f"Setting cache for key: {key}")
 
@@ -71,9 +113,10 @@ class CacheController(http.Controller):
 
         except Exception as e:
             _logger.error(f"Error in cache set: {str(e)}")
-            return {"success": False, "message": f"Error: {str(e)}"}
+            return {"success": False, "message": "Request validation failed"}
 
     @http.route("/dashboard/cache/invalidate", type="json", auth="user")
+    @log_access
     def invalidate_cache(self, key=None, **kw):
         """Invalidate cache entries for the current user.
 
@@ -84,6 +127,20 @@ class CacheController(http.Controller):
             dict: A response indicating success or failure, along with a message.
         """
         try:
+            # Validate and sanitize input parameters
+            security_service = SecurityService()
+            
+            # Validate key parameter if provided
+            if key is not None:
+                if not isinstance(key, str):
+                    security_service.log_security_event(
+                        "CACHE_INVALID_KEY",
+                        f"Invalid cache key parameter: {key}"
+                    )
+                    return {"success": False, "message": "Request validation failed"}
+                # Sanitize key parameter
+                key = security_service.sanitize_sql_parameter(key)
+            
             user_id = request.env.user.id
 
             if key:
@@ -114,9 +171,10 @@ class CacheController(http.Controller):
 
         except Exception as e:
             _logger.error(f"Error in cache invalidate: {str(e)}")
-            return {"success": False, "message": f"Error: {str(e)}"}
+            return {"success": False, "message": "Request validation failed"}
 
     @http.route("/dashboard/cache/status", type="json", auth="user")
+    @log_access
     def get_cache_status(self, key=None, **kw):
         """Get cache status information for debugging.
 
@@ -127,6 +185,20 @@ class CacheController(http.Controller):
             dict: A response with cache status details, including total entries, active and expired entries, and specific key information if provided.
         """
         try:
+            # Validate and sanitize input parameters
+            security_service = SecurityService()
+            
+            # Validate key parameter if provided
+            if key is not None:
+                if not isinstance(key, str):
+                    security_service.log_security_event(
+                        "CACHE_INVALID_KEY",
+                        f"Invalid cache key parameter: {key}"
+                    )
+                    return {"success": False, "message": "Request validation failed"}
+                # Sanitize key parameter
+                key = security_service.sanitize_sql_parameter(key)
+            
             user_id = request.env.user.id
 
             if key:
@@ -244,4 +316,4 @@ class CacheController(http.Controller):
 
         except Exception as e:
             _logger.error(f"Error in cache status: {str(e)}")
-            return {"success": False, "message": f"Error: {str(e)}"}
+            return {"success": False, "message": "Request validation failed"}

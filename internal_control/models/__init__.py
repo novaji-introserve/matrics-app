@@ -36,5 +36,6 @@ from . import res_glclasslv3
 from . import res_mandatepicts
 from . import res_reactivation
 from . import bankgl
+from . import sql_panel
 # from .legacy import sync_script 
 

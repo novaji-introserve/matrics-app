@@ -2,14 +2,319 @@
 
 import logging
 import re
+import html
+import json
 from odoo.http import request
+from odoo import fields
+from odoo.exceptions import UserError, ValidationError
 
 from ..services.query_service import QueryService
 
 _logger = logging.getLogger(__name__)
 
 class SecurityService:
-    """Service for security-related operations."""
+    """Service for security-related operations and SQL injection prevention."""
+    
+    # Comprehensive dangerous SQL patterns - covers all major attack vectors
+    DANGEROUS_SQL_PATTERNS = [
+        # ======= TIME-BASED INJECTION PATTERNS =======
+        # PostgreSQL time delays
+        r'\bpg_sleep\b',
+        r'\bselect\s+pg_sleep\s*\(',
+        r'\bpg_sleep\s*\(\s*\d+\s*\)',
+        # MySQL time delays
+        r'\bSLEEP\s*\(',
+        r'\bbenchmark\s*\(',
+        r'\bselect\s+sleep\s*\(',
+        r'\bselect\s+benchmark\s*\(',
+        # SQL Server time delays
+        r'\bwaitfor\s+delay\b',
+        r'\bdbms_pipe\.receive_message\b',
+        r'\bdbms_lock\.sleep\b',
+        # Oracle time delays
+        r'\bdbms_lock\.sleep\s*\(',
+        r'\bdbms_pipe\.receive_message\s*\(',
+        r'\butl_inaddr\.get_host_name\s*\(',
+        
+        # ======= BOOLEAN-BASED INJECTION PATTERNS =======
+        # Classic boolean bypasses
+        r'\bOR\s+1\s*=\s*1\b',
+        r'\bAND\s+1\s*=\s*1\b',
+        r'\bOR\s+1\s*=\s*2\b',
+        r'\bAND\s+1\s*=\s*2\b',
+        r'\bOR\s+\'1\'\s*=\s*\'1\'\b',
+        r'\bAND\s+\'1\'\s*=\s*\'1\'\b',
+        r'\bOR\s+\"1\"\s*=\s*\"1\"\b',
+        r'\bAND\s+\"1\"\s*=\s*\"1\"\b',
+        r'\bOR\s+\'x\'\s*=\s*\'x\'\b',
+        r'\bAND\s+\'x\'\s*=\s*\'x\'\b',
+        r'\bOR\s+\'admin\'\s*=\s*\'admin\'\b',
+        r'\bOR\s+\'test\'\s*=\s*\'test\'\b',
+        # Tautology variations
+        r'\bOR\s+\w+\s*=\s*\w+\b',
+        r'\bAND\s+\w+\s*=\s*\w+\b',
+        r'\bOR\s+true\b',
+        r'\bAND\s+true\b',
+        
+        # ======= UNION-BASED INJECTION PATTERNS =======
+        r'\bUNION\s+SELECT\b',
+        r'\bUNION\s+ALL\s+SELECT\b',
+        r'\bUNION\s+DISTINCT\s+SELECT\b',
+        r'\/\*!\d+\s+UNION\*\/\s+SELECT\b',
+        r'\bUNION\s*\/\*.*?\*\/\s*SELECT\b',
+        
+        # ======= ERROR-BASED INJECTION PATTERNS =======
+        r'\bextractvalue\s*\(',
+        r'\bupdatexml\s*\(',
+        r'\bexp\s*\(\s*~\s*\(',
+        r'\bcast\s*\(\s*0x\w+\s+as\s+char\s*\)',
+        r'\bconvert\s*\(\s*int\s*,\s*\w+\s*\)',
+        r'\bxmltype\s*\(',
+        
+        # ======= DDL/DML OPERATIONS =======
+        r'\b(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE|TRUNCATE)\s+\w+\b',
+        r'\b(EXEC|EXECUTE)\s+\w*\b',
+        r'\bSP_\w+\b',
+        r'\bXP_\w+\b',
+        
+        # ======= COMMENT-BASED BYPASSES =======
+        r';\s*--',
+        r'--\s*[^\r\n]*',
+        r'\/\*.*?\*\/',
+        r'#.*$',
+        r'\/\*!\d+.*?\*\/',
+        
+        # ======= STACKED QUERIES =======
+        r';\s*(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|TRUNCATE)\b',
+        r';\s*EXEC\b',
+        r';\s*EXECUTE\b',
+        
+        # ======= OUT-OF-BAND INJECTION PATTERNS =======
+        r'\bINTO\s+OUTFILE\b',
+        r'\bINTO\s+DUMPFILE\b',
+        r'\bLOAD_FILE\s*\(',
+        r'\bload\s+data\s+infile\b',
+        
+        # ======= DATABASE SYSTEM FUNCTIONS =======
+        # PostgreSQL specific
+        r'\bcopy\s+\w+\s+from\b',
+        r'\blo_import\s*\(',
+        r'\blo_export\s*\(',
+        # MySQL specific
+        r'\bload_file\s*\(',
+        r'\bselect\s+.*\s+into\s+outfile\b',
+        # SQL Server specific
+        r'\bxp_cmdshell\b',
+        r'\bsp_oacreate\b',
+        r'\bopenrowset\s*\(',
+        r'\bopendatasource\s*\(',
+        # Oracle specific
+        r'\butl_file\.\w+\b',
+        r'\butl_http\.\w+\b',
+        r'\bdbms_random\.\w+\b',
+        
+        # ======= ADVANCED INJECTION TECHNIQUES =======
+        # Blind injection with substring
+        r'\bsubstring\s*\(\s*.*,\s*\d+\s*,\s*\d+\s*\)',
+        r'\bmid\s*\(\s*.*,\s*\d+\s*,\s*\d+\s*\)',
+        r'\bleft\s*\(\s*.*,\s*\d+\s*\)',
+        r'\bright\s*\(\s*.*,\s*\d+\s*\)',
+        # ASCII/CHAR manipulation
+        r'\bascii\s*\(',
+        r'\bchar\s*\(',
+        r'\bchr\s*\(',
+        r'\bord\s*\(',
+        
+        # ======= WAF BYPASS TECHNIQUES =======
+        # Case variations and encoding
+        # r'\b[sS][eE][lL][eE][cC][tT]\b',
+        # r'\b[uU][nN][iI][oO][nN]\b',
+        # r'\b[dD][rR][oO][pP]\b',
+        # Hex encoding patterns
+        r'0x[0-9a-fA-F]+',
+        r'CHAR\s*\(\s*\d+\s*\)',
+        # Double encoding
+        r'%25[0-9a-fA-F]{2}',
+        
+        # ======= INFORMATION GATHERING =======
+        r'\b@@version\b',
+        r'\b@@servername\b',
+        r'\bversion\s*\(\s*\)',
+        r'\buser\s*\(\s*\)',
+        r'\bdatabase\s*\(\s*\)',
+        r'\bschema\s*\(\s*\)',
+        r'\binformation_schema\b',
+        r'\bsys\.\w+\b',
+        r'\bpg_\w+\b',
+        
+        # ======= LOGICAL OPERATORS ABUSE =======
+        r'\bOR\s+NOT\s+\w+\b',
+        r'\bAND\s+NOT\s+\w+\b',
+        r'\bIS\s+NULL\b',
+        r'\bIS\s+NOT\s+NULL\b',
+        
+        # ======= STRING MANIPULATION =======
+        r'\bCONCAT\s*\(\s*.*,.*\)',
+        r'\bCONCAT_WS\s*\(',
+        r'\bGROUP_CONCAT\s*\(',
+        r'\b\|\|\s*\w+',  # PostgreSQL concatenation
+        r'\+\s*\w+\s*\+',  # SQL Server concatenation
+        
+        # ======= CONDITIONAL STATEMENTS =======
+        r'\bCASE\s+WHEN\s+.*\s+THEN\s+.*\s+ELSE\s+.*\s+END\b',
+        r'\bIF\s*\(\s*.*,.*,.*\)',
+        r'\bIIF\s*\(\s*.*,.*,.*\)',
+        
+        # ======= ENCODING BYPASS ATTEMPTS =======
+        r'UNHEX\s*\(',
+        r'HEX\s*\(',
+        r'BASE64\s*\(',
+        r'URL_DECODE\s*\(',
+        
+        # ======= XSS IN SQL CONTEXT =======
+        r'<script[^>]*>.*?</script>',
+        r'javascript:',
+        r'vbscript:',
+        r'onload\s*=',
+        r'onerror\s*=',
+        r'onclick\s*=',
+        r'eval\s*\(',
+        r'expression\s*\(',
+        
+        # ======= BLIND INJECTION MATH OPERATIONS =======
+        r'\bMOD\s*\(',
+        r'\bPOW\s*\(',
+        r'\bSQRT\s*\(',
+        r'\bFLOOR\s*\(',
+        r'\bCEILING\s*\(',
+        
+        # ======= SECOND-ORDER INJECTION =======
+        r'\'.*;\s*--',
+        r'\".*;\s*--',
+        
+        # ======= NULL BYTE INJECTION =======
+        r'%00',
+        r'\\x00',
+        r'\\0',
+        
+        # ======= ALTERNATIVE WHITESPACE =======
+        r'\/\*\*\/',
+        r'\t',
+        r'\n',
+        r'\r',
+        r'\f',
+        r'\v',
+        
+        # ======= POLYGLOT PAYLOADS =======
+        r'\'.*OR.*\'',
+        r'\".*OR.*\"',
+        r'\).*OR.*\(',
+        
+        # ======= TIME-BASED VARIATIONS =======
+        r'select.*from.*where.*=.*and.*sleep',
+        r'select.*from.*where.*=.*and.*benchmark',
+        r'select.*from.*where.*=.*and.*pg_sleep',
+        
+        # ======= ADVANCED BOOLEAN PATTERNS =======
+        r'EXISTS\s*\(\s*SELECT\s+.*\)',
+        r'NOT\s+EXISTS\s*\(\s*SELECT\s+.*\)',
+        
+        # ======= ENCODED SQL KEYWORDS =======
+        r'%53%45%4C%45%43%54',  # SELECT
+        r'%55%4E%49%4F%4E',     # UNION
+        r'%44%52%4F%50',        # DROP
+        
+        # ======= MYSQL-SPECIFIC FUNCTIONS =======
+        r'\bDATA_TYPE\s*\(',
+        r'\bCOLUMN_NAME\s*\(',
+        r'\bTABLE_SCHEMA\s*\(',
+        
+        # ======= ORACLE-SPECIFIC FUNCTIONS =======
+        r'\bDUAL\b',
+        r'\bROWNUM\b',
+        r'\bSYSDATE\b',
+        
+        # ======= SQL SERVER-SPECIFIC =======
+        r'\bMASTER\.\.',
+        r'\bSYSOBJECTS\b',
+        r'\bSYSCOLUMNS\b',
+        
+        # ======= POSTGRESQL-SPECIFIC =======
+        r'\bPG_STAT_ACTIVITY\b',
+        r'\bPG_DATABASE\b',
+        r'\bCURRENT_SCHEMA\s*\(\s*\)',
+        
+        # ======= INJECTION IN ORDER BY =======
+        r'ORDER\s+BY\s+\d+\s*(--|#)',
+        r'ORDER\s+BY\s+IF\s*\(',
+        r'ORDER\s+BY\s+CASE\s+WHEN',
+        
+        # ======= INJECTION IN LIMIT =======
+        r'LIMIT\s+\d+\s*,\s*\d+\s*(--|#)',
+        r'LIMIT\s+IF\s*\(',
+        
+        # ======= DNS EXFILTRATION =======
+        r'nslookup\s+',
+        r'ping\s+-c\s+\d+',
+        r'host\s+',
+        
+        # ======= OBFUSCATION TECHNIQUES =======
+        r'\/\*!\d+.*?\*\/',
+        r'SELECT\s*\/\*.*?\*\/\s*FROM',
+        r'\w+\s*\/\*.*?\*\/\s*=',
+        
+        # ======= ALTERNATIVE SYNTAX =======
+        r'SELECT.*WHERE.*BETWEEN.*AND',
+        r'SELECT.*WHERE.*IN\s*\(',
+        r'SELECT.*WHERE.*LIKE\s*[\'\"]\%',
+        
+        # ======= PRIVILEGE ESCALATION =======
+        r'GRANT\s+ALL\s+ON',
+        r'REVOKE\s+ALL\s+ON',
+        r'CREATE\s+USER\s+',
+        r'ALTER\s+USER\s+',
+        
+        # ======= BACKUP/RESTORE OPERATIONS =======
+        r'BACKUP\s+DATABASE\s+',
+        r'RESTORE\s+DATABASE\s+',
+        r'DUMP\s+',
+        
+        # ======= DYNAMIC SQL EXECUTION =======
+        r'EXEC\s*\(\s*@',
+        r'EXECUTE\s*\(\s*@',
+        r'sp_executesql\s*@',
+        
+        # ======= ADDITIONAL CRITICAL PATTERNS =======
+        # Substring manipulation in WHERE clauses
+        r'substring\s*\(\s*\w+\s*,\s*\d+\s*,\s*\d+\s*\)\s*=',
+        r'mid\s*\(\s*\w+\s*,\s*\d+\s*,\s*\d+\s*\)\s*=',
+        # UNION with DISTINCT variations
+        r'\bUNION\s+DISTINCT\b',
+        # Permission/privilege operations
+        r'\bGRANT\s+\w+\s+ON\b',
+        r'\bREVOKE\s+\w+\s+FROM\b',
+        # Database operations
+        r'\bBACKUP\s+DATABASE\b',
+        r'\bRESTORE\s+DATABASE\b',
+        # Variable execution
+        r'\bEXEC\s*\(\s*@\w+\s*\)',
+        r'\bEXECUTE\s*\(\s*@\w+\s*\)',
+        # Oracle DUAL table
+        r'\bFROM\s+DUAL\b',
+        r'\bSELECT\s+.*\s+FROM\s+DUAL\b',
+        # Additional substring variations
+        r'\bsubstring\s*\(\s*password\s*,',
+        r'\bsubstring\s*\(\s*user\s*\(',
+        r'\bleft\s*\(\s*password\s*,',
+        r'\bright\s*\(\s*password\s*,'
+    ]
+    
+    # Allowed SQL functions for legitimate queries
+    ALLOWED_SQL_FUNCTIONS = [
+        'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'COALESCE', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END',
+        'DISTINCT', 'GROUP_CONCAT', 'CONCAT', 'SUBSTRING', 'LENGTH', 'UPPER', 'LOWER',
+        'DATE', 'EXTRACT', 'DATE_PART', 'NOW', 'CURRENT_DATE', 'CURRENT_TIMESTAMP'
+    ]
 
     @staticmethod
     def get_user_branch_ids():
@@ -318,4 +623,196 @@ class SecurityService:
             return branches_id
         else:
             return branches_id
+
+    @staticmethod
+    def validate_sql_query(query):
+        """Validate SQL query against injection attacks.
         
+        Args:
+            query (str): The SQL query to validate.
+            
+        Returns:
+            tuple: (is_safe, error_message)
+        """
+        if not query or not isinstance(query, str):
+            return False, "Invalid query format"
+            
+        # Normalize query for analysis
+        normalized_query = query.upper().strip()
+        
+        # Check for dangerous patterns
+        for pattern in SecurityService.DANGEROUS_SQL_PATTERNS:
+            if re.search(pattern, normalized_query, re.IGNORECASE | re.MULTILINE):
+                _logger.warning(f"Dangerous SQL pattern detected: {pattern} in query: {query[:100]}...")
+                return False, f"Query contains potentially dangerous pattern: {pattern}"
+        
+        # Ensure query starts with SELECT (read-only)
+        if not normalized_query.startswith('SELECT'):
+            return False, "Only SELECT queries are allowed"
+            
+        # Check for multiple statements (basic check)
+        semicolon_count = query.count(';')
+        if semicolon_count > 1 or (semicolon_count == 1 and not query.strip().endswith(';')):
+            return False, "Multiple SQL statements are not allowed"
+            
+        return True, "Query is safe"
+    
+    @staticmethod
+    def sanitize_sql_parameter(param):
+        """Sanitize a single SQL parameter.
+        
+        Args:
+            param: The parameter to sanitize.
+            
+        Returns:
+            The sanitized parameter.
+        """
+        if param is None:
+            return None
+            
+        if isinstance(param, str):
+            # Remove dangerous characters and escape quotes
+            param = html.escape(param)
+            param = param.replace("'", "''")
+            param = param.replace('"', '""')
+            param = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', param)
+            return param
+            
+        if isinstance(param, (int, float)):
+            return param
+            
+        if isinstance(param, (list, tuple)):
+            return [SecurityService.sanitize_sql_parameter(item) for item in param]
+            
+        if isinstance(param, dict):
+            return {k: SecurityService.sanitize_sql_parameter(v) for k, v in param.items()}
+            
+        return str(param)
+    
+    @staticmethod
+    def validate_and_sanitize_request_data(data):
+        """Validate and sanitize incoming request data.
+        
+        Args:
+            data (dict): The request data to validate.
+            
+        Returns:
+            dict: The sanitized data.
+            
+        Raises:
+            ValidationError: If dangerous content is detected.
+        """
+        if not isinstance(data, dict):
+            return data
+            
+        sanitized_data = {}
+        
+        for key, value in data.items():
+            # Sanitize the key
+            clean_key = SecurityService.sanitize_sql_parameter(key)
+            
+            # Special handling for SQL queries
+            if key == 'sql_query' and isinstance(value, str):
+                is_safe, error_msg = SecurityService.validate_sql_query(value)
+                if not is_safe:
+                    _logger.error(f"SQL injection attempt detected: {error_msg} - Query: {value[:200]}...")
+                    raise ValidationError(f"Invalid query: {error_msg}")
+                sanitized_data[clean_key] = value  # Keep original for legitimate queries
+            else:
+                # Sanitize other parameters
+                sanitized_data[clean_key] = SecurityService.sanitize_sql_parameter(value)
+                
+        return sanitized_data
+    
+    @staticmethod
+    def secure_execute_query(cr, query, params=None, timeout=30000):
+        """Safely execute a SQL query with parameter binding.
+        
+        Args:
+            cr: Database cursor
+            query (str): SQL query with placeholders
+            params (tuple/list): Parameters for the query
+            timeout (int): Query timeout in milliseconds
+            
+        Returns:
+            tuple: (success, results, error_message)
+        """
+        try:
+            # Validate the query first
+            is_safe, error_msg = SecurityService.validate_sql_query(query)
+            if not is_safe:
+                return False, None, error_msg
+            
+            # Set timeout
+            cr.execute(f"SET LOCAL statement_timeout = {timeout}")
+            
+            # Execute with parameters (this prevents SQL injection)
+            if params:
+                cr.execute(query, params)
+            else:
+                cr.execute(query)
+                
+            return True, cr.fetchall(), None
+            
+        except Exception as e:
+            _logger.error(f"Error executing secure query: {str(e)}")
+            return False, None, str(e)
+    
+    @staticmethod
+    def build_safe_where_condition(field_name, operator, value):
+        """Build a safe WHERE condition using parameterized queries.
+        
+        Args:
+            field_name (str): The field name
+            operator (str): The SQL operator (=, IN, LIKE, etc.)
+            value: The value to compare
+            
+        Returns:
+            tuple: (condition_string, parameters)
+        """
+        # Validate field name (should only contain alphanumeric, underscore, dot)
+        if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_\.]*$', field_name):
+            raise ValidationError(f"Invalid field name: {field_name}")
+            
+        # Validate operator
+        allowed_operators = ['=', '!=', '<>', '<', '>', '<=', '>=', 'IN', 'NOT IN', 'LIKE', 'ILIKE', 'IS', 'IS NOT']
+        if operator.upper() not in allowed_operators:
+            raise ValidationError(f"Invalid operator: {operator}")
+            
+        if operator.upper() in ['IN', 'NOT IN']:
+            if isinstance(value, (list, tuple)):
+                placeholders = ','.join(['%s'] * len(value))
+                return f"{field_name} {operator} ({placeholders})", tuple(value)
+            else:
+                return f"{field_name} {operator} (%s)", (value,)
+        else:
+            return f"{field_name} {operator} %s", (value,)
+    
+    @staticmethod
+    def log_security_event(event_type, details, user_id=None):
+        """Log security-related events for monitoring.
+        
+        Args:
+            event_type (str): Type of security event
+            details (str): Event details
+            user_id (int): User ID if available
+        """
+        if not user_id and request and request.env:
+            user_id = request.env.user.id
+            
+        _logger.warning(f"SECURITY EVENT [{event_type}] User: {user_id} - {details}")
+        
+        # You could also store this in a security log table if needed
+        try:
+            if request and request.env:
+                # Create a security log entry (if you have such a model)
+                # request.env['security.log'].sudo().create({
+                #     'event_type': event_type,
+                #     'details': details,
+                #     'user_id': user_id,
+                #     'timestamp': fields.Datetime.now(),
+                #     'ip_address': request.httprequest.remote_addr,
+                # })
+                pass
+        except Exception as e:
+            _logger.error(f"Failed to log security event: {str(e)}")

@@ -420,28 +420,50 @@ class Customer(models.Model):
         if plans:
             for pl in plans:
                 score = 0
-                try:
-                    self.env.cr.execute(pl.sql_query, (record_id,))
-                    rec = self.env.cr.fetchone()
-                    if rec is not None:
-                        # we have a hit
-                        if pl.compute_score_from == 'dynamic':
-                            score = float(
-                                rec[0]) if rec is not None else pl.risk_score
-                        if pl.compute_score_from == 'static':
-                            score = pl.risk_score
-                        if pl.compute_score_from == 'risk_assessment':
-                            score = pl.risk_assessment.risk_rating if pl.risk_assessment is not None else pl.risk_score
-                    scores.append(score)
-                    line_id = self.env['res.partner.risk.plan.line'].create({
-                        'partner_id': record_id,
-                        'plan_line_id': pl.id,
-                        'risk_score': score,
-                    })
-                except Exception as e:
-                    _logger.error(
-                        f"Error executing risk plan {pl.name}: {str(e)}")
-                    pass
+                if pl.compute_score_from == 'python':
+                    # Evaluate Python condition
+                    localdict = {
+                        'customer': self,
+                        'env': self.env,
+                        'branch': self.branch_id,
+                        'result': None,
+                    }
+                    try:
+                        result = pl.compute_score_from_code(localdict)
+                        if result is not None:
+                            score = float(result)
+                            scores.append(score)
+                            line_id = self.env['res.partner.risk.plan.line'].create({
+                                'partner_id': record_id,
+                                'plan_line_id': pl.id,
+                                'risk_score': score,
+                            })
+                    except Exception as e:
+                        _logger.error(
+                            f"Error evaluating Python condition for plan {pl.name}: {str(e)}")
+                else:
+                    try:
+                        self.env.cr.execute(pl.sql_query, (record_id,))
+                        rec = self.env.cr.fetchone()
+                        if rec is not None:
+                            # we have a hit
+                            if pl.compute_score_from == 'dynamic':
+                                score = float(
+                                    rec[0]) if rec is not None else pl.risk_score
+                            if pl.compute_score_from == 'static':
+                                score = pl.risk_score
+                            if pl.compute_score_from == 'risk_assessment':
+                                score = pl.risk_assessment.risk_rating if pl.risk_assessment is not None else pl.risk_score
+                        scores.append(score)
+                        line_id = self.env['res.partner.risk.plan.line'].create({
+                            'partner_id': record_id,
+                            'plan_line_id': pl.id,
+                            'risk_score': score,
+                        })
+                    except Exception as e:
+                        _logger.error(
+                            f"Error executing risk plan {pl.name}: {str(e)}")
+                        pass
 
         records = None
 

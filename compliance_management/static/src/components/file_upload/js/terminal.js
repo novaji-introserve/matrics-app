@@ -3,6 +3,12 @@ import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
 import { session } from "@web/session";
 
+// Debug mode - set to false for production
+const DEBUG = false;
+function logDebug(...args) {
+  if (DEBUG) console.log(...args);
+}
+
 /**
  * Terminal Service - Provides a console-like interface for log messages
  * 
@@ -44,7 +50,7 @@ export const terminalService = {
             notifyListeners(message, type, timestamp);
 
             // Log to console for debugging
-            console.log(`[Terminal ${type}] ${message}`);
+            logDebug(`[Terminal ${type}] ${message}`);
         }
 
         // Notify all registered listeners
@@ -53,7 +59,7 @@ export const terminalService = {
                 try {
                     listener(message, type, timestamp);
                 } catch (e) {
-                    console.error('Error in terminal listener:', e);
+                    logDebug('Error in terminal listener:', e);
                 }
             });
         }
@@ -81,14 +87,14 @@ export const terminalService = {
                 const wsConfig = await rpc('/csv_import/ws_config');
 
                 // Log the configuration
-                console.log('WebSocket configuration:', wsConfig);
+                logDebug('WebSocket configuration:', wsConfig);
 
                 // Construct the WebSocket URL
                 const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
                 const wsUrl = `${protocol}://${wsConfig.host}:${wsConfig.port}${wsConfig.path}`;
 
                 addLog(`Connecting to WebSocket at ${wsUrl}`, 'info');
-                console.log(`Attempting to connect to WebSocket at ${wsUrl}`);
+                logDebug(`Attempting to connect to WebSocket at ${wsUrl}`);
 
                 socket = new WebSocket(wsUrl);
 
@@ -105,20 +111,20 @@ export const terminalService = {
                         session_id: session.session_id
                     };
 
-                    console.log('Sending authentication:', authMsg);
+                    logDebug('Sending authentication:', authMsg);
                     socket.send(JSON.stringify(authMsg));
                 };
 
                 socket.onmessage = (event) => {
                     try {
-                        console.log('WebSocket message received:', event.data);
+                        logDebug('WebSocket message received:', event.data);
                         const data = JSON.parse(event.data);
 
                         if (data.type === 'log_message') {
                             addLog(data.message, data.message_type, data.timestamp);
                         } else if (data.type === 'connected') {
                             addLog(`WebSocket authenticated: ${data.message}`, 'success');
-                            console.log('WebSocket authenticated:', data.message);
+                            logDebug('WebSocket authenticated:', data.message);
 
                             // Generate full timestamp to match Python format
                             const now = new Date();
@@ -133,14 +139,14 @@ export const terminalService = {
                             }));
                         } else if (data.type === 'error') {
                             addLog(`WebSocket error: ${data.message}`, 'error');
-                            console.error('WebSocket error message:', data.message);
+                            logDebug('WebSocket error message:', data.message);
                         } else {
                             // Log other message types
-                            console.log(`WebSocket message (${data.type}):`, data);
+                            logDebug(`WebSocket message (${data.type}):`, data);
                         }
                     } catch (e) {
-                        console.error('Error parsing WebSocket message:', e);
-                        console.error('Original message:', event.data);
+                        logDebug('Error parsing WebSocket message:', e);
+                        logDebug('Original message:', event.data);
                     }
                 };
 
@@ -171,7 +177,7 @@ export const terminalService = {
                 };
 
                 socket.onerror = (error) => {
-                    console.error('WebSocket error:', error);
+                    logDebug('WebSocket error:', error);
                     addLog('WebSocket error, will try to reconnect', 'error');
                 };
 
@@ -189,7 +195,7 @@ export const terminalService = {
             } catch (e) {
                 connected = false;
                 addLog(`Error setting up WebSocket: ${e.message}`, 'error');
-                console.error('WebSocket setup error:', e);
+                logDebug('WebSocket setup error:', e);
                 startBusListening();
             }
         }
@@ -214,7 +220,7 @@ export const terminalService = {
 
                 addLog('Terminal connected via bus service (long-polling)', 'success');
             } catch (e) {
-                console.warn('Error setting up bus service:', e);
+                logDebug('Error setting up bus service:', e);
                 addLog(`Error setting up bus service: ${e.message}`, 'error');
             }
         }
@@ -238,7 +244,7 @@ export const terminalService = {
                     }));
                     return;
                 } catch (error) {
-                    console.warn('Error sending log via WebSocket, falling back to RPC:', error);
+                    logDebug('Error sending log via WebSocket, falling back to RPC:', error);
                 }
             }
 
@@ -250,7 +256,7 @@ export const terminalService = {
                     timestamp: timestamp  // Include timestamp here too
                 });
             } catch (error) {
-                console.error('Error sending log via RPC:', error);
+                logDebug('Error sending log via RPC:', error);
                 // Still add the log locally even if server send fails
                 addLog(`Failed to send log to server: ${error.message}`, 'warning', timestamp);
             }
@@ -280,7 +286,7 @@ export const terminalService = {
             // The server will send to both to ensure delivery
             startBusListening();
         } catch (e) {
-            console.error('Error initializing terminal service:', e);
+            logDebug('Error initializing terminal service:', e);
             // Add initial error log
             addLog(`Error initializing terminal service: ${e.message}`, 'error');
         }

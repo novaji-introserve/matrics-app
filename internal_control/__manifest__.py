@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "internal_control",
+    'name': "Transaction Monitoring",
 
     'summary': """
-        Internal Control Monitoring For Financial Institutions""",
+        Transaction Monitoring For Financial Institutions""",
 
     'description': """
            For Transaction monitoring    """,
@@ -18,7 +18,7 @@
     'version': '0.3',
 
     # any module necessary for this one to work correctly
-    'depends': ['icomply_dashboard', 'compliance_management', 'bi_sql_editor', 'psql_query_execute', 'alert_management'],
+    'depends': ['icomply_dashboard', 'compliance_management', 'bi_sql_editor', 'psql_query_execute', 'alert_management','transaction_screening'],
 
     # always loaded
     'data': [

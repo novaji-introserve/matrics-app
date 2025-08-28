@@ -6,6 +6,9 @@ import json
 import traceback
 from urllib.parse import urljoin, urlparse
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
+
 
 _logger = logging.getLogger(__name__)
 

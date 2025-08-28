@@ -3,6 +3,12 @@ import { Component, useState, useRef, onMounted, onWillUnmount } from "@odoo/owl
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
+// Debug mode - set to false for production
+const DEBUG = false;
+function logDebug(...args) {
+  if (DEBUG) console.log(...args);
+}
+
 export class TerminalComponent extends Component {
     setup() {
         // Initialize state with fallback empty data
@@ -49,7 +55,7 @@ export class TerminalComponent extends Component {
                     // Scroll to bottom
                     this.scrollToBottom();
                 } catch (e) {
-                    console.warn("Error initializing terminal component:", e);
+                    logDebug("Error initializing terminal component:", e);
                     // Add default log message on error
                     this.state.logs.push({
                         message: "Terminal service initialized with limited functionality",
@@ -65,7 +71,7 @@ export class TerminalComponent extends Component {
                     try {
                         this.unsubscribe();
                     } catch (e) {
-                        console.warn("Error unsubscribing from terminal logs:", e);
+                        logDebug("Error unsubscribing from terminal logs:", e);
                     }
                 }
 
@@ -75,7 +81,7 @@ export class TerminalComponent extends Component {
                 }
             });
         } catch (e) {
-            console.warn("Terminal service not available:", e);
+            logDebug("Terminal service not available:", e);
             // Add default log functionality for when service is not available
             this.terminal = {
                 addLog: (message, type = "info", timestamp = null) => {

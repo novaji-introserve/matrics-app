@@ -5,6 +5,7 @@ import logging
 
 from ..services.materialized_view import MaterializedViewService
 from ..services.database_service import DatabaseService
+from ..services.security_service import SecurityService
 
 _logger = logging.getLogger(__name__)
 

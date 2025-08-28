@@ -13,6 +13,7 @@ from ..services.cache_service import CacheService
 from ..services.materialized_view import MaterializedViewService
 from ..utils.cache_key_unique_identifier import get_unique_client_identifier, normalize_cache_key_components
 from ..services.query_service import QueryService
+from ..decorators.security_decorators import validate_sql_input, log_access
 
 _logger = logging.getLogger(__name__)
 
@@ -81,6 +82,8 @@ class Compliance(http.Controller):
         """
         return self.security_service.check_branches_id(branches_id)
 
+    @validate_sql_input
+    @log_access
     @http.route("/dashboard/dynamic_sql", auth="public", type="json")
     def extract_table_and_domain(self, sql_query: str, branches_id, cco):
         """
@@ -96,6 +99,19 @@ class Compliance(http.Controller):
         Returns:
             dict: A dictionary containing the extracted table name and domain conditions.
         """
+        # Validate and sanitize the SQL query first
+        try:
+            is_safe, error_msg = self.security_service.validate_sql_query(sql_query)
+            if not is_safe:
+                self.security_service.log_security_event(
+                    "SQL_INJECTION_ATTEMPT",
+                    f"Blocked dangerous query: {error_msg} - Query: {sql_query[:200]}..."
+                )
+                return {"error": "Request validation failed"}
+        except Exception as e:
+            _logger.error(f"Security validation error: {str(e)}")
+            return {"error": "Security validation failed"}
+            
         is_cco = self.security_service.is_cco_user()
         is_co = self.security_service.is_co_user()
         
@@ -172,8 +188,28 @@ class Compliance(http.Controller):
             return result_value
         return result_value
 
+    @log_access
     @http.route("/dashboard/stats", auth="public", type="json")
     def getAllstats(self, cco, branches_id, datepicked, **kw):
+        # Validate all input parameters
+        try:
+            # Sanitize and validate input parameters
+            sanitized_data = self.security_service.validate_and_sanitize_request_data({
+                'cco': cco,
+                'branches_id': branches_id,
+                'datepicked': datepicked,
+                **kw
+            })
+            cco = sanitized_data.get('cco', cco)
+            branches_id = sanitized_data.get('branches_id', branches_id)
+            datepicked = sanitized_data.get('datepicked', datepicked)
+        except Exception as e:
+            self.security_service.log_security_event(
+                "STATS_INPUT_VALIDATION_FAILED",
+                f"Stats endpoint input validation failed: {str(e)}"
+            )
+            return {"error": "Request validation failed"}
+            
         """
         Retrieve all statistics for the dashboard.
 
@@ -266,10 +302,16 @@ class Compliance(http.Controller):
                                     continue
 
                         try:
-                            cr.execute(f"{filter_query} LIMIT 1")
-                            result_row = cr.fetchone()
-                            if result_row:
-                                result_value = result_row[0] if result_row else 0
+                            # Use secure query execution for materialized view
+                            success, results, error_msg = self.security_service.secure_execute_query(
+                                cr, f"{filter_query} LIMIT 1", timeout=30000
+                            )
+                            
+                            if success and results:
+                                result_value = results[0][0] if results[0] else 0
+                            else:
+                                _logger.warning(f"Secure view query failed: {error_msg}")
+                                result_value = None
                         except Exception as view_error:
                             _logger.warning(f"Error querying view for stat {stat_id}: {view_error}")
                             
@@ -352,11 +394,16 @@ class Compliance(http.Controller):
                                     original_query += condition_str
                                     
                         try:
-                            cr.execute(original_query)
-                            result_row = cr.fetchone()
-                            result_value = (
-                                result_row[0] if result_row is not None else 0
+                            # Use secure query execution
+                            success, results, error_msg = self.security_service.secure_execute_query(
+                                cr, original_query, timeout=30000
                             )
+                            
+                            if success and results:
+                                result_value = results[0][0] if results[0] else 0
+                            else:
+                                _logger.error(f"Secure query execution failed: {error_msg}")
+                                result_value = 0
                         except Exception as e:
                             _logger.error(
                                 f"Error executing SQL query for stat {stat['name']}: {str(e)}"
@@ -407,6 +454,7 @@ class Compliance(http.Controller):
         
         return result
 
+    @log_access
     @http.route("/dashboard/statsbycategory", auth="public", type="json")
     def getAllstatsByCategory(self, cco, branches_id, category, datepicked, **kw):
         """
@@ -424,6 +472,27 @@ class Compliance(http.Controller):
         Returns:
             dict: A dictionary containing computed statistics and total count.
         """
+        # Validate all input parameters
+        try:
+            # Sanitize and validate input parameters
+            sanitized_data = self.security_service.validate_and_sanitize_request_data({
+                'cco': cco,
+                'branches_id': branches_id,
+                'category': category,
+                'datepicked': datepicked,
+                **kw
+            })
+            cco = sanitized_data.get('cco', cco)
+            branches_id = sanitized_data.get('branches_id', branches_id)
+            category = sanitized_data.get('category', category)
+            datepicked = sanitized_data.get('datepicked', datepicked)
+        except Exception as e:
+            self.security_service.log_security_event(
+                "STATS_CATEGORY_INPUT_VALIDATION_FAILED",
+                f"Stats by category endpoint input validation failed: {str(e)}"
+            )
+            return {"error": "Request validation failed"}
+            
         today = datetime.now().date()
         prevDate = today - timedelta(days=datepicked)
         start_of_prev_day = fields.Datetime.to_string(
@@ -500,13 +569,27 @@ class Compliance(http.Controller):
                         else:
                             original_query += condition_str
                             
-                    request.env.cr.execute(original_query)
-                else:
-                    request.env.cr.execute(original_query)
+                    # Use secure query execution
+                    success, results, error_msg = self.security_service.secure_execute_query(
+                        request.env.cr, original_query, timeout=30000
+                    )
                     
-                result_value = (
-                    request.env.cr.fetchone()[0] if request.env.cr.rowcount > 0 else 0
-                )
+                    if success and results:
+                        result_value = results[0][0] if results[0] else 0
+                    else:
+                        _logger.error(f"Secure query execution failed: {error_msg}")
+                        result_value = 0
+                else:
+                    # Use secure query execution
+                    success, results, error_msg = self.security_service.secure_execute_query(
+                        request.env.cr, original_query, timeout=30000
+                    )
+                    
+                    if success and results:
+                        result_value = results[0][0] if results[0] else 0
+                    else:
+                        _logger.error(f"Secure query execution failed: {error_msg}")
+                        result_value = 0
                 
                 computed_results.append(
                     {
@@ -528,10 +611,18 @@ class Compliance(http.Controller):
                 AND rcs.create_date < %s AND rcs.scope = %s;
             """
             
-            request.env.cr.execute(query, (start_of_prev_day, end_of_today, category))
+            # Use secure parameterized query execution
+            success, results, error_msg = self.security_service.secure_execute_query(
+                request.env.cr, query, (start_of_prev_day, end_of_today, category), timeout=30000
+            )
+            
+            if not success:
+                _logger.error(f"Secure query execution failed: {error_msg}")
+                return {"data": [], "total": 0}
+                
             stat_records = [
                 dict(zip([desc[0] for desc in request.env.cr.description], row)) 
-                for row in request.env.cr.fetchall()
+                for row in results
             ]
             
             computed_results = []
@@ -585,12 +676,16 @@ class Compliance(http.Controller):
                         else:
                             original_query += condition_str
                             
-                        request.env.cr.execute(original_query)
-                        result_value = (
-                            request.env.cr.fetchone()[0]
-                            if request.env.cr.rowcount > 0
-                            else 0
+                        # Use secure query execution
+                        success, results, error_msg = self.security_service.secure_execute_query(
+                            request.env.cr, original_query, timeout=30000
                         )
+                        
+                        if success and results:
+                            result_value = results[0][0] if results[0] else 0
+                        else:
+                            _logger.error(f"Secure query execution failed: {error_msg}")
+                            result_value = 0
                         
                         computed_results.append(
                             {

@@ -63,6 +63,35 @@ class Transaction(models.Model):
         compute='_compute_is_case_manager_installed',
         store=False,)
 
+    rule_ids = fields.One2many(
+        'res.transaction.screening.history', 'transaction_id',
+        string='Screening Rules')
+    
+    total_rules = fields.Integer(
+        string='Rules', compute='transaction_total_rules', index=True, store=False)
+    
+    @api.model
+    def create(self,vals_list):
+        records = super(Transaction, self).create(vals_list)
+        for rec in records:
+            rec.action_screen()
+        return records
+
+    @api.depends('rule_ids')
+    def transaction_total_rules(self):
+        for e in self:
+            e.total_rules = len(e.rule_ids)
+
+    def action_view_transaction_screening_rules(self):
+        return {
+            'name': _('Transaction Screening Rules'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.transaction.screening.history',
+            'view_mode': 'tree,form',
+            'domain': [('transaction_id.id', 'in', [self.id])],
+            'context': {'search_default_group_rule_id': 1}
+        }
+
     def action_create_transaction_case(self):
         self.ensure_one()
         # Prepare action to open case form
@@ -76,8 +105,9 @@ class Transaction(models.Model):
 
         # Prepare default values from customer
         context = {
-            'default_customer_id': self.id,
+            'default_customer_id': self.customer_id.id if self.customer_id else False,
             'default_case_status': 'draft',
+            'default_transaction_id': self.id,
         }
 
         # Add customer if available
@@ -140,11 +170,6 @@ class Transaction(models.Model):
                 ('state', '=', 'installed')
             ], limit=1))
         return self._case_management_available    
-    
-    
-    
-            
-    
 
     def action_create_case(self):
         """
@@ -186,16 +211,49 @@ class Transaction(models.Model):
     def done(self):
         for e in self:
             e.write({'state': 'done'})
+            
+    def multi_screen(self):
+        for e in self:
+            try:
+                e.action_screen()
+            except Exception as ex:
+                print(f"Error screening transaction {e.name}: {ex}")
 
     def action_screen(self):
+        self.ensure_one()
         rules = self.env['res.transaction.screening.rule'].search(
             [('state', '=', 'active')], order='priority')
-
+        
         if rules:
+            risk_levels = []
             for rule in rules:
                 # try:
+                if rule.condition_select == 'python':
+                    localdict = {
+                        'result': None,
+                        'transaction': self,
+                        'customer': self.customer_id,
+                        'branch': self.branch_id,
+                        'account': self.account_id,
+                        'currency': self.currency_id,
+                        'env': self.env
+                    }
+                    if rule._satisfy_condition(localdict) == True:
+                        history_id = self.env['res.transaction.screening.history'].create({
+                            'transaction_id': self.id,
+                            'rule_id': rule.id,
+                            'risk_level': rule.risk_level
+                        })
+                        self.rule_id = rule
+                        risk_levels.append(rule.risk_level)
+                        if rule.transaction_flag =='suspicious':
+                            self.action_mark_as_suspicious()
+                            
+                if rule.condition_select == 'sql':
                     query = rule.sql_query
-                    char_to_replace = {'#AMOUNT#': f"{self.amount}",
+                    char_to_replace = {
+                                    '#TRANSACTION_ID#': f"{self.id}",
+                                    '#AMOUNT#': f"{self.amount}",
                                     '#ACCOUNT_ID#': f"{self.account_id.id}",
                                     "#CUSTOMER_ID#": f"{self.customer_id.id}",
                                     "#TRAN_DATE#": f"{self.date_created}",
@@ -207,12 +265,26 @@ class Transaction(models.Model):
                         query = query.replace(key, value)
                         
                     self.env.cr.execute(query)
-                   
                     rec = self.env.cr.fetchone()
                     if rec is not None:
+                        history_id = self.env['res.transaction.screening.history'].create({
+                            'transaction_id': self.id,
+                            'rule_id': rule.id,
+                            'risk_level': rule.risk_level
+                        })
                         self.rule_id = rule
-                        self.risk_level = rule.risk_level
-                        return
+                        risk_levels.append(rule.risk_level)
+                        if rule.transaction_flag =='suspicious':
+                            self.action_mark_as_suspicious()
+            
+            if 'high' in risk_levels:
+                self.risk_level = 'high'
+                return
+            if 'medium' in risk_levels:
+                self.risk_level = 'medium'
+                return
+            self.risk_level = 'low'
+            return
                 
 
     @api.model
@@ -230,12 +302,12 @@ class Transaction(models.Model):
         # Set domain based on user group
         if has_compliance_access:
             # Chief Compliance Officers see all customers
-            domain = [('state', '=', 'new')]
+            domain = [('state', '!=', 'done')]
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
-                 e.id for e in self.env.user.branches_id]), ('state', '=', 'new')]
+                 e.id for e in self.env.user.branches_id]), ('state', '!=', 'done')]
             
         return {
             'name': _('Transactions To Review'),

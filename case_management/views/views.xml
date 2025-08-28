@@ -1,0 +1,77 @@
+<odoo>
+  <!-- Actions for Admin -->
+  <record id="action_open_cases_admin" model="ir.actions.act_window">
+    <field name="name">Open Cases</field>
+    <field name="res_model">case.management</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('process_status', '=', 'open')]</field>
+ 
+  </record>
+
+  <record id="action_closed_cases_admin" model="ir.actions.act_window">
+    <field name="name">Closed Cases</field>
+    <field name="res_model">case.management</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('process_status', '=', 'closed')]</field>
+
+  </record>
+
+  <record id="action_overdue_cases_admin" model="ir.actions.act_window">
+    <field name="name">Overdue Cases</field>
+    <field name="res_model">case.management</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('process_status', '=', 'overdue')]</field>
+  
+  </record>
+
+  <!-- Actions for Users -->
+  <record id="action_my_cases" model="ir.actions.act_window">
+    <field name="name">Cases Created By Me</field>
+    <field name="res_model">case.management</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('create_uid', '=', uid)]</field>
+  </record>
+
+  <record id="action_cases_assigned_to_me" model="ir.actions.act_window">
+    <field name="name">Cases Assigned to Me</field>
+    <field name="res_model">case.management</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('branch_staff_responsible_id', '=', uid)]</field>
+  </record>
+
+  <record id="action_my_alerts" model="ir.actions.act_window">
+    <field name="name">My Alerts</field>
+    <field name="res_model">mail.mail</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('recipient_ids', 'in', [uid])]</field>
+  </record>
+
+  <record id="action_reply_log" model="ir.actions.act_window">
+    <field name="name">Reply Log</field>
+    <field name="res_model">case.reply.log</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('case_id', '=', active_id)]</field>
+  </record>
+  <!-- Main Case Management Menu -->
+  <menuitem id="menu_case_management_root" name="Case Management" sequence="1" />
+
+  <!-- Submenu for Admin -->
+  <menuitem id="menu_open_cases" name="All Open Cases" parent="menu_case_management_root"
+    action="action_open_cases_admin" groups="base.group_system" />
+  <menuitem id="menu_closed_cases" name="All Closed Cases" parent="menu_case_management_root"
+    action="action_closed_cases_admin" groups="base.group_system" />
+  <menuitem id="menu_overdue_cases" name="All Overdue Cases" parent="menu_case_management_root"
+    action="action_overdue_cases_admin" groups="base.group_system" />
+
+  <!-- Submenu for Users -->
+  <menuitem id="menu_my_cases_created" name="Cases Created By Me" parent="menu_case_management_root"
+    action="action_my_cases" />
+  <menuitem id="menu_cases_assigned_to_me" name="Cases Assigned to Me"
+    parent="menu_case_management_root"
+    action="action_cases_assigned_to_me" />
+  <menuitem id="menu_my_alerts" name="My Alerts" parent="menu_case_management_root"
+    action="action_my_alerts" />
+
+
+
+</odoo>

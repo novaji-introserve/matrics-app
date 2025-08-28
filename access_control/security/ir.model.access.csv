@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_view_access_rule_admin,view.access.rule admin,model_view_access_rule,base.group_user,1,1,1,1
+access_view_access_rule_manager,view.access.rule manager,model_view_access_rule,access_control.group_view_access_manager,1,1,1,1
+access_ir_model_manager,ir.model for view access manager,base.model_ir_model,access_control.group_view_access_manager,1,0,0,0
+access_ir_actions_act_window_manager,ir.actions.act_window for view access manager,base.model_ir_actions_act_window,access_control.group_view_access_manager,1,0,0,0
+access_res_groups_manager,res.groups for view access manager,base.model_res_groups,access_control.group_view_access_manager,1,0,0,0
+access_view_access_model_list_admin,view.access.model.list admin,model_view_access_model_list,base.group_user,1,0,0,0

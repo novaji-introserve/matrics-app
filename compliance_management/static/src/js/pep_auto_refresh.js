@@ -6,6 +6,12 @@ import { useService } from "@web/core/utils/hooks";
 import { patch } from "@web/core/utils/patch";
 import { FormController } from "@web/views/form/form_controller";
 
+// Debug mode - set to false for production
+const DEBUG = false;
+function logDebug(...args) {
+  if (DEBUG) logDebug(...args);
+}
+
 // This patch adds auto-refresh functionality to PEP forms
 patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
     setup() {
@@ -15,7 +21,7 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
             return;
         }
         
-        console.log("PEP Auto-refresh: Added to PEP form");
+        logDebug("PEP Auto-refresh: Added to PEP form");
         
         this.orm = useService("orm");
         this.notification = useService("notification");
@@ -59,7 +65,7 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
         const channel = 'res.partner';
         const partnerId = this.env.services.user.partnerId;
         
-        console.log(`PEP Auto-refresh: Setting up bus listener for channel ${channel}/${partnerId}`);
+        logDebug(`PEP Auto-refresh: Setting up bus listener for channel ${channel}/${partnerId}`);
         
         // Subscribe to bus notifications
         this.bus.addChannel(`${channel}/${partnerId}`);
@@ -79,18 +85,18 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
                     
                     // Skip if we've already processed this notification
                     if (this.pepMonitoring.processedNotifications.has(notificationId)) {
-                        console.log("PEP Auto-refresh: Skipping duplicate notification", payload);
+                        logDebug("PEP Auto-refresh: Skipping duplicate notification", payload);
                         continue;
                     }
                     
                     // Mark this notification as processed
                     this.pepMonitoring.processedNotifications.add(notificationId);
                     
-                    console.log("PEP Auto-refresh: Received bus notification", payload);
+                    logDebug("PEP Auto-refresh: Received bus notification", payload);
                     
                     // Check if this notification is for the current record
                     if (payload.record_id === this.props.resId) {
-                        console.log(`PEP Auto-refresh: Processing notification for record ${payload.record_id}`);
+                        logDebug(`PEP Auto-refresh: Processing notification for record ${payload.record_id}`);
                         
                         // Stop monitoring
                         this._stopPepMonitoring();
@@ -126,9 +132,9 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
             // 2. Invalidate view to force re-rendering
             this.model.notify();
             
-            console.log(`PEP Auto-refresh: UI updated to status ${status}`);
+            logDebug(`PEP Auto-refresh: UI updated to status ${status}`);
         } catch (error) {
-            console.error("PEP Auto-refresh: Error updating UI:", error);
+            logDebug("PEP Auto-refresh: Error updating UI:", error);
             
             // If updating the UI fails, fall back to page refresh
             this.notification.add(
@@ -162,7 +168,7 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
             
             // If it's the Find Biography button, set up monitoring
             if (buttonName === "action_find_person") {
-                console.log("PEP Auto-refresh: Find Biography button clicked");
+                logDebug("PEP Auto-refresh: Find Biography button clicked");
                 
                 // Show a notification that the process has started
                 this.notification.add(
@@ -191,7 +197,7 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
         if (!this.props.resId) return;
         
         try {
-            console.log("PEP Auto-refresh: Checking initial status for record", this.props.resId);
+            logDebug("PEP Auto-refresh: Checking initial status for record", this.props.resId);
             
             // Use direct RPC call to avoid model.root issues
             const result = await this.orm.call(
@@ -200,14 +206,14 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
                 [this.props.resId]
             );
             
-            console.log("PEP Auto-refresh: Initial status check result:", result);
+            logDebug("PEP Auto-refresh: Initial status check result:", result);
             
             if (result && result.status === "running") {
-                console.log("PEP Auto-refresh: Found form with running job");
+                logDebug("PEP Auto-refresh: Found form with running job");
                 this._startPepMonitoring();
             }
         } catch (error) {
-            console.error("PEP Auto-refresh: Error checking initial status:", error);
+            logDebug("PEP Auto-refresh: Error checking initial status:", error);
         }
     },
     
@@ -218,7 +224,7 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
         // Don't start if already monitoring
         if (this.pepMonitoring.active) return;
         
-        console.log("PEP Auto-refresh: Starting job monitoring");
+        logDebug("PEP Auto-refresh: Starting job monitoring");
         this.pepMonitoring.active = true;
         
         // Reset processed notifications
@@ -243,7 +249,7 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
         }
         
         this.pepMonitoring.active = false;
-        console.log("PEP Auto-refresh: Stopped job monitoring");
+        logDebug("PEP Auto-refresh: Stopped job monitoring");
     },
     
     /**
@@ -259,7 +265,7 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
                 [this.props.resId]
             );
             
-            console.log("PEP Auto-refresh: Job status check result:", result);
+            logDebug("PEP Auto-refresh: Job status check result:", result);
             
             // If job is completed or failed, update the UI
             if (result && (result.status === "completed" || result.status === "failed")) {
@@ -282,7 +288,7 @@ patch(FormController.prototype, "compliance_management.PepAutoRefresh", {
                 this._updateFormUI(result.status, result.message);
             }
         } catch (error) {
-            console.error("PEP Auto-refresh: Error checking job status:", error);
+            logDebug("PEP Auto-refresh: Error checking job status:", error);
         }
     }
 });

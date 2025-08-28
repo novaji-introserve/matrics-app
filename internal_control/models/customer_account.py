@@ -1,15 +1,17 @@
 from odoo import models, fields, api, _
 
+
 class CustomerAccount(models.Model):
     _inherit = "res.partner.account"
-    _rec_name = 'accounttitle'
-    
+    # _rec_name = 'accounttitle'
+
     officercode = fields.Many2one(
         comodel_name='res.account.officer', string='Account Officer', index=True)
     sectorcode = fields.Many2one(
         comodel_name='res.partner.sector', string='Sector', index=True)
-    product_type_id = fields.Many2one(
-        comodel_name='res.partner.account.product', string='Product Type',index=True)
+    # This relationship already defined in compliance_management module as product_id
+    # product_type_id = fields.Many2one(
+    #    comodel_name='res.partner.account.product', string='Product Type',index=True)
     lnbalance = fields.Char(string="Ln Bal.")
     bkbalance = fields.Char(string="Bk Bal.")
     unclearedbal = fields.Char(string="Total Creadit")
@@ -21,26 +23,36 @@ class CustomerAccount(models.Model):
     account_tier = fields.Many2one(
         comodel_name='res.partner.tier', string='Account Tier', index=True)
     source_account_id = fields.Char(string="Source Account ID", index=True)
-    Status = fields.Boolean(default=False)
+    # Why the capitalization here?
+    # It should be 'status' to match the field definition above.
+    # If this is intentional, please clarify the purpose.
+    #Status = fields.Boolean(default=False)
+    status = fields.Boolean(default=False)
     accounttitle = fields.Char(string="Account Title")
-    product_id = fields.Many2one(
-        comodel_name='res.bank.product', string='Product',index=True)
- 
+    # This field already defined in compliance_management module
+    # product_id = fields.Many2one(
+    #    comodel_name='res.bank.product', string='Product',index=True)
+    bank_product_id = fields.Many2one(
+        comodel_name='res.bank.product', string='Bank Product', index=True)
 
     @api.model
     def open_accounts_tier_1(self):
-        tier_1 = self.env['res.partner.tier'].search([('code', '=', '001')], limit=1)
+        tier_1 = self.env['res.partner.tier'].search(
+            [('code', '=', '001')], limit=1)
         if not tier_1:
             return False
 
-        domain = [('account_tier', '=', tier_1.id)]  # Start with the base domain
-        
-         # Check if the current user is a Chief Compliance Officer
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
-        
+        # Start with the base domain
+        domain = [('account_tier', '=', tier_1.id)]
+
+        # Check if the current user is a Chief Compliance Officer
+        is_cco = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
         if not is_cco:  # Only apply branch filtering if not a CCO
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
-        
+            domain.append(
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+
         return {
             'name': _('Tier 1 Accounts'),
             'type': 'ir.actions.act_window',
@@ -52,17 +64,21 @@ class CustomerAccount(models.Model):
 
     @api.model
     def open_accounts_tier_2(self):
-        tier_2 = self.env['res.partner.tier'].search([('code', '=', '002')], limit=1)
+        tier_2 = self.env['res.partner.tier'].search(
+            [('code', '=', '002')], limit=1)
         if not tier_2:
             return False
-        
-        domain = [('account_tier', '=', tier_2.id)]  # Start with the base domain
-        
-         # Check if the current user is a Chief Compliance Officer
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
-        
+
+        # Start with the base domain
+        domain = [('account_tier', '=', tier_2.id)]
+
+        # Check if the current user is a Chief Compliance Officer
+        is_cco = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
         if not is_cco:  # Only apply branch filtering if not a CCO
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+            domain.append(
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
 
         return {
             'name': _('Tier 2 Accounts'),
@@ -75,17 +91,21 @@ class CustomerAccount(models.Model):
 
     @api.model
     def open_accounts_tier_3(self):
-        tier_3 = self.env['res.partner.tier'].search([('code', '=', '003')], limit=1)
+        tier_3 = self.env['res.partner.tier'].search(
+            [('code', '=', '003')], limit=1)
         if not tier_3:
             return False
-        
-        domain = [('account_tier', '=', tier_3.id)]  # Start with the base domain
-        
-         # Check if the current user is a Chief Compliance Officer
-        is_cco = self.env.user.has_group('compliance_management.group_compliance_chief_compliance_officer')
-        
+
+        # Start with the base domain
+        domain = [('account_tier', '=', tier_3.id)]
+
+        # Check if the current user is a Chief Compliance Officer
+        is_cco = self.env.user.has_group(
+            'compliance_management.group_compliance_chief_compliance_officer')
+
         if not is_cco:  # Only apply branch filtering if not a CCO
-            domain.append(('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
+            domain.append(
+                ('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]))
 
         return {
             'name': _('Tier 3 Accounts'),
@@ -95,13 +115,13 @@ class CustomerAccount(models.Model):
             'domain': domain,
             'context': {'search_default_group_branch': 1}
         }
-    
+
     def update_account_statistics(self):
-            """
-            Update transaction statistics for all accounts 
-            Separate calculations for credit and debit transactions
-            """
-            self.env.cr.execute("""
+        """
+        Update transaction statistics for all accounts 
+        Separate calculations for credit and debit transactions
+        """
+        self.env.cr.execute("""
                 WITH account_dates AS (
                     -- First get the latest transaction date for each account
                     SELECT 

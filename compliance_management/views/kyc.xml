@@ -3,7 +3,7 @@
         <field name="name">risk_plan_line_ids.view.tree</field>
         <field name="model">res.partner.risk.plan.line</field>
         <field name="arch" type="xml">
-            <tree string="Risk Analysis Lines" create="False" edit="False" delete="False" >
+            <tree string="Risk Analysis Lines" create="False" edit="False" delete="False">
                 <field name="plan_line_id" />
                 <field name="risk_score" />
                 <!-- <field name="create_date" /> -->
@@ -19,13 +19,13 @@
         <field name="inherit_id" ref="base.view_partner_form" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='vat']" position="after">
-                <field name="sector_id"/>
-                <field name="region_id"/>
+                <field name="sector_id" />
+                <field name="region_id" />
                 <field name="registration_date" />
                 <field name="company_reg_date" />
             </xpath>
             <xpath expr="//field[@name='category_id']" position="after">
-                <field name="internal_category"/>
+                <field name="internal_category" />
             </xpath>
             <xpath expr="//page[@name='contact_addresses']" position="attributes">
                 <attribute name="invisible">True</attribute>
@@ -72,33 +72,43 @@
                 <page name="digital_products" string="Customer Channels">
                     <!-- Simplified view without problematic fields -->
 
-                    <field name="channel_subscription_ids" context="{'default_customer_id': customer_id}" domain="[]">
+                    <field name="channel_subscription_ids"
+                        context="{'default_customer_id': customer_id}" domain="[]">
                         <tree editable="bottom" create="false" delete="false">
-                            <field name="channel_id"/>
-                            <field name="value"/>
+                            <field name="channel_id" />
+                            <field name="value" />
                         </tree>
                     </field>
                 </page>
 
 
-                <page name="risk_composite" string="Risk Composite" attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
-
-                    <separator string="COMPOSITE RISK SCORE" class="mt16"/>
+                <page name="risk_composite" string="Composition Risk Analysis"
+                    attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
+                    <div class="alert alert-info" role="alert" name="composition_tips">
+                        Composition-based risk analysis is used to calculate the risk score based on
+                        multiple factors and their weights. The composite risk score is calculated
+                        based on the weighted average of the individual risk scores from the
+                        composite plan lines. The customer's risk score is then calculated based on
+                        the
+                        composite risk score and the risk assessment plans.
+                    </div>
+                    <separator string="Composite Risk Score" class="mt16" />
                     <p>
-                        <field name="composite_risk_score" class="oe_inline" readonly="1" nolabel="1"/>
+                        <field name="composite_risk_score" class="oe_inline" readonly="1"
+                            nolabel="1" />
                     </p>
 
 
                     <!-- Add this new section -->
-                    <separator string="COMPOSITE RISK PLANS" class="mt16"/>
+                    <separator string="Composition-based Risk Analysis Lines" class="mt16" />
                     <field name="composite_plan_line_ids" readonly="1">
                         <tree editable="bottom" create="false" delete="false">
-                            <field name="name"/>
-                            <field name="universe_id"/>
-                            <field name="subject_id"/>
-                            <field name="matched"/>
-                            <field name="risk_score"/>
-                            <field name="universe_weight_percentage"/>
+                            <field name="name" />
+                            <field name="universe_id" />
+                            <field name="subject_id" />
+                            <field name="matched" />
+                            <field name="risk_score" />
+                            <field name="universe_weight_percentage" />
                             <!-- <field name="weighted_score" /> -->
 
                         </tree>
@@ -106,27 +116,44 @@
                 </page>
 
 
-                <page name='plans' string="Risk Analysis">
-                    <field name="risk_plan_line_ids" readonly="1" context="{'default_partner_id': active_id}" />
+                <page name='plans' string="Plan-based Risk Analysis">
+                    <div class="alert alert-info" role="alert" name="plan_tips">
+                        Plan-based risk analysis is used to calculate the risk score based on
+                        predefined plans and their computed risk score. The resulting risk score is
+                        calculated based on
+                        the weighted average or maximum (depending on system configuration) of the
+                        individual risk scores from the risk assessment
+                        plans.The customer's risk score is then calculated based on the
+                        composite risk score and the risk assessment plans
+                    </div>
+                    <field name="risk_plan_line_ids" readonly="1"
+                        context="{'default_partner_id': active_id}" />
                 </page>
 
                 <page name='risk_assessment' string="Risk Assessment">
-                    <field name="risk_assessment_ids" readonly="1" view_ref="compliance_customer_risk_assessment_tree" context="{'default_partner_id': active_id}" />
+                    <div class="alert alert-info" role="alert" name="risk_assessment_tips">
+                        A dedicated Risk Assessment can be conducted for a Customer. The resulting
+                        risk score overrides the EDD and Risk Plan items computed for the Customer</div>
+                    <field name="risk_assessment_ids" readonly="1"
+                        view_ref="compliance_customer_risk_assessment_tree"
+                        context="{'default_partner_id': active_id}" />
                 </page>
-                
-                <page name="due_diligence" string="Due Diligence" attrs="{'invisible' : [('internal_category', '!=', 'vendor')]}">
+
+                <page name="due_diligence" string="Due Diligence"
+                    attrs="{'invisible' : [('internal_category', '!=', 'vendor')]}">
                     <group>
                         <group>
-                            <field name="anti_bribery" filename="anti_bribery_file_name"/>
-                            <field name="anti_bribery_file_name" invisible="1"/>
-                            <field name="whistle_blowing" filename="whistle_blowing_file_name"/>
-                            <field name="whistle_blowing_file_name" invisible="1"/>
+                            <field name="anti_bribery" filename="anti_bribery_file_name" />
+                            <field name="anti_bribery_file_name" invisible="1" />
+                            <field name="whistle_blowing" filename="whistle_blowing_file_name" />
+                            <field name="whistle_blowing_file_name" invisible="1" />
                         </group>
                         <group>
-                            <field name="data_protection" filename="data_protection_file_name"/>
-                            <field name="data_protection_file_name" invisible="1"/>
-                            <field name="anti_money_laundering" filename="anti_money_laundering_file_name" />
-                            <field name="anti_money_laundering_file_name" invisible="1"/>
+                            <field name="data_protection" filename="data_protection_file_name" />
+                            <field name="data_protection_file_name" invisible="1" />
+                            <field name="anti_money_laundering"
+                                filename="anti_money_laundering_file_name" />
+                            <field name="anti_money_laundering_file_name" invisible="1" />
                         </group>
                     </group>
 
@@ -156,7 +183,7 @@
 
                 <!-- <notebook position="inside"> -->
                 <page string="Enhanced Due Diligence" name="edd_record">
-                   <field name="edd_ids" nolabel="1"
+                    <field name="edd_ids" nolabel="1"
                         context="{'form_view_ref': 'compliance_management.edd_form_view'}">
                         <tree string="EDD Record" create="False" edit="False" delete="False">
                             <field name="name" />
