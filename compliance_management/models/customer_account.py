@@ -184,8 +184,21 @@ class CustomerAccount(models.Model):
     tot_debit_last1y = fields.Float(
         string='Total Debit Amount - Last 1Y', digits=(15, 2))
 
-    state = fields.Selection(string='Status', selection=[('Active', 'Active'), ('Inactive', 'Inactive'), ('Dormant', 'Dormant'), (
-        'Flagged', 'Flagged'), ('Closed', 'Closed')], tracking=True, default='Active', required=False)  # sta_code
+    state = fields.Selection(string='Status', 
+                             selection=[('Active', 'Active'), 
+                                        ('Inactive', 'Inactive'), 
+                                        ('Dormant', 'Dormant'), 
+                                        ('Flagged', 'Flagged'), 
+                                        ('Opened', 'Opened'), 
+                                        ('Suspended', 'Suspended'), 
+                                        ('To be Reactivated', 'To be Reactivated'), 
+                                        ('To be suspended', 'To be suspended'), 
+                                        ('Unknown', 'Unknown'), 
+                                        ('Applied for closure', 'Applied for closure'), 
+                                        ('Closed', 'Closed')
+                                        ], 
+                             tracking=True, default='Active', required=False)  # sta_code
+    active = fields.Boolean(default=True, tracking=True)
     customer = fields.Char(string='Customer Id')
     max_debit_daily = fields.Float(string='Max. Debit - Daily', digits=(10, 2))
     overdraft_limit = fields.Float(string='OverDraft Limit', digits=(10, 2))
@@ -699,8 +712,9 @@ class CustomerAccountOfficer(models.Model):
     ]
     _order = "name"
     name = fields.Char(string="Name", required=True)
-    code = fields.Char(string="Code", required=True)
-    area = fields.Char(string="Area", required=True)
+    code = fields.Char(string="Code", )
+    area = fields.Char(string="Area", )
+    email = fields.Char(string="Email", )
 
 
 class CustomerAccountDetails(models.Model):

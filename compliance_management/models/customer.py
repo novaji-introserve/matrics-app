@@ -84,7 +84,7 @@ class Customer(models.Model):
         string='Identification Number', tracking=True, readonly=True)
     identification_expiry_date = fields.Date(
         string='Identification Expiry Date', index=True, tracking=True, readonly=True)
-    dob = fields.Date(
+    dob = fields.Char(
         string='Date of Birth', tracking=True, readonly=True)
     vat = fields.Char(string='Tax ID/TIN', index=True,
                       help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.", readonly=True)
@@ -106,7 +106,7 @@ class Customer(models.Model):
     middlename = fields.Char(string='Middle Name', readonly=True)
     othername = fields.Char(string='Other Name', readonly=True)
     town = fields.Char(string='Town', readonly=True)
-    registration_date = fields.Date(
+    registration_date = fields.Char(
         string='Registration Date', tracking=True, required=False, readonly=True)
     company_reg_date = fields.Date(
         string='Company Registration Date', tracking=True)
@@ -1058,6 +1058,8 @@ class Customer(models.Model):
             formatted = ', '.join(parts)
 
             record.formatted_phone = formatted
+            
+    
 
     @api.model
     def cron_run_risk_assessment(self):
@@ -1807,6 +1809,8 @@ class Customer(models.Model):
         }
 
     def create_customer_trigger(self):
+        
+        self.change_column_datatype()
 
         self.env.cr.execute("""
         SELECT EXISTS (
@@ -1849,6 +1853,7 @@ class Customer(models.Model):
                             NEW.lang = 'en_US';
                             NEW.color = 0;
                             NEW.tz = 'Africa/Lagos';
+                            NEW.origin = 'test';
                                                         
                             
                             -- Restore the original risk_level if it was set
@@ -1890,6 +1895,10 @@ class Customer(models.Model):
                     
                     IF NEW.tz IS NULL THEN
                         NEW.tz = 'Africa/Lagos';
+                    END IF;
+                                        
+                    IF (NEW.origin IS NULL OR TRIM(NEW.origin) = '') AND NEW.customer_id IS NOT NULL THEN
+                        NEW.origin = 'test';
                     END IF;
                     
                     IF NEW.write_date IS NULL THEN
@@ -1957,6 +1966,11 @@ class Customer(models.Model):
                 BEGIN
                     IF NEW.commercial_partner_id IS NULL THEN
                         UPDATE res_partner SET commercial_partner_id = NEW.id WHERE id = NEW.id;
+                    END IF;                   
+                    
+                    IF (NEW.origin IS NULL OR TRIM(NEW.origin) = '') AND NEW.customer_id IS NOT NULL THEN
+                        UPDATE res_partner SET origin = 'test' WHERE id = NEW.id;
+
                     END IF;
                     
                     RETURN NEW;
@@ -1971,6 +1985,42 @@ class Customer(models.Model):
                 FOR EACH ROW
                 EXECUTE FUNCTION set_partner_defaults_after_func();
             """)
+    
+    def change_column_datatype(self):
+        # Check and alter start_date column if not already VARCHAR/TEXT
+        self.env.cr.execute("""
+            SELECT data_type 
+            FROM information_schema.columns
+            WHERE table_name = 'res_partner'
+            AND column_name = 'registration_date'
+        """)
+        
+        start_date_type = self.env.cr.fetchone()
+        
+        if start_date_type and start_date_type[0] not in ('character varying', 'text'):
+            self.env.cr.execute("""
+                ALTER TABLE my_table
+                ALTER COLUMN registration_date TYPE VARCHAR
+                USING TO_CHAR(registration_date, 'YYYY-MM-DD')
+            """)
+
+        # Check and alter end_date column if not already VARCHAR/TEXT
+        self.env.cr.execute("""
+            SELECT data_type 
+            FROM information_schema.columns
+            WHERE table_name = 'res_partner'
+            AND column_name = 'dob'
+        """)
+        
+        end_date_type = self.env.cr.fetchone()
+        
+        if end_date_type and end_date_type[0] not in ('character varying', 'text'):
+            self.env.cr.execute("""
+                ALTER TABLE my_table
+                ALTER COLUMN dob TYPE VARCHAR
+                USING TO_CHAR(dob, 'YYYY-MM-DD')
+            """)
+
 
 
 

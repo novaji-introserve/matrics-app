@@ -62,7 +62,6 @@ class Transaction(models.Model):
     authorizer = fields.Char(string='Authorizer')
     transaction_type = fields.Selection(selection=[(
         'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
-    
     branch_code = fields.Char(string="Branch Code")
     
     show_create_case= fields.Boolean(

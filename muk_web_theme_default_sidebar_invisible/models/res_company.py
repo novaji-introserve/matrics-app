@@ -17,6 +17,7 @@ class ResCompany(models.Model):
         selection=[
             ('normal', 'Normal'),
             ('sided', 'Sided'),
+            ('bottom', 'Bottom'),
         ],
         string="Default Chatter Position",
-        default='normal')
+        default='bottom')

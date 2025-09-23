@@ -11,14 +11,11 @@ class AccountProduct(models.Model):
         #  "Account Product already exists. Value must be unique!"),
 
         ('uniq_product_id', 'unique(product_id)',
-         "Account Product id already exists. Value must be unique!"),
-        
-        ('uniq_account_product_code', 'unique(customer_product_id)',
-         "Account Product ID already exists. Value must be unique!")
+         "Account Product id already exists. Value must be unique!")
     ]
 
     name = fields.Char(string="Name", required=True)
-    code = fields.Char(string='Code', required=True)
+    code = fields.Char(string='Code')
     risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment',index=True)
     product_id = fields.Char(string='Product')
     product_category = fields.Char(string='Product Category')
