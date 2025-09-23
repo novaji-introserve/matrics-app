@@ -15,10 +15,11 @@ class CustomerAccount(models.Model):
          "Account Number already exists. Value must be unique!"),
     ]
 
-    _order = "name"
+    _order = 'id desc'
+
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', index=True)  # customer
-    name = fields.Char(string="Account Number")
+    name = fields.Char(string="Account Number", index=True)
     account_name = fields.Char(
         string='Account Name', index=True)  # account_title1
     account_position = fields.Char(string='Account Position', required=False)
@@ -35,7 +36,8 @@ class CustomerAccount(models.Model):
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', required=False)  # acct_officer
 
-    currency = fields.Char(string='Currency', required=False)  # currency
+    currency = fields.Char(
+        string='Currency', required=False, index=True)  # currency
 
     category = fields.Char(string='Category', required=False)  # category
 
@@ -258,10 +260,7 @@ class CustomerAccount(models.Model):
                         NEW.customer = NEW.customer_id::TEXT;                    
                     END IF;
                 
-                    IF NEW.active IS NULL THEN
-                        -- Set active field to True
-                        NEW.active = True;
-                    END IF;
+                    
                 
                 
                     RETURN NEW;
@@ -286,12 +285,6 @@ class CustomerAccount(models.Model):
             AND customer_id IS NOT NULL;
         """)
 
-        # Update existing records where active field is NULL
-        self.env.cr.execute("""
-            UPDATE res_partner_account
-            SET active = TRUE
-            WHERE active IS NULL;
-        """)
 
 
     @api.model
@@ -321,6 +314,7 @@ class CustomerAccount(models.Model):
             'res_model': 'res.partner.account',
             'view_mode': 'tree,form',
             'domain': domain,
+            'limit': 3000000,
             'context': {'search_default_group_branch': 1}
         }
 
@@ -742,7 +736,6 @@ class CustomerAccountDetails(models.Model):
     high_transaction_account = fields.Boolean(
         string="Is High Transaction Account")
     
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
     def init(self):
 
