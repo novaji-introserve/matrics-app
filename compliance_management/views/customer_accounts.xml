@@ -63,7 +63,6 @@
                             <label for="account_name" string="Account Name" />
                             <div>
                                 <field name="account_name" class="oe_inline" readonly="1" />
-                                <field name="active" invisible="1"/>
                             </div>
                         </div>
                     </div>
@@ -140,7 +139,7 @@
         <field name="arch" type="xml">
             <search string="Search Account">
                 <field name="name" />
-                <field name="customer_id" />
+                <field name="customer_id" string="Customer Id"/>
                 <field name="category"/>
              
 

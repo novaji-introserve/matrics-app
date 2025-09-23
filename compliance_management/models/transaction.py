@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+import logging
+from dotenv import load_dotenv
+
+load_dotenv()
+_logger = logging.getLogger(__name__)
+
 
 class Transaction(models.Model):
     _name = 'res.customer.transaction'
@@ -9,14 +15,15 @@ class Transaction(models.Model):
         ('uniq_trans_name', 'unique(name)',
          "Account Reference already exists. Value must be unique!"),
     ]
-    _order = 'date_created desc'
+    _order = 'id desc'
+    
     _inherit = ['mail.thread', 'mail.activity.mixin']
     name = fields.Char(string="Reference Number", index=True)
     account_id = fields.Many2one(
         comodel_name='res.partner.account', string='Account', index=True)
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
-    date_created = fields.Date(string='Tran. Date', index=True)
+    date_created = fields.Datetime(string='Tran. Date', index=True)
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', index=True) 
     branch_id = fields.Many2one(
@@ -55,7 +62,7 @@ class Transaction(models.Model):
     authorizer = fields.Char(string='Authorizer')
     transaction_type = fields.Selection(selection=[(
         'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
-    active = fields.Boolean(default=True, readonly=True)
+    
     branch_code = fields.Char(string="Branch Code")
     
     show_create_case= fields.Boolean(
@@ -65,10 +72,13 @@ class Transaction(models.Model):
 
     rule_ids = fields.One2many(
         'res.transaction.screening.history', 'transaction_id',
-        string='Screening Rules')
+        string='Screening Rules', tracking=True)
     
     total_rules = fields.Integer(
         string='Rules', compute='transaction_total_rules', index=True, store=False)
+    
+    rule_line_ids = fields.One2many(
+        comodel_name='res.transaction.screening.rule.line', inverse_name='transaction_id', string='Exception Analysis Lines', tracking=True)
     
     @api.model
     def create(self,vals_list):
@@ -204,6 +214,10 @@ class Transaction(models.Model):
     def init(self):
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_customer_transaction_id_idx ON res_customer_transaction (id)")
+        self.env.cr.execute("""
+        ALTER TABLE res_customer_transaction
+        ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+    """)
 
     def get_risk_level(self):
         return self.risk_level
@@ -250,6 +264,7 @@ class Transaction(models.Model):
                             self.action_mark_as_suspicious()
                             
                 if rule.condition_select == 'sql':
+                    # self.action_compute_rule_lines(rule)
                     query = rule.sql_query
                     char_to_replace = {
                                     '#TRANSACTION_ID#': f"{self.id}",
@@ -265,7 +280,9 @@ class Transaction(models.Model):
                         query = query.replace(key, value)
                         
                     self.env.cr.execute(query)
+                    _logger.info(f'this is the query to execute {query}')
                     rec = self.env.cr.fetchone()
+                    _logger.info(f'this is the result of the query {rec}, this is the trans amount {self.amount}')
                     if rec is not None:
                         history_id = self.env['res.transaction.screening.history'].create({
                             'transaction_id': self.id,
@@ -352,7 +369,7 @@ class Transaction(models.Model):
 
     @api.model
     def open_transactions_all(self):
-        
+
         user = self.env.user
         compliance_groups = [
             'compliance_management.group_compliance_chief_compliance_officer',
@@ -363,22 +380,42 @@ class Transaction(models.Model):
                                     for group in compliance_groups)
 
         # Set domain based on user group
+
+
         if has_compliance_access:
             domain = []
+
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
-                 e.id for e in self.env.user.branches_id])  ]
+                    e.id for e in self.env.user.branches_id])
+            ]
 
-        return {
+        action = {
             'name': _('All Transactions'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
             'domain': domain,
-            'context': {'search_default_group_branch': 1}
+            'limit' : 3000000,
+            'context': {'search_default_group_branch': 1},
         }
+            
 
+        return action
+    
     def get_risk_score(self):
         return self.risk_score
+    
+    def action_compute_rule_lines(self, rule):
+        
+        self.env["res.transaction.screening.rule.line"].search(
+            [('transaction_id', '=', self.id)]).unlink()
+                        
+        result = self.env.cr.execute(rule.sql_query, (self.id,))                
+        if result is not None:        
+            self.env['res.transaction.screening.rule.line'].create({
+                'transaction_id': self.id,
+                'rule_line_id': rule.id,
+            })

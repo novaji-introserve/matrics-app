@@ -307,7 +307,7 @@
         <field name="arch" type="xml">
             <xpath expr="//search" position="replace">
                 <search string="Search Customer">
-                    <field name="name" filter_domain="['|', '|', '|', '|', ('display_name', 'ilike', self), ('ref', 'ilike', self), ('email', 'ilike', self), ('vat', 'ilike', self), ('company_registry', 'ilike', self)]"/>
+                    <field name="name" filter_domain="['|', ('display_name', 'ilike', self), ('name', 'ilike', self)]"/>
                     <field name="parent_id" domain="[('is_company', '=', True)]" operator="child_of"/>
                     <field name="email" filter_domain="[('email', 'ilike', self)]"/>
                     <field name="phone" filter_domain="['|', ('phone', 'ilike', self), ('mobile', 'ilike', self)]"/>

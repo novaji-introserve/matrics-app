@@ -79,7 +79,6 @@
 
                                     <field name="customer_id" readonly="1" />
                                     <field name="account_id" readonly="1" />
-                                    <field name="active" invisible="1" />
 
                                 </group>
                                 <group>
@@ -97,6 +96,7 @@
                         <page name='internal_notes' string="Narration">
                             <field name="narration" readonly="0" />
                         </page>
+
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
@@ -116,6 +116,11 @@
                 <field name="name" />
                 <field name="customer_id" />
                 <separator />
+                <filter string="Today's Transactions" name="today_records" domain="[('date_created', '=', context_today().strftime('%Y-%m-%d'))]" />
+                <filter string="Yesterday's Transactions" name="yesterday_records" domain="[('date_created', '&gt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d')), ('date_created', '&lt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d'))]" />
+                <filter string="This Week's Transactions" name="this_week_records" domain="[('date_created', '&gt;=', context_today().strftime('%Y-%m-01')), ('date_created', '&lt;=', context_today().strftime('%Y-%m-%d'))]" />
+
+
                 <filter string="High Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','high')]" />
                 <filter string="Medium Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','medium')]" />
                 <filter string="Low Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','low')]" />
