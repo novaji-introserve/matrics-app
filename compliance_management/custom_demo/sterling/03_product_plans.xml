@@ -1,0 +1,1654 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+   
+    <record id="risk_plan_tier_1_easi_save_tier_1_easi_save" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For TIER 1 EASI SAVE</field>
+        <field name="code">TIER_1_EASI_SAVE_TIER_1_EASI_SAVE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'tier_1_easi_save' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using tier 1 easi save product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_tier_1_easi_save" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_ussd_savings_account_ussd_savings_account" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For USSD SAVINGS ACCOUNT</field>
+        <field name="code">USSD_SAVINGS_ACCOUNT_USSD_SAVINGS_ACCOUNT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'ussd_savings_account' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using ussd savings account product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_ussd_savings_account" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_platinum_hysa_individual_platinum_hysa" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL PLATINUM HYSA</field>
+        <field name="code">INDIVIDUAL_PLATINUM_HYSA_INDIVIDUAL_PLATINUM_HYSA</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_platinum_hysa' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual platinum hysa product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_platinum_hysa" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_hysa_diaspora_platinum_hysa_diaspora" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM HYSA DIASPORA</field>
+        <field name="code">PLATINUM_HYSA_DIASPORA_PLATINUM_HYSA_DIASPORA</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_hysa_diaspora' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum hysa diaspora product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_hysa_diaspora" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_apg_and_contract_current_apg_and_contract_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For APG AND CONTRACT CURRENT</field>
+        <field name="code">APG_AND_CONTRACT_CURRENT_APG_AND_CONTRACT_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'apg_and_contract_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using apg and contract current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_apg_and_contract_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_ind_diaspora_current_ind_diaspora_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For IND DIASPORA CURRENT</field>
+        <field name="code">IND_DIASPORA_CURRENT_IND_DIASPORA_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'ind_diaspora_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using ind diaspora current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_ind_diaspora_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corp_disaspora_current_corp_disaspora_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORP DISASPORA CURRENT</field>
+        <field name="code">CORP_DISASPORA_CURRENT_CORP_DISASPORA_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corp_disaspora_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corp disaspora current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corp_disaspora_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_individual_diaspora_platinum_individual_diaspora" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM - INDIVIDUAL DIASPORA</field>
+        <field name="code">PLATINUM_INDIVIDUAL_DIASPORA_PLATINUM_INDIVIDUAL_DIASPORA</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_individual_diaspora' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum - individual diaspora product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_individual_diaspora" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_diaspora_current_diaspora_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DIASPORA CURRENT</field>
+        <field name="code">DIASPORA_CURRENT_DIASPORA_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'diaspora_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using diaspora current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_diaspora_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_dbn_on_lending_scheme_dbn_on_lending_scheme" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DBN ON-LENDING SCHEME</field>
+        <field name="code">DBN_ON_LENDING_SCHEME_DBN_ON_LENDING_SCHEME</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'dbn_on_lending_scheme' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using dbn on-lending scheme product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_dbn_on_lending_scheme" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_otc_futures_margin_otc_futures_margin" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For OTC FUTURES MARGIN</field>
+        <field name="code">OTC_FUTURES_MARGIN_OTC_FUTURES_MARGIN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'otc_futures_margin' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using otc futures margin product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_otc_futures_margin" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_customer_fx_suspense_customer_fx_suspense" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CUSTOMER FX SUSPENSE</field>
+        <field name="code">CUSTOMER_FX_SUSPENSE_CUSTOMER_FX_SUSPENSE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'customer_fx_suspense' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using customer fx suspense product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_customer_fx_suspense" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_diaspora_fcy_savings_diaspora_fcy_savings" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DIASPORA FCY SAVINGS</field>
+        <field name="code">DIASPORA_FCY_SAVINGS_DIASPORA_FCY_SAVINGS</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'diaspora_fcy_savings' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using diaspora fcy savings product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_diaspora_fcy_savings" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_diamond_2_individual_diamond_2" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL DIAMOND 2</field>
+        <field name="code">INDIVIDUAL_DIAMOND_2_INDIVIDUAL_DIAMOND_2</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_diamond_2' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual diamond 2 product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_diamond_2" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_private_banking_kiddies_private_banking_kiddies" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PRIVATE BANKING KIDDIES</field>
+        <field name="code">PRIVATE_BANKING_KIDDIES_PRIVATE_BANKING_KIDDIES</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'private_banking_kiddies' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using private banking kiddies product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_private_banking_kiddies" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_tier_1_diamond_tier_1_diamond" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For TIER 1 DIAMOND</field>
+        <field name="code">TIER_1_DIAMOND_TIER_1_DIAMOND</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'tier_1_diamond' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using tier 1 diamond product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_tier_1_diamond" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_saphire_fn_individual_saphire_fn" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL SAPHIRE- FN</field>
+        <field name="code">INDIVIDUAL_SAPHIRE_FN_INDIVIDUAL_SAPHIRE_FN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_saphire_fn' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual saphire- fn product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_saphire_fn" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_dom_overdraft_corporate_dom_overdraft" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE DOM OVERDRAFT</field>
+        <field name="code">CORPORATE_DOM_OVERDRAFT_CORPORATE_DOM_OVERDRAFT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_dom_overdraft' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate dom overdraft product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_dom_overdraft" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_business_established_medium_platinum_business_established_medium" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM BUSINESS + ESTABLISHED / MEDIUM</field>
+        <field name="code">PLATINUM_BUSINESS_ESTABLISHED_MEDIUM_PLATINUM_BUSINESS_ESTABLISHED_MEDIUM</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_business_established_medium' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum business + established / medium product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_business_established_medium" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_loan_recovery_current_loan_recovery_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For LOAN RECOVERY CURRENT</field>
+        <field name="code">LOAN_RECOVERY_CURRENT_LOAN_RECOVERY_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'loan_recovery_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using loan recovery current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_loan_recovery_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_verve_credit_card_verve_credit_card" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For VERVE CREDIT CARD</field>
+        <field name="code">VERVE_CREDIT_CARD_VERVE_CREDIT_CARD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'verve_credit_card' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using verve credit card product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_verve_credit_card" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_premium_business_account_variant_1_fn_platinum_premium_business_account_variant_1_fn" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM PREMIUM BUSINESS ACCOUNT VARIANT 1 FN</field>
+        <field name="code">PLATINUM_PREMIUM_BUSINESS_ACCOUNT_VARIANT_1_FN_PLATINUM_PREMIUM_BUSINESS_ACCOUNT_VARIANT_1_FN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_premium_business_account_variant_1_fn' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum premium business account variant 1 fn product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_premium_business_account_variant_1_fn" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corp_pb_domiciliary_corp_pb_domiciliary" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORP PB DOMICILIARY</field>
+        <field name="code">CORP_PB_DOMICILIARY_CORP_PB_DOMICILIARY</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corp_pb_domiciliary' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corp pb domiciliary product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corp_pb_domiciliary" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_diaspora_vantage_silver_diaspora_vantage_silver" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DIASPORA VANTAGE SILVER</field>
+        <field name="code">DIASPORA_VANTAGE_SILVER_DIASPORA_VANTAGE_SILVER</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'diaspora_vantage_silver' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using diaspora vantage silver product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_diaspora_vantage_silver" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_debt_service_reserve_debt_service_reserve" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DEBT SERVICE RESERVE</field>
+        <field name="code">DEBT_SERVICE_RESERVE_DEBT_SERVICE_RESERVE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'debt_service_reserve' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using debt service reserve product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_debt_service_reserve" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_basic_individual_platinum_basic_individual" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM - BASIC INDIVIDUAL</field>
+        <field name="code">PLATINUM_BASIC_INDIVIDUAL_PLATINUM_BASIC_INDIVIDUAL</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_basic_individual' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum - basic individual product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_basic_individual" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_domicilary_od_domicilary_od" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DOMICILARY OD</field>
+        <field name="code">DOMICILARY_OD_DOMICILARY_OD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'domicilary_od' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using domicilary od product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_domicilary_od" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_pb_current_corporate_pb_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE PB CURRENT</field>
+        <field name="code">CORPORATE_PB_CURRENT_CORPORATE_PB_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_pb_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate pb current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_pb_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_bridge_account_fn_platinum_bridge_account_fn" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM BRIDGE ACCOUNT-FN</field>
+        <field name="code">PLATINUM_BRIDGE_ACCOUNT_FN_PLATINUM_BRIDGE_ACCOUNT_FN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_bridge_account_fn' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum bridge account-fn product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_bridge_account_fn" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_int_bearing_kiddies_int_bearing_kiddies" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INT. BEARING KIDDIES</field>
+        <field name="code">INT_BEARING_KIDDIES_INT_BEARING_KIDDIES</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'int_bearing_kiddies' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using int. bearing kiddies product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_int_bearing_kiddies" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_affinity_saphire_individual_affinity_saphire" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL AFFINITY SAPHIRE</field>
+        <field name="code">INDIVIDUAL_AFFINITY_SAPHIRE_INDIVIDUAL_AFFINITY_SAPHIRE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_affinity_saphire' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual affinity saphire product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_affinity_saphire" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_set_goal_customer_set_goal_customer" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For SET GOAL (CUSTOMER)</field>
+        <field name="code">SET_GOAL_CUSTOMER_SET_GOAL_CUSTOMER</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'set_goal_customer' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using set goal (customer) product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_set_goal_customer" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_diamond_3_individual_diamond_3" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL DIAMOND 3</field>
+        <field name="code">INDIVIDUAL_DIAMOND_3_INDIVIDUAL_DIAMOND_3</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_diamond_3' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual diamond 3 product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_diamond_3" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_platinum_hysa_corporate_platinum_hysa" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE PLATINUM HYSA</field>
+        <field name="code">CORPORATE_PLATINUM_HYSA_CORPORATE_PLATINUM_HYSA</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_platinum_hysa' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate platinum hysa product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_platinum_hysa" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_society_affinity_od_society_affinity_od" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For SOCIETY AFFINITY OD</field>
+        <field name="code">SOCIETY_AFFINITY_OD_SOCIETY_AFFINITY_OD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'society_affinity_od' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using society affinity od product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_society_affinity_od" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_geep_unregistered_current_geep_unregistered_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For GEEP UNREGISTERED CURRENT</field>
+        <field name="code">GEEP_UNREGISTERED_CURRENT_GEEP_UNREGISTERED_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'geep_unregistered_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using geep unregistered current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_geep_unregistered_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_diaspora_od_individual_diaspora_od" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL DIASPORA OD</field>
+        <field name="code">INDIVIDUAL_DIASPORA_OD_INDIVIDUAL_DIASPORA_OD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_diaspora_od' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual diaspora od product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_diaspora_od" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_staff_diamond_staff_diamond" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For STAFF DIAMOND</field>
+        <field name="code">STAFF_DIAMOND_STAFF_DIAMOND</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'staff_diamond' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using staff diamond product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_staff_diamond" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_kiddies_platinum_kiddies" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM KIDDIES</field>
+        <field name="code">PLATINUM_KIDDIES_PLATINUM_KIDDIES</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_kiddies' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum kiddies product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_kiddies" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_domiciliary_current_domiciliary_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DOMICILIARY CURRENT</field>
+        <field name="code">DOMICILIARY_CURRENT_DOMICILIARY_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'domiciliary_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using domiciliary current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_domiciliary_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_call_deposit_corporate_call_deposit" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE CALL DEPOSIT</field>
+        <field name="code">CORPORATE_CALL_DEPOSIT_CORPORATE_CALL_DEPOSIT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_call_deposit' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate call deposit product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_call_deposit" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_staff_domiciliary_current_staff_domiciliary_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For STAFF DOMICILIARY CURRENT</field>
+        <field name="code">STAFF_DOMICILIARY_CURRENT_STAFF_DOMICILIARY_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'staff_domiciliary_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using staff domiciliary current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_staff_domiciliary_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_nirsal_current_scheme_nirsal_current_scheme" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For NIRSAL CURRENT SCHEME</field>
+        <field name="code">NIRSAL_CURRENT_SCHEME_NIRSAL_CURRENT_SCHEME</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'nirsal_current_scheme' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using nirsal current scheme product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_nirsal_current_scheme" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_ind_affinity_current_ind_affinity_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For IND AFFINITY CURRENT</field>
+        <field name="code">IND_AFFINITY_CURRENT_IND_AFFINITY_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'ind_affinity_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using ind affinity current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_ind_affinity_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_visa_debit_card_visa_debit_card" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For VISA DEBIT CARD</field>
+        <field name="code">VISA_DEBIT_CARD_VISA_DEBIT_CARD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'visa_debit_card' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using visa debit card product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_visa_debit_card" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_ex_staff_current_ex_staff_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For EX-STAFF CURRENT</field>
+        <field name="code">EX_STAFF_CURRENT_EX_STAFF_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'ex_staff_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using ex-staff current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_ex_staff_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_current_corporate_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE CURRENT 2</field>
+        <field name="code">CORPORATE_CURRENT_CORPORATE_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_incubator_unregistered_incubator_unregistered" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INCUBATOR UNREGISTERED</field>
+        <field name="code">INCUBATOR_UNREGISTERED_INCUBATOR_UNREGISTERED</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'incubator_unregistered' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using incubator unregistered product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_incubator_unregistered" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_cbn_msme_facility_cbn_msme_facility" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CBN MSME FACILITY</field>
+        <field name="code">CBN_MSME_FACILITY_CBN_MSME_FACILITY</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'cbn_msme_facility' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using cbn msme facility product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_cbn_msme_facility" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_vintage_account_platinum_vintage_account" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM VINTAGE ACCOUNT</field>
+        <field name="code">PLATINUM_VINTAGE_ACCOUNT_PLATINUM_VINTAGE_ACCOUNT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_vintage_account' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum vintage account product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_vintage_account" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_ebanking_suspense_ebanking_suspense" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For EBANKING SUSPENSE</field>
+        <field name="code">EBANKING_SUSPENSE_EBANKING_SUSPENSE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'ebanking_suspense' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using ebanking suspense product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_ebanking_suspense" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_interest_bearing_saphire_interest_bearing_saphire" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INTEREST BEARING SAPHIRE</field>
+        <field name="code">INTEREST_BEARING_SAPHIRE_INTEREST_BEARING_SAPHIRE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'interest_bearing_saphire' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using interest bearing saphire product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_interest_bearing_saphire" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_diaspora_kiddies_diaspora_kiddies" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DIASPORA KIDDIES</field>
+        <field name="code">DIASPORA_KIDDIES_DIASPORA_KIDDIES</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'diaspora_kiddies' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using diaspora kiddies product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_diaspora_kiddies" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_affinity_premium_student_affinity_premium_student" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For AFFINITY PREMIUM STUDENT</field>
+        <field name="code">AFFINITY_PREMIUM_STUDENT_AFFINITY_PREMIUM_STUDENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'affinity_premium_student' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using affinity premium student product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_affinity_premium_student" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_special_saphire_individual_special_saphire" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL SPECIAL SAPHIRE</field>
+        <field name="code">INDIVIDUAL_SPECIAL_SAPHIRE_INDIVIDUAL_SPECIAL_SAPHIRE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_special_saphire' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual special saphire product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_special_saphire" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_pb_saphire_corporate_pb_saphire" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE PB SAPHIRE</field>
+        <field name="code">CORPORATE_PB_SAPHIRE_CORPORATE_PB_SAPHIRE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_pb_saphire' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate pb saphire product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_pb_saphire" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_special_public_works_program_of_fgn_special_public_works_program_of_fgn" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For SPECIAL PUBLIC WORKS PROGRAM OF FGN</field>
+        <field name="code">SPECIAL_PUBLIC_WORKS_PROGRAM_OF_FGN_SPECIAL_PUBLIC_WORKS_PROGRAM_OF_FGN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'special_public_works_program_of_fgn' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using special public works program of fgn product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_special_public_works_program_of_fgn" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_staff_saphire_staff_saphire" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For STAFF SAPHIRE</field>
+        <field name="code">STAFF_SAPHIRE_STAFF_SAPHIRE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'staff_saphire' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using staff saphire product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_staff_saphire" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_export_proceeds_domiciliary_account_export_proceeds_domiciliary_account" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For EXPORT PROCEEDS DOMICILIARY ACCOUNT</field>
+        <field name="code">EXPORT_PROCEEDS_DOMICILIARY_ACCOUNT_EXPORT_PROCEEDS_DOMICILIARY_ACCOUNT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'export_proceeds_domiciliary_account' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using export proceeds domiciliary account product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_export_proceeds_domiciliary_account" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_joint_affinity_current_joint_affinity_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For JOINT AFFINITY CURRENT</field>
+        <field name="code">JOINT_AFFINITY_CURRENT_JOINT_AFFINITY_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'joint_affinity_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using joint affinity current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_joint_affinity_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_corp_diaspora_platinum_corp_diaspora" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM - CORP. DIASPORA</field>
+        <field name="code">PLATINUM_CORP_DIASPORA_PLATINUM_CORP_DIASPORA</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_corp_diaspora' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum - corp. diaspora product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_corp_diaspora" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_government_current_government_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For GOVERNMENT CURRENT</field>
+        <field name="code">GOVERNMENT_CURRENT_GOVERNMENT_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'government_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using government current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_government_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_staff_current_staff_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For STAFF CURRENT</field>
+        <field name="code">STAFF_CURRENT_STAFF_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'staff_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using staff current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_staff_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_starter_micro_bus_incubator_starter_micro_bus_incubator" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For STARTER/MICRO BUS INCUBATOR</field>
+        <field name="code">STARTER_MICRO_BUS_INCUBATOR_STARTER_MICRO_BUS_INCUBATOR</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'starter_micro_bus_incubator' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using starter/micro bus incubator product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_starter_micro_bus_incubator" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_growing_small_bus_incubator_growing_small_bus_incubator" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For GROWING/SMALL BUS INCUBATOR</field>
+        <field name="code">GROWING_SMALL_BUS_INCUBATOR_GROWING_SMALL_BUS_INCUBATOR</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'growing_small_bus_incubator' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using growing/small bus incubator product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_growing_small_bus_incubator" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_business_growing_small_platinum_business_growing_small" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM BUSINESS + GROWING/SMALL</field>
+        <field name="code">PLATINUM_BUSINESS_GROWING_SMALL_PLATINUM_BUSINESS_GROWING_SMALL</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_business_growing_small' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum business + growing/small product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_business_growing_small" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_dom_pb_current_fn_dom_pb_current_fn" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DOM PB CURRENT-FN</field>
+        <field name="code">DOM_PB_CURRENT_FN_DOM_PB_CURRENT_FN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'dom_pb_current_fn' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using dom pb current-fn product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_dom_pb_current_fn" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_nuban_internal_account_nuban_internal_account" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For NUBAN INTERNAL ACCOUNT</field>
+        <field name="code">NUBAN_INTERNAL_ACCOUNT_NUBAN_INTERNAL_ACCOUNT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'nuban_internal_account' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using nuban internal account product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_nuban_internal_account" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_loan_recovery_current_individual_loan_recovery_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL LOAN RECOVERY CURRENT</field>
+        <field name="code">INDIVIDUAL_LOAN_RECOVERY_CURRENT_INDIVIDUAL_LOAN_RECOVERY_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_loan_recovery_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual loan recovery current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_loan_recovery_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_non_checking_saphire_non_checking_saphire" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For NON CHECKING SAPHIRE</field>
+        <field name="code">NON_CHECKING_SAPHIRE_NON_CHECKING_SAPHIRE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'non_checking_saphire' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using non checking saphire product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_non_checking_saphire" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_government_od_government_od" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For GOVERNMENT OD</field>
+        <field name="code">GOVERNMENT_OD_GOVERNMENT_OD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'government_od' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using government od product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_government_od" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_current_fn_individual_current_fn" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL CURRENT - FN</field>
+        <field name="code">INDIVIDUAL_CURRENT_FN_INDIVIDUAL_CURRENT_FN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_current_fn' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual current - fn product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_current_fn" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_diamond_individual_diamond" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL DIAMOND</field>
+        <field name="code">INDIVIDUAL_DIAMOND_INDIVIDUAL_DIAMOND</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_diamond' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual diamond product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_diamond" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_saphire_individual_saphire" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL SAPHIRE</field>
+        <field name="code">INDIVIDUAL_SAPHIRE_INDIVIDUAL_SAPHIRE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_saphire' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual saphire product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_saphire" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_ps_operative_ps_operative" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PS OPERATIVE</field>
+        <field name="code">PS_OPERATIVE_PS_OPERATIVE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'ps_operative' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using ps operative product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_ps_operative" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_corp_affinity_platinum_corp_affinity" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM - CORP AFFINITY</field>
+        <field name="code">PLATINUM_CORP_AFFINITY_PLATINUM_CORP_AFFINITY</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_corp_affinity' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum - corp affinity product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_corp_affinity" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_premium_business_account_variant_1_platinum_premium_business_account_variant_1" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM PREMIUM BUSINESS ACCOUNT VARIANT 1</field>
+        <field name="code">PLATINUM_PREMIUM_BUSINESS_ACCOUNT_VARIANT_1_PLATINUM_PREMIUM_BUSINESS_ACCOUNT_VARIANT_1</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_premium_business_account_variant_1' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum premium business account variant 1 product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_premium_business_account_variant_1" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_inv_disc_rec_fin_factorin_inv_disc_rec_fin_factorin" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INV DISC/REC FIN FACTORIN</field>
+        <field name="code">INV_DISC_REC_FIN_FACTORIN_INV_DISC_REC_FIN_FACTORIN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'inv_disc_rec_fin_factorin' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using inv disc/rec fin factorin product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_inv_disc_rec_fin_factorin" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_merchant_acquiring_merchant_acquiring" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For MERCHANT ACQUIRING</field>
+        <field name="code">MERCHANT_ACQUIRING_MERCHANT_ACQUIRING</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'merchant_acquiring' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using merchant acquiring product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_merchant_acquiring" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_diaspora_saphire_diaspora_saphire" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DIASPORA SAPHIRE</field>
+        <field name="code">DIASPORA_SAPHIRE_DIASPORA_SAPHIRE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'diaspora_saphire' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using diaspora saphire product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_diaspora_saphire" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_agency_banking_account_for_customers_agency_banking_account_for_customers" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For AGENCY BANKING ACCOUNT FOR CUSTOMERS</field>
+        <field name="code">AGENCY_BANKING_ACCOUNT_FOR_CUSTOMERS_AGENCY_BANKING_ACCOUNT_FOR_CUSTOMERS</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'agency_banking_account_for_customers' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using agency banking account for customers product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_agency_banking_account_for_customers" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_savings_dom_for_imto_receivers_re_and_diaspora_savings_dom_for_imto_receivers_re_and_diaspora" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For SAVINGS DOM FOR IMTO RECEIVERS RE AND DIASPORA</field>
+        <field name="code">SAVINGS_DOM_FOR_IMTO_RECEIVERS_RE_AND_DIASPORA_SAVINGS_DOM_FOR_IMTO_RECEIVERS_RE_AND_DIASPORA</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'savings_dom_for_imto_receivers_re_and_diaspora' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using savings dom for imto receivers re and diaspora product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_savings_dom_for_imto_receivers_re_and_diaspora" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_affinity_easi_save_affinity_easi_save" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For AFFINITY EASI SAVE</field>
+        <field name="code">AFFINITY_EASI_SAVE_AFFINITY_EASI_SAVE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'affinity_easi_save' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using affinity easi save product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_affinity_easi_save" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_online_diamond_online_diamond" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For ONLINE DIAMOND</field>
+        <field name="code">ONLINE_DIAMOND_ONLINE_DIAMOND</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'online_diamond' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using online diamond product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_online_diamond" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_pb_diamond_individual_pb_diamond" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL PB DIAMOND</field>
+        <field name="code">INDIVIDUAL_PB_DIAMOND_INDIVIDUAL_PB_DIAMOND</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_pb_diamond' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual pb diamond product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_pb_diamond" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_diamond_3_fn_individual_diamond_3_fn" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL DIAMOND 3 - FN</field>
+        <field name="code">INDIVIDUAL_DIAMOND_3_FN_INDIVIDUAL_DIAMOND_3_FN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_diamond_3_fn' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual diamond 3 - fn product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_diamond_3_fn" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_margin_trading_scheme_margin_trading_scheme" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For MARGIN TRADING SCHEME</field>
+        <field name="code">MARGIN_TRADING_SCHEME_MARGIN_TRADING_SCHEME</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'margin_trading_scheme' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using margin trading scheme product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_margin_trading_scheme" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_affinity_od_individual_affinity_od" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL AFFINITY OD</field>
+        <field name="code">INDIVIDUAL_AFFINITY_OD_INDIVIDUAL_AFFINITY_OD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_affinity_od' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual affinity od product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_affinity_od" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_domicilliary_affinity_od_domicilliary_affinity_od" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DOMICILLIARY AFFINITY OD</field>
+        <field name="code">DOMICILLIARY_AFFINITY_OD_DOMICILLIARY_AFFINITY_OD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'domicilliary_affinity_od' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using domicilliary affinity od product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_domicilliary_affinity_od" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_fcy_savings_individual_fcy_savings" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL FCY SAVINGS</field>
+        <field name="code">INDIVIDUAL_FCY_SAVINGS_INDIVIDUAL_FCY_SAVINGS</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_fcy_savings' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual fcy savings product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_fcy_savings" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_fcy_savings_corporate_fcy_savings" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE FCY SAVINGS</field>
+        <field name="code">CORPORATE_FCY_SAVINGS_CORPORATE_FCY_SAVINGS</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_fcy_savings' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate fcy savings product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_fcy_savings" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_call_deposit_individual_call_deposit" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL CALL DEPOSIT</field>
+        <field name="code">INDIVIDUAL_CALL_DEPOSIT_INDIVIDUAL_CALL_DEPOSIT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_call_deposit' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual call deposit product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_call_deposit" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_visa_credit_card_visa_credit_card" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For VISA CREDIT CARD</field>
+        <field name="code">VISA_CREDIT_CARD_VISA_CREDIT_CARD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'visa_credit_card' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using visa credit card product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_visa_credit_card" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_disapora_vantage_platinum_disapora_vantage_platinum" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For DISAPORA VANTAGE PLATINUM</field>
+        <field name="code">DISAPORA_VANTAGE_PLATINUM_DISAPORA_VANTAGE_PLATINUM</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'disapora_vantage_platinum' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using disapora vantage platinum product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_disapora_vantage_platinum" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_platinum_treasure_offer_2_platinum_treasure_offer_2" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For PLATINUM TREASURE OFFER 2</field>
+        <field name="code">PLATINUM_TREASURE_OFFER_2_PLATINUM_TREASURE_OFFER_2</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'platinum_treasure_offer_2' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using platinum treasure offer 2 product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_platinum_treasure_offer_2" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corp_affinity_current_corp_affinity_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORP AFFINITY CURRENT</field>
+        <field name="code">CORP_AFFINITY_CURRENT_CORP_AFFINITY_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corp_affinity_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corp affinity current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corp_affinity_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_domiciliary_corporate_domiciliary" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE DOMICILIARY</field>
+        <field name="code">CORPORATE_DOMICILIARY_CORPORATE_DOMICILIARY</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_domiciliary' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate domiciliary product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_domiciliary" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_current_individual_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL CURRENT 2</field>
+        <field name="code">INDIVIDUAL_CURRENT_INDIVIDUAL_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_contract_finance_facility_contract_finance_facility" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CONTRACT FINANCE FACILITY</field>
+        <field name="code">CONTRACT_FINANCE_FACILITY_CONTRACT_FINANCE_FACILITY</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'contract_finance_facility' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using contract finance facility product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_contract_finance_facility" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_nirsal_farmers_operative_scheme_nirsal_farmers_operative_scheme" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For NIRSAL FARMERS OPERATIVE SCHEME</field>
+        <field name="code">NIRSAL_FARMERS_OPERATIVE_SCHEME_NIRSAL_FARMERS_OPERATIVE_SCHEME</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'nirsal_farmers_operative_scheme' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using nirsal farmers operative scheme product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_nirsal_farmers_operative_scheme" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_individual_current_fn_individual_current_fn" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INDIVIDUAL CURRENT-FN</field>
+        <field name="code">INDIVIDUAL_CURRENT_FN_INDIVIDUAL_CURRENT_FN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'individual_current_fn' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using individual current-fn product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_individual_current_fn" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_non_checking_kiddies_non_checking_kiddies" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For NON CHECKING KIDDIES</field>
+        <field name="code">NON_CHECKING_KIDDIES_NON_CHECKING_KIDDIES</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'non_checking_kiddies' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using non checking kiddies product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_non_checking_kiddies" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_set_goal_staff_set_goal_staff" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For SET GOAL (STAFF)</field>
+        <field name="code">SET_GOAL_STAFF_SET_GOAL_STAFF</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'set_goal_staff' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using set goal (staff) product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_set_goal_staff" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_int_bearing_kiddies_fn_int_bearing_kiddies_fn" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For INT. BEARING KIDDIES-FN</field>
+        <field name="code">INT_BEARING_KIDDIES_FN_INT_BEARING_KIDDIES_FN</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'int_bearing_kiddies_fn' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using int. bearing kiddies-fn product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_int_bearing_kiddies_fn" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_affinity_od_corporate_affinity_od" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE AFFINITY OD</field>
+        <field name="code">CORPORATE_AFFINITY_OD_CORPORATE_AFFINITY_OD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_affinity_od' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate affinity od product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_affinity_od" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_joint_affinity_od_joint_affinity_od" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For JOINT AFFINITY OD</field>
+        <field name="code">JOINT_AFFINITY_OD_JOINT_AFFINITY_OD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'joint_affinity_od' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using joint affinity od product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_joint_affinity_od" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_geep_corporate_current_geep_corporate_current" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For GEEP CORPORATE CURRENT</field>
+        <field name="code">GEEP_CORPORATE_CURRENT_GEEP_CORPORATE_CURRENT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'geep_corporate_current' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using geep corporate current product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_geep_corporate_current" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_corporate_diaspora_od_corporate_diaspora_od" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For CORPORATE DIASPORA OD</field>
+        <field name="code">CORPORATE_DIASPORA_OD_CORPORATE_DIASPORA_OD</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'corporate_diaspora_od' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using corporate diaspora od product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_corporate_diaspora_od" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_easi_save_easi_save" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For EASI SAVE</field>
+        <field name="code">EASI_SAVE_EASI_SAVE</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'easi_save' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using easi save product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_easi_save" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+    <record id="risk_plan_regular_individual_account_regular_individual_account" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For REGULAR INDIVIDUAL ACCOUNT</field>
+        <field name="code">REGULAR_INDIVIDUAL_ACCOUNT_REGULAR_INDIVIDUAL_ACCOUNT</field>
+        <field name="sql_query">SELECT 1
+FROM res_partner_account a
+INNER JOIN res_partner r ON r.id = a.customer_id
+WHERE r.id = %s and lower(a.category) = 'regular_individual_account' ORDER BY a.opening_date DESC LIMIT 1;</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using regular individual account product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field ref="res_risk_assessment_regular_individual_account" name="risk_assessment" />
+        <field name="use_composite_calculation">True</field>
+        <field ref="compliance_inst_fc_risk_univ_22" name="universe_id" />
+    </record>
+</odoo>
