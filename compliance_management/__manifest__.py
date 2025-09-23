@@ -76,10 +76,7 @@
         "data/demo_data/risk_assessment/jurisdiction.xml",
         "data/demo_data/risk_assessment/delivery_channel.xml",
         "data/demo_data/risk_assessment/product_services.xml",
-        # product service demo data
-        "demo/product_service_data/01_product_service_subject.xml",
-        'demo/product_service_data/02_product_service_assessments.xml',
-        'demo/product_service_data/03_sterling_product_risk_plan.xml',
+       
 
         "data/demo_data/risk_assessment/compliance_history.xml",
         "data/demo_data/risk_assessment/data_quality.xml",
@@ -120,6 +117,15 @@
         "views/customer_screening.xml",
         'views/transaction_screening_history.xml',
         "views/menu_actions.xml",
+       
+        # Custom data
+        # Sterling
+        # "custom_demo/sterling/01_product_service_subject.xml",
+        # 'custom_demo/sterling/02_product_service_assessments.xml',
+        # 'custom_demo/sterling//03_sterling_product_risk_plan.xml',
+        
+        # Altbank
+        # 'custom_demo/altbank/03_sterling_product_risk_plan.xml',
     ],
     # only loaded in demonstration mode
     "demo": [
