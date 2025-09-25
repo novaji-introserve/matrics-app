@@ -6,6 +6,10 @@ import base64
 from datetime import datetime
 import random
 import string
+import mimetypes
+import magic
+import re
+from pathlib import Path
 from odoo import http, _, api
 from odoo.http import request, Response
 from ..services.websocket.connection import send_message
@@ -16,6 +20,191 @@ import socket
 
 _logger = logging.getLogger(__name__)
 
+class FileSecurityValidator:
+    """Comprehensive file security validation utility"""
+    
+    # Allowed file types with their corresponding MIME types and magic numbers
+    ALLOWED_FILE_TYPES = {
+        'csv': {
+            'extensions': ['.csv'],
+            'mime_types': ['text/csv', 'text/plain', 'application/csv'],
+            'magic_numbers': []  # CSV files don't have consistent magic numbers
+        },
+        'excel': {
+            'extensions': ['.xlsx', '.xls'],
+            'mime_types': [
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-excel'
+            ],
+            'magic_numbers': [
+                b'PK\x03\x04',  # XLSX (ZIP format)
+                b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1'  # XLS (OLE format)
+            ]
+        }
+    }
+    
+    # Maximum file size (2GB)
+    MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024
+    
+    # Dangerous file patterns to block
+    BLOCKED_PATTERNS = [
+        # Executable files
+        r'\.exe$', r'\.bat$', r'\.cmd$', r'\.com$', r'\.scr$',
+        # Script files
+        r'\.php$', r'\.py$', r'\.pl$', r'\.rb$', r'\.sh$', r'\.bash$',
+        r'\.js$', r'\.vbs$', r'\.ps1$',
+        # Archive files that could contain malicious content
+        r'\.zip$', r'\.rar$', r'\.7z$', r'\.tar$', r'\.gz$',
+        # System files
+        r'\.dll$', r'\.sys$', r'\.ini$',
+        # Hidden files and relative paths
+        r'^\.',  # Files starting with dot
+        r'\.\.',  # Path traversal attempts
+        # SQL injection patterns in filenames
+        r"[';\"]\s*(drop|delete|update|insert|exec|union|select)", 
+        r"--",  # SQL comment
+        r"/\*.*\*/",  # SQL block comment
+        # Path traversal variations
+        r"\.\.[\\/]",  # ../ or ..\
+        r"[\\/]\.\.",  # /.. or \..
+        r"%2e%2e",  # URL encoded ..
+        r"%2f",  # URL encoded /
+        r"%5c",  # URL encoded \
+    ]
+    
+    @staticmethod
+    def validate_filename(filename):
+        """Validate and sanitize filename"""
+        if not filename:
+            raise ValueError("Filename is required")
+        
+        # Remove any path components (security: prevent path traversal)
+        # Handle both Unix and Windows path separators
+        filename = os.path.basename(filename.replace('\\', '/'))
+        
+        # Check for dangerous patterns
+        filename_lower = filename.lower()
+        for pattern in FileSecurityValidator.BLOCKED_PATTERNS:
+            if re.search(pattern, filename_lower, re.IGNORECASE):
+                raise ValueError(f"File type not allowed: {filename}")
+        
+        # Check filename length
+        if len(filename) > 255:
+            raise ValueError("Filename too long")
+        
+        # Check for null bytes and control characters
+        if '\x00' in filename or any(ord(c) < 32 and c not in '\t\n\r' for c in filename):
+            raise ValueError("Invalid characters in filename")
+        
+        # Validate extension is allowed
+        file_ext = Path(filename).suffix.lower()
+        allowed_extensions = []
+        for file_type in FileSecurityValidator.ALLOWED_FILE_TYPES.values():
+            allowed_extensions.extend(file_type['extensions'])
+        
+        if file_ext not in allowed_extensions:
+            raise ValueError(f"File extension {file_ext} not allowed. Allowed: {', '.join(allowed_extensions)}")
+        
+        return filename
+    
+    @staticmethod
+    def validate_file_content(file_data, filename):
+        """Validate file content using magic numbers and structure"""
+        if not file_data:
+            raise ValueError("File content is empty")
+        
+        # Check file size
+        if len(file_data) > FileSecurityValidator.MAX_FILE_SIZE:
+            raise ValueError("File size exceeds maximum limit of 2GB")
+        
+        file_ext = Path(filename).suffix.lower()
+        
+        # Validate based on file type
+        if file_ext == '.csv':
+            FileSecurityValidator._validate_csv_content(file_data)
+        elif file_ext in ['.xlsx', '.xls']:
+            FileSecurityValidator._validate_excel_content(file_data, file_ext)
+        else:
+            raise ValueError(f"Unsupported file type: {file_ext}")
+        
+        return True
+    
+    @staticmethod
+    def _validate_csv_content(file_data):
+        """Validate CSV file content"""
+        try:
+            # Try to decode as text
+            content = file_data.decode('utf-8-sig')  # Handle BOM if present
+        except UnicodeDecodeError:
+            try:
+                # Try other common encodings
+                for encoding in ['latin-1', 'cp1252', 'iso-8859-1']:
+                    content = file_data.decode(encoding)
+                    break
+            except UnicodeDecodeError:
+                raise ValueError("File encoding not supported. Please use UTF-8, Latin-1, or similar text encoding")
+        
+        # Basic CSV validation
+        if not content.strip():
+            raise ValueError("CSV file appears to be empty")
+        
+        # Check for potential script injection
+        dangerous_patterns = [
+            r'<script', r'javascript:', r'vbscript:', r'onload=', r'onerror=',
+            r'<?php', r'<%', r'<\?', r'eval\s*\(',
+        ]
+        
+        content_lower = content.lower()
+        for pattern in dangerous_patterns:
+            if re.search(pattern, content_lower):
+                raise ValueError("File contains potentially malicious content")
+        
+        return True
+    
+    @staticmethod
+    def _validate_excel_content(file_data, file_ext):
+        """Validate Excel file content using magic numbers"""
+        if len(file_data) < 8:
+            raise ValueError("File too small to be valid Excel file")
+        
+        # Check magic numbers
+        if file_ext == '.xlsx':
+            # XLSX files are ZIP archives, should start with ZIP signature
+            if not file_data.startswith(b'PK\x03\x04'):
+                raise ValueError("Invalid XLSX file format")
+        elif file_ext == '.xls':
+            # XLS files use OLE format
+            if not file_data.startswith(b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1'):
+                raise ValueError("Invalid XLS file format")
+        
+        return True
+    
+    @staticmethod
+    def validate_mime_type(file_data, filename):
+        """Validate MIME type matches expected file type"""
+        try:
+            # Use python-magic to detect MIME type from content
+            mime_type = magic.from_buffer(file_data, mime=True)
+        except Exception:
+            # Fallback to mimetypes module
+            mime_type, _ = mimetypes.guess_type(filename)
+        
+        if not mime_type:
+            raise ValueError("Could not determine file MIME type")
+        
+        file_ext = Path(filename).suffix.lower()
+        
+        # Check if MIME type matches expected types for the extension
+        for file_type_info in FileSecurityValidator.ALLOWED_FILE_TYPES.values():
+            if file_ext in file_type_info['extensions']:
+                if mime_type in file_type_info['mime_types']:
+                    return True
+                # Special case for CSV files which can have various MIME types
+                if file_ext == '.csv' and mime_type.startswith('text/'):
+                    return True
+        
+        raise ValueError(f"File MIME type '{mime_type}' does not match expected type for {file_ext}")
+
 class CSVImportController(http.Controller):
     UPLOAD_DIR = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "media", "uploads"
@@ -23,7 +212,15 @@ class CSVImportController(http.Controller):
 
     def __init__(self):
         super(CSVImportController, self).__init__()
-        os.makedirs(self.UPLOAD_DIR, exist_ok=True)
+        # SECURITY: Create upload directory with secure permissions
+        if not os.path.exists(self.UPLOAD_DIR):
+            os.makedirs(self.UPLOAD_DIR, mode=0o700)  # Owner access only
+        else:
+            # Ensure existing directory has secure permissions
+            try:
+                os.chmod(self.UPLOAD_DIR, 0o700)
+            except OSError:
+                _logger.warning(f"Could not set secure permissions on upload directory: {self.UPLOAD_DIR}")
 
     @http.route("/csv_import/upload", type="http", auth="user")
     def csv_upload_page(self):
@@ -260,19 +457,34 @@ class CSVImportController(http.Controller):
         csrf=False,
     )
     def upload_chunk(self, **post):
-        """Handle chunked file uploads"""
+        """Handle chunked file uploads with comprehensive security validation"""
         try:
             chunk_number = request.httprequest.headers.get("X-Chunk-Number")
             total_chunks = request.httprequest.headers.get("X-Total-Chunks")
             file_id = request.httprequest.headers.get("X-File-Id")
             original_filename = request.httprequest.headers.get("X-Original-Filename")
             model_id = request.httprequest.headers.get("X-Model-Id")
-            _logger.info(
-                f"Processing chunk {chunk_number}/{total_chunks} for {original_filename}"
-            )
-            if not all(
-                [chunk_number, total_chunks, file_id, original_filename, model_id]
-            ):
+            
+            # SECURITY: Validate filename first (before any processing)
+            try:
+                if original_filename:
+                    sanitized_filename = FileSecurityValidator.validate_filename(original_filename)
+                    _logger.info(f"Processing chunk {chunk_number}/{total_chunks} for {sanitized_filename}")
+                else:
+                    return Response(
+                        json.dumps({"error": "Filename is required for security validation"}),
+                        content_type="application/json",
+                        status=400,
+                    )
+            except ValueError as e:
+                _logger.warning(f"Security validation failed for filename '{original_filename}': {str(e)}")
+                return Response(
+                    json.dumps({"error": f"File rejected: {str(e)}"}),
+                    content_type="application/json",
+                    status=400,
+                )
+                
+            if not all([chunk_number, total_chunks, file_id, model_id]):
                 return Response(
                     json.dumps({"error": "Missing required headers"}),
                     content_type="application/json",
@@ -335,10 +547,10 @@ class CSVImportController(http.Controller):
             )
             if chunk_number == total_chunks - 1:
                 self._send_message(
-                    "Final chunk received. Starting file reassembly...", "info"
+                    "Final chunk received. Starting file reassembly and security validation...", "info"
                 )
                 return self._handle_final_chunk(
-                    file_id, total_chunks, original_filename, ir_model, chunk_dir
+                    file_id, total_chunks, sanitized_filename, ir_model, chunk_dir
                 )
             return Response(
                 json.dumps(
@@ -384,22 +596,67 @@ class CSVImportController(http.Controller):
             
             # Assemble file from chunks - CRITICAL: This must complete before any processing
             self._send_message("Assembling file from chunks...", "info")
+            assembled_data = b''
+            
+            # Assemble chunks in memory first for security validation
+            for i in range(total_chunks):
+                chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
+                if not os.path.exists(chunk_path):
+                    self._send_message(f"Missing chunk {i}", "error")
+                    return Response(
+                        json.dumps({"error": f"Missing chunk {i}"}),
+                        content_type="application/json",
+                        status=500,
+                    )
+                with open(chunk_path, "rb") as infile:
+                    assembled_data += infile.read()
+            
+            # SECURITY: Comprehensive file validation before saving to disk
+            try:
+                self._send_message("Performing security validation...", "info")
+                
+                # Validate file content and structure
+                FileSecurityValidator.validate_file_content(assembled_data, original_filename)
+                
+                # Validate MIME type matches file extension  
+                FileSecurityValidator.validate_mime_type(assembled_data, original_filename)
+                
+                self._send_message("Security validation passed", "success")
+                
+            except ValueError as e:
+                self._send_message(f"Security validation failed: {str(e)}", "error")
+                _logger.warning(f"File rejected during security validation: {original_filename} - {str(e)}")
+                
+                # Clean up chunks
+                try:
+                    self._cleanup_chunks(chunk_dir, total_chunks)
+                except:
+                    pass
+                    
+                return Response(
+                    json.dumps({
+                        "error": f"File rejected by security validation: {str(e)}"
+                    }),
+                    content_type="application/json",
+                    status=400,
+                )
+            
+            # If validation passes, write to disk with secure permissions
             with open(final_path, "wb") as outfile:
-                for i in range(total_chunks):
-                    chunk_path = os.path.join(chunk_dir, f"chunk_{i}")
-                    if not os.path.exists(chunk_path):
-                        self._send_message(f"Missing chunk {i}", "error")
-                        return Response(
-                            json.dumps({"error": f"Missing chunk {i}"}),
-                            content_type="application/json",
-                            status=500,
-                        )
-                    with open(chunk_path, "rb") as infile:
-                        outfile.write(infile.read())
+                outfile.write(assembled_data)
+            
+            # SECURITY: Set restrictive file permissions (owner read/write only)
+            try:
+                os.chmod(final_path, 0o600)
+            except OSError as e:
+                _logger.warning(f"Could not set secure file permissions: {str(e)}")
+            
+            # Clear sensitive data from memory
+            assembled_data = None
             
             file_size = os.path.getsize(final_path)
             self._send_message(
-                f"File successfully reassembled: {self._format_bytes(file_size)}",
+                f"File successfully validated and saved: {self._format_bytes(file_size)}",
                 "success",
             )
             
