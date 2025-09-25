@@ -26,7 +26,8 @@ class Pep(models.Model):
     narration = fields.Html(string='Narration')
     lastmodifiedon = fields.Char(string="Last Modified On")
     lastmodifiedbyemail = fields.Char(string="Last Modified by Email")
-    unique_identifier = fields.Char(string="Unique Identifier", index=True,required=True)
+    unique_identifier = fields.Char(
+        string="Unique Identifier", index=True, required=True, default=lambda self: str(uuid.uuid4()))
     surname = fields.Char(string="Surname",tracking=True,required=True,index=True)
     first_name = fields.Char(string="First Name",tracking=True,required=True,index=True)
     middle_name = fields.Char(string="Middle Name")
