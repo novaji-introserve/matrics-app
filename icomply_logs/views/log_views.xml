@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <!-- <record id="icomply_logs_tree_view" model="ir.ui.view">
+        <field name="name">icomply.logs.tree</field>
+        <field name="model">icomply.logs</field>
+        <field name="arch" type="xml">
+            <tree string="System Logs" decoration-danger="level=='ERROR'" 
+                  decoration-warning="level=='WARNING'" decoration-info="level=='INFO'"
+                  default_order="timestamp desc">
+                <field name="timestamp"/>
+                <field name="level"/>
+                <field name="logger_name"/>
+                <field name="module"/>
+                <field name="message"/>
+            </tree>
+        </field>
+    </record> -->
+
+    <!-- Form View -->
+    <record id="icomply_logs_form_view" model="ir.ui.view">
+        <field name="name">icomply.logs.form</field>
+        <field name="model">icomply.logs</field>
+        <field name="arch" type="xml">
+            <form string="System Log Entry">
+                <header>
+                    <button name="action_refresh_logs" type="object" string="Refresh Logs" class="oe_highlight"/>
+                    <button name="action_show_stats" type="object" string="Show Stats"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="timestamp"/>
+                            <field name="level"/>
+                            <field name="logger_name"/>
+                            <field name="module"/>
+                        </group>
+                        <group>
+                            <field name="function_name"/>
+                            <field name="line_number"/>
+                            <field name="process_id"/>
+                            <field name="thread_id"/>
+                            <field name ="message"/>
+                            <field name="exception_info" widget="text" string="Exception Info" attrs="{'invisible': [('exception_info', '=', False)]}"/>
+                        </group>
+                         <group>
+                            <field name="detail_ids" string="">
+                                <tree editable="bottom" delete="false" no_open="1" limit="1000">
+                                </tree>
+                            </field>
+                        </group>
+
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="icomply_logs_search_view" model="ir.ui.view">
+        <field name="name">icomply.logs.search</field>
+        <field name="model">icomply.logs</field>
+        <field name="arch" type="xml">
+            <search string="Search System Logs">
+                <field name="message"/>
+                <field name="logger_name"/>
+                <field name="module"/>
+                <field name="level"/>
+                <separator/>
+                <filter string="Errors" name="errors" domain="[('level', '=', 'ERROR')]"/>
+                <filter string="Warnings" name="warnings" domain="[('level', '=', 'WARNING')]"/>
+                <filter string="Info" name="info" domain="[('level', '=', 'INFO')]"/>
+                <filter string="Debug" name="debug" domain="[('level', '=', 'DEBUG')]"/>
+                <separator/>
+                <filter string="Today" name="today" 
+                        domain="[('timestamp', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="This Week" name="week" 
+                        domain="[('timestamp', '&gt;=', (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Level" name="group_level" context="{'group_by': 'level'}"/>
+                    <filter string="Module" name="group_module" context="{'group_by': 'module'}"/>
+                    <filter string="Logger" name="group_logger" context="{'group_by': 'logger_name'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'timestamp:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_open_logs_form" model="ir.actions.server">
+            <field name="name">Open System logs</field>
+            <field name="model_id" ref="model_icomply_logs"/>
+            <field name="binding_model_id" ref="model_icomply_logs"/>
+            <field name="state">code</field>
+            <field name="code">action = env['icomply.logs'].open_logs_form()</field>
+    </record>
+    <!-- Server Action for Refreshing Logs -->
+    <record id="action_refresh_logs" model="ir.actions.server">
+        <field name="name">Refresh Logs</field>
+        <field name="model_id" ref="model_icomply_logs"/>
+        <field name="state">code</field>
+        <field name="code">
+count = model.refresh_logs()
+env.user.notify_info(f"Refreshed {count} log entries")
+        </field>
+    </record>
+
+
+    <!-- Main Menu -->
+    <menuitem id="menu_icomply_logs_root" 
+              name="System Logs" 
+              web_icon="icomply_logs,static/description/icon.png"
+              sequence="100"/>
+    
+    <!-- Sub Menu -->
+    <menuitem id="menu_icomply_logs" 
+              name="System Logs" 
+              parent="menu_icomply_logs_root"
+              action="action_open_logs_form"
+              sequence="10"/>
+              
+    <!-- Add to Settings menu as well -->
+    <menuitem id="menu_icomply_logs_settings" 
+              name="System Logs" 
+              parent="base.menu_administration"
+              action="action_open_logs_form"
+              sequence="100"/>
+
+</odoo>
