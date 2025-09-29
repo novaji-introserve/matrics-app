@@ -230,7 +230,7 @@ class FileSecurityValidator:
         
         # Minimum file size check (prevent empty/tiny malicious files)
         if len(file_data) < FileSecurityValidator.MIN_FILE_SIZE_BYTES:
-            raise ValueError(f"File too small to be valid (minimum {FileSecurityValidator.MIN_FILE_SIZE_BYTES} bytes)")
+            raise ValueError("File appears to be empty or corrupted. Please ensure your file contains data and try uploading again.")
         
         # CRITICAL: Scan for malicious content patterns FIRST
         FileSecurityValidator._scan_malicious_content(file_data, filename)
@@ -335,9 +335,9 @@ class FileSecurityValidator:
                     
                     # STEP 2: Ensure we found valid headers
                     if not headers_found:
-                        raise ValueError("Excel file must contain column headers in the first row")
+                        raise ValueError("Empty/Invalid file content")
                     
-                    _logger.info(f"Excel headers found: {headers_found[:10]}")  # Log first 10 headers
+                    _logger.info(f"Headers found: {headers_found[:10]}")  # Log first 10 headers
                     
                     # STEP 3: Scan all extracted cell content for malicious patterns
                     if cell_texts:
@@ -347,7 +347,8 @@ class FileSecurityValidator:
                     
             except Exception as e:
                 # If we can't read Excel content, fail securely
-                raise ValueError(f"Could not validate Excel file content: {str(e)}")
+                # raise ValueError(f"Empty/Invalid file content")
+                raise ValueError(f"{str(e)}")
             
             return True
         
@@ -429,12 +430,12 @@ class FileSecurityValidator:
                 # CRITICAL: Scan extracted cell content as plain text
                 if cell_texts:
                     combined_text = '\n'.join(cell_texts)
-                    _logger.info(f"Scanning {len(cell_texts)} Excel cell values, {len(combined_text)} total characters")
+                    _logger.info(f"Scanning {len(cell_texts)} cell values, {len(combined_text)} total characters")
                     # Only scan the actual cell content, not XML structure
                     FileSecurityValidator._detect_script_execution(combined_text, is_csv=False, is_excel=True)
                 else:
                     # SECURITY: If we found no cell content, the file might be suspicious or our extraction failed
-                    _logger.warning("No cell content found in Excel file - potential security concern")
+                    _logger.warning("No cell content found in file - potential security concern")
                     # Continue with minimal validation rather than failing, but log the concern
                 
                 # Note: We deliberately do NOT scan raw XML content as it contains
@@ -445,7 +446,8 @@ class FileSecurityValidator:
         except Exception as e:
             # If we can't read the Excel file, that's suspicious
             _logger.error(f"Excel validation failed: {str(e)}")
-            raise ValueError(f"Could not validate Excel file structure - potential security threat: {str(e)}")
+            raise ValueError(f"Could not validate file structure - potential security threat")
+            # raise ValueError(f"Could not validate Excel file structure - potential security threat: {str(e)}")
     
     @staticmethod
     def _check_excel_formula(formula):
@@ -459,7 +461,7 @@ class FileSecurityValidator:
         
         for pattern in dangerous_formulas:
             if re.search(pattern, formula, re.IGNORECASE):
-                raise ValueError("Malicious Excel formula detected")
+                raise ValueError("Malicious formula detected")
     
     @staticmethod
     def _detect_script_execution(content, is_csv=False, is_excel=False):
@@ -503,7 +505,7 @@ class FileSecurityValidator:
                             # Additional context validation for certain patterns
                             if FileSecurityValidator._validate_script_context(match, content_normalized, category, is_csv, is_excel):
                                 _logger.error(f"SECURITY THREAT DETECTED: {category} pattern matched - '{match.group(0)}'")
-                                raise ValueError(f"Script execution detected: {category} pattern matched")
+                                raise ValueError(f"Empty/Invalid file content")
                             else:
                                 _logger.info(f"Match dismissed by context validation: '{match.group(0)}'")
                     # else:
@@ -772,23 +774,23 @@ class FileSecurityValidator:
     def _validate_excel_headers(first_row_cells):
         """Validate that Excel file has proper column headers (SRP: Header validation)"""
         if not first_row_cells:
-            raise ValueError("Excel file must contain column headers in the first row")
+            raise ValueError("File must contain column headers in the first row")
         
         # Extract header values
         headers = [cell[1].strip().lower() if isinstance(cell[1], str) else str(cell[1]).strip().lower() 
                   for cell in first_row_cells if cell[1]]
         
         if not headers:
-            raise ValueError("Excel file headers cannot be empty")
+            raise ValueError("File headers cannot be empty")
         
         # Check for minimum number of headers
         if len(headers) < 1:
-            raise ValueError("Excel file must have at least one column header")
+            raise ValueError("File must have at least one column header")
         
         # Check for proper column headers (should contain at least some meaningful text)
         meaningful_headers = [h for h in headers if len(h) > 1 and not h.isdigit() and h not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
         if len(meaningful_headers) == 0:
-            raise ValueError("Excel file must contain meaningful column headers (not just numbers or single characters)")
+            raise ValueError("File must contain meaningful column headers (not just numbers or single characters)")
         
         # Headers should look like column names, not code
         malicious_header_patterns = [
@@ -1054,10 +1056,29 @@ class CSVImportController(http.Controller):
                         content_type="application/json",
                         status=400,
                     )
-            except ValueError as e:
+            except Exception as e:
                 _logger.warning(f"Security validation failed for filename '{original_filename}': {str(e)}")
+                
+                # Customize error message based on validation failure type
+                error_message = str(e)
+                if "appears to be empty or corrupted" in error_message:
+                    user_message = "Upload failed: Empty/Invalid file content"
+                elif "must contain meaningful column headers" in error_message:
+                    user_message = "Upload failed: Empty/Invalid file content."
+                elif "Script execution detected" in error_message or "malicious content" in error_message.lower():
+                    user_message = "Upload failed: Empty/Invalid file content."
+                elif "Invalid file extension" in error_message or "not allowed" in error_message:
+                    user_message = "Upload failed: File type not supported. Please upload a CSV or Excel file."
+                elif "File size exceeds" in error_message:
+                    user_message = "Upload failed: File size is too large. Please reduce file size and try again."
+                elif "Invalid" in error_message and ("CSV" in error_message or "Excel" in error_message):
+                    user_message = "Upload failed: File format is invalid or corrupted. Please check your file and try again."
+                else:
+                    # Fallback for any other validation errors
+                    user_message = f"Upload failed: {error_message}"
+                
                 return Response(
-                    json.dumps({"error": f"File rejected: {str(e)}"}),
+                    json.dumps({"error": user_message}),
                     content_type="application/json",
                     status=400,
                 )
@@ -1201,8 +1222,26 @@ class CSVImportController(http.Controller):
                 
                 self._send_message("Security validation passed", "success")
                 
-            except ValueError as e:
-                self._send_message(f"Security validation failed: {str(e)}", "error")
+            except Exception as e:
+                # Customize websocket message based on validation failure type
+                error_message = str(e)
+                if "appears to be empty or corrupted" in error_message:
+                    websocket_message = "Upload failed: Empty/Invalid file content"
+                elif "must contain meaningful column headers" in error_message:
+                    websocket_message = "Upload failed: Empty/Invalid file content"
+                elif "Script execution detected" in error_message or "malicious content" in error_message.lower():
+                    websocket_message = "Upload failed: Empty/Invalid file content"
+                elif "Invalid file extension" in error_message or "not allowed" in error_message:
+                    websocket_message = "Upload failed: File type not supported"
+                elif "File size exceeds" in error_message:
+                    websocket_message = "Upload failed: File size is too large"
+                elif "Invalid" in error_message and ("CSV" in error_message or "Excel" in error_message):
+                    websocket_message = "Upload failed: Empty/Invalid file content"
+                else:
+                    # Fallback for any other validation errors
+                    websocket_message = f"Upload failed: {error_message}"
+                
+                self._send_message(websocket_message, "error")
                 _logger.warning(f"File rejected during security validation: {original_filename} - {str(e)}")
                 
                 # Clean up chunks
@@ -1213,7 +1252,8 @@ class CSVImportController(http.Controller):
                     
                 return Response(
                     json.dumps({
-                        "error": f"File rejected by security validation: {str(e)}"
+                        # "error": f"File rejected by security validation"
+                        "error": f"{str(e)}"
                     }),
                     content_type="application/json",
                     status=400,
