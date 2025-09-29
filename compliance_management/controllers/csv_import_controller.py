@@ -76,45 +76,71 @@ class FileSecurityValidator:
         r"(script|malicious|hack|exploit|payload)\.csv$",  # Obviously suspicious names
     ]
     
-    # Comprehensive malicious content patterns
-    MALICIOUS_CONTENT_PATTERNS = [
-        # Shell/Bash commands
-        r'#!/bin/(sh|bash|zsh|csh|tcsh|ksh)',  # Shebang lines
-        r'\b(rm|mv|cp|dd|chmod|chown|sudo|su)\s+',  # Dangerous commands
-        r'\b(curl|wget|nc|netcat|telnet)\s+',  # Network commands
-        r'\|(sh|bash|zsh)\b',  # Pipe to shell
-        r'`[^`]*`',  # Command substitution
-        r'\$\([^)]*\)',  # Command substitution
+    # Context-aware script detection patterns - only match when followed by code syntax
+    SCRIPT_EXECUTION_PATTERNS = {
+        # Python script patterns - only when followed by code syntax
+        'python_imports': [
+            r'\bimport\s+(os|sys|subprocess|socket|urllib|shutil|pickle)\s*[;\n]',  # Dangerous imports with code syntax
+            r'\bfrom\s+(os|sys|subprocess|socket|urllib|shutil)\s+import\s+\w+',  # From imports
+            # For Excel cells: dangerous imports (fixed - removed anchors)
+            r'\bimport\s+(os|sys|subprocess|socket|urllib|shutil|pickle)\b',  # Match dangerous imports anywhere
+            r'\bfrom\s+(os|sys|subprocess|socket|urllib|shutil)\s+import\s+\w+',  # From imports anywhere
+        ],
+        'python_execution': [
+            r'\b(exec|eval|compile)\s*\(',  # Direct execution functions
+            r'\bos\.(system|popen|spawn|execv?)\s*\(',  # OS command execution
+            r'\bsubprocess\.(run|call|Popen|check_output)\s*\(',  # Subprocess execution
+            r'__import__\s*\(',  # Dynamic imports
+        ],
         
-        # Python/Script execution
-        r'\bimport\s+(os|sys|subprocess|socket|urllib)',  # Dangerous imports
-        r'\b(exec|eval|compile)\s*\(',  # Code execution
-        r'\b__import__\s*\(',  # Dynamic imports
-        r'\bos\.(system|popen|spawn)',  # OS commands
-        r'\bsubprocess\.(run|call|Popen)',  # Process execution
+        # Shell script patterns
+        'shell_execution': [
+            r'#!/bin/(sh|bash|zsh|csh|tcsh|ksh)',  # Shebang lines (always suspicious)
+            r'\b(rm|mv|cp|dd|chmod|chown|sudo|su)\s+[-/\w]',  # Commands with arguments
+            r'\b(curl|wget|nc|netcat|telnet)\s+[-\w]',  # Network commands with args
+            r'[;&|]\s*(rm|dd|mkfs|sudo)\s+',  # Chained dangerous commands
+            r'\$\([^)]*\)',  # Command substitution
+            r'`[^`]+`',  # Backtick command substitution
+        ],
         
-        # Web attacks
-        r'<script[^>]*>',  # Script tags
-        r'javascript:',  # JavaScript protocol
-        r'vbscript:',  # VBScript protocol
-        r'on(load|error|click|focus)\s*=',  # Event handlers
-        r'<\?php',  # PHP tags
-        r'<%[^>]*%>',  # ASP/JSP tags
+        # SQL injection patterns - context-aware
+        'sql_injection': [
+            r"';\s*(drop|delete|insert|update)\s+(table|from|into)",  # SQL with proper syntax
+            r'\bunion\s+select\s+',  # UNION SELECT attacks
+            r'--\s*[a-zA-Z].*[;\n]',  # SQL comments followed by statements
+            r'\)\s*;\s*(drop|delete|insert)\s+\w+',  # After closing parenthesis with target
+        ],
         
-        # SQL injection
-        r'\b(union|select|insert|update|delete|drop|create|alter)\s+',
-        r'--\s*[a-zA-Z]',  # SQL comments with text
-        r'/\*[^*]*\*/',  # SQL block comments
-        r"';\s*(drop|delete|update|insert|create|alter)",  # SQL injection in CSV data
-        r"'\s*;\s*(drop|delete|update|insert|create|alter)",  # SQL injection variations
-        r"'\s*;\s*drop\s+table",  # Drop table specifically
+        # Web script injection
+        'web_scripts': [
+            r'<script[^>]*>.*</script>',  # Complete script tags
+            r'javascript:\s*[a-zA-Z_$][\w$]*\s*\(',  # JavaScript function calls
+            r'<\?php\s+.*\?>',  # PHP code blocks
+            r'<%[^>]*%>',  # ASP/JSP code blocks
+            r'on(load|error|click|focus|mouse|key)\s*=\s*["\'][^"\']*["\']',  # Event handlers with values
+        ],
         
-        # Binary/executable signatures
-        r'\x7fELF',  # Linux executable
-        r'MZ\x90\x00',  # Windows executable
-        r'\xff\xfe',  # UTF-16 BOM (often used to hide content)
-        r'\xfe\xff',  # UTF-16 BE BOM
-    ]
+        # Command injection patterns
+        'command_injection': [
+            r'(system|shell_exec|passthru|exec)\s*\(\s*["\'][^"\']*["\']',  # Function calls with string args
+            r'proc_open\s*\(',  # Process execution
+            r'popen\s*\(\s*["\'][^"\']*["\']',  # Pipe open with commands
+        ],
+        
+        # File system attacks
+        'file_attacks': [
+            r'\.\./(\.\./)+(etc|bin|usr|var)',  # Path traversal to system dirs
+            r'file:///(etc|bin|usr|var|windows)',  # File protocol to system dirs
+            r'["\']/(etc|bin|usr|var)/(passwd|shadow|hosts)["\']',  # Direct system file access
+        ],
+        
+        # Excel formula injection
+        'excel_formula_injection': [
+            r'=\s*(cmd|powershell|system|exec)\s*\(',  # Executable formulas
+            r'=\s*HYPERLINK\s*\(\s*["\']https?://[^"\']*["\']',  # External hyperlinks
+            r'=\s*(IMPORTDATA|IMPORTXML|IMPORTHTML)\s*\(',  # Data import functions
+        ]
+    }
     
     @classmethod 
     def _initialize_file_types(cls):
@@ -207,7 +233,7 @@ class FileSecurityValidator:
             raise ValueError(f"File too small to be valid (minimum {FileSecurityValidator.MIN_FILE_SIZE_BYTES} bytes)")
         
         # CRITICAL: Scan for malicious content patterns FIRST
-        FileSecurityValidator._scan_malicious_content(file_data)
+        FileSecurityValidator._scan_malicious_content(file_data, filename)
         
         # Then validate specific file format
         if file_ext == '.csv':
@@ -220,72 +246,376 @@ class FileSecurityValidator:
         return True
     
     @staticmethod
-    def _scan_malicious_content(file_data):
-        """Comprehensive scan for malicious content patterns"""
-        # Check binary patterns first (for disguised executables)
-        if file_data.startswith(b'\x7fELF'):
-            raise ValueError("ELF executable header detected in file")
-        if file_data.startswith(b'MZ\x90\x00'):
-            raise ValueError("Windows executable header detected in file")
+    def _scan_malicious_content(file_data, filename=None):
+        """Context-aware malicious content detection following SRP"""
+        # Step 1: Check for binary executable signatures (SRP: Binary validation)
+        FileSecurityValidator._check_binary_signatures(file_data)
         
-        try:
-            # Try to decode as text for pattern matching
-            content = None
-            for encoding in ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252', 'iso-8859-1']:
-                try:
-                    content = file_data.decode(encoding)
-                    break
-                except UnicodeDecodeError:
-                    continue
-        except:
-            # If can't decode as text, check binary patterns
-            content = None
+        # Step 2: Determine file type for context-aware scanning
+        file_ext = filename.lower() if filename else ""
+        is_excel_file = file_ext.endswith(('.xlsx', '.xls'))
+        is_csv_file = file_ext.endswith('.csv')
         
-        # Check binary patterns first (for disguised executables)
-        for pattern in FileSecurityValidator.MALICIOUS_CONTENT_PATTERNS:
-            if isinstance(pattern, str) and pattern.startswith('\\x'):
-                # Binary pattern - search in raw bytes
-                try:
-                    # Convert pattern like '\\x7fELF' to actual bytes
-                    binary_pattern = pattern.encode().decode('unicode_escape').encode('latin1')
-                    if binary_pattern in file_data:
-                        raise ValueError(f"Suspicious binary signature detected")
-                except:
-                    pass
-        
-        # If we have text content, check text patterns
-        if content:
-            content_lower = content.lower()
-            
-            for pattern in FileSecurityValidator.MALICIOUS_CONTENT_PATTERNS:
-                if not isinstance(pattern, str) or pattern.startswith('\\x'):
-                    continue  # Skip binary patterns
+        # Step 3: For Excel files, extract and scan cell content
+        if is_excel_file:
+            # CRITICAL: Extract and scan actual cell content from Excel files
+            try:
+                import zipfile
+                from io import BytesIO
+                import xml.etree.ElementTree as ET
+                
+                with zipfile.ZipFile(BytesIO(file_data), 'r') as zip_file:
+                    cell_texts = []
+                    headers_found = []
                     
-                try:
-                    if re.search(pattern, content_lower, re.IGNORECASE | re.MULTILINE):
-                        raise ValueError(f"Potentially malicious content pattern detected")
-                except re.error:
-                    # Skip invalid regex patterns
-                    continue
+                    # Extract shared strings for reference
+                    shared_strings_map = {}
+                    try:
+                        shared_strings = zip_file.read('xl/sharedStrings.xml')
+                        root = ET.fromstring(shared_strings)
+                        for i, t_elem in enumerate(root.iter()):
+                            if t_elem.tag.endswith('}t') and t_elem.text:
+                                shared_strings_map[i] = t_elem.text
+                                cell_texts.append(t_elem.text)
+                    except:
+                        pass
+                    
+                    # Extract worksheet content and check for headers in first row
+                    for file_info in zip_file.infolist():
+                        if file_info.filename.startswith('xl/worksheets/'):
+                            try:
+                                worksheet = zip_file.read(file_info.filename)
+                                root = ET.fromstring(worksheet)
+                                
+                                # STEP 1: Check for proper headers in first row (A1, B1, C1, etc.)
+                                first_row_cells = []
+                                for row in root.iter():
+                                    if row.tag.endswith('}row') and row.get('r') == '1':  # First row
+                                        for cell in row.iter():
+                                            if cell.tag.endswith('}c'):  # Cell element
+                                                cell_ref = cell.get('r', '')
+                                                if cell_ref and cell_ref[0] in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+                                                    cell_value = None
+                                                    # Check for shared string reference
+                                                    for v_elem in cell.iter():
+                                                        if v_elem.tag.endswith('}v') and v_elem.text:
+                                                            if cell.get('t') == 's':  # Shared string
+                                                                try:
+                                                                    ss_index = int(v_elem.text)
+                                                                    cell_value = shared_strings_map.get(ss_index, v_elem.text)
+                                                                except:
+                                                                    cell_value = v_elem.text
+                                                            else:
+                                                                cell_value = v_elem.text
+                                                    # Check for inline string
+                                                    for t_elem in cell.iter():
+                                                        if t_elem.tag.endswith('}t') and t_elem.text:
+                                                            cell_value = t_elem.text
+                                                    
+                                                    if cell_value:
+                                                        first_row_cells.append((cell_ref, cell_value))
+                                        break  # Only check first row
+                                
+                                # Validate headers
+                                if first_row_cells:
+                                    headers_found.extend([cell[1] for cell in first_row_cells])
+                                    FileSecurityValidator._validate_excel_headers(first_row_cells)
+                                
+                                # Extract all cell content for malicious content scanning
+                                for elem in root.iter():
+                                    # Extract formulas and inline text
+                                    if elem.tag.endswith('}f') and elem.text:
+                                        cell_texts.append(elem.text)
+                                    elif elem.tag.endswith('}t') and elem.text:
+                                        cell_texts.append(elem.text)
+                                    elif elem.tag.endswith('}v') and elem.text:
+                                        cell_texts.append(elem.text)
+                            except:
+                                continue
+                    
+                    # STEP 2: Ensure we found valid headers
+                    if not headers_found:
+                        raise ValueError("Excel file must contain column headers in the first row")
+                    
+                    _logger.info(f"Excel headers found: {headers_found[:10]}")  # Log first 10 headers
+                    
+                    # STEP 3: Scan all extracted cell content for malicious patterns
+                    if cell_texts:
+                        combined_text = '\n'.join(cell_texts)
+                        _logger.info(f"Scanning {len(cell_texts)} Excel cell values, {len(combined_text)} total characters")
+                        FileSecurityValidator._detect_script_execution(combined_text, is_csv=False, is_excel=True)
+                    
+            except Exception as e:
+                # If we can't read Excel content, fail securely
+                raise ValueError(f"Could not validate Excel file content: {str(e)}")
             
-            # Additional checks for script content
-            lines = content.split('\n')
-            for i, line in enumerate(lines[:50]):  # Check first 50 lines
-                line_stripped = line.strip().lower()
-                
-                # Check for shebang lines
-                if line_stripped.startswith('#!') and i == 0:
-                    raise ValueError("Script file detected (shebang line found)")
-                
-                # Check for import statements that suggest code
-                if re.match(r'^\s*(import|from|require|include)\s+', line_stripped):
-                    raise ValueError("Script import statement detected")
-                
-                # Check for function definitions
-                if re.match(r'^\s*(def|function|sub|proc)\s+\w+', line_stripped):
-                    raise ValueError("Function definition detected - not a data file")
+            return True
+        
+        # Step 4: For CSV and other text files, decode content for analysis
+        content = FileSecurityValidator._decode_content_safely(file_data)
+        
+        if content:
+            # Step 5: Context-aware script detection with file type awareness
+            FileSecurityValidator._detect_script_execution(content, is_csv_file, is_excel_file)
         
         return True
+    
+    @staticmethod
+    def _check_binary_signatures(file_data):
+        """Check for executable binary signatures (SRP: Binary validation only)"""
+        binary_signatures = [
+            (b'\x7fELF', "ELF executable header detected"),
+            (b'MZ\x90\x00', "Windows executable header detected"),
+            (b'\xff\xfe', "UTF-16 BOM potentially hiding content"),
+            (b'\xfe\xff', "UTF-16 BE BOM potentially hiding content"),
+        ]
+        
+        for signature, error_msg in binary_signatures:
+            if file_data.startswith(signature):
+                raise ValueError(error_msg)
+    
+    @staticmethod
+    def _decode_content_safely(file_data):
+        """Safely decode file content for text analysis (SRP: Content decoding only)"""
+        encodings = ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252', 'iso-8859-1']
+        
+        for encoding in encodings:
+            try:
+                return file_data.decode(encoding)
+            except UnicodeDecodeError:
+                continue
+        
+        # If all decodings fail, this might be binary data - that's fine
+        return None
+    
+    @staticmethod
+    def _scan_excel_cell_content(file_data):
+        """Extract and scan actual cell content from Excel files (SRP: Excel-specific validation)"""
+        try:
+            import zipfile
+            from io import BytesIO
+            import xml.etree.ElementTree as ET
+            
+            with zipfile.ZipFile(BytesIO(file_data), 'r') as zip_file:
+                # Extract text content from cells only - ignore XML structure
+                cell_texts = []
+                
+                # Read shared strings (where most text content is stored)
+                try:
+                    shared_strings = zip_file.read('xl/sharedStrings.xml')
+                    root = ET.fromstring(shared_strings)
+                    for t_elem in root.iter():
+                        if t_elem.tag.endswith('}t') and t_elem.text:
+                            cell_texts.append(t_elem.text)
+                except:
+                    pass
+                
+                # Read worksheet cells for inline strings and formulas
+                for file_info in zip_file.infolist():
+                    if file_info.filename.startswith('xl/worksheets/'):
+                        try:
+                            worksheet = zip_file.read(file_info.filename)
+                            root = ET.fromstring(worksheet)
+                            for elem in root.iter():
+                                # Check for formula injection in formulas
+                                if elem.tag.endswith('}f') and elem.text:
+                                    FileSecurityValidator._check_excel_formula(elem.text)
+                                # Check inline strings
+                                elif elem.tag.endswith('}t') and elem.text:
+                                    cell_texts.append(elem.text)
+                        except:
+                            continue
+                
+                # CRITICAL: Scan extracted cell content as plain text
+                if cell_texts:
+                    combined_text = '\n'.join(cell_texts)
+                    _logger.info(f"Scanning {len(cell_texts)} Excel cell values, {len(combined_text)} total characters")
+                    # Only scan the actual cell content, not XML structure
+                    FileSecurityValidator._detect_script_execution(combined_text, is_csv=False, is_excel=True)
+                else:
+                    # SECURITY: If we found no cell content, the file might be suspicious or our extraction failed
+                    _logger.warning("No cell content found in Excel file - potential security concern")
+                    # Continue with minimal validation rather than failing, but log the concern
+                
+                # Note: We deliberately do NOT scan raw XML content as it contains
+                # legitimate XML attributes that can trigger false positives
+                    
+        except zipfile.BadZipFile:
+            raise ValueError("Corrupted XLSX file - invalid ZIP structure")
+        except Exception as e:
+            # If we can't read the Excel file, that's suspicious
+            _logger.error(f"Excel validation failed: {str(e)}")
+            raise ValueError(f"Could not validate Excel file structure - potential security threat: {str(e)}")
+    
+    @staticmethod
+    def _check_excel_formula(formula):
+        """Check Excel formulas for malicious content (SRP: Formula validation only)"""
+        dangerous_formulas = [
+            r'=.*cmd\s*\|',  # Command execution
+            r'=.*powershell',  # PowerShell execution  
+            r'=.*system\s*\(',  # System calls
+            r'=.*exec\s*\(',  # Exec calls
+        ]
+        
+        for pattern in dangerous_formulas:
+            if re.search(pattern, formula, re.IGNORECASE):
+                raise ValueError("Malicious Excel formula detected")
+    
+    @staticmethod
+    def _detect_script_execution(content, is_csv=False, is_excel=False):
+        """Context-aware script execution detection (SRP: Script detection only)"""
+        # Normalize content for consistent matching
+        content_normalized = FileSecurityValidator._normalize_content(content)
+        
+        # Debug: Log sample of content being scanned
+        sample_content = content_normalized[:500] + "..." if len(content_normalized) > 500 else content_normalized
+        _logger.info(f"Content sample being scanned: {repr(sample_content)}")
+        
+        # Debug: Quick test for obvious malicious content
+        if 'import os' in content_normalized:
+            _logger.error(f"DIRECT MATCH: Found 'import os' in content!")
+        if 'import sys' in content_normalized:
+            _logger.error(f"DIRECT MATCH: Found 'import sys' in content!")
+        if 'import socket' in content_normalized:
+            _logger.error(f"DIRECT MATCH: Found 'import socket' in content!")
+        
+        # For data files (CSV/Excel), be more lenient with certain patterns
+        categories_to_check = FileSecurityValidator.SCRIPT_EXECUTION_PATTERNS.keys()
+        
+        # Skip shell execution checks for Excel cell content (too many false positives)
+        if is_excel:
+            categories_to_check = [k for k in categories_to_check if k != 'shell_execution']
+        
+        # Check each category of script patterns
+        _logger.info(f"Checking categories: {list(categories_to_check)} for {'Excel' if is_excel else 'CSV' if is_csv else 'Unknown'} content")
+        
+        for category in categories_to_check:
+            patterns = FileSecurityValidator.SCRIPT_EXECUTION_PATTERNS[category]
+            _logger.info(f"Checking {category} with {len(patterns)} patterns")
+            
+            for pattern in patterns:
+                try:
+                    matches = list(re.finditer(pattern, content_normalized, re.IGNORECASE | re.MULTILINE | re.DOTALL))
+                    if matches:
+                        _logger.info(f"Found {len(matches)} matches for {category} pattern: {pattern}")
+                        for match in matches:
+                            _logger.info(f"Match found: '{match.group(0)}' at position {match.start()}-{match.end()}")
+                            # Additional context validation for certain patterns
+                            if FileSecurityValidator._validate_script_context(match, content_normalized, category, is_csv, is_excel):
+                                _logger.error(f"SECURITY THREAT DETECTED: {category} pattern matched - '{match.group(0)}'")
+                                raise ValueError(f"Script execution detected: {category} pattern matched")
+                            else:
+                                _logger.info(f"Match dismissed by context validation: '{match.group(0)}'")
+                    # else:
+                    #     _logger.info(f"No matches for {category} pattern: {pattern}")
+                except re.error:
+                    # Skip invalid regex patterns
+                    _logger.warning(f"Invalid regex pattern in {category}: {pattern}")
+                    continue
+    
+    @staticmethod
+    def _normalize_content(content):
+        """Normalize content for consistent pattern matching (SRP: Content normalization)"""
+        # Remove excessive whitespace but preserve structure for context analysis
+        normalized = re.sub(r'\s+', ' ', content)
+        # Remove common obfuscation attempts
+        normalized = normalized.replace('\x00', '')  # Remove null bytes
+        return normalized
+    
+    @staticmethod
+    def _validate_script_context(match, content, category, is_csv=False, is_excel=False):
+        """Validate if a pattern match is actually executable code vs. legitimate data (SRP: Context validation)"""
+        matched_text = match.group(0)
+        start_pos = match.start()
+        end_pos = match.end()
+        
+        # Get surrounding context (50 chars before and after)
+        context_start = max(0, start_pos - 50)
+        context_end = min(len(content), end_pos + 50)
+        context = content[context_start:context_end]
+        
+        # Context-specific validation rules with file type awareness
+        if category == 'python_imports':
+            # Allow "import/export business" but block "import os"
+            return FileSecurityValidator._is_python_import_execution(matched_text, context)
+        
+        elif category == 'sql_injection':
+            # Allow "I want to select a product" but block "'; DROP TABLE"
+            return FileSecurityValidator._is_sql_injection_attempt(matched_text, context)
+        
+        elif category == 'shell_execution':
+            # For data files, be more careful - many false positives
+            if is_csv or is_excel:
+                # Only flag if it really looks like a command with arguments
+                return FileSecurityValidator._is_actual_shell_command(matched_text, context)
+            return True
+        
+        elif category in ['web_scripts', 'command_injection']:
+            # These are almost always malicious in data context
+            return True
+        
+        elif category == 'excel_formula_injection':
+            # Only relevant for Excel files
+            return is_excel
+        
+        elif category == 'file_attacks':
+            # Path traversal attempts are always suspicious
+            return True
+        
+        # Default: if we're not sure, err on the side of security
+        return True
+    
+    @staticmethod
+    def _is_actual_shell_command(matched_text, context):
+        """Check if this is actually a shell command vs. regular text (SRP: Shell command validation)"""
+        # Look for command-like indicators
+        command_indicators = [
+            r'[;&|]\s*\w+\s+',  # Command chaining
+            r'^\s*\w+\s+-\w+',  # Command with flags
+            r'\$\(',  # Command substitution
+            r'`.*`',  # Backtick substitution
+            r'#!/',  # Shebang
+        ]
+        
+        for indicator in command_indicators:
+            if re.search(indicator, context, re.IGNORECASE):
+                return True
+        
+        return False
+    
+    @staticmethod
+    def _is_python_import_execution(matched_text, context):
+        """Check if this is actual Python import vs. business term (SRP: Python context validation)"""
+        # Look for code indicators around the import
+        code_indicators = [
+            r'[;\n]\s*import\s+',  # Import after statement separator
+            r'import\s+\w+\s*[;\n]',  # Import followed by statement separator
+            r'from\s+\w+\s+import\s+',  # From-import syntax
+            r'import\s+\w+\s*\.',  # Import followed by method call
+        ]
+        
+        for indicator in code_indicators:
+            if re.search(indicator, context, re.IGNORECASE):
+                return True
+        
+        return False
+    
+    @staticmethod
+    def _is_sql_injection_attempt(matched_text, context):
+        """Check if this is actual SQL injection vs. legitimate data (SRP: SQL context validation)"""
+        # Look for SQL injection indicators
+        injection_indicators = [
+            r"';\s*(drop|delete|insert|update)",  # Statement termination followed by SQL
+            r"union\s+select\s+",  # UNION SELECT attack
+            r"--.*[;\n]",  # SQL comment followed by statement
+            r"\)\s*;\s*(drop|delete)",  # Parenthesis closure followed by dangerous SQL
+        ]
+        
+        for indicator in injection_indicators:
+            if re.search(indicator, context, re.IGNORECASE):
+                return True
+        
+        return False
     
     @staticmethod
     def _validate_csv_structure(file_data):
@@ -345,7 +675,7 @@ class FileSecurityValidator:
     
     @staticmethod
     def _validate_excel_content(file_data, file_ext):
-        """Validate Excel file content using magic numbers"""
+        """Validate Excel file content using magic numbers and content scanning"""
         if len(file_data) < 8:
             raise ValueError("File too small to be valid Excel file")
         
@@ -354,12 +684,17 @@ class FileSecurityValidator:
             # XLSX files are ZIP archives, should start with ZIP signature
             if not file_data.startswith(b'PK\x03\x04'):
                 raise ValueError("Invalid XLSX file format")
+            # Additional content scanning for XLSX files
+            FileSecurityValidator._scan_excel_cell_content(file_data)
         elif file_ext == '.xls':
             # XLS files use OLE format
             if not file_data.startswith(b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1'):
                 raise ValueError("Invalid XLS file format")
+            # For XLS files, we can only do basic binary scanning
+            FileSecurityValidator._scan_malicious_content(file_data)
         
         return True
+    
     
     @staticmethod
     def validate_mime_type(file_data, filename):
@@ -432,6 +767,61 @@ class FileSecurityValidator:
             raise ValueError(f"Invalid {file_ext} file signature. Expected one of {expected_sigs}, got {actual_sig}")
         
         return True
+
+    @staticmethod
+    def _validate_excel_headers(first_row_cells):
+        """Validate that Excel file has proper column headers (SRP: Header validation)"""
+        if not first_row_cells:
+            raise ValueError("Excel file must contain column headers in the first row")
+        
+        # Extract header values
+        headers = [cell[1].strip().lower() if isinstance(cell[1], str) else str(cell[1]).strip().lower() 
+                  for cell in first_row_cells if cell[1]]
+        
+        if not headers:
+            raise ValueError("Excel file headers cannot be empty")
+        
+        # Check for minimum number of headers
+        if len(headers) < 1:
+            raise ValueError("Excel file must have at least one column header")
+        
+        # Check for proper column headers (should contain at least some meaningful text)
+        meaningful_headers = [h for h in headers if len(h) > 1 and not h.isdigit() and h not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
+        if len(meaningful_headers) == 0:
+            raise ValueError("Excel file must contain meaningful column headers (not just numbers or single characters)")
+        
+        # Headers should look like column names, not code
+        malicious_header_patterns = [
+            r'^import\s+\w+$',  # Python imports as headers
+            r'^from\s+\w+\s+import',  # From imports
+            r'^def\s+\w+\s*\(',  # Function definitions
+            r'^class\s+\w+',  # Class definitions
+            r'^#!/',  # Shebang lines
+            r'^<script',  # Script tags
+            r'^<\?php',  # PHP tags
+            r'^\s*(rm|mv|cp|dd|sudo|su)\s+',  # Shell commands
+            r'^\s*(exec|eval|system)\s*\(',  # Execution functions
+            r'^select\s+\*\s+from',  # SQL queries
+            r'^drop\s+table',  # SQL drops
+        ]
+        
+        # Check each header for malicious patterns
+        for header in headers:
+            for pattern in malicious_header_patterns:
+                if re.search(pattern, header, re.IGNORECASE):
+                    raise ValueError(f"Invalid header detected: '{header}' looks like executable code, not a column name")
+        
+        # Headers should be reasonable length (not huge code blocks)
+        for header in headers:
+            if len(header) > 100:  # Reasonable header length limit
+                raise ValueError(f"Header too long: '{header[:50]}...' (max 100 characters)")
+        
+        # Check for suspiciously repetitive patterns (like code)
+        if len(headers) > 5:
+            # If most headers start with same pattern, might be code
+            import_count = sum(1 for h in headers if h.startswith(('import ', 'from ')))
+            if import_count > len(headers) * 0.5:  # More than 50% are imports
+                raise ValueError("Too many import-like headers detected - this looks like code, not data headers")
 
 class CSVImportController(http.Controller):
     UPLOAD_DIR = os.path.join(
