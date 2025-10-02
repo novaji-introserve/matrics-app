@@ -72,16 +72,7 @@
         # "data/demo_data/risk_assessment/risk_subject.xml",
         "data/demo_data/risk_assessment/risk_subject_region.xml",
         "data/demo_data/risk_assessment/digital_delivery_channel.xml",
-        # "data/demo_data/risk_assessment/customer_type.xml",
-        # "data/demo_data/risk_assessment/jurisdiction.xml",
-        # "data/demo_data/risk_assessment/delivery_channel.xml",
-        # "data/demo_data/risk_assessment/product_services.xml",
        
-
-        # "data/demo_data/risk_assessment/compliance_history.xml",
-        # "data/demo_data/risk_assessment/data_quality.xml",
-        # "data/demo_data/risk_assessment/transaction_behavior.xml",
-        # 'data/demo_data/risk_assessment/digital_delivery_channel_assessment.xml',
         "data/demo_data/account/account_type.xml",
         "data/demo_data/education/educational_level.xml",
         "data/demo_data/tier/customer_tier.xml",
