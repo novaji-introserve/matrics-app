@@ -187,3 +187,83 @@ if __name__ == '__main__':
     )
 
     unittest.main(verbosity=2)
+    
+    
+    
+    
+    
+    
+# #!/usr/bin/env python3
+# """
+# SQL Injection Protection Tests for File Upload System
+
+# This module tests various SQL injection attack vectors that could be attempted
+# through file uploads and ensures they are properly blocked by our security measures.
+# """
+
+# import unittest
+# from unittest.mock import patch
+# from ..controllers.csv_import_controller import FileSecurityValidator
+
+
+# class TestSQLInjectionProtection(unittest.TestCase):
+#     """Test protection against SQL injection attacks through file uploads"""
+    
+#     def test_filename_sql_injection_protection(self):
+#         """Test that SQL injection attempts in filenames are blocked"""
+#         sql_injection_filenames = [
+#             "'; DROP TABLE users; --.csv",
+#             "test'; INSERT INTO admin VALUES ('hacker', 'password'); --.csv", 
+#             "data'; UPDATE users SET password='hacked' WHERE id=1; --.csv",
+#             "file'; DELETE FROM * WHERE 1=1; --.csv",
+#             "report' UNION SELECT * FROM passwords --.csv",
+#             "data.csv'; EXEC xp_cmdshell('format c:'); --",
+#             "test.csv' OR '1'='1",
+#             "file.csv\"; DROP DATABASE production; --"
+#         ]
+        
+#         for filename in sql_injection_filenames:
+#             with self.subTest(filename=filename):
+#                 with self.assertRaises(ValueError) as context:
+#                     FileSecurityValidator.validate_filename(filename)
+#                 # Should fail due to invalid characters or dangerous patterns
+#                 self.assertTrue(
+#                     "Invalid characters" in str(context.exception) or
+#                     "File type not allowed" in str(context.exception) or
+#                     "not allowed" in str(context.exception)
+#                 )
+    
+#     def test_malicious_script_filenames(self):
+#         """Test that script file extensions are blocked"""
+#         script_files = [
+#             "backdoor.php.csv",  # Double extension attack
+#             "script.py.csv", 
+#             "malware.exe.csv",
+#             "trojan.bat.csv",
+#             "virus.sh.csv"
+#         ]
+        
+#         for filename in script_files:
+#             with self.subTest(filename=filename):
+#                 with self.assertRaises(ValueError):
+#                     FileSecurityValidator.validate_filename(filename)
+
+#     def test_path_traversal_protection(self):
+#         """Test protection against path traversal attacks"""
+#         path_traversal_attempts = [
+#             "../../../etc/passwd.csv",
+#             "..\\..\\windows\\system32\\config\\sam.csv", 
+#             "....//....//etc//shadow.csv",
+#             "/etc/hosts.csv",
+#             "~/.ssh/id_rsa.csv"
+#         ]
+        
+#         for filename in path_traversal_attempts:
+#             with self.subTest(filename=filename):
+#                 with self.assertRaises(ValueError):
+#                     FileSecurityValidator.validate_filename(filename)
+
+
+# if __name__ == '__main__':
+#     unittest.main()
+    
