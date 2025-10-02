@@ -1,0 +1,738 @@
+<odoo>
+    <data noupdate="1">
+        <!-- Jurisdiction Plans -->
+
+        
+
+        <record id="risk_plan_abia"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Abia Region Analysis</field>
+            <field name="code">ABIA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'abia'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Abia region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_abia" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_adamawa"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Adamawa Region Analysis</field>
+            <field name="code">ADAMAWA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'adamawa'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Adamawa region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_adamawa" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_akwa_ibom"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Akwa Ibom Region Analysis</field>
+            <field name="code">AKWA_IBOM_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'akwa ibom'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Akwa Ibom region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_akwa_ibom" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_anambra"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Anambra Region Analysis</field>
+            <field name="code">ANAMBRA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'anambra'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Anambra region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_anambra" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_bauchi"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Bauchi Region Analysis</field>
+            <field name="code">BAUCHI_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'bauchi'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Bauchi region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_bauchi" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_bayelsa"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Bayelsa Region Analysis</field>
+            <field name="code">BAYELSA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'bayelsa'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Bayelsa region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_bayelsa" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_benue"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Benue Region Analysis</field>
+            <field name="code">BENUE_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'benue'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Benue region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_benue" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_borno"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Borno Region Analysis</field>
+            <field name="code">BORNO_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'borno'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Borno region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_borno" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_cross_river"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Cross River Region Analysis</field>
+            <field name="code">CROSS_RIVER_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'cross river'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Cross River region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_cross_river" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_delta"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Delta Region Analysis</field>
+            <field name="code">DELTA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'delta'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Delta region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_delta" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_edo"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Edo Region Analysis</field>
+            <field name="code">EDO_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'edo'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Edo region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_edo" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_ekiti"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Ekiti Region Analysis</field>
+            <field name="code">EKITI_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'ekiti'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Ekiti region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_ekiti" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_enugu"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Enugu Region Analysis</field>
+            <field name="code">ENUGU_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'enugu'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Enugu region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_enugu" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_gombe"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Gombe Region Analysis</field>
+            <field name="code">GOMBE_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'gombe'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Gombe region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_gombe" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_imo"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Imo Region Analysis</field>
+            <field name="code">IMO_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'imo'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Imo region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_imo" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_jigawa"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Jigawa Region Analysis</field>
+            <field name="code">JIGAWA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'jigawa'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Jigawa region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_jigawa" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_kaduna"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Kaduna Region Analysis</field>
+            <field name="code">KADUNA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'kaduna'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Kaduna region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_kaduna" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_kano"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Kano Region Analysis</field>
+            <field name="code">KANO_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'kano'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Kano region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_kano" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_katsina"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Katsina Region Analysis</field>
+            <field name="code">KATSINA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'katsina'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Katsina region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_katsina" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_kebbi"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Kebbi Region Analysis</field>
+            <field name="code">KEBBI_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'kebbi'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Kebbi region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_kebbi" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_kogi"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Kogi Region Analysis</field>
+            <field name="code">KOGI_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'kogi'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Kogi region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_kogi" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_kwara"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Kwara Region Analysis</field>
+            <field name="code">KWARA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'kwara'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Kwara region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_kwara" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_lagos"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Lagos Region Analysis</field>
+            <field name="code">LAGOS_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+AND LOWER(trim(rb.region)) = 'lagos'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Lagos region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_lagos" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_niger"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Niger Region Analysis</field>
+            <field name="code">NIGER_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'niger'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Niger region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_niger" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_ogun"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Ogun Region Analysis</field>
+            <field name="code">OGUN_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'ogun'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Ogun region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_ogun" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_ondo"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Ondo Region Analysis</field>
+            <field name="code">ONDO_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'ondo'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Ondo region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_ondo" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        
+        <record id="risk_plan_osun"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Osun Region Analysis</field>
+            <field name="code">OSUN_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'osun'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Osun region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_osun" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_oyo"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Oyo Region Analysis</field>
+            <field name="code">OYO_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'oyo'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Oyo region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_oyo" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_plateau"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Plateau Region Analysis</field>
+            <field name="code">PLATEAU_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'plateau'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Plateau region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_plateau" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_rivers"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Rivers Region Analysis</field>
+            <field name="code">RIVERS_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'rivers'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Rivers region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_rivers" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_sokoto"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Sokoto Region Analysis</field>
+            <field name="code">SOKOTO_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'sokoto'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Sokoto region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_sokoto" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+       
+        <record id="risk_plan_zamfara"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Zamfara Region Analysis</field>
+            <field name="code">ZAMFARA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'zamfara'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Zamfara region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_zamfara" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+        <record id="risk_plan_abuja"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Abuja Region Analysis</field>
+            <field name="code">ABUJA_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'abuja'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Abuja region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_abuja" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+    </data>
+
+
+</odoo>

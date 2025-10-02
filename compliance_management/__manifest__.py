@@ -69,19 +69,19 @@
         "data/demo_data/risk_assessment/risk_universe.xml",
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
-        "data/demo_data/risk_assessment/risk_subject.xml",
-        "data/demo_data/risk_assessment/risk_subject_2.xml",
+        # "data/demo_data/risk_assessment/risk_subject.xml",
+        "data/demo_data/risk_assessment/risk_subject_region.xml",
         "data/demo_data/risk_assessment/digital_delivery_channel.xml",
-        "data/demo_data/risk_assessment/customer_type.xml",
-        "data/demo_data/risk_assessment/jurisdiction.xml",
-        "data/demo_data/risk_assessment/delivery_channel.xml",
-        "data/demo_data/risk_assessment/product_services.xml",
+        # "data/demo_data/risk_assessment/customer_type.xml",
+        # "data/demo_data/risk_assessment/jurisdiction.xml",
+        # "data/demo_data/risk_assessment/delivery_channel.xml",
+        # "data/demo_data/risk_assessment/product_services.xml",
        
 
-        "data/demo_data/risk_assessment/compliance_history.xml",
-        "data/demo_data/risk_assessment/data_quality.xml",
-        "data/demo_data/risk_assessment/transaction_behavior.xml",
-        'data/demo_data/risk_assessment/digital_delivery_channel_assessment.xml',
+        # "data/demo_data/risk_assessment/compliance_history.xml",
+        # "data/demo_data/risk_assessment/data_quality.xml",
+        # "data/demo_data/risk_assessment/transaction_behavior.xml",
+        # 'data/demo_data/risk_assessment/digital_delivery_channel_assessment.xml',
         "data/demo_data/account/account_type.xml",
         "data/demo_data/education/educational_level.xml",
         "data/demo_data/tier/customer_tier.xml",
@@ -110,22 +110,28 @@
         'data/demo_data/stat/compliance_stats.xml',
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
-        'data/demo_data/plan/jurisdiction_plan.xml',
-        'data/demo_data/plan/customer_type_plan.xml',
-        'data/demo_data/plan/assessment_plan.xml',
+       
         'data/blacklist.xml',
         "views/customer_screening.xml",
         'views/transaction_screening_history.xml',
         "views/menu_actions.xml",
        
-        # Custom data
-        # Sterling
-        # "custom_demo/sterling/01_product_service_subject.xml",
-        # 'custom_demo/sterling/02_product_service_assessments.xml',
-        # 'custom_demo/sterling//03_sterling_product_risk_plan.xml',
         
         # Altbank
-        # 'custom_demo/altbank/03_sterling_product_risk_plan.xml',
+        
+        # Risk Subjects
+        "custom_demo/altbank/subjects/account_product.xml",
+        "custom_demo/altbank/subjects/customer_industry.xml",
+        
+        # Risk Assessments
+        "custom_demo/altbank/risk_assessment/jurisdiction_as.xml",
+        "custom_demo/altbank/risk_assessment/account_product_assessments.xml",
+        "custom_demo/altbank/risk_assessment/customer_industry_assessments.xml",
+       
+        # Risk Plans
+        "custom_demo/altbank/risk_plan/account_product_plans.xml",
+        "custom_demo/altbank/risk_plan/customer_industry_plans.xml",
+        # "custom_demo/altbank/risk_plan/jurisdiction_plan.xml"
     ],
     # only loaded in demonstration mode
     "demo": [
