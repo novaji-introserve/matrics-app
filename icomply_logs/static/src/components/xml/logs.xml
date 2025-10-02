@@ -8,8 +8,18 @@
                     <div class="d-flex align-items-center">
                         <h5 class="mb-0 me-3">
                             <i class="fa fa-terminal me-2"/>
-                            IComply System Logs
+                            <t t-if="state.profileInfo">
+                                <t t-esc="state.profileInfo.name"/> - System Logs
+                            </t>
+                            <t t-else="">
+                                IComply System Logs
+                            </t>
                         </h5>
+                        
+                        <!-- Profile Badge -->
+                        <span t-if="state.profileInfo" class="badge bg-info me-2">
+                            Profile ID: <t t-esc="state.profileId"/>
+                        </span>
                         
                         <!-- Connection Status -->
                         <span class="badge me-2" t-att-class="connectionStatusInfo.class">
@@ -41,9 +51,33 @@
                         </span>
                         
                         <!-- File Position (debug info) -->
-                        <span class="text-muted small" t-if="!hasTerminalService">
+                        <span class="text-muted small">
                             Pos: <t t-esc="state.filePosition"/>
                         </span>
+                    </div>
+                </div>
+                
+                <!-- Profile Info Row -->
+                <div t-if="state.profileInfo" class="mt-2 pt-2 border-top border-secondary">
+                    <div class="row small text-muted">
+                        <div class="col-md-4" t-if="state.profileInfo.company">
+                            <i class="fa fa-building-o me-1"/>
+                            Company: <t t-esc="state.profileInfo.company"/>
+                        </div>
+                        <div class="col-md-4" t-if="state.profileInfo.log_file">
+                            <i class="fa fa-file-text-o me-1"/>
+                            Log File: <t t-esc="state.profileInfo.log_file"/>
+                        </div>
+                        <div class="col-md-4" t-if="state.profileInfo.status">
+                            <i class="fa fa-info-circle me-1"/>
+                            Status: <span class="badge badge-sm" 
+                                          t-att-class="{
+                                              'bg-success': state.profileInfo.status === 'active',
+                                              'bg-secondary': state.profileInfo.status !== 'active'
+                                          }">
+                                <t t-esc="state.profileInfo.status"/>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -55,7 +89,7 @@
                         <!-- Auto Scroll Toggle -->
                         <button type="button" 
                                 t-on-click="toggleAutoScroll" 
-                                t-att-class="state.autoScroll ? 'btn btn-sm btn-success' : 'btn btn-sm btn-outline-light'"
+                                t-att-class="state.autoScroll ? 'btn btn-sm btn-success' : 'btn btn-sm btn-outline-secondary'"
                                 title="Toggle auto-scroll">
                             <i class="fa fa-arrow-down"/> Auto Scroll
                         </button>
@@ -102,14 +136,6 @@
                                 class="btn btn-sm btn-outline-light"
                                 title="Refresh all logs">
                             <i class="fa fa-refresh"/> Refresh
-                        </button>
-                        
-                        <!-- Test Log -->
-                        <button type="button" 
-                                t-on-click="sendTestLog" 
-                                class="btn btn-sm btn-outline-light"
-                                title="Send test log message">
-                            <i class="fa fa-flask"/> Test
                         </button>
                         
                         <!-- Clear -->
@@ -182,10 +208,22 @@
                  t-ref="terminalBody"
                  style="font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 13px; line-height: 1.4;">
                 
+                <!-- Profile Not Initialized -->
+                <div t-if="!state.profileId" class="text-center p-5 text-muted">
+                    <i class="fa fa-user-circle fa-4x mb-3"/>
+                    <h5>No Profile Selected</h5>
+                    <p>Please select a profile to view logs</p>
+                    <button type="button" 
+                            t-on-click="backToProfiles" 
+                            class="btn btn-primary mt-3">
+                        <i class="fa fa-list"/> Select Profile
+                    </button>
+                </div>
+                
                 <!-- No logs message -->
-                <div t-if="!state.logs.length" class="text-center p-4 text-muted">
+                <div t-if="state.profileId and !state.logs.length" class="text-center p-4 text-muted">
                     <i class="fa fa-inbox fa-3x mb-3"/>
-                    <p>No logs available</p>
+                    <p>No logs available for this profile</p>
                     <button type="button" t-on-click="refreshLogs" class="btn btn-sm btn-outline-light">
                         Load Logs
                     </button>
@@ -242,6 +280,9 @@
             <div class="terminal-status-bar bg-secondary text-light p-2 border-top">
                 <div class="d-flex justify-content-between align-items-center small">
                     <div class="d-flex gap-3">
+                        <span t-if="state.profileId">
+                            <i class="fa fa-user"/> Profile: <t t-esc="state.profileId"/>
+                        </span>
                         <span>
                             <i class="fa fa-eye"/> Visible: <t t-esc="visibleLogsCount"/>
                         </span>
@@ -254,7 +295,7 @@
                     </div>
                     <div class="d-flex gap-3">
                         <span>
-                            Service: <t t-esc="hasTerminalService ? 'Active' : 'Direct Polling'"/>
+                            Service: <t t-esc="hasTerminalService ? 'Active' : 'Disconnected'"/>
                         </span>
                         <span>
                             <i class="fa fa-clock-o"/> <t t-esc="formattedLastUpdate"/>
@@ -356,6 +397,20 @@
             
             .bg-danger {
                 background-color: #dc3545 !important;
+            }
+            
+            .bg-info {
+                background-color: #0dcaf0 !important;
+            }
+            
+            /* Profile info section */
+            .terminal-header .row.small {
+                font-size: 0.85rem;
+            }
+            
+            .badge-sm {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
             }
         </style>
     </t>

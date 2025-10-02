@@ -16,6 +16,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/menu_views.xml',
+        'views/log_views.xml'
     ],
    "assets": {
     "web.assets_backend": [
@@ -28,5 +29,5 @@
 },
     'installable': True,
     'application': True,
-    'post_init_hook': 'post_init_hook',
+    # 'post_init_hook': 'post_init_hook',
 }

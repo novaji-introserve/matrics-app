@@ -2,35 +2,18 @@
 import { registry } from "@web/core/registry";
 
 /**
- * IComply Terminal Service - Real-time log display terminal (File-based)
- * 
- * Features:
- * - Real-time log message display from server log files
- * - No database storage - reads directly from log files
- * - File position tracking for efficient polling
- * - Bus service integration for live updates
- * - Message filtering and searching
- * - Automatic log refresh from file system
+ * IComply Terminal Service - Multi-profile log viewer
  */
 export const icomplyTerminalService = {
     dependencies: ['bus_service', 'rpc'],
 
     start(env, { bus_service, rpc }) {
-        const logs = [];
-        const listeners = new Set();
-        const MAX_LOGS = 500; // Reduced for better performance
-        
-        let pollInterval = null;
-        let filePosition = 0; // Track file reading position
-        let isInitialized = false;
-        let isPaused = false;
+        const profileSessions = new Map(); // profileId -> session data
+        const MAX_LOGS = 10000;
 
-        /**
-         * Format timestamp consistently
-         */
         function formatTimestamp(date) {
             if (typeof date === 'string') {
-                return date; // Already formatted
+                return date;
             }
             const d = new Date(date);
             const year = d.getFullYear();
@@ -39,14 +22,27 @@ export const icomplyTerminalService = {
             const hours = String(d.getHours()).padStart(2, '0');
             const minutes = String(d.getMinutes()).padStart(2, '0');
             const seconds = String(d.getSeconds()).padStart(2, '0');
-
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         }
 
-        /**
-         * Add a log entry
-         */
-        function addLog(message, type = 'info', timestamp = null, level = null, skipNotify = false) {
+        function getOrCreateSession(profileId) {
+            if (!profileSessions.has(profileId)) {
+                profileSessions.set(profileId, {
+                    logs: [],
+                    listeners: new Set(),
+                    filePosition: 0,
+                    isPaused: false,
+                    pollInterval: null,
+                    isInitialized: false,
+                    profileInfo: null,
+                });
+            }
+            return profileSessions.get(profileId);
+        }
+
+        function addLog(profileId, message, type = 'info', timestamp = null, level = null, skipNotify = false) {
+            const session = getOrCreateSession(profileId);
+            
             if (!timestamp) {
                 timestamp = formatTimestamp(new Date());
             }
@@ -56,28 +52,25 @@ export const icomplyTerminalService = {
                 type, 
                 timestamp: formatTimestamp(timestamp), 
                 level: level || type.toUpperCase(),
-                id: Date.now() + Math.random() // Simple unique ID
+                id: Date.now() + Math.random()
             };
 
-            // Add to logs array
-            logs.push(logEntry);
+            session.logs.push(logEntry);
 
-            // Limit logs length for performance
-            if (logs.length > MAX_LOGS) {
-                logs.shift();
+            if (session.logs.length > MAX_LOGS) {
+                session.logs.shift();
             }
 
-            // Notify listeners unless specifically skipped
             if (!skipNotify) {
-                notifyListeners(logEntry);
+                notifyListeners(profileId, logEntry);
             }
         }
 
-        /**
-         * Notify all registered listeners
-         */
-        function notifyListeners(logEntry) {
-            listeners.forEach(listener => {
+        function notifyListeners(profileId, logEntry) {
+            const session = profileSessions.get(profileId);
+            if (!session) return;
+
+            session.listeners.forEach(listener => {
                 try {
                     listener(logEntry.message, logEntry.type, logEntry.timestamp, logEntry.level);
                 } catch (e) {
@@ -86,51 +79,53 @@ export const icomplyTerminalService = {
             });
         }
 
-        /**
-         * Load recent logs from file
-         */
-        async function loadRecentLogs() {
+        async function loadAllLogs(profileId) {
             try {
-                const recentLogs = await rpc('/icomply/logs/recent', { limit: 100 });
+                const session = getOrCreateSession(profileId);
+                console.log(`Loading all logs for profile ${profileId}...`);
                 
-                // Clear existing logs and add fresh ones
-                logs.length = 0;
+                const allLogs = await rpc('/icomply/logs/all', { 
+                    profile_id: profileId,
+                    limit: null
+                });
                 
-                recentLogs.forEach(log => {
+                session.logs.length = 0;
+                
+                console.log(`Received ${allLogs.length} logs for profile ${profileId}`);
+                
+                allLogs.forEach(log => {
                     addLog(
+                        profileId,
                         log.message,
                         log.type,
                         log.timestamp,
                         log.level,
-                        true // Skip notify during bulk load
+                        true
                     );
                 });
 
-                // Single notification for refresh
-                if (isInitialized) {
-                    addLog('Logs refreshed from file system', 'info');
+                if (session.isInitialized) {
+                    addLog(profileId, `Loaded ${allLogs.length} logs from file system`, 'success');
+                } else {
+                    console.log(`Initial load for profile ${profileId}: ${allLogs.length} logs loaded`);
                 }
 
-                console.log(`Loaded ${recentLogs.length} recent logs from file`);
             } catch (error) {
-                console.error('Error loading recent logs:', error);
-                addLog(`Error loading logs: ${error.message}`, 'error');
+                console.error(`Error loading logs for profile ${profileId}:`, error);
+                addLog(profileId, `Error loading logs: ${error.message}`, 'error');
             }
         }
 
-        /**
-         * Poll for new logs from file (incremental)
-         */
-        async function pollNewLogs() {
-            if (isPaused) return;
-
+        async function pollNewLogs(profileId) {
+            const session = getOrCreateSession(profileId);
+            
             try {
                 const result = await rpc('/icomply/logs/poll', { 
-                    last_position: filePosition 
+                    profile_id: profileId,
+                    last_position: session.filePosition 
                 });
 
                 if (result.logs && result.logs.length > 0) {
-                    // Map log levels to terminal types
                     const levelMapping = {
                         'DEBUG': 'info',
                         'INFO': 'info',
@@ -142,248 +137,284 @@ export const icomplyTerminalService = {
                     result.logs.forEach(log => {
                         const type = levelMapping[log.level] || 'info';
                         addLog(
+                            profileId,
                             log.message,
                             type,
                             log.timestamp,
-                            log.level
+                            log.level,
+                            session.isPaused
                         );
                     });
 
-                    console.log(`Polled ${result.logs.length} new logs from file`);
+                    if (!session.isPaused) {
+                        console.log(`Polled ${result.logs.length} new logs for profile ${profileId}`);
+                    }
                 }
 
-                // Update file position
-                filePosition = result.position;
+                session.filePosition = result.position;
 
             } catch (error) {
-                console.error('Error polling new logs:', error);
-                // Don't spam error messages for polling failures
-                if (isInitialized) {
-                    addLog(`Polling error: ${error.message}`, 'warning');
+                console.error(`Error polling logs for profile ${profileId}:`, error);
+                if (session.isInitialized && !session.isPaused) {
+                    addLog(profileId, `Polling error: ${error.message}`, 'warning');
                 }
             }
         }
 
-        /**
-         * Initialize the terminal service
-         */
-        async function initialize() {
+        async function initialize(profileId) {
             try {
-                // Load initial logs from file
-                await loadRecentLogs();
+                const session = getOrCreateSession(profileId);
                 
-                // Set up bus service for real-time updates (optional enhancement)
-                bus_service.addChannel('icomply_logs_realtime');
+                // Load profile information
+                const profileInfo = await rpc('/icomply/logs/profile/info', { 
+                    profile_id: profileId 
+                });
+                
+                if (profileInfo.error) {
+                    console.error('Profile not found:', profileId);
+                    addLog(profileId, 'Error: Profile not found', 'error');
+                    return;
+                }
+                
+                session.profileInfo = profileInfo;
+                
+                // Load all logs
+                await loadAllLogs(profileId);
+                
+                // Get initial file position
+                try {
+                    const result = await rpc('/icomply/logs/poll', { 
+                        profile_id: profileId,
+                        last_position: 0 
+                    });
+                    session.filePosition = result.position;
+                    console.log(`Initial file position for profile ${profileId}: ${session.filePosition}`);
+                } catch (e) {
+                    console.warn(`Could not set initial file position for profile ${profileId}:`, e);
+                }
+                
+                // Subscribe to bus channel
+                const channel = `icomply_logs_realtime_${profileId}`;
+                bus_service.addChannel(channel);
 
-                // Listen for real-time log broadcasts
                 bus_service.addEventListener('notification', (ev) => {
                     const notifications = ev.detail;
                     if (Array.isArray(notifications)) {
                         notifications.forEach((notification) => {
-                            if (notification.type === 'new_logs' && notification.payload) {
+                            if (notification.type === 'new_logs' && 
+                                notification.payload && 
+                                notification.payload.profile_id === profileId) {
                                 const payload = notification.payload;
                                 if (payload.logs && Array.isArray(payload.logs)) {
                                     payload.logs.forEach(log => {
                                         addLog(
+                                            profileId,
                                             log.message, 
                                             log.type, 
                                             log.timestamp, 
                                             log.level
                                         );
                                     });
-                                    filePosition = payload.position;
+                                    session.filePosition = payload.position;
                                 }
                             }
                         });
                     }
                 });
 
-                // Set up polling for new logs (every 2 seconds)
-                pollInterval = setInterval(() => {
-                    pollNewLogs();
+                // Start polling
+                session.pollInterval = setInterval(() => {
+                    pollNewLogs(profileId);
                 }, 2000);
 
-                isInitialized = true;
-                addLog('IComply Terminal initialized successfully (File-based)', 'success');
+                session.isInitialized = true;
+                addLog(profileId, `Terminal initialized for ${profileInfo.name}`, 'success');
 
             } catch (error) {
-                console.error('Error initializing terminal service:', error);
-                addLog(`Terminal initialization error: ${error.message}`, 'error');
+                console.error(`Error initializing profile ${profileId}:`, error);
+                addLog(profileId, `Initialization error: ${error.message}`, 'error');
             }
         }
 
-        /**
-         * Send a log message to the server (optional - for manual logging)
-         */
-        async function sendLog(message, level = 'INFO', module = null) {
-            try {
-                // Add locally first for immediate feedback
-                const timestamp = formatTimestamp(new Date());
-                const type = level.toLowerCase() === 'error' ? 'error' : 
-                            level.toLowerCase() === 'warning' ? 'warning' :
-                            level.toLowerCase() === 'critical' ? 'error' : 'info';
-                
-                addLog(message, type, timestamp, level);
-
-                // Send to server (this will write to log file and be picked up by polling)
-                await rpc('/icomply/logs/send', {
-                    message: message,
-                    level: level,
-                    module: module
-                });
-
-            } catch (error) {
-                console.error('Error sending log:', error);
-                addLog(`Failed to send log to server: ${error.message}`, 'error');
+        function cleanup(profileId) {
+            const session = profileSessions.get(profileId);
+            if (session && session.pollInterval) {
+                clearInterval(session.pollInterval);
+                session.pollInterval = null;
             }
         }
 
-        /**
-         * Get log statistics from file
-         */
-        async function getStats() {
-            try {
-                return await rpc('/icomply/logs/stats');
-            } catch (error) {
-                console.error('Error getting log stats:', error);
-                return {};
-            }
+        function cleanupAll() {
+            profileSessions.forEach((session, profileId) => {
+                cleanup(profileId);
+            });
         }
 
-        /**
-         * Cleanup function
-         */
-        function cleanup() {
-            if (pollInterval) {
-                clearInterval(pollInterval);
-                pollInterval = null;
-            }
-        }
+        window.addEventListener('beforeunload', cleanupAll);
 
-        // Initialize the service
-        initialize();
-
-        // Handle page unload
-        window.addEventListener('beforeunload', cleanup);
-
-        // Return public interface
         return {
-            /**
-             * Add a new log entry locally
-             */
-            addLog,
+            async initProfile(profileId) {
+                await initialize(profileId);
+            },
 
-            /**
-             * Send a log message to the server (will be written to file)
-             */
-            sendLog,
+            addLog(profileId, message, type, timestamp, level) {
+                addLog(profileId, message, type, timestamp, level);
+            },
 
-            /**
-             * Register a listener for new log entries
-             * @param {Function} listener - Callback function(message, type, timestamp, level)
-             * @returns {Function} - Function to unregister the listener
-             */
-            onLog(listener) {
-                listeners.add(listener);
+            onLog(profileId, listener) {
+                const session = getOrCreateSession(profileId);
+                session.listeners.add(listener);
                 return () => {
-                    listeners.delete(listener);
+                    session.listeners.delete(listener);
                 };
             },
 
-            /**
-             * Get all logged messages
-             */
-            getLogs() {
-                return [...logs];
+            getLogs(profileId) {
+                const session = profileSessions.get(profileId);
+                return session ? [...session.logs] : [];
             },
 
-            /**
-             * Clear all local logs (memory only)
-             */
-            clearLogs() {
-                logs.length = 0;
-                addLog('Local logs cleared', 'info');
+            clearLogs(profileId) {
+                const session = profileSessions.get(profileId);
+                if (session) {
+                    session.logs.length = 0;
+                    addLog(profileId, 'Local logs cleared', 'info');
+                }
             },
 
-            /**
-             * Refresh logs from file system
-             */
-            async refreshLogs() {
-                await loadRecentLogs();
+            async reloadAllLogs(profileId) {
+                await loadAllLogs(profileId);
             },
 
-            /**
-             * Force poll for new logs immediately
-             */
-            async pollNow() {
-                await pollNewLogs();
+            async refreshRecentLogs(profileId, limit = 100) {
+                try {
+                    const session = getOrCreateSession(profileId);
+                    const recentLogs = await rpc('/icomply/logs/recent', { 
+                        profile_id: profileId,
+                        limit: limit,
+                        get_all: false 
+                    });
+                    
+                    session.logs.length = 0;
+                    
+                    recentLogs.forEach(log => {
+                        addLog(
+                            profileId,
+                            log.message,
+                            log.type,
+                            log.timestamp,
+                            log.level,
+                            true
+                        );
+                    });
+
+                    addLog(profileId, `Refreshed with ${recentLogs.length} recent logs`, 'info');
+                } catch (error) {
+                    console.error('Error loading recent logs:', error);
+                    addLog(profileId, `Error loading logs: ${error.message}`, 'error');
+                }
             },
 
-            /**
-             * Get log statistics from file
-             */
-            getStats,
-
-            /**
-             * Pause/resume polling
-             */
-            pausePolling() {
-                isPaused = true;
-                addLog('Log polling paused', 'info');
+            async pollNow(profileId) {
+                await pollNewLogs(profileId);
             },
 
-            resumePolling() {
-                isPaused = false;
-                addLog('Log polling resumed', 'info');
+            async getStats(profileId) {
+                try {
+                    return await rpc('/icomply/logs/stats', { profile_id: profileId });
+                } catch (error) {
+                    console.error('Error getting log stats:', error);
+                    return {};
+                }
             },
 
-            isPaused() {
-                return isPaused;
+            pausePolling(profileId) {
+                const session = profileSessions.get(profileId);
+                if (session) {
+                    session.isPaused = true;
+                    addLog(profileId, 'Display paused - logs still accumulating', 'info');
+                }
             },
 
-            /**
-             * Get current file position
-             */
-            getFilePosition() {
-                return filePosition;
+            resumePolling(profileId) {
+                const session = profileSessions.get(profileId);
+                if (session) {
+                    session.isPaused = false;
+                    addLog(profileId, 'Display resumed - showing accumulated logs', 'info');
+                    
+                    // Notify about accumulated logs
+                    session.listeners.forEach(listener => {
+                        session.logs.slice(-50).forEach(log => {
+                            try {
+                                listener(log.message, log.type, log.timestamp, log.level);
+                            } catch (e) {
+                                console.error('Error in terminal listener:', e);
+                            }
+                        });
+                    });
+                }
             },
 
-            /**
-             * Reset file position (will re-read from beginning on next poll)
-             */
-            resetFilePosition() {
-                filePosition = 0;
-                addLog('File position reset - will re-read from beginning', 'info');
+            isPaused(profileId) {
+                const session = profileSessions.get(profileId);
+                return session ? session.isPaused : false;
             },
 
-            /**
-             * Manual cleanup
-             */
-            cleanup,
-
-            /**
-             * Check if service is initialized
-             */
-            isInitialized() {
-                return isInitialized;
+            getFilePosition(profileId) {
+                const session = profileSessions.get(profileId);
+                return session ? session.filePosition : 0;
             },
 
-            /**
-             * Get polling status
-             */
-            getStatus() {
+            resetFilePosition(profileId) {
+                const session = profileSessions.get(profileId);
+                if (session) {
+                    session.filePosition = 0;
+                    addLog(profileId, 'File position reset', 'info');
+                }
+            },
+
+            getProfileInfo(profileId) {
+                const session = profileSessions.get(profileId);
+                return session ? session.profileInfo : null;
+            },
+
+            cleanup(profileId) {
+                cleanup(profileId);
+            },
+
+            cleanupAll,
+
+            isInitialized(profileId) {
+                const session = profileSessions.get(profileId);
+                return session ? session.isInitialized : false;
+            },
+
+            getStatus(profileId) {
+                const session = profileSessions.get(profileId);
+                if (!session) {
+                    return {
+                        initialized: false,
+                        paused: false,
+                        filePosition: 0,
+                        logCount: 0,
+                        listenerCount: 0,
+                        maxLogs: MAX_LOGS,
+                        profileInfo: null,
+                    };
+                }
+
                 return {
-                    initialized: isInitialized,
-                    paused: isPaused,
-                    filePosition: filePosition,
-                    logCount: logs.length,
-                    listenerCount: listeners.size
+                    initialized: session.isInitialized,
+                    paused: session.isPaused,
+                    filePosition: session.filePosition,
+                    logCount: session.logs.length,
+                    listenerCount: session.listeners.size,
+                    maxLogs: MAX_LOGS,
+                    profileInfo: session.profileInfo,
                 };
             }
         };
     }
 };
 
-icomplyTerminalService.template = "icomply.Terminal";
-// Register the service
 registry.category("services").add("icomply_terminal", icomplyTerminalService);

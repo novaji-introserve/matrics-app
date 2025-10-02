@@ -1,129 +1,218 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Tree View -->
-    <!-- <record id="icomply_logs_tree_view" model="ir.ui.view">
-        <field name="name">icomply.logs.tree</field>
-        <field name="model">icomply.logs</field>
+    <!-- Log Profile Tree View -->
+    <record id="view_icomply_log_profile_tree" model="ir.ui.view">
+        <field name="name">icomply.log.profile.tree</field>
+        <field name="model">icomply.log.profile</field>
         <field name="arch" type="xml">
-            <tree string="System Logs" decoration-danger="level=='ERROR'" 
-                  decoration-warning="level=='WARNING'" decoration-info="level=='INFO'"
-                  default_order="timestamp desc">
-                <field name="timestamp"/>
-                <field name="level"/>
-                <field name="logger_name"/>
-                <field name="module"/>
-                <field name="message"/>
+            <tree string="Log Profiles">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="log_file_path"/>
+                <field name="file_exists" widget="boolean_toggle"/>
+                <field name="file_size"/>
+                <field name="line_count"/>
+                <field name="last_accessed"/>
+                <field name="active" widget="boolean_toggle"/>
             </tree>
         </field>
-    </record> -->
+    </record>
 
-    <!-- Form View -->
-    <record id="icomply_logs_form_view" model="ir.ui.view">
-        <field name="name">icomply.logs.form</field>
-        <field name="model">icomply.logs</field>
+    <!-- Log Profile Kanban View -->
+    <record id="view_icomply_log_profile_kanban" model="ir.ui.view">
+        <field name="name">icomply.log.profile.kanban</field>
+        <field name="model">icomply.log.profile</field>
         <field name="arch" type="xml">
-            <form string="System Log Entry">
+            <kanban class="o_kanban_mobile">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="log_file_path"/>
+                <field name="file_exists"/>
+                <field name="file_size"/>
+                <field name="line_count"/>
+                <field name="color"/>
+                <field name="last_accessed"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="active" widget="boolean_toggle"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="text-muted">
+                                        <i class="fa fa-file-text-o"/> 
+                                        <field name="log_file_path"/>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span t-if="record.file_exists.raw_value" class="badge badge-success">
+                                            <i class="fa fa-check"/> Accessible
+                                        </span>
+                                        <span t-else="" class="badge badge-danger">
+                                            <i class="fa fa-times"/> Not Found
+                                        </span>
+                                        <span class="badge badge-info ml-1">
+                                            <field name="file_size"/>
+                                        </span>
+                                        <span class="badge badge-secondary ml-1">
+                                            <field name="line_count"/> lines
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <button name="action_open_terminal" 
+                                                type="object" 
+                                                class="btn btn-primary btn-sm">
+                                            <i class="fa fa-terminal"/> Open Terminal
+                                        </button>
+                                        <button name="action_test_log_file" 
+                                                type="object" 
+                                                class="btn btn-secondary btn-sm ml-1">
+                                            <i class="fa fa-check-circle"/> Test
+                                        </button>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <small class="text-muted">
+                                            Last: <field name="last_accessed"/>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Log Profile Form View -->
+    <record id="view_icomply_log_profile_form" model="ir.ui.view">
+        <field name="name">icomply.log.profile.form</field>
+        <field name="model">icomply.log.profile</field>
+        <field name="arch" type="xml">
+            <form string="Log Profile">
                 <header>
-                    <button name="action_refresh_logs" type="object" string="Refresh Logs" class="oe_highlight"/>
-                    <button name="action_show_stats" type="object" string="Show Stats"/>
+                    <button name="action_open_terminal" 
+                            string="Open Terminal" 
+                            type="object" 
+                            class="oe_highlight"
+                            icon="fa-terminal"/>
+                    <button name="action_test_log_file" 
+                            string="Test File Access" 
+                            type="object"
+                            icon="fa-check-circle"/>
+                    <button name="action_refresh_info" 
+                            string="Refresh Info" 
+                            type="object"
+                            icon="fa-refresh"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_terminal" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-terminal">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Open</span>
+                                <span class="o_stat_text">Terminal</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" 
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Application Logs"/>
+                        </h1>
+                    </div>
+                    
                     <group>
+                        <group string="Basic Information">
+                            <field name="log_file_path" placeholder="/var/log/odoo/odoo.log"/>
+                            <field name="description" placeholder="Description of this log profile..."/>
+                            <field name="active"/>
+                            <field name="sequence"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                        
+                        <group string="File Information">
+                            <field name="file_exists" widget="boolean_toggle"/>
+                            <field name="file_size"/>
+                            <field name="line_count"/>
+                            <field name="last_accessed"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Display Settings">
                         <group>
-                            <field name="timestamp"/>
-                            <field name="level"/>
-                            <field name="logger_name"/>
-                            <field name="module"/>
+                            <field name="auto_scroll"/>
+                            <field name="show_timestamp"/>
                         </group>
                         <group>
-                            <field name="function_name"/>
-                            <field name="line_number"/>
-                            <field name="process_id"/>
-                            <field name="thread_id"/>
-                            <field name ="message"/>
-                            <field name="exception_info" widget="text" string="Exception Info" attrs="{'invisible': [('exception_info', '=', False)]}"/>
+                            <field name="show_level"/>
+                            <field name="max_lines"/>
                         </group>
-                         <group>
-                            <field name="detail_ids" string="">
-                                <tree editable="bottom" delete="false" no_open="1" limit="1000">
-                                </tree>
-                            </field>
-                        </group>
-
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <!-- Search View -->
-    <record id="icomply_logs_search_view" model="ir.ui.view">
-        <field name="name">icomply.logs.search</field>
-        <field name="model">icomply.logs</field>
+    <!-- Log Profile Search View -->
+    <!-- <record id="view_icomply_log_profile_search" model="ir.ui.view">
+        <field name="name">icomply.log.profile.search</field>
+        <field name="model">icomply.log.profile</field>
         <field name="arch" type="xml">
-            <search string="Search System Logs">
-                <field name="message"/>
-                <field name="logger_name"/>
-                <field name="module"/>
-                <field name="level"/>
-                <separator/>
-                <filter string="Errors" name="errors" domain="[('level', '=', 'ERROR')]"/>
-                <filter string="Warnings" name="warnings" domain="[('level', '=', 'WARNING')]"/>
-                <filter string="Info" name="info" domain="[('level', '=', 'INFO')]"/>
-                <filter string="Debug" name="debug" domain="[('level', '=', 'DEBUG')]"/>
-                <separator/>
-                <filter string="Today" name="today" 
-                        domain="[('timestamp', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]"/>
-                <filter string="This Week" name="week" 
-                        domain="[('timestamp', '&gt;=', (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d 00:00:00'))]"/>
+            <search string="Log Profiles">
+                <field name="name"/>
+                <field name="log_file_path"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                <filter string="File Exists" name="file_exists" domain="[('file_exists', '=', True)]"/>
+                <filter string="File Not Found" name="file_not_found" domain="[('file_exists', '=', False)]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Level" name="group_level" context="{'group_by': 'level'}"/>
-                    <filter string="Module" name="group_module" context="{'group_by': 'module'}"/>
-                    <filter string="Logger" name="group_logger" context="{'group_by': 'logger_name'}"/>
-                    <filter string="Date" name="group_date" context="{'group_by': 'timestamp:day'}"/>
+                    <filter string="Status" name="group_active" context="{'group_by': 'active'}"/>
                 </group>
             </search>
         </field>
-    </record>
+    </record> -->
 
-    <!-- Action -->
-    <record id="action_open_logs_form" model="ir.actions.server">
-            <field name="name">Open System logs</field>
-            <field name="model_id" ref="model_icomply_logs"/>
-            <field name="binding_model_id" ref="model_icomply_logs"/>
-            <field name="state">code</field>
-            <field name="code">action = env['icomply.logs'].open_logs_form()</field>
-    </record>
-    <!-- Server Action for Refreshing Logs -->
-    <record id="action_refresh_logs" model="ir.actions.server">
-        <field name="name">Refresh Logs</field>
-        <field name="model_id" ref="model_icomply_logs"/>
-        <field name="state">code</field>
-        <field name="code">
-count = model.refresh_logs()
-env.user.notify_info(f"Refreshed {count} log entries")
+    <!-- Log Profile Action -->
+    <record id="action_icomply_log_profile" model="ir.actions.act_window">
+        <field name="name">Log Profiles</field>
+        <field name="res_model">icomply.log.profile</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first log profile
+            </p>
+            <p>
+                Log profiles allow you to monitor different log files from a centralized interface.
+                Click the create button to add a new log profile.
+            </p>
         </field>
     </record>
 
+    <!-- Menu Items -->
+    <menuitem id="menu_icomply_logs_root"
+              name="Logs"
+              sequence="100"
+              web_icon="icomply,static/description/icon.png"/>
 
-    <!-- Main Menu -->
-    <menuitem id="menu_icomply_logs_root" 
-              name="System Logs" 
-              web_icon="icomply_logs,static/description/icon.png"
-              sequence="100"/>
-    
-    <!-- Sub Menu -->
-    <menuitem id="menu_icomply_logs" 
-              name="System Logs" 
+    <menuitem id="menu_icomply_log_profiles"
+              name="Log Profiles"
               parent="menu_icomply_logs_root"
-              action="action_open_logs_form"
+              action="action_icomply_log_profile"
               sequence="10"/>
-              
-    <!-- Add to Settings menu as well -->
-    <menuitem id="menu_icomply_logs_settings" 
-              name="System Logs" 
-              parent="base.menu_administration"
-              action="action_open_logs_form"
-              sequence="100"/>
-
 </odoo>

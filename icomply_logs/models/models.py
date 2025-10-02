@@ -1,5 +1,6 @@
 import os
 import logging
+import re
 from datetime import datetime
 from odoo import models, fields, api, http
 from odoo.exceptions import AccessError, UserError
@@ -13,45 +14,131 @@ class IcomplyLogs(models.TransientModel):
     _name = 'icomply.logs'
     _description = 'Real-time Log Viewer'
 
-    def _get_log_file_path(self, log_file_path=None):
-        """Resolve log file path: param → Odoo config → None"""
+    def _get_log_file_path(self, profile_id=None, log_file_path=None):
+        """Resolve log file path: profile → param → Odoo config → None"""
+        if profile_id:
+            profile = self.env['icomply.log.profile'].browse(profile_id)
+            if profile.exists():
+                return profile.log_file_path
+        
         if log_file_path:
             return log_file_path
-        return config.get("logfile")  # None if logs go to stdout
+            
+        return config.get("logfile")
 
-    def _is_valid_log_line(self, line):
-        """Check if a line follows the expected Odoo log format"""
-        if not line or len(line) < 20:
-            return False
+    def _extract_timestamp(self, line):
+        """Try to extract timestamp from common log formats"""
+        timestamp_patterns = [
+            # Odoo format: 2025-03-26 08:59:25
+            (r'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})', '%Y-%m-%d %H:%M:%S'),
+            # Nginx/Apache: [26/Mar/2025:08:59:25 +0000]
+            (r'\[(\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2})', '%d/%b/%Y:%H:%M:%S'),
+            # ISO format: 2025-03-26T08:59:25
+            (r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})', '%Y-%m-%dT%H:%M:%S'),
+            # Syslog: Mar 26 08:59:25
+            (r'(\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})', '%b %d %H:%M:%S'),
+        ]
+        
+        for pattern, date_format in timestamp_patterns:
+            match = re.search(pattern, line)
+            if match:
+                try:
+                    timestamp_str = match.group(1)
+                    timestamp = datetime.strptime(timestamp_str, date_format)
+                    # For syslog format without year, add current year
+                    if date_format == '%b %d %H:%M:%S':
+                        timestamp = timestamp.replace(year=datetime.now().year)
+                    return timestamp
+                except ValueError:
+                    continue
+        
+        return None
+
+    def _extract_level(self, line):
+        """Try to extract log level from the line"""
+        # Look for common log levels
+        level_patterns = [
+            (r'\b(CRITICAL|FATAL)\b', 'CRITICAL', 'error'),
+            (r'\bERROR\b', 'ERROR', 'error'),
+            (r'\b(WARN|WARNING)\b', 'WARNING', 'warning'),
+            (r'\bINFO\b', 'INFO', 'info'),
+            (r'\bDEBUG\b', 'DEBUG', 'info'),
+        ]
+        
+        for pattern, level, log_type in level_patterns:
+            if re.search(pattern, line, re.IGNORECASE):
+                return level, log_type
+        
+        # Check for HTTP status codes
+        status_match = re.search(r'\s(\d{3})\s', line)
+        if status_match:
+            status = int(status_match.group(1))
+            if status >= 500:
+                return 'ERROR', 'error'
+            elif status >= 400:
+                return 'WARNING', 'warning'
+            else:
+                return 'INFO', 'info'
+        
+        # Default
+        return 'INFO', 'info'
+
+    def _parse_log_line(self, line, log_counter):
+        """Parse any log line - universal parser"""
         try:
-            date_part = line[:10]
-            datetime.strptime(date_part, '%Y-%m-%d')
-            return True
-        except ValueError:
-            return False
+            line = line.strip()
+            
+            # Skip empty lines
+            if not line:
+                return None
+            
+            # Extract timestamp (or use current time as fallback)
+            timestamp = self._extract_timestamp(line)
+            if not timestamp:
+                timestamp = datetime.now()
+            
+            # Extract log level
+            level, log_type = self._extract_level(line)
+            
+            # Generate unique ID
+            log_id = f"{timestamp.timestamp()}-{log_counter}"
+            
+            # The entire line is the message
+            message = line
+            
+            # Try to extract module/source (anything before a colon or in brackets)
+            module = ''
+            module_match = re.search(r'^\[?([^\]:\s]+)[\]:]', line)
+            if module_match:
+                module = module_match.group(1)
+            
+            return {
+                'id': log_id,
+                'message': message,
+                'type': log_type,
+                'timestamp': timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                'level': level,
+                'module': module,
+            }
+            
+        except Exception as e:
+            _logger.debug(f"Error parsing log line: {e}")
+            # Even if parsing fails, return a basic log entry
+            return {
+                'id': f"parse-error-{log_counter}",
+                'message': line.strip() if line else "Empty line",
+                'type': 'info',
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'level': 'INFO',
+                'module': 'unknown',
+            }
 
-    def _tail(self, file, n):
-        """Read last n lines from file efficiently"""
-        file.seek(0, 2)  # Go to end of file
-        file_size = file.tell()
-        if file_size == 0:
-            return []
-        avg_line_length = 100
-        read_size = min(file_size, n * avg_line_length)
-        file.seek(max(0, file_size - read_size))
-        lines = file.readlines()
-        while len(lines) < n and file.tell() > read_size:
-            read_size *= 2
-            file.seek(max(0, file_size - read_size))
-            lines = file.readlines()
-        return lines[-n:]
-
- 
     @api.model
-    def get_logs_from_file(self, log_file_path=None, limit=1000, last_position=0):
-        log_file_path = self._get_log_file_path(log_file_path)
+    def get_logs_from_file(self, profile_id=None, log_file_path=None, limit=1000, last_position=0):
+        """Get new logs from file since last position"""
+        log_file_path = self._get_log_file_path(profile_id, log_file_path)
         if not log_file_path or not os.path.exists(log_file_path):
-            _logger.warning("No logfile configured or found.")
+            _logger.warning(f"No logfile configured or found: {log_file_path}")
             return {'logs': [], 'position': last_position}
 
         logs = []
@@ -68,192 +155,181 @@ class IcomplyLogs(models.TransientModel):
 
                 log_counter = 0
                 for line in new_lines:
-                    try:
-                        line = line.strip()
-                        if not line or not self._is_valid_log_line(line):
-                            continue
-                        parts = line.split(' ', 5)
-                        if len(parts) >= 5:
-                            timestamp_str = f"{parts[0]} {parts[1]}".split(',')[0]
-                            try:
-                                timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S')
-                            except ValueError:
-                                continue
-                            log_id = f"{timestamp.timestamp()}-{log_counter}"
-                            log_counter += 1
-                            logs.append({
-                                'id': log_id,
-                                'timestamp': timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                                'process_id': parts[2],
-                                'level': parts[3],
-                                'logger_name': parts[4],
-                                'module': parts[5].split(':')[0] if ':' in parts[5] else '',
-                                'message': parts[5].split(':', 1)[1].strip() if ':' in parts[5] else parts[5],
-                            })
-                    except Exception:
-                        continue
+                    parsed_log = self._parse_log_line(line, log_counter)
+                    if parsed_log:
+                        logs.append(parsed_log)
+                        log_counter += 1
+                        
+                        if limit and len(logs) >= limit:
+                            break
         except Exception as e:
             _logger.error(f"Error accessing log file: {e}")
 
         return {'logs': logs, 'position': current_position}
 
     @api.model
-    def get_recent_logs(self, limit=100):
-        log_file_path = self._get_log_file_path()
+    def get_all_logs(self, profile_id=None, log_file_path=None, limit=None):
+        """Get ALL logs from the log file from the beginning"""
+        log_file_path = self._get_log_file_path(profile_id, log_file_path)
         if not log_file_path or not os.path.exists(log_file_path):
-            _logger.warning("No logfile configured or found.")
+            _logger.warning(f"No logfile configured or found: {log_file_path}")
             return []
 
         logs = []
+        log_counter = 0
+        
         try:
-            with open(log_file_path, 'r', encoding="utf-8") as file:
-                lines = self._tail(file, limit * 2)
-                log_counter = 0
+            _logger.info(f"Reading all logs from: {log_file_path}")
+            
+            with open(log_file_path, 'r', encoding="utf-8", errors='replace') as file:
+                for line in file:
+                    parsed_log = self._parse_log_line(line, log_counter)
+                    if parsed_log:
+                        logs.append(parsed_log)
+                        log_counter += 1
+                        
+                        if limit and len(logs) >= limit:
+                            break
+            
+            _logger.info(f"Successfully read {len(logs)} logs from file")
+                        
+        except Exception as e:
+            _logger.error(f"Error reading log file: {e}")
+            return []
+
+        return logs
+
+    @api.model
+    def get_recent_logs(self, profile_id=None, log_file_path=None, limit=100, get_all=False):
+        """Get logs from the log file"""
+        if get_all:
+            return self.get_all_logs(profile_id=profile_id, log_file_path=log_file_path, limit=limit)
+        
+        log_file_path = self._get_log_file_path(profile_id, log_file_path)
+        if not log_file_path or not os.path.exists(log_file_path):
+            _logger.warning(f"No logfile configured or found: {log_file_path}")
+            return []
+
+        logs = []
+        log_counter = 0
+        
+        try:
+            with open(log_file_path, 'r', encoding="utf-8", errors='replace') as file:
+                lines = file.readlines()
+                
                 for line in lines:
-                    try:
-                        line = line.strip()
-                        if not line or not self._is_valid_log_line(line):
-                            continue
-                        parts = line.split(' ', 5)
-                        if len(parts) >= 5:
-                            timestamp_str = f"{parts[0]} {parts[1]}".split(',')[0]
-                            try:
-                                timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S')
-                            except ValueError:
-                                continue
-                            level_mapping = {
-                                'DEBUG': 'info',
-                                'INFO': 'info',
-                                'WARNING': 'warning',
-                                'ERROR': 'error',
-                                'CRITICAL': 'error',
-                            }
-                            log_id = f"{timestamp.timestamp()}-{log_counter}"
-                            log_counter += 1
-                            logs.append({
-                                'id': log_id,
-                                'message': parts[5].split(':', 1)[1].strip() if ':' in parts[5] else parts[5],
-                                'type': level_mapping.get(parts[3], 'info'),
-                                'timestamp': timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                                'level': parts[3],
-                                'module': parts[5].split(':')[0] if ':' in parts[5] else '',
-                            })
-                            if len(logs) >= limit:
-                                break
-                    except Exception:
-                        continue
+                    parsed_log = self._parse_log_line(line, log_counter)
+                    if parsed_log:
+                        logs.append(parsed_log)
+                        log_counter += 1
+                
+                if limit and len(logs) > limit:
+                    return logs[-limit:]
+                    
         except Exception as e:
             _logger.error(f"Error reading log file: {e}")
 
-        return logs[-limit:] if len(logs) > limit else logs
+        return logs
 
     @api.model
-    def get_log_stats(self):
+    def get_log_stats(self, profile_id=None, log_file_path=None):
+        """Get statistics about today's logs"""
         today = datetime.now().date()
         stats = {'error': 0, 'warning': 0, 'info': 0, 'debug': 0}
 
-        log_file_path = self._get_log_file_path()
+        log_file_path = self._get_log_file_path(profile_id, log_file_path)
         if not log_file_path or not os.path.exists(log_file_path):
-            _logger.warning("No logfile configured or found.")
+            _logger.warning(f"No logfile configured or found: {log_file_path}")
             return stats
 
         try:
-            with open(log_file_path, 'r', encoding="utf-8") as file:
+            with open(log_file_path, 'r', encoding="utf-8", errors='replace') as file:
+                log_counter = 0
                 for line in file:
-                    try:
-                        line = line.strip()
-                        if not line or not self._is_valid_log_line(line):
-                            continue
-                        parts = line.split(' ', 5)
-                        if len(parts) >= 4:
-                            timestamp_str = f"{parts[0]} {parts[1]}".split(',')[0]
-                            try:
-                                log_date = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S').date()
-                            except ValueError:
-                                continue
+                    parsed_log = self._parse_log_line(line, log_counter)
+                    if parsed_log:
+                        try:
+                            log_date = datetime.strptime(parsed_log['timestamp'], '%Y-%m-%d %H:%M:%S').date()
                             if log_date == today:
-                                level = parts[3].lower()
-                                if level in stats:
-                                    stats[level] += 1
-                    except Exception:
-                        continue
+                                log_type = parsed_log['type']
+                                if log_type in stats:
+                                    stats[log_type] += 1
+                        except Exception:
+                            continue
+                    log_counter += 1
         except Exception as e:
             _logger.error(f"Error reading log file: {e}")
 
         return stats
 
-
     @api.model
-    def broadcast_new_logs(self, last_position=0):
-        result = self.get_logs_from_file(last_position=last_position)
+    def broadcast_new_logs(self, profile_id=None, log_file_path=None, last_position=0):
+        """Broadcast new logs via bus service"""
+        result = self.get_logs_from_file(profile_id=profile_id, log_file_path=log_file_path, last_position=last_position)
         new_logs = result['logs']
         current_position = result['position']
 
         if new_logs:
-            level_mapping = {
-                'DEBUG': 'info',
-                'INFO': 'info',
-                'WARNING': 'warning',
-                'ERROR': 'error',
-                'CRITICAL': 'error',
-            }
-            terminal_logs = []
-            for log in new_logs:
-                terminal_logs.append({
-                    'id': log['id'],
-                    'message': log['message'],
-                    'type': level_mapping.get(log['level'], 'info'),
-                    'timestamp': log['timestamp'],
-                    'level': log['level'],
-                    'module': log['module'],
-                })
-            channel = 'icomply_logs_realtime'
+            channel = f'icomply_logs_realtime_{profile_id or "default"}'
             self.env['bus.bus']._sendone(channel, 'new_logs', {
-                'logs': terminal_logs,
-                'position': current_position
+                'logs': new_logs,
+                'position': current_position,
+                'profile_id': profile_id
             })
         return current_position
 
-   
-    @api.model
-    def send_test_log(self, message="Test log message from terminal"):
-        print(f"[TEST] {message}")
-        return True
-
-    @api.model
-    def open_logs_terminal(self):
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'icomply_logs_terminal',
-            'name': 'System Logs Terminal',
-            'target': 'current',
-        }
-
-
 
 class IcomplyLogsController(http.Controller):
+    """HTTP Controller for log viewing endpoints with profile support"""
 
     @http.route('/icomply/logs/recent', type='json', auth='user')
-    def get_recent_logs(self, limit=100):
+    def get_recent_logs(self, profile_id=None, limit=100, get_all=False):
+        """Get logs from the log file"""
         logs_model = request.env['icomply.logs']
-        return logs_model.get_recent_logs(limit)
+        return logs_model.get_recent_logs(profile_id=profile_id, limit=limit, get_all=get_all)
+
+    @http.route('/icomply/logs/all', type='json', auth='user')
+    def get_all_logs(self, profile_id=None, limit=None):
+        """Get ALL logs from the log file"""
+        logs_model = request.env['icomply.logs']
+        result = logs_model.get_all_logs(profile_id=profile_id, limit=limit)
+        _logger.info(f"Returning {len(result)} logs to client for profile {profile_id}")
+        return result
 
     @http.route('/icomply/logs/poll', type='json', auth='user')
-    def poll_new_logs(self, last_position=0):
+    def poll_new_logs(self, profile_id=None, last_position=0):
+        """Poll for new logs since last position"""
         logs_model = request.env['icomply.logs']
-        return logs_model.get_logs_from_file(last_position=last_position)
+        return logs_model.get_logs_from_file(profile_id=profile_id, last_position=last_position)
 
     @http.route('/icomply/logs/stats', type='json', auth='user')
-    def get_log_stats(self):
+    def get_log_stats(self, profile_id=None):
+        """Get log statistics"""
         logs_model = request.env['icomply.logs']
-        return logs_model.get_log_stats()
+        return logs_model.get_log_stats(profile_id=profile_id)
 
     @http.route('/icomply/logs/broadcast', type='json', auth='user')
-    def broadcast_logs(self, last_position=0):
+    def broadcast_logs(self, profile_id=None, last_position=0):
+        """Broadcast new logs via bus service"""
         logs_model = request.env['icomply.logs']
-        return {'position': logs_model.broadcast_new_logs(last_position)}
+        return {'position': logs_model.broadcast_new_logs(profile_id=profile_id, last_position=last_position)}
 
-    @http.route('/icomply/logs/test', type='json', auth='user')
-    def send_test_log(self, message="Test log from API"):
-        logs_model = request.env['icomply.logs']
-        return logs_model.send_test_log(message)
+    @http.route('/icomply/logs/profile/info', type='json', auth='user')
+    def get_profile_info(self, profile_id):
+        """Get profile information"""
+        profile = request.env['icomply.log.profile'].browse(int(profile_id))
+        if not profile.exists():
+            return {'error': 'Profile not found'}
+        
+        return {
+            'id': profile.id,
+            'name': profile.name,
+            'log_file_path': profile.log_file_path,
+            'file_exists': profile.file_exists,
+            'file_size': profile.file_size,
+            'line_count': profile.line_count,
+            'auto_scroll': profile.auto_scroll,
+            'show_timestamp': profile.show_timestamp,
+            'show_level': profile.show_level,
+            'max_lines': profile.max_lines,
+        }
