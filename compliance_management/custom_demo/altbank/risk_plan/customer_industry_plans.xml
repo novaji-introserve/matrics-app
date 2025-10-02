@@ -1,0 +1,1659 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="risk_plan_cash_crops" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Cash Crops</field>
+        <field name="code">CASH_CROPS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'cash crops') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using cash crops product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_CASH_CROPS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_poultry" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Poultry</field>
+        <field name="code">POULTRY</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'poultry') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using poultry product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_POULTRY" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_lantation" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Lantation</field>
+        <field name="code">LANTATION</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'lantation') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using lantation product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_LANTATION" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_waste_collect" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Waste Collect</field>
+        <field name="code">WASTE_COLLECT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'waste collect') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using waste collect product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_WASTE_COLLECT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_automobile" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Automobile</field>
+        <field name="code">AUTOMOBILE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'automobile') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using automobile product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_AUTOMOBILE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_automotive_part" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Automotive Part</field>
+        <field name="code">AUTOMOTIVE_PART</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'automotive part') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using automotive part product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_AUTOMOTIVE_PART" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_chemical_and_ap" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Chemical And AP</field>
+        <field name="code">CHEMICAL_AND_AP</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'chemical and ap') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using chemical and ap product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_CHEMICAL_AND_AP" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_domestic_trade" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Domestic Trade</field>
+        <field name="code">DOMESTIC_TRADE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'domestic trade') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using domestic trade product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_DOMESTIC_TRADE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_generator_set" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Generator Set</field>
+        <field name="code">GENERATOR_SET</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'generator set') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using generator set product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_GENERATOR_SET" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_trading_cocoa" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Trading (Cocoa)</field>
+        <field name="code">TRADING_COCOA</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'trading cocoa') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using trading (cocoa) product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_TRADING_COCOA" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_trading_rice" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Trading (Rice)</field>
+        <field name="code">TRADING_RICE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'trading rice') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using trading (rice) product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_TRADING_RICE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_aluminium_prod" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Aluminium Prod</field>
+        <field name="code">ALUMINIUM_PROD</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'aluminium prod') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using aluminium prod product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_ALUMINIUM_PROD" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_metal_products" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Metal Products</field>
+        <field name="code">METAL_PRODUCTS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'metal products') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using metal products product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_METAL_PRODUCTS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_building_mat" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Building Mat</field>
+        <field name="code">BUILDING_MAT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'building mat') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using building mat product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_BUILDING_MAT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_cables_mines" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Cables &amp; Mines</field>
+        <field name="code">CABLES_MINES</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'cables mines') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using cables &amp; mines product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_CABLES_MINES" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_chem_prod" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Chem Prod</field>
+        <field name="code">CHEM_PROD</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'chem prod') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using chem prod product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_CHEM_PROD" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_flour_milling" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Flour Milling</field>
+        <field name="code">FLOUR_MILLING</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'flour milling') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using flour milling product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_FLOUR_MILLING" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_food_manuf" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Food Manuf</field>
+        <field name="code">FOOD_MANUF</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'food manuf') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using food manuf product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_FOOD_MANUF" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_paints_products" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Paints Products</field>
+        <field name="code">PAINTS_PRODUCTS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'paints products') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using paints products product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PAINTS_PRODUCTS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_paper_products" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Paper Products</field>
+        <field name="code">PAPER_PRODUCTS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'paper products') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using paper products product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PAPER_PRODUCTS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_personal_care" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Personal Care</field>
+        <field name="code">PERSONAL_CARE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'personal care') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using personal care product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PERSONAL_CARE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_printing" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Printing</field>
+        <field name="code">PRINTING</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'printing') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using printing product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PRINTING" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_rubber_products" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Rubber Products</field>
+        <field name="code">RUBBER_PRODUCTS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'rubber products') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using rubber products product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RUBBER_PRODUCTS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_textile_and_app" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Textile And App</field>
+        <field name="code">TEXTILE_AND_APP</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'textile and app') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using textile and app product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_TEXTILE_AND_APP" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_household_equip" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Household Equip</field>
+        <field name="code">HOUSEHOLD_EQUIP</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'household equip') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using household equip product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HOUSEHOLD_EQUIP" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_air_transport" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Air Transport</field>
+        <field name="code">AIR_TRANSPORT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'air transport') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using air transport product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_AIR_TRANSPORT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_postal_and_cour" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Postal And Cour</field>
+        <field name="code">POSTAL_AND_COUR</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'postal and cour') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using postal and cour product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_POSTAL_AND_COUR" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_road_transport" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Road Transport</field>
+        <field name="code">ROAD_TRANSPORT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'road transport') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using road transport product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_ROAD_TRANSPORT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_warehouse_sup" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Warehouse &amp; Sup</field>
+        <field name="code">WAREHOUSE_SUP</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'warehouse sup') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using warehouse &amp; sup product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_WAREHOUSE_SUP" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_water_transport" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Water Transport</field>
+        <field name="code">WATER_TRANSPORT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'water transport') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using water transport product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_WATER_TRANSPORT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_advertising" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Advertising</field>
+        <field name="code">ADVERTISING</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'advertising') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using advertising product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_ADVERTISING" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_computer_prog" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Computer Prog</field>
+        <field name="code">COMPUTER_PROG</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'computer prog') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using computer prog product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_COMPUTER_PROG" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_info_service" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Info Service</field>
+        <field name="code">INFO_SERVICE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'info service') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using info service product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_INFO_SERVICE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_publishing_act" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Publishing Act</field>
+        <field name="code">PUBLISHING_ACT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'publishing act') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using publishing act product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PUBLISHING_ACT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_telecomm" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Telecomm</field>
+        <field name="code">TELECOMM</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'telecomm') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using telecomm product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_TELECOMM" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_asset_mgmt" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Asset Mgmt</field>
+        <field name="code">ASSET_MGMT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'asset mgmt') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using asset mgmt product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_ASSET_MGMT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_commercial_bank" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Commercial Bank</field>
+        <field name="code">COMMERCIAL_BANK</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'commercial bank') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using commercial bank product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_COMMERCIAL_BANK" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_finance_comp" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Finance Comp</field>
+        <field name="code">FINANCE_COMP</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'finance comp') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using finance comp product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_FINANCE_COMP" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_insurance_comp" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Insurance Comp</field>
+        <field name="code">INSURANCE_COMP</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'insurance comp') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using insurance comp product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_INSURANCE_COMP" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_microfinancebnk" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For MicrofinanceBnk</field>
+        <field name="code">MICROFINANCEBNK</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'microfinancebnk') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using microfinancebnk product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_MICROFINANCEBNK" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_other_financial" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Other Financial</field>
+        <field name="code">OTHER_FINANCIAL</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'other financial') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using other financial product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_OTHER_FINANCIAL" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_stockbroking" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Stockbroking</field>
+        <field name="code">STOCKBROKING</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'stockbroking') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using stockbroking product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_STOCKBROKING" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_commercial_prop" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Commercial Prop</field>
+        <field name="code">COMMERCIAL_PROP</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'commercial prop') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using commercial prop product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_COMMERCIAL_PROP" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_real_estate" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Real Estate</field>
+        <field name="code">REAL_ESTATE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'real estate') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using real estate product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_REAL_ESTATE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_real_est_cons" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Real Est Cons</field>
+        <field name="code">REAL_EST_CONS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'real est cons') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using real est cons product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_REAL_EST_CONS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_res_mrtge_loans" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Res Mrtge Loans</field>
+        <field name="code">RES_MRTGE_LOANS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'res mrtge loans') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using res mrtge loans product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RES_MRTGE_LOANS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_civil_eng" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Civil Eng</field>
+        <field name="code">CIVIL_ENG</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'civil eng') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using civil eng product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_CIVIL_ENG" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_specializeconst" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For SpecializeConst</field>
+        <field name="code">SPECIALIZECONST</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'specializeconst') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using specializeconst product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_SPECIALIZECONST" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_legal_activites" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Legal Activites</field>
+        <field name="code">LEGAL_ACTIVITES</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'legal activites') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using legal activites product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_LEGAL_ACTIVITES" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_market_resrch" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Market Resrch</field>
+        <field name="code">MARKET_RESRCH</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'market resrch') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using market resrch product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_MARKET_RESRCH" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_engr_activities" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Engr Activities</field>
+        <field name="code">ENGR_ACTIVITIES</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'engr activities') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using engr activities product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_ENGR_ACTIVITIES" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_other_prof" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Other Prof</field>
+        <field name="code">OTHER_PROF</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'other prof') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using other prof product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_OTHER_PROF" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_edu_support_ser" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Edu Support Ser</field>
+        <field name="code">EDU_SUPPORT_SER</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'edu support ser') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using edu support ser product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_EDU_SUPPORT_SER" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_ther_education" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Ther Education</field>
+        <field name="code">THER_EDUCATION</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'ther education') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using ther education product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_THER_EDUCATION" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_re_pry" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Re Pry</field>
+        <field name="code">RE_PRY</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 're pry') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using re pry product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RE_PRY" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_margin_lending" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Margin Lending</field>
+        <field name="code">MARGIN_LENDING</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'margin lending') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using margin lending product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_MARGIN_LENDING" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_share_loans" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Share Loans</field>
+        <field name="code">SHARE_LOANS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'share loans') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using share loans product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_SHARE_LOANS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_crud_oil_refine" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Crud Oil Refine</field>
+        <field name="code">CRUD_OIL_REFINE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'crud oil refine') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using crud oil refine product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_CRUD_OIL_REFINE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_natural_gas" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Natural Gas</field>
+        <field name="code">NATURAL_GAS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'natural gas') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using natural gas product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_NATURAL_GAS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_oil_downstream" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Oil Downstream</field>
+        <field name="code">OIL_DOWNSTREAM</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'oil downstream') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using oil downstream product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_OIL_DOWNSTREAM" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_oil_upstream" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Oil Upstream</field>
+        <field name="code">OIL_UPSTREAM</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'oil upstream') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using oil upstream product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_OIL_UPSTREAM" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_oil_gas_serv" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Oil &amp; Gas Serv</field>
+        <field name="code">OIL_GAS_SERV</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'oil gas serv') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using oil &amp; gas serv product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_OIL_GAS_SERV" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_utility_pvt" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Utility(Pvt)</field>
+        <field name="code">UTILITY_PVT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'utility pvt') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using utility(pvt) product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_UTILITY_PVT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_utility_pub" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Utility(Pub)</field>
+        <field name="code">UTILITY_PUB</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'utility pub') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using utility(pub) product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_UTILITY_PUB" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_federal_direct" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Federal-Direct</field>
+        <field name="code">FEDERAL_DIRECT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'federal direct') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using federal-direct product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_FEDERAL_DIRECT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_federal_para" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Federal-Para</field>
+        <field name="code">FEDERAL_PARA</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'federal para') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using federal-para product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_FEDERAL_PARA" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_local_direct" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Local-Direct</field>
+        <field name="code">LOCAL_DIRECT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'local direct') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using local-direct product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_LOCAL_DIRECT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_local_para" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Local-Para</field>
+        <field name="code">LOCAL_PARA</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'local para') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using local-para product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_LOCAL_PARA" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_state_direct" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For State-Direct</field>
+        <field name="code">STATE_DIRECT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'state direct') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using state-direct product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_STATE_DIRECT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_state_para" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For State-Para</field>
+        <field name="code">STATE_PARA</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'state para') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using state-para product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_STATE_PARA" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_ind_power_proj" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Ind Power Proj</field>
+        <field name="code">IND_POWER_PROJ</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'ind power proj') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using ind power proj product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_IND_POWER_PROJ" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_power_gen" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Power Gen</field>
+        <field name="code">POWER_GEN</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'power gen') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using power gen product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_POWER_GEN" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_port_activities" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Port Activities</field>
+        <field name="code">PORT_ACTIVITIES</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'port activities') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using port activities product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PORT_ACTIVITIES" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_human_health" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Human Health</field>
+        <field name="code">HUMAN_HEALTH</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'human health') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using human health product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HUMAN_HEALTH" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_residentialcare" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For ResidentialCare</field>
+        <field name="code">RESIDENTIALCARE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'residentialcare') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using residentialcare product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RESIDENTIALCARE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_office_admin" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Office Admin</field>
+        <field name="code">OFFICE_ADMIN</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'office admin') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using office admin product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_OFFICE_ADMIN" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_sec_and_invest" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Sec And Invest</field>
+        <field name="code">SEC_AND_INVEST</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'sec and invest') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using sec and invest product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_SEC_AND_INVEST" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_travel_agency" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Travel Agency</field>
+        <field name="code">TRAVEL_AGENCY</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'travel agency') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using travel agency product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_TRAVEL_AGENCY" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_emp_acivities" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Emp Acivities</field>
+        <field name="code">EMP_ACIVITIES</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'emp acivities') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using emp acivities product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_EMP_ACIVITIES" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_hotel_leisure" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Hotel &amp; Leisure</field>
+        <field name="code">HOTEL_LEISURE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'hotel leisure') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using hotel &amp; leisure product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HOTEL_LEISURE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_personal" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Personal</field>
+        <field name="code">PERSONAL</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'personal') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using personal product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PERSONAL" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_religious_body" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Religious Body</field>
+        <field name="code">RELIGIOUS_BODY</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'religious body') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using religious body product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RELIGIOUS_BODY" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_retail_others" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Retail (Others)</field>
+        <field name="code">RETAIL_OTHERS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'retail others') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using retail (others) product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RETAIL_OTHERS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_solar" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Solar</field>
+        <field name="code">SOLAR</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'solar') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using solar product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_SOLAR" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_biomass" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Biomass</field>
+        <field name="code">BIOMASS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'biomass') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using biomass product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_BIOMASS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_wind_energy" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Wind Energy</field>
+        <field name="code">WIND_ENERGY</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'wind energy') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using wind energy product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_WIND_ENERGY" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_hydro" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Hydro</field>
+        <field name="code">HYDRO</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'hydro') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using hydro product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HYDRO" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_geothermal" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Geothermal</field>
+        <field name="code">GEOTHERMAL</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'geothermal') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using geothermal product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_GEOTHERMAL" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_associations_un" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Associations/Un</field>
+        <field name="code">ASSOCIATIONS_UN</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'associations un') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using associations/un product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_ASSOCIATIONS_UN" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_tech_bus" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Tech/Bus.</field>
+        <field name="code">TECH_BUS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'tech bus') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using tech/bus. product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_TECH_BUS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_dealers_in_farm" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Dealers in Farm</field>
+        <field name="code">DEALERS_IN_FARM</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'dealers in farm') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using dealers in farm product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_DEALERS_IN_FARM" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_accounting_prof" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Accounting Prof</field>
+        <field name="code">ACCOUNTING_PROF</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'accounting prof') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using accounting prof product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_ACCOUNTING_PROF" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_rubber_prod" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Rubber Prod</field>
+        <field name="code">RUBBER_PROD</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'rubber prod') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using rubber prod product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RUBBER_PROD" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_timber_prod" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Timber Prod</field>
+        <field name="code">TIMBER_PROD</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'timber prod') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using timber prod product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_TIMBER_PROD" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_other_agricult" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Other Agricult</field>
+        <field name="code">OTHER_AGRICULT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'other agricult') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using other agricult product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_OTHER_AGRICULT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_non_agricultur" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Non Agricultur</field>
+        <field name="code">NON_AGRICULTUR</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'non agricultur') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using non agricultur product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_NON_AGRICULTUR" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_groundnuts_and" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Groundnuts and</field>
+        <field name="code">GROUNDNUTS_AND</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'groundnuts and') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using groundnuts and product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_GROUNDNUTS_AND" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_veterinary_act" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Veterinary act</field>
+        <field name="code">VETERINARY_ACT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'veterinary act') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using veterinary act product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_VETERINARY_ACT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_precious_metal" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Precious Metal</field>
+        <field name="code">PRECIOUS_METAL</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'precious metal') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using precious metal product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PRECIOUS_METAL" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_wholesale_merc" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Wholesale Merc</field>
+        <field name="code">WHOLESALE_MERC</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'wholesale merc') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using wholesale merc product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_WHOLESALE_MERC" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_retail_merchan" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Retail Merchan</field>
+        <field name="code">RETAIL_MERCHAN</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'retail merchan') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using retail merchan product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RETAIL_MERCHAN" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_video_n_televi" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Video n televi</field>
+        <field name="code">VIDEO_N_TELEVI</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'video n televi') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using video n televi product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_VIDEO_N_TELEVI" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_programming_an" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Programming an</field>
+        <field name="code">PROGRAMMING_AN</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'programming an') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using programming an product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PROGRAMMING_AN" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_bdc_curr_deale" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For BDC,curr deale</field>
+        <field name="code">BDC_CURR_DEALE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'bdc curr deale') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using bdc,curr deale product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_BDC_CURR_DEALE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_investment_bro" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Investment Bro</field>
+        <field name="code">INVESTMENT_BRO</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'investment bro') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using investment bro product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_INVESTMENT_BRO" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_investment_ban" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Investment Ban</field>
+        <field name="code">INVESTMENT_BAN</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'investment ban') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using investment ban product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_INVESTMENT_BAN" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_trustees_and_f" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Trustees and F</field>
+        <field name="code">TRUSTEES_AND_F</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'trustees and f') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using trustees and f product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_TRUSTEES_AND_F" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_mortgage_insti" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Mortgage insti</field>
+        <field name="code">MORTGAGE_INSTI</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'mortgage insti') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using mortgage insti product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_MORTGAGE_INSTI" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_development_ba" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Development ba</field>
+        <field name="code">DEVELOPMENT_BA</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'development ba') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using development ba product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_DEVELOPMENT_BA" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_pension_fund_c" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Pension Fund c</field>
+        <field name="code">PENSION_FUND_C</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'pension fund c') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using pension fund c product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PENSION_FUND_C" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_pension_fund_a" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Pension Fund a</field>
+        <field name="code">PENSION_FUND_A</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'pension fund a') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using pension fund a product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PENSION_FUND_A" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_portfolio_mgr" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Portfolio MGR</field>
+        <field name="code">PORTFOLIO_MGR</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'portfolio mgr') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using portfolio mgr product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PORTFOLIO_MGR" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_store_value_ca" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Store Value Ca</field>
+        <field name="code">STORE_VALUE_CA</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'store value ca') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using store value ca product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_STORE_VALUE_CA" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_residential_mo" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Residential Mo</field>
+        <field name="code">RESIDENTIAL_MO</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'residential mo') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using residential mo product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RESIDENTIAL_MO" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_clients_and_ex" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Clients and Ex</field>
+        <field name="code">CLIENTS_AND_EX</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'clients and ex') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using clients and ex product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_CLIENTS_AND_EX" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_share_facility" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Share Facility</field>
+        <field name="code">SHARE_FACILITY</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'share facility') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using share facility product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_SHARE_FACILITY" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_share_underwri" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Share underwri</field>
+        <field name="code">SHARE_UNDERWRI</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'share underwri') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using share underwri product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_SHARE_UNDERWRI" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_power_transmis" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Power transmis</field>
+        <field name="code">POWER_TRANSMIS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'power transmis') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using power transmis product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_POWER_TRANSMIS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_power_distribu" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Power distribu</field>
+        <field name="code">POWER_DISTRIBU</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'power distribu') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using power distribu product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_POWER_DISTRIBU" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_hospital_and_c" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Hospital and C</field>
+        <field name="code">HOSPITAL_AND_C</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'hospital and c') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using hospital and c product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HOSPITAL_AND_C" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_pharmaceutical" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Pharmaceutical</field>
+        <field name="code">PHARMACEUTICAL</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'pharmaceutical') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using pharmaceutical product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_PHARMACEUTICAL" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_diagnostics_an" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Diagnostics an</field>
+        <field name="code">DIAGNOSTICS_AN</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'diagnostics an') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using diagnostics an product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_DIAGNOSTICS_AN" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_health_equip_m" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Health Equip M</field>
+        <field name="code">HEALTH_EQUIP_M</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'health equip m') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using health equip m product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HEALTH_EQUIP_M" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_health_practit" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Health Practit</field>
+        <field name="code">HEALTH_PRACTIT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'health practit') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using health practit product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HEALTH_PRACTIT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_health_associa" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Health Associa</field>
+        <field name="code">HEALTH_ASSOCIA</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'health associa') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using health associa product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HEALTH_ASSOCIA" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_health_financi" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Health Financi</field>
+        <field name="code">HEALTH_FINANCI</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'health financi') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using health financi product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HEALTH_FINANCI" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_health_consult" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Health Consult</field>
+        <field name="code">HEALTH_CONSULT</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'health consult') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using health consult product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HEALTH_CONSULT" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_health_gover" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Health - Gover</field>
+        <field name="code">HEALTH_GOVER</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'health gover') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using health - gover product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_HEALTH_GOVER" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_federal_fire_s" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Federal Fire S</field>
+        <field name="code">FEDERAL_FIRE_S</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'federal fire s') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using federal fire s product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_FEDERAL_FIRE_S" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_religious_chu" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Religious (Chu</field>
+        <field name="code">RELIGIOUS_CHU</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'religious chu') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using religious (chu product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RELIGIOUS_CHU" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_religious_mos" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Religious Mos</field>
+        <field name="code">RELIGIOUS_MOS</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'religious mos') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using religious mos product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RELIGIOUS_MOS" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_religious_oth" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Religious (Oth</field>
+        <field name="code">RELIGIOUS_OTH</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'religious oth') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using religious (oth product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_RELIGIOUS_OTH" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_nigerian_intel" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Nigerian Intel</field>
+        <field name="code">NIGERIAN_INTEL</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'nigerian intel') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using nigerian intel product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_NIGERIAN_INTEL" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_iron_ore" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For IRON ORE</field>
+        <field name="code">IRON_ORE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'iron ore') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using iron ore product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_IRON_ORE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_coal" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For COAL</field>
+        <field name="code">COAL</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'coal') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using coal product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_COAL" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_bitumen" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For BITUMEN</field>
+        <field name="code">BITUMEN</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'bitumen') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using bitumen product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_BITUMEN" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_gold" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For GOLD</field>
+        <field name="code">GOLD</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'gold') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using gold product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_GOLD" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+    <record id="risk_plan_limestone" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For LIMESTONE</field>
+        <field name="code">LIMESTONE</field>
+        <field name="sql_query">SELECT 1 FROM res_partner WHERE id = %s AND customer_industry_id IN (    SELECT id FROM customer_industry WHERE name = 'limestone') LIMIT 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using limestone product</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_LIMESTONE" />
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_22" />
+    </record>
+</odoo>

@@ -89,7 +89,7 @@ export const terminalService = {
                 // Log the configuration
                 logDebug('WebSocket configuration:', wsConfig);
 
-                // Construct the WebSocket URL
+                // // Construct the WebSocket URL
                 // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
                 // const wsUrl = `${protocol}://${wsConfig.host}:${wsConfig.port}${wsConfig.path}`;
 
