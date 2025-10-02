@@ -43,6 +43,12 @@ class IcomplyLogsController(http.Controller):
         """Broadcast new logs via bus service"""
         logs_model = request.env['icomply.logs']
         return {'position': logs_model.broadcast_new_logs(profile_id=profile_id, last_position=last_position)}
+    
+    @http.route('/icomply/logs/clear_file', type='json', auth='user')
+    def clear_log_file(self, profile_id=None):
+        """Clear the log file contents"""
+        logs_model = request.env['icomply.logs']
+        return logs_model.clear_log_file(profile_id=profile_id)
 
     @http.route('/icomply/logs/profile/info', type='json', auth='user')
     def get_profile_info(self, profile_id):
