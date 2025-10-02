@@ -90,8 +90,22 @@ export const terminalService = {
                 logDebug('WebSocket configuration:', wsConfig);
 
                 // Construct the WebSocket URL
+                // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+                // const wsUrl = `${protocol}://${wsConfig.host}:${wsConfig.port}${wsConfig.path}`;
+
+                // Construct the WebSocket URL using current browser location
                 const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-                const wsUrl = `${protocol}://${wsConfig.host}:${wsConfig.port}${wsConfig.path}`;
+                const currentHost = window.location.hostname;
+                const currentPort = window.location.port;
+                
+                // Use the same host and port that the user is currently accessing
+                // This ensures WebSocket connects through the same proxy/routing as the main application
+                let wsUrl;
+                if (currentPort && currentPort !== '80' && currentPort !== '443') {
+                    wsUrl = `${protocol}://${currentHost}:${currentPort}${wsConfig.path}`;
+                } else {
+                    wsUrl = `${protocol}://${currentHost}${wsConfig.path}`;
+                }
 
                 addLog(`Connecting to WebSocket at ${wsUrl}`, 'info');
                 logDebug(`Attempting to connect to WebSocket at ${wsUrl}`);

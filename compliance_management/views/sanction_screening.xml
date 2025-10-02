@@ -18,7 +18,7 @@
             <field name="name">res.partner.watchlist.tree</field>
             <field name="model">res.partner.watchlist</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree create="False" delete="False">
                     <!-- <field name="name"/> -->
                     <!-- <field name="watchlist_id"/> -->
                     <!-- <field name="first_name" readonly="1"/> -->
@@ -38,7 +38,7 @@
             <field name="name">res.partner.watchlist.form</field>
             <field name="model">res.partner.watchlist</field>
             <field name="arch" type="xml">
-                <form>
+                <form create="False" delete="False">
                     <sheet>
 
                         <group>
@@ -153,7 +153,7 @@
             <field name="model">res.pep</field>
             <field name="arch" type="xml">
                 <tree string="Global PEP List">
-                    <!-- <field name="unique_identifier" /> -->
+                    <field name="unique_identifier" />
                     <field name="name" />
                     <field name="surname" />
                     <field name="first_name" />

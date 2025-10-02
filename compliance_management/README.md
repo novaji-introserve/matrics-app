@@ -631,3 +631,60 @@ If imports are not processing correctly:
 - Consider setting up rate limiting for file uploads
 
 By following these steps, you should have a fully functional CSV Import System with batch processing capabilities using Odoo's queue job framework and real-time progress updates via WebSockets on Windows, Linux, or MacOS.
+
+## libmagic Installation
+
+The `python-magic` library requires the system package `libmagic` to function properly. If you encounter errors related to `python-magic` or file type detection, follow these installation steps:
+
+### 1. Install System Dependency (libmagic)
+
+**Ubuntu/Debian:**
+
+```bash
+sudo apt-get update
+sudo apt-get install libmagic1
+sudo apt-get install libmagic-dev
+```
+
+**macOS (with Homebrew):**
+
+```bash
+brew install libmagic
+```
+
+**Fedora/CentOS/RHEL:**
+
+```bash
+sudo dnf install file-libs
+```
+
+**Or for older versions:**
+
+```bash
+sudo yum install file-libs
+```
+
+**Docker/Building:**
+
+If you're using Docker or building containers, add the appropriate package installation to your Dockerfile:
+
+```dockerfile
+# For Ubuntu/Debian base images
+RUN apt-get update && apt-get install -y libmagic1 libmagic-dev
+
+# For Alpine base images
+RUN apk add --no-cache libmagic
+
+# For CentOS/RHEL base images
+RUN yum install -y file-libs
+```
+
+### 2. Install Python Package
+
+After the system dependency is installed, install the Python binding:
+
+```bash
+pip install python-magic
+```
+
+This will ensure proper file type detection functionality for the CSV Import System.
