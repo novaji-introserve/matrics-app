@@ -390,6 +390,9 @@ export class IComplyTerminalComponent extends Component {
 IComplyTerminalComponent.template = "icomply.Terminal";
 IComplyTerminalComponent.props = {
     action: { type: Object, optional: true },
+    actionId: { type: [Number, String], optional: true },
+    className: { type: String, optional: true },
+    "*": true,  // Allow any additional props passed by Odoo's action system
 };
 
 registry.category("actions").add("icomply_terminal", IComplyTerminalComponent);
