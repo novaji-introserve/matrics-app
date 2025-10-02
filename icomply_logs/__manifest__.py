@@ -2,9 +2,9 @@
     'name': 'iComply Logs',
     'version': '1.0.0',
     'category': 'iComply',
-    'summary': 'View system logs in Odoo UI',
+    'summary': 'View system logs',
     'description': """
-        This module allows administrators to view system logs directly from the Odoo interface.
+        This module allows administrators to view system logs.
 
         Features:
         - View log entries with filtering and search
