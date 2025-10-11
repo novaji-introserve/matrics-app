@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="action_terminal" model="ir.actions.client">
+      <field name="name">Terminal</field>
+      <field name="tag">icomply_terminal</field>
+  </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_icomply_logs_root"
+              name="System Logs"
+              parent="base.menu_administration"
+              action="action_terminal"
+              sequence="10"/>
+</odoo>
