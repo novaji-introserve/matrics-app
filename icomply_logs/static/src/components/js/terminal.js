@@ -282,8 +282,32 @@ export const icomplyTerminalService = {
                 }
             },
 
+            
+
             async reloadAllLogs(profileId) {
                 await loadAllLogs(profileId);
+            },
+            async clearLogFile(profileId) {
+                try {
+                    const result = await rpc('/icomply/logs/clear_file', { 
+                        profile_id: profileId 
+                    });
+                    
+                    if (result.success) {
+                        const session = getOrCreateSession(profileId);
+                        session.logs.length = 0;
+                        session.filePosition = 0;
+                        addLog(profileId, result.message, 'success');
+                    } else {
+                        addLog(profileId, result.message, 'error');
+                    }
+                    
+                    return result;
+                } catch (error) {
+                    console.error('Error clearing log file:', error);
+                    addLog(profileId, `Error clearing file: ${error.message}`, 'error');
+                    return { success: false, message: error.message };
+                }
             },
 
             async refreshRecentLogs(profileId, limit = 100) {
@@ -327,6 +351,8 @@ export const icomplyTerminalService = {
                     return {};
                 }
             },
+
+            
 
             pausePolling(profileId) {
                 const session = profileSessions.get(profileId);

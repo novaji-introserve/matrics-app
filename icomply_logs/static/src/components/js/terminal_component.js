@@ -200,10 +200,19 @@ export class IComplyTerminalComponent extends Component {
         }
     }
 
-    clearLogs() {
-        this.state.logs = [];
-        if (this.terminal && this.terminal.clearLogs) {
-            this.terminal.clearLogs(this.profileId);
+    async clearLogs() {
+        if (confirm('This will permanently clear all logs from the file. Continue?')) {
+            try {
+                if (this.hasTerminalService && this.terminal.clearLogFile) {
+                    const result = await this.terminal.clearLogFile(this.profileId);
+                    if (result.success) {
+                        this.state.logs = [];
+                        this.state.filePosition = 0;
+                    }
+                }
+            } catch (error) {
+                this.addLocalLog('Failed to clear log file: ' + error.message, 'error');
+            }
         }
     }
 
@@ -390,6 +399,9 @@ export class IComplyTerminalComponent extends Component {
 IComplyTerminalComponent.template = "icomply.Terminal";
 IComplyTerminalComponent.props = {
     action: { type: Object, optional: true },
+    actionId: { type: [Number, String], optional: true },
+    className: { type: String, optional: true },
+    "*": true,  // Allow any additional props passed by Odoo's action system
 };
 
 registry.category("actions").add("icomply_terminal", IComplyTerminalComponent);

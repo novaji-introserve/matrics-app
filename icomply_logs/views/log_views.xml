@@ -208,7 +208,8 @@
     <menuitem id="menu_icomply_logs_root"
               name="Logs"
               sequence="100"
-              web_icon="icomply,static/description/icon.png"/>
+              web_icon="icomply,static/description/icon.png"
+              groups="icomply_logs.group_icomply_logs_technical"/>
 
     <menuitem id="menu_icomply_log_profiles"
               name="Log Profiles"

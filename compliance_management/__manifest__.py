@@ -33,8 +33,9 @@
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
+        "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/region/res.partner.region.csv",#REGION
-
+        "data/demo_data/industries/customer.industry.csv",#INDUSTRY
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -69,15 +70,26 @@
         "data/demo_data/risk_assessment/risk_universe.xml",
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
-        # "data/demo_data/risk_assessment/risk_subject.xml",
-        "data/demo_data/risk_assessment/risk_subject_region.xml",
-        "data/demo_data/risk_assessment/digital_delivery_channel.xml",
+        "data/demo_data/risk_assessment/risk_subject.xml",
+        "data/demo_data/risk_assessment/risk_subject_2.xml",
+       
+       
+        "data/demo_data/risk_assessment/jurisdiction.xml",
+        "data/demo_data/risk_assessment/delivery_channel.xml",
+        "data/demo_data/risk_assessment/product_services.xml",
+       
+
+        "data/demo_data/risk_assessment/compliance_history.xml",
+        "data/demo_data/risk_assessment/data_quality.xml",
+        "data/demo_data/risk_assessment/transaction_behavior.xml",
        
         "data/demo_data/account/account_type.xml",
         "data/demo_data/education/educational_level.xml",
         "data/demo_data/tier/customer_tier.xml",
+        "data/demo_data/customer/sector.xml",
+        "data/demo_data/customer/products.xml",
         "data/demo_data/customer/region.xml",
-
+        "data/demo_data/customer/account_officers.xml",
         "views/risk_assessment.xml",
         "views/sanction_screening.xml",
         "views/open_sanctions.xml",
@@ -101,28 +113,15 @@
         'data/demo_data/stat/compliance_stats.xml',
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
+        'data/demo_data/plan/jurisdiction_plan.xml',
        
+       
+        'data/demo_data/account/customer_product.xml',
+        'data/demo_data/partner/sectors.xml',
         'data/blacklist.xml',
         "views/customer_screening.xml",
         'views/transaction_screening_history.xml',
         "views/menu_actions.xml",
-       
-        
-        # Altbank
-        
-        # Risk Subjects
-        "custom_demo/altbank/subjects/account_product.xml",
-        "custom_demo/altbank/subjects/customer_industry.xml",
-        
-        # Risk Assessments
-        "custom_demo/altbank/risk_assessment/jurisdiction_as.xml",
-        "custom_demo/altbank/risk_assessment/account_product_assessments.xml",
-        "custom_demo/altbank/risk_assessment/customer_industry_assessments.xml",
-       
-        # Risk Plans
-        "custom_demo/altbank/risk_plan/account_product_plans.xml",
-        "custom_demo/altbank/risk_plan/customer_industry_plans.xml",
-        # "custom_demo/altbank/risk_plan/jurisdiction_plan.xml"
     ],
     # only loaded in demonstration mode
     "demo": [
