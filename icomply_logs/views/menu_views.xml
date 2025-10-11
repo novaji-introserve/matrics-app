@@ -10,5 +10,6 @@
               name="System Logs"
               parent="base.menu_administration"
               action="action_terminal"
-              sequence="10"/>
+              sequence="10"
+              groups="icomply_logs.group_icomply_logs_technical"/>
 </odoo>

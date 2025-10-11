@@ -276,3 +276,22 @@ class IcomplyLogs(models.TransientModel):
                 'profile_id': profile_id
             })
         return current_position
+    
+    @api.model
+    def clear_log_file(self, profile_id=None, log_file_path=None):
+        """Clear the contents of the log file without deleting it"""
+        log_file_path = self._get_log_file_path(profile_id, log_file_path)
+        if not log_file_path or not os.path.exists(log_file_path):
+            _logger.warning(f"No logfile configured or found: {log_file_path}")
+            return {'success': False, 'message': 'Log file not found'}
+
+        try:
+            # Open file in write mode to truncate it (clear all contents)
+            with open(log_file_path, 'w', encoding="utf-8") as file:
+                pass  # Just opening in 'w' mode clears the file
+            
+            _logger.info(f"Successfully cleared log file: {log_file_path}")
+            return {'success': True, 'message': 'Log file cleared successfully'}
+        except Exception as e:
+            _logger.error(f"Error clearing log file: {e}")
+            return {'success': False, 'message': f'Error: {str(e)}'}
