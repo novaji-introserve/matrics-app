@@ -70,18 +70,7 @@
         "data/demo_data/risk_assessment/risk_universe.xml",
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
-        "data/demo_data/risk_assessment/risk_subject.xml",
-        "data/demo_data/risk_assessment/risk_subject_2.xml",
-       
-       
-        "data/demo_data/risk_assessment/jurisdiction.xml",
-        "data/demo_data/risk_assessment/delivery_channel.xml",
-        "data/demo_data/risk_assessment/product_services.xml",
-       
 
-        "data/demo_data/risk_assessment/compliance_history.xml",
-        "data/demo_data/risk_assessment/data_quality.xml",
-        "data/demo_data/risk_assessment/transaction_behavior.xml",
        
         "data/demo_data/account/account_type.xml",
         "data/demo_data/education/educational_level.xml",
@@ -122,6 +111,7 @@
         "views/customer_screening.xml",
         'views/transaction_screening_history.xml',
         "views/menu_actions.xml",
+       
     ],
     # only loaded in demonstration mode
     "demo": [

@@ -35,13 +35,6 @@ class CustomerDigitalProduct(models.Model):
     specta = fields.Char(string='Has Specta', readonly=True)
     switch = fields.Char(string='Has Switch', readonly=True)
     
-    ifuel = fields.Char(string='Ifuel', readonly=True)
-    altpro = fields.Char(string='AltPro', readonly=True)
-    altmall = fields.Char(string='AltMall', readonly=True)
-    altinvest = fields.Char(string='AltInvest', readonly=True)
-    altpower = fields.Char(string='AltPower', readonly=True)
-    altdrive = fields.Char(string='AltDrive', readonly=True)
-    chequebook = fields.Char(string='ChequeBook', readonly=True)
 
   
     def init(self):

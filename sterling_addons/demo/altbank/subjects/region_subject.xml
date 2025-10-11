@@ -1,0 +1,227 @@
+<odoo>
+    <!-- region -->
+    <record id="compliance_inst_fc_risk_subject_abia" model="res.risk.subject">
+        <field name="name">ABIA</field>
+        <field name="code">NG0020064</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_adamawa" model="res.risk.subject">
+        <field name="name">ADAMAWA</field>
+        <field name="code">NG0020101</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_akwa_ibom" model="res.risk.subject">
+        <field name="name">AKWA IBOM</field>
+        <field name="code">NG0020039</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_anambra" model="res.risk.subject">
+        <field name="name">ANAMBRA</field>
+        <field name="code">NG0020012</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_bauchi" model="res.risk.subject">
+        <field name="name">BAUCHI</field>
+        <field name="code">NG0020005</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_bayelsa" model="res.risk.subject">
+        <field name="name">BAYELSA</field>
+        <field name="code">NG0020141</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_benue" model="res.risk.subject">
+        <field name="name">BENUE</field>
+        <field name="code">NG0020146</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_borno" model="res.risk.subject">
+        <field name="name">BORNO</field>
+        <field name="code">NG0020097</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_cross_river" model="res.risk.subject">
+        <field name="name">CROSS RIVER</field>
+        <field name="code">NG0020165</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_delta" model="res.risk.subject">
+        <field name="name">DELTA</field>
+        <field name="code">NG0020155</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+     <record id="compliance_inst_fc_risk_subject_edo" model="res.risk.subject">
+        <field name="name">EDO</field>
+        <field name="code">NG0020100</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_Ebonyi" model="res.risk.subject">
+        <field name="name">Ebonyi</field>
+        <field name="code">NG1120101</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_ekiti" model="res.risk.subject">
+        <field name="name">EKITI</field>
+        <field name="code">NG0020084</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_enugu" model="res.risk.subject">
+        <field name="name">ENUGU</field>
+        <field name="code">NG0020177</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_gombe" model="res.risk.subject">
+        <field name="name">GOMBE</field>
+        <field name="code">NG0020143</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_imo" model="res.risk.subject">
+        <field name="name">IMO</field>
+        <field name="code">NG0020025</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_jigawa" model="res.risk.subject">
+        <field name="name">JIGAWA</field>
+        <field name="code">NG0020034</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_kaduna" model="res.risk.subject">
+        <field name="name">KADUNA</field>
+        <field name="code">NG0020066</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_kano" model="res.risk.subject">
+        <field name="name">KANO</field>
+        <field name="code">NG0020153</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_katsina" model="res.risk.subject">
+        <field name="name">KATSINA</field>
+        <field name="code">NG0020134</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_kebbi" model="res.risk.subject">
+        <field name="name">KEBBI</field>
+        <field name="code">NG0020072</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_kogi" model="res.risk.subject">
+        <field name="name">KOGI</field>
+        <field name="code">NG0020068</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_kwara" model="res.risk.subject">
+        <field name="name">KWARA</field>
+        <field name="code">NG0020075</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_lagos" model="res.risk.subject">
+        <field name="name">LAGOS</field>
+        <field name="code">NG0020022</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_south_w" model="res.risk.subject">
+        <field name="name">SOUTH WEST</field>
+        <field name="code">NGSOUTH_WEST</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_abj" model="res.risk.subject">
+        <field name="name">ABUJA AND NORTH</field>
+        <field name="code">NG_ABJ_NORTH</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_ss_se" model="res.risk.subject">
+        <field name="name">SOUTH SOUTH AND SOUTH EAST</field>
+        <field name="code">NG_SS_SE</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_niger" model="res.risk.subject">
+        <field name="name">NIGER</field>
+        <field name="code">NG0020122</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_ogun" model="res.risk.subject">
+        <field name="name">OGUN</field>
+        <field name="code">NG0020081</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_ondo" model="res.risk.subject">
+        <field name="name">ONDO</field>
+        <field name="code">NG0020065</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_osun" model="res.risk.subject">
+        <field name="name">OSUN</field>
+        <field name="code">NG0020095</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_oyo" model="res.risk.subject">
+        <field name="name">OYO</field>
+        <field name="code">NG0020019</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_plateau" model="res.risk.subject">
+        <field name="name">PLATEAU</field>
+        <field name="code">NG0020058</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_rivers" model="res.risk.subject">
+        <field name="name">RIVERS</field>
+        <field name="code">NG0020109</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_sokoto" model="res.risk.subject">
+        <field name="name">SOKOTO</field>
+        <field name="code">NG0020008</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_zamfara" model="res.risk.subject">
+        <field name="name">ZAMFARA</field>
+        <field name="code">NG0020140</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+    <record id="compliance_inst_fc_risk_subject_abuja" model="res.risk.subject">
+        <field name="name">ABUJA</field>
+        <field name="code">NG0020098</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_nassarawa" model="res.risk.subject">
+        <field name="name">Nassarawa</field>
+        <field name="code">NG1120098</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
+    </record>
+
+</odoo>
