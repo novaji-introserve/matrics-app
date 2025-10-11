@@ -48,7 +48,7 @@
                                 </div>
                                 <div class="o_kanban_record_body">
                                     <div class="text-muted">
-                                        <i class="fa fa-file-text-o"/> 
+                                        <i class="fa fa-file-text-o" title="Log File Path"/> 
                                         <field name="log_file_path"/>
                                     </div>
                                     <div class="mt-2">
