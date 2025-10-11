@@ -34,6 +34,14 @@ class CustomerDigitalProduct(models.Model):
     doubble = fields.Char(string='Has Doubble', readonly=True)
     specta = fields.Char(string='Has Specta', readonly=True)
     switch = fields.Char(string='Has Switch', readonly=True)
+    
+    ifuel = fields.Char(string='Ifuel', readonly=True)
+    altpro = fields.Char(string='AltPro', readonly=True)
+    altmall = fields.Char(string='AltMall', readonly=True)
+    altinvest = fields.Char(string='AltInvest', readonly=True)
+    altpower = fields.Char(string='AltPower', readonly=True)
+    altdrive = fields.Char(string='AltDrive', readonly=True)
+    chequebook = fields.Char(string='ChequeBook', readonly=True)
 
   
     def init(self):
@@ -118,22 +126,21 @@ class DigitalDeliveryChannel(models.Model):
         count = self._cr.fetchone()[0]
 
         if count == 0:
-            self._create_initial_channels_fast()
-            _logger.info("Created initial channels")
+            # self._create_initial_channels_fast()
+            _logger.info("Skipped Creating initial channels from model")
 
 
     def _create_initial_channels_fast(self):
         """Fast channel creation without heavy operations"""
         channels_data = [
-            ('USSD', 'ussd', 'USSD Banking Services', 'active'),
             ('One Bank', 'onebank', 'One Bank Mobile App', 'active'),
+            ('Sterling Pro', 'sterling_pro', 'Sterling Pro Services', 'active'),
+            ('USSD', 'ussd', 'USSD Banking Services', 'active'),
             ('Card', 'carded_customer', 'Card Services', 'active'),
             ('Alt Bank', 'alt_bank', 'Alternative Banking', 'active'),
-            ('Sterling Pro', 'sterling_pro', 'Sterling Pro Services', 'active'),
             ('Banca', 'banca', 'Banca Services', 'active'),
             ('Doubble', 'doubble', 'Doubble Services', 'active'),
             ('Specta', 'specta', 'Specta Services', 'active'),
-            ('Switch', 'switch', 'Switch Services', 'active')
         ]
 
         # Simple bulk insert

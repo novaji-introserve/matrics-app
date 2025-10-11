@@ -140,6 +140,9 @@
                 <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
                     <field string="Risk Score" name="risk_score" widget="statinfo"/>
                 </button>
+
+
+                
             </xpath>
 
             <xpath expr="//field[@name='website']" position="replace">

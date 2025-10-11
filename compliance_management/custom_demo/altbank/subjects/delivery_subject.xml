@@ -1,0 +1,54 @@
+<odoo>
+
+ <!-- Risk Subject -->
+    <record id="compliance_inst_fc_risk_subject_ussd" model="res.risk.subject">
+        <field name="name">USSD</field>
+        <field name="code">ussd</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_altdrive" model="res.risk.subject">
+        <field name="name">Alt Drive</field>
+        <field name="code">altdrive</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_card" model="res.risk.subject">
+        <field name="name">Card</field>
+        <field name="code">card</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_alt" model="res.risk.subject">
+        <field name="name">Alt Bank</field>
+        <field name="code">alt</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_altinvest" model="res.risk.subject">
+        <field name="name">Alt Invest</field>
+        <field name="code">altinvest</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_altmall" model="res.risk.subject">
+        <field name="name">Alt Mall</field>
+        <field name="code">altmall</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_altpower" model="res.risk.subject">
+        <field name="name">Alt Power</field>
+        <field name="code">altpower</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_altpro" model="res.risk.subject">
+        <field name="name">Alt Pro</field>
+        <field name="code">altpro</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_chequebook" model="res.risk.subject">
+        <field name="name">Cheque Book</field>
+        <field name="code">chequebook</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+    <record id="compliance_inst_fc_risk_subject_ifuel" model="res.risk.subject">
+        <field name="name">IFuel</field>
+        <field name="code">ifuel</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_23" />
+    </record>
+</odoo>
