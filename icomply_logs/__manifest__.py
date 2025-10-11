@@ -19,6 +19,7 @@
         'muk_web_theme'
     ],
     'data': [
+        'security/groups.xml',
         'security/ir.model.access.csv',
         'views/menu_views.xml',
         'views/log_views.xml'
