@@ -132,9 +132,6 @@ class ViewSecurityController(http.Controller):
                 "You do not have permission to perform this action."
 
             )
-        contextt = kwargs.get('context', {})
-        _logger.info(
-            f"URL CONTEXT {contextt}.. MODEL {model}... Cookies {cookies_session}")
 
 
         if model in restricted_models:
@@ -166,7 +163,7 @@ class ViewSecurityController(http.Controller):
                 'get_views',
                 'web_search_read',     # Needed to populate list views
                 'read',                # MOVED HERE - needed to open records from list
-                'name_search',         # Name search (for dropdowns, etc.)
+                # 'name_search',         # Name search (for dropdowns, etc.)
                 'name_get',            # Get display names
                 'default_get',         # Get default values
                 'onchange',         # Get default values
@@ -599,3 +596,129 @@ class ViewSecurityController(http.Controller):
     @http.route('/view_access/get_available_groups', type='json', auth='user')
     def get_available_groups(self):
         return request.env['view.access.model.list'].get_available_groups()
+    
+    @http.route('/web/dataset/call_button', type='json', auth="user")
+    def call_button_security(self, model, method, args, kwargs, context_id=None):
+        """Block button method access"""
+                
+        user_session = request.env['user.session']
+        validation_result = user_session.validate_current_session_secure()
+        
+        if not validation_result['valid']:
+            _logger.info(f"Unauthorized button call blocked: {model}.{method} - {validation_result}")
+            raise UserError("You do not have permission to perform this action.")
+        else :
+           _logger.info(f"authorized button call allowed: {model}.{method} - {validation_result}")
+        
+        # Call the original method if validation passes
+        return DataSet().call_button(model, method, args, kwargs)
+    
+    @http.route("/csv_import/get_import_models", type="json", auth="user")
+    def get_import_models_security(self, search_term=None, limit=50, offset=0):
+        """Block unauthorized access to CSV import models"""
+        user = request.env.user
+
+        # Session validation
+        user_session = request.env['user.session']
+        validation_result = user_session.validate_current_session_secure()
+
+        if not validation_result['valid']:
+            _logger.warning(f"Unauthorized CSV import access blocked for user: {user.name} - {validation_result}")
+            raise UserError("You do not have permission to perform this action.")
+
+        # Permission check 
+        allowed_groups = [
+            'compliance_management.group_compliance_compliance_officer',
+        ]
+
+        has_permission = any(user.has_group(group) for group in allowed_groups)
+
+        if not has_permission:
+            _logger.warning(f"CSV import access denied for user: {user.name} - insufficient permissions")
+            raise AccessError("You do not have permission to access CSV import functionality. Contact your administrator for access.")
+
+        # Log successful access
+        _logger.info(f"Authorized CSV import models access for user: {user.name}")
+
+        # Recreate original functionality with security applied
+        try:
+            domain = [
+                ("transient", "=", False),
+                ("model", "not ilike", "ir.%"),
+                ("model", "not ilike", "base.%"),
+                ("model", "not ilike", "bus.%"),
+                ("model", "not ilike", "base_%"),
+            ]
+            if search_term:
+                domain += [
+                    "|",
+                    ("name", "ilike", search_term),
+                    ("model", "ilike", search_term),
+                ]
+                
+            
+            total_count = request.env["ir.model"].sudo().search_count(domain)
+            fields_to_fetch = ["id", "name", "model"]
+            if "description" in request.env["ir.model"]._fields:
+                fields_to_fetch.append("description")
+                
+            ir_models = (
+                request.env["ir.model"]
+                .sudo()
+                .search_read(
+                    domain=domain,
+                    fields=fields_to_fetch,
+                    limit=limit,
+                    offset=offset,
+                    order="name",
+                )
+            )
+            
+            models = []
+            for ir_model in ir_models:
+                model_name = ir_model["model"]
+                if model_name in request.env:
+                    try:
+                        model_obj = request.env[model_name].sudo()
+                        if model_obj._abstract or not model_obj._table:
+                            continue
+                        try:
+                            request.env.cr.execute(
+                                f"""
+                                SELECT EXISTS (
+                                    SELECT 1 FROM information_schema.tables 
+                                    WHERE table_name = %s
+                                )
+                            """,
+                                (model_obj._table,),
+                            )
+                            table_exists = request.env.cr.fetchone()[0]
+                            if not table_exists:
+                                continue
+                        except Exception as e:
+                            _logger.debug(f"Skipping model {model_name}, table check failed: {str(e)}")
+                            continue
+                        description = (
+                            ir_model.get("description", False)
+                            or f"Import data into {ir_model['name']}"
+                        )
+                        models.append(
+                            {
+                                "id": ir_model["id"],
+                                "name": ir_model["name"],
+                                "model_name": model_name,
+                                "description": description,
+                                "template_filename": f"{model_name.replace('.', '_')}_template.xlsx",
+                            }
+                        )
+                    except Exception as e:
+                        _logger.debug(f"Skipping model {model_name}: {str(e)}")
+                        continue
+                        
+            _logger.info(f"Returned {len(models)} models to authorized user {user.name}")
+            return {"models": models, "total": len(models)}
+            
+        except Exception as e:
+            error_msg = f"Error loading import models for user {user.name}: {str(e)}"
+            _logger.exception(error_msg)
+            return {"models": [], "total": 0, "error": error_msg}

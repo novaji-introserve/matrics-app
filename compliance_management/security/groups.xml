@@ -50,9 +50,7 @@
   Command.link(ref('base.group_system')),
   Command.link(ref('base.group_erp_manager')),
   Command.link(ref('base.group_user')),
-  Command.link(ref('group_compliance_compliance_officer')),
-  Command.link(ref('group_compliance_transaction_monitoring_team')),
-  Command.link(ref('group_compliance_compliance_risk_manager'))]"/>
+  Command.link(ref('group_compliance_compliance_officer'))]"/>
   <field name="comment">CCO oversees all branch compliance officers</field>
   <field name="category_id" ref="module_category_compliance"/>
 </record>

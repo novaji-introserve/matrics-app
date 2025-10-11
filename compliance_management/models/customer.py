@@ -765,7 +765,6 @@ class Customer(models.Model):
         """
         Calculate composite risk score based on weighted risk universes
         - Only include universes with violations (universe_score > 0) in the CCR calculation
-        - Show all risk plans regardless of match status
         - Apply dynamic calculation (avg/max/sum) at universe level based on settings
         """
         record_id = self.id

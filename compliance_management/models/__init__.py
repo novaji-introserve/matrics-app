@@ -7,6 +7,7 @@ and dashboard components necessary for the application.
 """
 
 
+from . import utils
 from . import education_level
 from . import kyc_limit
 from . import identification_types

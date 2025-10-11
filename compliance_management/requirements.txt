@@ -148,6 +148,7 @@ python-dateutil
 python-dotenv
 python-jose
 python-ldap
+python-magic
 python-multipart
 python-stdnum
 pytz

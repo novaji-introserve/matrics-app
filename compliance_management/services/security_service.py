@@ -200,7 +200,7 @@ class SecurityService:
         # ======= ALTERNATIVE WHITESPACE =======
         r'\/\*\*\/',
         r'\t',
-        r'\n',
+        # r'\n',
         r'\r',
         r'\f',
         r'\v',

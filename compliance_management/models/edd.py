@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 class CustomerEDD(models.Model):
     _name = 'res.partner.edd'
     _description = 'Enhanced Due Diligence'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin','conditional.method.mixin']
     _sql_constraints = [
         ('unique_name', 'UNIQUE(name)', 'The EDD name must be unique.')]
 
@@ -701,7 +701,8 @@ class CustomerEDD(models.Model):
                 f"Sending {template.name} notification to {recipient_info}, CC: {cc_info}")
 
             try:
-                template_with_context = template.with_context(**email_context)
+                
+                template_with_context = template.sudo().with_context(**email_context)
 
                 # Send the email with the context
                 email_result = template_with_context.send_mail(
@@ -859,19 +860,7 @@ class CustomerEDD(models.Model):
             },
         }
 
-    # @api.model
-    # def cron_send_for_assessment(self):
-    #     records = self.search([
-    #             ('status', '=', 'draft'),
-    #             ('responsible_id', '!=', False),
-    #             ('create_date', '!=', False)
-    #         ])
-    #     for record in records:
-    #             self._send_email_to_officers(
-    #                 'compliance_management.enhanced_due_diligence_assessment_template',
-    #                 to_cco_only=False,
-    #                 officer= record
-    #             )
+   
 
     def action_submit_for_review(self):
 
@@ -884,7 +873,7 @@ class CustomerEDD(models.Model):
             raise ValidationError(
                 "Attestation must be checked before submission.")
 
-        self.validate_responsible_user()
+        self.call_session_method('validate_responsible_user')
 
         self.write({
             'status': 'submitted',
@@ -921,7 +910,7 @@ class CustomerEDD(models.Model):
             raise ValidationError(
                 "Signature must be uploaded before completing review.")
 
-        self.validate_officer_can_complete()
+        self.call_session_method('validate_officer_can_complete')
 
         # Update status
         self.write({'status': 'completed'})
@@ -970,7 +959,7 @@ class CustomerEDD(models.Model):
 
         self.ensure_one()
 
-        self.validate_user_can_do_final_approval()
+        self.call_session_method('validate_user_can_do_final_approval')
 
         self.write({
             'status': 'approved',
@@ -1002,7 +991,7 @@ class CustomerEDD(models.Model):
     def action_cancel(self):
         self.ensure_one()
 
-        self.validate_approving_officer_or_creator()
+        self.call_session_method('validate_approving_officer_or_creator')
 
         self.write({
             'status': 'draft',
@@ -1034,7 +1023,7 @@ class CustomerEDD(models.Model):
     def action_send_back(self):
         self.ensure_one()
 
-        self.validate_approving_officer_or_creator()
+        self.call_session_method('validate_approving_officer_or_creator')
 
         self.write({
             'status': 'draft',
@@ -1125,7 +1114,7 @@ class CustomerEDD(models.Model):
 
         self.ensure_one()
 
-        self.validate_user_can_reject()
+        self.call_session_method('validate_user_can_reject')
 
         return {
             'type': 'ir.actions.act_window',
@@ -1493,42 +1482,6 @@ class CustomerEDD(models.Model):
             }
         }
 
-    # def _validate_document_field(self, field_name, attachments):
-    #     """Validate a single document field"""
-    #     if not attachments:
-    #         return
-
-    #     allowed_types = self._get_allowed_file_types()
-    #     invalid_files = []
-
-    #     for attachment in attachments:
-    #         is_valid = False
-
-    #         # First check by MIME type
-    #         if attachment.mimetype in allowed_types['mimetypes']:
-    #             is_valid = True
-    #         if attachment.extensions in allowed_types['extensions']:
-    #             is_valid = True
-    #         else:
-    #             # Fallback: check by file extension
-    #             if attachment.name:
-    #                 file_extension = '.' + \
-    #                     attachment.name.lower().split(
-    #                         '.')[-1] if '.' in attachment.name else ''
-    #                 if file_extension in allowed_types['extensions']:
-    #                     is_valid = True
-
-    #         if not is_valid:
-    #             invalid_files.append(attachment.name or 'Unknown file')
-
-    #     if invalid_files:
-    #         field_label = self._fields[field_name].string
-    #         raise ValidationError(_(
-    #             'Invalid file format in "%s". '
-    #             'The following files are not allowed: %s\n\n'
-    #             'Allowed formats: Images (JPG, PNG), '
-    #             'PDF, Word (DOC, DOCX), Excel (XLS, XLSX)'
-    #         ) % (field_label, ', '.join(invalid_files)))
 
     def _validate_document_field(self, field_name, attachments):
         """Validate a single document field"""

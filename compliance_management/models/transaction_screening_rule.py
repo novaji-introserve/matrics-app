@@ -39,6 +39,10 @@ class TransactionScreeningRule(models.Model):
 
     active = fields.Boolean(
         default=True, help='Set to false to hide the record without deleting it.')
+    
+    transaction_flag = fields.Selection(string='Flag Transactions As', selection=[('unusual', 'Unusual'), ('suspicious', 'Suspicious')], tracking=True,
+                                        help='Flag transactions as Unusual or Suspicious based on the rule. This will be used to set the state of the transaction when the rule is applied.')
+
 
     @api.model
     def create(self, vals):
@@ -103,3 +107,13 @@ class TransactionScreeningRule(models.Model):
         except:
             raise UserError(_('Wrong python code defined for transaction screening rule %s (%s).') % (
                 self.name, self.code))
+            
+
+
+class TransactionScreeningRuleLines(models.Model):
+    _name = "res.transaction.screening.rule.line"
+    _description = "Transaction Analysis Lines"
+    transaction_id = fields.Many2one(
+        'res.customer.transaction', string='Transaction', ondelete="cascade", index=True)
+    rule_line_id = fields.Many2one(
+        'res.transaction.screening.rule', string='Rule Line', index=True)
