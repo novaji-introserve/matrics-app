@@ -129,14 +129,14 @@
                     <field name="total_accounts" widget="statinfo"/>
                 </button>
 
-                 <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
+                <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
                     <div class="o_stat_info">
                         <!-- High risk - red background -->
                         <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'low'"/>
                         <span class="o_stat_text">Risk Level</span>
                     </div>
                 </button>
-                
+
                 <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
                     <field string="Risk Score" name="risk_score" widget="statinfo"/>
                 </button>
