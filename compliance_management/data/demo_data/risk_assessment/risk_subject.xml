@@ -1,5 +1,7 @@
 <odoo>
 
+    
+
  <!-- Risk Subject -->
     <record id="compliance_inst_fc_risk_subject_21" model="res.risk.subject">
         <field name="name">Private Banking Service</field>

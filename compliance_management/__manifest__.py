@@ -72,20 +72,17 @@
         "data/demo_data/risk_assessment/risk_level.xml",
         "data/demo_data/risk_assessment/risk_subject.xml",
         "data/demo_data/risk_assessment/risk_subject_2.xml",
-        "data/demo_data/risk_assessment/digital_delivery_channel.xml",
-        "data/demo_data/risk_assessment/customer_type.xml",
+       
+       
         "data/demo_data/risk_assessment/jurisdiction.xml",
         "data/demo_data/risk_assessment/delivery_channel.xml",
         "data/demo_data/risk_assessment/product_services.xml",
-        # product service demo data
-        "demo/product_service_data/01_product_service_subject.xml",
-        'demo/product_service_data/02_product_service_assessments.xml',
-        'demo/product_service_data/03_sterling_product_risk_plan.xml',
+       
 
         "data/demo_data/risk_assessment/compliance_history.xml",
         "data/demo_data/risk_assessment/data_quality.xml",
         "data/demo_data/risk_assessment/transaction_behavior.xml",
-        'data/demo_data/risk_assessment/digital_delivery_channel_assessment.xml',
+       
         "data/demo_data/account/account_type.xml",
         "data/demo_data/education/educational_level.xml",
         "data/demo_data/tier/customer_tier.xml",
@@ -117,8 +114,8 @@
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
         'data/demo_data/plan/jurisdiction_plan.xml',
-        'data/demo_data/plan/customer_type_plan.xml',
-        'data/demo_data/plan/assessment_plan.xml',
+       
+       
         'data/demo_data/account/customer_product.xml',
         'data/demo_data/partner/sectors.xml',
         'data/blacklist.xml',
