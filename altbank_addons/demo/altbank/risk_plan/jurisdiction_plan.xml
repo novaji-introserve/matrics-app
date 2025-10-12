@@ -19,7 +19,7 @@ LIMIT 1;
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_abia" />
+                   ref="altbank_addons.res_risk_assessment_abia" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -40,7 +40,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_adamawa" />
+                   ref="altbank_addons.res_risk_assessment_adamawa" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -61,7 +61,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_akwa_ibom" />
+                   ref="altbank_addons.res_risk_assessment_akwa_ibom" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -82,7 +82,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_anambra" />
+                   ref="altbank_addons.res_risk_assessment_anambra" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -103,7 +103,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_bauchi" />
+                   ref="altbank_addons.res_risk_assessment_bauchi" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -124,7 +124,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_bayelsa" />
+                   ref="altbank_addons.res_risk_assessment_bayelsa" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -145,7 +145,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_benue" />
+                   ref="altbank_addons.res_risk_assessment_benue" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -166,7 +166,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_borno" />
+                   ref="altbank_addons.res_risk_assessment_borno" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -187,7 +187,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_cross_river" />
+                   ref="altbank_addons.res_risk_assessment_cross_river" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -208,7 +208,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_delta" />
+                   ref="altbank_addons.res_risk_assessment_delta" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -229,7 +229,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_edo" />
+                   ref="altbank_addons.res_risk_assessment_edo" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -250,7 +250,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_ekiti" />
+                   ref="altbank_addons.res_risk_assessment_ekiti" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -271,7 +271,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_enugu" />
+                   ref="altbank_addons.res_risk_assessment_enugu" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -292,7 +292,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_gombe" />
+                   ref="altbank_addons.res_risk_assessment_gombe" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -313,7 +313,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_imo" />
+                   ref="altbank_addons.res_risk_assessment_imo" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -334,7 +334,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_jigawa" />
+                   ref="altbank_addons.res_risk_assessment_jigawa" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -355,7 +355,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_kaduna" />
+                   ref="altbank_addons.res_risk_assessment_kaduna" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -376,7 +376,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_kano" />
+                   ref="altbank_addons.res_risk_assessment_kano" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -397,7 +397,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_katsina" />
+                   ref="altbank_addons.res_risk_assessment_katsina" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -418,7 +418,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_kebbi" />
+                   ref="altbank_addons.res_risk_assessment_kebbi" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -439,7 +439,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_kogi" />
+                   ref="altbank_addons.res_risk_assessment_kogi" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -460,7 +460,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_kwara" />
+                   ref="altbank_addons.res_risk_assessment_kwara" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -481,7 +481,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_lagos" />
+                   ref="altbank_addons.res_risk_assessment_lagos" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -502,7 +502,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_niger" />
+                   ref="altbank_addons.res_risk_assessment_niger" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -523,7 +523,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_ogun" />
+                   ref="altbank_addons.res_risk_assessment_ogun" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -544,7 +544,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_ondo" />
+                   ref="altbank_addons.res_risk_assessment_ondo" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -566,7 +566,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_osun" />
+                   ref="altbank_addons.res_risk_assessment_osun" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -587,7 +587,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_oyo" />
+                   ref="altbank_addons.res_risk_assessment_oyo" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -608,7 +608,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_plateau" />
+                   ref="altbank_addons.res_risk_assessment_plateau" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -629,7 +629,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_rivers" />
+                   ref="altbank_addons.res_risk_assessment_rivers" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -650,7 +650,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_sokoto" />
+                   ref="altbank_addons.res_risk_assessment_sokoto" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -672,7 +672,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_zamfara" />
+                   ref="altbank_addons.res_risk_assessment_zamfara" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -694,7 +694,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_abuja" />
+                   ref="altbank_addons.res_risk_assessment_abuja" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />
@@ -716,7 +716,7 @@ LIMIT 1;</field>
             <field name="risk_score">4</field>
             <field name="compute_score_from">risk_assessment</field>
             <field name="risk_assessment"
-                   ref="compliance_management.res_risk_assessment_nassarawa" />
+                   ref="altbank_addons.res_risk_assessment_nassarawa" />
             <field name="use_composite_calculation">True</field>
             <field name="universe_id"
                    ref="compliance_management.compliance_inst_fc_risk_univ_21" />

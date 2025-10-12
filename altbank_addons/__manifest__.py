@@ -1,8 +1,8 @@
 {
-    'name': 'Demo Data For AltBank',
+    'name': 'Addons For AltBank',
     'version': '1.0.0',
     'category': 'iComply',
-    'summary': 'Demo data and extensions for Compliance Management (AltBank)',
+    'summary': 'Addons and extensions for Compliance Management (AltBank)',
     'description': """
             This module provides:
             - Sample data for compliance management

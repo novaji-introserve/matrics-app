@@ -8,7 +8,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using agro services product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Agro_Services" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Agro_Services" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -20,7 +20,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using cash crops product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Cash_Crops" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Cash_Crops" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -32,7 +32,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using crop production product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Crop_Production" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Crop_Production" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -44,7 +44,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using fishing product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Fishing" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Fishing" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -56,7 +56,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using poultry &amp; livestock product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Poultry_Livestock" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Poultry_Livestock" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -68,7 +68,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using lantation product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Lantation" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Lantation" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -80,7 +80,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using waste collection, treatment and y product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Waste_Collection_Treatment_And_Y" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Waste_Collection_Treatment_And_Y" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -92,7 +92,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using utomobile (motor vehicles) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Utomobile_Motor_Vehicles" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Utomobile_Motor_Vehicles" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -104,7 +104,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using utomotive parts product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Utomotive_Parts" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Utomotive_Parts" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -116,7 +116,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using hemical and allied products product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Hemical_And_Allied_Products" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Hemical_And_Allied_Products" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -128,7 +128,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using omestic trade product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Omestic_Trade" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Omestic_Trade" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -140,7 +140,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using enerator set(sales &amp; services) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Enerator_Set_Sales_Services" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Enerator_Set_Sales_Services" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -152,7 +152,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using rading (cocoa) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Rading_Cocoa" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Rading_Cocoa" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -164,7 +164,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using rading (rice) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Rading_Rice" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Rading_Rice" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -176,7 +176,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using ood processing product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Ood_Processing" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Ood_Processing" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -188,7 +188,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using aluminium and allied products product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Aluminium_And_Allied_Products" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Aluminium_And_Allied_Products" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -200,7 +200,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using basic metal products product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Basic_Metal_Products" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Basic_Metal_Products" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -212,7 +212,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using beverages product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Beverages" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Beverages" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -224,7 +224,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using breweries product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Breweries" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Breweries" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -236,7 +236,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using building materials product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Building_Materials" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Building_Materials" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -248,7 +248,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using cables and mines product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Cables_And_Mines" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Cables_And_Mines" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -260,7 +260,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using chemical and allied products product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Chemical_And_Allied_Products" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Chemical_And_Allied_Products" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -272,7 +272,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using conglomerate product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Conglomerate" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Conglomerate" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -284,7 +284,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using flour milling and bakeries product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Flour_Milling_And_Bakeries" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Flour_Milling_And_Bakeries" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -296,7 +296,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using food manfacturing product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Food_Manfacturing" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Food_Manfacturing" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -308,7 +308,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using footwear product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Footwear" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Footwear" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -320,7 +320,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using paints and allied products product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Paints_And_Allied_Products" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Paints_And_Allied_Products" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -332,7 +332,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using paper and paper products product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Paper_And_Paper_Products" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Paper_And_Paper_Products" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -344,7 +344,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using personal care product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Personal_Care" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Personal_Care" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -356,7 +356,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using pharmaceuticals product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Pharmaceuticals" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Pharmaceuticals" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -368,7 +368,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using plastics product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Plastics" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Plastics" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -380,7 +380,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using printing and publishing product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Printing_And_Publishing" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Printing_And_Publishing" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -392,7 +392,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using rubber and allied products product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Rubber_And_Allied_Products" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Rubber_And_Allied_Products" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -404,7 +404,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using textile and apparel product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Textile_And_Apparel" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Textile_And_Apparel" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -416,7 +416,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using ousehold equipments product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Ousehold_Equipments" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Ousehold_Equipments" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -428,7 +428,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using air transport product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Air_Transport" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Air_Transport" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -440,7 +440,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using postal and courier actis product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Postal_And_Courier_Actis" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Postal_And_Courier_Actis" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -452,7 +452,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using road transport product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Road_Transport" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Road_Transport" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -464,7 +464,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using warehousing and supportn product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Warehousing_And_Supportn" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Warehousing_And_Supportn" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -476,7 +476,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using water transport product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Water_Transport" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Water_Transport" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -488,7 +488,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using advertising and market reh product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Advertising_And_Market_Reh" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Advertising_And_Market_Reh" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -500,7 +500,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using computer programming, cons product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Computer_Programming_Cons" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Computer_Programming_Cons" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -512,7 +512,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using information service activs product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Information_Service_Activs" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Information_Service_Activs" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -524,7 +524,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using publishing activities product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Publishing_Activities" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Publishing_Activities" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -536,7 +536,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using telecommunication product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Telecommunication" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Telecommunication" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -548,7 +548,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using asset management product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Asset_Management" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Asset_Management" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -560,7 +560,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using commercial banksvities product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Commercial_Banksvities" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Commercial_Banksvities" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -572,7 +572,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using finance companies product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Finance_Companies" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Finance_Companies" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -584,7 +584,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using insurance companies product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Insurance_Companies" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Insurance_Companies" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -596,7 +596,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using microfinance bank product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Microfinance_Bank" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Microfinance_Bank" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -608,7 +608,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using other financial institutios product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Other_Financial_Institutios" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Other_Financial_Institutios" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -620,7 +620,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using stockbroking firmsties product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Stockbroking_Firmsties" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Stockbroking_Firmsties" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -632,7 +632,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using commercial property product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Commercial_Property" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Commercial_Property" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -644,7 +644,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using home equity product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Home_Equity" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Home_Equity" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -656,7 +656,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using real estate (income producing) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Real_Estate_Income_Producing" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Real_Estate_Income_Producing" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -668,7 +668,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using real estate construction/homes product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Real_Estate_Construction_Homes" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Real_Estate_Construction_Homes" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -680,7 +680,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using residential mortgage loans product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Residential_Mortgage_Loans" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Residential_Mortgage_Loans" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -692,7 +692,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using civil engineering product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Civil_Engineering" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Civil_Engineering" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -704,7 +704,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using specialized construction activis product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Specialized_Construction_Activis" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Specialized_Construction_Activis" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -716,7 +716,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using legal and accounting activites product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Legal_And_Accounting_Activites" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Legal_And_Accounting_Activites" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -728,7 +728,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using dvertising and market research product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Dvertising_And_Market_Research" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Dvertising_And_Market_Research" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -740,7 +740,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using rch and engr activities, tech product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Rch_And_Engr_Activities_Tech" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Rch_And_Engr_Activities_Tech" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -752,7 +752,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using ther professnal,scientific tech product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Ther_Professnal_Scientific_Tech" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Ther_Professnal_Scientific_Tech" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -764,7 +764,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using educational support services product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Educational_Support_Services" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Educational_Support_Services" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -776,7 +776,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using ther education product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Ther_Education" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Ther_Education" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -788,7 +788,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using re pry,pry,post pry,tert educ product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Re_Pry_Pry_Post_Pry_Tert_Educ" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Re_Pry_Pry_Post_Pry_Tert_Educ" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -800,7 +800,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using margin lending product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Margin_Lending" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Margin_Lending" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -812,7 +812,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using share loans product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Share_Loans" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Share_Loans" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -824,7 +824,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using crude oil refining product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Crude_Oil_Refining" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Crude_Oil_Refining" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -836,7 +836,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using natural gas product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Natural_Gas" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Natural_Gas" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -848,7 +848,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using oil - downstream product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Oil_Downstream" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Oil_Downstream" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -860,7 +860,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using oil - upstream product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Oil_Upstream" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Oil_Upstream" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -872,7 +872,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using oil &amp; gas services product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Oil_Gas_Services" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Oil_Gas_Services" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -884,7 +884,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using utility(private) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Utility_Private" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Utility_Private" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -896,7 +896,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using utility(public) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Utility_Public" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Utility_Public" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -908,7 +908,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using federal (direct) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Federal_Direct" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Federal_Direct" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -920,7 +920,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using federal (parastatal) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Federal_Parastatal" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Federal_Parastatal" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -932,7 +932,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using local (direct) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Local_Direct" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Local_Direct" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -944,7 +944,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using local (parastatal) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Local_Parastatal" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Local_Parastatal" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -956,7 +956,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using state (direct) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_State_Direct" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_State_Direct" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -968,7 +968,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using state (parastatal) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_State_Parastatal" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_State_Parastatal" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -980,7 +980,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using independent power projects product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Independent_Power_Projects" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Independent_Power_Projects" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -992,7 +992,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using power generation/power plants product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Power_Generation_Power_Plants" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Power_Generation_Power_Plants" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1004,7 +1004,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using ports activities and recreatn product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Ports_Activities_And_Recreatn" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Ports_Activities_And_Recreatn" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1016,7 +1016,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using human health activities product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Human_Health_Activities" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Human_Health_Activities" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1028,7 +1028,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using residential care activitis product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Residential_Care_Activitis" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Residential_Care_Activitis" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1040,7 +1040,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using office administrative,office sup product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Office_Administrative_Office_Sup" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Office_Administrative_Office_Sup" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1052,7 +1052,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using security and investigation activs product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Security_And_Investigation_Activs" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Security_And_Investigation_Activs" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1064,7 +1064,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using travel agency,tour operator,resv product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Travel_Agency_Tour_Operator_Resv" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Travel_Agency_Tour_Operator_Resv" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1076,7 +1076,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using employment acivities product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Employment_Acivities" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Employment_Acivities" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1088,7 +1088,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using hotel and leisure product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Hotel_And_Leisure" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Hotel_And_Leisure" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1100,7 +1100,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using logistics product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Logistics" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Logistics" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1112,7 +1112,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using personal product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Personal" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Personal" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1124,7 +1124,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using religious bodies product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Religious_Bodies" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Religious_Bodies" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1136,7 +1136,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using retail (others) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Retail_Others" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Retail_Others" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1148,7 +1148,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using solar product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Solar" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Solar" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1160,7 +1160,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using biomass product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Biomass" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Biomass" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1172,7 +1172,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using wind energy product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Wind_Energy" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Wind_Energy" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1184,7 +1184,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using hydro product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Hydro" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Hydro" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1196,7 +1196,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using geothermal product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Geothermal" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Geothermal" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1208,7 +1208,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using associations/unions product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Associations_Unions" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Associations_Unions" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1220,7 +1220,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using technical/business advisory product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Technical_Business_Advisory" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Technical_Business_Advisory" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1232,7 +1232,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using dealers in mechanized farm equip/machine product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Dealers_in_Mechanized_Farm_Equip_Machine" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Dealers_in_Mechanized_Farm_Equip_Machine" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1244,7 +1244,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using luxury goods product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Luxury_Goods" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Luxury_Goods" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1256,7 +1256,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using accounting professionals/services product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Accounting_Professionals_Services" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Accounting_Professionals_Services" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1268,7 +1268,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using rubber and rubber products product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Rubber_and_Rubber_Products" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Rubber_and_Rubber_Products" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1280,7 +1280,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using timber and timber products product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Timber_and_Timber_Products" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Timber_and_Timber_Products" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1292,7 +1292,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using other agricultural exports product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Other_Agricultural_Exports" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Other_Agricultural_Exports" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1304,7 +1304,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using non agricultural exports product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Non_Agricultural_Exports" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Non_Agricultural_Exports" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1316,7 +1316,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using groundnuts and groundnut oil product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Groundnuts_and_Groundnut_oil" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Groundnuts_and_Groundnut_oil" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1328,7 +1328,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using palm produce product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Palm_Produce" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Palm_Produce" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1340,7 +1340,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using veterinary activities product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Veterinary_activities" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Veterinary_activities" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1352,7 +1352,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using cotton product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Cotton" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Cotton" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1364,7 +1364,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using jewelry dealer product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Jewelry_Dealer" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Jewelry_Dealer" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1376,7 +1376,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using soft drinks product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Soft_Drinks" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Soft_Drinks" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1388,7 +1388,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using precious metal dealer product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Precious_Metal_Dealer" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Precious_Metal_Dealer" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1400,7 +1400,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using wholesale merchant product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Wholesale_Merchant" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Wholesale_Merchant" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1412,7 +1412,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using retail merchant product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Retail_Merchant" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Retail_Merchant" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1424,7 +1424,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using imports product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Imports" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Imports" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1436,7 +1436,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using export product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Export" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Export" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1448,7 +1448,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using video n televisn programe productn product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Video_n_televisn_programe_productn" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Video_n_televisn_programe_productn" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1460,7 +1460,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using programming and broadcasting act product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Programming_and_broadcasting_act" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Programming_and_broadcasting_act" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1472,7 +1472,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using bdc,curr dealers n money transmters product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_BDC_curr_dealers_N_money_transmters" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_BDC_curr_dealers_N_money_transmters" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1484,7 +1484,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using investment broker product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Investment_Broker" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Investment_Broker" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1496,7 +1496,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using investment banks product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Investment_Banks" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Investment_Banks" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1508,7 +1508,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using trustees and fiduciary accounts product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Trustees_and_Fiduciary_Accounts" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Trustees_and_Fiduciary_Accounts" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1520,7 +1520,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using mortgage institutions product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Mortgage_institutions" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Mortgage_institutions" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1532,7 +1532,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using development bank product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Development_bank" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Development_bank" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1544,7 +1544,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using pension fund custodians product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Pension_Fund_custodians" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Pension_Fund_custodians" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1556,7 +1556,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using pension fund administrators product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Pension_Fund_administrators" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Pension_Fund_administrators" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1568,7 +1568,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using deposit broker product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Deposit_Broker" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Deposit_Broker" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1580,7 +1580,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using portfolio mgr n admin accounts product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Portfolio_MGR_N_admin_Accounts" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Portfolio_MGR_N_admin_Accounts" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1592,7 +1592,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using store value cards product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Store_Value_Cards" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Store_Value_Cards" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1604,7 +1604,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using central bank product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Central_Bank" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Central_Bank" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1616,7 +1616,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using agent banking product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Agent_Banking" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Agent_Banking" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1628,7 +1628,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using residential mortgage facility product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Residential_Mortgage_facility" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Residential_Mortgage_facility" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1640,7 +1640,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using clients and executorships product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Clients_and_Executorships" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Clients_and_Executorships" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1652,7 +1652,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using share facility product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Share_Facility" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Share_Facility" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1664,7 +1664,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using share underwriting product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Share_underwriting" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Share_underwriting" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1676,7 +1676,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using power transmission product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Power_transmission" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Power_transmission" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1688,7 +1688,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using power distribution product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Power_distribution" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Power_distribution" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1700,7 +1700,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using hospital and clinics product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Hospital_and_Clinics" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Hospital_and_Clinics" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1712,7 +1712,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using pharmaceutical (retail) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Pharmaceutical_Retail" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Pharmaceutical_Retail" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1724,7 +1724,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using pharmaceutical (import and dist) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Pharmaceutical_Import_and_Dist" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Pharmaceutical_Import_and_Dist" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1736,7 +1736,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using diagnostics and laboratories product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Diagnostics_and_Laboratories" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Diagnostics_and_Laboratories" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1748,7 +1748,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using health equip manufacturing/supplies product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Health_Equip_Manufacturing_Supplies" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Health_Equip_Manufacturing_Supplies" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1760,7 +1760,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using health practitioners product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Health_Practitioners" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Health_Practitioners" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1772,7 +1772,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using health association/unions/boards product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Health_Association_Unions_Boards" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Health_Association_Unions_Boards" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1784,7 +1784,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using health financing/hmos product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Health_Financing_HMOs" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Health_Financing_HMOs" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1796,7 +1796,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using health consultants product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Health_Consultants" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Health_Consultants" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1808,7 +1808,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using health - government product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Health_Government" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Health_Government" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1820,7 +1820,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using federal fire service product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Federal_Fire_Service" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Federal_Fire_Service" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1832,7 +1832,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using religious (churches) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Religious_Churches" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Religious_Churches" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1844,7 +1844,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using religious (mosques) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Religious_Mosques" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Religious_Mosques" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1856,7 +1856,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using religious (others) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Religious_Others" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Religious_Others" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1868,7 +1868,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using nigerian army product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Nigerian_Army" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Nigerian_Army" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1880,7 +1880,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using navy product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Navy" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Navy" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1892,7 +1892,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using airforce product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Airforce" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Airforce" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1904,7 +1904,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using police product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Police" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Police" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1916,7 +1916,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using department of state services(dss) product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_DEPARTMENT_OF_STATE_SERVICES_DSS" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_DEPARTMENT_OF_STATE_SERVICES_DSS" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1928,7 +1928,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using customs product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Customs" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Customs" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1940,7 +1940,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using immigration product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Immigration" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Immigration" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1952,7 +1952,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using prison services product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Prison_Services" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Prison_Services" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1964,7 +1964,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using nscdc product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_NSCDC" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_NSCDC" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1976,7 +1976,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using efcc product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_EFCC" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_EFCC" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -1988,7 +1988,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using frsc product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_FRSC" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_FRSC" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -2000,7 +2000,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using icpc product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_ICPC" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_ICPC" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -2012,7 +2012,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using ndlea product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_NDLEA" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_NDLEA" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -2024,7 +2024,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using nigerian intelligence agency product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_Nigerian_Intelligence_Agency" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_Nigerian_Intelligence_Agency" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -2036,7 +2036,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using iron ore product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_IRON_ORE" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_IRON_ORE" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -2048,7 +2048,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using coal product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_COAL" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_COAL" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -2060,7 +2060,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using bitumen product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_BITUMEN" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_BITUMEN" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -2072,7 +2072,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using gold product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_GOLD" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_GOLD" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>
@@ -2084,7 +2084,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using limestone product</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="compliance_management.res_risk_assessment_LIMESTONE" />
+        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_LIMESTONE" />
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24" />
     </record>

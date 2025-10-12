@@ -68,7 +68,7 @@
         </record>
 
         <record id="digital_channel_ifuel" model="digital.delivery.channel">
-            <field name="name">fuel</field>
+            <field name="name">Ifuel</field>
             <field name="code">ifuel</field>
             <field name="description">Ifuel Services</field>
             <field name="status">active</field>

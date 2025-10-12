@@ -10,7 +10,12 @@ _logger = logging.getLogger(__name__)
 
 class CustomerDigitalProductExtend(models.Model):
     _inherit  = 'customer.digital.product'
+    _sql_constraints = [
+        ('uniq_account_no', 'unique(account_no)',
+         "account no already exists. account no must be unique!"),
+    ]
         
+    account_no = fields.Char(string='Account No', readonly=True)
     ifuel = fields.Char(string='Ifuel', readonly=True)
     altpro = fields.Char(string='AltPro', readonly=True)
     altmall = fields.Char(string='AltMall', readonly=True)
