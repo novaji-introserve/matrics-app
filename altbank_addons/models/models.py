@@ -23,3 +23,16 @@ class CustomerDigitalProductExtend(models.Model):
     altpower = fields.Char(string='AltPower', readonly=True)
     altdrive = fields.Char(string='AltDrive', readonly=True)
     chequebook = fields.Char(string='ChequeBook', readonly=True)
+    
+
+class CustomerDigitalProductMaterializedExtension(models.Model):
+    _inherit = 'customer.digital.product.mat'
+
+    account_no = fields.Char(string='Account No', readonly=True)
+    ifuel = fields.Char(string='Ifuel', readonly=True)
+    altpro = fields.Char(string='AltPro', readonly=True)
+    altmall = fields.Char(string='AltMall', readonly=True)
+    altinvest = fields.Char(string='AltInvest', readonly=True)
+    altpower = fields.Char(string='AltPower', readonly=True)
+    altdrive = fields.Char(string='AltDrive', readonly=True)
+    chequebook = fields.Char(string='ChequeBook', readonly=True)
