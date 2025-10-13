@@ -197,10 +197,6 @@ class Customer(models.Model):
 
     formatted_gender = fields.Char(string='Gender', compute='_compute_gender')
 
-    digital_product_view_ids = fields.One2many(
-        'res.partner.digital.product.view', 'partner_id',
-        string='Digital Products', readonly=True, auto_join=True)
-
     channel_subscription_ids = fields.One2many(
         'customer.channel.subscription', 'partner_id',
         string='Channel Subscriptions', readonly=True)

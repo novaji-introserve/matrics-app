@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Digital Delivery Channel Records -->
+        
+        <record id="digital_channel_ussd" model="digital.delivery.channel">
+            <field name="name">USSD</field>
+            <field name="code">ussd</field>
+            <field name="description">USSD Banking Services</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="digital_channel_card" model="digital.delivery.channel">
+            <field name="name">Card</field>
+            <field name="code">carded_customer</field>
+            <field name="description">Card Services</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="digital_channel_alt_bank" model="digital.delivery.channel">
+            <field name="name">Alt Bank</field>
+            <field name="code">alt_bank</field>
+            <field name="description">Alternative Banking</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="digital_channel_sterling_pro" model="digital.delivery.channel">
+            <field name="name">Sterling Pro</field>
+            <field name="code">sterling_pro</field>
+            <field name="description">Sterling Pro Services</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="digital_channel_banca" model="digital.delivery.channel">
+            <field name="name">Banca</field>
+            <field name="code">banca</field>
+            <field name="description">Banca Services</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="digital_channel_doubble" model="digital.delivery.channel">
+            <field name="name">Doubble</field>
+            <field name="code">doubble</field>
+            <field name="description">Doubble Services</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="digital_channel_specta" model="digital.delivery.channel">
+            <field name="name">Specta</field>
+            <field name="code">specta</field>
+            <field name="description">Specta Services</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="digital_channel_switch" model="digital.delivery.channel">
+            <field name="name">Switch</field>
+            <field name="code">switch</field>
+            <field name="description">Switch Services</field>
+            <field name="status">active</field>
+        </record>
+
+
+    </data>
+</odoo>

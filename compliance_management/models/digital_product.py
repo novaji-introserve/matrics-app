@@ -14,10 +14,14 @@ _logger = logging.getLogger(__name__)
 
 class CustomerDigitalProduct(models.Model):
     _name = 'customer.digital.product'
+<<<<<<< HEAD
     # _sql_constraints = [
     #     ('uniq_customer_id', 'unique(customer_id)',
     #      "Customer already exists. Customer must be unique!"),
     # ]
+=======
+    
+>>>>>>> bafcba35 (sterling custom data)
 
     customer_id = fields.Text(string='Customer ID',
                               index=True, readonly=True)  # customer,
@@ -28,12 +32,15 @@ class CustomerDigitalProduct(models.Model):
     carded_customer = fields.Char(
         string='Has A Card', index=True, readonly=True)
     alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
+<<<<<<< HEAD
     # onebank = fields.Char(string='Uses One Bank', index=True, readonly=True)
     # sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
     # banca = fields.Char(string='Has Banca', readonly=True)
     # doubble = fields.Char(string='Has Doubble', readonly=True)
     # specta = fields.Char(string='Has Specta', readonly=True)
     # switch = fields.Char(string='Has Switch', readonly=True)
+=======
+>>>>>>> bafcba35 (sterling custom data)
     
 
   
@@ -58,35 +65,6 @@ class CustomerDigitalProduct(models.Model):
                 _logger.warning(f"Index creation skipped: {e}")
 
 
-
-# view model to display Customer digital products
-class PartnerDigitalProductView(models.Model):
-    _name = 'res.partner.digital.product.view'
-    _description = 'Partner Digital Products View'
-    _auto = False  # This is a database view
-
-    partner_id = fields.Many2one(
-        'res.partner', string='Partner', readonly=True)
-    customer_id = fields.Char(string='Customer ID', readonly=True)
-    ussd = fields.Char(string='Uses USSD', readonly=True)
-    onebank = fields.Char(string='Uses One Bank', readonly=True)
-    carded_customer = fields.Char(string='Has A Card', readonly=True)
-    alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
-    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
-    banca = fields.Char(string='Has Banca', readonly=True)
-    doubble = fields.Char(string='Has Doubble', readonly=True)
-    specta = fields.Char(string='Has Specta', readonly=True)
-    switch = fields.Char(string='Has Switch', readonly=True)
-    customer_segment = fields.Char(string='Customer Segment', readonly=True)
-
-    
-    def init(self):
-        """Defer view creation to avoid slow loading"""
-        _logger.info(
-            "Partner digital product view initialization deferred for performance")
-        # View will be created manually when needed
-
-
    
 class DigitalDeliveryChannel(models.Model):
     """Optimized model for handling millions of records"""
@@ -107,8 +85,8 @@ class DigitalDeliveryChannel(models.Model):
         ('inactive', 'Inactive')
     ], default='active', index=True)
     
-                        
 
+<<<<<<< HEAD
     def init(self):
         """Ultra-fast initialization - minimal operations only"""
         _logger.info(
@@ -989,6 +967,8 @@ class DigitalDeliveryChannel(models.Model):
         }
     
     
+=======
+>>>>>>> bafcba35 (sterling custom data)
 
 class CustomerChannelSubscription(models.Model):
     """Optimized subscription model for large datasets"""
@@ -1037,14 +1017,9 @@ class CustomerDigitalProductMaterialized(models.Model):
     customer_name = fields.Char(string='Name', readonly=True)
     customer_segment = fields.Char(string='Customer Segment', readonly=True)
     ussd = fields.Char(string='Uses USSD', readonly=True)
-    onebank = fields.Char(string='Uses One Bank', readonly=True)
     carded_customer = fields.Char(string='Has A Card', readonly=True)
     alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
-    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
-    banca = fields.Char(string='Has Banca', readonly=True)
-    doubble = fields.Char(string='Has Doubble', readonly=True)
-    specta = fields.Char(string='Has Specta', readonly=True)
-    switch = fields.Char(string='Has Switch', readonly=True)
+    
 
     def init(self):
         """Minimal initialization - no heavy operations"""

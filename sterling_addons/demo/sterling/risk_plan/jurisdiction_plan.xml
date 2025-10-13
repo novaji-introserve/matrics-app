@@ -1,0 +1,89 @@
+<odoo>
+       <data noupdate="1">
+              <!-- Jurisdiction Plans -->
+
+              <record id="risk_plan_south_w" model="res.compliance.risk.assessment.plan">
+                     <field name="name">South West Region Analysis</field>
+                     <field name="code">south_west_PLAN</field>
+                     <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+AND LOWER(trim(rb.region)) = 'south west'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+                     <field name="priority">40</field>
+                     <field name="state">active</field>
+                     <field name="narration">Analysis for customers in South West region</field>
+                     <field name="risk_score">1</field>
+                     <field name="compute_score_from">risk_assessment</field>
+                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_south_W" />
+                     <field name="use_composite_calculation">True</field>
+                     <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
+              </record>
+
+              <!-- Abuja & North -->
+
+              <record id="risk_plan_abuja_north" model="res.compliance.risk.assessment.plan">
+                     <field name="name">Abuja &amp; North Region Analysis</field>
+                     <field name="code">Abuja_North_PLAN</field>
+                     <field name="sql_query">SELECT 1 
+      FROM res_partner_account rpa
+      INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+      WHERE rpa.customer_id = %s
+      AND LOWER(trim(rb.region)) = 'abuja &amp; north'
+      ORDER BY rpa.opening_date DESC
+      LIMIT 1;</field>
+                     <field name="priority">40</field>
+                     <field name="state">active</field>
+                     <field name="narration">Analysis for customers in Abuja &amp; North region</field>
+                     <field name="risk_score">1</field>
+                     <field name="compute_score_from">risk_assessment</field>
+                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_abj" />
+                     <field name="use_composite_calculation">True</field>
+                     <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
+              </record>
+
+
+              <!-- S/South & S/East  -->
+              <record id="risk_plan_ss_sw" model="res.compliance.risk.assessment.plan">
+                     <field name="name">S/South &amp; S/East Region Analysis</field>
+                     <field name="code">S/South_&amp;_S/East_PLAN</field>
+                     <field name="sql_query">SELECT 1 
+      FROM res_partner_account rpa
+      INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+      WHERE rpa.customer_id = %s
+      AND LOWER(trim(rb.region)) = 's/south &amp; s/east'
+      ORDER BY rpa.opening_date DESC
+      LIMIT 1;</field>
+                     <field name="priority">40</field>
+                     <field name="state">active</field>
+                     <field name="narration">Analysis for customers in S/South &amp; S/East region</field>
+                     <field name="risk_score">1</field>
+                     <field name="compute_score_from">risk_assessment</field>
+                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_ss_sw" />
+                     <field name="use_composite_calculation">True</field>
+                     <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
+              </record>
+
+              <record id="risk_plan_abuja" model="res.compliance.risk.assessment.plan">
+                     <field name="name">Abuja Region Analysis</field>
+                     <field name="code">ABUJA_PLAN</field>
+                     <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+  AND LOWER(rb.region) = 'abuja'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+                     <field name="priority">40</field>
+                     <field name="state">active</field>
+                     <field name="narration">Analysis for customers in Abuja region</field>
+                     <field name="risk_score">4</field>
+                     <field name="compute_score_from">risk_assessment</field>
+                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_abuja" />
+                     <field name="use_composite_calculation">True</field>
+                     <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
+              </record>
+       </data>
+</odoo>
