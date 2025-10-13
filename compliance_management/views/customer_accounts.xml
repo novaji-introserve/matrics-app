@@ -5,7 +5,7 @@
         <field name="name">res_customer_account_tree</field>
         <field name="model">res.partner.account</field>
         <field name="arch" type="xml">
-            <tree string="Account" create="false">
+            <tree string="Account" create="false" limit='40'>
                 <field name="name" string="Account Number" />
                 <field name="account_name" optional="show"/>
                 <field name="branch_id" optional="show"/>
@@ -138,8 +138,9 @@
         <field name="priority" eval="10" />
         <field name="arch" type="xml">
             <search string="Search Account">
+                <field name="account_name" />
                 <field name="name" />
-                <field name="customer_id" string="Customer Id"/>
+                <field name="customer" string="Customer Id"/>
                 <field name="category"/>
              
 

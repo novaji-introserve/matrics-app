@@ -5,7 +5,7 @@
         <field name="name">res_cust_transaction_tree</field>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <tree string="Transactions" create="false">
+            <tree string="Transactions" create="false" limit='50'>
                 <header>
                     <button name="done" class="oe_highlight" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" />
                 </header>

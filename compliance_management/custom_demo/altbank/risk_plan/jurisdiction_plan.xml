@@ -1,7 +1,5 @@
 <odoo>
-    <data noupdate="1">
-        <!-- Jurisdiction Plans -->
-
+    <data noupdate="0">
         
 
         <record id="risk_plan_abia"
@@ -9,12 +7,12 @@
             <field name="name">Abia Region Analysis</field>
             <field name="code">ABIA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'abia'
-ORDER BY rpa.opening_date DESC
-LIMIT 1;</field>
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'abia'
+LIMIT 1;
+</field>
             <field name="priority">40</field>
             <field name="state">active</field>
             <field name="narration">Analysis for customers in Abia region</field>
@@ -31,11 +29,10 @@ LIMIT 1;</field>
             <field name="name">Adamawa Region Analysis</field>
             <field name="code">ADAMAWA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'adamawa'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'adamawa'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -53,11 +50,10 @@ LIMIT 1;</field>
             <field name="name">Akwa Ibom Region Analysis</field>
             <field name="code">AKWA_IBOM_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'akwa ibom'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'akwa ibom'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -75,11 +71,10 @@ LIMIT 1;</field>
             <field name="name">Anambra Region Analysis</field>
             <field name="code">ANAMBRA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'anambra'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'anambra'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -97,11 +92,10 @@ LIMIT 1;</field>
             <field name="name">Bauchi Region Analysis</field>
             <field name="code">BAUCHI_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'bauchi'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'bauchi'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -119,11 +113,10 @@ LIMIT 1;</field>
             <field name="name">Bayelsa Region Analysis</field>
             <field name="code">BAYELSA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'bayelsa'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'bayelsa'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -141,11 +134,10 @@ LIMIT 1;</field>
             <field name="name">Benue Region Analysis</field>
             <field name="code">BENUE_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'benue'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'benue'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -163,11 +155,10 @@ LIMIT 1;</field>
             <field name="name">Borno Region Analysis</field>
             <field name="code">BORNO_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'borno'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'borno'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -185,11 +176,10 @@ LIMIT 1;</field>
             <field name="name">Cross River Region Analysis</field>
             <field name="code">CROSS_RIVER_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'cross river'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'cross river'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -207,11 +197,10 @@ LIMIT 1;</field>
             <field name="name">Delta Region Analysis</field>
             <field name="code">DELTA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'delta'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'delta'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -229,11 +218,10 @@ LIMIT 1;</field>
             <field name="name">Edo Region Analysis</field>
             <field name="code">EDO_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'edo'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'edo'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -251,11 +239,10 @@ LIMIT 1;</field>
             <field name="name">Ekiti Region Analysis</field>
             <field name="code">EKITI_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'ekiti'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'ekiti'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -273,11 +260,10 @@ LIMIT 1;</field>
             <field name="name">Enugu Region Analysis</field>
             <field name="code">ENUGU_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'enugu'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'enugu'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -295,11 +281,10 @@ LIMIT 1;</field>
             <field name="name">Gombe Region Analysis</field>
             <field name="code">GOMBE_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'gombe'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'gombe'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -317,11 +302,10 @@ LIMIT 1;</field>
             <field name="name">Imo Region Analysis</field>
             <field name="code">IMO_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'imo'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'imo'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -339,11 +323,10 @@ LIMIT 1;</field>
             <field name="name">Jigawa Region Analysis</field>
             <field name="code">JIGAWA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'jigawa'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'jigawa'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -361,11 +344,10 @@ LIMIT 1;</field>
             <field name="name">Kaduna Region Analysis</field>
             <field name="code">KADUNA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'kaduna'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'kaduna'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -383,11 +365,10 @@ LIMIT 1;</field>
             <field name="name">Kano Region Analysis</field>
             <field name="code">KANO_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'kano'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'kano'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -405,11 +386,10 @@ LIMIT 1;</field>
             <field name="name">Katsina Region Analysis</field>
             <field name="code">KATSINA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'katsina'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'katsina'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -427,11 +407,10 @@ LIMIT 1;</field>
             <field name="name">Kebbi Region Analysis</field>
             <field name="code">KEBBI_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'kebbi'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'kebbi'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -449,11 +428,10 @@ LIMIT 1;</field>
             <field name="name">Kogi Region Analysis</field>
             <field name="code">KOGI_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'kogi'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'kogi'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -471,11 +449,10 @@ LIMIT 1;</field>
             <field name="name">Kwara Region Analysis</field>
             <field name="code">KWARA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'kwara'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'kwara'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -493,11 +470,10 @@ LIMIT 1;</field>
             <field name="name">Lagos Region Analysis</field>
             <field name="code">LAGOS_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-AND LOWER(trim(rb.region)) = 'lagos'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'lagos'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -515,11 +491,10 @@ LIMIT 1;</field>
             <field name="name">Niger Region Analysis</field>
             <field name="code">NIGER_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'niger'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'niger'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -537,11 +512,10 @@ LIMIT 1;</field>
             <field name="name">Ogun Region Analysis</field>
             <field name="code">OGUN_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'ogun'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'ogun'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -559,11 +533,10 @@ LIMIT 1;</field>
             <field name="name">Ondo Region Analysis</field>
             <field name="code">ONDO_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'ondo'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'ondo'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -582,11 +555,10 @@ LIMIT 1;</field>
             <field name="name">Osun Region Analysis</field>
             <field name="code">OSUN_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'osun'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'osun'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -604,11 +576,10 @@ LIMIT 1;</field>
             <field name="name">Oyo Region Analysis</field>
             <field name="code">OYO_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'oyo'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'oyo'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -626,11 +597,10 @@ LIMIT 1;</field>
             <field name="name">Plateau Region Analysis</field>
             <field name="code">PLATEAU_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'plateau'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'plateau'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -648,11 +618,10 @@ LIMIT 1;</field>
             <field name="name">Rivers Region Analysis</field>
             <field name="code">RIVERS_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'rivers'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'rivers'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -670,11 +639,10 @@ LIMIT 1;</field>
             <field name="name">Sokoto Region Analysis</field>
             <field name="code">SOKOTO_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'sokoto'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'sokoto'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -693,11 +661,10 @@ LIMIT 1;</field>
             <field name="name">Zamfara Region Analysis</field>
             <field name="code">ZAMFARA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'zamfara'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'zamfara'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -710,16 +677,16 @@ LIMIT 1;</field>
             <field name="universe_id"
                    ref="compliance_inst_fc_risk_univ_21" />
         </record>
+       
         <record id="risk_plan_abuja"
                 model="res.compliance.risk.assessment.plan">
             <field name="name">Abuja Region Analysis</field>
             <field name="code">ABUJA_PLAN</field>
             <field name="sql_query">SELECT 1 
-FROM res_partner_account rpa
-INNER JOIN res_branch rb ON rpa.branch_id = rb.id
-WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'abuja'
-ORDER BY rpa.opening_date DESC
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'abuja'
 LIMIT 1;</field>
             <field name="priority">40</field>
             <field name="state">active</field>
@@ -732,6 +699,30 @@ LIMIT 1;</field>
             <field name="universe_id"
                    ref="compliance_inst_fc_risk_univ_21" />
         </record>
+   
+        <record id="risk_plan_nassarawa"
+                model="res.compliance.risk.assessment.plan">
+            <field name="name">Nassarawa Region Analysis</field>
+            <field name="code">Nassarawa_PLAN</field>
+            <field name="sql_query">SELECT 1 
+FROM res_partner rp
+INNER JOIN res_partner_region rpr ON rp.region_id = rpr.id
+WHERE rp.id = %s
+  AND LOWER(rpr.name) = 'nassarawa'
+LIMIT 1;</field>
+            <field name="priority">40</field>
+            <field name="state">active</field>
+            <field name="narration">Analysis for customers in Nassarawa region</field>
+            <field name="risk_score">4</field>
+            <field name="compute_score_from">risk_assessment</field>
+            <field name="risk_assessment"
+                   ref="res_risk_assessment_nassarawa" />
+            <field name="use_composite_calculation">True</field>
+            <field name="universe_id"
+                   ref="compliance_inst_fc_risk_univ_21" />
+        </record>
+   
+   
     </data>
 
 
