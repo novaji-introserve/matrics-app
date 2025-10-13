@@ -35,7 +35,7 @@
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
         "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/region/res.partner.region.csv",#REGION
-        # "data/demo_data/industries/customer.industry.csv",#INDUSTRY
+
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -70,25 +70,10 @@
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
         
-        # "data/demo_data/risk_assessment/risk_subject.xml", #to remove
-        # "data/demo_data/risk_assessment/risk_subject_2.xml",
-        # "data/demo_data/risk_assessment/digital_delivery_channel.xml",
-        
-        # "data/demo_data/risk_assessment/customer_type.xml",
-        # "data/demo_data/risk_assessment/jurisdiction.xml", #to remove
-        
-        # "data/demo_data/risk_assessment/delivery_channel.xml", #comp data
-        # "data/demo_data/risk_assessment/product_services.xml", #comp data
-        
-        # "data/demo_data/risk_assessment/compliance_history.xml",
-        # "data/demo_data/risk_assessment/data_quality.xml", to remove
-        # "data/demo_data/risk_assessment/transaction_behavior.xml",
+       
         'data/demo_data/risk_assessment/digital_delivery_channel_assessment.xml',
-        # "data/demo_data/account/account_type.xml",
-        # "data/demo_data/education/educational_level.xml",
+        
         "data/demo_data/tier/customer_tier.xml",
-        # "data/demo_data/customer/sector.xml",
-        # "data/demo_data/customer/products.xml", #comp demo
         "data/demo_data/customer/account_officers.xml",
         "views/risk_assessment.xml",
         "views/sanction_screening.xml",
@@ -114,7 +99,6 @@
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
         
-        # 'data/demo_data/account/customer_product.xml', //comp demo
         'data/blacklist.xml', 
         "views/customer_screening.xml",
         'views/transaction_screening_history.xml',
