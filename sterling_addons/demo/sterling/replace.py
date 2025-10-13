@@ -17,8 +17,9 @@ def process_file(file_path):
         pattern2 = re.compile(r'<field\b[^>]*?name="(subject_id|risk_assessment|risk_assessment_id)"[^>]*?ref="compliance_management\.([^"]+)"[^>]*?>', re.DOTALL)
         
         # Apply replacements
-        new_content = pattern1.sub(lambda m: m.group(0).replace('compliance_management.', ''), content)
-        new_content = pattern2.sub(lambda m: m.group(0).replace('compliance_management.', ''), new_content)
+        new_content = pattern1.sub(lambda m: m.group(0).replace('compliance_management.', 'sterling_addons.'), content)
+        new_content = pattern2.sub(lambda m: m.group(0).replace(
+            'compliance_management.', 'sterling_addons.'), new_content)
         
         # Check if any changes were made
         if new_content != content:

@@ -85,5 +85,25 @@ LIMIT 1;</field>
                      <field name="use_composite_calculation">True</field>
                      <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
               </record>
+
+              <record id="risk_plan_lagos" model="res.compliance.risk.assessment.plan">
+                     <field name="name">Lagos Region Analysis</field>
+                     <field name="code">LAGOS_PLAN</field>
+                     <field name="sql_query">SELECT 1 
+FROM res_partner_account rpa
+INNER JOIN res_branch rb ON rpa.branch_id = rb.id
+WHERE rpa.customer_id = %s
+AND LOWER(trim(rb.region)) = 'lagos'
+ORDER BY rpa.opening_date DESC
+LIMIT 1;</field>
+                     <field name="priority">40</field>
+                     <field name="state">active</field>
+                     <field name="narration">Analysis for customers in Lagos region</field>
+                     <field name="risk_score">4</field>
+                     <field name="compute_score_from">risk_assessment</field>
+                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_lagos" />
+                     <field name="use_composite_calculation">True</field>
+                     <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
+              </record>
        </data>
 </odoo>

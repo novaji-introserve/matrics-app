@@ -1,5 +1,5 @@
 {
-    'name': 'Demo Data For Sterling Bank',
+    'name': 'Addons For Sterling Bank',
     'version': '1.0.0',
     'category': 'iComply',
     'summary': 'Demo data and extensions for Compliance Management (Sterling Bank)',

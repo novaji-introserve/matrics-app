@@ -5,7 +5,7 @@ import os
 import glob
 import argparse
 
-def add_prefix_to_refs(file_path, output_dir=None, prefix="compliance_management."):
+def add_prefix_to_refs(file_path, output_dir=None, prefix="sterling_addons."):
     """Add prefix to ref attributes in an XML file that don't already have it."""
     try:
         # Read the XML file
@@ -51,7 +51,7 @@ def add_prefix_to_refs(file_path, output_dir=None, prefix="compliance_management
             "success": False
         }
 
-def process_files(files, output_dir=None, prefix="compliance_management."):
+def process_files(files, output_dir=None, prefix="sterling_addons."):
     """Process multiple files."""
     results = []
     for file_pattern in files:

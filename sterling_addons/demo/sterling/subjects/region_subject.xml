@@ -40,7 +40,8 @@
         <field name="code">NG0020022</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
     </record>
-    <record id="compliance_inst_fc_risk_subject_161" model="res.risk.subject">
+    
+    <record id="compliance_inst_fc_risk_subject_south_w" model="res.risk.subject">
         <field name="name">SOUTH WEST</field>
         <field name="code">NGSOUTH_WEST</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
