@@ -780,7 +780,7 @@ class Customer(models.Model):
         if plan_setting not in ['avg', 'max', 'sum']:
             plan_setting = 'avg'
 
-        _logger.info(f"Using risk calculation method: {plan_setting.upper()}")
+        # _logger.info(f"Using risk calculation method: {plan_setting.upper()}")
 
         # Clear previous composite plan lines
         self.env['res.partner.composite.plan.line'].sudo().search(
@@ -888,13 +888,13 @@ class Customer(models.Model):
                 universe_data['total_score'] = 0.0
 
             # Log the calculation details for debugging
-            if subject_scores:
-                _logger.info(
-                    f"Universe {universe_data['name']}: "
-                    f"Subject scores={subject_scores}, "
-                    f"Method={plan_setting.upper()}, "
-                    f"Universe total={universe_data['total_score']:.2f}"
-                )
+            # if subject_scores:
+            #     _logger.info(
+            #         f"Universe {universe_data['name']}: "
+            #         f"Subject scores={subject_scores}, "
+            #         f"Method={plan_setting.upper()}, "
+            #         f"Universe total={universe_data['total_score']:.2f}"
+            #     )
 
         # Create records for ALL universes and ALL subjects and calculate composite score
         for universe_id, universe_data in universe_scores.items():
@@ -905,12 +905,10 @@ class Customer(models.Model):
             # Only add to CCR if there's a violation (score > 0)
             if universe_data['total_score'] > 0:
                 composite_score += weighted_score
-                _logger.info(
-                    f"Universe {universe_data['name']} : Score={universe_data['total_score']:.2f}, "
-                    f"Weight={universe_data['weight']:.2f}, Weighted Score={weighted_score:.2f}")
+                
 
-        _logger.info(
-            f"Final CCR for customer recordid: {record_id} score: {composite_score:.2f}")
+        # _logger.info(
+        #     f"Final CCR for customer recordid: {record_id} score: {composite_score:.2f}")
         return round(composite_score, 2)
 
     def action_sync_channels(self):
