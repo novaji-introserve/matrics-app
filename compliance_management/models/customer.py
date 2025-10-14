@@ -257,8 +257,8 @@ class Customer(models.Model):
         for record in self:
             record.show_create_case = has_module
             # Debug logging
-            _logger.info(
-                f"Case module installed: {has_module}")
+            # _logger.info(
+            #     f"Case module installed: {has_module}")
 
     def action_create_customer_case(self):
         self.ensure_one()
