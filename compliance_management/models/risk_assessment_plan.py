@@ -3,6 +3,10 @@
 from odoo import models, fields, api, _
 from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError, ValidationError
+import re
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class RiskAssessmentPlan(models.Model):
     _name = 'res.compliance.risk.assessment.plan'
@@ -106,4 +110,271 @@ class RiskAssessmentPlan(models.Model):
             return False
         except:
             raise UserError(_('Wrong python code defined for customer risk analysis rule %s (%s).') % (self.name, self.code))
-    
+
+
+class RiskAnalysis(models.Model):
+    """
+    This model stores the generated PostgreSQL functions and contains the logic
+    to automatically generate them via a cron job.
+    """
+    _name = 'risk.analysis'
+    _description = 'Risk Analysis SQL Function'
+    _order = 'universe, name'
+
+    name = fields.Char(
+        string="Function Name",
+        required=True,
+        readonly=True,
+        help="The unique name of the generated PostgreSQL function (e.g., check_partner_industry)."
+    )
+    code = fields.Text(
+        string='SQL Function Script',
+        required=True,
+        readonly=True,
+        help="The complete 'CREATE OR REPLACE FUNCTION...' statement for this function."
+    )
+    sql_query = fields.Char(
+        string='Sample Execution Query',
+        readonly=True,
+        help="A sample SQL query to execute the function (e.g., SELECT check_partner_industry(partner_id);)."
+    )
+    universe = fields.Char(
+        string="Risk Universe",
+        required=True,
+        readonly=True,
+        help="The name of the risk universe these checks belong to."
+    )
+
+    # --- HELPER & LOGIC METHODS ---
+
+    def _slugify(self, text):
+        """Helper to create a valid SQL function name from a string."""
+        text = text.lower().strip()
+        text = re.sub(r'[\s\.]+', '_', text)
+        text = re.sub(r'[^\w_]', '', text)
+        return text
+
+    def _get_optimized_check_type(self, sql_query):
+        """
+        Analyzes a SQL query to determine the best optimization strategy.
+        """
+        sql_lower = sql_query.lower()
+
+        if 'select risk_score' in sql_lower:
+            return {'type': 'risk_score'}
+
+        # Pattern 1: One-to-One (Partner Region) - More robust
+        if 'res_partner_region' in sql_lower:
+            match = re.search(
+                r"where\s+(?:lower\s*\(\s*rpr.name\s*\)|rpr.name)\s*=\s*'([^']+)'", sql_lower)
+            if match:
+                return {
+                    'type': 'one-to-one', 'group': 'partner_region', 'value': match.group(1).lower(),
+                    'fetch_sql': "SELECT lower(rpr.name) FROM res_partner rp JOIN res_partner_region rpr ON rp.region_id = rpr.id WHERE rp.id = p_partner_id",
+                    'variable_name': 'partner_region_name'
+                }
+
+        # Pattern 2: One-to-One (Customer Industry) - More robust
+        if 'customer_industry' in sql_lower:
+            # This regex handles both `lower(name) = '...'` and `name = '...'`
+            match = re.search(
+                r"where\s+(?:lower\s*\(\s*name\s*\)|name)\s*=\s*'([^']+)'", sql_lower)
+            if match:
+                return {
+                    'type': 'one-to-one', 'group': 'customer_industry', 'value': match.group(1).lower(),
+                    'fetch_sql': "SELECT lower(ci.name) FROM res_partner rp JOIN customer_industry ci ON rp.customer_industry_id = ci.id WHERE rp.id = p_partner_id",
+                    'variable_name': 'partner_industry_name'
+                }
+
+        return {'type': 'one-to-many'}
+
+    @api.model
+    def _build_function_for_universe(self, universe, queries):
+        """
+        Builds a single, consolidated SQL function for a list of queries within a universe.
+        """
+        function_name = f"check_{self._slugify(universe.code)}"
+        declarations = ["result_json jsonb := '{}'::jsonb;"]
+        body_parts = []
+        one_to_one_groups = {}
+
+        for query_obj in queries:
+            analysis = self._get_optimized_check_type(query_obj.sql_query)
+
+            if analysis['type'] == 'one-to-one':
+                group = analysis['group']
+                if group not in one_to_one_groups:
+                    one_to_one_groups[group] = {
+                        'fetch_sql': analysis['fetch_sql'],
+                        'variable_name': analysis['variable_name'],
+                        'checks': []
+                    }
+                    if f"{analysis['variable_name']} text;" not in declarations:
+                        declarations.append(
+                            f"{analysis['variable_name']} text;")
+                one_to_one_groups[group]['checks'].append({
+                    'value': analysis['value'],
+                    'plan_code': query_obj.code
+                })
+
+            elif analysis['type'] == 'risk_score':
+                sql = query_obj.sql_query.strip().rstrip(';').replace('%s', 'p_partner_id')
+                temp_var = f"temp_score_{self._slugify(query_obj.code)}"
+                declarations.append(f"{temp_var} integer;")
+                body_parts.append(f"""
+    {temp_var} := ({sql.replace('LIMIT 1', '')} LIMIT 1);
+    IF {temp_var} IS NOT NULL THEN
+        result_json := result_json || jsonb_build_object('{query_obj.code}', {temp_var});
+    END IF;""")
+
+            else:  # 'one-to-many'
+                sql = query_obj.sql_query.strip().rstrip(';').replace('%s', 'p_partner_id')
+                body_parts.append(f"""
+    IF EXISTS ({sql}) THEN
+        result_json := result_json || jsonb_build_object('{query_obj.code}', true);
+    END IF;""")
+
+        # Process the grouped one-to-one checks at the start of the function body
+        one_to_one_body = []
+        for group_info in one_to_one_groups.values():
+            one_to_one_body.append(
+                f"{group_info['fetch_sql']} INTO {group_info['variable_name']};")
+            for check in group_info['checks']:
+                one_to_one_body.append(f"""
+    IF COALESCE({group_info['variable_name']}, '') = '{check['value']}' THEN
+        result_json := result_json || jsonb_build_object('{check['plan_code']}', true);
+    END IF;""")
+
+        body_str = "\n\n    ".join(one_to_one_body + body_parts)
+        declaration_str = "\n    ".join(declarations)
+
+        function_sql = f"""
+DROP FUNCTION IF EXISTS {function_name}(integer);
+CREATE OR REPLACE FUNCTION {function_name}(p_partner_id integer)
+RETURNS jsonb AS $$
+DECLARE
+    {declaration_str}
+BEGIN
+    {body_str}
+
+    RETURN result_json;
+END;
+$$ LANGUAGE plpgsql STABLE;
+"""
+        return {'name': function_name, 'code': function_sql, 'sql_query': f"SELECT {function_name}(partner_id);", 'universe': universe.name}
+
+    @api.model
+    def _build_function_for_single_query(self, plan):
+        """
+        Builds a dedicated SQL function for a single query plan that has no universe.
+        """
+        function_name = f"check_{self._slugify(plan.code)}"
+        sql = plan.sql_query.strip().rstrip(';').replace('%s', 'p_partner_id')
+        analysis = self._get_optimized_check_type(sql)
+
+        function_sql = ''  # Initialize variable to ensure it's always available
+        if analysis['type'] == 'risk_score':
+            function_body = f"""
+DECLARE
+    risk_score_val integer;
+BEGIN
+    risk_score_val := ({sql.replace('LIMIT 1', '')} LIMIT 1);
+    IF risk_score_val IS NOT NULL THEN
+        RETURN jsonb_build_object('{plan.code}', risk_score_val);
+    END IF;
+    RETURN '{{}}'::jsonb;
+END;
+"""
+            function_sql = f"""
+DROP FUNCTION IF EXISTS {function_name}(integer);
+CREATE OR REPLACE FUNCTION {function_name}(p_partner_id integer)
+RETURNS jsonb AS $$
+{function_body}
+$$ LANGUAGE plpgsql STABLE;
+"""
+        else:  # boolean check
+            function_body = f"""
+BEGIN
+    IF EXISTS({sql}) THEN
+        RETURN jsonb_build_object('{plan.code}', true);
+    END IF;
+    RETURN '{{}}'::jsonb;
+END;
+"""
+            function_sql = f"""
+DROP FUNCTION IF EXISTS {function_name}(integer);
+CREATE OR REPLACE FUNCTION {function_name}(p_partner_id integer)
+RETURNS jsonb AS $$
+{function_body}
+$$ LANGUAGE plpgsql STABLE;
+"""
+
+        return {'name': function_name, 'code': function_sql, 'sql_query': f"SELECT {function_name}(partner_id);", 'universe': 'Standalone'}
+
+    @api.model
+    def _cron_generate_sql_functions(self):
+        """Main method to be called by the cron job."""
+        _logger.info(
+            "CRON: Starting generation of risk analysis SQL functions.")
+
+        plans = self.env['res.compliance.risk.assessment.plan'].search([
+            ('state', '=', 'active'),
+            ('sql_query', '!=', False)
+        ])
+        if not plans:
+            _logger.warning(
+                "CRON: No active, dynamic SQL compliance plans found. Skipping generation.")
+            return
+
+        queries_by_universe = {}
+        orphan_queries = []
+
+        for plan in plans:
+            if plan.universe_id:
+                key = plan.universe_id.id
+                if key not in queries_by_universe:
+                    queries_by_universe[key] = []
+                queries_by_universe[key].append(plan)
+            else:
+                orphan_queries.append(plan)
+
+        self.search([]).unlink()
+
+        # Process queries grouped by a universe
+        all_universes = {
+            u.id: u for u in self.env['res.risk.universe'].search([])}
+        _logger.info(
+            f"CRON: Found {len(queries_by_universe)} universe groups to process.")
+        for universe_id, queries in queries_by_universe.items():
+            universe = all_universes.get(universe_id)
+            if not universe:
+                _logger.warning(
+                    f"CRON: Skipping queries for non-existent universe ID {universe_id}")
+                continue
+
+            function_data = self._build_function_for_universe(
+                universe, queries)
+            try:
+                self.env.cr.execute(function_data['code'])
+                self.env.cr.commit()
+                self.create(function_data)
+            except Exception as e:
+                _logger.error(
+                    f"CRON: Failed to create function for universe '{universe.name}': {e}")
+                self.env.cr.rollback()
+
+        # Process queries with no universe, creating one function for each
+        _logger.info(
+            f"CRON: Found {len(orphan_queries)} standalone queries to process.")
+        for plan in orphan_queries:
+            function_data = self._build_function_for_single_query(plan)
+            try:
+                self.env.cr.execute(function_data['code'])
+                self.env.cr.commit()
+                self.create(function_data)
+            except Exception as e:
+                _logger.error(
+                    f"CRON: Failed to create function for standalone plan '{plan.name}': {e}")
+                self.env.cr.rollback()
+
+        _logger.info("CRON: Risk analysis SQL function generation complete.")
