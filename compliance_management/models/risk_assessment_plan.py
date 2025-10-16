@@ -317,8 +317,6 @@ $$ LANGUAGE plpgsql STABLE;
     @api.model
     def _cron_generate_sql_functions(self):
         """Main method to be called by the cron job."""
-        _logger.info(
-            "CRON: Starting generation of risk analysis SQL functions.")
 
         plans = self.env['res.compliance.risk.assessment.plan'].search([
             ('state', '=', 'active'),
@@ -365,8 +363,7 @@ $$ LANGUAGE plpgsql STABLE;
                 self.env.cr.rollback()
 
         # Process queries with no universe, creating one function for each
-        _logger.info(
-            f"CRON: Found {len(orphan_queries)} standalone queries to process.")
+        
         for plan in orphan_queries:
             function_data = self._build_function_for_single_query(plan)
             try:
