@@ -214,7 +214,8 @@ class RiskAnalysis(models.Model):
                             f"{analysis['variable_name']} text;")
                 one_to_one_groups[group]['checks'].append({
                     'value': analysis['value'],
-                    'plan_code': query_obj.code
+                    'plan_code': query_obj.code,
+                    'score': query_obj.risk_assessment_score or 0
                 })
 
             elif analysis['type'] == 'risk_score':
@@ -229,9 +230,10 @@ class RiskAnalysis(models.Model):
 
             else:  # 'one-to-many'
                 sql = query_obj.sql_query.strip().rstrip(';').replace('%s', 'p_partner_id')
+                score = query_obj.risk_assessment_score or 0
                 body_parts.append(f"""
     IF EXISTS ({sql}) THEN
-        result_json := result_json || jsonb_build_object('{query_obj.code}', true);
+        result_json := result_json || jsonb_build_object('{query_obj.code}', {score});
     END IF;""")
 
         # Process the grouped one-to-one checks at the start of the function body
@@ -242,7 +244,7 @@ class RiskAnalysis(models.Model):
             for check in group_info['checks']:
                 one_to_one_body.append(f"""
     IF COALESCE({group_info['variable_name']}, '') = '{check['value']}' THEN
-        result_json := result_json || jsonb_build_object('{check['plan_code']}', true);
+        result_json := result_json || jsonb_build_object('{check['plan_code']}', {check['score']});
     END IF;""")
 
         body_str = "\n\n    ".join(one_to_one_body + body_parts)
@@ -293,10 +295,11 @@ RETURNS jsonb AS $$
 $$ LANGUAGE plpgsql STABLE;
 """
         else:  # boolean check
+            score = plan.risk_assessment_score or 0
             function_body = f"""
 BEGIN
     IF EXISTS({sql}) THEN
-        RETURN jsonb_build_object('{plan.code}', true);
+        RETURN jsonb_build_object('{plan.code}', {score});
     END IF;
     RETURN '{{}}'::jsonb;
 END;
@@ -343,12 +346,11 @@ $$ LANGUAGE plpgsql STABLE;
         # Process queries grouped by a universe
         all_universes = {
             u.id: u for u in self.env['res.risk.universe'].search([])}
-       
+        
         for universe_id, queries in queries_by_universe.items():
             universe = all_universes.get(universe_id)
             if not universe:
-                _logger.warning(
-                    f"CRON: Skipping queries for non-existent universe ID {universe_id}")
+                
                 continue
 
             function_data = self._build_function_for_universe(
