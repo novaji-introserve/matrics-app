@@ -323,7 +323,7 @@ $$ LANGUAGE plpgsql STABLE;
         ])
         if not plans:
             _logger.warning(
-                "CRON: No active, dynamic SQL compliance plans found. Skipping generation.")
+                "CRON: No active compliance plans found. Skipping generation.")
             return
 
         queries_by_universe = {}
@@ -343,8 +343,7 @@ $$ LANGUAGE plpgsql STABLE;
         # Process queries grouped by a universe
         all_universes = {
             u.id: u for u in self.env['res.risk.universe'].search([])}
-        _logger.info(
-            f"CRON: Found {len(queries_by_universe)} universe groups to process.")
+       
         for universe_id, queries in queries_by_universe.items():
             universe = all_universes.get(universe_id)
             if not universe:
@@ -377,4 +376,3 @@ $$ LANGUAGE plpgsql STABLE;
                     f"CRON: Failed to create function for standalone plan '{plan.name}': {e}")
                 self.env.cr.rollback()
 
-        _logger.info("CRON: Risk analysis SQL function generation complete.")
