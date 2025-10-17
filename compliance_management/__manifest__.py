@@ -71,9 +71,7 @@
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
         
-       
-        'data/demo_data/risk_assessment/digital_delivery_channel_assessment.xml',
-        
+               
         "data/demo_data/tier/customer_tier.xml",
         "data/demo_data/customer/account_officers.xml",
         "views/risk_assessment.xml",

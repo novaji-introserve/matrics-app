@@ -44,17 +44,13 @@ class RiskAssessment(models.Model):
         record = super(RiskAssessment, self).create(vals)
         for e in record:
             e.action_update_risk_score()
-        for e in record:
-            e.action_update_risk_score()
         return record
 
     def _compute_total_risk_lines(self):
         self.total_risk_lines = len(self.line_ids)
 
     def write(self, vals):
-        for e in self:
-            score = e.compute_risk_score_from_lines()
-            vals['risk_rating'] = score
+       
         for e in self:
             score = e.compute_risk_score_from_lines()
             vals['risk_rating'] = score
@@ -66,27 +62,43 @@ class RiskAssessment(models.Model):
             score = self.compute_risk_score_from_lines()
             rec.write({"risk_rating": score})     
 
+    
+    
     def compute_risk_score_from_lines(self):
-        setting  = self.env['res.compliance.settings'].search([('code','=','risk_assessment_computation')],limit = 1)
-        for e in setting:
-            plan_setting = e.val.strip().lower()
+        # Set a default value BEFORE the search. 'max' is a good default
+        # based on your if/else logic.
+        plan_setting = 'avg' 
+        
+        setting = self.env['res.compliance.settings'].search([('code','=','risk_assessment_computation')], limit=1)
+        
+        # Use a simple 'if' since you only expect one record.
+        # If a setting IS found, this will overwrite the default value.
+        if setting:
+            plan_setting = setting.val.strip().lower()
+
+        # Now, 'plan_setting' is GUARANTEED to have a value here.
         if plan_setting == 'avg':
             self.env.cr.execute("SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
         else:
             self.env.cr.execute("SELECT max(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
+        
         rec = self.env.cr.fetchone()
-        result = 0.00
+        result = 0.0
+        
+        # Your try/except block here is good for handling None results.
+        # Small improvement to handle the case where rec[0] is None.
         try:
-            result = f"{rec[0]:.2f}" if rec is not None else 0.0
-        except:
+            if rec and rec[0] is not None:
+                result = float(f"{rec[0]:.2f}")
+        except (TypeError, ValueError):
             result = 0.0
+            
         return result
 
     @api.depends('line_ids')
     def _compute_risk_score(self):
         score = self.compute_risk_score_from_lines()
         for rec in self:
-             rec.write({"risk_rating": score}) 
     
              rec.write({"risk_rating": score}) 
     

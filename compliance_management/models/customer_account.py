@@ -160,10 +160,10 @@ class CustomerAccount(models.Model):
         ('1', 'Tier 1'),
         ('2', 'Tier 2'),
         ('3', 'Tier 3')
-    ], string="Tier Level",index=True, compute='_compute_tier_info', search='_search_tier_level', store=True)
+    ], string="Tier Level",index=True, compute='_compute_tier_info', search='_search_tier_level', store=False)
 
     tier_name = fields.Char(
-        string="Account Tier", index=True, compute='_compute_tier_info', store=True)
+        string="Account Tier", index=True, compute='_compute_tier_info', store=False)
 
    
     def init(self):
