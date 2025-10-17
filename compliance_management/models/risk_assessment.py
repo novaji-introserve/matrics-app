@@ -65,18 +65,14 @@ class RiskAssessment(models.Model):
     
     
     def compute_risk_score_from_lines(self):
-        # Set a default value BEFORE the search. 'max' is a good default
-        # based on your if/else logic.
         plan_setting = 'avg' 
         
         setting = self.env['res.compliance.settings'].search([('code','=','risk_assessment_computation')], limit=1)
         
-        # Use a simple 'if' since you only expect one record.
         # If a setting IS found, this will overwrite the default value.
         if setting:
             plan_setting = setting.val.strip().lower()
 
-        # Now, 'plan_setting' is GUARANTEED to have a value here.
         if plan_setting == 'avg':
             self.env.cr.execute("SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
         else:
@@ -85,8 +81,6 @@ class RiskAssessment(models.Model):
         rec = self.env.cr.fetchone()
         result = 0.0
         
-        # Your try/except block here is good for handling None results.
-        # Small improvement to handle the case where rec[0] is None.
         try:
             if rec and rec[0] is not None:
                 result = float(f"{rec[0]:.2f}")
