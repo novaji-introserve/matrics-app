@@ -106,12 +106,27 @@ class Pep(models.Model):
                                help="Indicates if biography data was successfully retrieved")
     sanctions_added = fields.Boolean(string="Sanctions Added", default=False,
                                 help="Indicates if sanctions data was successfully retrieved")
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
 
+        
     def init(self):
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_pep_id_idx ON res_pep (id)")
+        """Initialize database index when module is installed/updated"""
+        
+        # 1. First, check if the index exists
+        self.env.cr.execute("""
+            SELECT 1 
+            FROM pg_indexes 
+            WHERE indexname = 'res_pep_id_idx'
+        """)
+        
+        # 2. fetchone() will be None if the index doesn't exist
+        index_exists = self.env.cr.fetchone()
+
+        # 3. Only create the index if it doesn't exist
+        if not index_exists:
+            self.env.cr.execute(
+                "CREATE INDEX res_pep_id_idx ON res_pep (id)"
+            )
 
     @api.model
     def create(self, vals):

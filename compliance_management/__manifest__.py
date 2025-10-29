@@ -102,6 +102,7 @@
         "views/customer_screening.xml",
         'views/transaction_screening_history.xml',
         "views/menu_actions.xml",
+        "data/demo_data/chart/charts.xml",
        
     ],
     # only loaded in demonstration mode

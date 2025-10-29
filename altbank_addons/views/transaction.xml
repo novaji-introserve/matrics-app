@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="compliance_transaction_form_inherit" model="ir.ui.view">
+            <field name="name">res.customer.transaction.form.inherit</field>
+            <field name="model">res.customer.transaction</field>
+            <field name="inherit_id" ref="compliance_management.compliance_transaction_form"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='date_created']" position="replace">
+                    <field name="created_date" string="Transaction Date" readonly="1" />
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="view_customer_trans_search_inherit" model="ir.ui.view">
+            <field name="name">res.customer.transaction.search.inherit</field>
+            <field name="model">res.customer.transaction</field>
+            <field name="inherit_id" ref="compliance_management.view_customer_trans_search"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//filter[@name='today_records']" position="replace">
+                     <filter string="Today's Transactions" name="today_records" domain="[('created_date', '=', context_today().strftime('%Y-%m-%d'))]" />
+                </xpath>
+
+                <xpath expr="//filter[@name='yesterday_records']" position="replace">
+                    <filter string="Yesterday's Transactions" name="yesterday_records" domain="[('created_date', '&gt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d')), ('created_date', '&lt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d'))]" />
+                </xpath>
+
+                <xpath expr="//filter[@name='this_week_records']" position="replace">
+                    <filter string="This Week's Transactions" name="this_week_records" domain="[('created_date', '&gt;=', context_today().strftime('%Y-%m-01')), ('created_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]" />
+                </xpath>
+                
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

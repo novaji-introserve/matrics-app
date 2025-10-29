@@ -26,6 +26,7 @@ class PepCustomer(models.Model):
     position = fields.Text(string='Position', tracking=True)
 
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+   
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute(f"""

@@ -36,3 +36,37 @@ class CustomerDigitalProductMaterializedExtension(models.Model):
     altpower = fields.Char(string='AltPower', readonly=True)
     altdrive = fields.Char(string='AltDrive', readonly=True)
     chequebook = fields.Char(string='ChequeBook', readonly=True)
+    
+    
+class CustomerCurrency(models.Model):
+    _inherit  = 'res.currency'
+    
+    def init(self):
+        self.env.cr.execute("""
+            UPDATE res_currency
+            SET code = CASE
+                WHEN name = 'USD' THEN '840'
+                WHEN name = 'EUR' THEN '987'
+                WHEN name = 'NGN' THEN '566'
+            END
+            WHERE name IN ('USD', 'EUR', 'NGN')
+            AND (
+                (name = 'USD' AND code <> '840') OR
+                (name = 'EUR' AND code <> '987') OR
+                (name = 'NGN' AND code <> '566')
+            );
+        """)
+        
+        
+class Transaction(models.Model):
+    _inherit = 'res.customer.transaction'
+    
+    transaction_type = fields.Selection(selection=[(
+        'credit', 'Credit'), ('Debit', 'Debit')],  index=True, string='Transaction Type')
+    
+    created_date = fields.Datetime(string='Transaction Date',  help="Transaction Date", index=True)
+
+
+        
+    
+    
