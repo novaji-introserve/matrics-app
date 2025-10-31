@@ -30,6 +30,14 @@ def post_init_hook(cr, registry):
         _logger.info("Menus hidden successfully")
     except Exception as e:
         _logger.error(f"Error hiding menus: {e}")
+        
+    # Remove unwanted partner actions
+    try:
+        _logger.info("Removing unwanted partner actions...")
+        env['res.partner'].remove_unwanted_partner_actions()
+        _logger.info("Partner actions removed successfully")
+    except Exception as e:
+        _logger.error(f"Error removing partner actions: {e}")
 
     # Set up dashboard tables
     try:

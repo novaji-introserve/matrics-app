@@ -78,7 +78,7 @@
         "views/sanction_screening.xml",
         "views/open_sanctions.xml",
         # remove unwanted partner/customer actions
-        'views/remove_partner_actions.xml',
+        # 'views/remove_partner_actions.xml',
         "views/customer.xml",
         "views/statistics.xml",
         "views/dashboard.xml",
