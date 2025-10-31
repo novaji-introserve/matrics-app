@@ -23,14 +23,15 @@ class Transaction(models.Model):
         comodel_name='res.partner.account', string='Account', index=True)
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
-    date_created = fields.Datetime(string='Tran. Date', index=True)
+    date_created = fields.Datetime(string='Tran. Date',  help="Tran. Date", index=True)
+    
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', index=True) 
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True)
     amount = fields.Float(string='Transaction Amount', digits=(15, 2))
-    # tran_type = fields.Selection(string='Tran. Type', selection=[
-    #                              ('dr', 'Debit'), ('cr', 'Credit')], index=True)
+    tran_type = fields.Selection(string='Tran. Type', selection=[
+                                 ('dr', 'Debit'), ('cr', 'Credit')], index=True)
     tran_type = fields.Many2one(comodel_name='res.transaction.type',
                               string='Tran. Type', index=True)
     narration = fields.Text(string='Narration')
@@ -50,10 +51,7 @@ class Transaction(models.Model):
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
     
     
-    show_create_case_button = fields.Boolean(
-    string="Case Management Installed",
-    compute='_compute_is_case_management_installed',
-    store=False,)
+    
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
     trans_code = fields.Char(string='Transaction Code')
@@ -78,6 +76,8 @@ class Transaction(models.Model):
     
     rule_line_ids = fields.One2many(
         comodel_name='res.transaction.screening.rule.line', inverse_name='transaction_id', string='Exception Analysis Lines', tracking=True)
+    
+    
     
     @api.model
     def create(self,vals_list):
@@ -133,7 +133,7 @@ class Transaction(models.Model):
         # Add transaction details to narration
         narration = f"Transaction Reference: {self.name or ''}\n"
         narration += f"Amount: {self.amount or 0.0} {self.currency or ''}\n"
-        narration += f"Date: {self.date_created or ''}\n"
+        narration += f"Date: {self.date_created or (self.created_date if hasattr(self, 'created_date') else None)}\n"
 
         if self.narration:
             narration += f"\nTransaction Narration: {self.narration}"
@@ -158,15 +158,6 @@ class Transaction(models.Model):
 
 
 
-    @api.depends('date_created')  
-    def _compute_is_case_management_installed(self):
-        case_management_installed = bool(self.env['ir.module.module'].search([
-            ('name', '=', 'case_management'),
-            ('state', '=', 'installed')
-        ], limit=1))
-        
-        for record in self:
-            record.show_create_case_button = case_management_installed
         
     
     
@@ -179,35 +170,7 @@ class Transaction(models.Model):
                 ('state', '=', 'installed')
             ], limit=1))
         return self._case_management_available    
-
-    def action_create_case(self):
-        """
-        Opens the case management form with the transaction reference pre-filled
-        """
-        # Create the context with required values
-        context = {
-            'default_status_id': self.env.ref('case_management.case_status_open').id,
-            'case_created': True,
-            'show_creation_notification': True,
-        }
-        
-        # Pre-fill the transaction reference
-        context['default_transaction_reference'] = self.name
-        
-        # Pre-fill the transaction_id field if it exists in the case model
-        context['default_transaction_id'] = self.id
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'New Case',
-            'res_model': 'case',
-            'view_mode': 'form',
-            'view_id': self.env.ref('case_management.case_form_view').id,
-            'target': 'current',
-            'context': context
-        }
-        
-        
+   
 
 
     def init(self):
@@ -270,7 +233,8 @@ class Transaction(models.Model):
                                     '#AMOUNT#': f"{self.amount}",
                                     '#ACCOUNT_ID#': f"{self.account_id.id}",
                                     "#CUSTOMER_ID#": f"{self.customer_id.id}",
-                                    "#TRAN_DATE#": f"{self.date_created}",
+                                    # "#TRAN_DATE#": f"{self.date_created}",
+                                    "#TRAN_DATE#": f"{self.date_created or (self.created_date if hasattr(self, 'created_date') else None)}",
                                     "#BRANCH_ID#": f"{self.branch_id.id}",
                                     "#CURRENCY_ID#": f"{self.currency_id.id}"}
                     # Iterate over all key-value pairs in dictionary

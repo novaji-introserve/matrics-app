@@ -35,6 +35,11 @@
         "demo/altbank/risk_plan/customer_industry_plans.xml",
         "demo/altbank/risk_plan/jurisdiction_plan.xml",
         "demo/altbank/risk_plan/delivery_channels_analysis.xml",
+        
+        #ID TYPE
+        "demo/altbank/identification/id_type.xml",
+        
+        "views/transaction.xml",
        
     ],
    "assets": {
