@@ -1203,12 +1203,6 @@ class Customer(models.Model):
             'watchlist_updated': len(watchlist_ids)
         }
 
-    def init(self):
-
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
-        
-        self.create_customer_trigger()
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -1802,6 +1796,7 @@ class Customer(models.Model):
             'context': {'default_customer_id': self.customer_id}
         }
 
+    @api.model
     def create_customer_trigger(self):
         
         self.change_column_datatype()
@@ -1979,6 +1974,9 @@ class Customer(models.Model):
                 FOR EACH ROW
                 EXECUTE FUNCTION set_partner_defaults_after_func();
             """)
+            
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
     
     def change_column_datatype(self):
         # Check and alter start_date column if not already VARCHAR/TEXT

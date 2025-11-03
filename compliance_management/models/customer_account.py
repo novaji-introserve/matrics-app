@@ -166,7 +166,8 @@ class CustomerAccount(models.Model):
         string="Account Tier", index=True, compute='_compute_tier_info', store=False)
 
    
-    def init(self):
+    @api.model
+    def customer_account_triggers_and_indexes(self):
         """Initialize database triggers when module is installed/updated"""
 
         # Create index on res_partner_account (only if it doesn't exist)
