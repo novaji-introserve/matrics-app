@@ -707,13 +707,13 @@
     <menuitem id="menu_compliance_root" name="Compliance" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_relationship_manager,group_compliance_transaction_monitoring_team" web_icon="compliance_management,static/description/icons-compliance.png" sequence="-1000" />
 
     <!-- Risk main menu -->
-    <menuitem id="menu_compliance_risk" name="Risk" groups="group_compliance_compliance_risk_manager" parent="menu_compliance_root" sequence="30" />
+    <menuitem id="menu_compliance_risk" name="Risk" groups="group_compliance_compliance_officer,group_compliance_compliance_risk_manager" parent="menu_compliance_root" sequence="30" />
 
     <!-- Configuration main menu -->
     <menuitem id="menu_compliance_configuration" name="Configuration" groups="group_compliance_compliance_officer,base.group_system" parent="menu_compliance_root" sequence="1500" />
 
     <!-- Sanction screening main menu -->
-    <menuitem id="menu_sanction_screening_root" name="Sanction screening" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="150" />
+    <menuitem id="menu_sanction_screening_root" name="Screening" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="150" />
 
     <!-- Due dilligence main menu -->
     <menuitem id="menu_compliance_dd" name="Due Diligence" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" parent="menu_compliance_root" sequence="5" />
@@ -828,7 +828,7 @@
     <menuitem id="menu_compliance_risk_assessment_cp" action="action_list_risk_assessment_cp" parent="menu_fcra_risk" name="Counter Party" groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" sequence="20" />
     
     <!-- Menu -->
-    <menuitem id="menu_compliance_risk_assessment_plan" action="action_list_risk_assessment_plan" parent="menu_risk_assessment" name="Customer Risk Analysis" groups="group_compliance_compliance_risk_manager" sequence="100" />
+    <menuitem id="menu_compliance_risk_assessment_plan" action="action_list_risk_assessment_plan" parent="menu_risk_assessment" name="Customer Risk Analysis" groups="group_compliance_compliance_officer,group_compliance_compliance_risk_manager" sequence="100" />
 
     <!-- Menu -->
 

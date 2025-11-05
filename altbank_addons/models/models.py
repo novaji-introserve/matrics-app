@@ -68,5 +68,13 @@ class Transaction(models.Model):
 
 
         
+class WatchList(models.Model):
+    _inherit = 'res.partner.watchlist'
+    
+    bank = fields.Char(string='bank', readonly=True)
+
+
+
+        
     
     
