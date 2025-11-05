@@ -30,6 +30,53 @@ def post_init_hook(cr, registry):
         _logger.info("Menus hidden successfully")
     except Exception as e:
         _logger.error(f"Error hiding menus: {e}")
+        
+    # Remove unwanted partner actions
+    try:
+        _logger.info("Removing unwanted partner actions...")
+        env['res.partner'].remove_unwanted_partner_actions()
+        _logger.info("Partner actions removed successfully")
+    except Exception as e:
+        _logger.error(f"Error removing partner actions: {e}")
+        
+    # Create trigger and index and res partner table
+    try:
+        _logger.info("Creating Trigger and index on res partner...")
+        env['res.partner'].create_customer_trigger()
+        _logger.info("Creating Trigger and index on res partner was successful")
+    except Exception as e:
+        _logger.error(f"Error Creating Trigger and index on res partner: {e}")
+        
+    # Create trigger and index and res.partner.account table
+    try:
+        _logger.info("Creating Trigger and index on res.partner.account...")
+        env['res.partner.account'].customer_account_triggers_and_indexes()
+        _logger.info("Creating Trigger and index on res.partner.account was successful")
+    except Exception as e:
+        _logger.error(f"Error Creating Trigger and index on res.partner.account: {e}")
+        
+    try:
+        _logger.info("Creating res_customer_pep view...")
+        cr.execute("""
+            CREATE OR REPLACE VIEW res_customer_pep AS (
+                SELECT 
+                    c.id AS id,
+                    c.id AS customer_id,
+                    c.branch_id,
+                    c.firstname,
+                    c.lastname,
+                    c.internal_category,
+                    c.name,
+                    c.global_pep_id AS pep_id,
+                    c.is_pep
+                FROM res_partner c
+                WHERE c.is_pep = TRUE
+            )
+        """)
+        cr.commit()  # Commit the schema change
+        _logger.info("Successfully created res_customer_pep view.")
+    except Exception as e:
+        _logger.error(f"Error creating res_customer_pep view: {e}")
 
     # Set up dashboard tables
     try:

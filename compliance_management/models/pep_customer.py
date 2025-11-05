@@ -27,24 +27,7 @@ class PepCustomer(models.Model):
 
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
    
-    def init(self):
-        tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute(f"""
-            CREATE OR REPLACE VIEW {self._table} AS (
-                SELECT 
-                    c.id AS id,
-                    c.id AS customer_id,
-                    c.branch_id,
-                    c.firstname,
-                    c.lastname,
-                    c.internal_category,
-                    c.name,
-                    c.global_pep_id AS pep_id,
-                    c.is_pep
-                FROM res_partner c
-                WHERE c.is_pep = TRUE
-            )
-        """)
+    
 
     def action_view_customer_pep(self):
         is_chief_compliance_officer = self.env.user.has_group(

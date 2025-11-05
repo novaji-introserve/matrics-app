@@ -1,0 +1,172 @@
+# Makefile for the High-Performance Customer Risk Analysis System
+
+# Variables
+BINARY_NAME=risk-processor
+BUILD_DIR=./build
+GO_FILES=$(shell find . -name '*.go' -not -path "./vendor/*")
+VERSION=$(shell git describe --tags --always --dirty)
+LDFLAGS=-ldflags "-X main.version=$(VERSION) -s -w"
+
+# Environment
+ENV_FILE ?= .env
+include $(ENV_FILE)
+export
+
+# Default target
+.PHONY: all
+all: clean build test
+
+# Build the application
+.PHONY: build
+build:
+	@echo "Building $(BINARY_NAME)..."
+	@mkdir -p $(BUILD_DIR)
+	@go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/risk-processor
+
+# Run the application
+.PHONY: run
+run: build
+	@echo "Running $(BINARY_NAME)..."
+	@$(BUILD_DIR)/$(BINARY_NAME)
+
+# Clean build artifacts
+.PHONY: clean
+clean:
+	@echo "Cleaning..."
+	@rm -rf $(BUILD_DIR)
+
+# Run tests
+.PHONY: test
+test:
+	@echo "Running tests..."
+	@go test -v ./...
+
+# Run tests with coverage
+.PHONY: test-coverage
+test-coverage:
+	@echo "Running tests with coverage..."
+	@go test -v -coverprofile=coverage.out ./...
+	@go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"
+
+# Format code
+.PHONY: fmt
+fmt:
+	@echo "Formatting code..."
+	@gofmt -s -w $(GO_FILES)
+
+# Lint code
+.PHONY: lint
+lint:
+	@echo "Linting code..."
+	@golint ./...
+
+# Vet code
+.PHONY: vet
+vet:
+	@echo "Vetting code..."
+	@go vet ./...
+
+# Install dependencies
+.PHONY: deps
+deps:
+	@echo "Installing dependencies..."
+	@go mod tidy
+	@go mod vendor
+
+# Build Docker image
+.PHONY: docker-build
+docker-build:
+	@echo "Building Docker image..."
+	@docker build -t $(BINARY_NAME):$(VERSION) .
+	@docker tag $(BINARY_NAME):$(VERSION) $(BINARY_NAME):latest
+
+# Run with Docker
+.PHONY: docker-run
+docker-run: docker-build
+	@echo "Running with Docker..."
+	@docker run --env-file $(ENV_FILE) $(BINARY_NAME):latest
+
+# Deploy with Docker Compose
+.PHONY: docker-compose-up
+docker-compose-up:
+	@echo "Deploying with Docker Compose..."
+	@docker-compose up -d
+
+# Stop Docker Compose deployment
+.PHONY: docker-compose-down
+docker-compose-down:
+	@echo "Stopping Docker Compose deployment..."
+	@docker-compose down
+
+# Show Docker Compose logs
+.PHONY: docker-compose-logs
+docker-compose-logs:
+	@docker-compose logs -f
+
+# Create database schema
+.PHONY: db-schema
+db-schema:
+	@echo "Creating database schema..."
+	@psql -h $(DB_HOST) -p $(DB_PORT) -U $(DB_USER) -d $(DB_NAME) -f database/schema.sql
+
+# Run in dry-run mode
+.PHONY: dry-run
+dry-run: build
+	@echo "Running in dry-run mode..."
+	@$(BUILD_DIR)/$(BINARY_NAME) --dry-run
+
+# Process specific customers
+.PHONY: process-customers
+process-customers: build
+	@echo "Processing specific customers: $(CUSTOMER_IDS)"
+	@$(BUILD_DIR)/$(BINARY_NAME) --customer-ids=$(CUSTOMER_IDS)
+
+# Resume from checkpoint
+.PHONY: resume
+resume: build
+	@echo "Resuming from checkpoint..."
+	@$(BUILD_DIR)/$(BINARY_NAME) --resume-from-checkpoint
+
+# Help command
+.PHONY: help
+help:
+	@echo "High-Performance Customer Risk Analysis System"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make [command]"
+	@echo ""
+	@echo "Available Commands:"
+	@echo "  all               Build and test the application"
+	@echo "  build             Build the application"
+	@echo "  clean             Remove build artifacts"
+	@echo "  test              Run tests"
+	@echo "  test-coverage     Run tests with coverage report"
+	@echo "  fmt               Format code"
+	@echo "  lint              Lint code"
+	@echo "  vet               Vet code"
+	@echo "  deps              Install dependencies"
+	@echo "  run               Build and run the application"
+	@echo "  docker-build      Build Docker image"
+	@echo "  docker-run        Run with Docker"
+	@echo "  docker-compose-up Deploy with Docker Compose"
+	@echo "  docker-compose-down Stop Docker Compose deployment"
+	@echo "  docker-compose-logs Show Docker Compose logs"
+	@echo "  db-schema         Create database schema"
+	@echo "  dry-run           Run in dry-run mode (no database updates)"
+	@echo "  process-customers Process specific customers (CUSTOMER_IDS=1,2,3)"
+	@echo "  resume            Resume from checkpoint"
+	@echo "  help              Show this help message"
+	@echo ""
+	@echo "Environment Variables (from .env file):"
+	@echo "  DB_HOST           Database hostname (default: localhost)"
+	@echo "  DB_PORT           Database port (default: 5432)"
+	@echo "  DB_NAME           Database name"
+	@echo "  DB_USER           Database username"
+	@echo "  DB_PASSWORD       Database password"
+	@echo "  WORKER_COUNT      Number of concurrent workers"
+	@echo "  BATCH_SIZE        Customers per batch"
+	@echo ""
+	@echo "Example:"
+	@echo "  make run WORKER_COUNT=50 BATCH_SIZE=2000"
+	@echo "  make process-customers CUSTOMER_IDS=1000,1001,1002"
