@@ -59,7 +59,7 @@ class RiskAssessment(models.Model):
 
     def action_update_risk_score(self):
         for rec in self:
-            score = self.compute_risk_score_from_lines()
+            score = rec.compute_risk_score_from_lines()
             rec.write({"risk_rating": score})     
 
     
@@ -118,4 +118,58 @@ class RiskAssessment(models.Model):
     def filter_subjects(self):
         for rec in self:
             return {'domain': {'subject_id': [('universe_id', '=', rec.universe_id.id)]}}
+        
+    @api.model
+    def cron_update_all_risk_scores(self, *args):
+        setting = self.env['res.compliance.settings'].search([('code', '=', 'risk_assessment_computation')], limit=1)
+        plan_setting = 'avg'
+        if setting:
+            plan_setting = setting.val.strip().lower()
+
+            if plan_setting == 'avg':
+                self.env.cr.execute("""
+                    UPDATE res_risk_assessment ra
+                    SET risk_rating = COALESCE(
+                        ROUND(
+                            CAST(
+                                (SELECT AVG(rl.residual_risk_score)
+                                FROM res_risk_assessment_line rl
+                                WHERE rl.risk_assessment_id = ra.id)
+                            AS numeric),
+                            2
+                        ),
+                        0.0
+                    )
+                """)
+            elif plan_setting == 'sum':
+                self.env.cr.execute("""
+                    UPDATE res_risk_assessment ra
+                    SET risk_rating = COALESCE(
+                        ROUND(
+                            CAST(
+                                (SELECT SUM(rl.residual_risk_score)
+                                FROM res_risk_assessment_line rl
+                                WHERE rl.risk_assessment_id = ra.id)
+                            AS numeric),
+                            2
+                        ),
+                        0.0
+                    )
+                """)
+            else:
+                # Default to 'max' as in your original logic
+                self.env.cr.execute("""
+                    UPDATE res_risk_assessment ra
+                    SET risk_rating = COALESCE(
+                        ROUND(
+                            CAST(
+                                (SELECT MAX(rl.residual_risk_score)
+                                FROM res_risk_assessment_line rl
+                                WHERE rl.risk_assessment_id = ra.id)
+                            AS numeric),
+                            2
+                        ),
+                        0.0
+                    )
+                """)
         

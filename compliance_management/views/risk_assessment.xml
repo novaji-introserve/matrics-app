@@ -74,6 +74,13 @@
         <field name="model">res.risk.assessment</field>
         <field name="arch" type="xml">
             <tree string="Risk Assessment">
+              <!-- This header adds buttons to the top of the tree view -->
+                <header>
+                    <button name="cron_update_all_risk_scores" 
+                            type="object" 
+                            string="Recalculate All Risk Scores" 
+                            class="btn-primary"/>
+                </header>
                 <field name="name" string="Name" />
                 <field name="subject_id" />
                 <field name="universe_id" />
