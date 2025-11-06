@@ -15,7 +15,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using ussd channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_ussd"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_ussd"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -36,7 +36,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using alt bank channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_alt"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_alt"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -56,7 +56,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using altdrive channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_altdrive"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_altdrive"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -76,7 +76,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using carded customer channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_card"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_card"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -96,7 +96,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using altinvest channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_altinvest"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_altinvest"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -116,7 +116,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using altmall channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_altmall"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_altmall"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -136,7 +136,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using Altpower channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_altpower"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_altpower"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -156,7 +156,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using sterling pro channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_altpro"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_altpro"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -176,7 +176,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using switch channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_chequebook"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_chequebook"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -196,7 +196,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using Ifuel channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="altbank_addons.res_risk_assessment_regulatory_ifuel"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_ifuel"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
