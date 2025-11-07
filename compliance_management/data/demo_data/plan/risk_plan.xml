@@ -50,7 +50,7 @@
                 HAVING COUNT(*) >= 3)
             ORDER BY customer_phone </field>
         <field name="priority">2</field>
-        <field name="state">active</field>
+        <field name="state">inactive</field>
         <field name="compute_score_from">static</field>
         <field name="narration">Detects customers using the same phone number for three or more account openings, flagging potential fraud risks.
         </field>

@@ -46,9 +46,6 @@
         'data/schedules/run_risk_assessment_cron.xml',
         'data/schedules/clean_cache.xml',
         'data/schedules/refresh_charts_materialized_views.xml',
-        "data/schedules/generate_sql_function.xml",
-        "data/schedules/compute_risk_assessment_score.xml",
-
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
         "data/email_templates/customer_screening_template.xml",
