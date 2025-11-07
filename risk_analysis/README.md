@@ -307,3 +307,26 @@ For direct server deployment:
 Copyright (c) 2025 Novaji Introserve
 
 All rights reserved.
+
+
+sudo chmod +x install_redis_8_2_3.sh
+sudo ./install_redis_8_2_3.sh
+
+
+redis-server --version
+redis-cli ping
+
+
+known errors
+
+failed to connect to Redis: MISCONF Redis is configured to save RDB snapshots, but it's currently unable to persist to disk. Commands that may modify the data set are disabled, because this instance is configured to report errors during writes if RDB snapshotting fails (stop-writes-on-bgsave-error option). Please check the Redis logs for details about the RDB error.
+
+SOLUTION:
+sudo mkdir -p /var/lib/redis
+sudo chown redis:redis /var/lib/redis
+sudo chmod 770 /var/lib/redis
+sudo systemctl restart redis
+sudo systemctl status redis --no-pager
+redis-cli ping
+
+echo 'export PATH="/usr/local/bin:$PATH"' | sudo tee -a /etc/profile.d/redis-path.sh

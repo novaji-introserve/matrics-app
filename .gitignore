@@ -18,6 +18,7 @@ compliance_management/demo/*
 
 # Ignore only the compiled binary inside risk_analysis  
 /risk_analysis/risk-processor
+/risk_analysis/risk-api-server
 
 # Keep the Go source directory tracked
 !/risk_analysis/cmd/risk-processor/

@@ -17,6 +17,7 @@ import (
 
 	"risk_analysis/application"
 	"risk_analysis/config"
+	"risk_analysis/infrastructure/cache"
 	"risk_analysis/infrastructure/database"
 	"risk_analysis/utils"
 )
@@ -67,8 +68,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error initializing logger: %v\n", err)
 		os.Exit(1)
 	}
-	// defer logger.Sync()
-	defer func() { _ = logger.Sync() }()
+	defer logger.Sync()
 
 	// Override with command line flags if provided
 	if *dryRun {
@@ -168,18 +168,57 @@ func main() {
 	}
 	defer dbConnection.Close()
 
-	// Create cache directories if they don't exist (from config)
-	if err := os.MkdirAll(cfg.CacheDirectory, 0755); err != nil {
-		logger.Warn("Failed to create cache directory",
-			zap.String("directory", cfg.CacheDirectory),
-			zap.Error(err),
+	// Initialize Redis if enabled
+	var processor *application.RiskProcessor
+	if cfg.RedisEnabled {
+		logger.Info("Redis caching enabled",
+			zap.String("host", cfg.RedisHost),
+			zap.Int("port", cfg.RedisPort),
+			zap.String("db_name", cfg.DBName),
+		)
+
+		// Create Redis client
+		redisClient, err := cache.NewRedisCacheClient(
+			cfg.RedisHost,
+			cfg.RedisPort,
+			cfg.RedisPassword,
+			cfg.RedisDB,
+			cfg.RedisPoolSize,
+			cfg.DBName,
+			logger,
+		)
+		if err != nil {
+			logger.Fatal("Failed to connect to Redis", zap.Error(err))
+		}
+		defer redisClient.Close()
+
+		// Create risk processor with Redis caching
+		processor = application.NewRedisRiskProcessor(cfg, dbConnection.GetPool(), redisClient.GetClient(), logger)
+
+		logger.Info("Risk processor initialized with Redis caching",
+			zap.String("db_name", cfg.DBName),
+			zap.String("cache_prefix", cfg.DBName),
 		)
 	} else {
-		logger.Info("Cache directory ready", zap.String("directory", cfg.CacheDirectory))
-	}
+		logger.Info("File-based caching enabled",
+			zap.String("cache_directory", cfg.CacheDirectory),
+		)
 
-	// Create risk processor
-	processor := application.NewRiskProcessor(cfg, dbConnection.GetPool(), logger)
+		// Create cache directories if they don't exist (from config)
+		if err := os.MkdirAll(cfg.CacheDirectory, 0755); err != nil {
+			logger.Warn("Failed to create cache directory",
+				zap.String("directory", cfg.CacheDirectory),
+				zap.Error(err),
+			)
+		} else {
+			logger.Info("Cache directory ready", zap.String("directory", cfg.CacheDirectory))
+		}
+
+		// Create risk processor with file-based caching
+		processor = application.NewRiskProcessor(cfg, dbConnection.GetPool(), logger)
+
+		logger.Info("Risk processor initialized with file-based caching")
+	}
 
 	// Initialize cache before processing customers (CRITICAL for performance!)
 	logger.Info("Initializing cache for optimal performance...")

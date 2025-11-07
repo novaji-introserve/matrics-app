@@ -45,7 +45,15 @@ type Config struct {
 	RiskFunctionsCacheFile   string
 	RiskMetadataCacheFile    string
 
-	// Logging settings
+	// Redis cache settings
+	RedisEnabled  bool
+	RedisHost     string
+	RedisPort     int
+	RedisPassword string
+	RedisDB       int
+	RedisPoolSize int
+
+	// Logging settings (for CLI/processor)
 	LogLevel      string
 	LogFormat     string
 	LogOutput     string
@@ -53,6 +61,15 @@ type Config struct {
 	LogMaxSize    int
 	LogMaxBackups int
 	LogMaxAge     int
+
+	// API Logging settings (separate from CLI)
+	APILogLevel      string
+	APILogFormat     string
+	APILogOutput     string
+	APILogFile       string
+	APILogMaxSize    int
+	APILogMaxBackups int
+	APILogMaxAge     int
 
 	// Retry settings
 	MaxRetries          int
@@ -65,6 +82,10 @@ type Config struct {
 	ResumeFromCheckpoint bool
 	CheckpointFile       string
 	CustomerIDs          []int // Optional specific customer IDs to process
+
+	// API settings
+	APIPort string
+	APIHost string
 }
 
 // LoadConfig loads configuration from config.conf file
@@ -86,6 +107,15 @@ func LoadConfig() (*Config, error) {
 
 	// Get risk_analysis section
 	riskSection := cfg.Section("risk_analysis")
+
+	// Get api section
+	apiSection := cfg.Section("api")
+
+	// Get redis section
+	redisSection := cfg.Section("redis")
+
+	// Get api.logging section (optional, falls back to risk_analysis logging)
+	apiLoggingSection := cfg.Section("api.logging")
 
 	config := &Config{
 		// Database settings from [database] section
@@ -139,6 +169,27 @@ func LoadConfig() (*Config, error) {
 		DryRun:               riskSection.Key("dry_run").MustBool(false),
 		ResumeFromCheckpoint: riskSection.Key("resume_from_checkpoint").MustBool(false),
 		CheckpointFile:       riskSection.Key("checkpoint_file").MustString("/tmp/risk-processor-checkpoint.json"),
+
+		// API settings
+		APIPort: apiSection.Key("port").MustString("8080"),
+		APIHost: apiSection.Key("host").MustString("0.0.0.0"),
+
+		// Redis cache settings from [redis] section
+		RedisEnabled:  redisSection.Key("enabled").MustBool(false),
+		RedisHost:     redisSection.Key("host").MustString("localhost"),
+		RedisPort:     redisSection.Key("port").MustInt(6379),
+		RedisPassword: redisSection.Key("password").MustString(""),
+		RedisDB:       redisSection.Key("db").MustInt(0),
+		RedisPoolSize: redisSection.Key("pool_size").MustInt(10),
+
+		// API Logging settings from [api.logging] section (falls back to [risk_analysis])
+		APILogLevel:      apiLoggingSection.Key("log_level").MustString(riskSection.Key("log_level").MustString("INFO")),
+		APILogFormat:     apiLoggingSection.Key("log_format").MustString(riskSection.Key("log_format").MustString("json")),
+		APILogOutput:     apiLoggingSection.Key("log_output").MustString(riskSection.Key("log_output").MustString("stdout")),
+		APILogFile:       apiLoggingSection.Key("log_file").MustString("/var/log/risk-api-server.log"),
+		APILogMaxSize:    apiLoggingSection.Key("log_max_size").MustInt(riskSection.Key("log_max_size").MustInt(100)),
+		APILogMaxBackups: apiLoggingSection.Key("log_max_backups").MustInt(riskSection.Key("log_max_backups").MustInt(5)),
+		APILogMaxAge:     apiLoggingSection.Key("log_max_age").MustInt(riskSection.Key("log_max_age").MustInt(30)),
 	}
 
 	// Validate required fields
