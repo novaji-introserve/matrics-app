@@ -39,5 +39,19 @@
             <field name="priority">5</field>
             <field name="active" eval="False"/>
         </record>
+
+        <!--            -->
+        <record id="ir_cron_generate_mv2" model="ir.cron">
+            <field name="name">Generated MV For Risk Analysis2</field>
+            <field name="model_id" ref="model_risk_analysis_mv2"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_generate_views()</field>
+            <field name="interval_number">6</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="priority">5</field>
+            <field name="active" eval="False"/>
+        </record>
     </data>
 </odoo>
