@@ -145,4 +145,3 @@ func CustomLevelEncoder(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString(l.String())
 	}
 }
-

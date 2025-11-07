@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
 	"risk_analysis/config"
@@ -21,7 +22,7 @@ import (
 // CustomerJob represents a job for processing a customer's risk score
 type CustomerJob struct {
 	customerID int
-	// processor  *RiskProcessor
+	processor  *RiskProcessor
 }
 
 // Process implements the Job interface for CustomerJob
@@ -51,12 +52,15 @@ type Checkpoint struct {
 
 // RiskProcessor orchestrates the risk score calculation process
 type RiskProcessor struct {
-	config         *config.Config // Use the config.Config type
+	config              *config.Config // Use the config.Config type
 	db                  *pgxpool.Pool
 	logger              *zap.Logger
 	batchedCalculator   *services.BatchedFunctionRiskCalculator // Function-based batched calculator (faster, matches Python logic)
 	workerPool          *workers.WorkerPool
-	customerCache       *cache.CustomerIDCache // File-based cache for customer IDs
+	customerCache       *cache.CustomerIDCache       // File-based cache for customer IDs
+	redisCustomerCache  *cache.RedisCustomerIDCache  // Redis-based cache for customer IDs
+	redisClient         *redis.Client                // Redis client for checkpoint storage
+	useRedis            bool                         // Flag to determine if Redis is enabled
 	stats          struct {
 		startTime       time.Time
 		endTime         time.Time
@@ -70,7 +74,7 @@ type RiskProcessor struct {
 	}
 }
 
-// NewRiskProcessor creates a new risk processor
+// NewRiskProcessor creates a new risk processor with file-based caching
 func NewRiskProcessor(config *config.Config, db *pgxpool.Pool, logger *zap.Logger) *RiskProcessor {
 	// Initialize BATCHED FUNCTION risk calculator with cache paths from config
 	batchedCalculator := services.NewBatchedFunctionRiskCalculator(
@@ -102,6 +106,44 @@ func NewRiskProcessor(config *config.Config, db *pgxpool.Pool, logger *zap.Logge
 		batchedCalculator: batchedCalculator,
 		workerPool:        workerPool,
 		customerCache:     customerCache,
+		useRedis:          false,
+	}
+}
+
+// NewRedisRiskProcessor creates a new risk processor with Redis-based caching
+func NewRedisRiskProcessor(config *config.Config, db *pgxpool.Pool, redisClient *redis.Client, logger *zap.Logger) *RiskProcessor {
+	// Initialize BATCHED FUNCTION risk calculator with Redis caching
+	batchedCalculator := services.NewRedisBatchedFunctionRiskCalculator(
+		db,
+		logger,
+		redisClient,
+		config.DBName,
+	)
+
+	// Create worker pool for parallel processing
+	workerPool := workers.NewWorkerPool(
+		config.WorkerCount,
+		config.BatchSize*2, // Buffer size twice the batch size to keep workers busy
+		logger,
+	)
+
+	// Initialize Redis customer ID cache
+	redisCustomerCache := cache.NewRedisCustomerIDCache(
+		redisClient,
+		db,
+		config.DBName,
+		logger,
+	)
+
+	return &RiskProcessor{
+		config:             config,
+		db:                 db,
+		logger:             logger,
+		batchedCalculator:  batchedCalculator,
+		workerPool:         workerPool,
+		redisCustomerCache: redisCustomerCache,
+		redisClient:        redisClient,
+		useRedis:           true,
 	}
 }
 
@@ -113,8 +155,14 @@ func (p *RiskProcessor) InitializeCache(ctx context.Context) error {
 	}
 
 	// Load processed customers to enable incremental processing
-	if err := p.customerCache.LoadProcessedCustomers(); err != nil {
-		return fmt.Errorf("failed to load processed customers: %w", err)
+	if p.useRedis {
+		if err := p.redisCustomerCache.LoadProcessedCustomers(ctx); err != nil {
+			return fmt.Errorf("failed to load processed customers from Redis: %w", err)
+		}
+	} else {
+		if err := p.customerCache.LoadProcessedCustomers(); err != nil {
+			return fmt.Errorf("failed to load processed customers: %w", err)
+		}
 	}
 
 	return nil
@@ -365,14 +413,24 @@ func (p *RiskProcessor) processSingleBatch(ctx context.Context, batchNum int, cu
 		}
 	}
 
-	// Mark successfully processed customers in the cache file
+	// Mark successfully processed customers in the cache (file-based or Redis)
 	if len(successfulCustomerIDs) > 0 {
-		if err := p.customerCache.MarkBatchProcessed(successfulCustomerIDs); err != nil {
-			p.logger.Warn("Failed to mark batch as processed in cache",
-				zap.Int("batch_number", batchNum),
-				zap.Int("success_count", len(successfulCustomerIDs)),
-				zap.Error(err),
-			)
+		if p.useRedis {
+			if err := p.redisCustomerCache.MarkBatchProcessed(ctx, successfulCustomerIDs); err != nil {
+				p.logger.Warn("Failed to mark batch as processed in Redis cache",
+					zap.Int("batch_number", batchNum),
+					zap.Int("success_count", len(successfulCustomerIDs)),
+					zap.Error(err),
+				)
+			}
+		} else {
+			if err := p.customerCache.MarkBatchProcessed(successfulCustomerIDs); err != nil {
+				p.logger.Warn("Failed to mark batch as processed in file cache",
+					zap.Int("batch_number", batchNum),
+					zap.Int("success_count", len(successfulCustomerIDs)),
+					zap.Error(err),
+				)
+			}
 		}
 	}
 
@@ -420,19 +478,37 @@ func (p *RiskProcessor) processSingleBatch(ctx context.Context, batchNum int, cu
 	return nil
 }
 
-// loadAllCustomerIDs loads all customer IDs using file-based cache
+// loadAllCustomerIDs loads all customer IDs using cache (file-based or Redis)
 func (p *RiskProcessor) loadAllCustomerIDs(ctx context.Context) ([]int, error) {
-	// Load from cache (will automatically check customer count and refresh if needed)
-	allCustomerIDs, err := p.customerCache.LoadOrRefresh(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load customer IDs from cache: %w", err)
+	var allCustomerIDs []int
+	var unprocessedCustomerIDs []int
+	var processedCount int
+	var err error
+
+	if p.useRedis {
+		// Load from Redis cache
+		allCustomerIDs, err = p.redisCustomerCache.LoadOrRefresh(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load customer IDs from Redis cache: %w", err)
+		}
+
+		// Filter to only unprocessed customers for incremental processing
+		unprocessedCustomerIDs = p.redisCustomerCache.GetUnprocessedCustomers(allCustomerIDs)
+		processedCount = p.redisCustomerCache.GetProcessedCount()
+	} else {
+		// Load from file cache
+		allCustomerIDs, err = p.customerCache.LoadOrRefresh(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load customer IDs from file cache: %w", err)
+		}
+
+		// Filter to only unprocessed customers for incremental processing
+		unprocessedCustomerIDs = p.customerCache.GetUnprocessedCustomers(allCustomerIDs)
+		processedCount = p.customerCache.GetProcessedCount()
 	}
 
-	// Filter to only unprocessed customers for incremental processing
-	unprocessedCustomerIDs := p.customerCache.GetUnprocessedCustomers(allCustomerIDs)
-
-	processedCount := p.customerCache.GetProcessedCount()
 	p.logger.Info("Loaded customer IDs from cache",
+		zap.Bool("redis", p.useRedis),
 		zap.Int("total_customers", len(allCustomerIDs)),
 		zap.Int("processed_customers", processedCount),
 		zap.Int("unprocessed_customers", len(unprocessedCustomerIDs)),
@@ -558,7 +634,7 @@ func (p *RiskProcessor) logProgress() {
 func (p *RiskProcessor) saveCheckpoint() error {
 	p.stats.mu.Lock()
 	defer p.stats.mu.Unlock()
-	
+
 	// Determine last processed customer ID
 	lastProcessedID := 0
 	if len(p.config.CustomerIDs) > 0 && p.stats.totalProcessed > 0 {
@@ -569,7 +645,7 @@ func (p *RiskProcessor) saveCheckpoint() error {
 		// No specific customer IDs, use workerPool stats
 		lastProcessedID = int(p.workerPool.GetStats().LastProcessedID)
 	}
-	
+
 	checkpoint := Checkpoint{
 		Version:           "1.0",
 		Timestamp:         time.Now(),
@@ -580,60 +656,109 @@ func (p *RiskProcessor) saveCheckpoint() error {
 		BatchNumber:       p.stats.batchCount,
 		FailedCustomerIDs: p.stats.failedCustomers,
 	}
-	
-	// Marshal checkpoint to JSON
-	data, err := json.MarshalIndent(checkpoint, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal checkpoint: %w", err)
+
+	if p.useRedis {
+		// Save checkpoint to Redis
+		ctx := context.Background()
+		data, err := json.Marshal(checkpoint)
+		if err != nil {
+			return fmt.Errorf("failed to marshal checkpoint: %w", err)
+		}
+
+		key := fmt.Sprintf("%s_checkpoint", p.config.DBName)
+		if err := p.redisClient.Set(ctx, key, data, 0).Err(); err != nil {
+			return fmt.Errorf("failed to save checkpoint to Redis: %w", err)
+		}
+
+		p.logger.Info("Checkpoint saved to Redis",
+			zap.String("key", key),
+			zap.String("db_name", p.config.DBName),
+			zap.Int("last_processed_id", lastProcessedID),
+			zap.Int("total_processed", p.stats.totalProcessed),
+		)
+	} else {
+		// Save checkpoint to file
+		data, err := json.MarshalIndent(checkpoint, "", "  ")
+		if err != nil {
+			return fmt.Errorf("failed to marshal checkpoint: %w", err)
+		}
+
+		// Ensure checkpoint directory exists
+		checkpointDir := filepath.Dir(p.config.CheckpointFile)
+		if err := os.MkdirAll(checkpointDir, 0755); err != nil {
+			return fmt.Errorf("failed to create checkpoint directory: %w", err)
+		}
+
+		// Write checkpoint to file
+		if err := os.WriteFile(p.config.CheckpointFile, data, 0644); err != nil {
+			return fmt.Errorf("failed to write checkpoint file: %w", err)
+		}
+
+		p.logger.Info("Checkpoint saved to file",
+			zap.String("file", p.config.CheckpointFile),
+			zap.Int("last_processed_id", lastProcessedID),
+			zap.Int("total_processed", p.stats.totalProcessed),
+		)
 	}
-	
-	// Ensure checkpoint directory exists
-	checkpointDir := filepath.Dir(p.config.CheckpointFile)
-	if err := os.MkdirAll(checkpointDir, 0755); err != nil {
-		return fmt.Errorf("failed to create checkpoint directory: %w", err)
-	}
-	
-	// Write checkpoint to file
-	if err := os.WriteFile(p.config.CheckpointFile, data, 0644); err != nil {
-		return fmt.Errorf("failed to write checkpoint file: %w", err)
-	}
-	
-	p.logger.Info("Checkpoint saved",
-		zap.String("file", p.config.CheckpointFile),
-		zap.Int("last_processed_id", lastProcessedID),
-		zap.Int("total_processed", p.stats.totalProcessed),
-	)
-	
+
 	return nil
 }
 
-// loadCheckpoint loads the processing state from a checkpoint file
+// loadCheckpoint loads the processing state from a checkpoint
 func (p *RiskProcessor) loadCheckpoint() (Checkpoint, error) {
 	var checkpoint Checkpoint
-	
-	// Check if checkpoint file exists
-	if _, err := os.Stat(p.config.CheckpointFile); os.IsNotExist(err) {
-		return checkpoint, fmt.Errorf("checkpoint file not found: %s", p.config.CheckpointFile)
+
+	if p.useRedis {
+		// Load checkpoint from Redis
+		ctx := context.Background()
+		key := fmt.Sprintf("%s_checkpoint", p.config.DBName)
+
+		data, err := p.redisClient.Get(ctx, key).Result()
+		if err != nil {
+			if err == redis.Nil {
+				return checkpoint, fmt.Errorf("checkpoint not found in Redis: %s", key)
+			}
+			return checkpoint, fmt.Errorf("failed to load checkpoint from Redis: %w", err)
+		}
+
+		// Unmarshal checkpoint data
+		if err := json.Unmarshal([]byte(data), &checkpoint); err != nil {
+			return checkpoint, fmt.Errorf("failed to unmarshal checkpoint data: %w", err)
+		}
+
+		p.logger.Info("Checkpoint loaded from Redis",
+			zap.String("key", key),
+			zap.String("db_name", p.config.DBName),
+			zap.Int("last_processed_id", checkpoint.LastProcessedID),
+			zap.Int64("total_processed", checkpoint.TotalProcessed),
+			zap.Time("timestamp", checkpoint.Timestamp),
+		)
+	} else {
+		// Load checkpoint from file
+		// Check if checkpoint file exists
+		if _, err := os.Stat(p.config.CheckpointFile); os.IsNotExist(err) {
+			return checkpoint, fmt.Errorf("checkpoint file not found: %s", p.config.CheckpointFile)
+		}
+
+		// Read checkpoint file
+		data, err := os.ReadFile(p.config.CheckpointFile)
+		if err != nil {
+			return checkpoint, fmt.Errorf("failed to read checkpoint file: %w", err)
+		}
+
+		// Unmarshal checkpoint data
+		if err := json.Unmarshal(data, &checkpoint); err != nil {
+			return checkpoint, fmt.Errorf("failed to unmarshal checkpoint data: %w", err)
+		}
+
+		p.logger.Info("Checkpoint loaded from file",
+			zap.String("file", p.config.CheckpointFile),
+			zap.Int("last_processed_id", checkpoint.LastProcessedID),
+			zap.Int64("total_processed", checkpoint.TotalProcessed),
+			zap.Time("timestamp", checkpoint.Timestamp),
+		)
 	}
-	
-	// Read checkpoint file
-	data, err := os.ReadFile(p.config.CheckpointFile)
-	if err != nil {
-		return checkpoint, fmt.Errorf("failed to read checkpoint file: %w", err)
-	}
-	
-	// Unmarshal checkpoint data
-	if err := json.Unmarshal(data, &checkpoint); err != nil {
-		return checkpoint, fmt.Errorf("failed to unmarshal checkpoint data: %w", err)
-	}
-	
-	p.logger.Info("Checkpoint loaded",
-		zap.String("file", p.config.CheckpointFile),
-		zap.Int("last_processed_id", checkpoint.LastProcessedID),
-		zap.Int64("total_processed", checkpoint.TotalProcessed),
-		zap.Time("timestamp", checkpoint.Timestamp),
-	)
-	
+
 	return checkpoint, nil
 }
 

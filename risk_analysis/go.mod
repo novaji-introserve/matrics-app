@@ -5,7 +5,18 @@ go 1.22.2
 require (
 	github.com/jackc/pgx/v5 v5.5.1
 	go.uber.org/zap v1.26.0
-	gopkg.in/ini.v1 v1.67.0
+)
+
+require gopkg.in/ini.v1 v1.67.0
+
+require (
+	github.com/gorilla/mux v1.8.1
+	github.com/redis/go-redis/v9 v9.16.0
+)
+
+require (
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 )
 
 require (

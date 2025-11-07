@@ -60,8 +60,7 @@ func (c *BatchedPlanRiskCalculator) InitializeCache(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	// defer tx.Rollback(ctx)
-	defer func() { _ = tx.Rollback(ctx) }()
+	defer tx.Rollback(ctx)
 
 	// Load settings
 	settings := &CachedSettings{}
@@ -393,8 +392,7 @@ func (c *BatchedPlanRiskCalculator) calculateSingleCustomer(ctx context.Context,
 	if err != nil {
 		return 0, "", fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	// defer tx.Rollback(ctx)
-	defer func() { _ = tx.Rollback(ctx) }()
+	defer tx.Rollback(ctx)
 
 	// Clear previous risk plan lines (as per Python code line 44-45)
 	_, err = tx.Exec(ctx,
@@ -445,10 +443,7 @@ func (c *BatchedPlanRiskCalculator) calculateSingleCustomer(ctx context.Context,
 			finalScore = settings.MaximumRiskThreshold
 		}
 		level := c.classifyRiskLevel(finalScore, settings)
-		// tx.Commit(ctx)
-		if err := tx.Commit(ctx); err != nil {
-			return 0, "", fmt.Errorf("failed to commit transaction: %w", err)
-		}
+		tx.Commit(ctx)
 		return finalScore, level, nil
 	}
 
@@ -463,10 +458,7 @@ func (c *BatchedPlanRiskCalculator) calculateSingleCustomer(ctx context.Context,
 			finalScore = settings.MaximumRiskThreshold
 		}
 		level := c.classifyRiskLevel(finalScore, settings)
-		// tx.Commit(ctx)
-		if err := tx.Commit(ctx); err != nil {
-			return 0, "", fmt.Errorf("failed to commit transaction: %w", err)
-		}
+		tx.Commit(ctx)
 		return finalScore, level, nil
 	}
 
@@ -580,10 +572,7 @@ func (c *BatchedPlanRiskCalculator) calculateSingleCustomer(ctx context.Context,
 	// Classify risk level
 	level := c.classifyRiskLevel(finalScore, settings)
 
-	// tx.Commit(ctx)
-	if err := tx.Commit(ctx); err != nil {
-		return 0, "", fmt.Errorf("failed to commit transaction: %w", err)
-	}
+	tx.Commit(ctx)
 	return finalScore, level, nil
 }
 
