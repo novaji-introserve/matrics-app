@@ -652,6 +652,21 @@ class RiskAnalysis(models.Model):
             {pattern['score']} AS risk_score
         FROM res_partner rp
         WHERE rp.is_pep = TRUE""")
+                
+            elif pattern['type'] == 'default_risk':
+                union_branches.append(f"""
+                -- Default risk rating
+                SELECT 
+                    rp.id AS partner_id,
+                    '{pattern['code']}' AS risk_code,
+                    {pattern['score']} AS risk_score
+                FROM res_partner rp
+                CROSS JOIN (
+                    SELECT risk_rating 
+                    FROM res_risk_assessment
+                    WHERE is_default = TRUE
+                    LIMIT 1
+                ) default_rating""")
             
             elif pattern['type'] == 'watchlist':
                 union_branches.append(f"""
@@ -662,6 +677,7 @@ class RiskAnalysis(models.Model):
             {pattern['score']} AS risk_score
         FROM res_partner rp
         WHERE rp.is_watchlist = TRUE""")
+           
         
         # Assemble the materialized view
         all_flags_cte = ""
@@ -776,6 +792,13 @@ class RiskAnalysis(models.Model):
         if "is_watchlist" in sql_lower:
             return {
                 'type': 'watchlist',
+                'code': plan_code,
+                'score': risk_score
+            }
+        # Pattern 8: Default Risk Rating
+        if "is_default" in sql_lower and "risk_rating" in sql_lower:
+            return {
+                'type': 'default_risk',
                 'code': plan_code,
                 'score': risk_score
             }
