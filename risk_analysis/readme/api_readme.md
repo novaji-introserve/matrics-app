@@ -157,9 +157,9 @@ risk_analysis/
 
 ```bash
 # POST request
-curl -X POST http://localhost:8080/api/v1/risk-analysis \
+curl -X POST http://localhost:4567/api/v1/risk-analysis \
   -H "Content-Type: application/json" \
-  -d '{"customer_ids":[3182038]}'
+  -d '{"customer_ids":[40967]}'
 
 # GET request
 curl "http://localhost:8080/api/v1/risk-analysis?customer_ids=3182038"
