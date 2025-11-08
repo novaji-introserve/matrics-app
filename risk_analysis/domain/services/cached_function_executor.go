@@ -28,16 +28,16 @@ type RiskFunctionDefinition struct {
 // and executes them from memory instead of querying the database each time
 // This eliminates N database queries per customer down to 0!
 type CachedFunctionExecutor struct {
-	db               *pgxpool.Pool
-	logger           *zap.Logger
-	functions        []*RiskFunctionDefinition
-	functionsMap     map[string]*RiskFunctionDefinition
-	cacheInitialized bool
-	cacheMu          sync.RWMutex
-	cacheFile        string        // Path to cache file (for file-based caching)
-	redisClient      *redis.Client // Redis client (for Redis-based caching)
-	dbName           string        // Database name for Redis key prefixing
-	useRedis         bool          // Flag to determine if Redis is enabled
+	db                *pgxpool.Pool
+	logger            *zap.Logger
+	functions         []*RiskFunctionDefinition
+	functionsMap      map[string]*RiskFunctionDefinition
+	cacheInitialized  bool
+	cacheMu           sync.RWMutex
+	cacheFile         string        // Path to cache file (for file-based caching)
+	redisClient       *redis.Client // Redis client (for Redis-based caching)
+	dbName            string        // Database name for Redis key prefixing
+	useRedis          bool          // Flag to determine if Redis is enabled
 }
 
 // NewCachedFunctionExecutor creates a new cached function executor with file-based caching
@@ -224,13 +224,13 @@ func (e *CachedFunctionExecutor) ExecuteAllFunctions(ctx context.Context, db *pg
 
 		// Log if function takes more than 100ms (should be <10ms normally)
 		if funcDuration > 100*time.Millisecond {
-			// e.logger.Warn("SLOW FUNCTION DETECTED",
-			// 	zap.String("function_name", fn.FunctionName),
-			// 	zap.Int("customer_id", customerID),
-			// 	zap.Duration("duration", funcDuration),
-			// 	zap.Float64("seconds", funcDuration.Seconds()),
-			// 	zap.String("query", fn.QueryText),
-			// )
+			e.logger.Warn("🐌 SLOW FUNCTION DETECTED",
+				zap.String("function_name", fn.FunctionName),
+				zap.Int("customer_id", customerID),
+				zap.Duration("duration", funcDuration),
+				zap.Float64("seconds", funcDuration.Seconds()),
+				zap.String("query", fn.QueryText),
+			)
 		}
 
 		if err != nil && err != pgx.ErrNoRows {

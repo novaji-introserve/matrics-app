@@ -31,7 +31,7 @@ class CustomerAccount(models.Model):
     last_transaction_date = fields.Date(
         string='Last Transaction Date', required=False)
     opening_date = fields.Date(
-        string='Opening Date', required=False)
+        string='Opening Date', required=False,index=True)
 
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', required=False)  # acct_officer
@@ -39,10 +39,10 @@ class CustomerAccount(models.Model):
     currency = fields.Char(
         string='Currency', required=False, index=True)  # currency
 
-    category = fields.Char(string='Category', required=False)  # category
+    category = fields.Char(string='Category', required=False,index=True)  # category
 
     category_description = fields.Char(
-        string='Category Description', required=False)  # category_desc
+        string='Category Description', required=False,index=True)  # category_desc
 
     is_joint_account = fields.Boolean(
         string='Is Joint Account', required=False)  # category_desc
@@ -55,7 +55,7 @@ class CustomerAccount(models.Model):
     date_created = fields.Date(
         string='Date Created', index=True)  # date_created
     ledger_id = fields.Many2one(
-        comodel_name='res.partner.account.ledger', string='Ledger', index=True)
+        comodel_name='res.partner.account.ledger', string='Ledger')
     closure_status = fields.Selection(string='Closure Status', selection=[
                                       ('N', 'No'), ('Y', 'Yes')])
     branch_id = fields.Many2one(
@@ -65,10 +65,8 @@ class CustomerAccount(models.Model):
         comodel_name='res.partner.account.type', string='Account Type', index=True)
 
     risk_assessment = fields.Many2one(
-        comodel_name='res.risk.assessment', string='Risk Assessment', index=True)
+        comodel_name='res.risk.assessment', string='Risk Assessment')
     
-    account_type_id = fields.Many2one(
-        comodel_name='res.partner.account.type', string='Account Type', index=True)
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
     branch_code = fields.Char(string="Branch Code")
@@ -173,6 +171,7 @@ class CustomerAccount(models.Model):
         # Create index on res_partner_account (only if it doesn't exist)
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")
+        
 
         # Check if the trigger exists
         self.env.cr.execute("""

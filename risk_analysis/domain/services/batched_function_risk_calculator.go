@@ -11,12 +11,11 @@ import (
 	"sync"
 	"time"
 
-	"sync/atomic"
-
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
+	"sync/atomic"
 )
 
 // convertPythonToPostgresSQL converts Python-style placeholders (%s) to PostgreSQL placeholders ($1, $2, etc.)
@@ -63,7 +62,7 @@ type CustomerRiskResult struct {
 // RiskPlanLine represents a risk plan line from function execution
 type RiskPlanLine struct {
 	PartnerID    int
-	PlanLineID   *int // Optional: can be NULL if not associated with a specific plan
+	PlanLineID   *int    // Optional: can be NULL if not associated with a specific plan
 	RiskScore    float64
 	FunctionName string
 	Matched      bool
@@ -89,23 +88,23 @@ type CompositePlanLine struct {
 // 5. Bulk updates using UNNEST for maximum throughput
 // Performance: 100x faster than per-customer processing!
 type BatchedFunctionRiskCalculator struct {
-	db                   *pgxpool.Pool
-	logger               *zap.Logger
-	functionExecutor     *CachedFunctionExecutor
-	cachedSettings       *CachedSettings
-	compositePlans       []*RiskPlan           // Cached composite plans
-	riskPlans            []*RiskPlan           // Cached regular risk plans (for plan-based scoring)
-	cachedUniverses      map[int]*RiskUniverse // CACHED UNIVERSES - loaded ONCE at startup!
-	cacheInitialized     bool
-	cacheMu              sync.RWMutex
-	cacheFilePath        string // Path to cache metadata file from config (file-based caching)
-	riskPlansCachePath   string // Path to risk_plans.json cache file (file-based caching)
+	db               *pgxpool.Pool
+	logger            *zap.Logger
+	functionExecutor  *CachedFunctionExecutor
+	cachedSettings    *CachedSettings
+	compositePlans    []*RiskPlan // Cached composite plans
+	riskPlans         []*RiskPlan // Cached regular risk plans (for plan-based scoring)
+	cachedUniverses   map[int]*RiskUniverse // CACHED UNIVERSES - loaded ONCE at startup!
+	cacheInitialized  bool
+	cacheMu           sync.RWMutex
+	cacheFilePath     string // Path to cache metadata file from config (file-based caching)
+	riskPlansCachePath string // Path to risk_plans.json cache file (file-based caching)
 	compositePlansByCode map[string]*CompositePlanMetadata
 
 	// Redis caching support
-	redisClient *redis.Client // Redis client (for Redis-based caching)
-	dbName      string        // Database name for Redis key prefixing
-	useRedis    bool          // Flag to determine if Redis is enabled
+	redisClient       *redis.Client // Redis client (for Redis-based caching)
+	dbName            string        // Database name for Redis key prefixing
+	useRedis          bool          // Flag to determine if Redis is enabled
 
 	// Performance metrics
 	totalBatches      int64
@@ -116,12 +115,12 @@ type BatchedFunctionRiskCalculator struct {
 
 // New struct for cached composite plan metadata
 type CompositePlanMetadata struct {
-	PlanID       int
-	PlanName     string
-	UniverseID   int
-	AssessmentID int
-	SubjectID    int
-	RiskRating   float64
+    PlanID       int
+    PlanName     string
+    UniverseID   int
+    AssessmentID int
+    SubjectID    int
+    RiskRating   float64
 }
 
 // RiskPlan represents a risk assessment plan
@@ -140,10 +139,10 @@ type RiskPlan struct {
 
 // RiskUniverse represents a risk universe used in composite calculations
 type RiskUniverse struct {
-	ID                    int
-	Name                  string
-	IsIncludedInComposite bool
-	WeightPercentage      float64
+	ID                     int
+	Name                   string
+	IsIncludedInComposite  bool
+	WeightPercentage       float64
 }
 
 // RiskAssessment represents a risk assessment with its rating and subject
@@ -264,10 +263,10 @@ func (c *BatchedFunctionRiskCalculator) InitializeCache(ctx context.Context) err
 	}
 
 	// After loading composite plans, build the code lookup map
-	c.compositePlansByCode = make(map[string]*CompositePlanMetadata)
-
-	// Query to get all composite plan metadata with code
-	rows, err := tx.Query(ctx, `
+    c.compositePlansByCode = make(map[string]*CompositePlanMetadata)
+    
+    // Query to get all composite plan metadata with code
+    rows, err := tx.Query(ctx, `
         SELECT 
             p.id, p.name, p.code, p.universe_id, 
             p.risk_assessment, a.subject_id, a.risk_rating
@@ -276,39 +275,39 @@ func (c *BatchedFunctionRiskCalculator) InitializeCache(ctx context.Context) err
         WHERE p.use_composite_calculation = true
         AND p.code IS NOT NULL
     `)
-	if err != nil {
-		c.logger.Warn("Failed to load composite plan metadata", zap.Error(err))
-	} else {
-		defer rows.Close()
-
-		for rows.Next() {
-			var planID int
-			var planName, code string
-			var universeID, assessmentID sql.NullInt32
-			var subjectID sql.NullInt64
-			var riskRating sql.NullFloat64
-
-			if err := rows.Scan(&planID, &planName, &code, &universeID, &assessmentID, &subjectID, &riskRating); err != nil {
-				c.logger.Warn("Failed to scan composite plan metadata", zap.Error(err))
-				continue
-			}
-
-			// Only add if all required fields are valid
-			if universeID.Valid && assessmentID.Valid && subjectID.Valid && riskRating.Valid {
-				c.compositePlansByCode[code] = &CompositePlanMetadata{
-					PlanID:       planID,
-					PlanName:     planName,
-					UniverseID:   int(universeID.Int32),
-					AssessmentID: int(assessmentID.Int32),
-					SubjectID:    int(subjectID.Int64),
-					RiskRating:   riskRating.Float64,
-				}
-			}
-		}
-	}
-
-	c.logger.Info("Composite plan code lookup map built",
-		zap.Int("plan_codes", len(c.compositePlansByCode)))
+    if err != nil {
+        c.logger.Warn("Failed to load composite plan metadata", zap.Error(err))
+    } else {
+        defer rows.Close()
+        
+        for rows.Next() {
+            var planID int
+            var planName, code string
+            var universeID, assessmentID sql.NullInt32
+            var subjectID sql.NullInt64
+            var riskRating sql.NullFloat64
+            
+            if err := rows.Scan(&planID, &planName, &code, &universeID, &assessmentID, &subjectID, &riskRating); err != nil {
+                c.logger.Warn("Failed to scan composite plan metadata", zap.Error(err))
+                continue
+            }
+            
+            // Only add if all required fields are valid
+            if universeID.Valid && assessmentID.Valid && subjectID.Valid && riskRating.Valid {
+                c.compositePlansByCode[code] = &CompositePlanMetadata{
+                    PlanID:       planID,
+                    PlanName:     planName,
+                    UniverseID:   int(universeID.Int32),
+                    AssessmentID: int(assessmentID.Int32),
+                    SubjectID:    int(subjectID.Int64),
+                    RiskRating:   riskRating.Float64,
+                }
+            }
+        }
+    }
+    
+    c.logger.Info("Composite plan code lookup map built",
+        zap.Int("plan_codes", len(c.compositePlansByCode)))
 
 	// Load regular risk plans for plan-based scoring (Priority 2)
 	riskPlans, err := c.loadRiskPlans(ctx, tx)
@@ -373,7 +372,7 @@ func (c *BatchedFunctionRiskCalculator) InitializeCache(ctx context.Context) err
 			}
 			cachedUniverses[u.ID] = &u
 		}
-		c.logger.Info("Risk universes loaded into cache",
+		c.logger.Info("✓ Risk universes loaded into cache",
 			zap.Int("universe_count", len(cachedUniverses)),
 			zap.String("performance_note", "This prevents 5M+ redundant database queries!"),
 		)
@@ -386,7 +385,7 @@ func (c *BatchedFunctionRiskCalculator) InitializeCache(ctx context.Context) err
 	c.cachedSettings = settings
 	c.compositePlans = compositePlans
 	c.riskPlans = riskPlans
-	c.cachedUniverses = cachedUniverses // Store cached universes
+	c.cachedUniverses = cachedUniverses  // Store cached universes
 	c.cacheInitialized = true
 
 	// Save cache metadata for future validation
@@ -413,14 +412,14 @@ func (c *BatchedFunctionRiskCalculator) InitializeCache(ctx context.Context) err
 // saveCacheMetadata saves cache validation data to file or Redis
 func (c *BatchedFunctionRiskCalculator) saveCacheMetadata(functionCount, compositePlanCount, riskPlanCount int) {
 	cacheMetadata := map[string]interface{}{
-		"function_count":       functionCount,
-		"composite_plan_count": compositePlanCount,
-		"risk_plan_count":      riskPlanCount,
-		"universe_count":       len(c.cachedUniverses),
-		"cached_at":            time.Now().Format(time.RFC3339),
-		"composite_plans":      c.compositePlans,
-		"risk_plans":           c.riskPlans,
-		"universes":            c.cachedUniverses, // CRITICAL: Cache universes to Redis!
+		"function_count":        functionCount,
+		"composite_plan_count":  compositePlanCount,
+		"risk_plan_count":       riskPlanCount,
+		"universe_count":        len(c.cachedUniverses),
+		"cached_at":             time.Now().Format(time.RFC3339),
+		"composite_plans":       c.compositePlans,
+		"risk_plans":            c.riskPlans,
+		"universes":             c.cachedUniverses, // CRITICAL: Cache universes to Redis!
 	}
 
 	if c.useRedis {
@@ -801,7 +800,7 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 	)
 
 	if !c.cacheInitialized {
-		c.logger.Error("CRITICAL: Cache not initialized - call InitializeCache() first")
+		c.logger.Error("❌ CRITICAL: Cache not initialized - call InitializeCache() first")
 		results := make([]CustomerRiskResult, len(customerIDs))
 		for i, custID := range customerIDs {
 			results[i] = CustomerRiskResult{
@@ -813,7 +812,7 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 	}
 
 	if c.functionExecutor.GetFunctionCount() == 0 {
-		c.logger.Error("CRITICAL: Function cache is empty - no functions loaded")
+		c.logger.Error("❌ CRITICAL: Function cache is empty - no functions loaded")
 	}
 
 	if len(customerIDs) == 0 {
@@ -824,11 +823,11 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 	// 2. PERFORMANCE OPTIMIZATION: Bulk delete existing records BEFORE processing
 	if !dryRun {
 		c.logger.Info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-		// c.logger.Info("PHASE 1: Bulk Delete Existing Records")
-		// deleteStart := time.Now()
-
+		c.logger.Info("PHASE 1: Bulk Delete Existing Records")
+		deleteStart := time.Now()
+		
 		if err := c.bulkDeleteExistingRecords(ctx, customerIDs); err != nil {
-			c.logger.Error("BULK DELETE FAILED - WILL FALL BACK TO SLOW INDIVIDUAL DELETES ",
+			c.logger.Error("⚠️⚠️⚠️ BULK DELETE FAILED - WILL FALL BACK TO SLOW INDIVIDUAL DELETES ⚠️⚠️⚠️",
 				zap.Error(err),
 				zap.Int("customer_count", len(customerIDs)),
 				zap.String("impact", "This will cause 10M+ individual DELETE operations"),
@@ -837,21 +836,21 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 			// Consider making this fatal instead of continuing
 			// return results with error
 		} else {
-			// deleteDuration := time.Since(deleteStart)
-			// c.logger.Info("Bulk delete completed successfully",
-			// 	zap.Duration("duration", deleteDuration),
-			// 	zap.Float64("ms_per_customer", float64(deleteDuration.Milliseconds())/float64(len(customerIDs))),
-			// 	zap.Int("customers", len(customerIDs)),
-			// 	zap.String("optimization", "1 transaction vs thousands"),
-			// )
+			deleteDuration := time.Since(deleteStart)
+			c.logger.Info("✓ Bulk delete completed successfully",
+				zap.Duration("duration", deleteDuration),
+				zap.Float64("ms_per_customer", float64(deleteDuration.Milliseconds())/float64(len(customerIDs))),
+				zap.Int("customers", len(customerIDs)),
+				zap.String("optimization", "1 transaction vs thousands"),
+			)
 		}
 	}
 
 	// 3. Process customers in parallel using worker pool
-	// c.logger.Info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	// c.logger.Info("PHASE 2: Calculate Risk Scores (Parallel Processing)")
+	c.logger.Info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	c.logger.Info("PHASE 2: Calculate Risk Scores (Parallel Processing)")
 	processStart := time.Now()
-
+	
 	results := make([]CustomerRiskResult, len(customerIDs))
 	var wg sync.WaitGroup
 	var processedCount int64
@@ -897,7 +896,7 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 				customerStart := time.Now()
 				score, level, compositePlanLines, riskPlanLines, err := c.calculateSingleCustomer(ctx, j.customerID)
 				customerDuration := time.Since(customerStart)
-
+				
 				results[j.index] = CustomerRiskResult{
 					CustomerID:         j.customerID,
 					RiskScore:          score,
@@ -909,7 +908,7 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 
 				localProcessed++
 				atomic.AddInt64(&processedCount, 1)
-
+				
 				if err != nil {
 					localErrors++
 					atomic.AddInt64(&errorCount, 1)
@@ -918,15 +917,15 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 				// Log slow customers (anything over 5 seconds is abnormal)
 				if customerDuration > 5*time.Second {
 					atomic.AddInt64(&slowCustomerCount, 1)
-					// c.logger.Warn("SLOW CUSTOMER DETECTED",
-					// 	zap.Int("worker_id", workerID),
-					// 	zap.Int("customer_id", j.customerID),
-					// 	zap.Duration("duration", customerDuration),
-					// 	zap.Float64("seconds", customerDuration.Seconds()),
-					// 	zap.Error(err),
-					// 	zap.Int("composite_lines", len(compositePlanLines)),
-					// 	zap.Int("risk_lines", len(riskPlanLines)),
-					// )
+					c.logger.Warn("🐌 SLOW CUSTOMER DETECTED",
+						zap.Int("worker_id", workerID),
+						zap.Int("customer_id", j.customerID),
+						zap.Duration("duration", customerDuration),
+						zap.Float64("seconds", customerDuration.Seconds()),
+						zap.Error(err),
+						zap.Int("composite_lines", len(compositePlanLines)),
+						zap.Int("risk_lines", len(riskPlanLines)),
+					)
 				}
 
 				// Log progress every 100 customers per worker
@@ -961,7 +960,7 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 	wg.Wait()
 
 	processDuration := time.Since(processStart)
-	c.logger.Info("Processing phase completed",
+	c.logger.Info("✓ Processing phase completed",
 		zap.Duration("duration", processDuration),
 		zap.Int64("processed", processedCount),
 		zap.Int64("errors", errorCount),
@@ -971,7 +970,7 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 	)
 
 	if slowCustomerCount > 0 {
-		c.logger.Warn("Performance issue detected",
+		c.logger.Warn("⚠️ Performance issue detected",
 			zap.Int64("slow_customers", slowCustomerCount),
 			zap.String("note", "Customers taking >5 seconds indicate potential issues"),
 		)
@@ -985,10 +984,10 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 		// Update risk scores
 		updateStart := time.Now()
 		if err := c.updateCustomerRiskScores(ctx, results); err != nil {
-			c.logger.Error("Failed to update customer risk scores", zap.Error(err))
+			c.logger.Error("❌ Failed to update customer risk scores", zap.Error(err))
 		} else {
 			updateDuration := time.Since(updateStart)
-			c.logger.Info("Risk scores updated",
+			c.logger.Info("✓ Risk scores updated",
 				zap.Duration("duration", updateDuration),
 				zap.Int("customers", len(customerIDs)),
 			)
@@ -997,10 +996,10 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 		// Bulk insert composite plan lines using COPY
 		compositeStart := time.Now()
 		if err := c.bulkInsertCompositePlanLines(ctx, results); err != nil {
-			c.logger.Error("Failed to bulk insert composite plan lines", zap.Error(err))
+			c.logger.Error("❌ Failed to bulk insert composite plan lines", zap.Error(err))
 		} else {
 			compositeDuration := time.Since(compositeStart)
-
+			
 			// Count total composite lines
 			totalCompositeLines := 0
 			for _, result := range results {
@@ -1008,8 +1007,8 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 					totalCompositeLines += len(result.CompositePlanLines)
 				}
 			}
-
-			c.logger.Info("Composite plan lines inserted",
+			
+			c.logger.Info("✓ Composite plan lines inserted",
 				zap.Duration("duration", compositeDuration),
 				zap.Int("total_lines", totalCompositeLines),
 				zap.String("method", "PostgreSQL COPY"),
@@ -1019,10 +1018,10 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 		// Bulk insert risk plan lines using COPY
 		riskStart := time.Now()
 		if err := c.bulkInsertRiskPlanLines(ctx, results); err != nil {
-			c.logger.Error("Failed to bulk insert risk plan lines", zap.Error(err))
+			c.logger.Error("❌ Failed to bulk insert risk plan lines", zap.Error(err))
 		} else {
 			riskDuration := time.Since(riskStart)
-
+			
 			// Count total risk plan lines
 			totalRiskLines := 0
 			for _, result := range results {
@@ -1030,8 +1029,8 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 					totalRiskLines += len(result.RiskPlanLines)
 				}
 			}
-
-			c.logger.Info("Risk plan lines inserted",
+			
+			c.logger.Info("✓ Risk plan lines inserted",
 				zap.Duration("duration", riskDuration),
 				zap.Int("total_lines", totalRiskLines),
 				zap.String("method", "PostgreSQL COPY"),
@@ -1046,7 +1045,7 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 
 	// Final summary
 	c.logger.Info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	c.logger.Info("BATCH PROCESSING COMPLETED",
+	c.logger.Info("✓ BATCH PROCESSING COMPLETED",
 		zap.Int("customer_count", len(customerIDs)),
 		zap.Int("workers", numWorkers),
 		zap.Duration("total_duration", totalDuration),
@@ -1061,7 +1060,7 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 	// Warn if performance is degraded
 	avgMsPerCustomer := float64(totalDuration.Milliseconds()) / float64(len(customerIDs))
 	if avgMsPerCustomer > 1000 { // More than 1 second per customer
-		c.logger.Error("PERFORMANCE DEGRADATION DETECTED ",
+		c.logger.Error("⚠️⚠️⚠️ PERFORMANCE DEGRADATION DETECTED ⚠️⚠️⚠️",
 			zap.Float64("avg_ms_per_customer", avgMsPerCustomer),
 			zap.String("expected", "<100ms per customer"),
 			zap.String("actual", fmt.Sprintf("%.2fms per customer", avgMsPerCustomer)),
@@ -1071,7 +1070,6 @@ func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 
 	return results
 }
-
 // func (c *BatchedFunctionRiskCalculator) ProcessCustomerBatch(
 // 	ctx context.Context,
 // 	customerIDs []int,
@@ -1543,7 +1541,7 @@ func (c *BatchedFunctionRiskCalculator) bulkInsertCompositePlanLines(ctx context
 	// Use pgx CopyFrom for bulk insert (MAXIMUM PERFORMANCE)
 	// This is significantly faster than individual INSERTs
 	copyCount, err := c.db.CopyFrom(
-		// _, err := c.db.CopyFrom(
+	// _, err := c.db.CopyFrom(
 		ctx,
 		pgx.Identifier{"res_partner_composite_plan_line"},
 		[]string{"partner_id", "plan_id", "universe_id", "subject_id", "assessment_id", "matched", "risk_score", "name", "active", "create_uid", "create_date", "write_uid", "write_date"},
@@ -1569,8 +1567,8 @@ func (c *BatchedFunctionRiskCalculator) bulkInsertCompositePlanLines(ctx context
 				line.Matched,
 				line.RiskScore,
 				line.Name,
-				true, // active
-				1,    // create_uid
+				true,  // active
+				1,     // create_uid
 				time.Now(),
 				1, // write_uid
 				time.Now(),
@@ -1692,7 +1690,6 @@ func (c *BatchedFunctionRiskCalculator) GetMetrics() map[string]interface{} {
 }
 
 // Helper methods for risk calculation
-//
 //nolint:unused // Will be used in future feature
 func (c *BatchedFunctionRiskCalculator) checkRiskAssessment(ctx context.Context, tx pgx.Tx, customerID int) (float64, bool, error) {
 	var riskRating sql.NullFloat64
@@ -2007,12 +2004,12 @@ func (c *BatchedFunctionRiskCalculator) calculateCompositeScoreFromFunctions(
 	// 	)
 	// }
 
-	// loopStart := time.Now()
+	loopStart := time.Now()
 	// ... process all function keys ...
-	// c.logger.Info("Composite plan lookup phase",
-	// 	zap.Int("customer_id", customerID),
-	// 	zap.Duration("lookup_duration", time.Since(loopStart)),
-	// 	zap.Int("keys_processed", len(functionResults)))
+	c.logger.Info("Composite plan lookup phase",
+		zap.Int("customer_id", customerID),
+		zap.Duration("lookup_duration", time.Since(loopStart)),
+		zap.Int("keys_processed", len(functionResults)))
 
 	for functionKey, score := range functionResults {
 		c.logger.Debug("Processing function result key",
@@ -2023,7 +2020,7 @@ func (c *BatchedFunctionRiskCalculator) calculateCompositeScoreFromFunctions(
 		c.cacheMu.RLock()
 		planMeta, exists := c.compositePlansByCode[functionKey]
 		c.cacheMu.RUnlock()
-
+		
 		if !exists {
 			c.logger.Debug("Could not find composite plan for function key",
 				zap.String("function_key", functionKey),
@@ -2407,6 +2404,9 @@ func (c *BatchedFunctionRiskCalculator) calculateCompositeScore(
 
 	return 0, compositePlanLines, nil
 }
+
+
+
 
 // package services
 
@@ -3052,19 +3052,19 @@ func (c *BatchedFunctionRiskCalculator) calculateCompositeScore(
 // 		if err != nil {
 // 			// If query returns no rows or error, plan doesn't match
 // 			if err == pgx.ErrNoRows {
-// 				// c.logger.Info("Plan did not match customer (no rows)",
-// 				// 	zap.Int("customer_id", customerID),
-// 				// 	zap.Int("plan_id", plan.ID),
-// 				// 	zap.String("plan_name", plan.Name),
-// 				// )
+// 				c.logger.Info("Plan did not match customer (no rows)",
+// 					zap.Int("customer_id", customerID),
+// 					zap.Int("plan_id", plan.ID),
+// 					zap.String("plan_name", plan.Name),
+// 				)
 // 			} else {
-// 				// c.logger.Warn("Failed to execute plan SQL",
-// 				// 	zap.Int("customer_id", customerID),
-// 				// 	zap.Int("plan_id", plan.ID),
-// 				// 	zap.String("plan_name", plan.Name),
-// 				// 	zap.String("sql_query", plan.SQLQuery),
-// 				// 	zap.Error(err),
-// 				// )
+// 				c.logger.Warn("Failed to execute plan SQL",
+// 					zap.Int("customer_id", customerID),
+// 					zap.Int("plan_id", plan.ID),
+// 					zap.String("plan_name", plan.Name),
+// 					zap.String("sql_query", plan.SQLQuery),
+// 					zap.Error(err),
+// 				)
 // 			}
 // 			continue
 // 		}
@@ -3107,6 +3107,15 @@ func (c *BatchedFunctionRiskCalculator) calculateCompositeScore(
 // 	}
 
 // 	startTime := time.Now()
+
+// 	// PERFORMANCE OPTIMIZATION: Bulk delete existing records for entire batch BEFORE processing
+// 	// This is 1000x faster than individual deletes per customer in separate transactions
+// 	if !dryRun {
+// 		if err := c.bulkDeleteExistingRecords(ctx, customerIDs); err != nil {
+// 			c.logger.Error("Failed to bulk delete existing records", zap.Error(err))
+// 			// Continue anyway - the individual deletes will handle it as fallback
+// 		}
+// 	}
 
 // 	// Process customers in parallel using worker pool
 // 	results := make([]CustomerRiskResult, len(customerIDs))
@@ -3215,21 +3224,11 @@ func (c *BatchedFunctionRiskCalculator) calculateCompositeScore(
 // 	// defer tx.Rollback(ctx)
 // 	defer func() { _ = tx.Rollback(ctx) }()
 
-// 	// Clear previous composite plan lines AND risk plan lines (Python line 47-49)
-// 	_, err = tx.Exec(ctx,
-// 		"DELETE FROM res_partner_composite_plan_line WHERE partner_id = $1",
-// 		customerID)
-// 	if err != nil {
-// 		c.logger.Warn("Failed to delete composite plan lines", zap.Int("customer_id", customerID), zap.Error(err))
-// 	}
-
-// 	// Clear previous risk plan lines
-// 	_, err = tx.Exec(ctx,
-// 		"DELETE FROM res_partner_risk_plan_line WHERE partner_id = $1",
-// 		customerID)
-// 	if err != nil {
-// 		c.logger.Warn("Failed to delete risk plan lines", zap.Int("customer_id", customerID), zap.Error(err))
-// 	}
+// 	// PERFORMANCE OPTIMIZATION: DELETE operations moved to bulk operation in ProcessCustomerBatch
+// 	// This eliminates 10M individual DELETE transactions, reducing processing time from 1500+ hours to 32-34 hours
+// 	// Old code (kept for reference):
+// 	// _, err = tx.Exec(ctx, "DELETE FROM res_partner_composite_plan_line WHERE partner_id = $1", customerID)
+// 	// _, err = tx.Exec(ctx, "DELETE FROM res_partner_risk_plan_line WHERE partner_id = $1", customerID)
 
 // 	// ╔═══════════════════════════════════════════════════════════════════════════════╗
 // 	// ║  COMPOSITE SCORE CALCULATION - FUNCTION-BASED (FAST!)                       ║
@@ -3513,6 +3512,50 @@ func (c *BatchedFunctionRiskCalculator) calculateCompositeScore(
 
 // 	c.logger.Debug("Updated customer risk scores",
 // 		zap.Int("count", len(validResults)),
+// 	)
+
+// 	return nil
+// }
+
+// // bulkDeleteExistingRecords deletes all existing composite and risk plan lines for a batch of customers
+// // This is a MASSIVE performance optimization: 1 DELETE vs 1000 DELETEs = 1000x faster
+// func (c *BatchedFunctionRiskCalculator) bulkDeleteExistingRecords(ctx context.Context, customerIDs []int) error {
+// 	if len(customerIDs) == 0 {
+// 		return nil
+// 	}
+
+// 	// Start a transaction for the bulk deletes
+// 	tx, err := c.db.Begin(ctx)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to begin transaction for bulk delete: %w", err)
+// 	}
+// 	defer func() { _ = tx.Rollback(ctx) }()
+
+// 	// Delete all composite plan lines for this batch using ANY clause
+// 	// This is MUCH faster than individual DELETEs: 1 query vs 500 queries
+// 	_, err = tx.Exec(ctx,
+// 		"DELETE FROM res_partner_composite_plan_line WHERE partner_id = ANY($1)",
+// 		customerIDs)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to bulk delete composite plan lines: %w", err)
+// 	}
+
+// 	// Delete all risk plan lines for this batch
+// 	_, err = tx.Exec(ctx,
+// 		"DELETE FROM res_partner_risk_plan_line WHERE partner_id = ANY($1)",
+// 		customerIDs)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to bulk delete risk plan lines: %w", err)
+// 	}
+
+// 	// Commit the transaction
+// 	if err := tx.Commit(ctx); err != nil {
+// 		return fmt.Errorf("failed to commit bulk delete transaction: %w", err)
+// 	}
+
+// 	c.logger.Debug("Bulk deleted existing records",
+// 		zap.Int("customer_count", len(customerIDs)),
+// 		zap.String("optimization", "1 transaction vs 1000 individual transactions"),
 // 	)
 
 // 	return nil
