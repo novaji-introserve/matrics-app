@@ -1,0 +1,418 @@
+openapi: 3.0.3
+info:
+  title: Risk Analysis API
+  description: |
+    High-performance risk analysis API using materialized views and Redis caching.
+
+    This API calculates risk scores for customers based on:
+    - Composite risk plans (weighted aggregation across universes)
+    - Regular risk assessment plans
+    - Enhanced Due Diligence (EDD) scores
+
+    **Performance**: Uses pre-computed materialized views for 10x faster processing compared to function-based approaches.
+  version: 1.0.0
+  contact:
+    name: iComply dev team
+    email: tech-support@novajii.com
+
+servers:
+  - url: http://localhost:4567/api/v1
+    description: Local development server
+  # - url: https://api.example.com/api/v1
+  #   description: Production server
+
+# externalDocs:
+#   description: Interactive API Documentation
+#   url: http://localhost:4567/docs
+
+tags:
+  - name: Risk Analysis
+    description: Customer risk score calculation endpoints
+  - name: Health
+    description: Service health check endpoints
+
+paths:
+  /risk-analysis:
+    post:
+      tags:
+        - Risk Analysis
+      summary: Analyze customer risk (Batch POST)
+      description: |
+        Calculate risk scores for multiple customers in a single request.
+
+        **Processing Details**:
+        - Uses materialized views for fast computation
+        - Supports Redis caching for improved performance
+        - Calculates weighted composite scores across multiple risk universes
+        - Returns risk score, risk level (low/medium/high), and detailed metadata
+
+        **Performance**: Processes 1000+ customers per second with materialized views enabled.
+      operationId: analyzeRisk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskAnalysisRequest'
+            examples:
+              single_customer:
+                summary: Single customer analysis
+                value:
+                  customer_ids: [123456]
+                  dry_run: false
+              batch_customers:
+                summary: Batch customer analysis
+                value:
+                  customer_ids: [123456, 789012, 345678]
+                  dry_run: false
+              dry_run:
+                summary: Dry run (no database writes)
+                value:
+                  customer_ids: [123456]
+                  dry_run: true
+      responses:
+        '200':
+          description: Risk analysis completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskAnalysisResponse'
+              examples:
+                success_all:
+                  summary: All customers processed successfully
+                  value:
+                    status: true
+                    message: "Risk analysis computed successfully"
+                    status_code: 0
+                    data:
+                      - customer_id: 123456
+                        risk_score: 4.5
+                        risk_level: "medium"
+                        success: true
+                      - customer_id: 789012
+                        risk_score: 2.3
+                        risk_level: "low"
+                        success: true
+                    metadata:
+                      processing_time_ms: 45
+                      total_customers: 2
+                      success_count: 2
+                      failure_count: 0
+                      dry_run: false
+                    request_path: "/api/v1/risk-analysis"
+                partial_success:
+                  summary: Some customers failed
+                  value:
+                    status: true
+                    message: "Risk analysis completed with some failures"
+                    status_code: 0
+                    data:
+                      - customer_id: 123456
+                        risk_score: 4.5
+                        risk_level: "medium"
+                        success: true
+                      - customer_id: 999999
+                        success: false
+                        error: "customer not found"
+                    metadata:
+                      processing_time_ms: 50
+                      total_customers: 2
+                      success_count: 1
+                      failure_count: 1
+                      dry_run: false
+                    request_path: "/api/v1/risk-analysis"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                empty_customer_ids:
+                  summary: Empty customer IDs
+                  value:
+                    status: false
+                    message: "customer_ids is required and must not be empty"
+                    status_code: 400
+                    request_path: "/api/v1/risk-analysis"
+                invalid_customer_id:
+                  summary: Invalid customer ID format
+                  value:
+                    status: false
+                    message: "All customer_ids must be positive integers"
+                    status_code: 400
+                    request_path: "/api/v1/risk-analysis"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags:
+        - Risk Analysis
+      summary: Analyze customer risk (Query GET)
+      description: |
+        Calculate risk scores for multiple customers using query parameters.
+        Alternative to POST endpoint for simple use cases.
+      operationId: analyzeRiskByQuery
+      parameters:
+        - name: customer_ids
+          in: query
+          required: true
+          description: Comma-separated list of customer IDs
+          schema:
+            type: string
+          example: "123456,789012,345678"
+        - name: dry_run
+          in: query
+          required: false
+          description: If true, performs calculation without database writes
+          schema:
+            type: boolean
+            default: false
+          example: false
+      responses:
+        '200':
+          description: Risk analysis completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskAnalysisResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_parameter:
+                  summary: Missing customer_ids parameter
+                  value:
+                    status: false
+                    message: "customer_ids query parameter is required"
+                    status_code: 400
+                    request_path: "/api/v1/risk-analysis"
+                invalid_format:
+                  summary: Invalid customer_ids format
+                  value:
+                    status: false
+                    message: "Invalid customer_ids format. Expected comma-separated integers"
+                    status_code: 400
+                    request_path: "/api/v1/risk-analysis"
+
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: |
+        Check the health status of the risk analysis service.
+
+        **Checks**:
+        - Database connectivity
+        - Cache initialization status
+        - Service version
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: true
+                message: "Service is healthy"
+                status_code: 0
+                data:
+                  status: "healthy"
+                  database: "connected"
+                  cache: "initialized"
+                  version: "1.0.0"
+                request_path: "/api/v1/health"
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: false
+                message: "Database connection failed"
+                status_code: 503
+                request_path: "/api/v1/health"
+
+components:
+  schemas:
+    RiskAnalysisRequest:
+      type: object
+      required:
+        - customer_ids
+      properties:
+        customer_ids:
+          type: array
+          items:
+            type: integer
+            format: int32
+            minimum: 1
+          description: List of customer IDs to analyze
+          example: [123456, 789012, 345678]
+          minItems: 1
+        dry_run:
+          type: boolean
+          description: If true, performs calculation without database writes
+          default: false
+          example: false
+
+    RiskAnalysisResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+          description: Overall request status
+          example: true
+        message:
+          type: string
+          description: Human-readable status message
+          example: "Risk analysis computed successfully"
+        status_code:
+          type: integer
+          description: Application-specific status code (0 = success, 1 = failure)
+          example: 0
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskAnalysisResult'
+        metadata:
+          type: object
+          properties:
+            processing_time_ms:
+              type: integer
+              description: Total processing time in milliseconds
+              example: 45
+            total_customers:
+              type: integer
+              description: Total number of customers in request
+              example: 3
+            success_count:
+              type: integer
+              description: Number of customers processed successfully
+              example: 3
+            failure_count:
+              type: integer
+              description: Number of customers that failed processing
+              example: 0
+            dry_run:
+              type: boolean
+              description: Whether this was a dry run
+              example: false
+        request_path:
+          type: string
+          description: API endpoint path
+          example: "/api/v1/risk-analysis"
+
+    RiskAnalysisResult:
+      type: object
+      required:
+        - customer_id
+        - success
+      properties:
+        customer_id:
+          type: integer
+          description: Customer ID
+          example: 123456
+        risk_score:
+          type: number
+          format: double
+          description: Calculated risk score (0-9 scale)
+          example: 4.5
+          minimum: 0
+          maximum: 9
+        risk_level:
+          type: string
+          description: Risk level classification
+          enum: [low, medium, high]
+          example: "medium"
+        success:
+          type: boolean
+          description: Whether processing succeeded for this customer
+          example: true
+        error:
+          type: string
+          description: Error message (only present if success is false)
+          example: "customer not found"
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+          description: Overall service health status
+          example: true
+        message:
+          type: string
+          description: Health status message
+          example: "Service is healthy"
+        status_code:
+          type: integer
+          description: Status code
+          example: 0
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              description: Service status
+              enum: [healthy, unhealthy]
+              example: "healthy"
+            database:
+              type: string
+              description: Database connection status
+              enum: [connected, disconnected]
+              example: "connected"
+            cache:
+              type: string
+              description: Cache initialization status
+              enum: [initialized, not_initialized]
+              example: "initialized"
+            version:
+              type: string
+              description: API version
+              example: "1.0.0"
+        request_path:
+          type: string
+          description: API endpoint path
+          example: "/api/v1/health"
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+          description: Request status (false for errors)
+          example: false
+        message:
+          type: string
+          description: Error message
+          example: "customer_ids is required and must not be empty"
+        status_code:
+          type: integer
+          description: HTTP status code
+          example: 400
+        request_path:
+          type: string
+          description: API endpoint path
+          example: "/api/v1/risk-analysis"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication (if enabled)
+
+# Uncomment if API key authentication is enabled
+# security:
+#   - ApiKeyAuth: []

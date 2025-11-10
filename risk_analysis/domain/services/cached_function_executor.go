@@ -224,13 +224,13 @@ func (e *CachedFunctionExecutor) ExecuteAllFunctions(ctx context.Context, db *pg
 
 		// Log if function takes more than 100ms (should be <10ms normally)
 		if funcDuration > 100*time.Millisecond {
-			// e.logger.Warn("SLOW FUNCTION DETECTED",
-			// 	zap.String("function_name", fn.FunctionName),
-			// 	zap.Int("customer_id", customerID),
-			// 	zap.Duration("duration", funcDuration),
-			// 	zap.Float64("seconds", funcDuration.Seconds()),
-			// 	zap.String("query", fn.QueryText),
-			// )
+			e.logger.Warn("SLOW FUNCTION DETECTED",
+				zap.String("function_name", fn.FunctionName),
+				zap.Int("customer_id", customerID),
+				zap.Duration("duration", funcDuration),
+				zap.Float64("seconds", funcDuration.Seconds()),
+				zap.String("query", fn.QueryText),
+			)
 		}
 
 		if err != nil && err != pgx.ErrNoRows {
