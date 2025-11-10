@@ -1,5 +1,7 @@
 <odoo>
- <!-- Subject: South East -->
+    <data noupdate="1">
+    
+     <!-- Subject: South East -->
     <record id="res_risk_assessment_south_east" model="res.risk.assessment">
         <field name="name">South East</field>
         <field name="narration">Assessing ML/TF risks in the South East region.</field>
@@ -835,5 +837,7 @@
         <field name="residual_risk_score">4</field>
         <field name="residual_risk_probability">75</field>
     </record>
+    
+    </data>
 
 </odoo>
