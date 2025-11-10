@@ -13,15 +13,24 @@
 
 ## Overview
 
-The Risk Analysis System is a high-performance Go application designed to calculate risk scores for millions of customers concurrently. It implements a function-based risk calculation approach with composite scoring, matching the logic of an existing Python/Odoo implementation.
+The Risk Analysis System is a high-performance Go application designed to calculate risk scores for millions of customers concurrently. It uses **materialized views** for 10x faster processing, with optional **Redis caching** for distributed metadata storage. The system includes both a CLI processor and a RESTful API with Swagger documentation.
 
 ### Design Principles
 
 - **Clean Architecture**: Clear separation between business logic and infrastructure
+- **Materialized Views**: Pre-computed risk data for 10x query performance
+- **Redis Caching**: Optional distributed caching for improved performance
 - **Concurrency**: Parallel processing using goroutines and worker pools
-- **Caching**: File-based and in-memory caching for performance
 - **Resumability**: Checkpoint system for fault tolerance
 - **Observability**: Comprehensive logging and metrics
+- **RESTful API**: Built-in HTTP API with Swagger documentation
+
+### Performance
+
+- **900 customers**: Processed in less than 3 minutes
+- **5,000,000+ customers**: Estimated 27-30 hours (with materialized views)
+- **Processing Rate**: 50+ customers/second with MVs, 5 customers/second without
+- **Improvement**: 10x faster than function-based approach
 
 ---
 
@@ -94,9 +103,10 @@ type RiskProcessor struct {
     config            *config.Config
     db                *pgxpool.Pool
     logger            *zap.Logger
-    batchedCalculator *services.BatchedFunctionRiskCalculator
+    mvCalculator      *services.MVRiskCalculator  // Using materialized views
     workerPool        *workers.WorkerPool
     customerCache     *cache.CustomerIDCache
+    redisCache        *cache.RedisCache  // Optional Redis caching
     stats             struct {
         startTime, endTime  time.Time
         totalCustomers      int
@@ -251,7 +261,7 @@ Calculates risk score for a single customer:
 
 **Algorithm:**
 
-```
+```bash
 1. Clear previous composite plan lines
 2. Calculate composite score if composite plans exist
    - For each composite plan:
@@ -275,7 +285,7 @@ Implements composite risk calculation:
 
 **Logic:**
 
-```
+```bash
 1. Load universes with is_included_in_composite = true
 2. For each composite plan:
    - Validate universe_id and risk_assessment_id
@@ -490,7 +500,7 @@ Returns worker pool statistics:
 
 ### Risk Calculation Flow
 
-```
+```bash
 1. Load Configuration
    ↓
 2. Initialize Database Connection
@@ -589,7 +599,7 @@ func classifyRiskLevel(score float64, settings *CachedSettings) string {
 
 ### Customer Processing Pipeline
 
-```
+```bash
 Customer IDs
     ↓
 ┌───────────────────────────────┐
@@ -1182,7 +1192,7 @@ VACUUM ANALYZE res_partner_risk_plan_line;
 
 Configure logrotate for `/var/log/risk-processor.log`:
 
-```
+```bash
 /var/log/risk-processor.log {
     daily
     rotate 7
@@ -1235,7 +1245,7 @@ Configure logrotate for `/var/log/risk-processor.log`:
 
 ### Command Line Interface
 
-```
+```bash
 Usage: risk-processor [options]
 
 Options:

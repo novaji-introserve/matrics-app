@@ -136,7 +136,7 @@
         <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_W"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">18.00</field>
+        <field name="residual_risk_impact">22.00</field>
         <field name="residual_risk_score">4</field>
         <field name="residual_risk_probability">75</field>
     </record>
