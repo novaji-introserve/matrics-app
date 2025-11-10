@@ -32,7 +32,6 @@
         "data/demo_data/location/res.country.state.csv",
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
-        "data/demo_data/chart/charts.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
         "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/region/res.partner.region.csv",#REGION
