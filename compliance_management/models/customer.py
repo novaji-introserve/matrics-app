@@ -503,6 +503,8 @@ class Customer(models.Model):
         risk_score = records[0] if records is not None else 0.00
         # Store the risk score directly
         self.risk_score = risk_score
+        
+       
         return risk_score
 
     def calculate_risk_batch(self, batch_size=1000):
@@ -1756,11 +1758,13 @@ class Customer(models.Model):
         for record in self:
             # Calculate the risk score and level
             score = record._get_risk_score_from_plan()
-            risk_level = self.compute_customer_rating(score)
 
             if record.composite_risk_score and record.composite_risk_score > 0:
                 composite_risk_score = record.composite_risk_score
                 score = composite_risk_score + score
+                
+            risk_level = self.compute_customer_rating(score)
+            
             if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
                 score = float(self.env['res.compliance.settings'].get_setting(
                     'maximum_risk_threshold'))

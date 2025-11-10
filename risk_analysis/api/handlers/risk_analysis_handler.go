@@ -19,52 +19,44 @@ import (
 
 // RiskAnalysisHandler handles risk analysis API requests
 type RiskAnalysisHandler struct {
-	config            *config.Config
-	db                *pgxpool.Pool
-	logger            *zap.Logger
-	batchedCalculator *services.BatchedFunctionRiskCalculator
-	useRedis          bool
+	config       *config.Config
+	db           *pgxpool.Pool
+	logger       *zap.Logger
+	mvCalculator *services.MVRiskCalculator
+	useRedis     bool
 }
 
-// NewRiskAnalysisHandler creates a new risk analysis handler with file-based caching
+// NewRiskAnalysisHandler creates a new risk analysis handler (DEPRECATED: now uses MV calculator)
 func NewRiskAnalysisHandler(cfg *config.Config, db *pgxpool.Pool, logger *zap.Logger) *RiskAnalysisHandler {
-	batchedCalculator := services.NewBatchedFunctionRiskCalculator(
-		db,
-		logger,
-		cfg.RiskFunctionsCacheFile,
-		cfg.RiskMetadataCacheFile,
-	)
+	// Use MV calculator without Redis
+	mvCalculator := services.NewMVRiskCalculator(db, logger, nil, cfg.DBName)
 
 	return &RiskAnalysisHandler{
-		config:            cfg,
-		db:                db,
-		logger:            logger,
-		batchedCalculator: batchedCalculator,
-		useRedis:          false,
+		config:       cfg,
+		db:           db,
+		logger:       logger,
+		mvCalculator: mvCalculator,
+		useRedis:     false,
 	}
 }
 
-// NewRedisRiskAnalysisHandler creates a new risk analysis handler with Redis caching
+// NewRedisRiskAnalysisHandler creates a new risk analysis handler with Redis caching (using MV calculator)
 func NewRedisRiskAnalysisHandler(cfg *config.Config, db *pgxpool.Pool, redisClient *redis.Client, logger *zap.Logger) *RiskAnalysisHandler {
-	batchedCalculator := services.NewRedisBatchedFunctionRiskCalculator(
-		db,
-		logger,
-		redisClient,
-		cfg.DBName,
-	)
+	// Use MV calculator with Redis
+	mvCalculator := services.NewMVRiskCalculator(db, logger, redisClient, cfg.DBName)
 
 	return &RiskAnalysisHandler{
-		config:            cfg,
-		db:                db,
-		logger:            logger,
-		batchedCalculator: batchedCalculator,
-		useRedis:          true,
+		config:       cfg,
+		db:           db,
+		logger:       logger,
+		mvCalculator: mvCalculator,
+		useRedis:     true,
 	}
 }
 
 // InitializeCache initializes the handler's cache
 func (h *RiskAnalysisHandler) InitializeCache(ctx context.Context) error {
-	return h.batchedCalculator.InitializeCache(ctx)
+	return h.mvCalculator.InitializeCache(ctx)
 }
 
 // AnalyzeRisk handles POST /api/v1/risk-analysis
@@ -99,8 +91,8 @@ func (h *RiskAnalysisHandler) AnalyzeRisk(w http.ResponseWriter, r *http.Request
 		zap.Bool("dry_run", req.DryRun),
 	)
 
-	// Process customers in batch
-	results := h.batchedCalculator.ProcessCustomerBatch(
+	// Process customers in batch using MV calculator
+	results := h.mvCalculator.ProcessCustomerBatch(
 		ctx,
 		req.CustomerIDs,
 		req.DryRun,
@@ -196,8 +188,8 @@ func (h *RiskAnalysisHandler) AnalyzeRiskByQuery(w http.ResponseWriter, r *http.
 		zap.Bool("dry_run", dryRun),
 	)
 
-	// Process customers in batch
-	results := h.batchedCalculator.ProcessCustomerBatch(
+	// Process customers in batch using MV calculator
+	results := h.mvCalculator.ProcessCustomerBatch(
 		ctx,
 		customerIDs,
 		dryRun,

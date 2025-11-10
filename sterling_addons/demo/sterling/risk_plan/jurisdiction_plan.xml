@@ -9,7 +9,7 @@
 FROM res_partner_account rpa
 INNER JOIN res_branch rb ON rpa.branch_id = rb.id
 WHERE rpa.customer_id = %s
-AND LOWER(trim(rb.region)) = 'south west'
+AND rb.region = 'South West'
 ORDER BY rpa.opening_date DESC
 LIMIT 1;</field>
                      <field name="priority">40</field>
@@ -31,7 +31,7 @@ LIMIT 1;</field>
       FROM res_partner_account rpa
       INNER JOIN res_branch rb ON rpa.branch_id = rb.id
       WHERE rpa.customer_id = %s
-      AND LOWER(trim(rb.region)) = 'abuja &amp; north'
+      AND rb.region = 'Abuja &amp; North'
       ORDER BY rpa.opening_date DESC
       LIMIT 1;</field>
                      <field name="priority">40</field>
@@ -53,7 +53,7 @@ LIMIT 1;</field>
       FROM res_partner_account rpa
       INNER JOIN res_branch rb ON rpa.branch_id = rb.id
       WHERE rpa.customer_id = %s
-      AND LOWER(trim(rb.region)) = 's/south &amp; s/east'
+      AND rb.region = 'S/south &amp; S/east'
       ORDER BY rpa.opening_date DESC
       LIMIT 1;</field>
                      <field name="priority">40</field>
@@ -73,7 +73,7 @@ LIMIT 1;</field>
 FROM res_partner_account rpa
 INNER JOIN res_branch rb ON rpa.branch_id = rb.id
 WHERE rpa.customer_id = %s
-  AND LOWER(rb.region) = 'abuja'
+  AND rb.region = 'Abuja'
 ORDER BY rpa.opening_date DESC
 LIMIT 1;</field>
                      <field name="priority">40</field>
@@ -93,7 +93,7 @@ LIMIT 1;</field>
 FROM res_partner_account rpa
 INNER JOIN res_branch rb ON rpa.branch_id = rb.id
 WHERE rpa.customer_id = %s
-AND LOWER(trim(rb.region)) = 'lagos'
+AND rb.region = 'Lagos'
 ORDER BY rpa.opening_date DESC
 LIMIT 1;</field>
                      <field name="priority">40</field>
