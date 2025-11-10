@@ -880,6 +880,7 @@
     <menuitem id="menu_compliance_risk_type" action="action_list_risk_type" parent="menu_risk_assessment" name="Risk Types" groups="group_compliance_compliance_officer" sequence="4" />
 
     <menuitem id="menu_compliance_risk_fcra_score" action="action_fcra_score_action" parent="menu_compliance_risk_settings" name="Slider Settings" groups="group_compliance_compliance_officer" sequence="5" />
+    <menuitem id="menu_compliance_risk_fcra_slider_threshold" action="action_fcra_slider_threshold_action" parent="menu_compliance_risk_settings" name="Slider Threshold Settings" groups="group_compliance_compliance_officer" sequence="5" />
 
 
     <menuitem id="menu_dashboard_chart" action="res_charts_action" parent="menu_compliance_dashboard_charts" name="Charts" sequence="10" groups="group_compliance_compliance_officer" />

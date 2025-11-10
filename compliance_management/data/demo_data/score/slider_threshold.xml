@@ -1,0 +1,13 @@
+<odoo>
+    <data noupdate="1">
+     <record id="fcra_slider_threshold_low" model="res.slider.threshold">
+        <field name="name">low</field>
+        <field name="threshold">3</field>
+    </record>
+     <record id="fcra_slider_threshold_high" model="res.slider.threshold">
+        <field name="name">high</field>
+        <field name="threshold">6</field>
+    </record>
+    
+    </data>
+</odoo>

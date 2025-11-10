@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 class ColorGenerator:
     """Service for generating chart colors with improved performance.
@@ -8,18 +7,30 @@ class ColorGenerator:
     """
     
     COLOR_SCHEMES = {
-        'cool': ['#3366cc', '#66ccff', '#6666ff', '#3333cc', '#000099'],
-        'warm': ['#ff6600', '#ff9933', '#ffcc66', '#ff0000', '#cc0000'],
-        'rainbow': ['#ff0000', '#ff9900', '#ffff00', '#00ff00', '#0099ff', '#6633ff'],
-        'brown': [
-            '#483E1D', '#F2D473', '#564B2B', '#ECDFA4', '#83733F',
-            '#ECE1A2', '#5F5330', '#B78C00', '#6A5D36', '#C4AA55'
+        "cool_colors": [
+            "#0077B6", "#0096C7", "#030405", "#48CAE4", "#80FFDB",
+            "#277A70", "#6930C3", "#5E60CE", "#5390D9", "#4361EE"
         ],
-        'default': [
-            '#483E1D', '#F2D473', '#564B2B', '#ECDFA4', '#83733F',
-            '#ECE1A2', '#5F5330', '#B78C00', '#6A5D36', '#C4AA55'
+        "warm_colors": [
+            "#FF6B00", "#FF8C42", "#FFB703", "#FFD60A",
+            "#E85D04", "#D00000", "#654F57", "#FF4D6D",
+            "#C1121F", "#FAA307"
+        ],
+        "rainbow_colors": [
+            "#FF0000", "#FF7F00", "#FFFF00", "#7FFF00",
+            "#00FF00", "#00FF7F", "#00FFFF", "#007FFF",
+            "#0000FF", "#8B00FF"
+        ],
+        "brown_colors": [
+            "#5A3E36", "#7A5C2E", "#A97142", "#C2B280", "#B38B6D",
+            "#8C7851", "#4B3832", "#9C6644", "#D4A373", "#6B705C"
+        ],
+        "default_colors": [
+            "#6B705C", "#B7B7A4", "#A68A64", "#CB997E", "#DDB892",
+            "#EDE0D4", "#B08968", "#7F5539", "#9C6644", "#5E503F"
         ]
     }
+
     
     def _generate_colors(self, color_scheme, count):
         """Generate colors based on the selected color scheme.

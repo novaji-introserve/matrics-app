@@ -46,6 +46,24 @@ export class RiskSliderField extends Component {
           ['min_score', 'max_score'],
           { limit: 1 }
         );
+
+        // Load thresholds from res.compliance.settings
+      const settings = await this.orm.searchRead(
+        'res.compliance.settings',
+        [['code', 'in', ['low_risk_threshold', 'medium_risk_threshold']]],
+        ['code', 'val']
+      );
+
+      const thresholdMap = {};
+      for (const s of settings) {
+        if (s.code === 'low_risk_threshold') thresholdMap.low = parseFloat(s.val);
+        if (s.code === 'medium_risk_threshold') thresholdMap.medium = parseFloat(s.val);
+      }
+
+      this.state.thresholds = thresholdMap;
+
+  
+        
         this.state.minValue = parseFloat(scoreRecord?.min_score || 0);
         this.state.maxValue = parseFloat(scoreRecord?.max_score || 9);
         this.state.value = this.props.record.data[this.props.name] !== undefined
@@ -61,6 +79,8 @@ export class RiskSliderField extends Component {
 
     onWillUpdateProps((nextProps) => {
       const newValue = nextProps.record.data[this.props.name];
+      
+      
       if (newValue !== undefined && newValue !== this.state.value) {
         this.state.value = parseFloat(newValue);
         this.pendingValue = this.state.value;
@@ -130,30 +150,28 @@ export class RiskSliderField extends Component {
     }
   }
 
-  get badgeClass() {
-    const range = this.state.maxValue - this.state.minValue;
-    const lowThreshold = this.state.minValue + range * 0.33;
-    const highThreshold = this.state.minValue + range * 0.66;
-    const useReverseColors = this.state.reverseColors || this.props.name === 'control_effectiveness_score';
 
+  get badgeClass() {
+    const low = this.state.thresholds?.low ?? (this.state.minValue + (this.state.maxValue - this.state.minValue) * 0.33);
+    const medium = this.state.thresholds?.medium ?? (this.state.minValue + (this.state.maxValue - this.state.minValue) * 0.66);
+
+    const value = this.pendingValue;
+    const useReverseColors =
+      this.state.reverseColors || this.props.name === 'control_effectiveness_score';
+
+    // Color mapping logic
     if (useReverseColors) {
-      if (this.pendingValue <= lowThreshold) {
-        return 'bg-danger';
-      } else if (this.pendingValue <= highThreshold) {
-        return 'bg-warning';
-      } else {
-        return 'bg-success';
-      }
+      if (value <= low) return 'bg-danger';
+      if (value <= medium) return 'bg-warning';
+      return 'bg-success';
     } else {
-      if (this.pendingValue <= lowThreshold) {
-        return 'bg-success';
-      } else if (this.pendingValue <= highThreshold) {
-        return 'bg-warning';
-      } else {
-        return 'bg-danger';
-      }
+      // Normal meaning (low = good)
+      if (value <= low) return 'bg-success';
+      if (value <= medium) return 'bg-warning';
+      return 'bg-danger';
     }
   }
+
 
   get formattedValue() {
     return this.pendingValue.toFixed(1);
