@@ -14,7 +14,7 @@ from datetime import datetime
 from multiprocessing import Pool, cpu_count
 
 # Default database cnfiguration file path
-DEFAULT_CONFIG_FILE = "/data/Altbank/debian/odoo.conf" #path to your .conf file eg odoo.conf
+DEFAULT_CONFIG_FILE = "/data/odoo/debian/odoo.conf" #path to your .conf file eg odoo.conf
 
 def setup_logging():
     """Configure logging with rotation based on file size"""
