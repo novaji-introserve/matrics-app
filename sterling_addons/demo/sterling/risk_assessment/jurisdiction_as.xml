@@ -1,5 +1,7 @@
 <odoo>
- <!-- Subject: South East -->
+    <data noupdate="1">
+    
+     <!-- Subject: South East -->
     <record id="res_risk_assessment_south_east" model="res.risk.assessment">
         <field name="name">South East</field>
         <field name="narration">Assessing ML/TF risks in the South East region.</field>
@@ -136,7 +138,7 @@
         <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_W"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">18.00</field>
+        <field name="residual_risk_impact">22.00</field>
         <field name="residual_risk_score">4</field>
         <field name="residual_risk_probability">75</field>
     </record>
@@ -835,5 +837,7 @@
         <field name="residual_risk_score">4</field>
         <field name="residual_risk_probability">75</field>
     </record>
+    
+    </data>
 
 </odoo>

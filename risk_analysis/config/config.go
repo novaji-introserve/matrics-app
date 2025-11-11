@@ -91,8 +91,8 @@ type Config struct {
 // LoadConfig loads configuration from config.conf file
 func LoadConfig() (*Config, error) {
 	// Try to load settings.conf file
-	// CONFIGPATH := "/data/odoo/ETL_script/update_script/settings.conf" //--sterling-bank-config-path
-	CONFIGPATH := "/data/Altbank/ETL_script/update_script/settings.conf" //--altbank-config-path
+	CONFIGPATH := "/data/odoo/ETL_script/update_script/settings.conf" //--sterling-bank-config-path
+	// CONFIGPATH := "/data/Altbank/ETL_script/update_script/settings.conf" //--altbank-config-path
 	if _, err := os.Stat(CONFIGPATH); os.IsNotExist(err) {
 		return nil, fmt.Errorf("config file not found: %s", CONFIGPATH)
 	}

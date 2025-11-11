@@ -5,6 +5,7 @@ __pycache__/
 *:Zone.Identifier
 node_modules
 .env
+.log
 .DS_Store
 media/
 internal_control/models/db_sync/db_config.json
@@ -15,6 +16,7 @@ compliance_management/demo/*
 *.log
 *.log.gz
 /risk_analysis/cache/
+/risk_analysis/config/settings.conf
 
 # Ignore only the compiled binary inside risk_analysis  
 /risk_analysis/risk-processor

@@ -144,11 +144,11 @@ class RiskAnalysis(models.Model):
         
         # Pattern 1: res_partner_account with category
         match = re.search(
-            r"from\s+res_partner_account\s+a.*?"
-            r"where.*?r\.id\s*=\s*%s.*?"
-            r"and\s+lower\s*\(\s*a\.(category(?:_description)?)\s*\)\s*=\s*'([^']+)'",
-            sql_lower, re.DOTALL
-        )
+        r"from\s+res_partner_account\s+a.*?"
+        r"where.*?(?:r|rp|a\.customer_id|rpa\.customer_id)\.id\s*=\s*%s.*?"
+        r"and\s+(?:lower\s*\(\s*)?a\.(category(?:_description)?)\s*(?:\)\s*)?=\s*'([^']+)'",
+        sql_lower, re.DOTALL
+    )
         if match:
             field, value = match.groups()
             return {
@@ -168,6 +168,7 @@ class RiskAnalysis(models.Model):
             r"where\s+(?:lower\s*\(\s*name\s*\)|name)\s*=\s*'([^']+)'",
             sql_lower, re.DOTALL
         )
+        
         if match:
             return {
                 'type': 'industry',
@@ -182,12 +183,12 @@ class RiskAnalysis(models.Model):
         
         # Pattern 3: res_partner_region join
         match = re.search(
-            r"from\s+res_partner\s+rp.*?"
-            r"join\s+res_partner_region\s+rpr\s+on\s+rp\.region_id\s*=\s*rpr\.id.*?"
-            r"where.*?rp\.id\s*=\s*%s.*?"
-            r"and\s+lower\s*\(\s*rpr\.name\s*\)\s*=\s*'([^']+)'",
-            sql_lower, re.DOTALL
-        )
+        r"from\s+res_partner\s+(?:rp|r).*?"
+        r"(?:join|inner join)\s+res_partner_region\s+(?:rpr|r)\s+on\s+(?:rp|r)\.region_id\s*=\s*(?:rpr|r)\.id.*?"
+        r"where.*?(?:rp|r)\.id\s*=\s*%s.*?"
+        r"and\s+(?:lower\s*\(\s*)?(?:rpr|r)\.name(?:\s*\))?\s*=\s*'([^']+)'",
+        sql_lower, re.DOTALL
+    )
         if match:
             return {
                 'type': 'region',
@@ -227,13 +228,14 @@ class RiskAnalysis(models.Model):
             }
         
         # Pattern 5: branch region
+
         match = re.search(
-            r"from\s+res_partner_account\s+rpa.*?"
-            r"join\s+res_branch\s+rb\s+on\s+rpa\.branch_id\s*=\s*rb\.id.*?"
-            r"where.*?rpa\.customer_id\s*=\s*%s.*?"
-            r"and\s+lower\s*\(\s*trim\s*\(\s*rb\.region\s*\)\s*\)\s*=\s*'([^']+)'",
-            sql_lower, re.DOTALL
-        )
+        r"from\s+res_partner_account\s+(?:rpa|a).*?"
+        r"(?:join|inner join)\s+res_branch\s+(?:rb|r|b)\s+on\s+(?:rpa|a)\.branch_id\s*=\s*(?:rb|r|b)\.id.*?"
+        r"where.*?(?:rpa|a)\.customer_id\s*=\s*%s.*?"
+        r"and\s+(?:lower\s*\(\s*)?(?:trim\s*\(\s*)?(?:rb|r|b)\.region(?:\s*\))?(?:\s*\))?\s*=\s*'([^']+)'",
+        sql_lower, re.DOTALL
+    )
         if match:
             return {
                 'type': 'branch_region',
@@ -250,12 +252,11 @@ class RiskAnalysis(models.Model):
     
     @api.model
     def _build_optimized_view(self, universe, plans):
-        """
-        Builds a single UNION ALL query with one final aggregation.
-        Pure set-based operations, no correlated subqueries.
-        """
+        """Builds a partitioned table structure instead of materialized view."""
         view_name = f"mv_risk_{self._slugify(universe.code)}"
         
+        # Extract all patterns (keep your existing code here)...
+        # ... (all your pattern extraction code) ...
         # Extract all patterns
         patterns = {
             'account_category': {},
@@ -444,15 +445,16 @@ class RiskAnalysis(models.Model):
                 )
                 values_list.append(f"'{item['value']}'")
             
+    
             union_branches.append(f"""
         -- Branch Regions
         SELECT 
-            rpa.customer_id AS partner_id,
+            rpa_latest.customer_id AS partner_id,
             CASE 
-    {chr(10).join(case_whens_code)}
+        {chr(10).join(case_whens_code)}
             END AS risk_code,
             CASE 
-    {chr(10).join(case_whens_score)}
+        {chr(10).join(case_whens_score)}
             END AS risk_score
         FROM (
             SELECT DISTINCT ON (rpa.customer_id)
@@ -462,98 +464,61 @@ class RiskAnalysis(models.Model):
             WHERE lower(trim(rb.region)) IN ({', '.join(values_list)})
             ORDER BY rpa.customer_id, rpa.opening_date DESC
         ) rpa_latest
-        INNER JOIN res_branch rb ON lower(trim(rb.region)) IN ({', '.join(values_list)})""")
+        """)
         
         # Handle empty case
         if not union_branches:
-            view_sql = f"""
-    DROP MATERIALIZED VIEW IF EXISTS {view_name} CASCADE;
-    CREATE MATERIALIZED VIEW {view_name} AS
-    SELECT
-        id AS partner_id,
-        name AS partner_name,
-        '{{}}'::jsonb AS risk_data
-    FROM res_partner
-    WHERE FALSE;
-
-    CREATE UNIQUE INDEX idx_{view_name}_partner_id ON {view_name} (partner_id);
-    """
             return {
                 'name': view_name,
-                'code': view_sql,
+                'code': "-- Empty view, no patterns matched",
                 'universe': universe.name,
-                'stats': f"No patterns matched. Unmatched: {len(unmatched)}"
+                'stats': f"No patterns matched. Unmatched: {len(unmatched)}",
+                'is_partitioned': True
             }
         
-        # Assemble final query with single aggregation
-        # Properly join branches with UNION ALL between them
+        # Assemble the SQL for populating partitions
         all_flags_cte = ""
         if union_branches:
             all_flags_cte = union_branches[0]  # First branch without UNION ALL
             for branch in union_branches[1:]:
-                all_flags_cte += f"\n    UNION ALL{branch}"  # Add UNION ALL between branches
+                all_flags_cte += f"\n    UNION ALL{branch}"
         
-        view_sql = f"""
-    DROP MATERIALIZED VIEW IF EXISTS {view_name} CASCADE;
-
-    CREATE MATERIALIZED VIEW {view_name} AS
-    WITH all_risk_flags AS (
-    {all_flags_cte}
-    )
-    SELECT 
-        rp.id AS partner_id,
-        rp.name AS partner_name,
-        COALESCE(
-            (SELECT jsonb_object_agg(risk_code, risk_score)
-            FROM all_risk_flags arf
-            WHERE arf.partner_id = rp.id
-            AND arf.risk_code IS NOT NULL
-            AND arf.risk_score IS NOT NULL),
-            '{{}}'::jsonb
-        ) AS risk_data
-    FROM res_partner rp;
-
-    -- Indexes for performance
-    CREATE UNIQUE INDEX idx_{view_name}_partner_id ON {view_name} (partner_id);
-    CREATE INDEX idx_{view_name}_risk_data_gin ON {view_name} USING GIN (risk_data);
-    CREATE INDEX idx_{view_name}_has_risks ON {view_name} (partner_id) 
-        WHERE risk_data != '{{}}'::jsonb;
-    """
+        # Create the SQL for populating partitioned tables - NOT creating a materialized view 
+        
+        populate_sql = f"""
+        -- SQL to populate partitioned table {view_name}
+        INSERT INTO {view_name} (partner_id, partner_name, risk_data)
+        WITH all_risk_flags AS (
+        {all_flags_cte}
+        )
+        SELECT 
+            rp.id AS partner_id,
+            rp.name AS partner_name,
+            COALESCE(
+                (SELECT jsonb_object_agg(risk_code, risk_score)
+                FROM all_risk_flags arf
+                WHERE arf.partner_id = rp.id
+                AND arf.risk_code IS NOT NULL
+                AND arf.risk_score IS NOT NULL),
+                '{{}}'::jsonb
+            ) AS risk_data
+        FROM res_partner rp
+        WHERE rp.id >= ? AND rp.id < ?;  -- Note the < instead of <= for upper bound
+        """
         
         return {
             'name': view_name,
-            'code': view_sql,
+            'code': populate_sql,
             'universe': universe.name,
-            'stats': f"Patterns matched: {len(union_branches)}, Unmatched: {len(unmatched)}"
-        }
-            
-            
-            
-    def action_refresh_view(self):
-        """Refresh ALL views concurrently (non-blocking)."""
+            'stats': f"Patterns matched: {len(union_branches)}, Unmatched: {len(unmatched)}",
+            'is_partitioned': True
+        }     
         
-        # Get all records for this model, not just the selected ones
-        all_mv_records = self.env[self._name].search([])
-        
-        for record in all_mv_records:
-            try:
-                with self.pool.cursor() as new_cr:
-                    _logger.info(f"Attempting to refresh {record.name}...")
-                    new_cr.execute(f"REFRESH MATERIALIZED VIEW CONCURRENTLY {record.name}")
-                    new_cr.commit()
-                
-                # This write will be committed by the main transaction
-                record.last_refresh = fields.Datetime.now()
-                _logger.info(f"✓ Refreshed {record.name}")
-                
-            except Exception as e:
-                # WARNING: This will stop the entire loop on the first error
-                raise models.ValidationError(_("Refresh failed for %s: %s") % (record.name, str(e)))
-        
+    
     @api.model
     def _build_independent_risk_view(self):
         """
-        Creates a materialized view for risk assessments that are not tied to a universe.
+        Creates a partitioned table for risk assessments that are not tied to a universe.
         Handles standalone risk queries like PEP, sanctions, watchlists, etc.
         """
         view_name = "mv_risk_independent_factors"
@@ -576,31 +541,8 @@ class RiskAnalysis(models.Model):
             else:
                 unmatched.append(plan.code)
         
-        # If no patterns matched, create an empty view
-        if not risk_patterns:
-            view_sql = f"""
-    DROP MATERIALIZED VIEW IF EXISTS {view_name} CASCADE;
-    CREATE MATERIALIZED VIEW {view_name} AS
-    SELECT
-        id AS partner_id,
-        name AS partner_name,
-        '{{}}'::jsonb AS risk_data
-    FROM res_partner
-    WHERE FALSE;
-
-    CREATE UNIQUE INDEX idx_{view_name}_partner_id ON {view_name} (partner_id);
-    """
-            return {
-                'name': view_name,
-                'code': view_sql,
-                'universe': 'Independent Risk Factors',
-                'stats': f"No patterns matched. Unmatched: {len(unmatched)}"
-            }
-        
-        # Build the materialized view with all risk patterns
+        # Build the union branches for risk patterns
         union_branches = []
-        
-        # Add all risk patterns as UNION ALL branches
         for pattern in risk_patterns:            
             
             if pattern['type'] == 'invalid_bvn':
@@ -677,57 +619,48 @@ class RiskAnalysis(models.Model):
             {pattern['score']} AS risk_score
         FROM res_partner rp
         WHERE rp.is_watchlist = TRUE""")
-           
         
-        # Assemble the materialized view
+        # Add union branches based on risk patterns
+        # [Keep your existing code for building these branches]
+        
+        # Assemble the SQL for populating partitions
         all_flags_cte = ""
         if union_branches:
-            all_flags_cte = union_branches[0]  # First branch without UNION ALL
+            all_flags_cte = union_branches[0]
             for branch in union_branches[1:]:
                 all_flags_cte += f"\n    UNION ALL{branch}"
         
-        view_sql = f"""
-    DROP MATERIALIZED VIEW IF EXISTS {view_name} CASCADE;
-
-    CREATE MATERIALIZED VIEW {view_name} AS
-    WITH all_risk_flags AS (
-    {all_flags_cte}
-    )
-    SELECT 
-        rp.id AS partner_id,
-        rp.name AS partner_name,
-        COALESCE(
-            (SELECT jsonb_object_agg(risk_code, risk_score)
-            FROM all_risk_flags arf
-            WHERE arf.partner_id = rp.id
-            AND arf.risk_code IS NOT NULL
-            AND arf.risk_score IS NOT NULL),
-            '{{}}'::jsonb
-        ) AS risk_data
-    FROM res_partner rp;
-
-    -- Indexes for materialized view itself (these are always created fresh)
-    CREATE UNIQUE INDEX idx_{view_name}_partner_id ON {view_name} (partner_id);
-    CREATE INDEX idx_{view_name}_risk_data_gin ON {view_name} USING GIN (risk_data);
-    CREATE INDEX idx_{view_name}_has_risks ON {view_name} (partner_id) 
-        WHERE risk_data != '{{}}'::jsonb;
-
-    -- Create partial indexes for common filter conditions to speed up joins
-    -- Fixed: Added IF NOT EXISTS to all index creation statements
-    CREATE INDEX IF NOT EXISTS idx_{view_name}_pep ON res_partner (id) WHERE is_pep = TRUE;
-    CREATE INDEX IF NOT EXISTS idx_{view_name}_sanction ON res_partner (id) WHERE likely_sanction = TRUE;
-    CREATE INDEX IF NOT EXISTS idx_{view_name}_watchlist ON res_partner (id) WHERE is_watchlist = TRUE;
-    CREATE INDEX IF NOT EXISTS idx_{view_name}_customer_phone ON res_partner (customer_phone) 
-        WHERE customer_phone IS NOT NULL AND customer_phone != '';
-    """
+        # Create the SQL for populating partitioned tables
+        populate_sql = f"""
+        -- SQL to populate partitioned table {view_name}
+        INSERT INTO {view_name} (partner_id, partner_name, risk_data)
+        WITH all_risk_flags AS (
+        {all_flags_cte}
+        )
+        SELECT 
+            rp.id AS partner_id,
+            rp.name AS partner_name,
+            COALESCE(
+                (SELECT jsonb_object_agg(risk_code, risk_score)
+                FROM all_risk_flags arf
+                WHERE arf.partner_id = rp.id
+                AND arf.risk_code IS NOT NULL
+                AND arf.risk_score IS NOT NULL),
+                '{{}}'::jsonb
+            ) AS risk_data
+        FROM res_partner rp
+        WHERE rp.id BETWEEN ? AND ?;
+        """
         
         return {
             'name': view_name,
-            'code': view_sql,
+            'code': populate_sql,
             'universe': 'Independent Risk Factors',
-            'stats': f"Patterns matched: {len(union_branches)}, Unmatched: {len(unmatched)}"
+            'stats': f"Patterns matched: {len(union_branches)}, Unmatched: {len(unmatched)}",
+            'is_partitioned': True
         }
-
+    
+    
     @api.model
     def _extract_independent_pattern(self, sql_query, plan_code, risk_score):
         """
@@ -805,12 +738,13 @@ class RiskAnalysis(models.Model):
         
         return None
 
+            
     @api.model
     def _cron_generate_views(self):
-        """Main cron entry point to generate all materialized views."""
+        """Main cron entry point to generate all partitioned views."""
         # Clear existing views
         self.search([]).unlink()
-        
+    
         # First, handle universe-based risk assessments
         universe_plans = {}
         plans = self.env['res.compliance.risk.assessment.plan'].search([
@@ -824,36 +758,309 @@ class RiskAnalysis(models.Model):
         
         for universe, plans in universe_plans.items():
             view_data = self._build_optimized_view(universe, plans)
+            view_name = view_data['name']
+            
+            # Create the table structure in its own transaction
+            table_created = False
             try:
                 with self.pool.cursor() as new_cr:
-                    new_cr.execute(view_data['code'])
+                    # Setup environment with new cursor
+                    env = api.Environment(new_cr, self.env.uid, self.env.context)
+                    table_created = env[self._name]._setup_partitioned_view(view_name)
                     new_cr.commit()
+            except Exception as e:
+                _logger.error(f"✗ Failed to create table structure for {view_name}: {e}")
+                continue
+                
+            if not table_created:
+                continue
+            
+            # Populate the data in its own transaction
+            populated = False
+            try:
+                with self.pool.cursor() as new_cr:
+                    env = api.Environment(new_cr, self.env.uid, self.env.context)
+                    populated = env[self._name]._populate_partitioned_view(view_name, view_data['code'])
+                    new_cr.commit()
+            except Exception as e:
+                _logger.error(f"✗ Failed to populate data for {view_name}: {e}")
+                continue
+                
+            if not populated:
+                continue
+                
+            # Create indexes in its own transaction
+            indexes_created = False
+            try:
+                with self.pool.cursor() as new_cr:
+                    env = api.Environment(new_cr, self.env.uid, self.env.context)
+                    indexes_created = env[self._name]._create_partition_indexes(view_name)
+                    new_cr.commit()
+            except Exception as e:
+                _logger.error(f"✗ Failed to create indexes for {view_name}: {e}")
+            
+            # Create the record in a separate transaction with retry
+            record_created = False
+            retry_count = 0
+            max_retries = 3
+            
+            while not record_created and retry_count < max_retries:
+                try:
+                    with self.pool.cursor() as new_cr:
+                        env = api.Environment(new_cr, self.env.uid, self.env.context)
+                        env[self._name].create({
+                            'name': view_name,
+                            'code': view_data['code'],
+                            'universe': view_data['universe'],
+                            'pattern_stats': view_data.get('stats', ''),
+                            'last_refresh': fields.Datetime.now()
+                        })
+                        new_cr.commit()
+                        record_created = True
+                        _logger.info(f"✓ Created risk analysis record for: {view_name}")
+                except Exception as e:
+                    retry_count += 1
+                    _logger.error(f"✗ Failed to create record for {view_name} (attempt {retry_count}): {e}")
+                    time.sleep(1)  # Wait before retry
+            
+            if record_created:
+                _logger.info(f"✓ Completed view creation for {view_name}")
+        
+        # Process independent risk assessments with the same approach
+        view_data = self._build_independent_risk_view()
+        view_name = view_data['name']
+        
+        if self._setup_partitioned_view(view_name):
+            if self._populate_partitioned_view(view_name, view_data['code']):
+                self._create_partition_indexes(view_name)
                 
                 self.create({
-                    'name': view_data['name'],
+                    'name': view_name,
                     'code': view_data['code'],
                     'universe': view_data['universe'],
-                    'pattern_stats': view_data.get('stats', '')
+                    'pattern_stats': view_data.get('stats', ''),
+                    'last_refresh': fields.Datetime.now()
                 })
-                _logger.info(f"✓ Created optimized MV: {view_data['name']}")
-                _logger.info(f"  {view_data.get('stats', '')}")
-            except Exception as e:
-                _logger.error(f"✗ Failed to create view for {universe.name}: {e}")
-        
-        # Next, handle independent risk assessments
+                _logger.info(f"✓ Created partitioned table for independent risks: {view_name}")
+
+    def _create_partition_indexes(self, view_name):
+        """Create necessary indexes on each partition."""
         try:
-            view_data = self._build_independent_risk_view()
-            with self.pool.cursor() as new_cr:
-                new_cr.execute(view_data['code'])
-                new_cr.commit()
-            
-            self.create({
-                'name': view_data['name'],
-                'code': view_data['code'],
-                'universe': view_data['universe'],
-                'pattern_stats': view_data.get('stats', '')
-            })
-            _logger.info(f"✓ Created independent risk MV: {view_data['name']}")
-            _logger.info(f"  {view_data.get('stats', '')}")
+            with self.pool.cursor() as cr:
+                # Set higher memory for index creation
+                cr.execute("SET maintenance_work_mem = '1GB';")
+                
+                # Get all partitions for this view
+                cr.execute(f"""
+                SELECT inhrelid::regclass AS partition_name
+                FROM pg_inherits
+                WHERE inhparent = '{view_name}'::regclass;
+                """)
+                
+                partitions = [row[0] for row in cr.fetchall()]
+                
+                for partition in partitions:
+                    # Create index name without schema parts
+                    partition_str = str(partition).split('.')[-1]
+                    index_name = f"idx_{partition_str}_risk_data_gin"
+                    has_risks_name = f"idx_{partition_str}_has_risks"
+                    
+                    # Create GIN index on risk_data
+                    cr.execute(f"""
+                    CREATE INDEX IF NOT EXISTS {index_name} 
+                    ON {partition} USING GIN (risk_data);
+                    """)
+                    cr.commit()
+                    
+                    # Create index for has_risks condition
+                    cr.execute(f"""
+                    CREATE INDEX IF NOT EXISTS {has_risks_name} 
+                    ON {partition} (partner_id) 
+                    WHERE risk_data != '{{}}'::jsonb;
+                    """)
+                    cr.commit()
+                    
+                _logger.info(f"✓ Created indexes for all partitions of {view_name}")
+                return True
         except Exception as e:
-            _logger.error(f"✗ Failed to create independent risk view: {e}")
+            _logger.error(f"✗ Failed to create indexes for {view_name}: {e}")
+            return False
+        
+    def _setup_partitioned_view(self, view_name):
+        """Create a partitioned table structure to replace a materialized view."""
+        try:
+            with self.pool.cursor() as cr:
+                # Increase timeout and work memory
+                cr.execute("SET statement_timeout = '3600000';")  # 1 hour
+                cr.execute("SET maintenance_work_mem = '1GB';")
+                
+                # Check if object exists and its type
+                cr.execute("""
+                    SELECT c.relkind 
+                    FROM pg_class c 
+                    JOIN pg_namespace n ON n.oid = c.relnamespace 
+                    WHERE c.relname = %s 
+                    AND n.nspname = current_schema()
+                """, (view_name,))
+                
+                result = cr.fetchone()
+                
+                # Drop existing object properly based on its type
+                if result:
+                    object_type = result[0]
+                    if object_type == 'm':  # materialized view
+                        cr.execute(f"DROP MATERIALIZED VIEW IF EXISTS {view_name} CASCADE;")
+                    else:  # table or other object
+                        cr.execute(f"DROP TABLE IF EXISTS {view_name} CASCADE;")
+                else:
+                    # Object doesn't exist, try both just to be safe
+                    cr.execute(f"DROP MATERIALIZED VIEW IF EXISTS {view_name} CASCADE;")
+                    cr.execute(f"DROP TABLE IF EXISTS {view_name} CASCADE;")
+                
+                # Create parent table with partitioning
+                cr.execute(f"""
+                CREATE TABLE {view_name} (
+                    partner_id INTEGER PRIMARY KEY,
+                    partner_name VARCHAR,
+                    risk_data JSONB
+                ) PARTITION BY RANGE (partner_id);
+                """)
+                
+                # Get min/max partner IDs to determine partition ranges
+                cr.execute("SELECT MIN(id), MAX(id) FROM res_partner;")
+                min_id, max_id = cr.fetchone()
+                
+                if not min_id or not max_id:
+                    _logger.warning(f"No partners found to create partitions for {view_name}")
+                    return False
+                
+                # Calculate partition size to create roughly 10 partitions
+                partition_size = max(1, (max_id - min_id + 1) // 10)
+                
+                # Create partitions with non-overlapping boundaries
+                current_id = min_id
+                partition_num = 1
+                
+                while current_id < max_id:
+                    next_id = min(current_id + partition_size, max_id + 1)
+                    partition_name = f"{view_name}_p{partition_num}"
+                    
+                    # Use exclusive upper bound (< next_id) for non-overlapping ranges
+                    cr.execute(f"""
+                    CREATE TABLE {partition_name} PARTITION OF {view_name}
+                    FOR VALUES FROM ({current_id}) TO ({next_id});
+                    """)
+                    
+                    current_id = next_id
+                    partition_num += 1
+                
+                cr.commit()
+                _logger.info(f"✓ Created partitioned table {view_name} with {partition_num-1} partitions")
+                return True
+                
+        except Exception as e:
+            _logger.error(f"✗ Failed to create partitioned table {view_name}: {e}")
+            return False    
+    
+    def action_refresh_view(self):
+        """Refresh partitioned views without overlapping ranges."""
+        for record in self:
+            try:
+                # Clear the table but keep structure
+                with self.pool.cursor() as cr:
+                    # Verify the table exists
+                    cr.execute(f"SELECT to_regclass('{record.name}');")
+                    exists = cr.fetchone()[0]
+                    
+                    if not exists:
+                        # Table doesn't exist, we need to recreate it
+                        self._setup_partitioned_view(record.name)
+                    else:
+                        # Table exists, just truncate it
+                        cr.execute(f"TRUNCATE TABLE {record.name};")
+                    
+                    cr.commit()
+                
+                # Re-populate with fresh data
+                self._populate_partitioned_view(record.name, record.code)
+                
+                # Ensure indexes exist
+                self._create_partition_indexes(record.name)
+                
+                # Update refresh timestamp
+                record.last_refresh = fields.Datetime.now()
+                _logger.info(f"✓ Refreshed partitioned table {record.name}")
+                
+            except Exception as e:
+                _logger.error(f"✗ Failed to refresh {record.name}: {e}")
+                
+    def _populate_partitioned_view(self, view_name, populate_sql):
+        """
+        Populate the partitioned table with data, ensuring no batch overlap and using
+        independent transactions for better resilience.
+        """
+        try:
+            # Get partition ranges
+            with self.pool.cursor() as cr:
+                cr.execute(f"""
+                SELECT 
+                    child.relname AS child_table,
+                    pg_get_expr(child.relpartbound, child.oid) AS partition_bound
+                FROM pg_inherits
+                JOIN pg_class parent ON pg_inherits.inhparent = parent.oid
+                JOIN pg_class child ON pg_inherits.inhrelid = child.oid
+                JOIN pg_namespace nmsp_parent ON nmsp_parent.oid = parent.relnamespace
+                JOIN pg_namespace nmsp_child ON nmsp_child.oid = child.relnamespace
+                WHERE parent.relname = '{view_name}'
+                ORDER BY child.relname;
+                """)
+                partitions = cr.fetchall()
+            
+            # Process each partition with its own cursor/transaction
+            for child_table, bounds in partitions:
+                # Extract the range values from the partition bounds
+                match = re.search(r"FROM\s*\((\d+)\)\s*TO\s*\((\d+)\)", bounds)
+                if not match:
+                    continue
+                    
+                start_id, end_id = int(match.group(1)), int(match.group(2))
+                
+                # Clear existing data for this partition
+                with self.pool.cursor() as cr:
+                    cr.execute(f"DELETE FROM {child_table};")
+                    cr.commit()
+                
+                # Process this range in smaller chunks with independent transactions
+                batch_size = 150000
+                for chunk_start in range(start_id, end_id, batch_size):
+                    chunk_end = min(chunk_start + batch_size, end_id)
+                    
+                    try:
+                        with self.pool.cursor() as cr:
+                            # Set optimizations for this chunk
+                            cr.execute("SET statement_timeout = '600000';")  # 10 minutes per chunk
+                            cr.execute("SET work_mem = '512MB';")
+                            cr.execute("SET synchronous_commit = 'off';")
+                            
+                            # Modify SQL to use exclusive upper bound (< not <=)
+                            modified_sql = populate_sql.replace("?", "%s")
+                            
+                            _logger.info(f"Processing partners {chunk_start} to {chunk_end-1}")
+                            cr.execute(modified_sql, (chunk_start, chunk_end))
+                            cr.commit()
+                        
+                    except Exception as e:
+                        _logger.error(f"Error processing chunk {chunk_start}-{chunk_end-1}: {e}")
+                        # Continue with next chunk even if this one failed
+                        continue
+                        
+                _logger.info(f"✓ Completed partition {child_table}")
+            
+            return True
+        except Exception as e:
+            _logger.error(f"✗ Failed to populate partitioned view {view_name}: {e}")
+            return False
+        
+        
+        
+        
