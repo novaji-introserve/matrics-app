@@ -16,7 +16,7 @@
 
 
     # any module necessary for this one to work correctly
-    'depends': ['base','web', 'sale', 'board'],
+    'depends': ['base','web', 'board'],
 
     # always loaded
     'data': [

@@ -830,6 +830,7 @@
     <!-- Menu -->
     <menuitem id="menu_compliance_risk_assessment_plan" action="action_list_risk_assessment_plan" parent="menu_risk_assessment" name="Customer Risk Analysis" groups="group_compliance_compliance_officer,group_compliance_compliance_risk_manager" sequence="100" />
 
+
     <!-- Menu -->
 
     <menuitem id="menu_pep_sources" name="PEP Sources" parent="menu_pep_configurations" action="action_pep_sources" sequence="10" />
