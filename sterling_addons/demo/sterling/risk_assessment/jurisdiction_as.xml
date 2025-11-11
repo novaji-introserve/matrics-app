@@ -1,92 +1,6 @@
 <odoo>
     <data noupdate="1">
     
-     <!-- Subject: South East -->
-    <record id="res_risk_assessment_south_east" model="res.risk.assessment">
-        <field name="name">South East</field>
-        <field name="narration">Assessing ML/TF risks in the South East region.</field>
-        <field name="recommendation">Apply enhanced due diligence on new accounts.</field>
-        <field name="subject_id" ref="sterling_addons.compliance_inst_fc_risk_subject_23"/>
-        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21"/>
-        <field name="assessment_type_id" ref="compliance_management.compliance_inst_assessment_type_inst"/>
-        <field name="type_id" ref="compliance_management.compliance_inst_risk_type_3"/>
-    </record>
-
-    <record id="res_risk_assessment_line_se_ml" model="res.risk.assessment.line">
-        <field name="name">Money Laundering</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">24.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_se_tf" model="res.risk.assessment.line">
-        <field name="name">Terrorism Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">22.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_se_pf" model="res.risk.assessment.line">
-        <field name="name">Proliferation Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">18.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_se_sr" model="res.risk.assessment.line">
-        <field name="name">Sanction Risk</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">21.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_se_bc" model="res.risk.assessment.line">
-        <field name="name">Bribery And Corruption</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">19.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-    
     <!-- Subject: South West -->
 
     <!--  -->
@@ -94,102 +8,20 @@
         <field name="name">South West Jurisdiction</field>
         <field name="narration">Risk assessment for customers or entities located in South West.</field>
         <field name="recommendation">Check against global sanction lists before approval.</field>
-        <field name="subject_id" ref="sterling_addons.compliance_inst_fc_risk_subject_south_w"/>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_south_w"/>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21"/>
         <field name="assessment_type_id" ref="compliance_management.compliance_inst_assessment_type_inst"/>
         <field name="type_id" ref="compliance_management.compliance_inst_risk_type_3"/>
     </record>
 
-    <record id="res_risk_assessment_line_south_w_ml" model="res.risk.assessment.line">
-        <field name="name">Money Laundering</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]"/>
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_W"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">24.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-    <record id="res_risk_assessment_line_south_w_tf" model="res.risk.assessment.line">
-        <field name="name">Terrorism Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]"/>
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_W"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">22.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-    <record id="res_risk_assessment_line_south_w_pf" model="res.risk.assessment.line">
-        <field name="name">Proliferation Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]"/>
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_W"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">22.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-    <record id="res_risk_assessment_line_south_w_sr" model="res.risk.assessment.line">
-        <field name="name">Sanction Risk</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]"/>
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_W"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">21.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-    <record id="res_risk_assessment_line_south_w_bc" model="res.risk.assessment.line">
-        <field name="name">Bribery And Corruption</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]"/>
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_W"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">19.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <!-- Subject: South South -->
-    <record id="res_risk_assessment_south_south" model="res.risk.assessment">
-        <field name="name">South South</field>
-        <field name="narration">Assessing ML/TF risks in the South res_risk_assessment_south_south region.</field>
-        <field name="recommendation">Apply enhanced due diligence on new accounts.</field>
-        <field name="subject_id" ref="sterling_addons.compliance_inst_fc_risk_subject_south_south"/>
-        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21"/>
-        <field name="assessment_type_id" ref="compliance_management.compliance_inst_assessment_type_inst"/>
-        <field name="type_id" ref="compliance_management.compliance_inst_risk_type_3"/>
-    </record>
-
-    <record id="res_risk_assessment_line_ss_ml" model="res.risk.assessment.line">
+   <record id="res_risk_assessment_line_south_e_ml" model="res.risk.assessment.line">
         <field name="name">Money Laundering</field>
         <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
         <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_south"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_south_W"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">24.00</field>
@@ -197,14 +29,14 @@
         <field name="residual_risk_probability">75</field>
     </record>
 
-    <record id="res_risk_assessment_line_ss_tf" model="res.risk.assessment.line">
+    <record id="res_risk_assessment_line_south_e_tf" model="res.risk.assessment.line">
         <field name="name">Terrorism Financing</field>
         <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
         <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_south"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_south_W"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">22.00</field>
@@ -212,14 +44,14 @@
         <field name="residual_risk_probability">75</field>
     </record>
 
-    <record id="res_risk_assessment_line_ss_pf" model="res.risk.assessment.line">
+    <record id="res_risk_assessment_line_south__epf" model="res.risk.assessment.line">
         <field name="name">Proliferation Financing</field>
         <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
         <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_south"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_south_W"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">18.00</field>
@@ -227,14 +59,14 @@
         <field name="residual_risk_probability">75</field>
     </record>
 
-    <record id="res_risk_assessment_line_ss_sr" model="res.risk.assessment.line">
+    <record id="res_risk_assessment_line_south_e_sr" model="res.risk.assessment.line">
         <field name="name">Sanction Risk</field>
         <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
         <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_south"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_south_W"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">21.00</field>
@@ -242,14 +74,14 @@
         <field name="residual_risk_probability">75</field>
     </record>
 
-    <record id="res_risk_assessment_line_ss_bc" model="res.risk.assessment.line">
+    <record id="res_risk_assessment_line_south_e_bc" model="res.risk.assessment.line">
         <field name="name">Bribery And Corruption</field>
         <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
         <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_south_south"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_south_W"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">19.00</field>
@@ -257,269 +89,12 @@
         <field name="residual_risk_probability">75</field>
     </record>
 
-    <!-- Subject: North East -->
-    <record id="res_risk_assessment_north_east" model="res.risk.assessment">
-        <field name="name">North East</field>
-        <field name="narration">Risk assessment for customers or activities in the North East region.</field>
-        <field name="recommendation">Apply Enhanced Due Diligence (EDD).</field>
-        <field name="subject_id" ref="sterling_addons.compliance_inst_fc_risk_subject_ne23"/>
-        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21"/>
-        <field name="assessment_type_id" ref="compliance_management.compliance_inst_assessment_type_inst"/>
-        <field name="type_id" ref="compliance_management.compliance_inst_risk_type_3"/>
-    </record>
-
-    <record id="res_risk_assessment_line_ne_ml" model="res.risk.assessment.line">
-        <field name="name">Money Laundering</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">24.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_ne_tf" model="res.risk.assessment.line">
-        <field name="name">Terrorism Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">22.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_ne_pf" model="res.risk.assessment.line">
-        <field name="name">Proliferation Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">18.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_ne_sr" model="res.risk.assessment.line">
-        <field name="name">Sanction Risk</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">21.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_ne_bc" model="res.risk.assessment.line">
-        <field name="name">Bribery And Corruption</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_east"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">19.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <!-- Subject: North West -->
-    <record id="res_risk_assessment_north_west" model="res.risk.assessment">
-        <field name="name">North West</field>
-        <field name="narration">Risk assessment for customers or activities in the North west region.</field>
-        <field name="recommendation">Apply Enhanced Due Diligence (EDD).</field>
-        <field name="subject_id" ref="sterling_addons.compliance_inst_fc_risk_subject_nw"/>
-        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21"/>
-        <field name="assessment_type_id" ref="compliance_management.compliance_inst_assessment_type_inst"/>
-        <field name="type_id" ref="compliance_management.compliance_inst_risk_type_3"/>
-    </record>
-
-    <record id="res_risk_assessment_line_nw_ml" model="res.risk.assessment.line">
-        <field name="name">Money Laundering</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_west"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">24.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_nw_tf" model="res.risk.assessment.line">
-        <field name="name">Terrorism Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_west"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">22.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_nw_pf" model="res.risk.assessment.line">
-        <field name="name">Proliferation Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_west"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">18.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_nw_sr" model="res.risk.assessment.line">
-        <field name="name">Sanction Risk</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_west"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">21.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_nw_bc" model="res.risk.assessment.line">
-        <field name="name">Bribery And Corruption</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_west"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">19.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <!-- Subject: North Central -->
-    <record id="res_risk_assessment_north_central" model="res.risk.assessment">
-        <field name="name">North Central</field>
-        <field name="narration">Risk assessment for customers or activities in the North Central region.</field>
-        <field name="recommendation">Apply Enhanced Due Diligence (EDD).</field>
-        <field name="subject_id" ref="sterling_addons.compliance_inst_fc_risk_subject_nc"/>
-        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21"/>
-        <field name="assessment_type_id" ref="compliance_management.compliance_inst_assessment_type_inst"/>
-        <field name="type_id" ref="compliance_management.compliance_inst_risk_type_3"/>
-    </record>
-
-    <record id="res_risk_assessment_line_nc_ml" model="res.risk.assessment.line">
-        <field name="name">Money Laundering</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_central"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">24.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_nc_tf" model="res.risk.assessment.line">
-        <field name="name">Terrorism Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_central"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">22.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_nc_pf" model="res.risk.assessment.line">
-        <field name="name">Proliferation Financing</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_central"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">18.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_nc_sr" model="res.risk.assessment.line">
-        <field name="name">Sanction Risk</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_central"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">21.00</field>
-        <field name="residual_risk_score">6</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
-
-    <record id="res_risk_assessment_line_nc_bc" model="res.risk.assessment.line">
-        <field name="name">Bribery And Corruption</field>
-        <field name="implication" eval="[(6, 0, [ref('compliance_management.implication_regulatory_fine_aml_failure')])]" />
-        <field name="existing_controls" eval="[(6, 0, [ref('compliance_management.risk_control_fcra_access_controls')])]"/>
-        <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
-        <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
-        <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_north_central"/>
-        <field name="inherent_risk_score">9</field>
-        <field name="control_effectiveness_score">8</field>
-        <field name="residual_risk_impact">19.00</field>
-        <field name="residual_risk_score">4</field>
-        <field name="residual_risk_probability">75</field>
-    </record>
 
     <record id="res_risk_assessment_abj" model="res.risk.assessment">
         <field name="name">Abuja &amp; North Jurisdiction</field>
         <field name="narration">Risk assessment for customers or entities located in Abuja &amp; North.</field>
         <field name="recommendation">Check against global sanction lists before approval.</field>
-        <field name="subject_id" ref="sterling_addons.compliance_inst_fc_risk_subject_abj"/>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_abj"/>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21"/>
         <field name="assessment_type_id" ref="compliance_management.compliance_inst_assessment_type_inst"/>
         <field name="type_id" ref="compliance_management.compliance_inst_risk_type_3"/>
@@ -531,7 +106,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abj"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abj"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">24.00</field>
@@ -545,7 +120,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abj"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abj"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">22.00</field>
@@ -559,7 +134,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abj"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abj"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">18.00</field>
@@ -573,7 +148,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abj"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abj"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">21.00</field>
@@ -587,7 +162,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abj"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abj"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">19.00</field>
@@ -599,7 +174,7 @@
         <field name="name">South South &amp; South East Jurisdiction</field>
         <field name="narration">Risk assessment for customers or entities located in SS &amp; SW.</field>
         <field name="recommendation">Check against global sanction lists before approval.</field>
-        <field name="subject_id" ref="sterling_addons.compliance_inst_fc_risk_subject_ss_se"/>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_ss_se"/>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21"/>
         <field name="assessment_type_id" ref="compliance_management.compliance_inst_assessment_type_inst"/>
         <field name="type_id" ref="compliance_management.compliance_inst_risk_type_3"/>
@@ -612,7 +187,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_ss_sw"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_ss_sw"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">24.00</field>
@@ -626,7 +201,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_ss_sw"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_ss_sw"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">22.00</field>
@@ -640,7 +215,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_ss_sw"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_ss_sw"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">18.00</field>
@@ -654,7 +229,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_ss_sw"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_ss_sw"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">21.00</field>
@@ -668,7 +243,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_ss_sw"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_ss_sw"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">19.00</field>
@@ -680,7 +255,7 @@
         <field name="name">Lagos Jurisdiction</field>
         <field name="narration">Risk assessment for customers or entities located in Lagos.</field>
         <field name="recommendation">Check against global sanction lists before approval.</field>
-        <field name="subject_id" ref="sterling_addons.compliance_inst_fc_risk_subject_lagos"/>
+        <field name="subject_id" ref="compliance_inst_fc_risk_subject_lagos"/>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21"/>
         <field name="assessment_type_id" ref="compliance_management.compliance_inst_assessment_type_inst"/>
         <field name="type_id" ref="compliance_management.compliance_inst_risk_type_3"/>
@@ -694,7 +269,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_lagos"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_lagos"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">24.00</field>
@@ -708,7 +283,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_lagos"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_lagos"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">22.00</field>
@@ -722,7 +297,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_lagos"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_lagos"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">18.00</field>
@@ -736,7 +311,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_lagos"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_lagos"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">21.00</field>
@@ -750,7 +325,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_lagos"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_lagos"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">19.00</field>
@@ -774,7 +349,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_1"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abuja"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abuja"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">24.00</field>
@@ -788,7 +363,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_2"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abuja"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abuja"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">22.00</field>
@@ -802,7 +377,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_3"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abuja"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abuja"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">18.00</field>
@@ -816,7 +391,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_53"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abuja"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abuja"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">21.00</field>
@@ -830,7 +405,7 @@
         <field name="planned_mitigation" eval="[(6, 0, [ref('compliance_management.mitigation_1_demo')])]"/>
         <field name="category_id" ref="compliance_management.compliance_inst_fc_risk_category_42"/>
         <field name="department_id" ref="compliance_management.hr_department_compliance"/>
-        <field name="risk_assessment_id" ref="sterling_addons.res_risk_assessment_abuja"/>
+        <field name="risk_assessment_id" ref="res_risk_assessment_abuja"/>
         <field name="inherent_risk_score">9</field>
         <field name="control_effectiveness_score">8</field>
         <field name="residual_risk_impact">19.00</field>

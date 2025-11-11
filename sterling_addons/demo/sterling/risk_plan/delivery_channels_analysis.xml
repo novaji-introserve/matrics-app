@@ -14,7 +14,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using ussd channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_regulatory_ussd"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_ussd"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -33,7 +33,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using alt bank channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_regulatory_alt"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_alt"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -52,7 +52,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using banca channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_regulatory_banca"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_banca"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -71,7 +71,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using carded customer channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_regulatory_card"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_card"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -90,7 +90,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using doubble channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_regulatory_doubble"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_doubble"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -109,7 +109,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using onebank channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_regulatory_onebank"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_onebank"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -128,7 +128,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using specta channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_regulatory_specta"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_specta"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -147,7 +147,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using sterling pro channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_regulatory_sterling"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_sterling"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>
@@ -166,7 +166,7 @@
         <field name="state">active</field>
         <field name="narration">Analysis for customers using switch channel</field>
         <field name="compute_score_from">risk_assessment</field>
-        <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_regulatory_switch"/>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_switch"/>
         <field name="use_composite_calculation">True</field>
         <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
     </record>

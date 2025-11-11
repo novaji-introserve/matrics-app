@@ -9,7 +9,7 @@
             <field name="narration">Risk assessment for agriculture sector clients. Apply enhanced compliance monitoring for agriculture sector.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_agriculture"/>
+            <field name="risk_assessment" ref="res_risk_assessment_agriculture"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -22,7 +22,7 @@
             <field name="narration">Risk assessment for admin &amp; support services clients. Apply enhanced compliance monitoring for admin &amp; support services.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_admin_support"/>
+            <field name="risk_assessment" ref="res_risk_assessment_admin_support"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -35,7 +35,7 @@
             <field name="narration">Risk assessment for oil and gas sector clients. Apply enhanced compliance monitoring for oil and gas sector.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_oil_gas"/>
+            <field name="risk_assessment" ref="res_risk_assessment_oil_gas"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -48,7 +48,7 @@
             <field name="narration">Risk assessment for arts &amp; entertainment clients. Apply enhanced compliance monitoring for arts &amp; entertainment.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_arts_entertainment"/>
+            <field name="risk_assessment" ref="res_risk_assessment_arts_entertainment"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -61,7 +61,7 @@
             <field name="narration">Risk assessment for professional &amp; tech sector clients. Apply enhanced compliance monitoring for professional &amp; tech sector.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_prof_scitech"/>
+            <field name="risk_assessment" ref="res_risk_assessment_prof_scitech"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -74,7 +74,7 @@
             <field name="narration">Risk assessment for general client clients. Apply enhanced compliance monitoring for general client.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_general"/>
+            <field name="risk_assessment" ref="res_risk_assessment_general"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -87,7 +87,7 @@
             <field name="narration">Risk assessment for finance &amp; insurance clients. Apply enhanced compliance monitoring for finance &amp; insurance.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_finance_insurance"/>
+            <field name="risk_assessment" ref="res_risk_assessment_finance_insurance"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -100,7 +100,7 @@
             <field name="narration">Risk assessment for government sector clients. Apply enhanced compliance monitoring for government sector.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_government"/>
+            <field name="risk_assessment" ref="res_risk_assessment_government"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -113,7 +113,7 @@
             <field name="narration">Risk assessment for public utilities clients. Apply enhanced compliance monitoring for public utilities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_public_utilities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_public_utilities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -126,7 +126,7 @@
             <field name="narration">Risk assessment for oneforce family clients. Apply enhanced compliance monitoring for oneforce family.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_oneforce_family"/>
+            <field name="risk_assessment" ref="res_risk_assessment_oneforce_family"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -139,7 +139,7 @@
             <field name="narration">Risk assessment for general commerce clients. Apply enhanced compliance monitoring for general commerce.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_general_commerce"/>
+            <field name="risk_assessment" ref="res_risk_assessment_general_commerce"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -152,7 +152,7 @@
             <field name="narration">Risk assessment for health sector clients. Apply enhanced compliance monitoring for health sector.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_health"/>
+            <field name="risk_assessment" ref="res_risk_assessment_health"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -165,7 +165,7 @@
             <field name="narration">Risk assessment for not for profit clients. Apply enhanced compliance monitoring for not for profit.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_not_for_profit"/>
+            <field name="risk_assessment" ref="res_risk_assessment_not_for_profit"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -178,7 +178,7 @@
             <field name="narration">Risk assessment for renewable energy clients. Apply enhanced compliance monitoring for renewable energy.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_renewable_energy"/>
+            <field name="risk_assessment" ref="res_risk_assessment_renewable_energy"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -191,7 +191,7 @@
             <field name="narration">Risk assessment for real estate sector clients. Apply enhanced compliance monitoring for real estate sector.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_real_estate"/>
+            <field name="risk_assessment" ref="res_risk_assessment_real_estate"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -204,7 +204,7 @@
             <field name="narration">Risk assessment for cooperative cluster clients. Apply enhanced compliance monitoring for cooperative cluster.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cooperative_cluster"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cooperative_cluster"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -217,7 +217,7 @@
             <field name="narration">Risk assessment for human health &amp; social work clients. Apply enhanced compliance monitoring for human health &amp; social work.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_human_health_social"/>
+            <field name="risk_assessment" ref="res_risk_assessment_human_health_social"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -230,7 +230,7 @@
             <field name="narration">Risk assessment for education sector risk assessment clients. Apply enhanced compliance monitoring for education sector risk assessment.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_education"/>
+            <field name="risk_assessment" ref="res_risk_assessment_education"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -243,7 +243,7 @@
             <field name="narration">Risk assessment for manufacturing sector clients. Apply enhanced compliance monitoring for manufacturing sector.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_manufacturing"/>
+            <field name="risk_assessment" ref="res_risk_assessment_manufacturing"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -256,7 +256,7 @@
             <field name="narration">Risk assessment for transportation sector clients. Apply enhanced compliance monitoring for transportation sector.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_transportation"/>
+            <field name="risk_assessment" ref="res_risk_assessment_transportation"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -269,7 +269,7 @@
             <field name="narration">Risk assessment for power and energy clients. Apply enhanced compliance monitoring for power and energy.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_power_energy"/>
+            <field name="risk_assessment" ref="res_risk_assessment_power_energy"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -282,7 +282,7 @@
             <field name="narration">Risk assessment for capital market clients. Apply enhanced compliance monitoring for capital market.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_capital_market"/>
+            <field name="risk_assessment" ref="res_risk_assessment_capital_market"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -295,7 +295,7 @@
             <field name="narration">Risk assessment for information &amp; communication clients. Apply enhanced compliance monitoring for information &amp; communication.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_information_comm"/>
+            <field name="risk_assessment" ref="res_risk_assessment_information_comm"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -308,7 +308,7 @@
             <field name="narration">Risk assessment for state &amp; private agencies clients. Apply enhanced compliance monitoring for state &amp; private agencies.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_state_private_agencies"/>
+            <field name="risk_assessment" ref="res_risk_assessment_state_private_agencies"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -321,7 +321,7 @@
             <field name="narration">Risk assessment for trustees &amp; fiduciary accounts clients. Apply enhanced compliance monitoring for trustees &amp; fiduciary accounts.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_trustees_and_fiduciary_accounts"/>
+            <field name="risk_assessment" ref="res_risk_assessment_trustees_and_fiduciary_accounts"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -334,7 +334,7 @@
             <field name="narration">Risk assessment for logistics clients. Apply enhanced compliance monitoring for logistics.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_logistics"/>
+            <field name="risk_assessment" ref="res_risk_assessment_logistics"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -347,7 +347,7 @@
             <field name="narration">Risk assessment for embassy/high commission clients. Apply enhanced compliance monitoring for embassy/high commission.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_embassy_high_commission"/>
+            <field name="risk_assessment" ref="res_risk_assessment_embassy_high_commission"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -360,7 +360,7 @@
             <field name="narration">Risk assessment for supermarket clients. Apply enhanced compliance monitoring for supermarket.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_supermarket"/>
+            <field name="risk_assessment" ref="res_risk_assessment_supermarket"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -373,7 +373,7 @@
             <field name="narration">Risk assessment for restaurant clients. Apply enhanced compliance monitoring for restaurant.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_restaurant"/>
+            <field name="risk_assessment" ref="res_risk_assessment_restaurant"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -386,7 +386,7 @@
             <field name="narration">Risk assessment for retail sale of computers, software clients. Apply enhanced compliance monitoring for retail sale of computers, software.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_retail_sale_of_computers_software"/>
+            <field name="risk_assessment" ref="res_risk_assessment_retail_sale_of_computers_software"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -399,7 +399,7 @@
             <field name="narration">Risk assessment for telemarketing clients. Apply enhanced compliance monitoring for telemarketing.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_telemarketing"/>
+            <field name="risk_assessment" ref="res_risk_assessment_telemarketing"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -412,7 +412,7 @@
             <field name="narration">Risk assessment for clearing and forwarding clients. Apply enhanced compliance monitoring for clearing and forwarding.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_clearing_and_forwarding"/>
+            <field name="risk_assessment" ref="res_risk_assessment_clearing_and_forwarding"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -425,7 +425,7 @@
             <field name="narration">Risk assessment for estate (deceased individuals) clients. Apply enhanced compliance monitoring for estate (deceased individuals).</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_estate_deceased_individuals"/>
+            <field name="risk_assessment" ref="res_risk_assessment_estate_deceased_individuals"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -438,7 +438,7 @@
             <field name="narration">Risk assessment for automotive parts clients. Apply enhanced compliance monitoring for automotive parts.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_automotive_parts"/>
+            <field name="risk_assessment" ref="res_risk_assessment_automotive_parts"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -451,7 +451,7 @@
             <field name="narration">Risk assessment for domestic trade clients. Apply enhanced compliance monitoring for domestic trade.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_domestic_trade"/>
+            <field name="risk_assessment" ref="res_risk_assessment_domestic_trade"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -464,7 +464,7 @@
             <field name="narration">Risk assessment for jewelry dealer clients. Apply enhanced compliance monitoring for jewelry dealer.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_jewelry_dealer"/>
+            <field name="risk_assessment" ref="res_risk_assessment_jewelry_dealer"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -477,7 +477,7 @@
             <field name="narration">Risk assessment for precious metal dealer clients. Apply enhanced compliance monitoring for precious metal dealer.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_precious_metal_dealer"/>
+            <field name="risk_assessment" ref="res_risk_assessment_precious_metal_dealer"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -490,7 +490,7 @@
             <field name="narration">Risk assessment for automobile, motor vehicles clients. Apply enhanced compliance monitoring for automobile, motor vehicles.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_automobile_motor_vehicles"/>
+            <field name="risk_assessment" ref="res_risk_assessment_automobile_motor_vehicles"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -503,7 +503,7 @@
             <field name="narration">Risk assessment for food processing clients. Apply enhanced compliance monitoring for food processing.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_food_processing"/>
+            <field name="risk_assessment" ref="res_risk_assessment_food_processing"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -516,7 +516,7 @@
             <field name="narration">Risk assessment for chemicals and allied products clients. Apply enhanced compliance monitoring for chemicals and allied products.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_chemicals_and_allied_products"/>
+            <field name="risk_assessment" ref="res_risk_assessment_chemicals_and_allied_products"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -529,7 +529,7 @@
             <field name="narration">Risk assessment for trading, rice clients. Apply enhanced compliance monitoring for trading, rice.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_trading_rice"/>
+            <field name="risk_assessment" ref="res_risk_assessment_trading_rice"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -542,7 +542,7 @@
             <field name="narration">Risk assessment for trading, cocoa clients. Apply enhanced compliance monitoring for trading, cocoa.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_trading_cocoa"/>
+            <field name="risk_assessment" ref="res_risk_assessment_trading_cocoa"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -555,7 +555,7 @@
             <field name="narration">Risk assessment for generator set, sales and services clients. Apply enhanced compliance monitoring for generator set, sales and services.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_generator_set_sales_and_services"/>
+            <field name="risk_assessment" ref="res_risk_assessment_generator_set_sales_and_services"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -568,7 +568,7 @@
             <field name="narration">Risk assessment for groundnuts and groundnut oil clients. Apply enhanced compliance monitoring for groundnuts and groundnut oil.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_groundnuts_and_groundnut_oil"/>
+            <field name="risk_assessment" ref="res_risk_assessment_groundnuts_and_groundnut_oil"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -581,7 +581,7 @@
             <field name="narration">Risk assessment for palm produce clients. Apply enhanced compliance monitoring for palm produce.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_palm_produce"/>
+            <field name="risk_assessment" ref="res_risk_assessment_palm_produce"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -594,7 +594,7 @@
             <field name="narration">Risk assessment for cotton clients. Apply enhanced compliance monitoring for cotton.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cotton"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cotton"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -607,7 +607,7 @@
             <field name="narration">Risk assessment for hides and skins clients. Apply enhanced compliance monitoring for hides and skins.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_hides_and_skins"/>
+            <field name="risk_assessment" ref="res_risk_assessment_hides_and_skins"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -620,7 +620,7 @@
             <field name="narration">Risk assessment for rubber and rubber products clients. Apply enhanced compliance monitoring for rubber and rubber products.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_rubber_and_rubber_products"/>
+            <field name="risk_assessment" ref="res_risk_assessment_rubber_and_rubber_products"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -633,7 +633,7 @@
             <field name="narration">Risk assessment for timber and timber products clients. Apply enhanced compliance monitoring for timber and timber products.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_timber_and_timber_products"/>
+            <field name="risk_assessment" ref="res_risk_assessment_timber_and_timber_products"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -646,7 +646,7 @@
             <field name="narration">Risk assessment for other agricultural exports clients. Apply enhanced compliance monitoring for other agricultural exports.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_other_agricultural_exports"/>
+            <field name="risk_assessment" ref="res_risk_assessment_other_agricultural_exports"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -659,7 +659,7 @@
             <field name="narration">Risk assessment for non agricultural exports clients. Apply enhanced compliance monitoring for non agricultural exports.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_non_agricultural_exports"/>
+            <field name="risk_assessment" ref="res_risk_assessment_non_agricultural_exports"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -672,7 +672,7 @@
             <field name="narration">Risk assessment for imports clients. Apply enhanced compliance monitoring for imports.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_imports"/>
+            <field name="risk_assessment" ref="res_risk_assessment_imports"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -685,7 +685,7 @@
             <field name="narration">Risk assessment for retail merchant clients. Apply enhanced compliance monitoring for retail merchant.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_retail_merchant"/>
+            <field name="risk_assessment" ref="res_risk_assessment_retail_merchant"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -698,7 +698,7 @@
             <field name="narration">Risk assessment for export clients. Apply enhanced compliance monitoring for export.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_export"/>
+            <field name="risk_assessment" ref="res_risk_assessment_export"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -711,7 +711,7 @@
             <field name="narration">Risk assessment for car/boat/plane dealership clients. Apply enhanced compliance monitoring for car/boat/plane dealership.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_car_boat_plane_dealership"/>
+            <field name="risk_assessment" ref="res_risk_assessment_car_boat_plane_dealership"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -724,7 +724,7 @@
             <field name="narration">Risk assessment for wholesalers of consumer electronics clients. Apply enhanced compliance monitoring for wholesalers of consumer electronics.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_wholesalers_of_consumer_electronics"/>
+            <field name="risk_assessment" ref="res_risk_assessment_wholesalers_of_consumer_electronics"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -737,7 +737,7 @@
             <field name="narration">Risk assessment for luxury goods clients. Apply enhanced compliance monitoring for luxury goods.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_luxury_goods"/>
+            <field name="risk_assessment" ref="res_risk_assessment_luxury_goods"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -750,7 +750,7 @@
             <field name="narration">Risk assessment for federal, direct clients. Apply enhanced compliance monitoring for federal, direct.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_federal_direct"/>
+            <field name="risk_assessment" ref="res_risk_assessment_federal_direct"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -763,7 +763,7 @@
             <field name="narration">Risk assessment for federal, mdas clients. Apply enhanced compliance monitoring for federal, mdas.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_federal_mdas"/>
+            <field name="risk_assessment" ref="res_risk_assessment_federal_mdas"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -776,7 +776,7 @@
             <field name="narration">Risk assessment for state, direct clients. Apply enhanced compliance monitoring for state, direct.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_state_direct"/>
+            <field name="risk_assessment" ref="res_risk_assessment_state_direct"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -789,7 +789,7 @@
             <field name="narration">Risk assessment for state, mdas clients. Apply enhanced compliance monitoring for state, mdas.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_state_mdas"/>
+            <field name="risk_assessment" ref="res_risk_assessment_state_mdas"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -802,7 +802,7 @@
             <field name="narration">Risk assessment for local, direct clients. Apply enhanced compliance monitoring for local, direct.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_local_direct"/>
+            <field name="risk_assessment" ref="res_risk_assessment_local_direct"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -815,7 +815,7 @@
             <field name="narration">Risk assessment for local, mdas clients. Apply enhanced compliance monitoring for local, mdas.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_local_mdas"/>
+            <field name="risk_assessment" ref="res_risk_assessment_local_mdas"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -828,7 +828,7 @@
             <field name="narration">Risk assessment for human health activities clients. Apply enhanced compliance monitoring for human health activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_human_health_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_human_health_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -841,7 +841,7 @@
             <field name="narration">Risk assessment for residential care activities clients. Apply enhanced compliance monitoring for residential care activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_residential_care_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_residential_care_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -854,7 +854,7 @@
             <field name="narration">Risk assessment for social work without accommodation clients. Apply enhanced compliance monitoring for social work without accommodation.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_social_work_without_accommodation"/>
+            <field name="risk_assessment" ref="res_risk_assessment_social_work_without_accommodation"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -867,7 +867,7 @@
             <field name="narration">Risk assessment for domestic care services clients. Apply enhanced compliance monitoring for domestic care services.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_domestic_care_services"/>
+            <field name="risk_assessment" ref="res_risk_assessment_domestic_care_services"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -880,7 +880,7 @@
             <field name="narration">Risk assessment for publishing activities clients. Apply enhanced compliance monitoring for publishing activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_publishing_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_publishing_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -893,7 +893,7 @@
             <field name="narration">Risk assessment for video n televisn programe productn clients. Apply enhanced compliance monitoring for video n televisn programe productn.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_video_n_televisn_programe_productn"/>
+            <field name="risk_assessment" ref="res_risk_assessment_video_n_televisn_programe_productn"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -906,7 +906,7 @@
             <field name="narration">Risk assessment for programming and broadcasting act clients. Apply enhanced compliance monitoring for programming and broadcasting act.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_programming_and_broadcasting_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_programming_and_broadcasting_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -919,7 +919,7 @@
             <field name="narration">Risk assessment for telecommunications clients. Apply enhanced compliance monitoring for telecommunications.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_telecommunications"/>
+            <field name="risk_assessment" ref="res_risk_assessment_telecommunications"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -932,7 +932,7 @@
             <field name="narration">Risk assessment for programing, consult n related act clients. Apply enhanced compliance monitoring for programing, consult n related act.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_programing_consult_n_related_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_programing_consult_n_related_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -945,7 +945,7 @@
             <field name="narration">Risk assessment for information service activities clients. Apply enhanced compliance monitoring for information service activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_information_service_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_information_service_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -958,7 +958,7 @@
             <field name="narration">Risk assessment for flourmills and bakeries clients. Apply enhanced compliance monitoring for flourmills and bakeries.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_flourmills_and_bakeries"/>
+            <field name="risk_assessment" ref="res_risk_assessment_flourmills_and_bakeries"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -971,7 +971,7 @@
             <field name="narration">Risk assessment for food manufacturing clients. Apply enhanced compliance monitoring for food manufacturing.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_food_manufacturing"/>
+            <field name="risk_assessment" ref="res_risk_assessment_food_manufacturing"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -984,7 +984,7 @@
             <field name="narration">Risk assessment for beverages clients. Apply enhanced compliance monitoring for beverages.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_beverages"/>
+            <field name="risk_assessment" ref="res_risk_assessment_beverages"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -997,7 +997,7 @@
             <field name="narration">Risk assessment for aluminium and allied products clients. Apply enhanced compliance monitoring for aluminium and allied products.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_aluminium_and_allied_products"/>
+            <field name="risk_assessment" ref="res_risk_assessment_aluminium_and_allied_products"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1010,7 +1010,7 @@
             <field name="narration">Risk assessment for basic metal products clients. Apply enhanced compliance monitoring for basic metal products.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_basic_metal_products"/>
+            <field name="risk_assessment" ref="res_risk_assessment_basic_metal_products"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1023,7 +1023,7 @@
             <field name="narration">Risk assessment for breweries clients. Apply enhanced compliance monitoring for breweries.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_breweries"/>
+            <field name="risk_assessment" ref="res_risk_assessment_breweries"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1036,7 +1036,7 @@
             <field name="narration">Risk assessment for building materials clients. Apply enhanced compliance monitoring for building materials.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_building_materials"/>
+            <field name="risk_assessment" ref="res_risk_assessment_building_materials"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1049,7 +1049,7 @@
             <field name="narration">Risk assessment for cement clients. Apply enhanced compliance monitoring for cement.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cement"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cement"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1062,7 +1062,7 @@
             <field name="narration">Risk assessment for chemicals and allied products clients. Apply enhanced compliance monitoring for chemicals and allied products.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_chemicals_and_allied_products"/>
+            <field name="risk_assessment" ref="res_risk_assessment_chemicals_and_allied_products"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1075,7 +1075,7 @@
             <field name="narration">Risk assessment for footwear clients. Apply enhanced compliance monitoring for footwear.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_footwear"/>
+            <field name="risk_assessment" ref="res_risk_assessment_footwear"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1088,7 +1088,7 @@
             <field name="narration">Risk assessment for hides and skin clients. Apply enhanced compliance monitoring for hides and skin.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_hides_and_skin"/>
+            <field name="risk_assessment" ref="res_risk_assessment_hides_and_skin"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1101,7 +1101,7 @@
             <field name="narration">Risk assessment for household equipment clients. Apply enhanced compliance monitoring for household equipment.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_household_equipment"/>
+            <field name="risk_assessment" ref="res_risk_assessment_household_equipment"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1114,7 +1114,7 @@
             <field name="narration">Risk assessment for pharmaceuticals clients. Apply enhanced compliance monitoring for pharmaceuticals.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_pharmaceuticals"/>
+            <field name="risk_assessment" ref="res_risk_assessment_pharmaceuticals"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1127,7 +1127,7 @@
             <field name="narration">Risk assessment for paints and allied products clients. Apply enhanced compliance monitoring for paints and allied products.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_paints_and_allied_products"/>
+            <field name="risk_assessment" ref="res_risk_assessment_paints_and_allied_products"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1140,7 +1140,7 @@
             <field name="narration">Risk assessment for miscellaneous manufacturing clients. Apply enhanced compliance monitoring for miscellaneous manufacturing.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_miscellaneous_manufacturing"/>
+            <field name="risk_assessment" ref="res_risk_assessment_miscellaneous_manufacturing"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1153,7 +1153,7 @@
             <field name="narration">Risk assessment for paper and paper products clients. Apply enhanced compliance monitoring for paper and paper products.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_paper_and_paper_products"/>
+            <field name="risk_assessment" ref="res_risk_assessment_paper_and_paper_products"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1166,7 +1166,7 @@
             <field name="narration">Risk assessment for personal care clients. Apply enhanced compliance monitoring for personal care.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_personal_care"/>
+            <field name="risk_assessment" ref="res_risk_assessment_personal_care"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1179,7 +1179,7 @@
             <field name="narration">Risk assessment for plastics clients. Apply enhanced compliance monitoring for plastics.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_plastics"/>
+            <field name="risk_assessment" ref="res_risk_assessment_plastics"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1192,7 +1192,7 @@
             <field name="narration">Risk assessment for rubber and allied products clients. Apply enhanced compliance monitoring for rubber and allied products.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_rubber_and_allied_products"/>
+            <field name="risk_assessment" ref="res_risk_assessment_rubber_and_allied_products"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1205,7 +1205,7 @@
             <field name="narration">Risk assessment for steel rolling mills clients. Apply enhanced compliance monitoring for steel rolling mills.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_steel_rolling_mills"/>
+            <field name="risk_assessment" ref="res_risk_assessment_steel_rolling_mills"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1218,7 +1218,7 @@
             <field name="narration">Risk assessment for soft drinks clients. Apply enhanced compliance monitoring for soft drinks.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_soft_drinks"/>
+            <field name="risk_assessment" ref="res_risk_assessment_soft_drinks"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1231,7 +1231,7 @@
             <field name="narration">Risk assessment for cables and mines clients. Apply enhanced compliance monitoring for cables and mines.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cables_and_mines"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cables_and_mines"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1244,7 +1244,7 @@
             <field name="narration">Risk assessment for textiles and apparel clients. Apply enhanced compliance monitoring for textiles and apparel.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_textiles_and_apparel"/>
+            <field name="risk_assessment" ref="res_risk_assessment_textiles_and_apparel"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1257,7 +1257,7 @@
             <field name="narration">Risk assessment for tyre clients. Apply enhanced compliance monitoring for tyre.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_tyre"/>
+            <field name="risk_assessment" ref="res_risk_assessment_tyre"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1270,7 +1270,7 @@
             <field name="narration">Risk assessment for conglomerate clients. Apply enhanced compliance monitoring for conglomerate.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_conglomerate"/>
+            <field name="risk_assessment" ref="res_risk_assessment_conglomerate"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1283,7 +1283,7 @@
             <field name="narration">Risk assessment for meat, food process, can n cold store clients. Apply enhanced compliance monitoring for meat, food process, can n cold store.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_meat_food_process_can_n_cold_store"/>
+            <field name="risk_assessment" ref="res_risk_assessment_meat_food_process_can_n_cold_store"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1296,7 +1296,7 @@
             <field name="narration">Risk assessment for wood products including furniture clients. Apply enhanced compliance monitoring for wood products including furniture.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_wood_products_including_furniture"/>
+            <field name="risk_assessment" ref="res_risk_assessment_wood_products_including_furniture"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1309,7 +1309,7 @@
             <field name="narration">Risk assessment for soap, oil detergent clients. Apply enhanced compliance monitoring for soap, oil detergent.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_soap_oil_detergent"/>
+            <field name="risk_assessment" ref="res_risk_assessment_soap_oil_detergent"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1322,7 +1322,7 @@
             <field name="narration">Risk assessment for metal tin, iron, etc clients. Apply enhanced compliance monitoring for metal tin, iron, etc.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_metal_tin_iron_etc"/>
+            <field name="risk_assessment" ref="res_risk_assessment_metal_tin_iron_etc"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1335,7 +1335,7 @@
             <field name="narration">Risk assessment for non.metal quarrying clients. Apply enhanced compliance monitoring for non.metal quarrying.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_nonmetal_quarrying"/>
+            <field name="risk_assessment" ref="res_risk_assessment_nonmetal_quarrying"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1348,7 +1348,7 @@
             <field name="narration">Risk assessment for coal clients. Apply enhanced compliance monitoring for coal.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_coal"/>
+            <field name="risk_assessment" ref="res_risk_assessment_coal"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1361,7 +1361,7 @@
             <field name="narration">Risk assessment for oil . downstream clients. Apply enhanced compliance monitoring for oil . downstream.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_oil__downstream"/>
+            <field name="risk_assessment" ref="res_risk_assessment_oil__downstream"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1374,7 +1374,7 @@
             <field name="narration">Risk assessment for oil . upstream clients. Apply enhanced compliance monitoring for oil . upstream.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_oil__upstream"/>
+            <field name="risk_assessment" ref="res_risk_assessment_oil__upstream"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1387,7 +1387,7 @@
             <field name="narration">Risk assessment for natural gas clients. Apply enhanced compliance monitoring for natural gas.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_natural_gas"/>
+            <field name="risk_assessment" ref="res_risk_assessment_natural_gas"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1400,7 +1400,7 @@
             <field name="narration">Risk assessment for crude oil refining clients. Apply enhanced compliance monitoring for crude oil refining.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_crude_oil_refining"/>
+            <field name="risk_assessment" ref="res_risk_assessment_crude_oil_refining"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1413,7 +1413,7 @@
             <field name="narration">Risk assessment for oil &amp; gas services clients. Apply enhanced compliance monitoring for oil &amp; gas services.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_oil_and_gas_services"/>
+            <field name="risk_assessment" ref="res_risk_assessment_oil_and_gas_services"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1426,7 +1426,7 @@
             <field name="narration">Risk assessment for independent power projects, ipp clients. Apply enhanced compliance monitoring for independent power projects, ipp.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_independent_power_projects_ipp"/>
+            <field name="risk_assessment" ref="res_risk_assessment_independent_power_projects_ipp"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1439,7 +1439,7 @@
             <field name="narration">Risk assessment for power generation, power plants clients. Apply enhanced compliance monitoring for power generation, power plants.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_power_generation_power_plants"/>
+            <field name="risk_assessment" ref="res_risk_assessment_power_generation_power_plants"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1452,7 +1452,7 @@
             <field name="narration">Risk assessment for power transmission clients. Apply enhanced compliance monitoring for power transmission.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_power_transmission"/>
+            <field name="risk_assessment" ref="res_risk_assessment_power_transmission"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1465,7 +1465,7 @@
             <field name="narration">Risk assessment for power distribution clients. Apply enhanced compliance monitoring for power distribution.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_power_distribution"/>
+            <field name="risk_assessment" ref="res_risk_assessment_power_distribution"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1478,7 +1478,7 @@
             <field name="narration">Risk assessment for legal and accounting activities clients. Apply enhanced compliance monitoring for legal and accounting activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_legal_and_accounting_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_legal_and_accounting_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1491,7 +1491,7 @@
             <field name="narration">Risk assessment for act of headoff, mgt consutancy act clients. Apply enhanced compliance monitoring for act of headoff, mgt consutancy act.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_act_of_headoff_mgt_consutancy_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_act_of_headoff_mgt_consutancy_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1504,7 +1504,7 @@
             <field name="narration">Risk assessment for arch n eng act tech tstng n anlysis clients. Apply enhanced compliance monitoring for arch n eng act tech tstng n anlysis.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_arch_n_eng_act_tech_tstng_n_anlysis"/>
+            <field name="risk_assessment" ref="res_risk_assessment_arch_n_eng_act_tech_tstng_n_anlysis"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1517,7 +1517,7 @@
             <field name="narration">Risk assessment for scientific research and dev clients. Apply enhanced compliance monitoring for scientific research and dev.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_scientific_research_and_dev"/>
+            <field name="risk_assessment" ref="res_risk_assessment_scientific_research_and_dev"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1530,7 +1530,7 @@
             <field name="narration">Risk assessment for advertising and market research clients. Apply enhanced compliance monitoring for advertising and market research.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_advertising_and_market_research"/>
+            <field name="risk_assessment" ref="res_risk_assessment_advertising_and_market_research"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1543,7 +1543,7 @@
             <field name="narration">Risk assessment for oth prof, scientific and tech act clients. Apply enhanced compliance monitoring for oth prof, scientific and tech act.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_oth_prof_scientific_and_tech_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_oth_prof_scientific_and_tech_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1556,7 +1556,7 @@
             <field name="narration">Risk assessment for veterinary activities clients. Apply enhanced compliance monitoring for veterinary activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_veterinary_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_veterinary_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1569,7 +1569,7 @@
             <field name="narration">Risk assessment for sole practitioners clients. Apply enhanced compliance monitoring for sole practitioners.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_sole_practitioners"/>
+            <field name="risk_assessment" ref="res_risk_assessment_sole_practitioners"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1582,7 +1582,7 @@
             <field name="narration">Risk assessment for tax consultant clients. Apply enhanced compliance monitoring for tax consultant.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_tax_consultant"/>
+            <field name="risk_assessment" ref="res_risk_assessment_tax_consultant"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1595,7 +1595,7 @@
             <field name="narration">Risk assessment for estate surveyors and valuers clients. Apply enhanced compliance monitoring for estate surveyors and valuers.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_estate_surveyors_and_valuers"/>
+            <field name="risk_assessment" ref="res_risk_assessment_estate_surveyors_and_valuers"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1608,7 +1608,7 @@
             <field name="narration">Risk assessment for accounting professionals/services clients. Apply enhanced compliance monitoring for accounting professionals/services.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_accounting_professionals_services"/>
+            <field name="risk_assessment" ref="res_risk_assessment_accounting_professionals_services"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1621,7 +1621,7 @@
             <field name="narration">Risk assessment for utility, private clients. Apply enhanced compliance monitoring for utility, private.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_utility_private"/>
+            <field name="risk_assessment" ref="res_risk_assessment_utility_private"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1634,7 +1634,7 @@
             <field name="narration">Risk assessment for utility, public clients. Apply enhanced compliance monitoring for utility, public.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_utility_public"/>
+            <field name="risk_assessment" ref="res_risk_assessment_utility_public"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1647,7 +1647,7 @@
             <field name="narration">Risk assessment for residential mortgage loans clients. Apply enhanced compliance monitoring for residential mortgage loans.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_residential_mortgage_loans"/>
+            <field name="risk_assessment" ref="res_risk_assessment_residential_mortgage_loans"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1660,7 +1660,7 @@
             <field name="narration">Risk assessment for commercial property clients. Apply enhanced compliance monitoring for commercial property.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_commercial_property"/>
+            <field name="risk_assessment" ref="res_risk_assessment_commercial_property"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1673,7 +1673,7 @@
             <field name="narration">Risk assessment for home equity clients. Apply enhanced compliance monitoring for home equity.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_home_equity"/>
+            <field name="risk_assessment" ref="res_risk_assessment_home_equity"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1686,7 +1686,7 @@
             <field name="narration">Risk assessment for real estate const. home developers clients. Apply enhanced compliance monitoring for real estate const. home developers.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_real_estate_const_home_developers"/>
+            <field name="risk_assessment" ref="res_risk_assessment_real_estate_const_home_developers"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1699,7 +1699,7 @@
             <field name="narration">Risk assessment for real estate, income.producing clients. Apply enhanced compliance monitoring for real estate, income.producing.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_real_estate_incomeproducing"/>
+            <field name="risk_assessment" ref="res_risk_assessment_real_estate_incomeproducing"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1712,7 +1712,7 @@
             <field name="narration">Risk assessment for high.volatility comm real estate clients. Apply enhanced compliance monitoring for high.volatility comm real estate.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_highvolatility_comm_real_estate"/>
+            <field name="risk_assessment" ref="res_risk_assessment_highvolatility_comm_real_estate"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1725,7 +1725,7 @@
             <field name="narration">Risk assessment for non residential clients. Apply enhanced compliance monitoring for non residential.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_non_residential"/>
+            <field name="risk_assessment" ref="res_risk_assessment_non_residential"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1738,7 +1738,7 @@
             <field name="narration">Risk assessment for owner.occupier.property clients. Apply enhanced compliance monitoring for owner.occupier.property.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_owneroccupierproperty"/>
+            <field name="risk_assessment" ref="res_risk_assessment_owneroccupierproperty"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1751,7 +1751,7 @@
             <field name="narration">Risk assessment for onehome clients. Apply enhanced compliance monitoring for onehome.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_onehome"/>
+            <field name="risk_assessment" ref="res_risk_assessment_onehome"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1764,7 +1764,7 @@
             <field name="narration">Risk assessment for estate developer clients. Apply enhanced compliance monitoring for estate developer.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_estate_developer"/>
+            <field name="risk_assessment" ref="res_risk_assessment_estate_developer"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1777,7 +1777,7 @@
             <field name="narration">Risk assessment for campaign account clients. Apply enhanced compliance monitoring for campaign account.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_campaign_account"/>
+            <field name="risk_assessment" ref="res_risk_assessment_campaign_account"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1790,7 +1790,7 @@
             <field name="narration">Risk assessment for political party clients. Apply enhanced compliance monitoring for political party.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_political_party"/>
+            <field name="risk_assessment" ref="res_risk_assessment_political_party"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1803,7 +1803,7 @@
             <field name="narration">Risk assessment for road transport clients. Apply enhanced compliance monitoring for road transport.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_road_transport"/>
+            <field name="risk_assessment" ref="res_risk_assessment_road_transport"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1816,7 +1816,7 @@
             <field name="narration">Risk assessment for water transport clients. Apply enhanced compliance monitoring for water transport.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_water_transport"/>
+            <field name="risk_assessment" ref="res_risk_assessment_water_transport"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1829,7 +1829,7 @@
             <field name="narration">Risk assessment for air transport clients. Apply enhanced compliance monitoring for air transport.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_air_transport"/>
+            <field name="risk_assessment" ref="res_risk_assessment_air_transport"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1842,7 +1842,7 @@
             <field name="narration">Risk assessment for warehouse n support act for trans. clients. Apply enhanced compliance monitoring for warehouse n support act for trans..</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_warehouse_n_support_act_for_trans"/>
+            <field name="risk_assessment" ref="res_risk_assessment_warehouse_n_support_act_for_trans"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1855,7 +1855,7 @@
             <field name="narration">Risk assessment for postal and courier activities clients. Apply enhanced compliance monitoring for postal and courier activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_postal_and_courier_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_postal_and_courier_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1868,7 +1868,7 @@
             <field name="narration">Risk assessment for rail transport clients. Apply enhanced compliance monitoring for rail transport.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_rail_transport"/>
+            <field name="risk_assessment" ref="res_risk_assessment_rail_transport"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1881,7 +1881,7 @@
             <field name="narration">Risk assessment for transportation &amp; storage-individual clients. Apply enhanced compliance monitoring for transportation &amp; storage-individual.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_transportation_and_storage-individual"/>
+            <field name="risk_assessment" ref="res_risk_assessment_transportation_and_storage-individual"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1894,7 +1894,7 @@
             <field name="narration">Risk assessment for water col., treatment and supply clients. Apply enhanced compliance monitoring for water col., treatment and supply.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_water_col_treatment_and_supply"/>
+            <field name="risk_assessment" ref="res_risk_assessment_water_col_treatment_and_supply"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1907,7 +1907,7 @@
             <field name="narration">Risk assessment for sewerage clients. Apply enhanced compliance monitoring for sewerage.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_sewerage"/>
+            <field name="risk_assessment" ref="res_risk_assessment_sewerage"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1920,7 +1920,7 @@
             <field name="narration">Risk assessment for waste, treatmt n dispo act mat reco clients. Apply enhanced compliance monitoring for waste, treatmt n dispo act mat reco.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_waste_treatmt_n_dispo_act_mat_reco"/>
+            <field name="risk_assessment" ref="res_risk_assessment_waste_treatmt_n_dispo_act_mat_reco"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1933,7 +1933,7 @@
             <field name="narration">Risk assessment for remediatn act n oth waste mgt serv clients. Apply enhanced compliance monitoring for remediatn act n oth waste mgt serv.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_remediatn_act_n_oth_waste_mgt_serv"/>
+            <field name="risk_assessment" ref="res_risk_assessment_remediatn_act_n_oth_waste_mgt_serv"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1946,7 +1946,7 @@
             <field name="narration">Risk assessment for commercial bank clients. Apply enhanced compliance monitoring for commercial bank.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_commercial_bank"/>
+            <field name="risk_assessment" ref="res_risk_assessment_commercial_bank"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1959,7 +1959,7 @@
             <field name="narration">Risk assessment for microfinance bank clients. Apply enhanced compliance monitoring for microfinance bank.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_microfinance_bank"/>
+            <field name="risk_assessment" ref="res_risk_assessment_microfinance_bank"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1972,7 +1972,7 @@
             <field name="narration">Risk assessment for development bank clients. Apply enhanced compliance monitoring for development bank.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_development_bank"/>
+            <field name="risk_assessment" ref="res_risk_assessment_development_bank"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1985,7 +1985,7 @@
             <field name="narration">Risk assessment for asset management clients. Apply enhanced compliance monitoring for asset management.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_asset_management"/>
+            <field name="risk_assessment" ref="res_risk_assessment_asset_management"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -1998,7 +1998,7 @@
             <field name="narration">Risk assessment for mortgage institutions clients. Apply enhanced compliance monitoring for mortgage institutions.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_mortgage_institutions"/>
+            <field name="risk_assessment" ref="res_risk_assessment_mortgage_institutions"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2011,7 +2011,7 @@
             <field name="narration">Risk assessment for insurance companies clients. Apply enhanced compliance monitoring for insurance companies.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_insurance_companies"/>
+            <field name="risk_assessment" ref="res_risk_assessment_insurance_companies"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2024,7 +2024,7 @@
             <field name="narration">Risk assessment for pension fund custodians clients. Apply enhanced compliance monitoring for pension fund custodians.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_pension_fund_custodians"/>
+            <field name="risk_assessment" ref="res_risk_assessment_pension_fund_custodians"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2037,7 +2037,7 @@
             <field name="narration">Risk assessment for pension fund administrators clients. Apply enhanced compliance monitoring for pension fund administrators.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_pension_fund_administrators"/>
+            <field name="risk_assessment" ref="res_risk_assessment_pension_fund_administrators"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2050,7 +2050,7 @@
             <field name="narration">Risk assessment for stock broking firms clients. Apply enhanced compliance monitoring for stock broking firms.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_stock_broking_firms"/>
+            <field name="risk_assessment" ref="res_risk_assessment_stock_broking_firms"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2063,7 +2063,7 @@
             <field name="narration">Risk assessment for other financial institutions clients. Apply enhanced compliance monitoring for other financial institutions.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_other_financial_institutions"/>
+            <field name="risk_assessment" ref="res_risk_assessment_other_financial_institutions"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2076,7 +2076,7 @@
             <field name="narration">Risk assessment for investment banks clients. Apply enhanced compliance monitoring for investment banks.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_investment_banks"/>
+            <field name="risk_assessment" ref="res_risk_assessment_investment_banks"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2089,7 +2089,7 @@
             <field name="narration">Risk assessment for bdc, curr dealers n money transmters clients. Apply enhanced compliance monitoring for bdc, curr dealers n money transmters.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_bdc_curr_dealers_n_money_transmters"/>
+            <field name="risk_assessment" ref="res_risk_assessment_bdc_curr_dealers_n_money_transmters"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2102,7 +2102,7 @@
             <field name="narration">Risk assessment for investment broker clients. Apply enhanced compliance monitoring for investment broker.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_investment_broker"/>
+            <field name="risk_assessment" ref="res_risk_assessment_investment_broker"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2115,7 +2115,7 @@
             <field name="narration">Risk assessment for deposit broker clients. Apply enhanced compliance monitoring for deposit broker.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_deposit_broker"/>
+            <field name="risk_assessment" ref="res_risk_assessment_deposit_broker"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2128,7 +2128,7 @@
             <field name="narration">Risk assessment for portfolio mgr n admin accounts clients. Apply enhanced compliance monitoring for portfolio mgr n admin accounts.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_portfolio_mgr_n_admin_accounts"/>
+            <field name="risk_assessment" ref="res_risk_assessment_portfolio_mgr_n_admin_accounts"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2141,7 +2141,7 @@
             <field name="narration">Risk assessment for store value cards clients. Apply enhanced compliance monitoring for store value cards.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_store_value_cards"/>
+            <field name="risk_assessment" ref="res_risk_assessment_store_value_cards"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2154,7 +2154,7 @@
             <field name="narration">Risk assessment for central bank clients. Apply enhanced compliance monitoring for central bank.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_central_bank"/>
+            <field name="risk_assessment" ref="res_risk_assessment_central_bank"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2167,7 +2167,7 @@
             <field name="narration">Risk assessment for agent banking clients. Apply enhanced compliance monitoring for agent banking.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_agent_banking"/>
+            <field name="risk_assessment" ref="res_risk_assessment_agent_banking"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2180,7 +2180,7 @@
             <field name="narration">Risk assessment for fintech clients. Apply enhanced compliance monitoring for fintech.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_fintech"/>
+            <field name="risk_assessment" ref="res_risk_assessment_fintech"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2193,7 +2193,7 @@
             <field name="narration">Risk assessment for virtual asset dealers clients. Apply enhanced compliance monitoring for virtual asset dealers.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_virtual_asset_dealers"/>
+            <field name="risk_assessment" ref="res_risk_assessment_virtual_asset_dealers"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2206,7 +2206,7 @@
             <field name="narration">Risk assessment for forex dealers and remittance servic clients. Apply enhanced compliance monitoring for forex dealers and remittance servic.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_forex_dealers_and_remittance_servic"/>
+            <field name="risk_assessment" ref="res_risk_assessment_forex_dealers_and_remittance_servic"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2219,7 +2219,7 @@
             <field name="narration">Risk assessment for cryptocurrency dealer clients. Apply enhanced compliance monitoring for cryptocurrency dealer.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cryptocurrency_dealer"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cryptocurrency_dealer"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2232,7 +2232,7 @@
             <field name="narration">Risk assessment for cross border banking and rlshps clients. Apply enhanced compliance monitoring for cross border banking and rlshps.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cross_border_banking_and_rlshps"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cross_border_banking_and_rlshps"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2245,7 +2245,7 @@
             <field name="narration">Risk assessment for creative, arts n entertainment act clients. Apply enhanced compliance monitoring for creative, arts n entertainment act.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_creative_arts_n_entertainment_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_creative_arts_n_entertainment_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2258,7 +2258,7 @@
             <field name="narration">Risk assessment for library, arch, museum n cutural act clients. Apply enhanced compliance monitoring for library, arch, museum n cutural act.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_library_arch_museum_n_cutural_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_library_arch_museum_n_cutural_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2271,7 +2271,7 @@
             <field name="narration">Risk assessment for gambling and betting activities clients. Apply enhanced compliance monitoring for gambling and betting activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_gambling_and_betting_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_gambling_and_betting_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2284,7 +2284,7 @@
             <field name="narration">Risk assessment for sports n amusement n recreatn act clients. Apply enhanced compliance monitoring for sports n amusement n recreatn act.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_sports_n_amusement_n_recreatn_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_sports_n_amusement_n_recreatn_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2297,7 +2297,7 @@
             <field name="narration">Risk assessment for art and artique dealers clients. Apply enhanced compliance monitoring for art and artique dealers.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_art_and_artique_dealers"/>
+            <field name="risk_assessment" ref="res_risk_assessment_art_and_artique_dealers"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2310,7 +2310,7 @@
             <field name="narration">Risk assessment for hospital &amp; clinics clients. Apply enhanced compliance monitoring for hospital &amp; clinics.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_hospital_and_clinics"/>
+            <field name="risk_assessment" ref="res_risk_assessment_hospital_and_clinics"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2323,7 +2323,7 @@
             <field name="narration">Risk assessment for pharmaceutical (retail) clients. Apply enhanced compliance monitoring for pharmaceutical (retail).</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_pharmaceutical_retail"/>
+            <field name="risk_assessment" ref="res_risk_assessment_pharmaceutical_retail"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2336,7 +2336,7 @@
             <field name="narration">Risk assessment for pharmaceutical (import &amp; dist) clients. Apply enhanced compliance monitoring for pharmaceutical (import &amp; dist).</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_pharmaceutical_import_and_dist"/>
+            <field name="risk_assessment" ref="res_risk_assessment_pharmaceutical_import_and_dist"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2349,7 +2349,7 @@
             <field name="narration">Risk assessment for diagnostics &amp; laboratories clients. Apply enhanced compliance monitoring for diagnostics &amp; laboratories.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_diagnostics_and_laboratories"/>
+            <field name="risk_assessment" ref="res_risk_assessment_diagnostics_and_laboratories"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2362,7 +2362,7 @@
             <field name="narration">Risk assessment for health equip manufacturing/supplies clients. Apply enhanced compliance monitoring for health equip manufacturing/supplies.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_health_equip_manufacturing_supplies"/>
+            <field name="risk_assessment" ref="res_risk_assessment_health_equip_manufacturing_supplies"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2375,7 +2375,7 @@
             <field name="narration">Risk assessment for health practitioners clients. Apply enhanced compliance monitoring for health practitioners.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_health_practitioners"/>
+            <field name="risk_assessment" ref="res_risk_assessment_health_practitioners"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2388,7 +2388,7 @@
             <field name="narration">Risk assessment for health association/unions/boards clients. Apply enhanced compliance monitoring for health association/unions/boards.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_health_association_unions_boards"/>
+            <field name="risk_assessment" ref="res_risk_assessment_health_association_unions_boards"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2401,7 +2401,7 @@
             <field name="narration">Risk assessment for health financing/hmos clients. Apply enhanced compliance monitoring for health financing/hmos.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_health_financing_hmos"/>
+            <field name="risk_assessment" ref="res_risk_assessment_health_financing_hmos"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2414,7 +2414,7 @@
             <field name="narration">Risk assessment for health consultants clients. Apply enhanced compliance monitoring for health consultants.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_health_consultants"/>
+            <field name="risk_assessment" ref="res_risk_assessment_health_consultants"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2427,7 +2427,7 @@
             <field name="narration">Risk assessment for health - government clients. Apply enhanced compliance monitoring for health - government.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_health_-_government"/>
+            <field name="risk_assessment" ref="res_risk_assessment_health_-_government"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2440,7 +2440,7 @@
             <field name="narration">Risk assessment for health - individual clients. Apply enhanced compliance monitoring for health - individual.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_health_-_individual"/>
+            <field name="risk_assessment" ref="res_risk_assessment_health_-_individual"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2453,7 +2453,7 @@
             <field name="narration">Risk assessment for technical/business advisory clients. Apply enhanced compliance monitoring for technical/business advisory.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_technical_business_advisory"/>
+            <field name="risk_assessment" ref="res_risk_assessment_technical_business_advisory"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2466,7 +2466,7 @@
             <field name="narration">Risk assessment for embassy/high commission clients. Apply enhanced compliance monitoring for embassy/high commission.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_embassy_high_commission"/>
+            <field name="risk_assessment" ref="res_risk_assessment_embassy_high_commission"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2479,7 +2479,7 @@
             <field name="narration">Risk assessment for solar energy clients. Apply enhanced compliance monitoring for solar energy.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_solar_energy"/>
+            <field name="risk_assessment" ref="res_risk_assessment_solar_energy"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2492,7 +2492,7 @@
             <field name="narration">Risk assessment for biomass energy clients. Apply enhanced compliance monitoring for biomass energy.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_biomass_energy"/>
+            <field name="risk_assessment" ref="res_risk_assessment_biomass_energy"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2505,7 +2505,7 @@
             <field name="narration">Risk assessment for geothermal energy clients. Apply enhanced compliance monitoring for geothermal energy.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_geothermal_energy"/>
+            <field name="risk_assessment" ref="res_risk_assessment_geothermal_energy"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2518,7 +2518,7 @@
             <field name="narration">Risk assessment for wind clients. Apply enhanced compliance monitoring for wind.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_wind"/>
+            <field name="risk_assessment" ref="res_risk_assessment_wind"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2531,7 +2531,7 @@
             <field name="narration">Risk assessment for captive markets clients. Apply enhanced compliance monitoring for captive markets.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_captive_markets"/>
+            <field name="risk_assessment" ref="res_risk_assessment_captive_markets"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2544,7 +2544,7 @@
             <field name="narration">Risk assessment for act of xtrateritorial org n bodies clients. Apply enhanced compliance monitoring for act of xtrateritorial org n bodies.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_act_of_xtrateritorial_org_n_bodies"/>
+            <field name="risk_assessment" ref="res_risk_assessment_act_of_xtrateritorial_org_n_bodies"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2557,7 +2557,7 @@
             <field name="narration">Risk assessment for rental and leasing activities clients. Apply enhanced compliance monitoring for rental and leasing activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_rental_and_leasing_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_rental_and_leasing_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2570,7 +2570,7 @@
             <field name="narration">Risk assessment for employment activities clients. Apply enhanced compliance monitoring for employment activities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_employment_activities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_employment_activities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2583,7 +2583,7 @@
             <field name="narration">Risk assessment for travel ag, tour oper, reservatn serv clients. Apply enhanced compliance monitoring for travel ag, tour oper, reservatn serv.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_travel_ag_tour_oper_reservatn_serv"/>
+            <field name="risk_assessment" ref="res_risk_assessment_travel_ag_tour_oper_reservatn_serv"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2596,7 +2596,7 @@
             <field name="narration">Risk assessment for security and investigation act. clients. Apply enhanced compliance monitoring for security and investigation act..</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_security_and_investigation_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_security_and_investigation_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2609,7 +2609,7 @@
             <field name="narration">Risk assessment for servs to buildings n landscape act clients. Apply enhanced compliance monitoring for servs to buildings n landscape act.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_servs_to_buildings_n_landscape_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_servs_to_buildings_n_landscape_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2622,7 +2622,7 @@
             <field name="narration">Risk assessment for office admin n business support act clients. Apply enhanced compliance monitoring for office admin n business support act.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_office_admin_n_business_support_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_office_admin_n_business_support_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2635,7 +2635,7 @@
             <field name="narration">Risk assessment for tourism clients. Apply enhanced compliance monitoring for tourism.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_tourism"/>
+            <field name="risk_assessment" ref="res_risk_assessment_tourism"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2648,7 +2648,7 @@
             <field name="narration">Risk assessment for workplace banking clients. Apply enhanced compliance monitoring for workplace banking.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_workplace_banking"/>
+            <field name="risk_assessment" ref="res_risk_assessment_workplace_banking"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2661,7 +2661,7 @@
             <field name="narration">Risk assessment for crop production clients. Apply enhanced compliance monitoring for crop production.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_crop_production"/>
+            <field name="risk_assessment" ref="res_risk_assessment_crop_production"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2674,7 +2674,7 @@
             <field name="narration">Risk assessment for poultry and livestock clients. Apply enhanced compliance monitoring for poultry and livestock.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_poultry_and_livestock"/>
+            <field name="risk_assessment" ref="res_risk_assessment_poultry_and_livestock"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2687,7 +2687,7 @@
             <field name="narration">Risk assessment for fishing clients. Apply enhanced compliance monitoring for fishing.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_fishing"/>
+            <field name="risk_assessment" ref="res_risk_assessment_fishing"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2700,7 +2700,7 @@
             <field name="narration">Risk assessment for plantation clients. Apply enhanced compliance monitoring for plantation.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_plantation"/>
+            <field name="risk_assessment" ref="res_risk_assessment_plantation"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2713,7 +2713,7 @@
             <field name="narration">Risk assessment for agro services clients. Apply enhanced compliance monitoring for agro services.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_agro_services"/>
+            <field name="risk_assessment" ref="res_risk_assessment_agro_services"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2726,7 +2726,7 @@
             <field name="narration">Risk assessment for cash crop eg cotton, cocoa, rubber clients. Apply enhanced compliance monitoring for cash crop eg cotton, cocoa, rubber.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cash_crop_eg_cotton_cocoa_rubber"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cash_crop_eg_cotton_cocoa_rubber"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2739,7 +2739,7 @@
             <field name="narration">Risk assessment for forestry clients. Apply enhanced compliance monitoring for forestry.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_forestry"/>
+            <field name="risk_assessment" ref="res_risk_assessment_forestry"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2752,7 +2752,7 @@
             <field name="narration">Risk assessment for oth.food crop e.g tuber, citrus, veg clients. Apply enhanced compliance monitoring for oth.food crop e.g tuber, citrus, veg.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_othfood_crop_eg_tuber_citrus_veg"/>
+            <field name="risk_assessment" ref="res_risk_assessment_othfood_crop_eg_tuber_citrus_veg"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2765,7 +2765,7 @@
             <field name="narration">Risk assessment for food crops, grains clients. Apply enhanced compliance monitoring for food crops, grains.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_food_crops_grains"/>
+            <field name="risk_assessment" ref="res_risk_assessment_food_crops_grains"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2778,7 +2778,7 @@
             <field name="narration">Risk assessment for agriculture - individual clients. Apply enhanced compliance monitoring for agriculture - individual.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_agriculture_-_individual"/>
+            <field name="risk_assessment" ref="res_risk_assessment_agriculture_-_individual"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2791,7 +2791,7 @@
             <field name="narration">Risk assessment for dealers in mechanized farming clients. Apply enhanced compliance monitoring for dealers in mechanized farming.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_dealers_in_mechanized_farming"/>
+            <field name="risk_assessment" ref="res_risk_assessment_dealers_in_mechanized_farming"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2804,7 +2804,7 @@
             <field name="narration">Risk assessment for dealers mechanized farming &amp; equip clients. Apply enhanced compliance monitoring for dealers mechanized farming &amp; equip.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_dealers_mechanized_farming_and_equip"/>
+            <field name="risk_assessment" ref="res_risk_assessment_dealers_mechanized_farming_and_equip"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2817,7 +2817,7 @@
             <field name="narration">Risk assessment for margin lending clients. Apply enhanced compliance monitoring for margin lending.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_margin_lending"/>
+            <field name="risk_assessment" ref="res_risk_assessment_margin_lending"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2830,7 +2830,7 @@
             <field name="narration">Risk assessment for proprietary trading clients. Apply enhanced compliance monitoring for proprietary trading.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_proprietary_trading"/>
+            <field name="risk_assessment" ref="res_risk_assessment_proprietary_trading"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2843,7 +2843,7 @@
             <field name="narration">Risk assessment for share loans clients. Apply enhanced compliance monitoring for share loans.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_share_loans"/>
+            <field name="risk_assessment" ref="res_risk_assessment_share_loans"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2856,7 +2856,7 @@
             <field name="narration">Risk assessment for share underwriting clients. Apply enhanced compliance monitoring for share underwriting.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_share_underwriting"/>
+            <field name="risk_assessment" ref="res_risk_assessment_share_underwriting"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2869,7 +2869,7 @@
             <field name="narration">Risk assessment for bonds, debt obligations clients. Apply enhanced compliance monitoring for bonds, debt obligations.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_bonds_debt_obligations"/>
+            <field name="risk_assessment" ref="res_risk_assessment_bonds_debt_obligations"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2882,7 +2882,7 @@
             <field name="narration">Risk assessment for civil engineering clients. Apply enhanced compliance monitoring for civil engineering.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_civil_engineering"/>
+            <field name="risk_assessment" ref="res_risk_assessment_civil_engineering"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2895,7 +2895,7 @@
             <field name="narration">Risk assessment for specialized construction act. clients. Apply enhanced compliance monitoring for specialized construction act..</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_specialized_construction_act"/>
+            <field name="risk_assessment" ref="res_risk_assessment_specialized_construction_act"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2908,7 +2908,7 @@
             <field name="narration">Risk assessment for pre primary and primary education clients. Apply enhanced compliance monitoring for pre primary and primary education.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_pre_primary_and_primary_education"/>
+            <field name="risk_assessment" ref="res_risk_assessment_pre_primary_and_primary_education"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2921,7 +2921,7 @@
             <field name="narration">Risk assessment for post primary education clients. Apply enhanced compliance monitoring for post primary education.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_post_primary_education"/>
+            <field name="risk_assessment" ref="res_risk_assessment_post_primary_education"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2934,7 +2934,7 @@
             <field name="narration">Risk assessment for tertiary education clients. Apply enhanced compliance monitoring for tertiary education.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_tertiary_education"/>
+            <field name="risk_assessment" ref="res_risk_assessment_tertiary_education"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2947,7 +2947,7 @@
             <field name="narration">Risk assessment for other education clients. Apply enhanced compliance monitoring for other education.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_other_education"/>
+            <field name="risk_assessment" ref="res_risk_assessment_other_education"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2960,7 +2960,7 @@
             <field name="narration">Risk assessment for educational support services clients. Apply enhanced compliance monitoring for educational support services.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_educational_support_services"/>
+            <field name="risk_assessment" ref="res_risk_assessment_educational_support_services"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2973,7 +2973,7 @@
             <field name="narration">Risk assessment for edu-swess clients. Apply enhanced compliance monitoring for edu-swess.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_edu-swess"/>
+            <field name="risk_assessment" ref="res_risk_assessment_edu-swess"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2986,7 +2986,7 @@
             <field name="narration">Risk assessment for education - individual clients. Apply enhanced compliance monitoring for education - individual.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_education_-_individual"/>
+            <field name="risk_assessment" ref="res_risk_assessment_education_-_individual"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -2999,7 +2999,7 @@
             <field name="narration">Risk assessment for religious (churches) clients. Apply enhanced compliance monitoring for religious (churches).</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_religious_churches"/>
+            <field name="risk_assessment" ref="res_risk_assessment_religious_churches"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3012,7 +3012,7 @@
             <field name="narration">Risk assessment for religious (mosques) clients. Apply enhanced compliance monitoring for religious (mosques).</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_religious_mosques"/>
+            <field name="risk_assessment" ref="res_risk_assessment_religious_mosques"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3025,7 +3025,7 @@
             <field name="narration">Risk assessment for religious (others) clients. Apply enhanced compliance monitoring for religious (others).</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_religious_others"/>
+            <field name="risk_assessment" ref="res_risk_assessment_religious_others"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3038,7 +3038,7 @@
             <field name="narration">Risk assessment for non governmental organisations clients. Apply enhanced compliance monitoring for non governmental organisations.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_non_governmental_organisations"/>
+            <field name="risk_assessment" ref="res_risk_assessment_non_governmental_organisations"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3051,7 +3051,7 @@
             <field name="narration">Risk assessment for hotel and leisure clients. Apply enhanced compliance monitoring for hotel and leisure.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_hotel_and_leisure"/>
+            <field name="risk_assessment" ref="res_risk_assessment_hotel_and_leisure"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3064,7 +3064,7 @@
             <field name="narration">Risk assessment for individual . clergy clients. Apply enhanced compliance monitoring for individual . clergy.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_individual__clergy"/>
+            <field name="risk_assessment" ref="res_risk_assessment_individual__clergy"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3077,7 +3077,7 @@
             <field name="narration">Risk assessment for individual . entrepreneur clients. Apply enhanced compliance monitoring for individual . entrepreneur.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_individual__entrepreneur"/>
+            <field name="risk_assessment" ref="res_risk_assessment_individual__entrepreneur"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3090,7 +3090,7 @@
             <field name="narration">Risk assessment for ind . private sector employee clients. Apply enhanced compliance monitoring for ind . private sector employee.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_ind__private_sector_employee"/>
+            <field name="risk_assessment" ref="res_risk_assessment_ind__private_sector_employee"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3103,7 +3103,7 @@
             <field name="narration">Risk assessment for ind . public sector employee clients. Apply enhanced compliance monitoring for ind . public sector employee.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_ind__public_sector_employee"/>
+            <field name="risk_assessment" ref="res_risk_assessment_ind__public_sector_employee"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3116,7 +3116,7 @@
             <field name="narration">Risk assessment for individual . self employed clients. Apply enhanced compliance monitoring for individual . self employed.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_individual__self_employed"/>
+            <field name="risk_assessment" ref="res_risk_assessment_individual__self_employed"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3129,7 +3129,7 @@
             <field name="narration">Risk assessment for individual . military, police clients. Apply enhanced compliance monitoring for individual . military, police.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_individual__military_police"/>
+            <field name="risk_assessment" ref="res_risk_assessment_individual__military_police"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3142,7 +3142,7 @@
             <field name="narration">Risk assessment for individual . student, minor clients. Apply enhanced compliance monitoring for individual . student, minor.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_individual__student_minor"/>
+            <field name="risk_assessment" ref="res_risk_assessment_individual__student_minor"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3155,7 +3155,7 @@
             <field name="narration">Risk assessment for special purpose entities clients. Apply enhanced compliance monitoring for special purpose entities.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_special_purpose_entities"/>
+            <field name="risk_assessment" ref="res_risk_assessment_special_purpose_entities"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3168,7 +3168,7 @@
             <field name="narration">Risk assessment for nominees clients. Apply enhanced compliance monitoring for nominees.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_nominees"/>
+            <field name="risk_assessment" ref="res_risk_assessment_nominees"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3181,7 +3181,7 @@
             <field name="narration">Risk assessment for wholesale merchant clients. Apply enhanced compliance monitoring for wholesale merchant.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_wholesale_merchant"/>
+            <field name="risk_assessment" ref="res_risk_assessment_wholesale_merchant"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3194,7 +3194,7 @@
             <field name="narration">Risk assessment for renewable energy - individual clients. Apply enhanced compliance monitoring for renewable energy - individual.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_renewable_energy_-_individual"/>
+            <field name="risk_assessment" ref="res_risk_assessment_renewable_energy_-_individual"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3207,7 +3207,7 @@
             <field name="narration">Risk assessment for cooperatives clients. Apply enhanced compliance monitoring for cooperatives.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cooperatives"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cooperatives"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3220,7 +3220,7 @@
             <field name="narration">Risk assessment for residential estate cooperatives clients. Apply enhanced compliance monitoring for residential estate cooperatives.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_residential_estate_cooperatives"/>
+            <field name="risk_assessment" ref="res_risk_assessment_residential_estate_cooperatives"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3233,7 +3233,7 @@
             <field name="narration">Risk assessment for associations/union registered clients. Apply enhanced compliance monitoring for associations/union registered.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_associations_union_registered"/>
+            <field name="risk_assessment" ref="res_risk_assessment_associations_union_registered"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3246,7 +3246,7 @@
             <field name="narration">Risk assessment for other ass/unions not registered clients. Apply enhanced compliance monitoring for other ass/unions not registered.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_other_ass_unions_not_registered"/>
+            <field name="risk_assessment" ref="res_risk_assessment_other_ass_unions_not_registered"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3259,7 +3259,7 @@
             <field name="narration">Risk assessment for cooperative individual clients. Apply enhanced compliance monitoring for cooperative individual.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cooperative_individual"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cooperative_individual"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3272,7 +3272,7 @@
             <field name="narration">Risk assessment for cooperative societies clients. Apply enhanced compliance monitoring for cooperative societies.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cooperative_societies"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cooperative_societies"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3285,7 +3285,7 @@
             <field name="narration">Risk assessment for fashion business entrepreneur clients. Apply enhanced compliance monitoring for fashion business entrepreneur.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_fashion_business_entrepreneur"/>
+            <field name="risk_assessment" ref="res_risk_assessment_fashion_business_entrepreneur"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3298,7 +3298,7 @@
             <field name="narration">Risk assessment for fashion school clients. Apply enhanced compliance monitoring for fashion school.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_fashion_school"/>
+            <field name="risk_assessment" ref="res_risk_assessment_fashion_school"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3311,7 +3311,7 @@
             <field name="narration">Risk assessment for accessories making clients. Apply enhanced compliance monitoring for accessories making.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_accessories_making"/>
+            <field name="risk_assessment" ref="res_risk_assessment_accessories_making"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3324,7 +3324,7 @@
             <field name="narration">Risk assessment for fashion services clients. Apply enhanced compliance monitoring for fashion services.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_fashion_services"/>
+            <field name="risk_assessment" ref="res_risk_assessment_fashion_services"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3337,7 +3337,7 @@
             <field name="narration">Risk assessment for vocational craft clients. Apply enhanced compliance monitoring for vocational craft.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_vocational_craft"/>
+            <field name="risk_assessment" ref="res_risk_assessment_vocational_craft"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3350,7 +3350,7 @@
             <field name="narration">Risk assessment for other state and private agencies clients. Apply enhanced compliance monitoring for other state and private agencies.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_other_state_and_private_agencies"/>
+            <field name="risk_assessment" ref="res_risk_assessment_other_state_and_private_agencies"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3363,7 +3363,7 @@
             <field name="narration">Risk assessment for distributors clients. Apply enhanced compliance monitoring for distributors.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_distributors"/>
+            <field name="risk_assessment" ref="res_risk_assessment_distributors"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3376,7 +3376,7 @@
             <field name="narration">Risk assessment for consumers clients. Apply enhanced compliance monitoring for consumers.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_consumers"/>
+            <field name="risk_assessment" ref="res_risk_assessment_consumers"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3389,7 +3389,7 @@
             <field name="narration">Risk assessment for suppliers clients. Apply enhanced compliance monitoring for suppliers.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_suppliers"/>
+            <field name="risk_assessment" ref="res_risk_assessment_suppliers"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3402,7 +3402,7 @@
             <field name="narration">Risk assessment for value chain (staff) clients. Apply enhanced compliance monitoring for value chain (staff).</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_value_chain_staff"/>
+            <field name="risk_assessment" ref="res_risk_assessment_value_chain_staff"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3415,7 +3415,7 @@
             <field name="narration">Risk assessment for nigerian army clients. Apply enhanced compliance monitoring for nigerian army.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_nigerian_army"/>
+            <field name="risk_assessment" ref="res_risk_assessment_nigerian_army"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3428,7 +3428,7 @@
             <field name="narration">Risk assessment for navy clients. Apply enhanced compliance monitoring for navy.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_navy"/>
+            <field name="risk_assessment" ref="res_risk_assessment_navy"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3441,7 +3441,7 @@
             <field name="narration">Risk assessment for airforce clients. Apply enhanced compliance monitoring for airforce.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_airforce"/>
+            <field name="risk_assessment" ref="res_risk_assessment_airforce"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3454,7 +3454,7 @@
             <field name="narration">Risk assessment for police clients. Apply enhanced compliance monitoring for police.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_police"/>
+            <field name="risk_assessment" ref="res_risk_assessment_police"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3467,7 +3467,7 @@
             <field name="narration">Risk assessment for department of state services(dss) clients. Apply enhanced compliance monitoring for department of state services(dss).</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_department_of_state_servicesdss"/>
+            <field name="risk_assessment" ref="res_risk_assessment_department_of_state_servicesdss"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3480,7 +3480,7 @@
             <field name="narration">Risk assessment for nscdc clients. Apply enhanced compliance monitoring for nscdc.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_nscdc"/>
+            <field name="risk_assessment" ref="res_risk_assessment_nscdc"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3493,7 +3493,7 @@
             <field name="narration">Risk assessment for frsc clients. Apply enhanced compliance monitoring for frsc.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_frsc"/>
+            <field name="risk_assessment" ref="res_risk_assessment_frsc"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3506,7 +3506,7 @@
             <field name="narration">Risk assessment for customs clients. Apply enhanced compliance monitoring for customs.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_customs"/>
+            <field name="risk_assessment" ref="res_risk_assessment_customs"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3519,7 +3519,7 @@
             <field name="narration">Risk assessment for immigration clients. Apply enhanced compliance monitoring for immigration.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_immigration"/>
+            <field name="risk_assessment" ref="res_risk_assessment_immigration"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3532,7 +3532,7 @@
             <field name="narration">Risk assessment for prison services clients. Apply enhanced compliance monitoring for prison services.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_prison_services"/>
+            <field name="risk_assessment" ref="res_risk_assessment_prison_services"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3545,7 +3545,7 @@
             <field name="narration">Risk assessment for efcc clients. Apply enhanced compliance monitoring for efcc.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_efcc"/>
+            <field name="risk_assessment" ref="res_risk_assessment_efcc"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3558,7 +3558,7 @@
             <field name="narration">Risk assessment for federal fire service clients. Apply enhanced compliance monitoring for federal fire service.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_federal_fire_service"/>
+            <field name="risk_assessment" ref="res_risk_assessment_federal_fire_service"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3571,7 +3571,7 @@
             <field name="narration">Risk assessment for ndlea clients. Apply enhanced compliance monitoring for ndlea.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_ndlea"/>
+            <field name="risk_assessment" ref="res_risk_assessment_ndlea"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3584,7 +3584,7 @@
             <field name="narration">Risk assessment for nigerian intelligence agency clients. Apply enhanced compliance monitoring for nigerian intelligence agency.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_nigerian_intelligence_agency"/>
+            <field name="risk_assessment" ref="res_risk_assessment_nigerian_intelligence_agency"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3597,7 +3597,7 @@
             <field name="narration">Risk assessment for directorate military intelligence clients. Apply enhanced compliance monitoring for directorate military intelligence.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_directorate_military_intelligence"/>
+            <field name="risk_assessment" ref="res_risk_assessment_directorate_military_intelligence"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3610,7 +3610,7 @@
             <field name="narration">Risk assessment for icpc clients. Apply enhanced compliance monitoring for icpc.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_icpc"/>
+            <field name="risk_assessment" ref="res_risk_assessment_icpc"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3623,7 +3623,7 @@
             <field name="narration">Risk assessment for manufacturers of military vechicles clients. Apply enhanced compliance monitoring for manufacturers of military vechicles.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_manufacturers_of_military_vechicles"/>
+            <field name="risk_assessment" ref="res_risk_assessment_manufacturers_of_military_vechicles"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3636,7 +3636,7 @@
             <field name="narration">Risk assessment for manufacturers of military amunition clients. Apply enhanced compliance monitoring for manufacturers of military amunition.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_manufacturers_of_military_amunition"/>
+            <field name="risk_assessment" ref="res_risk_assessment_manufacturers_of_military_amunition"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3649,7 +3649,7 @@
             <field name="narration">Risk assessment for religious . churches clients. Apply enhanced compliance monitoring for religious . churches.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_religious__churches"/>
+            <field name="risk_assessment" ref="res_risk_assessment_religious__churches"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3662,7 +3662,7 @@
             <field name="narration">Risk assessment for religious . mosques clients. Apply enhanced compliance monitoring for religious . mosques.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_religious__mosques"/>
+            <field name="risk_assessment" ref="res_risk_assessment_religious__mosques"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3675,7 +3675,7 @@
             <field name="narration">Risk assessment for religious . others clients. Apply enhanced compliance monitoring for religious . others.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_religious__others"/>
+            <field name="risk_assessment" ref="res_risk_assessment_religious__others"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3688,7 +3688,7 @@
             <field name="narration">Risk assessment for co.operative societies clients. Apply enhanced compliance monitoring for co.operative societies.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_cooperative_societies"/>
+            <field name="risk_assessment" ref="res_risk_assessment_cooperative_societies"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>
@@ -3701,7 +3701,7 @@
             <field name="narration">Risk assessment for non.govtal org not for profit org clients. Apply enhanced compliance monitoring for non.govtal org not for profit org.</field>
             <field name="risk_score">5</field>
             <field name="compute_score_from">risk_assessment</field>
-            <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_nongovtal_org_not_for_profit_org"/>
+            <field name="risk_assessment" ref="res_risk_assessment_nongovtal_org_not_for_profit_org"/>
             <field name="use_composite_calculation">True</field>
             <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_24"/>
         </record>

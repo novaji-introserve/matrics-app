@@ -17,7 +17,7 @@ LIMIT 1;</field>
                      <field name="narration">Analysis for customers in South West region</field>
                      <field name="risk_score">1</field>
                      <field name="compute_score_from">risk_assessment</field>
-                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_south_W" />
+                     <field name="risk_assessment" ref="res_risk_assessment_south_W" />
                      <field name="use_composite_calculation">True</field>
                      <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
               </record>
@@ -39,7 +39,7 @@ LIMIT 1;</field>
                      <field name="narration">Analysis for customers in Abuja &amp; North region</field>
                      <field name="risk_score">1</field>
                      <field name="compute_score_from">risk_assessment</field>
-                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_abj" />
+                     <field name="risk_assessment" ref="res_risk_assessment_abj" />
                      <field name="use_composite_calculation">True</field>
                      <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
               </record>
@@ -61,7 +61,7 @@ LIMIT 1;</field>
                      <field name="narration">Analysis for customers in S/South &amp; S/East region</field>
                      <field name="risk_score">1</field>
                      <field name="compute_score_from">risk_assessment</field>
-                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_ss_sw" />
+                     <field name="risk_assessment" ref="res_risk_assessment_ss_sw" />
                      <field name="use_composite_calculation">True</field>
                      <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
               </record>
@@ -81,7 +81,7 @@ LIMIT 1;</field>
                      <field name="narration">Analysis for customers in Abuja region</field>
                      <field name="risk_score">4</field>
                      <field name="compute_score_from">risk_assessment</field>
-                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_abuja" />
+                     <field name="risk_assessment" ref="res_risk_assessment_abuja" />
                      <field name="use_composite_calculation">True</field>
                      <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
               </record>
@@ -101,7 +101,7 @@ LIMIT 1;</field>
                      <field name="narration">Analysis for customers in Lagos region</field>
                      <field name="risk_score">4</field>
                      <field name="compute_score_from">risk_assessment</field>
-                     <field name="risk_assessment" ref="sterling_addons.res_risk_assessment_lagos" />
+                     <field name="risk_assessment" ref="res_risk_assessment_lagos" />
                      <field name="use_composite_calculation">True</field>
                      <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_21" />
               </record>
