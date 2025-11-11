@@ -1,5 +1,5 @@
 <odoo>
-       <data noupdate="1">
+       <data noupdate="0">
               <!-- Jurisdiction Plans -->
 
               <record id="risk_plan_south_w" model="res.compliance.risk.assessment.plan">
