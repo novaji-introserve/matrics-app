@@ -7,25 +7,25 @@ class ColorGenerator:
     """
     
     COLOR_SCHEMES = {
-        "cool_colors": [
+        "cool": [
             "#0077B6", "#30454D", "#030405", "#678187", "#80FFDB",
             "#277A70", "#6930C3", "#5E60CE", "#5390D9", "#4361EE"
         ],
-        "warm_colors": [
+        "warm": [
             "#FF6B00", "#C7AC9B", "#2C5C3F", "#938A5C",
             "#29180E", "#513535", "#654F57", "#FF4D6D",
             "#C1121F", "#FAA307"
         ],
-        "rainbow_colors": [
+        "rainbow": [
             "#FF0000", "#FF7F00", "#FFFF00", "#7FFF00",
             "#00FF00", "#24342C", "#00FFFF", "#3F5871",
             "#0000FF", "#8B00FF"
         ],
-        "brown_colors": [
+        "brown": [
             "#5A3E36", "#7A5C2E", "#A97142", "#C2B280", "#B38B6D",
             "#484744", "#C26448", "#DCA888", "#120D08", "#6B705C"
         ],
-        "default_colors": [
+        "default": [
             "#6B705C", "#B7B7A4", "#A68A64", "#CB997E", "#DDB892",
             "#EDE0D4", "#B08968", "#7F5539", "#9C6644", "#5E503F"
         ]
