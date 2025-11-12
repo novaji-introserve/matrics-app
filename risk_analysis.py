@@ -12,9 +12,12 @@ import configparser
 import multiprocessing
 from datetime import datetime
 from multiprocessing import Pool, cpu_count
+import sys
+
 
 # Default database cnfiguration file path
-DEFAULT_CONFIG_FILE = "/data/odoo/debian/odoo.conf" #path to your .conf file eg odoo.conf
+# path to your .conf file eg odoo.conf
+DEFAULT_CONFIG_FILE = "/data/odoo/debian/odoo.conf"
 
 def setup_logging():
     """Configure logging with rotation based on file size"""
@@ -32,7 +35,9 @@ def setup_logging():
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.FileHandler(log_file, encoding='utf-8'),
+            # logging.FileHandler(log_file, encoding='utf-8'),
+            logging.StreamHandler(sys.stdout),
+
         ]
     )
     return logging.getLogger("__RISK_ASSESSMENT_MV__")

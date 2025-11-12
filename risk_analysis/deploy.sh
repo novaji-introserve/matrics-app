@@ -16,6 +16,7 @@ BINARY_DIR="/usr/local/bin"
 SERVICE_USER="risk-processor"
 CURRENT_DIR=$(pwd)
 BACKUP_DIR="/tmp/risk-analysis-backup-$(date +%s)"
+LOG_FILE="${BACKUP_DIR}/deployment.log"
 
 # Track what was installed for rollback
 INSTALLED_GO=false
@@ -24,25 +25,32 @@ CREATED_USER=false
 CREATED_INSTALL_DIR=false
 INSTALLED_SERVICES=false
 GO_BACKUP_PATH=""
+LAST_COMMAND=""
+CURRENT_COMMAND=""
 
 # Function to print status
 print_status() {
     echo -e "${GREEN}[✓]${NC} $1"
+    echo "[SUCCESS] $(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
 }
 
 print_warning() {
     echo -e "${YELLOW}[!]${NC} $1"
+    echo "[WARNING] $(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
 }
 
 print_error() {
     echo -e "${RED}[✗]${NC} $1"
+    echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
 }
 
 # Rollback function
 rollback() {
-    echo ""
+    echo "" | tee -a "$LOG_FILE"
     print_error "Deployment failed! Rolling back changes..."
-    echo ""
+    print_error "Last command: ${LAST_COMMAND}"
+    print_error "Failed command: ${CURRENT_COMMAND}"
+    echo "" | tee -a "$LOG_FILE"
 
     # Stop and remove services if installed
     if [ "$INSTALLED_SERVICES" = true ]; then
@@ -78,18 +86,30 @@ rollback() {
         rm -rf /usr/local/go
     fi
 
-    # Note: We don't rollback Redis as it might be used by other services
-
-    # Remove backup directory
-    rm -rf "$BACKUP_DIR"
-
     echo ""
     print_error "Rollback completed. System restored to previous state."
+    echo "[COMPLETED] $(date '+%Y-%m-%d %H:%M:%S') - Rollback finished" >> "$LOG_FILE"
     exit 1
 }
 
-# Set trap to call rollback on error
-trap rollback ERR
+# Set trap to call rollback on error with improved error capture
+trap 'LAST_COMMAND=$CURRENT_COMMAND; CURRENT_COMMAND=$BASH_COMMAND; echo "Error on line ${LINENO}: command ${CURRENT_COMMAND} failed with exit code $?"; rollback' ERR
+
+# Function to check for required tools
+check_requirements() {
+    local missing_tools=()
+    for cmd in wget tar systemctl grep sed; do
+        if ! command -v $cmd &>/dev/null; then
+            missing_tools+=($cmd)
+        fi
+    done
+    
+    if [ ${#missing_tools[@]} -gt 0 ]; then
+        print_error "Missing required tools: ${missing_tools[*]}"
+        print_warning "Please install them using: apt-get install ${missing_tools[*]}"
+        exit 1
+    fi
+}
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then
@@ -97,14 +117,20 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Create backup directory and log file
+mkdir -p "$BACKUP_DIR"
+touch "$LOG_FILE"
+echo "[STARTED] $(date '+%Y-%m-%d %H:%M:%S') - Deployment script started" >> "$LOG_FILE"
+
 print_status "Starting deployment process..."
+print_status "Backup directory created at: $BACKUP_DIR"
+print_status "Log file: $LOG_FILE"
 echo ""
 print_warning "Note: This script will rollback all changes if any step fails"
 echo ""
 
-# Create backup directory
-mkdir -p "$BACKUP_DIR"
-print_status "Backup directory created at: $BACKUP_DIR"
+# Check for required tools
+check_requirements
 
 # Step 1: Install Go if not present
 echo ""
@@ -144,7 +170,9 @@ if command -v go &> /dev/null; then
                 echo "export PATH=\$PATH:/usr/local/go/bin" >> /etc/profile
             fi
 
-            export PATH=$PATH:/usr/local/go/bin
+            # Update PATH for current session
+            export PATH=/usr/local/go/bin:$PATH
+            hash -r
             INSTALLED_GO=true
             print_status "Go ${GO_VERSION} installed successfully"
         else
@@ -163,7 +191,9 @@ else
         echo "export PATH=\$PATH:/usr/local/go/bin" >> /etc/profile
     fi
 
-    export PATH=$PATH:/usr/local/go/bin
+    # Update PATH for current session
+    export PATH=/usr/local/go/bin:$PATH
+    hash -r
     INSTALLED_GO=true
     print_status "Go ${GO_VERSION} installed successfully"
 fi
@@ -173,11 +203,33 @@ if ! command -v go &> /dev/null; then
     print_error "Go installation verification failed"
     exit 1
 fi
-print_status "Go version: $(go version)"
+
+# Verify Go version
+go_version=$(go version | awk '{print $3}' | sed 's/go//')
+if [ "$go_version" != "$GO_VERSION" ]; then
+    print_warning "Go version mismatch. Expected ${GO_VERSION}, got ${go_version}"
+    print_warning "This might be due to PATH not being updated in the current shell"
+    print_warning "Using full path to Go binary for builds"
+else
+    print_status "Go version verified: $(go version)"
+fi
 
 # Step 2: Install Redis
 echo ""
 echo -e "${YELLOW}Step 2: Installing Redis 8.2.3${NC}"
+
+# Fix TimescaleDB repository issue before installing Redis
+print_status "Checking for problematic package repositories..."
+if [ -f /etc/apt/sources.list.d/timescaledb.list ]; then
+    print_warning "Found TimescaleDB repository config, checking for issues..."
+    if grep -q "timescale/timescaledb/debian" /etc/apt/sources.list.d/timescaledb.list; then
+        print_status "Fixing TimescaleDB repository configuration..."
+        cp /etc/apt/sources.list.d/timescaledb.list "${BACKUP_DIR}/timescaledb.list.backup"
+        sed -i '/timescale\/timescaledb\/debian/d' /etc/apt/sources.list.d/timescaledb.list
+        print_status "TimescaleDB repository fixed"
+    fi
+fi
+
 if command -v redis-server &> /dev/null; then
     print_warning "Redis is already installed: $(redis-server --version | head -n1)"
     read -p "Do you want to reinstall Redis? (y/N) " -n 1 -r
@@ -185,7 +237,13 @@ if command -v redis-server &> /dev/null; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         if [ -f "${CURRENT_DIR}/install_redis_8_2_3.sh" ]; then
             print_status "Running Redis installation script..."
-            bash "${CURRENT_DIR}/install_redis_8_2_3.sh"
+            if ! bash "${CURRENT_DIR}/install_redis_8_2_3.sh"; then
+                print_warning "Redis installation script failed. Attempting direct installation..."
+                apt-get update -y
+                apt-get install -y redis-server
+                systemctl enable redis
+                systemctl start redis
+            fi
             INSTALLED_REDIS=true
             print_status "Redis installed successfully"
         else
@@ -198,12 +256,35 @@ if command -v redis-server &> /dev/null; then
 else
     if [ -f "${CURRENT_DIR}/install_redis_8_2_3.sh" ]; then
         print_status "Running Redis installation script..."
-        bash "${CURRENT_DIR}/install_redis_8_2_3.sh"
+        if ! bash "${CURRENT_DIR}/install_redis_8_2_3.sh"; then
+            print_warning "Redis installation script failed. Attempting direct installation..."
+            apt-get update -y
+            apt-get install -y redis-server
+            systemctl enable redis
+            systemctl start redis
+        fi
         INSTALLED_REDIS=true
         print_status "Redis installed successfully"
     else
         print_warning "Redis installation script not found at ${CURRENT_DIR}/install_redis_8_2_3.sh"
-        print_warning "Skipping Redis installation. Please install Redis manually."
+        print_warning "Attempting direct Redis installation..."
+        apt-get update -y
+        apt-get install -y redis-server
+        systemctl enable redis
+        systemctl start redis
+        INSTALLED_REDIS=true
+        print_status "Redis installed via package manager"
+    fi
+fi
+
+# Verify Redis is actually running
+if ! systemctl is-active --quiet redis; then
+    print_warning "Redis service is not running. Attempting to start..."
+    systemctl start redis
+    sleep 2
+    if ! systemctl is-active --quiet redis; then
+        print_error "Failed to start Redis service"
+        exit 1
     fi
 fi
 
@@ -300,12 +381,13 @@ if [ -f "/etc/systemd/system/risk-api-server.service" ]; then
     cp /etc/systemd/system/risk-api-server.service "${BACKUP_DIR}/risk-api-server.service.backup"
 fi
 
+# Note: Removed PostgreSQL dependency from the service files
 cat > /etc/systemd/system/risk-processor.service <<EOF
 [Unit]
 Description=Risk Analysis Processor
 Documentation=https://github.com/your-org/risk-analysis
-After=network.target postgresql.service redis.service
-Requires=postgresql.service redis.service
+After=network.target redis.service
+Requires=redis.service
 
 [Service]
 Type=simple
@@ -337,8 +419,8 @@ cat > /etc/systemd/system/risk-api-server.service <<EOF
 [Unit]
 Description=Risk Analysis API Server
 Documentation=https://github.com/your-org/risk-analysis
-After=network.target postgresql.service redis.service
-Requires=postgresql.service redis.service
+After=network.target redis.service
+Requires=redis.service
 
 [Service]
 Type=simple
@@ -455,3 +537,4 @@ echo "  http://localhost:4567 (redirects to Swagger UI)"
 echo "  http://localhost:4567/docs"
 echo ""
 echo -e "${GREEN}Deployment completed successfully!${NC}"
+echo "[COMPLETED] $(date '+%Y-%m-%d %H:%M:%S') - Deployment finished successfully" >> "$LOG_FILE"
