@@ -10,7 +10,7 @@
                     JOIN res_partner_account rp ON rb.id = rp.branch_id
                     GROUP BY rb.id, rb.name
                     ORDER BY account_count DESC
-                    LIMIT 10;
+                    LIMIT 5;
             </field>
             <field name="color_scheme">brown</field>
             <field name="x_axis_field">name</field>
@@ -39,7 +39,7 @@
                     WHERE p.risk_level = 'high'
                     GROUP BY rb.id, rb.name
                     ORDER BY high_risk_accounts DESC
-                    LIMIT 10;
+                    LIMIT 5;
             </field>
             <field name="color_scheme">brown</field>
             <field name="x_axis_field">name</field>
@@ -67,7 +67,7 @@
             JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
             GROUP BY rtsr.id, rtsr.name
             ORDER BY hit_count DESC
-            LIMIT 10;
+            LIMIT 5;
             </field>
             <field name="color_scheme">brown</field>
             <field name="x_axis_field">name</field>

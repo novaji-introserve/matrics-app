@@ -829,6 +829,9 @@
     
     <!-- Menu -->
     <menuitem id="menu_compliance_risk_assessment_plan" action="action_list_risk_assessment_plan" parent="menu_risk_assessment" name="Customer Risk Analysis" groups="group_compliance_compliance_officer,group_compliance_compliance_risk_manager" sequence="100" />
+    <menuitem id="menu_compliance_risk_assessment_control" action="action_risk_assessment_control" parent="menu_risk_assessment" name="Risk Assessment Control" groups="group_compliance_compliance_officer,group_compliance_compliance_risk_manager" sequence="110" />
+    <menuitem id="menu_compliance_risk_assessment_mitigation" action="action_risk_assessment_mitigation" parent="menu_risk_assessment" name="Risk Assessment Mitigation" groups="group_compliance_compliance_officer,group_compliance_compliance_risk_manager" sequence="120" />
+    <menuitem id="menu_compliance_risk_assessment_implication" action="action_risk_assessment_implication" parent="menu_risk_assessment" name="Risk Assessment Implication" groups="group_compliance_compliance_officer,group_compliance_compliance_risk_manager" sequence="130" />
 
 
     <!-- Menu -->

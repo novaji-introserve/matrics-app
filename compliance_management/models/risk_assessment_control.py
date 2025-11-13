@@ -2,7 +2,7 @@
 
 from odoo import models, fields, api
 from datetime import datetime
-
+from odoo.exceptions import ValidationError
 class RiskAssessmentControl(models.Model):
     _name = 'risk.assessment.control'
     _description = 'Risk Assessment Control'
@@ -38,22 +38,108 @@ class RiskAssessmentControl(models.Model):
     ], string='Priority', default='1', tracking=True)
     
     # Effectiveness
-    effectiveness_score = fields.Selection([
-        ('1', 'Not Effective'),
-        ('2', 'Partially Effective'),
-        ('3', 'Mostly Effective'),
-        ('4', 'Effective'),
-        ('5', 'Highly Effective')
-    ], string='Effectiveness Score', tracking=True)
+    effectiveness_score = fields.Integer(
+        string='Effectiveness Score',
+        tracking=True,
+        default=False,
+        help="Score from 0 to 100 (integer percentage)."
+    )
+    effectiveness_score_help = fields.Char(
+        string='Score Help',
+        compute='_compute_effectiveness_score_help',
+        # store=False (default) — no DB storage, computed on-the-fly
+    )
     last_assessment_date = fields.Date('Last Assessment Date', tracking=True)
     
    
     state = fields.Selection([
-        ('draft', 'Draft'),
         ('active', 'Active'),
-        ('under_review', 'Under Review'),
         ('inactive', 'Inactive')
-    ], string='Status', default='draft', tracking=True)
+    ], string='Status', default='active', tracking=True)
     
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')    
    
+
+    def action_set_active(self):
+        self.write({'state': 'active'})
+
+    def action_set_under_review(self):
+        self.write({'state': 'under_review'})
+
+    def action_set_inactive(self):
+        self.write({'state': 'inactive'})
+
+
+    @api.depends('effectiveness_score') 
+    def _compute_effectiveness_score_help(self):
+        # Fetch config once (cached per request)
+        score_config = self.env['res.fcra.score'].sudo().search([], limit=1)
+        if score_config:
+            min_s = int(score_config.min_score)
+            max_s = int(score_config.max_score)
+            help_text = f"Valid range: {min_s} – {max_s} (configured in FCRA settings)"
+        else:
+            help_text = "FCRA score range not configured — contact administrator."
+
+        for rec in self:
+            rec.effectiveness_score_help = help_text
+
+    @api.onchange('effectiveness_score')
+    def _onchange_effectiveness_score(self):
+        # Skip if not set (None/False) or if 0 is likely accidental *and* below min
+        score = self.effectiveness_score
+        if score is False:
+            return  # truly unset
+
+        score_config = self.env['res.fcra.score'].sudo().search([], limit=1)
+        if not score_config:
+            return {'warning': {
+                'title': "Missing Configuration",
+                'message': "FCRA score range is not configured. Please set min/max scores in FCRA settings."
+            }}
+
+        min_score = int(score_config.min_score)
+        max_score = int(score_config.max_score)
+
+
+        if score == 0 and min_score > 0:
+            return
+
+        # Now validate intentional values
+        if not (min_score <= score <= max_score):
+            return {
+                'warning': {
+                    'title': "Invalid Effectiveness Score",
+                    'message': (
+                        f"The entered score ({score}) is outside the allowed range.\n"
+                        f"Valid range: {min_score} – {max_score}."
+                    )
+                }
+            }
+
+    
+    @api.constrains('effectiveness_score')
+    def _check_effectiveness_score_range(self):
+        score_config = self.env['res.fcra.score'].sudo().search([], limit=1)
+        if not score_config:
+            # Only raise if any record has a score set
+            if any(rec.effectiveness_score is not False and rec.effectiveness_score != 0 for rec in self):
+                raise ValidationError("FCRA score configuration is missing...")
+            return  # allow saving if no meaningful score set yet
+
+        min_score = int(score_config.min_score)
+        max_score = int(score_config.max_score)
+
+        for rec in self:
+            score = rec.effectiveness_score
+            # Treat 0 as "not set" ONLY if 0 is below the minimum (i.e., invalid by config)
+            # i.e., if min_score > 0, then 0 is likely accidental blank → skip validation
+            if score == 0 and min_score > 0:
+                # Assume user left it blank → skip
+                continue
+            if score is False:
+                continue
+            if not (min_score <= score <= max_score):
+                raise ValidationError(
+                    f"Effectiveness Score ({score}) is outside allowed range [{min_score}, {max_score}]."
+                )

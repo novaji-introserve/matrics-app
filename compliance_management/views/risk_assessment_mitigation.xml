@@ -1,0 +1,92 @@
+<odoo>
+    <!-- Tree (List) View -->
+    <record id="view_risk_assessment_mitigation_tree" model="ir.ui.view">
+        <field name="name">risk.assessment.mitigation.tree</field>
+        <field name="model">risk.assessment.mitigation</field>
+        <field name="arch" type="xml">
+            <tree string="Risk Mitigations">
+                <field name="name"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_risk_assessment_mitigation_search" model="ir.ui.view">
+        <field name="name">risk.assessment.mitigation.search</field>
+        <field name="model">risk.assessment.mitigation</field>
+        <field name="arch" type="xml">
+            <search string="Search Mitigations">
+                <field name="name" string="Mitigation" filter_domain="[('name','ilike',self)]"/>
+                <field name="description" string="Description" filter_domain="[('description','ilike',self)]"/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="inactive" string="Archived" domain="[('active','=',False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_active" string="Status" context="{'group_by':'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_risk_assessment_mitigation_form" model="ir.ui.view">
+        <field name="name">risk.assessment.mitigation.form</field>
+        <field name="model">risk.assessment.mitigation</field>
+        <field name="arch" type="xml">
+            <form string="Risk Mitigation">
+                <header/>
+                <sheet>
+                    <!-- Archived Banner -->
+                    <div class="o_form_statusbar" attrs="{'invisible': [('active', '=', True)]}">
+                        <div class="alert alert-danger mb-0 py-1 px-3 d-flex align-items-center">
+                            <i class="fa fa-exclamation-triangle me-2"/>
+                            <strong>Archived</strong>
+                        </div>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. Multi-Factor Authentication"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                        <group/>
+                    </group>
+
+                    <label for="description" string="Description"/>
+                    <field name="description"
+                           placeholder="Describe the mitigation: purpose, steps, owner, timeline, etc."
+                           nolabel="1"/>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_risk_assessment_mitigation" model="ir.actions.act_window">
+        <field name="name">Risk Mitigations</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">risk.assessment.mitigation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_risk_assessment_mitigation_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new risk mitigation measure.
+            </p>
+            <p>
+                Mitigation actions reduce the likelihood or impact of identified FCRA-related risks.
+            </p>
+        </field>
+    </record>
+</odoo>

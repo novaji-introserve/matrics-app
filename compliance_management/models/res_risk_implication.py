@@ -21,3 +21,8 @@ class FcraImplication(models.Model):
     ], string='Severity',default="high", tracking=True)
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
    
+    def action_set_active(self):
+        self.write({'state': 'active'})
+
+    def action_set_inactive(self):
+        self.write({'state': 'inactive'})
