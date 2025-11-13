@@ -31,8 +31,11 @@ export class RiskSliderField extends Component {
     // Apply options
     this.updateStateFromProps(this.props);
 
-    if (this.props.name === 'control_effectiveness_score') {
+    if (this.props.name == 'control_effectiveness_score') {
+     
+      
       this.state.reverseColors = true;
+      this.state.readonly = true;
     }
 
     this.orm = useService("orm");
@@ -86,7 +89,7 @@ export class RiskSliderField extends Component {
         this.pendingValue = this.state.value;
       }
       this.updateStateFromProps(nextProps);
-      if (this.props.name === 'control_effectiveness_score') {
+      if (this.props.name == 'control_effectiveness_score') {
         this.state.reverseColors = true;
       }
     });
@@ -158,6 +161,8 @@ export class RiskSliderField extends Component {
     const value = this.pendingValue;
     const useReverseColors =
       this.state.reverseColors || this.props.name === 'control_effectiveness_score';
+
+      
 
     // Color mapping logic
     if (useReverseColors) {

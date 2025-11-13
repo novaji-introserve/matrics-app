@@ -3,7 +3,7 @@
 from odoo import models, fields, api, _
 import logging
 # CONTROL_EFFECTIVENESS_MAX_SCORE = 25
-
+from odoo.exceptions import ValidationError
 _logger = logging.getLogger(__name__)
 
 
@@ -24,7 +24,7 @@ class RiskAssessmentLine(models.Model):
         string='Inherent Risk Score', required=True, tracking=True)
     existing_controls = fields.Many2many("risk.assessment.control", "res_risk_assessment_line_risk_assessment_control_rel", tracking=True)
     control_effectiveness_score = fields.Float(
-        string='Control Effectiveness Score', tracking=True)
+        string='Control Effectiveness Score', readonly=True,  tracking=True)
     residual_risk_probability = fields.Float(
         string='Residual Risk Probability', compute='_compute_risk_probability', store=True)
     residual_risk_impact = fields.Float(
@@ -72,6 +72,57 @@ class RiskAssessmentLine(models.Model):
         record = super(RiskAssessmentLine, self).write(vals)
         self.update_aggregate_risk_score()
         return record
+
+    
+    @api.onchange('existing_controls')
+    def _check_accumulated_score(self):
+        for record in self:
+            if not record.existing_controls:
+                record.update({'control_effectiveness_score': 0}) 
+                continue
+
+            score_config = self.env['res.fcra.score'].sudo().search([], limit=1)
+            if not score_config:
+                return {'warning': {...}}
+
+            max_threshold = float(score_config.max_score)
+            total_score = sum(control.effectiveness_score or 0 for control in record.existing_controls)
+
+            if total_score > max_threshold:
+                # Remove last added control (approximate)
+                record.existing_controls = [(3, record.existing_controls[-1].id)] if record.existing_controls else []
+                return {'warning': {...}}
+
+            # Use .update() to set readonly field in onchange context
+            record.update({'control_effectiveness_score': total_score})
+
+    @api.constrains('existing_controls')
+    def _check_controls_total_score(self):
+        """Ensure total effectiveness score of selected controls doesn't exceed threshold"""
+        score_config = self.env['res.fcra.score'].sudo().search([], limit=1)
+        
+        if not score_config:
+            raise ValidationError(_("FCRA score configuration is missing. Please contact administrator."))
+        
+        max_threshold = float(score_config.max_score)
+        
+        for record in self:
+            if record.existing_controls:
+                total_score = sum(
+                    control.effectiveness_score or 0 
+                    for control in record.existing_controls
+                )
+                
+                if total_score > max_threshold:
+                    raise ValidationError(_(
+                        f"Total Effectiveness Score Exceeded!\n\n"
+                        f"The sum of effectiveness scores from selected controls ({total_score}) "
+                        f"exceeds the maximum threshold of {max_threshold}.\n\n"
+                        f"Please remove some controls or select different ones to stay within the limit."
+                    ))
+                
+                # Update control_effectiveness_score with the calculated total
+                record.control_effectiveness_score = total_score
 
     @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact','residual_risk_score','residual_risk_probability','residual_risk_score')
     def _compute_risk_score(self):
