@@ -81,11 +81,22 @@ class RiskAssessmentLine(models.Model):
                 record.update({'control_effectiveness_score': 0}) 
                 continue
 
-            score_config = self.env['res.fcra.score'].sudo().search([], limit=1)
-            if not score_config:
-                return {'warning': {...}}
+            # Search for the specific setting record by code
+            max_threshold_setting = self.env['res.compliance.settings'].sudo().search(
+                [('code', '=', 'maximum_risk_threshold')], 
+                limit=1
+            )
+            
+            if not max_threshold_setting:
+                return {
+                    'warning': {
+                        'title': _("Compliance Settings"),
+                        'message': "High risk threshold setting is not configured"
+                    }
+                }
 
-            max_threshold = float(score_config.max_score)
+            max_threshold = float(max_threshold_setting.val)
+    
             total_score = sum(control.effectiveness_score_numeric or 0 for control in record.existing_controls)
             
             if total_score > max_threshold:

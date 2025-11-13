@@ -53,6 +53,15 @@
         <field name="val">3.9</field>
         <field name="narration">Low Risk Threshold</field>
     </record>
+
+    <record id="res_compl_settings_minimum_risk_threshold" model="res.compliance.settings">
+        <field name="name">Minimum Risk Threshold</field>
+        <field name="code">minimum_risk_threshold</field>
+        <field name="val">1</field>
+        <field name="narration">Minimum Risk Threshold</field>
+    </record>
+
+
     <record id="res_compl_settings_medium_risk_threshold" model="res.compliance.settings">
         <field name="name">Medium Risk Threshold</field>
         <field name="code">medium_risk_threshold</field>

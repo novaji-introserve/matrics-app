@@ -32,8 +32,6 @@ export class RiskSliderField extends Component {
     this.updateStateFromProps(this.props);
 
     if (this.props.name == 'control_effectiveness_score') {
-     
-      
       this.state.reverseColors = true;
       this.state.readonly = true;
     }
@@ -43,32 +41,32 @@ export class RiskSliderField extends Component {
 
     onWillStart(async () => {
       try {
-        const [scoreRecord] = await this.orm.searchRead(
-          'res.fcra.score',
-          [],
-          ['min_score', 'max_score'],
-          { limit: 1 }
+        // Load settings from res.compliance.settings
+        const settings = await this.orm.searchRead(
+          'res.compliance.settings',
+          [['code', 'in', ['low_risk_threshold', 'medium_risk_threshold', 'maximum_risk_threshold', 'minimum_risk_threshold', 'high_risk_threshold']]],
+          ['code', 'val']
         );
 
-        // Load thresholds from res.compliance.settings
-      const settings = await this.orm.searchRead(
-        'res.compliance.settings',
-        [['code', 'in', ['low_risk_threshold', 'medium_risk_threshold']]],
-        ['code', 'val']
-      );
+        const settingsMap = {};
+        for (const s of settings) {
+          if (s.code === 'low_risk_threshold') settingsMap.low = parseFloat(s.val);
+          if (s.code === 'medium_risk_threshold') settingsMap.medium = parseFloat(s.val);
+          if (s.code === 'minimum_risk_threshold') settingsMap.min = parseFloat(s.val);
+          if (s.code === 'maximum_risk_threshold') settingsMap.max = parseFloat(s.val);
+        }
+    
 
-      const thresholdMap = {};
-      for (const s of settings) {
-        if (s.code === 'low_risk_threshold') thresholdMap.low = parseFloat(s.val);
-        if (s.code === 'medium_risk_threshold') thresholdMap.medium = parseFloat(s.val);
-      }
+        // Set thresholds for badge colors
+        this.state.thresholds = {
+          low: settingsMap.low,
+          medium: settingsMap.medium
+        };
 
-      this.state.thresholds = thresholdMap;
-
-  
+        // Set min and max values for slider range
+        this.state.minValue = settingsMap.min || 1;
+        this.state.maxValue = settingsMap.max || 9;
         
-        this.state.minValue = parseFloat(scoreRecord?.min_score || 0);
-        this.state.maxValue = parseFloat(scoreRecord?.max_score || 9);
         this.state.value = this.props.record.data[this.props.name] !== undefined
           ? this.props.record.data[this.props.name]
           : this.state.minValue;
@@ -82,7 +80,6 @@ export class RiskSliderField extends Component {
 
     onWillUpdateProps((nextProps) => {
       const newValue = nextProps.record.data[this.props.name];
-      
       
       if (newValue !== undefined && newValue !== this.state.value) {
         this.state.value = parseFloat(newValue);
@@ -153,7 +150,6 @@ export class RiskSliderField extends Component {
     }
   }
 
-
   get badgeClass() {
     const low = this.state.thresholds?.low ?? (this.state.minValue + (this.state.maxValue - this.state.minValue) * 0.33);
     const medium = this.state.thresholds?.medium ?? (this.state.minValue + (this.state.maxValue - this.state.minValue) * 0.66);
@@ -161,8 +157,6 @@ export class RiskSliderField extends Component {
     const value = this.pendingValue;
     const useReverseColors =
       this.state.reverseColors || this.props.name === 'control_effectiveness_score';
-
-      
 
     // Color mapping logic
     if (useReverseColors) {
@@ -176,7 +170,6 @@ export class RiskSliderField extends Component {
       return 'bg-danger';
     }
   }
-
 
   get formattedValue() {
     return this.pendingValue.toFixed(1);
