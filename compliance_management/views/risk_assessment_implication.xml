@@ -17,25 +17,7 @@
         </field>
     </record>
 
-    <!-- View for CCO (full access) -->
-<record id="view_risk_assessment_implication_tree_cco" model="ir.ui.view">
-    <field name="name">risk.assessment.implication.tree.cco</field>
-    <field name="model">risk.assessment.implication</field>
-    <field name="priority">10</field>
-    <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_chief_compliance_officer'))]"/>
-    <field name="arch" type="xml">
-            <tree string="Risk Implications" decoration-muted="state == 'inactive' or not active">
-                <field name="code"/>
-                <field name="name"/>
-                <field name="severity" widget="badge"
-                       decoration-success="severity == 'low'"
-                       decoration-warning="severity == 'medium'"
-                       decoration-danger="severity == 'high'"/>
-                <field name="state"/>
-                <field name="active" invisible="1"/>
-            </tree>
-        </field>
-</record>
+   
 
     <!-- Search View -->
     <record id="view_risk_assessment_implication_search" model="ir.ui.view">
