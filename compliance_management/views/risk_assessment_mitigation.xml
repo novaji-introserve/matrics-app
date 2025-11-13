@@ -11,6 +11,20 @@
         </field>
     </record>
 
+        <!-- View for CCO (full access) -->
+<record id="view_risk_assessment_mitigation_tree_cco" model="ir.ui.view">
+    <field name="name">risk.assessment.mitigation.tree.cco</field>
+    <field name="model">risk.assessment.mitigation</field>
+    <field name="priority">10</field>
+    <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_chief_compliance_officer'))]"/>
+    <field name="arch" type="xml">
+            <tree string="Risk Mitigations">
+                <field name="name"/>
+                <field name="active" invisible="1"/>
+            </tree>
+    </field>
+</record>
+
     <!-- Search View -->
     <record id="view_risk_assessment_mitigation_search" model="ir.ui.view">
         <field name="name">risk.assessment.mitigation.search</field>
@@ -37,14 +51,7 @@
             <form string="Risk Mitigation">
                 <header/>
                 <sheet>
-                    <!-- Archived Banner -->
-                    <div class="o_form_statusbar" attrs="{'invisible': [('active', '=', True)]}">
-                        <div class="alert alert-danger mb-0 py-1 px-3 d-flex align-items-center">
-                            <i class="fa fa-exclamation-triangle me-2"/>
-                            <strong>Archived</strong>
-                        </div>
-                    </div>
-
+                    
                     <div class="oe_title">
                         <h1>
                             <field name="name" placeholder="e.g. Multi-Factor Authentication"/>

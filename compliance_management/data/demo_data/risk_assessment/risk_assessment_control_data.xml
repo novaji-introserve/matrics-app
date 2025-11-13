@@ -17,7 +17,7 @@
     <field name="control_nature">semi_automated</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">3</field>
-    <field name="effectiveness_score">4</field>
+    <field name="effectiveness_score_numeric">4</field>
     <field name="state">active</field>
 </record>
 
@@ -29,7 +29,7 @@
     <field name="control_nature">automated</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">3</field>
-    <field name="effectiveness_score">4</field>
+    <field name="effectiveness_score_numeric">4</field>
     <field name="state">active</field>
 </record>
 
@@ -41,7 +41,7 @@
     <field name="control_nature">manual</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">2</field>
-    <field name="effectiveness_score">3</field>
+    <field name="effectiveness_score_numeric">3</field>
     <field name="state">active</field>
 </record>
 
@@ -53,7 +53,7 @@
     <field name="control_nature">automated</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">3</field>
-    <field name="effectiveness_score">5</field>
+    <field name="effectiveness_score_numeric">5</field>
     <field name="state">active</field>
 </record>
 
@@ -65,7 +65,7 @@
     <field name="control_nature">semi_automated</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">2</field>
-    <field name="effectiveness_score">4</field>
+    <field name="effectiveness_score_numeric">4</field>
     <field name="state">active</field>
 </record>
 
@@ -77,7 +77,7 @@
     <field name="control_nature">manual</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">2</field>
-    <field name="effectiveness_score">4</field>
+    <field name="effectiveness_score_numeric">4</field>
     <field name="state">active</field>
 </record>
 
@@ -89,7 +89,7 @@
     <field name="control_nature">automated</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">2</field>
-    <field name="effectiveness_score">3</field>
+    <field name="effectiveness_score_numeric">3</field>
     <field name="state">active</field>
 </record>
 
@@ -101,7 +101,7 @@
     <field name="control_nature">manual</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">2</field>
-    <field name="effectiveness_score">4</field>
+    <field name="effectiveness_score_numeric">4</field>
     <field name="state">active</field>
 </record>
 
@@ -113,7 +113,7 @@
     <field name="control_nature">automated</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">3</field>
-    <field name="effectiveness_score">4</field>
+    <field name="effectiveness_score_numeric">4</field>
     <field name="state">active</field>
 </record>
 
@@ -125,7 +125,7 @@
     <field name="control_nature">semi_automated</field>
     <field name="is_fcra_relevant">True</field>
     <field name="priority">2</field>
-    <field name="effectiveness_score">3</field>
+    <field name="effectiveness_score_numeric">3</field>
     <field name="state">active</field>
 </record>
 
