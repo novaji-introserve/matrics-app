@@ -112,7 +112,6 @@ class RiskAssessmentPlan(models.Model):
             raise UserError(_('Wrong python code defined for customer risk analysis rule %s (%s).') % (self.name, self.code))
 
 
-
 class RiskAnalysis(models.Model):
     """
     Highly optimized Materialized Views using pure set-based operations.

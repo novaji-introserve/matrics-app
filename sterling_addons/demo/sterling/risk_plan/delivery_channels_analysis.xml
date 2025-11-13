@@ -1,4 +1,4 @@
-<odoo noupdate="1">
+<odoo noupdate="0">
 
     <record id="risk_plan_ussd" model="res.compliance.risk.assessment.plan">
         <field name="name">Risk Analysis For USSD Delivery Channel</field>
