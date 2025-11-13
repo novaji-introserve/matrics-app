@@ -86,12 +86,22 @@ class RiskAssessmentLine(models.Model):
                 return {'warning': {...}}
 
             max_threshold = float(score_config.max_score)
-            total_score = sum(control.effectiveness_score or 0 for control in record.existing_controls)
-
+            total_score = sum(control.effectiveness_score_numeric or 0 for control in record.existing_controls)
+            
             if total_score > max_threshold:
                 # Remove last added control (approximate)
                 record.existing_controls = [(3, record.existing_controls[-1].id)] if record.existing_controls else []
-                return {'warning': {...}}
+                return {
+                    'warning': {
+                        'title': _("Total Effectiveness Score Exceeded"),
+                        'message': _(
+                            "The current selection of controls has a total effectiveness score of %.1f, "
+                            "which exceeds the allowed maximum of %.1f.\n\n"
+                            "This will prevent saving until corrected. "
+                            "Consider removing or replacing some controls."
+                        ) % (total_score, max_threshold)
+                    }
+                }
 
             # Use .update() to set readonly field in onchange context
             record.update({'control_effectiveness_score': total_score})
@@ -109,7 +119,7 @@ class RiskAssessmentLine(models.Model):
         for record in self:
             if record.existing_controls:
                 total_score = sum(
-                    control.effectiveness_score or 0 
+                    control.effectiveness_score_numeric or 0 
                     for control in record.existing_controls
                 )
                 

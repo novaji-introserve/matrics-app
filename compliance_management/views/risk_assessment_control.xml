@@ -1,28 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_risk_assessment_control_tree" model="ir.ui.view">
-        <field name="name">risk.assessment.control.tree</field>
-        <field name="model">risk.assessment.control</field>
-        <field name="arch" type="xml">
-            <tree
-             create="compliance_management.group_compliance_chief_compliance_officer"
-                edit="compliance_management.group_compliance_chief_compliance_officer"
-                delete="compliance_management.group_compliance_chief_compliance_officer"
-             default_order="priority desc, name">
-                <field name="code" optional="show"/>
-                <field name="name"/>
-                <field name="control_type" widget="badge"/>
-                <field name="effectiveness_score" string="Effectiveness" />
-                <field name="state" widget="badge"
-                       decoration-success="state == 'active'"
-                       decoration-info="state == 'draft'"
-                       decoration-warning="state == 'under_review'"
-                       decoration-danger="state == 'inactive'"/>
-                <field name="last_assessment_date"/>
-            </tree>
-        </field>
-    </record>
+    <!-- View for regular users (read-only) -->
+<record id="view_risk_assessment_control_tree" model="ir.ui.view">
+    <field name="name">risk.assessment.control.tree</field>
+    <field name="model">risk.assessment.control</field>
+    <field name="priority">20</field>
+    <field name="arch" type="xml">
+        <tree
+            create="0"
+            edit="0"
+            delete="0"
+            default_order="priority desc, name">
+            <field name="code" optional="show"/>
+            <field name="name"/>
+            <field name="control_type" widget="badge"/>
+            <field name="effectiveness_score_numeric" string="Effectiveness" />
+            <field name="state" widget="badge"
+                   decoration-success="state == 'active'"
+                   decoration-info="state == 'draft'"
+                   decoration-warning="state == 'under_review'"
+                   decoration-danger="state == 'inactive'"/>
+            <field name="last_assessment_date"/>
+        </tree>
+    </field>
+</record>
+
+<!-- View for CCO (full access) -->
+<record id="view_risk_assessment_control_tree_cco" model="ir.ui.view">
+    <field name="name">risk.assessment.control.tree.cco</field>
+    <field name="model">risk.assessment.control</field>
+    <field name="priority">10</field>
+    <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_chief_compliance_officer'))]"/>
+    <field name="arch" type="xml">
+        <tree default_order="priority desc, name">
+            <field name="code" optional="show"/>
+            <field name="name"/>
+            <field name="control_type" widget="badge"/>
+            <field name="effectiveness_score_numeric" string="Effectiveness" />
+            <field name="state" widget="badge"
+                   decoration-success="state == 'active'"
+                   decoration-info="state == 'draft'"
+                   decoration-warning="state == 'under_review'"
+                   decoration-danger="state == 'inactive'"/>
+            <field name="last_assessment_date"/>
+        </tree>
+    </field>
+</record>
 
     <record id="view_risk_assessment_control_form" model="ir.ui.view">
         <field name="name">risk.assessment.control.form</field>
@@ -82,7 +106,7 @@
                             <field name="control_nature" required="1"/>
                         </group>
                         <group string="Effectiveness">
-                            <field name="effectiveness_score"
+                            <field name="effectiveness_score_numeric"
                                 widget="slider"
                                 options="{'min': 0, 'max': 20, 'step': 1}"/>
                             <!-- Dynamic help below -->

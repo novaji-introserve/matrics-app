@@ -38,12 +38,20 @@ class RiskAssessmentControl(models.Model):
     ], string='Priority', default='1', tracking=True)
     
     # Effectiveness
-    effectiveness_score = fields.Integer(
-        string='Effectiveness Score',
+    effectiveness_score_numeric = fields.Integer(
+        string='Effectiveness Score Numeric',
         tracking=True,
         default=False,
         help="Score from 0 to 100 (integer percentage)."
     )
+    effectiveness_score = fields.Selection([
+        ('1', 'Not Effective'),
+        ('2', 'Partially Effective'),
+        ('3', 'Mostly Effective'),
+        ('4', 'Effective'),
+        ('5', 'Highly Effective')
+    ], string='Effectiveness Score', tracking=True)
+
     effectiveness_score_help = fields.Char(
         string='Score Help',
         compute='_compute_effectiveness_score_help',
@@ -70,7 +78,7 @@ class RiskAssessmentControl(models.Model):
         self.write({'state': 'inactive'})
 
 
-    @api.depends('effectiveness_score') 
+    @api.depends('effectiveness_score_numeric') 
     def _compute_effectiveness_score_help(self):
         # Fetch config once (cached per request)
         score_config = self.env['res.fcra.score'].sudo().search([], limit=1)
@@ -84,10 +92,10 @@ class RiskAssessmentControl(models.Model):
         for rec in self:
             rec.effectiveness_score_help = help_text
 
-    @api.onchange('effectiveness_score')
+    @api.onchange('effectiveness_score_numeric')
     def _onchange_effectiveness_score(self):
         # Skip if not set (None/False) or if 0 is likely accidental *and* below min
-        score = self.effectiveness_score
+        score = self.effectiveness_score_numeric
         if score is False:
             return  # truly unset
 
@@ -118,12 +126,12 @@ class RiskAssessmentControl(models.Model):
             }
 
     
-    @api.constrains('effectiveness_score')
+    @api.constrains('effectiveness_score_numeric')
     def _check_effectiveness_score_range(self):
         score_config = self.env['res.fcra.score'].sudo().search([], limit=1)
         if not score_config:
             # Only raise if any record has a score set
-            if any(rec.effectiveness_score is not False and rec.effectiveness_score != 0 for rec in self):
+            if any(rec.effectiveness_score_numeric is not False and rec.effectiveness_score_numeric != 0 for rec in self):
                 raise ValidationError("FCRA score configuration is missing...")
             return  # allow saving if no meaningful score set yet
 
@@ -131,7 +139,7 @@ class RiskAssessmentControl(models.Model):
         max_score = int(score_config.max_score)
 
         for rec in self:
-            score = rec.effectiveness_score
+            score = rec.effectiveness_score_numeric
             # Treat 0 as "not set" ONLY if 0 is below the minimum (i.e., invalid by config)
             # i.e., if min_score > 0, then 0 is likely accidental blank → skip validation
             if score == 0 and min_score > 0:

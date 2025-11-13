@@ -32,6 +32,7 @@
         "data/demo_data/location/res.country.state.csv",
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
+        "data/demo_data/score/fcra_score.xml",    
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
         "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/region/res.partner.region.csv",#REGION
@@ -50,7 +51,6 @@
         'data/email_templates/edd_notifications_template.xml',
         "data/email_templates/customer_screening_template.xml",
 
-
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
         "data/schedules/count-weight-avg.xml",
@@ -62,7 +62,6 @@
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
-        "data/demo_data/score/fcra_score.xml",    
         "data/data.xml",
         "data/demo_data/risk_assessment/category.xml",
         "data/demo_data/risk_assessment/risk_universe.xml",
