@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    
+    <!-- Tree View -->
+    <record id="view_email_template_config_tree" model="ir.ui.view">
+        <field name="name">email.template.config.tree</field>
+        <field name="model">email.template.config</field>
+        <field name="arch" type="xml">
+            <tree string="Email Template Configurations" 
+                  decoration-success="is_active == True"
+                  decoration-muted="is_active == False">
+                <field name="name" />
+                <field name="company_id" groups="base.group_multi_company" />
+                <field name="is_active" widget="boolean_toggle" />
+                <field name="usage_count" string="Used" />
+                <field name="last_used_date" string="Last Used" widget="datetime" optional="hide" />
+                <field name="created_by" string="Created By" optional="hide" />
+                <field name="create_date" string="Created" optional="hide" />
+                <field name="description" optional="hide" />
+                
+                <!-- Active Template Badge -->
+                <field name="is_active" invisible="1" />
+                <button name="action_activate_template" 
+                        string="Activate" 
+                        type="object" 
+                        class="btn-success btn-sm"
+                        icon="fa-check-circle"
+                        attrs="{'invisible': [('is_active', '=', True)]}"
+                        help="Activate this template" />
+                        
+                <button name="action_preview_email" 
+                        string="Preview" 
+                        type="object" 
+                        class="btn-info btn-sm"
+                        icon="fa-eye"
+                        help="Preview email with this template" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_email_template_config_form" model="ir.ui.view">
+        <field name="name">email.template.config.form</field>
+        <field name="model">email.template.config</field>
+        <field name="arch" type="xml">
+            <form string="Email Template Configuration">
+                <header>
+                    <button name="action_activate_template" 
+                            string="Activate Template" 
+                            type="object" 
+                            class="btn-success"
+                            attrs="{'invisible': [('is_active', '=', True)]}"
+                            confirm="This will make this template active and deactivate any other active templates for this company. Continue?" />
+                    
+                    <button name="action_deactivate_template" 
+                            string="Deactivate" 
+                            type="object" 
+                            class="btn-warning"
+                            attrs="{'invisible': [('is_active', '=', False)]}"
+                            confirm="Are you sure you want to deactivate this template?" />
+                    
+                    <button name="action_preview_email" 
+                            string="Preview Email" 
+                            type="object" 
+                            class="btn-info"
+                            icon="fa-eye" />
+                    
+                    <field name="is_active" widget="statusbar" />
+                </header>
+                
+                <sheet>
+                    <!-- <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_usage_stats" icon="fa-line-chart">
+                            <field string="Times Used" name="usage_count" widget="statinfo"/>
+                        </button>
+                    </div> -->
+                    
+                    <!-- Active Template Banner -->
+                    <div class="alert alert-success" role="status" attrs="{'invisible': [('is_active', '=', False)]}">
+                        <strong>✅ Active Template:</strong> This template is currently being used for all alert emails.
+                    </div>
+                    
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" placeholder="Enter template name (e.g., 'Company Branded Template')" />
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company" />
+                            <field name="description" />
+                        </group>
+                        <group>
+                            <field name="created_by" readonly="1" />
+                            <field name="last_used_date" readonly="1" />
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <!-- BRANDING TAB -->
+                        <page string="🎨 Branding" name="branding">
+                            <group string="Logo Configuration">
+                                <group>
+                                    <field name="use_company_logo" widget="boolean_toggle" />
+                                    <field name="custom_logo" 
+                                           widget="image" 
+                                           class="oe_avatar"
+                                           attrs="{'invisible': [('use_company_logo', '=', True)]}" />
+                                    <field name="custom_logo_filename" 
+                                           attrs="{'invisible': [('use_company_logo', '=', True)]}" />
+                                </group>
+                                <group>
+                                    <field name="logo_width" />
+                                    <field name="logo_height" />
+                                    <!-- Preview of effective logo -->
+                                    <field name="effective_logo" widget="image" class="oe_avatar" readonly="1" string="Logo Preview" />
+                                </group>
+                            </group>
+                            
+                            <group string="Primary Brand Colors">
+                                <group>
+                                    <field name="primary_brand_color" widget="color" />
+                                    <field name="secondary_brand_color" widget="color" />
+                                </group>
+                                <group>
+                                    <div class="o_form_field">
+                                        <p><strong>Primary Brand Color:</strong> Used for headers, highlights, and main branding elements.</p>
+                                        <p><strong>Secondary Brand Color:</strong> Used for buttons, accents, and secondary elements.</p>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <!-- COLORS TAB -->
+                        <page string="🌈 Colors" name="colors">
+                            <group string="Table Colors">
+                                <group>
+                                    <field name="table_header_bg_color" widget="color" />
+                                    <field name="table_header_text_color" widget="color" />
+                                    <field name="table_border_color" widget="color" />
+                                </group>
+                                <group>
+                                    <field name="table_row_even_color" widget="color" />
+                                    <field name="table_row_odd_color" widget="color" />
+                                </group>
+                            </group>
+                            
+                            <group string="Button Colors">
+                                <group>
+                                    <field name="button_bg_color" widget="color" />
+                                    <field name="button_text_color" widget="color" />
+                                    <field name="button_hover_color" widget="color" />
+                                </group>
+                                <group>
+                                    <field name="button_border_radius" />
+                                </group>
+                            </group>
+                            
+                            <group string="Link and Background Colors">
+                                <group>
+                                    <field name="link_color" widget="color" />
+                                    <field name="link_hover_color" widget="color" />
+                                </group>
+                                <group>
+                                    <field name="email_bg_color" widget="color" />
+                                    <field name="content_bg_color" widget="color" />
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <!-- FOOTER TAB -->
+                        <page string="📄 Footer" name="footer">
+                            <group string="Footer Configuration">
+                                <group>
+                                    <field name="show_footer" widget="boolean_toggle" />
+                                    <field name="use_company_details" widget="boolean_toggle" attrs="{'invisible': [('show_footer', '=', False)]}" />
+                                </group>
+                                <group>
+                                    <field name="footer_bg_color" widget="color" attrs="{'invisible': [('show_footer', '=', False)]}" />
+                                    <field name="footer_text_color" widget="color" attrs="{'invisible': [('show_footer', '=', False)]}" />
+                                </group>
+                            </group>
+                            
+                            <group string="Custom Footer Details" attrs="{'invisible': ['|', ('show_footer', '=', False), ('use_company_details', '=', True)]}">
+                                <group>
+                                    <field name="custom_company_name" placeholder="Company Name" />
+                                    <field name="custom_phone" placeholder="+1 234-567-8900" />
+                                </group>
+                                <group>
+                                    <field name="custom_email" placeholder="info@company.com" />
+                                    <field name="custom_website" placeholder="https://www.company.com" />
+                                </group>
+                            </group>
+                            
+                            <group string="Effective Footer Details" attrs="{'invisible': [('show_footer', '=', False)]}">
+                                <div class="o_form_field">
+                                    <p><strong>Company:</strong> <field name="effective_company_name" readonly="1" nolabel="1" /></p>
+                                    <p><strong>Note:</strong> When "Use Company Details" is enabled, information is automatically pulled from company settings.</p>
+                                </div>
+                            </group>
+                        </page>
+                        
+                        <!-- TYPOGRAPHY TAB -->
+                        <page string="✍️ Typography" name="typography">
+                            <group string="Font Configuration">
+                                <group>
+                                    <field name="font_family" />
+                                    <field name="email_width" />
+                                    <field name="content_padding" />
+                                </group>
+                                <group>
+                                    <div class="o_form_field">
+                                        <p><strong>Font Family:</strong> Choose the font family for all email content.</p>
+                                        <p><strong>Email Width:</strong> Maximum width of email content in pixels.</p>
+                                        <p><strong>Content Padding:</strong> Padding around content areas in pixels.</p>
+                                    </div>
+                                </group>
+                            </group>
+                            
+                            <group string="Font Sizes">
+                                <group>
+                                    <field name="heading_font_size" />
+                                    <field name="subheading_font_size" />
+                                </group>
+                                <group>
+                                    <field name="body_font_size" />
+                                    <field name="small_font_size" />
+                                </group>
+                            </group>
+                            
+                            <group string="Font Size Guide">
+                                <div class="o_form_field">
+                                    <ul>
+                                        <li><strong>Heading:</strong> Main title and important headers</li>
+                                        <li><strong>Subheading:</strong> Section headers and subtitles</li>
+                                        <li><strong>Body:</strong> Main content and table text</li>
+                                        <li><strong>Small:</strong> Footer text and captions</li>
+                                    </ul>
+                                </div>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread" />
+                    <field name="activity_ids" widget="mail_activity" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_email_template_config_search" model="ir.ui.view">
+        <field name="name">email.template.config.search</field>
+        <field name="model">email.template.config</field>
+        <field name="arch" type="xml">
+            <search string="Email Template Configurations">
+                <field name="name" string="Template Name" />
+                <field name="company_id" />
+                <field name="description" />
+                <field name="created_by" />
+                
+                <filter string="Active Templates" name="active_templates" domain="[('is_active', '=', True)]" />
+                <filter string="Inactive Templates" name="inactive_templates" domain="[('is_active', '=', False)]" />
+                <separator />
+                <filter string="My Templates" name="my_templates" domain="[('created_by', '=', uid)]" />
+                <separator />
+                <filter string="Recently Used" name="recently_used" domain="[('last_used_date', '>=', (context_today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]" />
+                
+                <group expand="0" string="Group By">
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}" />
+                    <filter string="Status" name="group_status" context="{'group_by': 'is_active'}" />
+                    <filter string="Created By" name="group_created_by" context="{'group_by': 'created_by'}" />
+                    <filter string="Creation Date" name="group_create_date" context="{'group_by': 'create_date'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Confirmation Wizard View -->
+    <record id="view_email_template_config_confirm_form" model="ir.ui.view">
+        <field name="name">email.template.config.confirm.form</field>
+        <field name="model">email.template.config.confirm</field>
+        <field name="arch" type="xml">
+            <form string="Confirm Template Activation">
+                <group>
+                    <div class="alert alert-warning" role="alert">
+                        <p><strong>⚠️ Template Activation Confirmation</strong></p>
+                        <p>You are about to activate the template: <strong><field name="template_id" readonly="1" nolabel="1" /></strong></p>
+                        <p>This will automatically deactivate the following active template(s):</p>
+                        <field name="other_active_templates" readonly="1" nolabel="1">
+                            <tree>
+                                <field name="name" />
+                                <field name="usage_count" />
+                                <field name="last_used_date" />
+                            </tree>
+                        </field>
+                    </div>
+                </group>
+                <footer>
+                    <button string="Confirm Activation" name="action_confirm_activation" type="object" class="btn-primary" />
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Preview Wizard View -->
+    <record id="view_email_template_preview_form" model="ir.ui.view">
+        <field name="name">email.template.preview.form</field>
+        <field name="model">email.template.preview</field>
+        <field name="arch" type="xml">
+            <form string="Email Template Preview">
+                <group>
+                    <field name="template_id" readonly="1" />
+                </group>
+                <notebook>
+                    <page string="Email Preview">
+                        <field name="preview_html" widget="html" readonly="1" />
+                    </page>
+                </notebook>
+                <footer>
+                    <button string="Close" class="btn-primary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_email_template_config" model="ir.actions.act_window">
+        <field name="name">Email Template Configuration</field>
+        <field name="res_model">email.template.config</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_email_template_config_search" />
+        <field name="context">{
+            'search_default_active_templates': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first email template configuration!
+            </p>
+            <p>
+                Email template configurations allow you to customize the look and feel 
+                of alert emails sent by the system. You can configure colors, logos, 
+                fonts, and footer information to match your company branding.
+            </p>
+        </field>
+    </record>
+
+</odoo>

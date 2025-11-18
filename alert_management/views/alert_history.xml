@@ -57,6 +57,8 @@
                 
                     <group>
                         <field name="risk_rating" string="Rating" />
+                          <field name="template_config_id"/>
+                        <field name="dynamic_logo_url"/>
                     </group>
                     <group>
                         <field name="source" string="Source" />

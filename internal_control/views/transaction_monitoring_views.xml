@@ -30,27 +30,27 @@
                 <!-- Transaction Details -->
                 <group string="Transaction Information">
                     <group string="Transaction Details">
-                        <field name="accountmodule"/>
-                        <field name="tran_channel"/>
-                        <field name="tellerno"/>
-                        <field name="reversal"/>
+                        <field name="accountmodule" readonly="1"/>
+                        <field name="tran_channel" readonly="1"/>
+                        <field name="tellerno" readonly="1"/>
+                        <field name="reversal" readonly="1"/>
                     </group>
                     <group string="Date Information">
-                        <field name="valuedate"/>
-                        <field name="actualdate"/>
-                        <field name="userid"/>
+                        <field name="valuedate" readonly="1"/>
+                        <field name="actualdate" readonly="1"/>
+                        <field name="userid" readonly="1"/>
                     </group>
                 </group>
                 
                 <!-- Processing Information -->
                 <group string="Processing Information">
                     <group string="Status Details">
-                        <field name="status"/>
-                        <field name="deptcode"/>
+                        <field name="status" readonly="1"/>
+                        <field name="deptcode" readonly="1"/>
                     </group>
                     <group string="Reference Information">
-                        <field name="request_id"/>
-                        <field name="trans_id"/>
+                        <field name="request_id" readonly="1"/>
+                        <field name="trans_id" readonly="1"/>
                     </group>
                 </group>
             </xpath>
@@ -89,13 +89,12 @@
         <field name="inherit_id" ref="compliance_management.compliance_transaction_tree"/>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <!-- <xpath expr="//button[@name='action_create']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath> -->
-           
-
+            <!-- Disable create and delete operations -->
             <xpath expr="//tree" position="attributes">
                 <attribute name="default_order">valuedate desc</attribute>
+                <attribute name="create">false</attribute>
+                <attribute name="delete">false</attribute>
+                <attribute name="edit">false</attribute>
                 <!-- <attribute name="limit">80</attribute> -->
             </xpath>
 

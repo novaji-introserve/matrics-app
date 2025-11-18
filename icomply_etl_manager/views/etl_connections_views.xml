@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Database Connection Tree View -->
+    <record id="view_etl_database_connection_tree" model="ir.ui.view">
+        <field name="name">etl.database.connection.tree</field>
+        <field name="model">etl.database.connection</field>
+        <field name="arch" type="xml">
+            <tree string="Database Connections">
+                <field name="name"/>
+                <field name="database_type"/>
+                <field name="host"/>
+                <field name="port"/>
+                <field name="database_name"/>
+                <field name="last_test_status" decoration-success="last_test_status == 'success'" 
+                       decoration-danger="last_test_status == 'failed'" 
+                       decoration-muted="last_test_status == 'never'"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Database Connection Form View -->
+    <record id="view_etl_database_connection_form" model="ir.ui.view">
+        <field name="name">etl.database.connection.form</field>
+        <field name="model">etl.database.connection</field>
+        <field name="arch" type="xml">
+            <form string="Database Connection">
+                <header>
+                    <button name="action_test_connection" 
+                            string="Test Connection" 
+                            type="object" 
+                            class="oe_highlight"/>
+                    <field name="last_test_status" widget="statusbar" 
+                           statusbar_colors='{"success":"green","failed":"red","never":"gray"}'/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"/>
+                        </button>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="e.g., Customer Database Server"/></h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Connection Details">
+                            <field name="database_type"/>
+                            <field name="host"/>
+                            <field name="port"/>
+                            <field name="database_name"/>
+                            <field name="username"/>
+                            <field name="password" password="True"/>
+                            <field name="ssl_enabled"/>
+                            <field name="connection_timeout"/>
+                        </group>
+                        <group string="Connection Status">
+                            <field name="last_test_time" readonly="1"/>
+                            <field name="last_test_message" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Additional Parameters" attrs="{'invisible': [('additional_params', '=', False)]}">
+                        <field name="additional_params" widget="ace" options="{'mode': 'json'}" 
+                               placeholder='{"param1": "value1", "param2": "value2"}'/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Database Connection Search View -->
+    <record id="view_etl_database_connection_search" model="ir.ui.view">
+        <field name="name">etl.database.connection.search</field>
+        <field name="model">etl.database.connection</field>
+        <field name="arch" type="xml">
+            <search string="Search Database Connections">
+                <field name="name"/>
+                <field name="database_type"/>
+                <field name="host"/>
+                <field name="database_name"/>
+                <separator/>
+                <filter string="PostgreSQL" name="filter_postgresql" domain="[('database_type', '=', 'postgresql')]"/>
+                <filter string="MySQL" name="filter_mysql" domain="[('database_type', '=', 'mysql')]"/>
+                <filter string="MSSQL" name="filter_mssql" domain="[('database_type', '=', 'mssql')]"/>
+                <filter string="Oracle" name="filter_oracle" domain="[('database_type', '=', 'oracle')]"/>
+                <filter string="SQLite" name="filter_sqlite" domain="[('database_type', '=', 'sqlite')]"/>
+                <separator/>
+                <filter string="Connection Success" name="filter_success" domain="[('last_test_status', '=', 'success')]"/>
+                <filter string="Connection Failed" name="filter_failed" domain="[('last_test_status', '=', 'failed')]"/>
+                <filter string="Never Tested" name="filter_never" domain="[('last_test_status', '=', 'never')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Database Type" name="group_database_type" context="{'group_by': 'database_type'}"/>
+                    <filter string="Host" name="group_host" context="{'group_by': 'host'}"/>
+                    <filter string="Test Status" name="group_status" context="{'group_by': 'last_test_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Database Connection Action -->
+    <record id="action_etl_database_connection" model="ir.actions.act_window">
+        <field name="name">Database Connections</field>
+        <field name="res_model">etl.database.connection</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_etl_database_connection_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first database connection!
+            </p>
+            <p>
+                Define database connections for ETL source and target databases.
+                Supports PostgreSQL, MySQL, MSSQL, Oracle, and SQLite.
+            </p>
+        </field>
+    </record>
+</odoo>

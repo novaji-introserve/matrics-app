@@ -78,4 +78,19 @@
         sequence="10"
         />
 
+    <menuitem 
+        id="menu_email_template_config" 
+        name="Email Template Config" 
+        parent="menu_internal_ctrl_alert_monitoring" 
+        action="action_email_template_config" 
+        sequence="15"
+        groups="compliance_management.group_tech_support" />
+    
+    <!-- <menuitem 
+        id="menu_alert_delivery_methods"
+        name="Delivery Methods"
+        action="action_alert_delivery_method"
+        parent="menu_internal_ctrl_alert_monitoring"
+        sequence="15"/> -->
+
 </odoo>
