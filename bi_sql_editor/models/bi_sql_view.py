@@ -30,8 +30,8 @@ class BiSQLView(models.Model):
     _sql_request_users_relation = "bi_sql_view_users_rel"
 
     _STATE_SQL_EDITOR = [
-        ("model_valid", "Created"),
-        ("ui_valid", "Published"),
+        ("model_valid", "SQL View and Model Created"),
+        ("ui_valid", "Views, Action and Menu Created"),
     ]
 
     technical_name = fields.Char(
@@ -152,7 +152,7 @@ class BiSQLView(models.Model):
     )
 
     cron_id = fields.Many2one(
-        string="Automation Job",
+        string="Odoo Cron",
         comodel_name="ir.cron",
         readonly=True,
         help="Cron Task that will refresh the materialized view",
@@ -168,22 +168,6 @@ class BiSQLView(models.Model):
     )
 
     sequence = fields.Integer(string="sequence")
-    
-    def action_view_result(self):
-        self.ensure_one()
-        self.env.cr.execute(self.query)
-        results = self.env.cr.dictfetchall()
-        
-        columns = list(results[0].keys()) if results else []
-        return {
-            "type": "ir.actions.act_window",
-            "res_model": self.model_id.model,
-            "search_view_id": self.search_view_id.id,
-            # "view_mode": self.action_id.view_mode,
-            "view_mode": "tree",
-            "name": " ",
-            # "context": {"results": results}
-        }
 
     # Constrains Section
     @api.constrains("is_materialized")
@@ -358,8 +342,6 @@ class BiSQLView(models.Model):
         )
         self.menu_id = self.env["ir.ui.menu"].create(self._prepare_menu()).id
         self.write({"state": "ui_valid"})
-        
-        
 
     def button_update_model_access(self):
         self._drop_model_access()
@@ -374,10 +356,7 @@ class BiSQLView(models.Model):
             "type": "ir.actions.act_window",
             "res_model": self.model_id.model,
             "search_view_id": self.search_view_id.id,
-            # "view_mode": self.action_id.view_mode,
-            "view_mode": "tree,form",
-            "name": " "
-
+            "view_mode": self.action_id.view_mode,
         }
 
     # Prepare Function
@@ -450,7 +429,7 @@ class BiSQLView(models.Model):
             """</tree>""".format(
                 "".join([x._prepare_tree_field() for x in self.bi_sql_view_field_ids])
             ),
-        } 
+        }
 
     def _prepare_graph_view(self):
         self.ensure_one()

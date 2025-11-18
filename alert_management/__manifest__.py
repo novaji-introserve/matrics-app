@@ -31,7 +31,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','compliance_management', 'mail', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo','web_widget_numeric_step','legion_hide_odoo','base_automation'],
+    'depends': ['base','compliance_management', 'mail', 'web', 'bus', 'contacts', 'hr', 'access_apps', 'muk_web_theme_default_sidebar_invisible', 'web_field_slider', 'spreadsheet_dashboard', 'hide_powered_by_odoo', 'hide_menu_user','web_widget_numeric_step','legion_hide_odoo','base_automation'],
     # always loaded
     'data': [
         'security/ir.model.access.csv',
@@ -42,12 +42,14 @@
         'views/frequency_view.xml',
         'views/mail_template.xml',
         'views/sql_view.xml', 
+        'views/email_template_config_views.xml',
 
         # demo data
 
         'data/hr/hr_dpt.xml',
-        'data/hr/hr_job.xml',
-        'data/alert.xml',
+        # 'data/hr/hr_job.xml',
+        # 'data/alert.xml',
+        # 'data/alert_delivery_method_data.xml',
         # 'data/hr/hr_employee.xml',
         # 'data/users.xml',
 

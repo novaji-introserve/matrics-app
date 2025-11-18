@@ -4,8 +4,10 @@
     <record id="internal_control_customer_tree" model="ir.ui.view">
         <field name="name">internal.control.customer.tree</field>
         <field name="model">res.partner</field>
+        <field name="priority">1</field>
         <field name="arch" type="xml">
-            <tree create="true">
+            <!-- disable create & delete -->
+            <tree create="false" delete="false">
                 <field name="customer_id" optional="show"/>
                 <field name="firstname" optional="show"/>
                 <field name="lastname" optional="show"/>
@@ -23,15 +25,16 @@
     <record id="internal_control_customer_form" model="ir.ui.view">
         <field name="name">internal.control.customer.form</field>
         <field name="model">res.partner</field>
+        <field name="priority">1</field>
         <field name="arch" type="xml">
-            <form readonly="1">
+            <!-- disable delete -->
+            <form readonly="1" delete="false">
                 <header>
-
                 </header>
                 <sheet>
                     <h1>
                         <label for="name">Name</label>
-                        <field name="name" class="text-break"/>
+                        <field name="name" class="text-break" readonly="1"/>
                     </h1>
                     
                     <group>
@@ -39,31 +42,35 @@
                             <field name="customer_id" readonly="1"/>
                             <field name="firstname" readonly="1"/>
                             <field name="lastname" readonly="1"/>
-                            <field name="nin" string="NIN"/>
-                            <field name="date_opened" string="Date Opened"/>
-                            <field name="nationality"/>
+                            <field name="nin" string="NIN" readonly="1"/>
+                            <field name="date_opened" string="Date Opened" readonly="1"/>
+                            <field name="nationality" readonly="1"/>
                         </group>
                         <group string="Contact Information">
                             <field name="formatted_phone" readonly="1"/>
                             <field name="branch_id" readonly="1"/>
-                            <field name="country_id" invisible="1"/>  <!-- Required for state_id domain -->
-                            <field name="state_id"/>
+                            <field name="country_id" invisible="1"/>
+                            <field name="state_id" readonly="1"/>
                         </group>
                     </group>
                     
                     <notebook>
-
-                        <page string="Additional Info" name="additional_info">
+                        <page string="Additional Information" name="additional_info">
                             <group>
                                 <field name="sector_id" readonly="1"/>
                                 <field name="customer_industry_id" readonly="1"/>
-                                <field name="employment_status"/>
-                                <field name="state_residence"/>
+                                <field name="employment_status" readonly="1"/>
+                                <field name="state_residence" readonly="1"/>
                                 <field name="first_risk_rating" readonly="1"/>
                             </group>
                         </page>
                     </notebook>
                 </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread" />
+                    <field name="activity_ids" widget="mail_activity" />
+                </div>
             </form>
         </field>
     </record>
@@ -88,7 +95,7 @@
                 <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
                 <separator/>
                 <group expand="0" name="group_by" string="Group By">
-                    <filter name="group_branch" string="Branch" context="{'group_by': 'branch_id'}"/>
+                    <!-- <filter name="group_branch" string="Branch" context="{'group_by': 'branch_id'}"/> -->
                     <filter name="group_state" string="State" context="{'group_by': 'state_id'}"/>
                     <filter name="group_nationality" string="Nationality" context="{'group_by': 'nationality'}"/>
                 </group>
@@ -96,34 +103,33 @@
         </field>
     </record>
 
-    <!-- Internal Control Action -->
-    <record id="action_internal_control_customers" model="ir.actions.act_window">
-        <field name="name">Internal Control Customers</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('internal_control_customer_tree')}),
-            (0, 0, {'view_mode': 'form', 'view_id': ref('internal_control_customer_form')})]"/>
-        <field name="search_view_id" ref="internal_control_customer_search"/>
-        <field name="domain">[('internal_category', '=', 'customer')]</field>
-        <field name="context">{}</field>
+    <!-- Actions -->
+    <record id="action_customers_all" model="ir.actions.server">
+        <field name="name">All Customers</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">action = model.open_all_customers()</field>
     </record>
 
-    <!-- Your existing server actions - keep them -->
-    <record id="action_open_customers_today" model="ir.actions.server">
-        <field name="name">Today</field>
-        <field name="model_id" ref="model_res_partner"/>
-        <field name="type">ir.actions.server</field>
+    <record id="action_customers_today" model="ir.actions.server">
+        <field name="name">Customers Today</field>
+        <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
-        <field name="code">action = env['res.partner'].open_all_customers_today()</field>
+        <field name="code">action = model.open_all_customers_today()</field>
     </record>
-    
-    <record id="action_open_customers_last_7days" model="ir.actions.server">
-        <field name="name">Last 7 Days</field>
-        <field name="model_id" ref="model_res_partner"/>
-        <field name="type">ir.actions.server</field>
+
+    <record id="action_customers_last_7days" model="ir.actions.server">
+        <field name="name">Customers Last 7days</field>
+        <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
-        <field name="code">action = env['res.partner'].open_all_customers_last_7days()</field>
+        <field name="code">action = model.open_all_customers_last_7days()</field>
+    </record>
+
+    <record id="action_customers_last_30days" model="ir.actions.server">
+        <field name="name">Customers Last 30days</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">action = model.open_all_customers_last_30days()</field>
     </record>
 
 </odoo>

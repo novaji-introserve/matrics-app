@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_case_status,access right for case status,icomply_dashboard.model_case_status,base.group_user,1,1,1,1
-access_case_rating,access right for case rating,icomply_dashboard.model_case_rating,base.group_user,1,1,1,1
-access_case_management,access right for case management,icomply_dashboard.model_case_management,base.group_user,1,1,1,1
