@@ -37,12 +37,16 @@
                     </group>
                     <group>
                         <group>
-                            <field name="control_effectiveness_score" widget="risk_slider" />
+                            <field name="control_effectiveness_score"
+                                widget="risk_slider"
+                                readonly="1"
+                                options="{'step': 1, 'show_value': true}" />
+                            <!-- <field name="control_effectiveness_score" widget="risk_slider" options="{'readonly': true, 'step': 1, 'show_value': true}" /> -->
                             <!-- <field name="control_effectiveness_score" widget="risk_slider" options="{'reverseColors': true}" /> -->
                         </group>
                         <group>
                             
-                          <field name="residual_risk_impact" widget="risk_slider" options="{'readonly': true}"/>
+                          <field name="residual_risk_impact" widget="risk_slider" options="{'readonly': true, 'step': 1, 'show_value': true, 'reverse_colors': false}"/>
                         </group>
                     </group>
                     <group>
@@ -74,6 +78,13 @@
         <field name="model">res.risk.assessment</field>
         <field name="arch" type="xml">
             <tree string="Risk Assessment">
+              <!-- This header adds buttons to the top of the tree view -->
+                <header>
+                    <button name="cron_update_all_risk_scores" 
+                            type="object" 
+                            string="Recalculate All Risk Scores" 
+                            class="btn-primary"/>
+                </header>
                 <field name="name" string="Name" />
                 <field name="subject_id" />
                 <field name="universe_id" />

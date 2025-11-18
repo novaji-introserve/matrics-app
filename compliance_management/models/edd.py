@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 class CustomerEDD(models.Model):
     _name = 'res.partner.edd'
     _description = 'Enhanced Due Diligence'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin','conditional.method.mixin']
     _sql_constraints = [
         ('unique_name', 'UNIQUE(name)', 'The EDD name must be unique.')]
 
@@ -701,7 +701,8 @@ class CustomerEDD(models.Model):
                 f"Sending {template.name} notification to {recipient_info}, CC: {cc_info}")
 
             try:
-                template_with_context = template.with_context(**email_context)
+                
+                template_with_context = template.sudo().with_context(**email_context)
 
                 # Send the email with the context
                 email_result = template_with_context.send_mail(

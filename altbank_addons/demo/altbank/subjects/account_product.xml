@@ -1,0 +1,915 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="compliance_inst_fc_salary_advance_subject" model="res.risk.subject">
+            <field name="name">Salary Advance</field>
+            <field name="code">Salary Advance</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_other_receivables_subject" model="res.risk.subject">
+            <field name="name">OTHER RECEIVABLES</field>
+            <field name="code">OTHER RECEIVABLES</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_qard_deposit_subject" model="res.risk.subject">
+            <field name="name">Qard Deposit</field>
+            <field name="code">Qard Deposit</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_helb_account_subject" model="res.risk.subject">
+            <field name="name">HELB</field>
+            <field name="code">HELB Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_operations_liability_acct_subject" model="res.risk.subject">
+            <field name="name">Ops Liability Acct</field>
+            <field name="code">Operations Liability Acct</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_minor_account_subject" model="res.risk.subject">
+            <field name="name">MINOR ACCOUNT</field>
+            <field name="code">MINOR ACCOUNT</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijarah_finance_lease_corporate_subject" model="res.risk.subject">
+            <field name="name">Ijar Fin Lease Corp</field>
+            <field name="code">Ijarah Finance Lease-Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_excro_deposit_a_c_subject" model="res.risk.subject">
+            <field name="name">EXCRO _Deposit A/c</field>
+            <field name="code">EXCRO _Deposit A/c</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_termed_qard_deposit_subject" model="res.risk.subject">
+            <field name="name">TERMED QARD DEPOSIT</field>
+            <field name="code">TERMED QARD DEPOSIT</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_disbursed_facility_subject" model="res.risk.subject">
+            <field name="name">DISBURSED FACILITY</field>
+            <field name="code">DISBURSED FACILITY</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_staff_facility_subject" model="res.risk.subject">
+            <field name="name">Murab Staff Facility</field>
+            <field name="code">Murabaha Staff Facility</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murab_facility_lc_corp_subject" model="res.risk.subject">
+            <field name="name">Murab Fac LC Corp</field>
+            <field name="code">Murab Facility LC Corp</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_facility_lc_retail_subject" model="res.risk.subject">
+            <field name="name">Murab LC Retail.</field>
+            <field name="code">Murabaha Facility LC Retail</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_transit_account_subject" model="res.risk.subject">
+            <field name="name">Murabaha Transit Acc</field>
+            <field name="code">Murabaha Transit Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_vostro_account_subject" model="res.risk.subject">
+            <field name="name">Vostro Account</field>
+            <field name="code">Vostro Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_vostro_account_foreign_banks_subject" model="res.risk.subject">
+            <field name="name">VOSTRO ACCOUNT</field>
+            <field name="code">VOSTRO ACCOUNT - FOREIGN BANKS</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_account_subject" model="res.risk.subject">
+            <field name="name">Current Account</field>
+            <field name="code">Current Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_salary_current_account_subject" model="res.risk.subject">
+            <field name="name">Salary Current Accou</field>
+            <field name="code">Salary Current Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_account_staff_subject" model="res.risk.subject">
+            <field name="name">Current Acct Staff</field>
+            <field name="code">Current Account Staff</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_acct_tijara_subject" model="res.risk.subject">
+            <field name="name">Current Acct(Tijara)</field>
+            <field name="code">Current Acct-Tijara</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_account_biashara_subject" model="res.risk.subject">
+            <field name="name">Curr Acct (Biashara)</field>
+            <field name="code">Current Account-Biashara</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_account_individual_subject" model="res.risk.subject">
+            <field name="name">Current Acct - Indiv</field>
+            <field name="code">Current Account - Individual</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_year_end_staff_gift_subject" model="res.risk.subject">
+            <field name="name">Year End Staff</field>
+            <field name="code">Year End Staff Gift</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_online_individual_current_account_subject" model="res.risk.subject">
+            <field name="name">Online Current</field>
+            <field name="code">Online Individual Current Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_sukuk_subject" model="res.risk.subject">
+            <field name="name">SUKUK</field>
+            <field name="code">SUKUK</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijarah_operating_lease_corporate_subject" model="res.risk.subject">
+            <field name="name">Ijarah Opr Leas Cop</field>
+            <field name="code">Ijarah Operating Lease Corporate.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijarah_wa_iqtina_corporate_subject" model="res.risk.subject">
+            <field name="name">Ijarah Wa Iqtina Cor</field>
+            <field name="code">Ijarah Wa Iqtina Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_wa_iqtina_staff_subject" model="res.risk.subject">
+            <field name="name">Ijara wa Iqtina Staf</field>
+            <field name="code">Ijara Wa Iqtina-Staff</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_wa_iqtina_related_party_subject" model="res.risk.subject">
+            <field name="name">Ijara wa Iqtina RP</field>
+            <field name="code">Ijara Wa Iqtina-Related Party</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijarah_finance_subject" model="res.risk.subject">
+            <field name="name">Ijara Fin</field>
+            <field name="code">Ijarah Finance</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_finance_lease_related_party_subject" model="res.risk.subject">
+            <field name="name">Ijar Fin Lease R/P</field>
+            <field name="code">Ijara Finance Lease-Related Party</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_financing_lease_personal_subject" model="res.risk.subject">
+            <field name="name">Ijara Fin Leas Pers</field>
+            <field name="code">Ijara Financing Lease  Personal.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_althomes_subject" model="res.risk.subject">
+            <field name="name">Ijara Althomes</field>
+            <field name="code">Ijara Althomes</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_altrent_finance_personal_subject" model="res.risk.subject">
+            <field name="name">Ijar AltRent</field>
+            <field name="code">Ijara AltRent Finance - Personal</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_musharaka_financing_subject" model="res.risk.subject">
+            <field name="name">Musharaka Financing</field>
+            <field name="code">Musharaka Financing</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_musharaka_retail_subject" model="res.risk.subject">
+            <field name="name">Musharaka-Retail</field>
+            <field name="code">Musharaka-Retail</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_musharaka_corporate_subject" model="res.risk.subject">
+            <field name="name">Musharaka- Corporate</field>
+            <field name="code">Musharaka- Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_musharaka_related_party_subject" model="res.risk.subject">
+            <field name="name">Musharaka-R/P</field>
+            <field name="code">Musharaka-Related Party</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_auto_amp_others_subject" model="res.risk.subject">
+            <field name="name">Ijara Auto &amp; Others</field>
+            <field name="code">Ijara Auto &amp; Others</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_auto_personal_subject" model="res.risk.subject">
+            <field name="name">Ijara Auto - Pers.</field>
+            <field name="code">Ijara Auto - Personal</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_altbiz_finanac_sme_subject" model="res.risk.subject">
+            <field name="name">Ijara Altbiz Finanac</field>
+            <field name="code">Ijara Altbiz Finanac SME</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_lc_corporate_provisions_subject" model="res.risk.subject">
+            <field name="name">Murab LC Corp Prov</field>
+            <field name="code">Murabaha LC Corporate Provisions</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_lc_retail_provisions_subject" model="res.risk.subject">
+            <field name="name">Murab LC Ret Prov</field>
+            <field name="code">Murabaha LC Retail Provisions</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_lc_personal_provisions_subject" model="res.risk.subject">
+            <field name="name">Murab LC Pers Prov</field>
+            <field name="code">Murabaha LC Personal Provisions</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_zakat_subject" model="res.risk.subject">
+            <field name="name">Zakat</field>
+            <field name="code">Zakat</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_inventory_murabaha_auto_staff_old_subject" model="res.risk.subject">
+            <field name="name">Invmurab Auto Staf O</field>
+            <field name="code">Inventory Murabaha Auto Staff Old</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_equity_mudarabah_subject" model="res.risk.subject">
+            <field name="name">Equity Mudarabah</field>
+            <field name="code">Equity Mudarabah</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_istisna_subject" model="res.risk.subject">
+            <field name="name">Istisna</field>
+            <field name="code">Istisna</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_commodity_stocks_subject" model="res.risk.subject">
+            <field name="name">Murabaha Comm Stocks</field>
+            <field name="code">Murabaha Commodity Stocks</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_retail_shop_subject" model="res.risk.subject">
+            <field name="name">Murabaha  Retail</field>
+            <field name="code">Murabaha  Retail Shop</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_saf_micro_small_medium_enterprises_subject" model="res.risk.subject">
+            <field name="name">SAF MSME</field>
+            <field name="code">SAF MICRO SMALL MEDIUM ENTERPRISES</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_provision_subject" model="res.risk.subject">
+            <field name="name">Murabaha Provision</field>
+            <field name="code">Murabaha Provision</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_finance_line_subject" model="res.risk.subject">
+            <field name="name">Murabaha Fin Line</field>
+            <field name="code">Murabaha Finance Line</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_saf_sway_ag_subject" model="res.risk.subject">
+            <field name="name">SAF Sway Ag</field>
+            <field name="code">SAF Sway Ag</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_other_market_instruments_income_subject" model="res.risk.subject">
+            <field name="name">Other Market Instrum</field>
+            <field name="code">Other Market Instruments Income</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_account_association_subject" model="res.risk.subject">
+            <field name="name">CURRENT ACCOUNT ASSO</field>
+            <field name="code">CURRENT ACCOUNT ASSOCIATION</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_altbiz_facility_products_subject" model="res.risk.subject">
+            <field name="name">ALtbiz Facility Prod</field>
+            <field name="code">ALtbiz Facility Products</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_hamish_jiddiyah_subject" model="res.risk.subject">
+            <field name="name">Hamish Jiddiyah</field>
+            <field name="code">Hamish Jiddiyah</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_other_expense_tbh_subject" model="res.risk.subject">
+            <field name="name">OTHER EXPENSE TBH</field>
+            <field name="code">OTHER EXPENSE TBH</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_musharaka_investment_subject" model="res.risk.subject">
+            <field name="name">Musharaka Investment</field>
+            <field name="code">Musharaka Investment</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_other_income_tbh_subject" model="res.risk.subject">
+            <field name="name">OTHER INCOME TBH</field>
+            <field name="code">OTHER INCOME TBH</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_altmall_finance_subject" model="res.risk.subject">
+            <field name="name">Murabaha Altmall f</field>
+            <field name="code">Murabaha – Altmall finance</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_vostro_accounts_subject" model="res.risk.subject">
+            <field name="name">Vostro Accounts</field>
+            <field name="code">Vostro Accounts</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_finance_real_estate_subject" model="res.risk.subject">
+            <field name="name">Murab Fin - Real Est</field>
+            <field name="code">Murabaha Finance - Real Estate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_nostro_accounts_subject" model="res.risk.subject">
+            <field name="name">Nostro Accounts</field>
+            <field name="code">Nostro Accounts</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_nostro_accts_foreign_banks_subject" model="res.risk.subject">
+            <field name="name">Nostro Accts-Fgn Bnk</field>
+            <field name="code">Nostro Accts-Foreign Banks</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_nostro_local_banks_subject" model="res.risk.subject">
+            <field name="name">Nostro-Local Bnks</field>
+            <field name="code">Nostro-Local Banks</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_clearing_accounts_subject" model="res.risk.subject">
+            <field name="name">Clearing Accounts.</field>
+            <field name="code">Clearing Accounts</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_non_governmental_organisation_account_subject" model="res.risk.subject">
+            <field name="name">NGO Account</field>
+            <field name="code">Non Governmental Organisation Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_savings_account_public_sector_subject" model="res.risk.subject">
+            <field name="name">Savings Account - PS</field>
+            <field name="code">Savings Account - Public Sector</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_savings_account_federal_subject" model="res.risk.subject">
+            <field name="name">Savings Acc- Fed.</field>
+            <field name="code">Savings Account - Federal</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_savings_account_state_subject" model="res.risk.subject">
+            <field name="name">Savings Acct- State</field>
+            <field name="code">Savings Account- State</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_savings_account_lg_subject" model="res.risk.subject">
+            <field name="name">Savings Acct- LG</field>
+            <field name="code">Savings Account- LG</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_other_deposits_subject" model="res.risk.subject">
+            <field name="name">Other Deposits</field>
+            <field name="code">Other Deposits</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_manager_x27_s_cheque_subject" model="res.risk.subject">
+            <field name="name">Manager's Cheq</field>
+            <field name="code">Manager's Cheque</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_stale_manager_x27_s_cheque_subject" model="res.risk.subject">
+            <field name="name">Stale MCs</field>
+            <field name="code">Stale Manager's Cheque</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_other_fees_subject" model="res.risk.subject">
+            <field name="name">Other fees</field>
+            <field name="code">Other fees</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_commodity_murabaha_corporate_subject" model="res.risk.subject">
+            <field name="name">Commodity Murab Corp</field>
+            <field name="code">Commodity Murabaha Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_nysc_entrepreneurship_scheme_subject" model="res.risk.subject">
+            <field name="name">NYSC ENTREPREN SCHEM</field>
+            <field name="code">NYSC ENTREPRENEURSHIP SCHEME</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mudarabah_investment_subject" model="res.risk.subject">
+            <field name="name">Mudarabah Investment</field>
+            <field name="code">Mudarabah Investment</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_qard_placement_subject" model="res.risk.subject">
+            <field name="name">Qard Placement</field>
+            <field name="code">Qard Placement</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_structured_trade_finance_subject" model="res.risk.subject">
+            <field name="name">Murabaha Struc Trade</field>
+            <field name="code">Murabaha Structured Trade Finance</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabah_deffered_year_structured_trade_subject" model="res.risk.subject">
+            <field name="name">Murabah Deffered Yr</field>
+            <field name="code">Murabah Deffered Year-Structured Trade</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_commodity_mudarabah_subject" model="res.risk.subject">
+            <field name="name">Commodity Mudarabah</field>
+            <field name="code">Commodity Mudarabah</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_auto_staff_subject" model="res.risk.subject">
+            <field name="name">Murabaha Auto Staff</field>
+            <field name="code">Murabaha Auto Staff.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_finance_corporate_subject" model="res.risk.subject">
+            <field name="name">Murabaha Fin.-Corp</field>
+            <field name="code">Murabaha Finance - Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_fmcg_corporate_subject" model="res.risk.subject">
+            <field name="name">Murab FMCG -Corporat</field>
+            <field name="code">Murabaha FMCG- Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_finance_retail_shop_subject" model="res.risk.subject">
+            <field name="name">Muraba.Retail.Shop</field>
+            <field name="code">Murabaha Finance - Retail Shop</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_dell_altmall_finance_subject" model="res.risk.subject">
+            <field name="name">DELL Altmall Finance</field>
+            <field name="code">DELL Altmall Finance</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_finance_alt_drive_subject" model="res.risk.subject">
+            <field name="name">Murabaha Fi AltDrive</field>
+            <field name="code">Murabaha Finance Alt Drive</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_retail_msme_subject" model="res.risk.subject">
+            <field name="name">Murabaha Retail MSME</field>
+            <field name="code">Murabaha Retail MSME</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murab_loan_lc_corp_subject" model="res.risk.subject">
+            <field name="name">Murab Loan LC Corp</field>
+            <field name="code">Murab Loan LC Corp</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_loan_lc_retail_subject" model="res.risk.subject">
+            <field name="name">Murab LC Retail</field>
+            <field name="code">Murabaha Loan LC Retail</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_retail_provisions_subject" model="res.risk.subject">
+            <field name="name">Mur Retail Prov</field>
+            <field name="code">Murabaha Retail Provisions</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_staff_provision_subject" model="res.risk.subject">
+            <field name="name">Mur Staff Prov</field>
+            <field name="code">Murabaha Staff Provision</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_retail_provisions_subject" model="res.risk.subject">
+            <field name="name">Ijara Ret Prov</field>
+            <field name="code">Ijara Retail Provisions</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_personal_provision_subject" model="res.risk.subject">
+            <field name="name">Ijara Pers Prov</field>
+            <field name="code">Ijara Personal Provision</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_umrah_tour_package_finance_subject" model="res.risk.subject">
+            <field name="name">Umrah Pack Finanace</field>
+            <field name="code">Umrah Tour Package Finance.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_outward_bill_for_collection_subject" model="res.risk.subject">
+            <field name="name">OUTWARD BILL COLLECT</field>
+            <field name="code">OUTWARD BILL FOR COLLECTION</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_sukuk_commission_subject" model="res.risk.subject">
+            <field name="name">Sukuk Commission</field>
+            <field name="code">Sukuk Commission</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_salary_advantage_subject" model="res.risk.subject">
+            <field name="name">Salary Advantage</field>
+            <field name="code">Salary Advantage</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_others_subject" model="res.risk.subject">
+            <field name="name">Murabaha-Others</field>
+            <field name="code">Murabaha-Others</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_private_murabaha_subject" model="res.risk.subject">
+            <field name="name">Private Murabaha</field>
+            <field name="code">Private Murabaha</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mudaraba_others_expense_subject" model="res.risk.subject">
+            <field name="name">Mudaraba others</field>
+            <field name="code">Mudaraba others Expense</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_istisna_health_medicals_subject" model="res.risk.subject">
+            <field name="name">Ist-Health/Medicals</field>
+            <field name="code">Istisna-Health/Medicals</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_istisna_education_subject" model="res.risk.subject">
+            <field name="name">Istisna-Education</field>
+            <field name="code">Istisna-Education</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_health_medicals_subject" model="res.risk.subject">
+            <field name="name">Mur-Health/Medicals</field>
+            <field name="code">Murabaha-Health/Medicals</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_education_subject" model="res.risk.subject">
+            <field name="name">Mur-Education</field>
+            <field name="code">Murabaha-Education</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_finance_health_medicals_subject" model="res.risk.subject">
+            <field name="name">Ijara Fin-Health/Med</field>
+            <field name="code">Ijara Finance-Health/Medicals</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijarafinance_education_subject" model="res.risk.subject">
+            <field name="name">Ijara Fin-Education</field>
+            <field name="code">IjaraFinance-Education</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_eazirent_account_subject" model="res.risk.subject">
+            <field name="name">Ijara EaziRent Acct</field>
+            <field name="code">Ijara EaziRent Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_hajj_services_subject" model="res.risk.subject">
+            <field name="name">Ijara -Hajj Services</field>
+            <field name="code">Ijara - Hajj Services</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_services_subject" model="res.risk.subject">
+            <field name="name">Ijara Services</field>
+            <field name="code">Ijara Services</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_altmobile_services_subject" model="res.risk.subject">
+            <field name="name">Ijara Altmobile Serv</field>
+            <field name="code">Ijara Altmobile Services</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_kiakia_no_bvn_subject" model="res.risk.subject">
+            <field name="name">KiaKia-No BVN</field>
+            <field name="code">KiaKia-No BVN</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mudaraba_investment_income_subject" model="res.risk.subject">
+            <field name="name">Mudaraba Inv Income</field>
+            <field name="code">Mudaraba Investment Income</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_other_market_instruments_subject" model="res.risk.subject">
+            <field name="name">OTHER MARKET INSTRUM</field>
+            <field name="code">OTHER MARKET INSTRUMENTS</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_fmcg_retail_subject" model="res.risk.subject">
+            <field name="name">Murab FMCG Retail</field>
+            <field name="code">Murabaha FMCG Retail</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_altelite_hni_subject" model="res.risk.subject">
+            <field name="name">AltElite-HNI</field>
+            <field name="code">AltElite-HNI</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_activ8_regular_tier_1_subject" model="res.risk.subject">
+            <field name="name">Activ8 Tier 1</field>
+            <field name="code">Activ8 Regular Tier 1</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mfb_settlement_subject" model="res.risk.subject">
+            <field name="name">MFB SETTLEMENT</field>
+            <field name="code">MFB SETTLEMENT</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_other_investments_subject" model="res.risk.subject">
+            <field name="name">Other Investments</field>
+            <field name="code">Other Investments</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_billings_account_subject" model="res.risk.subject">
+            <field name="name">Billings Account</field>
+            <field name="code">Billings Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_kiakia_tier_2_subject" model="res.risk.subject">
+            <field name="name">KiaKia-Tier 2</field>
+            <field name="code">KiaKia-Tier 2</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mudaraba_commodity_income_subject" model="res.risk.subject">
+            <field name="name">Mudaraba Commodity I</field>
+            <field name="code">Mudaraba Commodity Income</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_gold_alt_coin_subject" model="res.risk.subject">
+            <field name="name">Gold Alt-Coin</field>
+            <field name="code">Gold Alt-Coin</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_tier_1_domiciliary_account_subject" model="res.risk.subject">
+            <field name="name">Tier 1 Dom Account</field>
+            <field name="code">Tier 1 Domiciliary Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_alttravel_services_subject" model="res.risk.subject">
+            <field name="name">Ijara AltTravel Serv</field>
+            <field name="code">Ijara AltTravel Services</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_hajj_operators_subject" model="res.risk.subject">
+            <field name="name">Ijara-Hajj Operators</field>
+            <field name="code">Ijara - Hajj Operators</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mudaraba_others_subject" model="res.risk.subject">
+            <field name="name">Mudaraba Others</field>
+            <field name="code">Mudaraba Others</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_other_income_gold_subject" model="res.risk.subject">
+            <field name="name">Other Income - Gold</field>
+            <field name="code">Other Income - Gold</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_education_services_subject" model="res.risk.subject">
+            <field name="name">Ijara Education ser</field>
+            <field name="code">Ijara Education services</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_altdrive_ijara_finance_subject" model="res.risk.subject">
+            <field name="name">Altdrive Ijara Finan</field>
+            <field name="code">Altdrive Ijara Finance</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mpos_agent_merchant_subject" model="res.risk.subject">
+            <field name="name">MPOS AGENT/MERCHANT</field>
+            <field name="code">MPOS AGENT/MERCHANT</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_home_finance_subject" model="res.risk.subject">
+            <field name="name">Ijara Home Finance</field>
+            <field name="code">Ijara Home Finance</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_pocketpal_subject" model="res.risk.subject">
+            <field name="name">Pocketpal</field>
+            <field name="code">Pocketpal</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mpos_settlement_subject" model="res.risk.subject">
+            <field name="name">MPOS SETTLEMENT</field>
+            <field name="code">MPOS SETTLEMENT</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_altplace_collection_subject" model="res.risk.subject">
+            <field name="name">ALTPLACE COLLECTION</field>
+            <field name="code">ALTPLACE COLLECTION</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_i_fuel_subject" model="res.risk.subject">
+            <field name="name">Murabaha – I-fuel</field>
+            <field name="code">Murabaha – I-fuel</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_good_faith_murabaha_account_subject" model="res.risk.subject">
+            <field name="name">Good Faith Murabaha</field>
+            <field name="code">Good Faith Murabaha Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_account_corporate_subject" model="res.risk.subject">
+            <field name="name">Current A/c (corp)</field>
+            <field name="code">Current Account Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_non_oil_export_dom_subject" model="res.risk.subject">
+            <field name="name">Non-Oil Export Dom</field>
+            <field name="code">Non-Oil Export Dom</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_federal_government_demand_deposit_subject" model="res.risk.subject">
+            <field name="name">FEDERAL GOVT. DD</field>
+            <field name="code">FEDERAL GOVERNMENT DEMAND DEPOSIT</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_account_federal_govt_subject" model="res.risk.subject">
+            <field name="name">CURRENT A/C [FG]</field>
+            <field name="code">CURRENT ACCOUNT - FEDERAL GOVT.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_account_state_govt_subject" model="res.risk.subject">
+            <field name="name">CURRENT A/C [SG]</field>
+            <field name="code">CURRENT ACCOUNT - STATE GOVT.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_current_account_local_govt_subject" model="res.risk.subject">
+            <field name="name">CURRENT A/C [LG]</field>
+            <field name="code">CURRENT ACCOUNT - LOCAL GOVT.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mudaraba_deposit_subject" model="res.risk.subject">
+            <field name="name">Mud Dep</field>
+            <field name="code">Mudaraba Deposit</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_saving_deposits_subject" model="res.risk.subject">
+            <field name="name">Saving Deposits</field>
+            <field name="code">Saving Deposits</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_savings_account_subject" model="res.risk.subject">
+            <field name="name">Savings Account</field>
+            <field name="code">Savings Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_online_savings_account_subject" model="res.risk.subject">
+            <field name="name">Online Sav A/c</field>
+            <field name="code">Online Savings Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_activ8_classic_savings_subject" model="res.risk.subject">
+            <field name="name">Activ8 Savings</field>
+            <field name="code">Activ8 Classic Savings</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_supa_account_subject" model="res.risk.subject">
+            <field name="name">Supa Account</field>
+            <field name="code">Supa Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_kia_kia_account_subject" model="res.risk.subject">
+            <field name="name">Kia Kia Account</field>
+            <field name="code">Kia Kia Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_istisna_staff_subject" model="res.risk.subject">
+            <field name="name">Istisna Staff</field>
+            <field name="code">Istisna Staff</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_qard_hasan_subject" model="res.risk.subject">
+            <field name="name">QARD HASAN</field>
+            <field name="code">QARD HASAN</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_staff_loan_qard_hassan_subject" model="res.risk.subject">
+            <field name="name">Staff Loan - Qard H.</field>
+            <field name="code">Staff Loan - Qard Hassan</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_qard_hassan_subject" model="res.risk.subject">
+            <field name="name">QARD Hassan</field>
+            <field name="code">QARD Hassan</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_financing_subject" model="res.risk.subject">
+            <field name="name">Murabaha Financing</field>
+            <field name="code">Murabaha Financing</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_corporate_subject" model="res.risk.subject">
+            <field name="name">Murabaha Corporate</field>
+            <field name="code">Murabaha Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_staff_subject" model="res.risk.subject">
+            <field name="name">Murabaha Staff</field>
+            <field name="code">Murabaha Staff</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_related_party_subject" model="res.risk.subject">
+            <field name="name">Murabaha R/P</field>
+            <field name="code">Murabaha Related Party</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_auto_personal_subject" model="res.risk.subject">
+            <field name="name">Murabaha Auto Person</field>
+            <field name="code">Murabaha Auto Personal.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_trust_account_deposits_subject" model="res.risk.subject">
+            <field name="name">Trust Account</field>
+            <field name="code">Trust Account Deposits</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_insurance_computers_hardware_subject" model="res.risk.subject">
+            <field name="name">Ins. Computers</field>
+            <field name="code">Insurance Computers Hardware</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_money_insurance_subject" model="res.risk.subject">
+            <field name="name">Money Insurance</field>
+            <field name="code">Money Insurance</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_insurance_others_subject" model="res.risk.subject">
+            <field name="name">Insurance Others</field>
+            <field name="code">Insurance Others</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_corporatre_provision_subject" model="res.risk.subject">
+            <field name="name">Murabaha Prov Corpor</field>
+            <field name="code">Murabaha Corporatre Provision.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_insurance_subject" model="res.risk.subject">
+            <field name="name">Insurance</field>
+            <field name="code">Insurance.</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_murabaha_trade_finance_subject" model="res.risk.subject">
+            <field name="name">Murabaha MTF</field>
+            <field name="code">Murabaha Trade Finance</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_ijara_wa_iqtina_corporate_subject" model="res.risk.subject">
+            <field name="name">Ijara Wa Iqtina C</field>
+            <field name="code">Ijara Wa Iqtina- Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_musharaka_retail_asset_subject" model="res.risk.subject">
+            <field name="name">Mush.Retail Asset</field>
+            <field name="code">Musharaka Retail Asset</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_overseas_cheques_subject" model="res.risk.subject">
+            <field name="name">Overseas Cheques.</field>
+            <field name="code">Overseas Cheques</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_visa_card_settlement_account_subject" model="res.risk.subject">
+            <field name="name">Visa Card Settlmnt</field>
+            <field name="code">Visa Card Settlement Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_mastercard_settlement_account_subject" model="res.risk.subject">
+            <field name="name">Mastercard Settlmnt</field>
+            <field name="code">Mastercard Settlement Account</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_salam_financing_subject" model="res.risk.subject">
+            <field name="name">Salam Financing</field>
+            <field name="code">Salam Financing</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_salam_retail_subject" model="res.risk.subject">
+            <field name="name">Salam Retail</field>
+            <field name="code">Salam Retail</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_salam_corporate_subject" model="res.risk.subject">
+            <field name="name">Salam Corporate</field>
+            <field name="code">Salam Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_istisna_financing_subject" model="res.risk.subject">
+            <field name="name">Istisna Financing</field>
+            <field name="code">Istisna Financing</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_istisna_retail_subject" model="res.risk.subject">
+            <field name="name">Istisna Retail</field>
+            <field name="code">Istisna Retail</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_istisna_corporate_subject" model="res.risk.subject">
+            <field name="name">Istisna Corporate</field>
+            <field name="code">Istisna Corporate</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_istisna_r_p_subject" model="res.risk.subject">
+            <field name="name">Istisna R/P</field>
+            <field name="code">Istisna R/P</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+        <record id="compliance_inst_fc_savings_accounts_exp_subject" model="res.risk.subject">
+            <field name="name">Savings Accounts Exp</field>
+            <field name="code">Savings Accounts Exp</field>
+            <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_22" />
+        </record>
+    </data>
+</odoo>

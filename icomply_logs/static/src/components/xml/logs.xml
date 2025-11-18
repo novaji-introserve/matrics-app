@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="icomply.Terminal" owl="1">
+        <div class="icomply-terminal-container d-flex flex-column h-100">
+            <!-- Terminal Header -->
+            <div class="terminal-header border-bottom p-3 bg-dark text-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <h5 class="mb-0 me-3">
+                            <i class="fa fa-terminal me-2"/>
+                            <t t-if="state.profileInfo">
+                                <t t-esc="state.profileInfo.name"/> - System Logs
+                            </t>
+                            <t t-else="">
+                                IComply System Logs
+                            </t>
+                        </h5>
+                        
+                        <!-- Profile Badge -->
+                        <span t-if="state.profileInfo" class="badge bg-info me-2">
+                            Profile ID: <t t-esc="state.profileId"/>
+                        </span>
+                        
+                        <!-- Connection Status -->
+                        <span class="badge me-2" t-att-class="connectionStatusInfo.class">
+                            <t t-esc="connectionStatusInfo.icon"/> 
+                            <t t-esc="connectionStatusInfo.text"/>
+                        </span>
+                        
+                        <!-- Processing Indicator -->
+                        <span t-if="state.isProcessing" class="text-info me-2">
+                            <t t-esc="processingIndicator"/> Processing
+                        </span>
+                        
+                        <!-- Pause Status -->
+                        <span t-if="state.isPaused" class="badge bg-warning me-2">
+                            ⏸ Paused
+                        </span>
+                    </div>
+                    
+                    <!-- Header Controls -->
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Log Count -->
+                        <span class="text-muted small" t-ref="logCount">
+                            <t t-esc="visibleLogsCount"/>/<t t-esc="state.logs.length"/> logs
+                        </span>
+                        
+                        <!-- Last Update -->
+                        <span class="text-muted small">
+                            Last: <t t-esc="formattedLastUpdate"/>
+                        </span>
+                        
+                        <!-- File Position (debug info) -->
+                        <span class="text-muted small">
+                            Pos: <t t-esc="state.filePosition"/>
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Profile Info Row -->
+                <div t-if="state.profileInfo" class="mt-2 pt-2 border-top border-secondary">
+                    <div class="row small text-muted">
+                        <div class="col-md-4" t-if="state.profileInfo.company">
+                            <i class="fa fa-building-o me-1"/>
+                            Company: <t t-esc="state.profileInfo.company"/>
+                        </div>
+                        <div class="col-md-4" t-if="state.profileInfo.log_file">
+                            <i class="fa fa-file-text-o me-1"/>
+                            Log File: <t t-esc="state.profileInfo.log_file"/>
+                        </div>
+                        <div class="col-md-4" t-if="state.profileInfo.status">
+                            <i class="fa fa-info-circle me-1"/>
+                            Status: <span class="badge badge-sm" 
+                                          t-att-class="{
+                                              'bg-success': state.profileInfo.status === 'active',
+                                              'bg-secondary': state.profileInfo.status !== 'active'
+                                          }">
+                                <t t-esc="state.profileInfo.status"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Bar -->
+            <div class="terminal-controls bg-secondary p-2 border-bottom">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Auto Scroll Toggle -->
+                        <button type="button" 
+                                t-on-click="toggleAutoScroll" 
+                                t-att-class="state.autoScroll ? 'btn btn-sm btn-success' : 'btn btn-sm btn-outline-secondary'"
+                                title="Toggle auto-scroll">
+                            <i class="fa fa-arrow-down"/> Auto Scroll
+                        </button>
+                        
+                        <!-- Pause/Resume Toggle -->
+                        <button type="button" 
+                                t-on-click="togglePause" 
+                                t-att-class="state.isPaused ? 'btn btn-sm btn-success' : 'btn btn-sm btn-warning'"
+                                title="Pause/Resume log polling">
+                            <i t-att-class="state.isPaused ? 'fa fa-play' : 'fa fa-pause'"/>
+                            <span t-if="state.isPaused"> Resume</span>
+                            <span t-else=""> Pause</span>
+                        </button>
+                        
+                        <!-- Manual Poll -->
+                        <button type="button" 
+                                t-on-click="pollNow" 
+                                class="btn btn-sm btn-info"
+                                title="Poll for new logs now">
+                            <i class="fa fa-refresh"/> Poll Now
+                        </button>
+                        
+                        <!-- Reset Position -->
+                        <button type="button" 
+                                t-on-click="resetFilePosition" 
+                                class="btn btn-sm btn-outline-light"
+                                title="Reset file reading position">
+                            <i class="fa fa-fast-backward"/> Reset
+                        </button>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Filter Toggle -->
+                        <button type="button" 
+                                t-on-click="toggleFilterPanel" 
+                                t-att-class="state.showFilterPanel ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-light'"
+                                title="Toggle filter panel">
+                            <i class="fa fa-filter"/> Filters
+                        </button>
+                        
+                        <!-- Refresh -->
+                        <button type="button" 
+                                t-on-click="refreshLogs" 
+                                class="btn btn-sm btn-outline-light"
+                                title="Refresh all logs">
+                            <i class="fa fa-refresh"/> Refresh
+                        </button>
+                        
+                        <!-- Clear -->
+                        <button type="button" 
+                                t-on-click="clearLogs" 
+                                class="btn btn-sm btn-danger"
+                                title="Clear all logs">
+                            <i class="fa fa-trash"/> Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Panel (Collapsible) -->
+            <div t-if="state.showFilterPanel" 
+                 class="filter-panel bg-light p-3 border-bottom" 
+                 t-ref="filterPanel">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Search in logs:</label>
+                        <input type="text" 
+                               class="form-control form-control-sm" 
+                               placeholder="Search messages..."
+                               t-att-value="state.searchText"
+                               t-on-input="onFilterInput"
+                               t-ref="filterInput"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Severity Levels:</label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <div class="form-check">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       id="sev-info"
+                                       t-att-checked="state.enabledSeverities.info"
+                                       t-on-change="() => this.toggleSeverity('info')"/>
+                                <label class="form-check-label text-primary" for="sev-info">Info</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       id="sev-success"
+                                       t-att-checked="state.enabledSeverities.success"
+                                       t-on-change="() => this.toggleSeverity('success')"/>
+                                <label class="form-check-label text-success" for="sev-success">Success</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       id="sev-warning"
+                                       t-att-checked="state.enabledSeverities.warning"
+                                       t-on-change="() => this.toggleSeverity('warning')"/>
+                                <label class="form-check-label text-warning" for="sev-warning">Warning</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       id="sev-error"
+                                       t-att-checked="state.enabledSeverities.error"
+                                       t-on-change="() => this.toggleSeverity('error')"/>
+                                <label class="form-check-label text-danger" for="sev-error">Error</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal Body -->
+            <div class="terminal-body flex-grow-1 overflow-auto bg-dark text-light position-relative" 
+                 t-ref="terminalBody"
+                 style="font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 13px; line-height: 1.4;">
+                
+                <!-- Profile Not Initialized -->
+                <div t-if="!state.profileId" class="text-center p-5 text-muted">
+                    <i class="fa fa-user-circle fa-4x mb-3"/>
+                    <h5>No Profile Selected</h5>
+                    <p>Please select a profile to view logs</p>
+                    <button type="button" 
+                            t-on-click="backToProfiles" 
+                            class="btn btn-primary mt-3">
+                        <i class="fa fa-list"/> Select Profile
+                    </button>
+                </div>
+                
+                <!-- No logs message -->
+                <div t-if="state.profileId and !state.logs.length" class="text-center p-4 text-muted">
+                    <i class="fa fa-inbox fa-3x mb-3"/>
+                    <p>No logs available for this profile</p>
+                    <button type="button" t-on-click="refreshLogs" class="btn btn-sm btn-outline-light">
+                        Load Logs
+                    </button>
+                </div>
+                
+                <!-- Log entries -->
+                <div class="p-3" t-if="state.logs.length">
+                    <t t-foreach="state.logs" t-as="log" t-key="log_index">
+                        <div t-if="isLogVisible(log)" 
+                             class="log-entry mb-1 d-flex align-items-start" 
+                             t-att-class="getLogTypeClass(log)">
+                            
+                            <!-- Timestamp -->
+                            <span t-if="state.showTimestamp" class="log-timestamp text-info me-2 flex-shrink-0" style="font-size: 11px;">
+                                [<t t-esc="formatLogTimestamp(log.timestamp)"/>]
+                            </span>
+                            
+                            <!-- Level Badge -->
+                            <span t-if="state.showLevel" class="log-level badge me-2 flex-shrink-0" style="font-size: 10px;"
+                                  t-att-class="{
+                                      'bg-primary': log.type === 'info',
+                                      'bg-success': log.type === 'success', 
+                                      'bg-warning': log.type === 'warning',
+                                      'bg-danger': log.type === 'error'
+                                  }">
+                                <t t-esc="log.level or log.type.toUpperCase()"/>
+                            </span>
+                            
+                            <!-- Message -->
+                            <span class="log-message flex-grow-1" 
+                                  t-att-class="{
+                                      'text-light': log.type === 'info',
+                                      'text-success': log.type === 'success',
+                                      'text-warning': log.type === 'warning', 
+                                      'text-danger': log.type === 'error'
+                                  }">
+                                <t t-esc="log.message"/>
+                            </span>
+                        </div>
+                    </t>
+                </div>
+                
+                <!-- No visible logs message -->
+                <div t-if="state.logs.length and !visibleLogsCount" class="text-center p-4 text-muted">
+                    <i class="fa fa-filter fa-2x mb-3"/>
+                    <p>No logs match current filters</p>
+                    <button type="button" t-on-click="toggleFilterPanel" class="btn btn-sm btn-outline-light">
+                        Adjust Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="terminal-status-bar bg-secondary text-light p-2 border-top">
+                <div class="d-flex justify-content-between align-items-center small">
+                    <div class="d-flex gap-3">
+                        <span t-if="state.profileId">
+                            <i class="fa fa-user"/> Profile: <t t-esc="state.profileId"/>
+                        </span>
+                        <span>
+                            <i class="fa fa-eye"/> Visible: <t t-esc="visibleLogsCount"/>
+                        </span>
+                        <span t-if="hasErrors">
+                            <i class="fa fa-exclamation-triangle text-danger"/> Errors detected
+                        </span>
+                        <span t-if="state.searchText">
+                            <i class="fa fa-search"/> Filtered: "<t t-esc="state.searchText"/>"
+                        </span>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <span>
+                            Service: <t t-esc="hasTerminalService ? 'Active' : 'Disconnected'"/>
+                        </span>
+                        <span>
+                            <i class="fa fa-clock-o"/> <t t-esc="formattedLastUpdate"/>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Styles -->
+        <style>
+            .icomply-terminal-container {
+                height: 90vh;
+                max-height: 90vh;
+                min-height: 600px;
+            }
+            
+            .terminal-header {
+                flex-shrink: 0;
+            }
+            
+            .terminal-controls {
+                flex-shrink: 0;
+            }
+            
+            .filter-panel {
+                flex-shrink: 0;
+            }
+            
+            .terminal-body {
+                flex: 1 1 auto;
+                overflow-y: auto;
+                background-color: #1a1a1a !important;
+            }
+            
+            .terminal-status-bar {
+                flex-shrink: 0;
+            }
+            
+            .log-entry {
+                word-wrap: break-word;
+                word-break: break-word;
+            }
+            
+            .log-timestamp {
+                color: #569cd6 !important;
+            }
+            
+            .log-message {
+                white-space: pre-wrap;
+            }
+            
+            .terminal-body::-webkit-scrollbar {
+                width: 8px;
+            }
+            
+            .terminal-body::-webkit-scrollbar-track {
+                background: #2d2d30;
+            }
+            
+            .terminal-body::-webkit-scrollbar-thumb {
+                background: #555;
+                border-radius: 4px;
+            }
+            
+            .terminal-body::-webkit-scrollbar-thumb:hover {
+                background: #777;
+            }
+            
+            /* Log type specific styling */
+            .log-type-error .log-message {
+                color: #f14c4c !important;
+            }
+            
+            .log-type-warning .log-message {
+                color: #ff8c00 !important;
+            }
+            
+            .log-type-success .log-message {
+                color: #4caf50 !important;
+            }
+            
+            .log-type-info .log-message {
+                color: #d4d4d4 !important;
+            }
+            
+            /* Badge colors for better visibility */
+            .bg-primary {
+                background-color: #0d6efd !important;
+            }
+            
+            .bg-success {
+                background-color: #198754 !important;
+            }
+            
+            .bg-warning {
+                background-color: #fd7e14 !important;
+            }
+            
+            .bg-danger {
+                background-color: #dc3545 !important;
+            }
+            
+            .bg-info {
+                background-color: #0dcaf0 !important;
+            }
+            
+            /* Profile info section */
+            .terminal-header .row.small {
+                font-size: 0.85rem;
+            }
+            
+            .badge-sm {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+        </style>
+    </t>
+</templates>

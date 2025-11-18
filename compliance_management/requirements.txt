@@ -31,7 +31,6 @@ crashtest
 cryptography
 decorator
 defusedxml
-distlib
 distro
 dnspython
 docopt
@@ -51,7 +50,6 @@ filelock
 freezegun
 gevent
 gevent-websocket
-greenlet
 grpcio
 h11
 hashids
@@ -150,6 +148,7 @@ python-dateutil
 python-dotenv
 python-jose
 python-ldap
+python-magic
 python-multipart
 python-stdnum
 pytz
@@ -205,3 +204,17 @@ zope.event
 zope.interface
 openpyexcel
 sqlparse
+matplotlib-inline
+mistune
+mock
+nbclient
+nbconvert
+nbformat
+num2words
+numpy
+odfpy
+ofxparse
+ollama
+openpyxl
+outcome
+packaging

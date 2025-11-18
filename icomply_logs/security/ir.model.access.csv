@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_icomply_logs_technical,icomply.logs technical,model_icomply_logs,icomply_logs.group_icomply_logs_technical,1,1,1,1
+access_profile_logs_technical,icomply.profile technical,model_icomply_log_profile,icomply_logs.group_icomply_logs_technical,1,1,1,1

@@ -5,7 +5,7 @@
         <field name="name">res_customer_account_tree</field>
         <field name="model">res.partner.account</field>
         <field name="arch" type="xml">
-            <tree string="Account" create="false">
+            <tree string="Account" create="false" limit='40'>
                 <field name="name" string="Account Number" />
                 <field name="account_name" optional="show"/>
                 <field name="branch_id" optional="show"/>
@@ -35,7 +35,7 @@
         <field name="arch" type="xml">
             <form readonly="1">
                 <header>
-                    <field name="state" widget="statusbar" statusbar_visible="Active,Inactive,Dormant,Flagged,Closed" clickable="True" />
+                    <field name="state" widget="statusbar" statusbar_visible="Active,Inactive,Dormant,Flagged,Closed,Opened,Suspended" clickable="True" />
                 </header>
                 <sheet string="Account">
                     <div class="oe_button_box" name="button_box">
@@ -63,7 +63,6 @@
                             <label for="account_name" string="Account Name" />
                             <div>
                                 <field name="account_name" class="oe_inline" readonly="1" />
-                                <field name="active" invisible="1"/>
                             </div>
                         </div>
                     </div>
@@ -139,8 +138,9 @@
         <field name="priority" eval="10" />
         <field name="arch" type="xml">
             <search string="Search Account">
+                <field name="account_name" />
                 <field name="name" />
-                <field name="customer_id" />
+                <field name="customer" string="Customer Id"/>
                 <field name="category"/>
              
 

@@ -15,10 +15,11 @@ class CustomerAccount(models.Model):
          "Account Number already exists. Value must be unique!"),
     ]
 
-    _order = "name"
+    _order = 'id desc'
+
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', index=True)  # customer
-    name = fields.Char(string="Account Number")
+    name = fields.Char(string="Account Number", index=True)
     account_name = fields.Char(
         string='Account Name', index=True)  # account_title1
     account_position = fields.Char(string='Account Position', required=False)
@@ -30,17 +31,18 @@ class CustomerAccount(models.Model):
     last_transaction_date = fields.Date(
         string='Last Transaction Date', required=False)
     opening_date = fields.Date(
-        string='Opening Date', required=False)
+        string='Opening Date', required=False,index=True)
 
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', required=False)  # acct_officer
 
-    currency = fields.Char(string='Currency', required=False)  # currency
+    currency = fields.Char(
+        string='Currency', required=False, index=True)  # currency
 
-    category = fields.Char(string='Category', required=False)  # category
+    category = fields.Char(string='Category', required=False,index=True)  # category
 
     category_description = fields.Char(
-        string='Category Description', required=False)  # category_desc
+        string='Category Description', required=False,index=True)  # category_desc
 
     is_joint_account = fields.Boolean(
         string='Is Joint Account', required=False)  # category_desc
@@ -53,7 +55,7 @@ class CustomerAccount(models.Model):
     date_created = fields.Date(
         string='Date Created', index=True)  # date_created
     ledger_id = fields.Many2one(
-        comodel_name='res.partner.account.ledger', string='Ledger', index=True)
+        comodel_name='res.partner.account.ledger', string='Ledger')
     closure_status = fields.Selection(string='Closure Status', selection=[
                                       ('N', 'No'), ('Y', 'Yes')])
     branch_id = fields.Many2one(
@@ -63,13 +65,8 @@ class CustomerAccount(models.Model):
         comodel_name='res.partner.account.type', string='Account Type', index=True)
 
     risk_assessment = fields.Many2one(
-        comodel_name='res.risk.assessment', string='Risk Assessment', index=True)
-    risk_score = fields.Float(string='Risk Score', digits=(
-        10, 2), related="customer_id.risk_score")
-    risk_level = fields.Char(string='Risk Rating',
-                             related="customer_id.risk_level")
-    account_type_id = fields.Many2one(
-        comodel_name='res.partner.account.type', string='Account Type', index=True)
+        comodel_name='res.risk.assessment', string='Risk Assessment')
+    
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
     branch_code = fields.Char(string="Branch Code")
@@ -126,66 +123,26 @@ class CustomerAccount(models.Model):
     tot_debit_last1y = fields.Float(
         string='Total Debit Amount - Last 1Y', digits=(15, 2))
     risk_score = fields.Float(string='Risk Score', digits=(
-        10, 2), related="customer_id.risk_score")
+        10, 2), related="customer_id.risk_score",index=True)
     risk_level = fields.Char(string='Risk Rating',
-                             related="customer_id.risk_level")
+                             related="customer_id.risk_level",index=True)
 
-    # num_tran_last6m_credit = fields.Integer(string='Transactions - Last 6m')
-    # avg_tran_last6m_credit = fields.Float(string='Avg. Transaction Amount - Last 6m', digits=(10,2))
-    # max_tran_last6m_credit = fields.Float(string='Max. Transaction - Last 6m', digits=(10,2))
-    # tot_tran_last6m_credit = fields.Float(string='Total Transaction Amount - Last 6m', digits=(15,2))
-    # num_tran_last1y_credit = fields.Integer(string='Transactions - Last 1Y')
-    # avg_tran_last1y_credit = fields.Float(string='Avg. Transaction Amount - Last 1Y', digits=(10,2))
-    # max_tran_last1y_credit = fields.Float(string='Max. Transaction - Last 1Y', digits=(10,2))
-    # tot_tran_last1y_credit = fields.Float(string='Total Transaction Amount - Last 1Y', digits=(15,2))
-    # num_tran_last6m_debit = fields.Integer(string='Transactions - Last 6m')
-    # avg_tran_last6m_debit = fields.Float(string='Avg. Transaction Amount - Last 6m', digits=(10,2))
-    # max_tran_last6m_debit = fields.Float(string='Max. Transaction - Last 6m', digits=(10,2))
-    # tot_tran_last6m_debit = fields.Float(string='Total Transaction Amount - Last 6m', digits=(15,2))
-    # num_tran_last1y_debit = fields.Integer(string='Transactions - Last 1Y')
-    # avg_tran_last1y_debit = fields.Float(string='Avg. Transaction Amount - Last 1Y', digits=(10,2))
-    # max_tran_last1y_debit = fields.Float(string='Max. Transaction - Last 1Y', digits=(10,2))
-    # tot_tran_last1y_debit = fields.Float(string='Total Transaction Amount - Last 1Y', digits=(15,2))
-    # 6 months credit stats
-    num_credit_last6m = fields.Integer(string='Credit Transactions - Last 6m')
-    avg_credit_last6m = fields.Float(
-        string='Avg. Credit Amount - Last 6m', digits=(10, 2))
-    max_credit_last6m = fields.Float(
-        string='Max. Credit - Last 6m', digits=(10, 2))
-    tot_credit_last6m = fields.Float(
-        string='Total Credit Amount - Last 6m', digits=(15, 2))
-
-    # 6 months debit stats
-    num_debit_last6m = fields.Integer(string='Debit Transactions - Last 6m')
-    avg_debit_last6m = fields.Float(
-        string='Avg. Debit Amount - Last 6m', digits=(10, 2))
-    max_debit_last6m = fields.Float(
-        string='Max. Debit - Last 6m', digits=(10, 2))
-    tot_debit_last6m = fields.Float(
-        string='Total Debit Amount - Last 6m', digits=(15, 2))
-
-    # 1 year credit stats
-    num_credit_last1y = fields.Integer(string='Credit Transactions - Last 1Y')
-    avg_credit_last1y = fields.Float(
-        string='Avg. Credit Amount - Last 1Y', digits=(10, 2))
-    max_credit_last1y = fields.Float(
-        string='Max. Credit - Last 1Y', digits=(10, 2))
-    tot_credit_last1y = fields.Float(
-        string='Total Credit Amount - Last 1Y', digits=(15, 2))
-
-    # 1 year debit stats
-    num_debit_last1y = fields.Integer(string='Debit Transactions - Last 1Y')
-    avg_debit_last1y = fields.Float(
-        string='Avg. Debit Amount - Last 1Y', digits=(10, 2))
-    max_debit_last1y = fields.Float(
-        string='Max. Debit - Last 1Y', digits=(10, 2))
-    tot_debit_last1y = fields.Float(
-        string='Total Debit Amount - Last 1Y', digits=(15, 2))
-
-    state = fields.Selection(string='Status', selection=[('Active', 'Active'), ('Inactive', 'Inactive'), ('Dormant', 'Dormant'), (
-        'Flagged', 'Flagged'), ('Closed', 'Closed')], tracking=True, default='Active', required=False)  # sta_code
+    state = fields.Selection(string='Status', 
+                             selection=[('Active', 'Active'), 
+                                        ('Inactive', 'Inactive'), 
+                                        ('Dormant', 'Dormant'), 
+                                        ('Flagged', 'Flagged'), 
+                                        ('Opened', 'Opened'), 
+                                        ('Suspended', 'Suspended'), 
+                                        ('To be Reactivated', 'To be Reactivated'), 
+                                        ('To be suspended', 'To be suspended'), 
+                                        ('Unknown', 'Unknown'), 
+                                        ('Applied for closure', 'Applied for closure'), 
+                                        ('Closed', 'Closed')
+                                        ], 
+                             tracking=True, default='Active', required=False,index=True)  # sta_code
     active = fields.Boolean(default=True, tracking=True)
-    customer = fields.Char(string='Customer Id')
+    customer = fields.Char(string='Customer Id', index=True)
     max_debit_daily = fields.Float(string='Max. Debit - Daily', digits=(10, 2))
     overdraft_limit = fields.Float(string='OverDraft Limit', digits=(10, 2))
     uncleared_balance = fields.Float(
@@ -201,18 +158,20 @@ class CustomerAccount(models.Model):
         ('1', 'Tier 1'),
         ('2', 'Tier 2'),
         ('3', 'Tier 3')
-    ], string="Tier Level", compute='_compute_tier_info', search='_search_tier_level', store=False)
+    ], string="Tier Level",index=True, compute='_compute_tier_info', search='_search_tier_level', store=False)
 
     tier_name = fields.Char(
-        string="Account Tier", compute='_compute_tier_info', store=False)
+        string="Account Tier", index=True, compute='_compute_tier_info', store=False)
 
    
-    def init(self):
+    @api.model
+    def customer_account_triggers_and_indexes(self):
         """Initialize database triggers when module is installed/updated"""
 
         # Create index on res_partner_account (only if it doesn't exist)
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")
+        
 
         # Check if the trigger exists
         self.env.cr.execute("""
@@ -246,10 +205,7 @@ class CustomerAccount(models.Model):
                         NEW.customer = NEW.customer_id::TEXT;                    
                     END IF;
                 
-                    IF NEW.active IS NULL THEN
-                        -- Set active field to True
-                        NEW.active = True;
-                    END IF;
+                    
                 
                 
                     RETURN NEW;
@@ -274,12 +230,6 @@ class CustomerAccount(models.Model):
             AND customer_id IS NOT NULL;
         """)
 
-        # Update existing records where active field is NULL
-        self.env.cr.execute("""
-            UPDATE res_partner_account
-            SET active = TRUE
-            WHERE active IS NULL;
-        """)
 
 
     @api.model
@@ -309,6 +259,7 @@ class CustomerAccount(models.Model):
             'res_model': 'res.partner.account',
             'view_mode': 'tree,form',
             'domain': domain,
+            'limit': 3000000,
             'context': {'search_default_group_branch': 1}
         }
 
@@ -337,8 +288,6 @@ class CustomerAccount(models.Model):
                     INSERT INTO account_agg_risk_score (
                         branch_id,
                         product_id,
-                        currency_id,
-                        account_type_id,
                         state,
                         weighted_avg_risk_score,
                         total_accounts,
@@ -349,8 +298,6 @@ class CustomerAccount(models.Model):
                     SELECT
                         rpa.branch_id,
                         rpa.product_id,
-                        rpa.currency_id,
-                        rpa.account_type_id,
                         rpa.state,
 
                         ROUND(
@@ -375,8 +322,6 @@ class CustomerAccount(models.Model):
                     GROUP BY
                         rpa.branch_id,
                         rpa.product_id,
-                        rpa.currency_id,
-                        rpa.account_type_id,
                         rpa.state;
                 """)
 
@@ -413,12 +358,12 @@ class CustomerAccount(models.Model):
         return True
 
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        print(fields)
-        print(domain)
         """
         Enhanced read_group method using pre-aggregated data from account.agg.risk.score.
         Falls back to standard read_group if no aggregated data is available.
         """
+        return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
 
         if not groupby:
             return super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
@@ -504,8 +449,8 @@ class CustomerAccount(models.Model):
                 field_mapping = {
                     'branch_id': 'branch_id',
                     'product_id': 'product_id',
-                    'currency_id': 'currency_id',
-                    'account_type_id': 'account_type_id',
+                    # 'currency_id': 'currency_id',
+                    # 'account_type_id': 'account_type_id',
                     'state': 'state'
                 }
 
@@ -706,8 +651,9 @@ class CustomerAccountOfficer(models.Model):
     ]
     _order = "name"
     name = fields.Char(string="Name", required=True)
-    code = fields.Char(string="Code", required=True)
-    area = fields.Char(string="Area", required=True)
+    code = fields.Char(string="Code", )
+    area = fields.Char(string="Area", )
+    email = fields.Char(string="Email", )
 
 
 class CustomerAccountDetails(models.Model):
@@ -729,7 +675,6 @@ class CustomerAccountDetails(models.Model):
     high_transaction_account = fields.Boolean(
         string="Is High Transaction Account")
     
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
     def init(self):
 

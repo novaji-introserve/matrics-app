@@ -5,8 +5,23 @@ __pycache__/
 *:Zone.Identifier
 node_modules
 .env
+.log
 .DS_Store
 media/
 internal_control/models/db_sync/db_config.json
 internal_control/models/db_sync/etl.log*
 internal_control/models/db_sync/etl_config.json
+compliance_management/demo/*
+
+*.log
+*.log.gz
+/risk_analysis/cache/
+/risk_analysis/config/settings.conf
+
+# Ignore only the compiled binary inside risk_analysis  
+/risk_analysis/risk-processor
+/risk_analysis/risk-api-server
+
+# Keep the Go source directory tracked
+!/risk_analysis/cmd/risk-processor/
+

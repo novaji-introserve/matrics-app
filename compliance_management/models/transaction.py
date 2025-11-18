@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+import logging
+from dotenv import load_dotenv
+
+load_dotenv()
+_logger = logging.getLogger(__name__)
+
 
 class Transaction(models.Model):
     _name = 'res.customer.transaction'
@@ -9,21 +15,23 @@ class Transaction(models.Model):
         ('uniq_trans_name', 'unique(name)',
          "Account Reference already exists. Value must be unique!"),
     ]
-    _order = 'date_created desc'
+    _order = 'id desc'
+    
     _inherit = ['mail.thread', 'mail.activity.mixin']
     name = fields.Char(string="Reference Number", index=True)
     account_id = fields.Many2one(
         comodel_name='res.partner.account', string='Account', index=True)
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Currency', index=True)
-    date_created = fields.Date(string='Tran. Date', index=True)
+    date_created = fields.Datetime(string='Tran. Date',  help="Tran. Date", index=True)
+    
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', index=True) 
     branch_id = fields.Many2one(
         comodel_name='res.branch', string='Branch', index=True)
     amount = fields.Float(string='Transaction Amount', digits=(15, 2))
-    # tran_type = fields.Selection(string='Tran. Type', selection=[
-    #                              ('dr', 'Debit'), ('cr', 'Credit')], index=True)
+    tran_type = fields.Selection(string='Tran. Type', selection=[
+                                 ('dr', 'Debit'), ('cr', 'Credit')], index=True)
     tran_type = fields.Many2one(comodel_name='res.transaction.type',
                               string='Tran. Type', index=True)
     narration = fields.Text(string='Narration')
@@ -43,10 +51,7 @@ class Transaction(models.Model):
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
     
     
-    show_create_case_button = fields.Boolean(
-    string="Case Management Installed",
-    compute='_compute_is_case_management_installed',
-    store=False,)
+    
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', index=True, tracking=True, readonly=True)
     trans_code = fields.Char(string='Transaction Code')
@@ -55,7 +60,6 @@ class Transaction(models.Model):
     authorizer = fields.Char(string='Authorizer')
     transaction_type = fields.Selection(selection=[(
         'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
-    active = fields.Boolean(default=True, readonly=True)
     branch_code = fields.Char(string="Branch Code")
     
     show_create_case= fields.Boolean(
@@ -65,10 +69,15 @@ class Transaction(models.Model):
 
     rule_ids = fields.One2many(
         'res.transaction.screening.history', 'transaction_id',
-        string='Screening Rules')
+        string='Screening Rules', tracking=True)
     
     total_rules = fields.Integer(
         string='Rules', compute='transaction_total_rules', index=True, store=False)
+    
+    rule_line_ids = fields.One2many(
+        comodel_name='res.transaction.screening.rule.line', inverse_name='transaction_id', string='Exception Analysis Lines', tracking=True)
+    
+    
     
     @api.model
     def create(self,vals_list):
@@ -124,7 +133,7 @@ class Transaction(models.Model):
         # Add transaction details to narration
         narration = f"Transaction Reference: {self.name or ''}\n"
         narration += f"Amount: {self.amount or 0.0} {self.currency or ''}\n"
-        narration += f"Date: {self.date_created or ''}\n"
+        narration += f"Date: {self.date_created or (self.created_date if hasattr(self, 'created_date') else None)}\n"
 
         if self.narration:
             narration += f"\nTransaction Narration: {self.narration}"
@@ -149,15 +158,6 @@ class Transaction(models.Model):
 
 
 
-    @api.depends('date_created')  
-    def _compute_is_case_management_installed(self):
-        case_management_installed = bool(self.env['ir.module.module'].search([
-            ('name', '=', 'case_management'),
-            ('state', '=', 'installed')
-        ], limit=1))
-        
-        for record in self:
-            record.show_create_case_button = case_management_installed
         
     
     
@@ -170,40 +170,16 @@ class Transaction(models.Model):
                 ('state', '=', 'installed')
             ], limit=1))
         return self._case_management_available    
-
-    def action_create_case(self):
-        """
-        Opens the case management form with the transaction reference pre-filled
-        """
-        # Create the context with required values
-        context = {
-            'default_status_id': self.env.ref('case_management.case_status_open').id,
-            'case_created': True,
-            'show_creation_notification': True,
-        }
-        
-        # Pre-fill the transaction reference
-        context['default_transaction_reference'] = self.name
-        
-        # Pre-fill the transaction_id field if it exists in the case model
-        context['default_transaction_id'] = self.id
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'New Case',
-            'res_model': 'case',
-            'view_mode': 'form',
-            'view_id': self.env.ref('case_management.case_form_view').id,
-            'target': 'current',
-            'context': context
-        }
-        
-        
+   
 
 
     def init(self):
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_customer_transaction_id_idx ON res_customer_transaction (id)")
+        self.env.cr.execute("""
+        ALTER TABLE res_customer_transaction
+        ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+    """)
 
     def get_risk_level(self):
         return self.risk_level
@@ -250,13 +226,15 @@ class Transaction(models.Model):
                             self.action_mark_as_suspicious()
                             
                 if rule.condition_select == 'sql':
+                    # self.action_compute_rule_lines(rule)
                     query = rule.sql_query
                     char_to_replace = {
                                     '#TRANSACTION_ID#': f"{self.id}",
                                     '#AMOUNT#': f"{self.amount}",
                                     '#ACCOUNT_ID#': f"{self.account_id.id}",
                                     "#CUSTOMER_ID#": f"{self.customer_id.id}",
-                                    "#TRAN_DATE#": f"{self.date_created}",
+                                    # "#TRAN_DATE#": f"{self.date_created}",
+                                    "#TRAN_DATE#": f"{self.date_created or (self.created_date if hasattr(self, 'created_date') else None)}",
                                     "#BRANCH_ID#": f"{self.branch_id.id}",
                                     "#CURRENCY_ID#": f"{self.currency_id.id}"}
                     # Iterate over all key-value pairs in dictionary
@@ -265,7 +243,9 @@ class Transaction(models.Model):
                         query = query.replace(key, value)
                         
                     self.env.cr.execute(query)
+                    _logger.info(f'this is the query to execute {query}')
                     rec = self.env.cr.fetchone()
+                    _logger.info(f'this is the result of the query {rec}, this is the trans amount {self.amount}')
                     if rec is not None:
                         history_id = self.env['res.transaction.screening.history'].create({
                             'transaction_id': self.id,
@@ -352,7 +332,7 @@ class Transaction(models.Model):
 
     @api.model
     def open_transactions_all(self):
-        
+
         user = self.env.user
         compliance_groups = [
             'compliance_management.group_compliance_chief_compliance_officer',
@@ -363,22 +343,42 @@ class Transaction(models.Model):
                                     for group in compliance_groups)
 
         # Set domain based on user group
+
+
         if has_compliance_access:
             domain = []
+
         else:
             # Regular users only see customers in their assigned branches
             domain = [
                 ('branch_id.id', 'in', [
-                 e.id for e in self.env.user.branches_id])  ]
+                    e.id for e in self.env.user.branches_id])
+            ]
 
-        return {
+        action = {
             'name': _('All Transactions'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.customer.transaction',
             'view_mode': 'tree,form',
             'domain': domain,
-            'context': {'search_default_group_branch': 1}
+            'limit' : 3000000,
+            'context': {'search_default_group_branch': 1},
         }
+            
 
+        return action
+    
     def get_risk_score(self):
         return self.risk_score
+    
+    def action_compute_rule_lines(self, rule):
+        
+        self.env["res.transaction.screening.rule.line"].search(
+            [('transaction_id', '=', self.id)]).unlink()
+                        
+        result = self.env.cr.execute(rule.sql_query, (self.id,))                
+        if result is not None:        
+            self.env['res.transaction.screening.rule.line'].create({
+                'transaction_id': self.id,
+                'rule_line_id': rule.id,
+            })

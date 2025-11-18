@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- View for regular users (read-only) -->
+<record id="view_risk_assessment_control_tree" model="ir.ui.view">
+    <field name="name">risk.assessment.control.tree</field>
+    <field name="model">risk.assessment.control</field>
+    <field name="priority">20</field>
+    <field name="arch" type="xml">
+        <tree
+            default_order="priority desc, name">
+            <field name="code" optional="show"/>
+            <field name="name"/>
+            <field name="control_type" widget="badge"/>
+            <field name="effectiveness_score_numeric" string="Effectiveness" />
+            <field name="state" widget="badge"
+                   decoration-success="state == 'active'"
+                   decoration-info="state == 'draft'"
+                   decoration-warning="state == 'under_review'"
+                   decoration-danger="state == 'inactive'"/>
+            <field name="last_assessment_date"/>
+        </tree>
+    </field>
+</record>
+
+
+
+    <record id="view_risk_assessment_control_form" model="ir.ui.view">
+        <field name="name">risk.assessment.control.form</field>
+        <field name="model">risk.assessment.control</field>
+        <field name="arch" type="xml">
+            <form
+                create="compliance_management.group_compliance_chief_compliance_officer"
+                edit="compliance_management.group_compliance_chief_compliance_officer"
+                delete="compliance_management.group_compliance_chief_compliance_officer"
+                string="Risk Control">
+                <header>
+                    <button name="action_set_active" string="Activate" 
+                            type="object" states="draft,under_review,inactive" 
+                            class="oe_highlight"/>
+                    <button name="action_set_inactive" string="Deactivate" 
+                            type="object" states="active,under_review"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,under_review,inactive"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title mb16">
+                        <!-- Main Title Row -->
+                        <div class="d-flex flex-column flex-md-row align-items-md-start gap-2 mb8">
+                            <!-- Control Name (Primary) -->
+                            <div class="flex-grow-1 w-100">
+                                <label class="form-label" for="control_name">Control Name</label>
+                                <field 
+                                    name="name" 
+                                    id="control_name"
+                                    placeholder="e.g. Permissible Purpose Verification, Adverse Action Notice Process..." 
+                                    class="form-control form-control-lg"
+                                    required="1"/>
+                            </div>
+                            
+                            <!-- Code (Secondary, compact) -->
+                            <div class="flex-shrink-0" style="width: 180px;">
+                                <label class="form-label" for="control_code">Code</label>
+                                <field 
+                                    name="code" 
+                                    id="control_code"
+                                    placeholder="FCRA-CTRL-001" 
+                                    class="form-control"
+                                    maxlength="32"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Optional Help Text -->
+                        <div class="text-muted small">
+                            Provide a clear, actionable name for this control. The code should be unique and follow your organization's naming convention.
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Control Classification">
+                            <field name="control_type" required="1"/>
+                            <field name="control_nature" required="1"/>
+                        </group>
+                        <group string="Effectiveness">
+                            <field name="effectiveness_score_numeric"
+                                widget="slider"
+                                options="{'min': 0, 'max': 20, 'step': 1}"/>
+                            <!-- Dynamic help below -->
+                            <field name="effectiveness_score_help" nolabel="1"
+                                class="text-muted small mt4"
+                                style="grid-column: 1 / -1;"/> 
+                            <field name="last_assessment_date"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Describe purpose, scope, and execution of this control..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_risk_assessment_control" model="ir.actions.act_window">
+        <field name="name">Risk Controls</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">risk.assessment.control</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" eval="False"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new risk control to mitigate threats and ensure compliance.
+            </p>
+        </field>
+        <field name="context">{'search_default_state_active': 1}</field>
+        <field name="domain">[('active', '=', True)]</field>
+    </record>
+
+
+</odoo>

@@ -21,9 +21,10 @@ class ResUsers(models.Model):
         selection=[
             ('normal', 'Normal'),
             ('sided', 'Sided'),
+            ('bottom', 'Bottom'),
         ],
         string="Chatter Position",
-        default='normal',
+        default='bottom',
         required=True)
     
     @api.model

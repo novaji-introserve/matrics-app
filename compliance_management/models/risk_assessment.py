@@ -17,21 +17,21 @@ class RiskAssessment(models.Model):
     code = fields.Char(string="Code", index=True)
     state = fields.Char(string="State")
     user_id = fields.Many2one(comodel_name='res.users', string='User',
-                              required=True, index=True, default=lambda self: self.env.user.id)
+                              required=True, tracking=True, index=True, default=lambda self: self.env.user.id)
     risk_rating = fields.Float(
-        string='Risk Rating', digits=(10, 2), default=0.0)
+        string='Risk Rating', digits=(10, 2), default=0.0, tracking=True)
     narration = fields.Html(string='Narration')
     subject_id = fields.Many2one(
-        comodel_name='res.risk.subject', string='Risk Subject', index=True)
+        comodel_name='res.risk.subject', string='Risk Subject', index=True, tracking=True)
     universe_id = fields.Many2one(
-        comodel_name='res.risk.universe', string='Risk Universe', index=True)
+        comodel_name='res.risk.universe', string='Risk Universe', tracking=True, index=True)
     recommendation = fields.Html(string='Recommendation')
     assessment_type_id = fields.Many2one(
-        comodel_name='res.risk.assessment.type', string='Assessment Type')
-    type_id = fields.Many2one(comodel_name='res.risk.type', string='Risk Type')
-    partner_id = fields.Many2one(comodel_name='res.partner', string='Partner')
+        comodel_name='res.risk.assessment.type', string='Assessment Type', tracking=True)
+    type_id = fields.Many2one(comodel_name='res.risk.type', string='Risk Type', tracking=True)
+    partner_id = fields.Many2one(comodel_name='res.partner', string='Partner', tracking=True)
     line_ids = fields.One2many(comodel_name='res.risk.assessment.line',
-                               inverse_name='risk_assessment_id', string='Risk Assessment Lines')
+                               inverse_name='risk_assessment_id', string='Risk Assessment Lines', tracking=True)
     total_risk_lines = fields.Integer(
         string='Total Risk Lines', _compute='_compute_total_risk_lines', store=True)
     internal_category = fields.Selection(string='Internal Category', selection=[('inst', 'Institutional'), ('cp', 'Counter Party')],default='inst')
@@ -44,17 +44,13 @@ class RiskAssessment(models.Model):
         record = super(RiskAssessment, self).create(vals)
         for e in record:
             e.action_update_risk_score()
-        for e in record:
-            e.action_update_risk_score()
         return record
 
     def _compute_total_risk_lines(self):
         self.total_risk_lines = len(self.line_ids)
 
     def write(self, vals):
-        for e in self:
-            score = e.compute_risk_score_from_lines()
-            vals['risk_rating'] = score
+       
         for e in self:
             score = e.compute_risk_score_from_lines()
             vals['risk_rating'] = score
@@ -63,30 +59,40 @@ class RiskAssessment(models.Model):
 
     def action_update_risk_score(self):
         for rec in self:
-            score = self.compute_risk_score_from_lines()
+            score = rec.compute_risk_score_from_lines()
             rec.write({"risk_rating": score})     
 
+    
+    
     def compute_risk_score_from_lines(self):
-        setting  = self.env['res.compliance.settings'].search([('code','=','risk_assessment_computation')],limit = 1)
-        for e in setting:
-            plan_setting = e.val.strip().lower()
+        plan_setting = 'avg' 
+        
+        setting = self.env['res.compliance.settings'].search([('code','=','risk_assessment_computation')], limit=1)
+        
+        # If a setting IS found, this will overwrite the default value.
+        if setting:
+            plan_setting = setting.val.strip().lower()
+
         if plan_setting == 'avg':
             self.env.cr.execute("SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
         else:
             self.env.cr.execute("SELECT max(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
+        
         rec = self.env.cr.fetchone()
-        result = 0.00
+        result = 0.0
+        
         try:
-            result = f"{rec[0]:.2f}" if rec is not None else 0.0
-        except:
+            if rec and rec[0] is not None:
+                result = float(f"{rec[0]:.2f}")
+        except (TypeError, ValueError):
             result = 0.0
+            
         return result
 
     @api.depends('line_ids')
     def _compute_risk_score(self):
         score = self.compute_risk_score_from_lines()
         for rec in self:
-             rec.write({"risk_rating": score}) 
     
              rec.write({"risk_rating": score}) 
     
@@ -112,4 +118,58 @@ class RiskAssessment(models.Model):
     def filter_subjects(self):
         for rec in self:
             return {'domain': {'subject_id': [('universe_id', '=', rec.universe_id.id)]}}
+        
+    @api.model
+    def cron_update_all_risk_scores(self, *args):
+        setting = self.env['res.compliance.settings'].search([('code', '=', 'risk_assessment_computation')], limit=1)
+        plan_setting = 'avg'
+        if setting:
+            plan_setting = setting.val.strip().lower()
+
+            if plan_setting == 'avg':
+                self.env.cr.execute("""
+                    UPDATE res_risk_assessment ra
+                    SET risk_rating = COALESCE(
+                        ROUND(
+                            CAST(
+                                (SELECT AVG(rl.residual_risk_score)
+                                FROM res_risk_assessment_line rl
+                                WHERE rl.risk_assessment_id = ra.id)
+                            AS numeric),
+                            2
+                        ),
+                        0.0
+                    )
+                """)
+            elif plan_setting == 'sum':
+                self.env.cr.execute("""
+                    UPDATE res_risk_assessment ra
+                    SET risk_rating = COALESCE(
+                        ROUND(
+                            CAST(
+                                (SELECT SUM(rl.residual_risk_score)
+                                FROM res_risk_assessment_line rl
+                                WHERE rl.risk_assessment_id = ra.id)
+                            AS numeric),
+                            2
+                        ),
+                        0.0
+                    )
+                """)
+            else:
+                # Default to 'max' as in your original logic
+                self.env.cr.execute("""
+                    UPDATE res_risk_assessment ra
+                    SET risk_rating = COALESCE(
+                        ROUND(
+                            CAST(
+                                (SELECT MAX(rl.residual_risk_score)
+                                FROM res_risk_assessment_line rl
+                                WHERE rl.risk_assessment_id = ra.id)
+                            AS numeric),
+                            2
+                        ),
+                        0.0
+                    )
+                """)
         
