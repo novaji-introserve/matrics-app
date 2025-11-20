@@ -28,12 +28,14 @@ class RiskAssessmentPlan(models.Model):
     state = fields.Selection(string='State', selection=[('draft', 'Draft'), (
         'active', 'Active'), ('inactive', 'Inactive')], default='draft', index=True)
     narration = fields.Text(string='Narration')
-    risk_score = fields.Integer(string='Risk Score', default=1)
+    risk_score = fields.Float(string='Risk Score', default=1, digits=(10,1))
     compute_score_from = fields.Selection(string='Compute Risk Score From', selection=[(
         'dynamic', 'SQL Query Return Single Value'), ('static', 'From Risk Rating'),('risk_assessment','Related Risk Assessment'),('python','Python Expression')], default='risk_assessment', index=True,required=True)
     risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment', index=True, required=False,
                                       help="Risk Assessment to which this plan is associated")
     risk_assessment_score = fields.Float(string='Risk Assessment Score',digits=(10, 2),related="risk_assessment.risk_rating")
+    max_risk_score = fields.Float(string='Maximum Risk Score', compute='_compute_max_risk_score', store=False)
+    
     
     use_composite_calculation = fields.Boolean(string='Use Composite Calculation', default=False,
                                                help="If checked, composite risk calculation will be used")
@@ -43,6 +45,15 @@ class RiskAssessmentPlan(models.Model):
     condition_python = fields.Text(string='Python Expression',help='Applied this rule for calculation if condition is true. You can specify condition like result = 10 if customer.is_pep == True else 1')
     
     
+    
+    @api.depends('compute_score_from')
+    def _compute_max_risk_score(self):
+        """Compute the maximum risk score to use for slider widget"""
+        for record in self:
+            if record.compute_score_from:
+                record.max_risk_score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
+            else:
+                record.max_risk_score = 10  # Default maximum value
     
     @api.model
     def create(self, vals):

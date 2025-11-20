@@ -38,12 +38,14 @@ class RiskAssessmentControl(models.Model):
     ], string='Priority', default='1', tracking=True)
     
     # Effectiveness
-    effectiveness_score_numeric = fields.Integer(
+    effectiveness_score_numeric = fields.Float(
         string='Effectiveness Score Numeric',
         tracking=True,
-        default=False,
-        help="Score from 0 to 100 (integer percentage)."
+        default=1,
+        digits=(10,1),
+        help="Score from 1 to the maximum risk score."
     )
+
     effectiveness_score = fields.Selection([
         ('1', 'Not Effective'),
         ('2', 'Partially Effective'),
@@ -65,7 +67,10 @@ class RiskAssessmentControl(models.Model):
         ('inactive', 'Inactive')
     ], string='Status', default='active', tracking=True)
     
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')    
+    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
+    max_risk_score = fields.Float(string='Maximum Risk Score', compute='_compute_max_risk_score', store=False)
+    
    
 
     def action_set_active(self):
@@ -77,7 +82,16 @@ class RiskAssessmentControl(models.Model):
     def action_set_inactive(self):
         self.write({'state': 'inactive'})
 
-
+    
+    @api.depends('name')
+    def _compute_max_risk_score(self):
+        """Compute the maximum risk score to use for slider widget"""
+        for record in self:
+            if record.name:
+                record.max_risk_score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
+            else:
+                record.max_risk_score = 10  # Default maximum value
+                
     @api.depends('effectiveness_score_numeric') 
     def _compute_effectiveness_score_help(self):
         # Fetch config once (cached per request)
@@ -91,6 +105,7 @@ class RiskAssessmentControl(models.Model):
 
         for rec in self:
             rec.effectiveness_score_help = help_text
+            
 
     @api.onchange('effectiveness_score_numeric')
     def _onchange_effectiveness_score(self):

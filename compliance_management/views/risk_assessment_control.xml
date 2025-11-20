@@ -83,9 +83,10 @@
                             <field name="control_nature" required="1"/>
                         </group>
                         <group string="Effectiveness">
+                            <field name="max_risk_score" invisible="1"/>
+
                             <field name="effectiveness_score_numeric"
-                                widget="slider"
-                                options="{'min': 0, 'max': 20, 'step': 1}"/>
+                                widget="slider" step="0.1" min="1" max="max_risk_score"/>
                             <!-- Dynamic help below -->
                             <field name="effectiveness_score_help" nolabel="1"
                                 class="text-muted small mt4"

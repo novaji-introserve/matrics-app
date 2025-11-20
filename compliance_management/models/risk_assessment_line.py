@@ -24,7 +24,7 @@ class RiskAssessmentLine(models.Model):
         string='Inherent Risk Score', required=True, tracking=True)
     existing_controls = fields.Many2many("risk.assessment.control", "res_risk_assessment_line_risk_assessment_control_rel", tracking=True)
     control_effectiveness_score = fields.Float(
-        string='Control Effectiveness Score', readonly=True,  tracking=True)
+        string='Control Effectiveness Score', tracking=True,readonly="True")
     residual_risk_probability = fields.Float(
         string='Residual Risk Probability', compute='_compute_risk_probability', store=True)
     residual_risk_impact = fields.Float(
@@ -46,6 +46,11 @@ class RiskAssessmentLine(models.Model):
         string='Residual Risk Score', compute='_compute_risk_score', store=True, tracking=True)
     
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    
+    max_risk_score = fields.Float(string='Maximum Risk Score', compute='_compute_max_risk_score', store=False)
+    
+    risk_level = fields.Char(string='Risk Level', compute='_compute_risk_level', store=False)
+
     
     def init(self):
         """
@@ -164,7 +169,7 @@ class RiskAssessmentLine(models.Model):
             inherent_score = record.inherent_risk_score or 0  # Handle None/False values
             
             # Ensure we don't have negative values if control score > max
-            record.residual_risk_impact = inherent_score * (1 - (control_effectiveness_score / max_score))
+            record.residual_risk_impact = float(inherent_score * (1 - (control_effectiveness_score / max_score)))
             _logger.info(f"Residual risk impact score is {record.residual_risk_impact}")
 
 
@@ -180,9 +185,9 @@ class RiskAssessmentLine(models.Model):
     
     def get_control_effectiveness_max_score(self):
         """Get the maximum score for control effectiveness from model"""
-        max_score = self.env['res.fcra.score'].search([], limit=1).max_score or 9
+        max_score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
 
-        return float(max_score)
+        return (max_score)
     
 
     def _compute_risk_probability(self, control_effectiveness_score):
@@ -200,4 +205,36 @@ class RiskAssessmentLine(models.Model):
         risk_assessment_id = self.risk_assessment_id.id
         self.env.cr.execute('update res_risk_assessment set risk_rating = (SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s) where id =%s',
                             (risk_assessment_id, risk_assessment_id))
-        
+    
+    @api.depends('name')
+    def _compute_max_risk_score(self):
+        """Compute the maximum risk score to use for slider widget"""
+        for record in self:
+            if record.name:
+                record.max_risk_score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
+            else:
+                record.max_risk_score = 10  # Default maximum value
+
+    @api.depends('residual_risk_impact')
+    def _compute_risk_level(self):
+        """Compute risk level based on residual_risk_impact"""
+        for record in self:
+            try:
+                if record.residual_risk_impact is None or record.residual_risk_impact == 0:
+                    record.risk_level = 'low'
+                    continue
+                
+                # Get thresholds from settings
+                low_threshold = float(self.env['res.compliance.settings'].get_setting('low_risk_threshold'))
+                medium_threshold = float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold'))
+                
+                # Check from high to low
+                if record.residual_risk_impact > medium_threshold:
+                    record.risk_level = 'high'
+                elif record.residual_risk_impact > low_threshold:
+                    record.risk_level = 'medium'
+                else:
+                    record.risk_level = 'low'
+            except Exception as e:
+                _logger.error(f"Error computing risk level for record {record.id}: {e}")
+                record.risk_level = 'low'
