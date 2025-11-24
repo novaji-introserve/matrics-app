@@ -257,7 +257,6 @@ class Customer(models.Model):
         for record in self:
             if record.last_risk_calculation:
                 # Convert the stored UTC object directly to a string
-                # This locks the value as "2025-11-24 16:29:05"
                 record.last_risk_calculation_raw = record.last_risk_calculation.strftime('%Y-%m-%d %H:%M:%S')
             else:
                 record.last_risk_calculation_raw = ""
