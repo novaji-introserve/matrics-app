@@ -205,7 +205,7 @@ class Customer(models.Model):
         string='Composite Risk Score', digits=(10, 2))
 
     last_risk_calculation = fields.Datetime(string='Last Analysis', readonly=True,
-                                            help="When the risk score was last calculated",tracking=True)
+                                            help="When the risk score was last calculated")
 
     # universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
     #                                       string='Universe Weights')
@@ -247,7 +247,8 @@ class Customer(models.Model):
     
     last_risk_calculation_raw = fields.Char(
     string="Last Analysis Date",
-    compute='_compute_raw_time'
+    compute='_compute_raw_time',
+    tracking=True
 )
 
     
