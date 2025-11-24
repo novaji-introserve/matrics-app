@@ -149,7 +149,7 @@
             'compliance_management/static/src/js/custom_title_service.js',
             'compliance_management/static/src/js/cache_service.js',
 
-            'compliance_management/static/src/img/logov.png',
+            'compliance_management/static/src/img/matrics-logo.png',
             'compliance_management/static/img/alt_bank_logo.png',
         ]
     },

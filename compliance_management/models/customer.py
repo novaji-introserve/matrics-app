@@ -204,8 +204,8 @@ class Customer(models.Model):
     composite_risk_score = fields.Float(
         string='Composite Risk Score', digits=(10, 2))
 
-    last_risk_calculation = fields.Datetime(string='Last Risk Calculation', readonly=True,
-                                            help="When the risk score was last calculated")
+    last_risk_calculation = fields.Datetime(string='Last Analysis', readonly=True,
+                                            help="When the risk score was last calculated",tracking=True)
 
     # universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
     #                                       string='Universe Weights')
@@ -244,7 +244,23 @@ class Customer(models.Model):
     customer_status = fields.Many2one(
         'customer.status',
         string='Customer Status', readonly=True)
+    
+    last_risk_calculation_raw = fields.Char(
+    string="Last Analysis Date",
+    compute='_compute_raw_time'
+)
 
+    
+    @api.depends('last_risk_calculation')
+    def _compute_raw_time(self):
+        for record in self:
+            if record.last_risk_calculation:
+                # Convert the stored UTC object directly to a string
+                # This locks the value as "2025-11-24 16:29:05"
+                record.last_risk_calculation_raw = record.last_risk_calculation.strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                record.last_risk_calculation_raw = ""
+    
     @api.depends('customer_id')
     def _compute_is_case_manager_installed(self):
         module = self.env['ir.module.module'].sudo().search([
@@ -1772,7 +1788,9 @@ class Customer(models.Model):
             # Use ORM write method to update and track changes
             record.sudo().write({
                 'risk_score': score,
-                'risk_level': risk_level
+                'risk_level': risk_level,
+                'last_risk_calculation': fields.Datetime.now()
+
             })
 
         return True

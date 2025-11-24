@@ -141,7 +141,7 @@ class CustomerAccount(models.Model):
                                         ('Closed', 'Closed')
                                         ], 
                              tracking=True, default='Active', required=False,index=True)  # sta_code
-    active = fields.Boolean(default=True, tracking=True)
+    
     customer = fields.Char(string='Customer Id', index=True)
     max_debit_daily = fields.Float(string='Max. Debit - Daily', digits=(10, 2))
     overdraft_limit = fields.Float(string='OverDraft Limit', digits=(10, 2))
