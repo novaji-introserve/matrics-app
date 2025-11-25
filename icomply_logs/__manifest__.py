@@ -1,5 +1,5 @@
 {
-    'name': 'iComply Logs',
+    'name': 'Log Manager',
     'version': '1.0.0',
     'category': 'iComply',
     'summary': 'View system logs',
