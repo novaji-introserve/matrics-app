@@ -33,7 +33,7 @@ export class RiskSliderField extends Component {
 
     if (this.props.name == 'control_effectiveness_score') {
       this.state.reverseColors = true;
-      this.state.readonly = true;
+      // this.state.readonly = true;
     }
 
     this.orm = useService("orm");
