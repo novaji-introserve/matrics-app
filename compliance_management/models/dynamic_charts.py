@@ -246,8 +246,8 @@ class ResCharts(models.Model):
         remote_addr = self.env.context.get('remote_addr', 'Unknown IP')
         
         # Log all SQL query attempts for security auditing
-        _logger.info(f"Chart SQL Query Attempt - {user_info} from {remote_addr}")
-        _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
+        # _logger.info(f"Chart SQL Query Attempt - {user_info} from {remote_addr}")
+        # _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
             
         try:
             # Clean and normalize the query
@@ -314,8 +314,8 @@ class ResCharts(models.Model):
                 raise
             
             # Log successful validation
-            _logger.info(f"Chart SQL Query Validated Successfully - {user_info}")
-            _logger.info(f"Final Query: {original_query}")
+            # _logger.info(f"Chart SQL Query Validated Successfully - {user_info}")
+            # _logger.info(f"Final Query: {original_query}")
             
             return original_query, original_query.lower()
             

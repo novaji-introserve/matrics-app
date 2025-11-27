@@ -117,9 +117,9 @@ class Compliance(http.Controller):
         
         if is_co:
             cco = True
-            _logger.info(
-                f"CO user {request.env.user.id} accessing dynamic SQL with CCO privileges"
-            )
+            # _logger.info(
+            #     f"CO user {request.env.user.id} accessing dynamic SQL with CCO privileges"
+            # )
             
         lower_query = sql_query.lower()
         table = None
@@ -170,7 +170,7 @@ class Compliance(http.Controller):
             else:
                 domain = additional_filters
                 
-        _logger.info(f"Final domain: {domain}")
+        # _logger.info(f"Final domain: {domain}")
         return {"table": table, "domain": domain}
 
     def format_number(self, result_value):
@@ -361,7 +361,7 @@ class Compliance(http.Controller):
                                     conditions.append("1=0")
                                     
                             if has_res_partner:
-                                conditions.append("origin IN ('demo','test','prod')")
+                                conditions.append("origin IN ('demo','test','prod');")
                                 
                             if conditions:
                                 if has_where:
@@ -543,7 +543,7 @@ class Compliance(http.Controller):
                     conditions = []
                     
                     if "res_partner" in query or "res.partner" in query:
-                        conditions.append("origin IN ('demo','test','prod')")
+                        conditions.append("origin IN ('demo','test','prod');")
                         
                     if conditions:
                         if has_where:
@@ -650,7 +650,7 @@ class Compliance(http.Controller):
                         conditions.append("1=0")
                         
                     if "res_partner" in query or "res.partner" in query:
-                        conditions.append("origin IN ('demo','test','prod')")
+                        conditions.append("origin IN ('demo','test','prod');")
                         
                     if conditions:
                         if has_where:

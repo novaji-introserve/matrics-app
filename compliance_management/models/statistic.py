@@ -175,8 +175,8 @@ class Statistic(models.Model):
         remote_addr = self.env.context.get('remote_addr', 'Unknown IP')
         
         # Log all SQL query attempts for security auditing
-        _logger.info(f"SQL Query Attempt - {user_info} from {remote_addr}")
-        _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
+        # _logger.info(f"SQL Query Attempt - {user_info} from {remote_addr}")
+        # _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
             
         try:
             # Clean and normalize the query
@@ -250,9 +250,9 @@ class Statistic(models.Model):
                 # Apply origin filtering for res_partner queries
                 has_where = bool(re.search(r"\bwhere\b", query_lower))
                 condition = (
-                    " AND origin IN ('demo','test','prod')"
+                    " AND origin IN ('demo','test','prod');"
                     if has_where
-                    else " WHERE origin IN ('demo','test','prod')"
+                    else " WHERE origin IN ('demo','test','prod');"
                 )
                 
                 # Find the right place to insert the condition
@@ -268,11 +268,11 @@ class Statistic(models.Model):
                 else:
                     original_query += condition
                 
-                _logger.info(f"Applied security filter for res_partner query - {user_info}")
+                # _logger.info(f"Applied security filter for res_partner query - {user_info}")
             
             # Log successful validation
-            _logger.info(f"SQL Query Validated Successfully - {user_info}")
-            _logger.info(f"Final Query: {original_query}")
+            # _logger.info(f"SQL Query Validated Successfully - {user_info}")
+            # _logger.info(f"Final Query: {original_query}")
             
             return original_query, query_lower
             

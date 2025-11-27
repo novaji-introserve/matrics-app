@@ -81,7 +81,7 @@ class SecurityService:
         r';\s*--',
         r'--\s*[^\r\n]*',
         r'\/\*.*?\*\/',
-        r'#.*$',
+        # r'#.*$',
         r'\/\*!\d+.*?\*\/',
         
         # ======= STACKED QUERIES =======
@@ -150,7 +150,7 @@ class SecurityService:
         # ======= LOGICAL OPERATORS ABUSE =======
         r'\bOR\s+NOT\s+\w+\b',
         r'\bAND\s+NOT\s+\w+\b',
-        r'\bIS\s+NULL\b',
+        # r'\bIS\s+NULL\b',
         r'\bIS\s+NOT\s+NULL\b',
         
         # ======= STRING MANIPULATION =======
@@ -468,7 +468,7 @@ class SecurityService:
                 subquery_start = match.group(1)
                 where_clause = match.group(2)
                 subquery_end = match.group(3)
-                new_where = where_clause + " AND origin IN ('demo', 'test', 'prod') "
+                new_where = where_clause + " AND origin IN ('demo', 'test', 'prod'); "
                 modified_subquery = subquery_start + new_where + subquery_end
                 modified_query = modified_query.replace(
                     match.group(0), modified_subquery
