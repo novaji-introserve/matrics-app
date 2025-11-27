@@ -52,8 +52,7 @@ class CustomerAccount(models.Model):
 
     product_id = fields.Many2one(
         comodel_name='res.partner.account.product', string='Product', index=True)
-    date_created = fields.Date(
-        string='Date Created', index=True)  # date_created
+    
     ledger_id = fields.Many2one(
         comodel_name='res.partner.account.ledger', string='Ledger')
     closure_status = fields.Selection(string='Closure Status', selection=[
