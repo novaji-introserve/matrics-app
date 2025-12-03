@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 
 class Pep(models.Model):
     _name = 'res.pep'
-    _description = 'PEP List'
+    _description = 'Global PEP List'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
     _sql_constraints = [

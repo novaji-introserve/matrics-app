@@ -87,10 +87,11 @@ class StatisticViewRefresher(models.Model):
         """
         mv_service = MaterializedViewService(self.env)
         success = mv_service.create_stat_materialized_view(stat_id)
-        
+
         if success:
             stat = self.env["res.compliance.stat"].browse(stat_id)
-            view_name = f"stat_view_{stat_id}"
+            sanitized_code = MaterializedViewService.sanitize_view_name(stat.code)
+            view_name = f"stat_view_{sanitized_code}"
             
             refresher = self.search([("stat_id", "=", stat_id)], limit=1)
             now = fields.Datetime.now()
@@ -135,8 +136,9 @@ class StatisticViewRefresher(models.Model):
             errors = 0
             
             for stat in stats:
-                view_name = f"stat_view_{stat.id}"
-                
+                sanitized_code = MaterializedViewService.sanitize_view_name(stat.code)
+                view_name = f"stat_view_{sanitized_code}"
+
                 db_service = DatabaseService(self.env)
                 view_exists = db_service.check_view_exists(view_name)
                 

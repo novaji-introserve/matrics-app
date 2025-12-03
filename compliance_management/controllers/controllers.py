@@ -272,7 +272,9 @@ class Compliance(http.Controller):
             with request.env.registry.cursor() as cr:
                 try:
                     stat_id = stat["id"]
-                    view_name = f"stat_view_{stat_id}"
+                    stat_code = stat.get("code", "")
+                    sanitized_code = MaterializedViewService.sanitize_view_name(stat_code)
+                    view_name = f"stat_view_{sanitized_code}"
                     result_value = None
                     use_view = stat.get("use_materialized_view", False)
                     

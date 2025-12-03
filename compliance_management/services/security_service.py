@@ -206,9 +206,9 @@ class SecurityService:
         r'\v',
         
         # ======= POLYGLOT PAYLOADS =======
-        r'\'.*OR.*\'',
-        r'\".*OR.*\"',
-        r'\).*OR.*\(',
+        # r'\'.*OR.*\'',  # COMMENTED OUT - Causes false positives on IN clauses like IN ('demo','test','prod')
+        # r'\".*OR.*\"',  # COMMENTED OUT - Causes false positives on IN clauses
+        # r'\).*OR.*\(',  # COMMENTED OUT - Causes false positives on IN clauses and legitimate OR conditions
         
         # ======= TIME-BASED VARIATIONS =======
         r'select.*from.*where.*=.*and.*sleep',
@@ -264,9 +264,9 @@ class SecurityService:
         r'\w+\s*\/\*.*?\*\/\s*=',
         
         # ======= ALTERNATIVE SYNTAX =======
-        r'SELECT.*WHERE.*BETWEEN.*AND',
-        r'SELECT.*WHERE.*IN\s*\(',
-        r'SELECT.*WHERE.*LIKE\s*[\'\"]\%',
+        # r'SELECT.*WHERE.*BETWEEN.*AND',  # COMMENTED OUT - Legitimate SQL syntax, causes false positives
+        # r'SELECT.*WHERE.*IN\s*\(',  # COMMENTED OUT - Rejects legitimate IN clauses including origin IN ('demo','test','prod')
+        # r'SELECT.*WHERE.*LIKE\s*[\'\"]\%',  # COMMENTED OUT - Legitimate SQL syntax for pattern matching
         
         # ======= PRIVILEGE ESCALATION =======
         r'GRANT\s+ALL\s+ON',

@@ -852,13 +852,37 @@ class CSVImportController(http.Controller):
         """Get available models for import directly from ir.model"""
         try:
             self._send_message("Fetching available models from database...", "info")
+
+            # WHITELISTED MODELS: Only allow specific screening list models for import
+            # This restricts the upload functionality to only sanctioned/screening list models
+            allowed_models = [
+                "res.partner.greylist",      # Grey List - Suspicious entities
+                "res.partner.watchlist",     # Watch List - Entities under monitoring
+                "res.pep",                   # Politically Exposed Persons
+                "pep.list",                  # PEP List - Additional PEP data
+                "res.partner.blacklist",     # Black List - Sanctioned/banned entities
+            ]
+
+            # Build domain with whitelist filter
             domain = [
                 ("transient", "=", False),
-                ("model", "not ilike", "ir.%"),
-                ("model", "not ilike", "base.%"),
-                ("model", "not ilike", "bus.%"),
-                ("model", "not ilike", "base_%"),
+                ("model", "in", allowed_models),  # Only allow whitelisted models
             ]
+
+            # PREVIOUS IMPLEMENTATION (COMMENTED OUT):
+            # The code below allowed ALL non-system models to be imported, which exposed
+            # too many internal models to users. This has been restricted to only screening
+            # list models for security and user experience improvements.
+            #
+            # domain = [
+            #     ("transient", "=", False),
+            #     ("model", "not ilike", "ir.%"),      # Excluded infrastructure models
+            #     ("model", "not ilike", "base.%"),    # Excluded base system models
+            #     ("model", "not ilike", "bus.%"),     # Excluded bus/messaging models
+            #     ("model", "not ilike", "base_%"),    # Excluded base-prefixed models
+            # ]
+
+            # Apply search term filter if provided
             if search_term:
                 domain += [
                     "|",

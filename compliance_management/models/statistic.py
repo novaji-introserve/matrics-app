@@ -344,7 +344,34 @@ class Statistic(models.Model):
                 self._execute_query_and_get_value(original_query, query)
             except Exception as e:
                 raise ValidationError(f"Invalid SQL query:\n{str(e)}")
-        return super(Statistic, self).write(vals)
+
+        result = super(Statistic, self).write(vals)
+
+        # Fields that should trigger materialized view refresh when changed
+        refresh_trigger_fields = ['sql_query', 'use_materialized_view', 'state']
+
+        # Check if any of the trigger fields were updated
+        if any(field in vals for field in refresh_trigger_fields):
+            for record in self:
+                # Only refresh if materialized view is enabled and stat is active
+                if record.use_materialized_view and record.state == 'active':
+                    try:
+                        refresher = self.env["dashboard.stats.view.refresher"].sudo()
+                        # If materialized view doesn't exist yet, create it
+                        refresher.create_materialized_view_for_stat(record.id)
+                        # Then refresh it to get latest data
+                        refresh_success = refresher.refresh_stat_view(record.id)
+
+                        if refresh_success:
+                            # Invalidate cache to ensure UI shows updated value on next access (using new API)
+                            record.invalidate_recordset(['val'])
+                            _logger.info(f"Automatically refreshed materialized view for stat {record.name} (ID: {record.id})")
+                        else:
+                            _logger.warning(f"Materialized view refresh returned False for stat {record.name}")
+                    except Exception as e:
+                        _logger.warning(f"Failed to auto-refresh materialized view for stat {record.name}: {e}")
+
+        return result
 
     @api.depends("sql_query", "use_materialized_view")
     def _compute_val(self):
@@ -383,10 +410,13 @@ class Statistic(models.Model):
         Returns:
             str: The value from the materialized view or None if not available.
         """
+        from ..services.materialized_view import MaterializedViewService
+
         self.ensure_one()
         if not self.use_materialized_view:
             return None
-        view_name = f"stat_view_{self.id}"
+        sanitized_code = MaterializedViewService.sanitize_view_name(self.code)
+        view_name = f"stat_view_{sanitized_code}"
         self.env.cr.execute(
             """
             SELECT EXISTS (
@@ -439,19 +469,73 @@ class Statistic(models.Model):
                     "sticky": False,
                 },
             }
+        from ..services.materialized_view import MaterializedViewService
+
         refresher = self.env["dashboard.stats.view.refresher"].sudo()
         success = refresher.refresh_stat_view(self.id)
         if success:
-            return {
-                "type": "ir.actions.client",
-                "tag": "display_notification",
-                "params": {
-                    "title": "Success",
-                    "message": "Materialized view refreshed successfully.",
-                    "type": "success",
-                    "sticky": False,
-                },
-            }
+            # Query the materialized view directly to get the fresh value
+            sanitized_code = MaterializedViewService.sanitize_view_name(self.code)
+            view_name = f"stat_view_{sanitized_code}"
+
+            try:
+                # Fetch value directly from materialized view
+                self.env.cr.execute(f"SELECT * FROM {view_name} LIMIT 1")
+                result = self.env.cr.fetchone()
+
+                if result is not None:
+                    # Format the value
+                    if len(result) == 1:
+                        raw_value = result[0]
+                    else:
+                        raw_value = 1
+
+                    if isinstance(raw_value, (int, float)):
+                        new_value = "{:,}".format(raw_value)
+                    else:
+                        new_value = str(raw_value) if raw_value is not None else "0"
+                else:
+                    new_value = "0"
+
+                # Update the val field directly in the database
+                self.env.cr.execute(
+                    """
+                    UPDATE res_compliance_stat
+                    SET val = %s
+                    WHERE id = %s
+                    """,
+                    (new_value, self.id)
+                )
+
+                # Invalidate cache to ensure fresh data is loaded
+                self.invalidate_recordset(['val'])
+
+                # Return action with reload to refresh the form view
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params": {
+                        "title": "Success",
+                        "message": "Materialized view refreshed.",
+                        "type": "success",
+                        "sticky": False,
+                        "next": {
+                            "type": "ir.actions.act_window_close",
+                        }
+                    },
+                }
+            except Exception as e:
+                _logger.error(f"Error fetching value from materialized view: {e}")
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "display_notification",
+                    "params": {
+                        "title": "Success",
+                        "message": "Materialized view refreshed successfully.",
+                        "type": "success",
+                        "sticky": False,
+                    },
+                }
         else:
             return {
                 "type": "ir.actions.client",
