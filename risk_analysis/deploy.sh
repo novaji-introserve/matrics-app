@@ -165,9 +165,14 @@ if command -v go &> /dev/null; then
             tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
             rm "go${GO_VERSION}.linux-amd64.tar.gz"
 
-            # Add Go to PATH
+            # Add Go to PATH in /etc/profile
             if ! grep -q "/usr/local/go/bin" /etc/profile; then
                 echo "export PATH=\$PATH:/usr/local/go/bin" >> /etc/profile
+            fi
+
+            # Add Go to PATH in /etc/bash.bashrc for all users
+            if ! grep -q "/usr/local/go/bin" /etc/bash.bashrc; then
+                echo "export PATH=\$PATH:/usr/local/go/bin" >> /etc/bash.bashrc
             fi
 
             # Update PATH for current session
@@ -300,38 +305,42 @@ else
     print_status "User ${SERVICE_USER} created"
 fi
 
-# Step 4: Backup existing installation if present
+# Step 4: Prepare project directory (work in place - no copying)
 echo ""
-echo -e "${YELLOW}Step 4: Setting up project directory${NC}"
-if [ -d "$INSTALL_DIR" ]; then
-    print_warning "Installation directory already exists"
-    read -p "Do you want to backup and replace it? (Y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        print_status "Backing up existing installation..."
-        EXISTING_BACKUP="${BACKUP_DIR}/risk-analysis-existing"
-        cp -r "$INSTALL_DIR" "$EXISTING_BACKUP"
-        print_status "Backup saved to: $EXISTING_BACKUP"
+echo -e "${YELLOW}Step 4: Preparing project directory${NC}"
 
-        print_status "Removing old installation..."
-        rm -rf "$INSTALL_DIR"
-        CREATED_INSTALL_DIR=true
-    else
-        print_error "Cannot proceed without replacing installation directory"
-        exit 1
-    fi
-else
-    CREATED_INSTALL_DIR=true
+# Work in the current directory where code already exists
+INSTALL_DIR="${CURRENT_DIR}"
+print_status "Working in current directory: ${INSTALL_DIR}"
+
+# Ask for config file path
+echo ""
+echo -e "${YELLOW}Configuration File Location${NC}"
+echo "Please provide the full path to your config.conf file"
+echo "Press ENTER to use default: ${INSTALL_DIR}/config.conf"
+read -p "Config file path: " CONFIG_FILE_PATH
+echo
+
+if [ -z "$CONFIG_FILE_PATH" ]; then
+    CONFIG_FILE_PATH="${INSTALL_DIR}/config.conf"
 fi
 
-print_status "Creating directory ${INSTALL_DIR}..."
-mkdir -p "$INSTALL_DIR"
+# Verify config file exists
+if [ ! -f "$CONFIG_FILE_PATH" ]; then
+    print_error "Config file not found at: $CONFIG_FILE_PATH"
+    exit 1
+fi
+
+print_status "Using config file: ${CONFIG_FILE_PATH}"
+
+# Create necessary subdirectories if they don't exist
+print_status "Creating required subdirectories..."
 mkdir -p "${INSTALL_DIR}/log"
 mkdir -p "${INSTALL_DIR}/cache"
 mkdir -p "${INSTALL_DIR}/tmp"
 
-print_status "Copying project files..."
-cp -r "${CURRENT_DIR}"/* "$INSTALL_DIR/"
+# Set ownership to service user
+print_status "Setting ownership to ${SERVICE_USER}..."
 chown -R "$SERVICE_USER":"$SERVICE_USER" "$INSTALL_DIR"
 
 # Step 5: Install Go dependencies and build
@@ -366,9 +375,9 @@ cp "${INSTALL_DIR}/risk-api-server" "${BINARY_DIR}/risk-api-server"
 chmod +x "${BINARY_DIR}/risk-processor"
 chmod +x "${BINARY_DIR}/risk-api-server"
 
-# Step 6: Create systemd service for risk-processor
+# Step 6: Install systemd services
 echo ""
-echo -e "${YELLOW}Step 6: Creating systemd services${NC}"
+echo -e "${YELLOW}Step 6: Installing systemd services${NC}"
 
 # Backup existing services if present
 if [ -f "/etc/systemd/system/risk-processor.service" ]; then
@@ -381,75 +390,33 @@ if [ -f "/etc/systemd/system/risk-api-server.service" ]; then
     cp /etc/systemd/system/risk-api-server.service "${BACKUP_DIR}/risk-api-server.service.backup"
 fi
 
-# Note: Removed PostgreSQL dependency from the service files
-cat > /etc/systemd/system/risk-processor.service <<EOF
-[Unit]
-Description=Risk Analysis Processor
-Documentation=https://github.com/your-org/risk-analysis
-After=network.target redis.service
-Requires=redis.service
+# Install service files with path replacement
+if [ -f "${INSTALL_DIR}/systemd/risk-processor.service" ]; then
+    print_status "Installing risk-processor.service with correct paths..."
+    # Replace /opt/risk-analysis with actual INSTALL_DIR and config path in the service file
+    sed -e "s|/opt/risk-analysis|${INSTALL_DIR}|g" \
+        -e "s|CONFIG_FILE=/opt/risk-analysis/config.conf|CONFIG_FILE=${CONFIG_FILE_PATH}|g" \
+        "${INSTALL_DIR}/systemd/risk-processor.service" > /etc/systemd/system/risk-processor.service
+    print_status "risk-processor.service installed (uses CONFIG_FILE=${CONFIG_FILE_PATH})"
+else
+    print_error "Service file not found: ${INSTALL_DIR}/systemd/risk-processor.service"
+    exit 1
+fi
 
-[Service]
-Type=simple
-User=${SERVICE_USER}
-Group=${SERVICE_USER}
-WorkingDirectory=${INSTALL_DIR}
-ExecStartPre=/bin/sleep 5
-ExecStart=${INSTALL_DIR}/risk-processor
-Restart=always
-RestartSec=10
-StandardOutput=append:${INSTALL_DIR}/log/risk-processor.log
-StandardError=append:${INSTALL_DIR}/log/risk-processor-error.log
-
-# Environment variables
-Environment="PATH=/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin"
-
-# Security settings
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=true
-ReadWritePaths=${INSTALL_DIR}
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-cat > /etc/systemd/system/risk-api-server.service <<EOF
-[Unit]
-Description=Risk Analysis API Server
-Documentation=https://github.com/your-org/risk-analysis
-After=network.target redis.service
-Requires=redis.service
-
-[Service]
-Type=simple
-User=${SERVICE_USER}
-Group=${SERVICE_USER}
-WorkingDirectory=${INSTALL_DIR}
-ExecStartPre=/bin/sleep 5
-ExecStart=${INSTALL_DIR}/risk-api-server
-Restart=always
-RestartSec=10
-StandardOutput=append:${INSTALL_DIR}/log/risk-api-server.log
-StandardError=append:${INSTALL_DIR}/log/risk-api-server-error.log
-
-# Environment variables
-Environment="PATH=/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin"
-
-# Security settings
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=true
-ReadWritePaths=${INSTALL_DIR}
-
-[Install]
-WantedBy=multi-user.target
-EOF
+if [ -f "${INSTALL_DIR}/systemd/risk-api-server.service" ]; then
+    print_status "Installing risk-api-server.service with correct paths..."
+    # Replace /opt/risk-analysis with actual INSTALL_DIR and config path in the service file
+    sed -e "s|/opt/risk-analysis|${INSTALL_DIR}|g" \
+        -e "s|CONFIG_FILE=/opt/risk-analysis/config.conf|CONFIG_FILE=${CONFIG_FILE_PATH}|g" \
+        "${INSTALL_DIR}/systemd/risk-api-server.service" > /etc/systemd/system/risk-api-server.service
+    print_status "risk-api-server.service installed (uses CONFIG_FILE=${CONFIG_FILE_PATH})"
+else
+    print_error "Service file not found: ${INSTALL_DIR}/systemd/risk-api-server.service"
+    exit 1
+fi
 
 INSTALLED_SERVICES=true
-print_status "Systemd services created"
+print_status "Systemd services installed successfully"
 
 # Step 7: Enable and start services
 echo ""
@@ -506,7 +473,65 @@ fi
 # Disable trap now that deployment succeeded
 trap - ERR
 
-# Step 8: Cleanup and summary
+# Step 8: Configure Apache (optional)
+echo ""
+echo -e "${YELLOW}Step 8: Apache Configuration (Optional)${NC}"
+if command -v apache2 &> /dev/null || command -v httpd &> /dev/null; then
+    read -p "Do you want to install Apache reverse proxy config for the API? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if [ -f "${INSTALL_DIR}/apache/risk-api.conf" ]; then
+            print_status "Installing Apache config..."
+
+            # Determine Apache config directory
+            if [ -d "/etc/apache2/sites-available" ]; then
+                APACHE_CONF_DIR="/etc/apache2/sites-available"
+                APACHE_CMD="apache2"
+            elif [ -d "/etc/httpd/conf.d" ]; then
+                APACHE_CONF_DIR="/etc/httpd/conf.d"
+                APACHE_CMD="httpd"
+            else
+                print_error "Could not find Apache config directory"
+                exit 1
+            fi
+
+            # Copy config
+            cp "${INSTALL_DIR}/apache/risk-api.conf" "${APACHE_CONF_DIR}/"
+            print_status "Apache config copied to ${APACHE_CONF_DIR}/"
+
+            # Enable required modules
+            if command -v a2enmod &> /dev/null; then
+                print_status "Enabling Apache modules..."
+                a2enmod proxy proxy_http rewrite headers ssl 2>/dev/null || true
+            fi
+
+            # Enable site if using Debian/Ubuntu
+            if command -v a2ensite &> /dev/null; then
+                print_status "Enabling risk-api site..."
+                a2ensite risk-api.conf 2>/dev/null || true
+            fi
+
+            # Reload Apache
+            print_status "Reloading Apache..."
+            if command -v systemctl &> /dev/null; then
+                systemctl reload ${APACHE_CMD} 2>/dev/null || systemctl restart ${APACHE_CMD}
+            else
+                service ${APACHE_CMD} reload 2>/dev/null || service ${APACHE_CMD} restart
+            fi
+
+            print_status "Apache reverse proxy configured"
+            print_warning "Remember to update ServerName in ${APACHE_CONF_DIR}/risk-api.conf"
+        else
+            print_warning "Apache config not found at ${INSTALL_DIR}/apache/risk-api.conf"
+        fi
+    else
+        print_status "Skipping Apache configuration"
+    fi
+else
+    print_warning "Apache not installed, skipping reverse proxy setup"
+fi
+
+# Step 9: Cleanup and summary
 echo ""
 echo -e "${GREEN}=== Deployment Completed Successfully! ===${NC}"
 echo ""

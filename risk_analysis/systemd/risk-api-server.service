@@ -1,0 +1,45 @@
+[Unit]
+Description=Risk Analysis API Server - RESTful API for Risk Scoring
+Documentation=https://github.com/your-org/risk-analysis
+After=network.target postgresql.service redis.service
+Requires=postgresql.service redis.service
+
+[Service]
+Type=simple
+User=risk-processor
+Group=risk-processor
+WorkingDirectory=/opt/risk-analysis
+
+# Wait for dependencies to be fully ready
+ExecStartPre=/bin/sleep 5
+
+# Start the API server
+ExecStart=/opt/risk-analysis/risk-api-server
+
+# Restart policy - always restart if it crashes
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=append:/opt/risk-analysis/log/risk-api-server.log
+StandardError=append:/opt/risk-analysis/log/risk-api-server-error.log
+
+# Environment variables
+Environment="PATH=/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="CONFIG_FILE=/opt/risk-analysis/config.conf"
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/risk-analysis
+
+# Resource limits (adjust based on your needs)
+# Uncomment and adjust if needed:
+# LimitNOFILE=65536
+# MemoryMax=2G
+# CPUQuota=100%
+
+[Install]
+WantedBy=multi-user.target
