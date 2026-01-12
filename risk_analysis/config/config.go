@@ -86,18 +86,31 @@ type Config struct {
 	// API settings
 	APIPort string
 	APIHost string
+
+	// Monitor mode settings
+	MonitorMode         bool // Enable monitor mode by default
+	MonitorPollInterval int  // Polling interval in seconds for monitor mode
 }
 
 // LoadConfig loads configuration from config.conf file
 func LoadConfig() (*Config, error) {
 	// Try to load settings.conf file
-	CONFIGPATH := "/data/odoo/ETL_script/update_script/settings.conf" //--sterling-bank-config-path
+	// CONFIGPATH := "/data/odoo/ETL_script/update_script/settings.conf" //--sterling-bank-config-path
 	// CONFIGPATH := "/data/Altbank/ETL_script/update_script/settings.conf" //--altbank-config-path
-	if _, err := os.Stat(CONFIGPATH); os.IsNotExist(err) {
-		return nil, fmt.Errorf("config file not found: %s", CONFIGPATH)
+
+	// Determine config file path with priority:
+	// 1. CONFIG_FILE environment variable
+	// 2. Default: config.conf in current directory
+	configPath := os.Getenv("CONFIG_FILE")
+	if configPath == "" {
+		configPath = "config.conf"
 	}
 
-	cfg, err := ini.Load(CONFIGPATH)
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("config file not found: %s (set CONFIG_FILE env var to specify path)", configPath)
+	}
+
+	cfg, err := ini.Load(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load config file: %w", err)
 	}
@@ -190,6 +203,10 @@ func LoadConfig() (*Config, error) {
 		APILogMaxSize:    apiLoggingSection.Key("log_max_size").MustInt(riskSection.Key("log_max_size").MustInt(100)),
 		APILogMaxBackups: apiLoggingSection.Key("log_max_backups").MustInt(riskSection.Key("log_max_backups").MustInt(5)),
 		APILogMaxAge:     apiLoggingSection.Key("log_max_age").MustInt(riskSection.Key("log_max_age").MustInt(30)),
+
+		// Monitor mode settings from [risk_analysis] section
+		MonitorMode:         riskSection.Key("monitor_mode").MustBool(false),
+		MonitorPollInterval: riskSection.Key("monitor_poll_interval").MustInt(40), // Default: 40 seconds
 	}
 
 	// Validate required fields
