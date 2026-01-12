@@ -1,9 +1,11 @@
 import os
 import logging
 import subprocess
+import re
 from datetime import datetime
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
+from odoo.addons.bus.models.bus import channel_with_db
 import platform
 import getpass
 
@@ -22,6 +24,10 @@ class IcomplyLogProfile(models.Model):
     sequence = fields.Integer(string='Sequence', default=10)
     color = fields.Integer(string='Color Index', default=0)
     
+    # File tracking for monitoring
+    last_file_position = fields.Integer(string='Last File Position', default=0)
+    last_monitored = fields.Datetime(string='Last Monitored', readonly=True)
+    
     # Statistics
     last_accessed = fields.Datetime(string='Last Accessed', readonly=True)
     file_size = fields.Char(string='File Size', compute='_compute_file_info', store=False)
@@ -33,6 +39,12 @@ class IcomplyLogProfile(models.Model):
     show_timestamp = fields.Boolean(string='Show Timestamp', default=True)
     show_level = fields.Boolean(string='Show Level', default=True)
     max_lines = fields.Integer(string='Max Lines to Display', default=1000)
+    
+    # Monitoring settings
+    enable_realtime = fields.Boolean(string='Enable Real-time Monitoring', default=True,
+                                     help='Automatically monitor and push log updates via WebSocket')
+    monitor_interval = fields.Integer(string='Monitor Interval (seconds)', default=2,
+                                      help='How often to check for new logs')
     
     @api.depends('log_file_path')
     def _compute_file_info(self):
@@ -231,4 +243,202 @@ class IcomplyLogProfile(models.Model):
             'res_model': 'icomply.log.profile',
             'view_mode': 'kanban,tree,form',
             'target': 'current',
+        }
+    
+    # ==================== WEBSOCKET MONITORING SYSTEM ====================
+    
+    @api.model
+    def _monitor_log_files_cron(self):
+        """
+        Cron job to monitor active log files and send updates via WebSocket.
+        This should be called every 1-5 seconds by an Odoo scheduled action.
+        """
+        profiles = self.search([
+            ('active', '=', True),
+            ('enable_realtime', '=', True)
+        ])
+        
+        _logger.debug(f"Monitoring {len(profiles)} active log profiles")
+        
+        for profile in profiles:
+            try:
+                new_logs = profile._read_new_logs()
+                if new_logs:
+                    _logger.info(f"Found {len(new_logs)} new logs for profile '{profile.name}'")
+                    profile.send_log_to_clients(profile.id, new_logs)
+                    profile.last_monitored = fields.Datetime.now()
+            except Exception as e:
+                _logger.error(f"Error monitoring profile '{profile.name}': {e}", exc_info=True)
+
+    def _read_new_logs(self):
+        """Read new logs from file since last check"""
+        self.ensure_one()
+        
+        if not self.log_file_path or not os.path.exists(self.log_file_path):
+            _logger.warning(f"Log file does not exist: {self.log_file_path}")
+            return []
+        
+        try:
+            file_size = os.path.getsize(self.log_file_path)
+            
+            # Check if file was truncated (file size is less than last position)
+            if file_size < self.last_file_position:
+                _logger.info(f"Log file '{self.name}' was truncated, resetting position")
+                self.last_file_position = 0
+            
+            # No new data
+            if file_size == self.last_file_position:
+                return []
+            
+            new_logs = []
+            
+            with open(self.log_file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                # Seek to last known position
+                f.seek(self.last_file_position)
+                
+                # Read new lines
+                lines = f.readlines()
+                
+                # Update file position
+                self.last_file_position = f.tell()
+                
+                # Parse each line
+                for line in lines:
+                    line = line.strip()
+                    if line:  # Skip empty lines
+                        parsed_log = self._parse_log_line(line)
+                        new_logs.append(parsed_log)
+            
+            return new_logs
+            
+        except Exception as e:
+            _logger.error(f"Error reading new logs from {self.log_file_path}: {e}", exc_info=True)
+            return []
+
+    def _parse_log_line(self, line):
+        """
+        Parse a log line and extract timestamp, level, and message.
+        Customize this based on your log format.
+        """
+        # Default log entry
+        log_entry = {
+            'message': line,
+            'type': 'info',
+            'level': 'INFO',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        # Try to parse standard Python/Odoo log format
+        # Example: "2024-01-15 10:30:45,123 12345 INFO dbname module.name: Message here"
+        
+        # Pattern 1: Standard Python logging format
+        pattern1 = r'^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})[,\s]+.*?\s+(DEBUG|INFO|WARNING|ERROR|CRITICAL)\s+.*?:\s*(.+)$'
+        match = re.match(pattern1, line, re.IGNORECASE)
+        
+        if match:
+            timestamp_str, level, message = match.groups()
+            log_entry['timestamp'] = timestamp_str
+            log_entry['level'] = level.upper()
+            log_entry['message'] = message.strip()
+            log_entry['type'] = self._level_to_type(level)
+            return log_entry
+        
+        # Pattern 2: Simple timestamp + level format
+        # Example: "[2024-01-15 10:30:45] ERROR: Something went wrong"
+        pattern2 = r'^\[?(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\]?\s+(DEBUG|INFO|WARNING|ERROR|CRITICAL)[:\s]+(.+)$'
+        match = re.match(pattern2, line, re.IGNORECASE)
+        
+        if match:
+            timestamp_str, level, message = match.groups()
+            log_entry['timestamp'] = timestamp_str
+            log_entry['level'] = level.upper()
+            log_entry['message'] = message.strip()
+            log_entry['type'] = self._level_to_type(level)
+            return log_entry
+        
+        # Pattern 3: Just level at start
+        # Example: "ERROR: Connection failed"
+        pattern3 = r'^(DEBUG|INFO|WARNING|ERROR|CRITICAL)[:\s]+(.+)$'
+        match = re.match(pattern3, line, re.IGNORECASE)
+        
+        if match:
+            level, message = match.groups()
+            log_entry['level'] = level.upper()
+            log_entry['message'] = message.strip()
+            log_entry['type'] = self._level_to_type(level)
+            return log_entry
+        
+        # If no pattern matches, try to detect level from keywords
+        line_upper = line.upper()
+        if 'ERROR' in line_upper or 'FAILED' in line_upper or 'EXCEPTION' in line_upper:
+            log_entry['type'] = 'error'
+            log_entry['level'] = 'ERROR'
+        elif 'WARNING' in line_upper or 'WARN' in line_upper:
+            log_entry['type'] = 'warning'
+            log_entry['level'] = 'WARNING'
+        elif 'SUCCESS' in line_upper or 'COMPLETED' in line_upper or 'DONE' in line_upper:
+            log_entry['type'] = 'success'
+            log_entry['level'] = 'INFO'
+        
+        return log_entry
+
+    def _level_to_type(self, level):
+        """Convert log level to frontend type"""
+        level_upper = level.upper()
+        mapping = {
+            'DEBUG': 'info',
+            'INFO': 'info',
+            'WARNING': 'warning',
+            'ERROR': 'error',
+            'CRITICAL': 'error',
+        }
+        return mapping.get(level_upper, 'info')
+
+    def send_log_to_clients(self, profile_id, logs):
+        """Send logs via WebSocket to all connected clients"""
+        if not logs:
+            return
+        
+        channel = f'icomply_logs_realtime_{profile_id}'
+        
+        try:
+            self.env['bus.bus']._sendone(
+                channel_with_db(self.env.cr.dbname, channel),
+                'new_logs',
+                {
+                    'profile_id': profile_id,
+                    'logs': logs,
+                }
+            )
+            _logger.debug(f"Sent {len(logs)} logs to channel '{channel}'")
+        except Exception as e:
+            _logger.error(f"Error sending logs to WebSocket channel: {e}", exc_info=True)
+
+    def action_reset_file_position(self):
+        """Reset file position to start reading from beginning"""
+        self.ensure_one()
+        self.last_file_position = 0
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Reset',
+                'message': 'File position reset to beginning',
+                'type': 'success',
+            }
+        }
+
+    def action_toggle_realtime(self):
+        """Toggle real-time monitoring"""
+        self.ensure_one()
+        self.enable_realtime = not self.enable_realtime
+        status = "enabled" if self.enable_realtime else "disabled"
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Real-time Monitoring',
+                'message': f'Real-time monitoring {status}',
+                'type': 'success',
+            }
         }
