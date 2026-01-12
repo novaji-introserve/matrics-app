@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Simplified ETL Dashboard View -->
+    <record id="view_etl_dashboard" model="ir.ui.view">
+        <field name="name">etl.dashboard</field>
+        <field name="model">etl.source.table</field>
+        <field name="arch" type="xml">
+            <kanban class="oe_background_grey o_kanban_dashboard" create="0">
+                <field name="name"/>
+                <field name="source_connection_id"/>
+                <field name="target_connection_id"/>
+                <field name="category_id"/>
+                <field name="last_sync_status"/>
+                <field name="total_records_synced"/>
+                <field name="last_full_sync_time"/>
+                <field name="last_incremental_sync"/>
+                <field name="full_sync_enabled"/>
+                <field name="incremental_sync_enabled"/>
+                <field name="estimated_record_count"/>
+                <field name="job_status"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click" style="min-height: 180px;">
+                            <div class="oe_kanban_content">
+                                <!-- Header Row -->
+                                <div class="row">
+                                    <div class="col-8">
+                                        <strong style="font-size: 16px;"><field name="name"/></strong>
+                                        <div class="mt-1">
+                                            <t t-if="record.full_sync_enabled.raw_value">
+                                                <span class="badge badge-primary mr-1">Full</span>
+                                            </t>
+                                            <t t-if="record.incremental_sync_enabled.raw_value">
+                                                <span class="badge badge-info mr-1">Incremental</span>
+                                            </t>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="float-right badge badge-pill" 
+                                              t-attf-class="badge-#{record.last_sync_status.raw_value == 'success' ? 'success' : record.last_sync_status.raw_value == 'failed' ? 'danger' : 'warning'}">
+                                            <field name="last_sync_status"/>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Connection Information -->
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            <i class="fa fa-arrow-right" title="Source connection"></i>
+                                            <strong>Source:</strong> <field name="source_connection_id"/>
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            <i class="fa fa-arrow-left" title="Target connection"></i>
+                                            <strong>Target:</strong> <field name="target_connection_id"/>
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Category -->
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <small><strong>Category:</strong></small><br/>
+                                        <field name="category_id"/>
+                                    </div>
+                                    <div class="col-6">
+                                        <small><strong>Records:</strong></small><br/>
+                                        <strong style="color: #007bff;"><field name="total_records_synced"/></strong>
+                                    </div>
+                                </div>
+
+                                <!-- Sync Times -->
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            <strong>Last Full:</strong> 
+                                            <t t-if="record.last_full_sync_time.raw_value">
+                                                <field name="last_full_sync_time"/>
+                                            </t>
+                                            <t t-else="">Never</t>
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="row" t-if="record.incremental_sync_enabled.raw_value">
+                                    <div class="col-12">
+                                        <small class="text-info">
+                                            <strong>Last Incremental:</strong> 
+                                            <t t-if="record.last_incremental_sync.raw_value">
+                                                <field name="last_incremental_sync"/>
+                                            </t>
+                                            <t t-else="">Never</t>
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="row mt-3 pt-2" style="border-top: 1px solid #dee2e6;">
+                                    <div class="col-12 text-center">
+                                        <button type="object" name="action_sync_table_full" 
+                                                class="btn btn-sm btn-primary mr-1"
+                                                t-if="record.full_sync_enabled.raw_value and record.job_status.raw_value != 'started'">
+                                            <i class="fa fa-refresh" title="Refresh full sync"></i> Full Sync
+                                        </button>
+                                        <button type="object" name="action_sync_table_incremental" 
+                                                class="btn btn-sm btn-info mr-1"
+                                                t-if="record.incremental_sync_enabled.raw_value and record.job_status.raw_value != 'started'">
+                                            <i class="fa fa-plus" title="Run incremental sync"></i> Incremental
+                                        </button>
+                                        <span t-if="record.job_status.raw_value == 'started'" 
+                                              class="badge badge-info">
+                                            <i class="fa fa-spinner fa-spin" title="Sync in progress"></i> Running
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="action_etl_dashboard" model="ir.actions.act_window">
+        <field name="name">ETL Dashboard</field>
+        <field name="res_model">etl.source.table</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_etl_dashboard"/>
+        <field name="context">{'search_default_group_category': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Welcome to the ETL Dashboard!
+            </p>
+            <p>
+                Monitor your ETL operations with real-time status and quick actions.
+            </p>
+        </field>
+    </record>
+
+    <!-- System Status Dashboard -->
+    <record id="view_etl_system_status_dashboard" model="ir.ui.view">
+        <field name="name">etl.system.status.dashboard</field>
+        <field name="model">etl.database.connection</field>
+        <field name="arch" type="xml">
+            <kanban class="oe_background_grey o_kanban_dashboard" create="0">
+                <field name="name"/>
+                <field name="database_type"/>
+                <field name="host"/>
+                <field name="last_test_status"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <!-- Header -->
+                                <div class="row">
+                                    <div class="col-8">
+                                        <strong><field name="name"/></strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="float-right badge badge-pill" 
+                                              t-attf-class="badge-#{record.last_test_status.raw_value == 'success' ? 'success' : record.last_test_status.raw_value == 'failed' ? 'danger' : 'secondary'}">
+                                            <field name="last_test_status"/>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Connection Info -->
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <small><strong>Type:</strong></small><br/>
+                                        <span class="badge badge-info"><field name="database_type"/></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small><strong>Host:</strong></small><br/>
+                                        <field name="host"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- System Status Dashboard Action -->
+    <record id="action_etl_system_status_dashboard" model="ir.actions.act_window">
+        <field name="name">ETL System Status</field>
+        <field name="res_model">etl.database.connection</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_etl_system_status_dashboard"/>
+        <field name="domain">[('active', '=', True)]</field>
+    </record>
+</odoo>

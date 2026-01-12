@@ -34,9 +34,9 @@ class SQLRequestMixin(models.AbstractModel):
 
     _sql_request_users_relation = False
 
-    STATE_SELECTION = [("draft", "Draft"), ("sql_valid", "Validated")]
+    STATE_SELECTION = [("draft", "Draft"), ("sql_valid", "SQL Valid")]
 
-    PROHIBITED_WORDS = [ 
+    PROHIBITED_WORDS = [
         "delete",
         "drop",
         "insert",

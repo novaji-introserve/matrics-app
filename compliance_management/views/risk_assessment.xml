@@ -23,10 +23,13 @@
                     </group>
                     <group>
                         <group>
+                            <field name="max_risk_score" invisible="1"/>
+                            <field name="risk_level" invisible="1"/>
+
                             <field name="category_id"/>
                         </group>
                         <group>
-                            <field name="inherent_risk_score"  widget="risk_slider" options="{'step': 1, 'show_value': true, 'reverse_colors': false, 'readonly': false}" />
+                            <field name="inherent_risk_score"  widget="slider" step="0.1" min="1" max="max_risk_score" />
                         </group>
                     </group>
         
@@ -37,12 +40,11 @@
                     </group>
                     <group>
                         <group>
-                            <field name="control_effectiveness_score" widget="risk_slider" />
-                            <!-- <field name="control_effectiveness_score" widget="risk_slider" options="{'reverseColors': true}" /> -->
-                        </group>
+                            <field name="control_effectiveness_score" widget="slider" step="0.1" min="1" max="max_risk_score"/>
+                          
+                          </group>
                         <group>
-                            
-                          <field name="residual_risk_impact" widget="risk_slider" options="{'readonly': true}"/>
+                            <field name="residual_risk_impact" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level =='low'"/>
                         </group>
                     </group>
                     <group>

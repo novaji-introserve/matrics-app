@@ -3,67 +3,15 @@
     <!-- Main Menu -->
     <menuitem web_icon="internal_control,static/description/icon.png" id="menu_internal_control_main"  name="Transaction Monitoring" sequence="-800"/>
 
+    <menuitem web_icon="internal_control,static/src/img/icons-report.png" id="menu_internal_control_transactions_report" name="Reports" sequence="-500" action="action_bi_sql_view_enhanced"/>
+
+
     <!-- Dashboard Submenu -->
     <menuitem id="menu_internal_control_dashboard" name="Dashboard" parent="menu_internal_control_main" action="icomply_dashboard.dashboard_home" sequence="10"/>
     
-    <menuitem id="menu_transaction_monitoring_root" name="Transactions" parent="menu_internal_control_main" sequence="30"/>
+    <menuitem id="menu_transaction_monitoring_root" name="Transaction Monitoring" parent="menu_internal_control_main" sequence="30"/>
 
        <!-- All transactions -->
-    <!-- <menuitem id="menu_all_transactions_root" name="Transaction Review" sequence="20" parent="menu_transaction_monitoring_root"/> -->
-    
-<!-- All Transactions menus -->
-<!-- <menuitem id="menu_internal_control_all_transactions" 
-          name="All Transactions" 
-          sequence="10" 
-          parent="menu_all_transactions_root"/>
-
-<menuitem id="menu_all_transactions_today" 
-          name="Today" 
-          sequence="11" 
-          parent="menu_internal_control_all_transactions" 
-          action="action_all_transactions_today"/>
-
-<menuitem id="menu_all_transactions_last_7_days" 
-          name="Last 7 Days" 
-          sequence="12" 
-          parent="menu_internal_control_all_transactions" 
-          action="action_all_transactions_last_7_days"/> -->
-
-<!-- Awaiting Review menus -->
-<!-- <menuitem id="menu_internal_control_awaiting_review" 
-          name="Awaiting Review" 
-          sequence="20" 
-          parent="menu_all_transactions_root"/>
-
-<menuitem id="menu_awaiting_review_today" 
-          name="Today" 
-          sequence="21" 
-          parent="menu_internal_control_awaiting_review" 
-          action="action_awaiting_review_today"/>
-
-<menuitem id="menu_awaiting_review_last_7_days" 
-          name="Last 7 Days" 
-          sequence="22" 
-          parent="menu_internal_control_awaiting_review" 
-          action="action_awaiting_review_last_7_days"/> -->
-
-<!-- Reviewed menus -->
-<!-- <menuitem id="menu_internal_control_reviewed" 
-          name="Reviewed" 
-          sequence="30" 
-          parent="menu_all_transactions_root"/>
-
-<menuitem id="menu_reviewed_today" 
-          name="Today" 
-          sequence="31" 
-          parent="menu_internal_control_reviewed" 
-          action="action_reviewed_today"/>
-
-<menuitem id="menu_reviewed_last_7_days" 
-          name="Last 7 Days" 
-          sequence="32" 
-          parent="menu_internal_control_reviewed" 
-          action="action_reviewed_last_7_days"/> -->
 
     <!-- start here -->
 
@@ -135,38 +83,38 @@
     <!-- stop here -->
 
 
-    <menuitem id="menu_internal_control_transactions_report_root" name="Reporting" sequence="40" parent="menu_transaction_monitoring_root"/>
+    <!-- <menuitem id="menu_internal_control_transactions_report_root" name="Reporting" sequence="40" parent="menu_transaction_monitoring_root"/> -->
 
-    <menuitem id="menu_internal_control_transactions_report" name="Reports" sequence="10" parent="menu_internal_control_transactions_report_root" action="bi_sql_editor.action_bi_sql_view"/>
+    <!-- <menuitem id="menu_internal_control_transactions_report" name="Reports" sequence="10" parent="menu_internal_control_transactions_report_root" action="bi_sql_editor.action_bi_sql_view"/> -->
 
 
     <!-- Alert Monitoring -->
-    <menuitem id="menu_internal_control_alert_monitoring"
-              name="Alerts"
+    <!-- <menuitem id="menu_internal_control_alert_monitoring"
+              name="Alert Monitoring"
               parent="menu_internal_control_main"
-              sequence="30"/>
+              sequence="30"/> -->
 
-    <menuitem 
+    <!-- <menuitem 
         id="menu_internal_control_alert_rules_monitoring" 
         name="Processes" 
         parent="menu_internal_control_alert_monitoring" 
         action="alert_management.action_alert_rules" 
         sequence="10"
-        />
+        /> -->
 
-    <menuitem 
+    <!-- <menuitem 
         id="menu_alert_history" name="Alert History" 
         parent="menu_internal_control_alert_monitoring"
         action="alert_management.action_alert_history_status" 
         sequence="20" 
-        />
+        /> -->
 
 
 
    
     <!-- Configurations -->
     <menuitem id="menu_internal_control_configurations"
-              name="Configuration"
+              name="Configurations"
               groups="compliance_management.group_compliance_chief_compliance_officer"
               parent="menu_internal_control_main"
               sequence="40"/>
@@ -200,29 +148,41 @@
 
 
     <menuitem id="menu_customer_management" 
-            name="Customers"  
+            name="Customer Management"  
             parent="menu_internal_control_main"
             sequence="20"/>
     
    
     <menuitem id="menu_customer"  
-            name="Customer"  
+            name="Customers"  
             parent="menu_customer_management"
             sequence="10"/>
+
+    <menuitem id="menu_customers_all"  
+        name="All Customers"  
+        parent="menu_customer"
+        action="action_customers_all"
+        sequence="5"/>
 
     <menuitem id="menu_customer_today"  
             name="Today"  
             parent="menu_customer" 
-            action="action_open_customers_today"
+            action="action_customers_today"
             sequence="10"/>
 
     <menuitem id="menu_customer_last_7days"  
             name="Last 7 Days"  
             parent="menu_customer" 
-            action="action_open_customers_last_7days"
-            sequence="20"/>
+            action="action_customers_last_7days"
+            sequence="15"/>
    
-    
+
+    <menuitem id="menu_customers_last_30days"  
+            name="Last 30days"  
+            parent="menu_customer"
+            action="action_customers_last_30days"
+            sequence="20"/>
+            
     <!-- <menuitem id="menu_account" 
             name="Account"  
             parent="menu_customer_management" 
@@ -253,6 +213,13 @@
         parent="menu_account"
         action="action_open_accounts_tier_3"
         sequence="3"/>
+
+    <menuitem id="menu_res_transaction_channel" 
+        name="Transaction Channels" 
+        parent="menu_internal_control_configurations"
+        groups="compliance_management.group_compliance_chief_compliance_officer"
+        action="action_res_transaction_channel"
+        sequence="80"/>
     
 
     <!-- <menuitem id="menu_internal_control_cron_tree_parent" 

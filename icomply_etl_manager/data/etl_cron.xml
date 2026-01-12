@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Simplified Cron Jobs -->
+        
+        <!-- Incremental Sync Scheduler (Every 15 minutes) -->
+        <record id="ir_cron_etl_incremental_sync" model="ir.cron">
+            <field name="name">ETL: Incremental Sync Scheduler</field>
+            <field name="model_id" ref="model_etl_manager"/>
+            <field name="state">code</field>
+            <field name="code">model.run_incremental_sync()</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <!-- Daily Full Sync Scheduler -->
+        <record id="ir_cron_etl_sync_daily" model="ir.cron">
+            <field name="name">ETL: Daily Sync Scheduler</field>
+            <field name="model_id" ref="model_etl_manager"/>
+            <field name="state">code</field>
+            <field name="code">model.run_scheduled_sync('daily')</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=1, minute=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <!-- Hourly Full Sync Scheduler -->
+        <record id="ir_cron_etl_sync_hourly" model="ir.cron">
+            <field name="name">ETL: Hourly Sync Scheduler</field>
+            <field name="model_id" ref="model_etl_manager"/>
+            <field name="state">code</field>
+            <field name="code">model.run_scheduled_sync('hourly')</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <!-- Weekly Full Sync Scheduler -->
+        <record id="ir_cron_etl_sync_weekly" model="ir.cron">
+            <field name="name">ETL: Weekly Sync Scheduler</field>
+            <field name="model_id" ref="model_etl_manager"/>
+            <field name="state">code</field>
+            <field name="code">model.run_scheduled_sync('weekly')</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=1, minute=0) + timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <!-- Cleanup Old Logs (Daily at 2 AM) -->
+        <record id="ir_cron_etl_cleanup_logs" model="ir.cron">
+            <field name="name">ETL: Cleanup Old Logs</field>
+            <field name="model_id" ref="model_etl_manager"/>
+            <field name="state">code</field>
+            <field name="code">model.cleanup_old_logs(30)</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=2, minute=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,30 @@
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Default Alert Delivery Methods -->
+        <record id="delivery_method_branch" model="alert.delivery.method">
+            <field name="name">By Branch</field>
+            <field name="code">branch</field>
+            <field name="description">Split records by branch_id and send to branch-specific recipients. This is the default behavior.</field>
+            <field name="sequence">10</field>
+            <field name="active">True</field>
+        </record>
+        
+        <record id="delivery_method_department" model="alert.delivery.method">
+            <field name="name">By Department</field>
+            <field name="code">department</field>
+            <field name="description">Send all records to recipients in the selected department only. Branch information is ignored.</field>
+            <field name="sequence">20</field>
+            <field name="active">True</field>
+        </record>
+        
+        <record id="delivery_method_branch_department" model="alert.delivery.method">
+            <field name="name">By Branch &amp; Department</field>
+            <field name="code">branch_department</field>
+            <field name="description">Split records by branch_id AND filter recipients by department. Most restrictive option.</field>
+            <field name="sequence">30</field>
+            <field name="active">True</field>
+        </record>
+        
+    </data>
+</odoo>

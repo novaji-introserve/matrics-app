@@ -90,9 +90,13 @@ type Config struct {
 	// Monitor mode settings
 	MonitorMode         bool // Enable monitor mode by default
 	MonitorPollInterval int  // Polling interval in seconds for monitor mode
+
+	// Monitor mode settings
+	MonitorMode         bool // Enable monitor mode by default
+	MonitorPollInterval int  // Polling interval in seconds for monitor mode
 }
 
-// LoadConfig loads configuration from config.conf file
+// LoadConfig loads configuration from settings.conf file
 func LoadConfig() (*Config, error) {
 	// Try to load settings.conf file
 	// CONFIGPATH := "/data/odoo/ETL_script/update_script/settings.conf" //--sterling-bank-config-path
@@ -110,6 +114,7 @@ func LoadConfig() (*Config, error) {
 		return nil, fmt.Errorf("config file not found: %s (set CONFIG_FILE env var to specify path)", configPath)
 	}
 
+	cfg, err := ini.Load(configPath)
 	cfg, err := ini.Load(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load config file: %w", err)
@@ -260,4 +265,3 @@ func parseCustomerIDs(idStr string) ([]int, error) {
 	
 	return result, nil
 }
-

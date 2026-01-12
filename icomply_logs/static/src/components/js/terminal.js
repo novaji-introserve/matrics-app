@@ -2,7 +2,7 @@
 import { registry } from "@web/core/registry";
 
 /**
- * IComply Terminal Service - Multi-profile log viewer
+ * IComply Terminal Service - WebSocket-based Multi-profile log viewer
  */
 export const icomplyTerminalService = {
     dependencies: ['bus_service', 'rpc'],
@@ -30,11 +30,10 @@ export const icomplyTerminalService = {
                 profileSessions.set(profileId, {
                     logs: [],
                     listeners: new Set(),
-                    filePosition: 0,
                     isPaused: false,
-                    pollInterval: null,
                     isInitialized: false,
                     profileInfo: null,
+                    busListener: null,
                 });
             }
             return profileSessions.get(profileId);
@@ -61,7 +60,7 @@ export const icomplyTerminalService = {
                 session.logs.shift();
             }
 
-            if (!skipNotify) {
+            if (!skipNotify && !session.isPaused) {
                 notifyListeners(profileId, logEntry);
             }
         }
@@ -116,51 +115,6 @@ export const icomplyTerminalService = {
             }
         }
 
-        async function pollNewLogs(profileId) {
-            const session = getOrCreateSession(profileId);
-            
-            try {
-                const result = await rpc('/icomply/logs/poll', { 
-                    profile_id: profileId,
-                    last_position: session.filePosition 
-                });
-
-                if (result.logs && result.logs.length > 0) {
-                    const levelMapping = {
-                        'DEBUG': 'info',
-                        'INFO': 'info',
-                        'WARNING': 'warning', 
-                        'ERROR': 'error',
-                        'CRITICAL': 'error',
-                    };
-
-                    result.logs.forEach(log => {
-                        const type = levelMapping[log.level] || 'info';
-                        addLog(
-                            profileId,
-                            log.message,
-                            type,
-                            log.timestamp,
-                            log.level,
-                            session.isPaused
-                        );
-                    });
-
-                    if (!session.isPaused) {
-                        console.log(`Polled ${result.logs.length} new logs for profile ${profileId}`);
-                    }
-                }
-
-                session.filePosition = result.position;
-
-            } catch (error) {
-                console.error(`Error polling logs for profile ${profileId}:`, error);
-                if (session.isInitialized && !session.isPaused) {
-                    addLog(profileId, `Polling error: ${error.message}`, 'warning');
-                }
-            }
-        }
-
         async function initialize(profileId) {
             try {
                 const session = getOrCreateSession(profileId);
@@ -178,57 +132,57 @@ export const icomplyTerminalService = {
                 
                 session.profileInfo = profileInfo;
                 
-                // Load all logs
+                // Load all existing logs
                 await loadAllLogs(profileId);
                 
-                // Get initial file position
-                try {
-                    const result = await rpc('/icomply/logs/poll', { 
-                        profile_id: profileId,
-                        last_position: 0 
-                    });
-                    session.filePosition = result.position;
-                    console.log(`Initial file position for profile ${profileId}: ${session.filePosition}`);
-                } catch (e) {
-                    console.warn(`Could not set initial file position for profile ${profileId}:`, e);
-                }
-                
-                // Subscribe to bus channel
+                // Subscribe to WebSocket channel for real-time updates
                 const channel = `icomply_logs_realtime_${profileId}`;
                 bus_service.addChannel(channel);
+                console.log(`Subscribed to WebSocket channel: ${channel}`);
 
-                bus_service.addEventListener('notification', (ev) => {
+                // Create bus listener
+                session.busListener = (ev) => {
                     const notifications = ev.detail;
                     if (Array.isArray(notifications)) {
                         notifications.forEach((notification) => {
                             if (notification.type === 'new_logs' && 
                                 notification.payload && 
                                 notification.payload.profile_id === profileId) {
+                                
                                 const payload = notification.payload;
                                 if (payload.logs && Array.isArray(payload.logs)) {
+                                    console.log(`Received ${payload.logs.length} logs via WebSocket for profile ${profileId}`);
+                                    
+                                    const levelMapping = {
+                                        'DEBUG': 'info',
+                                        'INFO': 'info',
+                                        'WARNING': 'warning', 
+                                        'ERROR': 'error',
+                                        'CRITICAL': 'error',
+                                    };
+
                                     payload.logs.forEach(log => {
+                                        const type = levelMapping[log.level] || 'info';
                                         addLog(
                                             profileId,
                                             log.message, 
-                                            log.type, 
+                                            type, 
                                             log.timestamp, 
-                                            log.level
+                                            log.level,
+                                            session.isPaused
                                         );
                                     });
-                                    session.filePosition = payload.position;
                                 }
                             }
                         });
                     }
-                });
+                };
 
-                // Start polling
-                session.pollInterval = setInterval(() => {
-                    pollNewLogs(profileId);
-                }, 2000);
+                // Register the listener
+                bus_service.addEventListener('notification', session.busListener);
 
                 session.isInitialized = true;
-                addLog(profileId, `Terminal initialized for ${profileInfo.name}`, 'success');
+                addLog(profileId, `Terminal initialized for ${profileInfo.name} (WebSocket mode)`, 'success');
 
             } catch (error) {
                 console.error(`Error initializing profile ${profileId}:`, error);
@@ -238,9 +192,18 @@ export const icomplyTerminalService = {
 
         function cleanup(profileId) {
             const session = profileSessions.get(profileId);
-            if (session && session.pollInterval) {
-                clearInterval(session.pollInterval);
-                session.pollInterval = null;
+            if (session) {
+                // Remove bus listener
+                if (session.busListener) {
+                    bus_service.removeEventListener('notification', session.busListener);
+                    session.busListener = null;
+                }
+
+                // Unsubscribe from channel
+                const channel = `icomply_logs_realtime_${profileId}`;
+                bus_service.deleteChannel(channel);
+                
+                console.log(`Cleaned up profile ${profileId}`);
             }
         }
 
@@ -282,11 +245,10 @@ export const icomplyTerminalService = {
                 }
             },
 
-            
-
             async reloadAllLogs(profileId) {
                 await loadAllLogs(profileId);
             },
+
             async clearLogFile(profileId) {
                 try {
                     const result = await rpc('/icomply/logs/clear_file', { 
@@ -296,7 +258,6 @@ export const icomplyTerminalService = {
                     if (result.success) {
                         const session = getOrCreateSession(profileId);
                         session.logs.length = 0;
-                        session.filePosition = 0;
                         addLog(profileId, result.message, 'success');
                     } else {
                         addLog(profileId, result.message, 'error');
@@ -339,10 +300,6 @@ export const icomplyTerminalService = {
                 }
             },
 
-            async pollNow(profileId) {
-                await pollNewLogs(profileId);
-            },
-
             async getStats(profileId) {
                 try {
                     return await rpc('/icomply/logs/stats', { profile_id: profileId });
@@ -351,8 +308,6 @@ export const icomplyTerminalService = {
                     return {};
                 }
             },
-
-            
 
             pausePolling(profileId) {
                 const session = profileSessions.get(profileId);
@@ -386,19 +341,6 @@ export const icomplyTerminalService = {
                 return session ? session.isPaused : false;
             },
 
-            getFilePosition(profileId) {
-                const session = profileSessions.get(profileId);
-                return session ? session.filePosition : 0;
-            },
-
-            resetFilePosition(profileId) {
-                const session = profileSessions.get(profileId);
-                if (session) {
-                    session.filePosition = 0;
-                    addLog(profileId, 'File position reset', 'info');
-                }
-            },
-
             getProfileInfo(profileId) {
                 const session = profileSessions.get(profileId);
                 return session ? session.profileInfo : null;
@@ -421,7 +363,6 @@ export const icomplyTerminalService = {
                     return {
                         initialized: false,
                         paused: false,
-                        filePosition: 0,
                         logCount: 0,
                         listenerCount: 0,
                         maxLogs: MAX_LOGS,
@@ -432,7 +373,6 @@ export const icomplyTerminalService = {
                 return {
                     initialized: session.isInitialized,
                     paused: session.isPaused,
-                    filePosition: session.filePosition,
                     logCount: session.logs.length,
                     listenerCount: session.listeners.size,
                     maxLogs: MAX_LOGS,

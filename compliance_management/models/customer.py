@@ -134,13 +134,38 @@ class Customer(models.Model):
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
     is_pep = fields.Boolean(
         string="Is PEP", default=False, tracking=True, index=True)
+    pep_result = fields.Char(
+        string = "PEP Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     is_watchlist = fields.Boolean(
         string="Is Watchlist", default=False, tracking=True)
+    watchlist_result = fields.Char(
+        string = "Watchlist Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
+    fep_result = fields.Char(
+        string = "FEP Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     is_blacklist = fields.Boolean(
         string="Is Blacklist", default=False, tracking=True)
+    blacklist_result = fields.Char(
+        string = "Blacklist Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     global_pep = fields.Boolean(
         string="Global PEP",  index=True, default=False)
+    global_pep_result = fields.Char(
+        string = "Global PEP Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     current_branch_id = fields.Integer(
         string='Current Branch', compute='_get_current_branch')
     internal_category = fields.Selection(string='Internal Category', selection=[('customer', 'Customer'), (
@@ -179,6 +204,11 @@ class Customer(models.Model):
 
     is_greylist = fields.Boolean(
         string="Is Greylist", default=False, tracking=True)
+    greylist_result = fields.Char(
+        string = "Greylist Result",
+        compute="_compute_screening_results",
+        store =False
+    )
 
     origin = fields.Selection(string='Data Origin', selection=[('demo', 'Demo Data'), (
         'test', 'Test Data'), ('prod', 'Production Data')], index=True)
@@ -192,6 +222,11 @@ class Customer(models.Model):
         string='Phone Number(s)', index=True, compute='_compute_formatted_phone')
 
     likely_sanction = fields.Boolean(string='Is Sanctioned', tracking=True)
+    likely_sanction_result = fields.Char(
+        string = "Likely Sanction Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code", index=True)
 
@@ -204,7 +239,7 @@ class Customer(models.Model):
     composite_risk_score = fields.Float(
         string='Composite Risk Score', digits=(10, 2))
 
-    last_risk_calculation = fields.Datetime(string='Last Risk Calculation', readonly=True,
+    last_risk_calculation = fields.Datetime(string='Last Analysis', readonly=True,
                                             help="When the risk score was last calculated")
 
     # universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
@@ -244,7 +279,23 @@ class Customer(models.Model):
     customer_status = fields.Many2one(
         'customer.status',
         string='Customer Status', readonly=True)
+    
+    last_risk_calculation_raw = fields.Char(
+    string="Last Analysis Date",
+    compute='_compute_raw_time',
+    tracking=True
+)
 
+    
+    @api.depends('last_risk_calculation')
+    def _compute_raw_time(self):
+        for record in self:
+            if record.last_risk_calculation:
+                # Convert the stored UTC object directly to a string
+                record.last_risk_calculation_raw = record.last_risk_calculation.strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                record.last_risk_calculation_raw = ""
+    
     @api.depends('customer_id')
     def _compute_is_case_manager_installed(self):
         module = self.env['ir.module.module'].sudo().search([
@@ -259,6 +310,20 @@ class Customer(models.Model):
             # Debug logging
             # _logger.info(
             #     f"Case module installed: {has_module}")
+
+    def _screening_text(self, matched):
+        return "Matched" if matched else "Not Matched"
+
+    @api.depends('is_pep','is_watchlist','is_fep','is_blacklist','global_pep','is_greylist','likely_sanction')
+    def _compute_screening_results(self):
+        for rec in self:
+            rec.pep_result = self._screening_text(rec.is_pep)
+            rec.watchlist_result = self._screening_text(rec.is_watchlist)
+            rec.fep_result = self._screening_text(rec.is_fep)
+            rec.blacklist_result = self._screening_text(rec.is_blacklist)
+            rec.global_pep_result = self._screening_text(rec.global_pep)
+            rec.greylist_result = self._screening_text(rec.is_greylist)
+            rec.likely_sanction_result = self._screening_text(rec.likely_sanction)
 
     def action_create_customer_case(self):
         self.ensure_one()
@@ -1772,7 +1837,9 @@ class Customer(models.Model):
             # Use ORM write method to update and track changes
             record.sudo().write({
                 'risk_score': score,
-                'risk_level': risk_level
+                'risk_level': risk_level,
+                'last_risk_calculation': fields.Datetime.now()
+
             })
 
         return True

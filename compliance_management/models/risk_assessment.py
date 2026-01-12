@@ -17,21 +17,21 @@ class RiskAssessment(models.Model):
     code = fields.Char(string="Code", index=True)
     state = fields.Char(string="State")
     user_id = fields.Many2one(comodel_name='res.users', string='User',
-                              required=True, index=True, default=lambda self: self.env.user.id)
+                              required=True, tracking=True, index=True, default=lambda self: self.env.user.id)
     risk_rating = fields.Float(
-        string='Risk Rating', digits=(10, 2), default=0.0)
+        string='Risk Rating', digits=(10, 2), default=0.0, tracking=True)
     narration = fields.Html(string='Narration')
     subject_id = fields.Many2one(
-        comodel_name='res.risk.subject', string='Risk Subject', index=True)
+        comodel_name='res.risk.subject', string='Risk Subject', index=True, tracking=True)
     universe_id = fields.Many2one(
-        comodel_name='res.risk.universe', string='Risk Universe', index=True)
+        comodel_name='res.risk.universe', string='Risk Universe', tracking=True, index=True)
     recommendation = fields.Html(string='Recommendation')
     assessment_type_id = fields.Many2one(
-        comodel_name='res.risk.assessment.type', string='Assessment Type')
-    type_id = fields.Many2one(comodel_name='res.risk.type', string='Risk Type')
-    partner_id = fields.Many2one(comodel_name='res.partner', string='Partner')
+        comodel_name='res.risk.assessment.type', string='Assessment Type', tracking=True)
+    type_id = fields.Many2one(comodel_name='res.risk.type', string='Risk Type', tracking=True)
+    partner_id = fields.Many2one(comodel_name='res.partner', string='Partner', tracking=True)
     line_ids = fields.One2many(comodel_name='res.risk.assessment.line',
-                               inverse_name='risk_assessment_id', string='Risk Assessment Lines')
+                               inverse_name='risk_assessment_id', string='Risk Assessment Lines', tracking=True)
     total_risk_lines = fields.Integer(
         string='Total Risk Lines', _compute='_compute_total_risk_lines', store=True)
     internal_category = fields.Selection(string='Internal Category', selection=[('inst', 'Institutional'), ('cp', 'Counter Party')],default='inst')
@@ -173,3 +173,4 @@ class RiskAssessment(models.Model):
                     )
                 """)
         
+    

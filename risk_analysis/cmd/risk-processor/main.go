@@ -53,6 +53,11 @@ func main() {
 		os.Setenv("CONFIG_FILE", *configFile)
 	}
 
+	// Set config file path if specified via flag (highest priority)
+	if *configFile != "" {
+		os.Setenv("CONFIG_FILE", *configFile)
+	}
+
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -93,6 +98,16 @@ func main() {
 
 	if *resumeCheckpoint {
 		cfg.ResumeFromCheckpoint = true
+	}
+
+	// Monitor mode can be enabled via flag or config
+	if *monitorMode {
+		cfg.MonitorMode = true
+	}
+
+	// Poll interval: command-line flag overrides config (convert minutes to seconds)
+	if *pollInterval > 0 {
+		cfg.MonitorPollInterval = *pollInterval * 60 // Convert minutes to seconds
 	}
 
 	// Monitor mode can be enabled via flag or config
@@ -189,6 +204,7 @@ func main() {
 	// Initialize Redis if enabled
 	var processor *application.RiskProcessor
 	var redisClient *cache.RedisCacheClient // Declare at function scope for monitor mode
+	var redisClient *cache.RedisCacheClient // Declare at function scope for monitor mode
 	if cfg.RedisEnabled {
 		logger.Info("Redis caching enabled",
 			zap.String("host", cfg.RedisHost),
@@ -247,6 +263,78 @@ func main() {
 		logger.Fatal("Failed to initialize cache", zap.Error(err))
 	}
 
+	// Run risk processor based on mode
+	var startTime time.Time
+	if cfg.MonitorMode {
+		// Monitor mode: continuously poll for MV refresh and trigger processing
+		if !cfg.RedisEnabled {
+			logger.Fatal("Monitor mode requires Redis to be enabled")
+		}
+
+		logger.Info("Starting in MONITOR mode",
+			zap.Int("poll_interval_seconds", cfg.MonitorPollInterval),
+			zap.String("poll_interval_human", (time.Duration(cfg.MonitorPollInterval)*time.Second).String()),
+			zap.String("mode", "Continuous monitoring for MV refresh"),
+		)
+
+		// Create MV refresh monitor
+		monitor := application.NewMVRefreshMonitor(
+			dbConnection.GetPool(),
+			redisClient.GetClient(),
+			cfg.DBName,
+			logger,
+			time.Duration(cfg.MonitorPollInterval)*time.Second,
+		)
+
+		// Set callback to run risk processing when MV refresh is detected
+		monitor.SetRefreshCallback(func(ctx context.Context) error {
+			logger.Info("========================================")
+			logger.Info("MV REFRESH DETECTED - STARTING PROCESSING")
+			logger.Info("========================================")
+
+			startTime := time.Now()
+			err := processor.Run(ctx)
+
+			if err != nil {
+				logger.Error("Processing failed after MV refresh",
+					zap.Error(err),
+					zap.Duration("duration", time.Since(startTime)),
+				)
+				return err
+			}
+
+			stats := processor.GetStats()
+			logger.Info("========================================")
+			logger.Info("PROCESSING COMPLETED AFTER MV REFRESH")
+			logger.Info("========================================")
+			logger.Info("Final statistics",
+				zap.Duration("duration", time.Since(startTime)),
+				zap.Int("total_customers", stats.TotalCustomers),
+				zap.Int("total_processed", stats.TotalProcessed),
+				zap.Int("success_count", stats.SuccessCount),
+				zap.Int("failed_count", stats.FailedCount),
+			)
+
+			return nil
+		})
+
+		// Start monitoring
+		monitor.Start(ctx)
+		defer monitor.Stop()
+
+		// Wait for shutdown signal
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+		logger.Info("Monitor running... Press Ctrl+C to stop")
+		<-sigChan
+		logger.Info("Shutdown signal received, stopping monitor...")
+
+		return
+	}
+
+	// Standard mode: run once and exit
+	startTime = time.Now()
 	// Run risk processor based on mode
 	var startTime time.Time
 	if cfg.MonitorMode {
@@ -416,13 +504,24 @@ Options:
   --help                     Show this help message
 
 Configuration:
-  All configuration is loaded from config.conf file (INI format).
-  The file contains two main sections:
+  Config file can be specified in three ways (in order of priority):
+  1. --config flag:           risk-processor --config=/etc/risk-analysis/config.conf
+  2. CONFIG_FILE env var:     export CONFIG_FILE=/etc/risk-analysis/config.conf
+  3. Default location:        ./config.conf (current directory)
+
+  The config file uses INI format with sections:
     [database]       - Database connection and pool settings
     [risk_analysis]  - Risk processing, logging, and execution settings
 	[redis]          - Redis cache settings (required for monitor mode)
 
   See config.conf for all available options and defaults.
+
+Monitor Mode:
+  When --monitor flag is used, the processor runs continuously as a service,
+  polling the risk_analysis table's last_refresh column for changes.
+  When a change is detected (indicating the materialized view has been refreshed),
+  it automatically triggers risk analysis processing.
+  This mode requires Redis to be enabled in config.conf.
 
 Monitor Mode:
   When --monitor flag is used, the processor runs continuously as a service,

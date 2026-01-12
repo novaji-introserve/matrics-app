@@ -52,8 +52,7 @@ class CustomerAccount(models.Model):
 
     product_id = fields.Many2one(
         comodel_name='res.partner.account.product', string='Product', index=True)
-    date_created = fields.Date(
-        string='Date Created', index=True)  # date_created
+    
     ledger_id = fields.Many2one(
         comodel_name='res.partner.account.ledger', string='Ledger')
     closure_status = fields.Selection(string='Closure Status', selection=[
@@ -141,7 +140,7 @@ class CustomerAccount(models.Model):
                                         ('Closed', 'Closed')
                                         ], 
                              tracking=True, default='Active', required=False,index=True)  # sta_code
-    active = fields.Boolean(default=True, tracking=True)
+    
     customer = fields.Char(string='Customer Id', index=True)
     max_debit_daily = fields.Float(string='Max. Debit - Daily', digits=(10, 2))
     overdraft_limit = fields.Float(string='OverDraft Limit', digits=(10, 2))

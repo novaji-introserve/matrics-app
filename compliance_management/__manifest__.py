@@ -32,6 +32,7 @@
         "data/demo_data/location/res.country.state.csv",
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
+        "data/demo_data/score/fcra_score.xml",    
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
         "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/region/res.partner.region.csv",#REGION
@@ -50,7 +51,6 @@
         'data/email_templates/edd_notifications_template.xml',
         "data/email_templates/customer_screening_template.xml",
 
-
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
         "data/schedules/count-weight-avg.xml",
@@ -62,7 +62,6 @@
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
-        "data/demo_data/score/fcra_score.xml",    
         "data/data.xml",
         "data/demo_data/risk_assessment/category.xml",
         "data/demo_data/risk_assessment/risk_universe.xml",
@@ -82,6 +81,9 @@
         "views/dashboard.xml",
         "views/card_dashboard_template.xml",
         "views/risk_assessment_plan.xml",
+        "views/risk_assessment_control.xml",
+        "views/risk_assessment_mitigation.xml",
+        "views/risk_assessment_implication.xml",
         "views/settings.xml",
         "views/customer_accounts.xml",
         "views/transaction.xml",
@@ -147,7 +149,7 @@
             'compliance_management/static/src/js/custom_title_service.js',
             'compliance_management/static/src/js/cache_service.js',
 
-            'compliance_management/static/src/img/logov.png',
+            'compliance_management/static/src/img/matrics-logo.png',
             'compliance_management/static/img/alt_bank_logo.png',
         ]
     },

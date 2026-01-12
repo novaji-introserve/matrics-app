@@ -313,7 +313,7 @@ class QueryService:
         condition_string = condition_string.strip()
 
         def parse_expression(expr, depth=0):
-            _logger.info(f"Parsing expression (depth {depth}): {expr}")
+            # _logger.info(f"Parsing expression (depth {depth}): {expr}")
             if not expr.strip():
                 return []
             
@@ -343,7 +343,7 @@ class QueryService:
 
         try:
             domain = parse_expression(condition_string)
-            _logger.info(f"Parsed domain: {domain}")
+            # _logger.info(f"Parsed domain: {domain}")
             return domain
         except Exception as e:
             _logger.error(f"Error parsing condition: {e}")

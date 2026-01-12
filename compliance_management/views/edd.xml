@@ -106,6 +106,7 @@
                             <field name="show_submit_for_review_button" invisible="1"/>
                             <field name="show_cancel_button" invisible="1"/>
                             <field name="show_notify_button" invisible="1"/>
+                            <field name="max_risk_score" invisible="1"/>
 
 
                             <field name="name" attrs="{'readonly': ['|', ('is_editable_user', '=', False), ('status', 'in', ['approved','archived','completed'])], 'required': [('is_editable_user', '=', True)]}"/>
@@ -146,9 +147,15 @@
                         <group>
                             <field name="user_id" string="Initiated By" readonly="1"/>
                             <field name="reject_reason" readonly="1" attrs="{'invisible': [('status', '!=', 'rejected')]}"/>
+                       
+                        <field name="risk_score" widget="slider" step="0.1" min="1" max="max_risk_score"
+                        attrs="{'readonly': ['|', ('is_editable_user', '=', False), ('status', 'in', ['approved','archived','completed'])]}"/>
                         </group>
+ 
 
                     </group>
+
+
 
                     <notebook>
                         <page string="Risk Assessment">
