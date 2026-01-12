@@ -18,7 +18,7 @@
     'version': '0.3',
 
     # any module necessary for this one to work correctly
-    'depends': ['icomply_dashboard', 'compliance_management', 'bi_sql_editor', 'psql_query_execute', 'alert_management','transaction_screening'],
+    'depends': ['icomply_dashboard', 'compliance_management', 'bi_sql_editor', 'psql_query_execute', 'alert_management', 'case_management_v2', 'icomply_etl_manager'],
 
     # always loaded
     'data': [
@@ -26,9 +26,10 @@
         # 'views/actions.xml',
         # 'views/branch_view.xml',
         # 'views/account_monitoring_views.xml',
-        'views/screen_rules_cron_job.xml',
-        'views/cron_schedule.xml',
+        # 'views/screen_rules_cron_job.xml',
+        # 'views/cron_schedule.xml',
         'views/transaction_rule.xml',
+        'views/transaction_channel.xml',
         'views/transaction_monitoring_views.xml',
         'views/customer.xml',
         'views/customer_account.xml',
@@ -36,24 +37,29 @@
         'views/fraud_monitoring_views.xml',
         'views/process_view.xml',
         'views/process_category_view.xml',        
-        # 'views/department.xml',
-        'views/user_profile.xml',
+        'views/department.xml',
+        # 'views/user_profile.xml',  # Commented out due to xpath error
         'views/emplpyee.xml',
         'views/sql_panel.xml', 
+        'views/bi_sql_enhanced_views.xml',
         'views/menus.xml',       
         'security/groups.xml',
         
      
         # cron job
         
-        'data/schedule/cron_trans_screening.xml',
-        'data/schedule/cron_branch_sync.xml',
-        'data/schedule/account_trans_metrics.xml',
-        'data/schedule/cron_sync_tran_bid.xml'
+        # 'data/schedule/cron_trans_screening.xml',
+        # 'data/schedule/cron_branch_sync.xml',
+        # 'data/schedule/account_trans_metrics.xml',
+        # 'data/schedule/cron_sync_tran_bid.xml',
+        
+        # Preloaded BI SQL Editor data
+        # 'data/preloaded_data/bi_sql_views_complete_data.xml'
     ],
 
     'images': [
     'static/description/icon.png',
+    'static/src/img/icons-report.png',
     ],
    
 
@@ -65,7 +71,8 @@
         'web.assets_backend': [
            "internal_control/static/src/components/**/*.js",
            "internal_control/static/src/css/**/*.css",
-           "internal_control/static/src/components/**/*.xml"
+           "internal_control/static/src/components/**/*.xml",
+           "internal_control/static/src/js/bi_sql_security.js"
         ]
     }
 }

@@ -68,10 +68,7 @@
           "target": "account_code",
           "type": "direct"
         },
-        "date_created": {
-          "target": "date_created",
-          "type": "direct"
-        },
+       
         "account_type": {
           "target": "account_type",
           "type": "direct"

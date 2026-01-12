@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Currencies -->
+       
+        <record id="NGN" model="res.currency">
+            <field name="name">NGN</field>
+            <field name="full_name">Nigeria Naira</field>
+            <field name="symbol">N</field>
+            <field name="rounding">0.01</field>
+            <field name="position">before</field>
+            <field name="active" eval="False"/>
+            <field name="currency_unit_label">Naira</field>
+            <field name="currency_subunit_label">Kobo</field>
+        </record>
+
+    </data>
+</odoo>

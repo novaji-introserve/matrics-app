@@ -13,6 +13,21 @@ class TransactionMonitoring(models.Model):
          "Transaction already exists. Value must be unique!"),
     ] 
 
+    def init(self):
+        """Automatically setup transaction triggers when model initializes"""
+        super().init()
+        try:
+            # Check if triggers already exist to avoid recreating them
+            if not self._verify_transaction_triggers():
+                _logger.info("Transaction triggers not found, setting up production system...")
+                self._setup_transaction_indexes()
+                self._setup_transaction_triggers()
+                _logger.info("Transaction production system initialized automatically")
+        except Exception as e:
+            _logger.warning(f"Auto-setup failed, manual setup may be required: {str(e)}")
+            # Don't raise the exception to prevent module loading failure
+            pass
+
     # id = fields.Integer(string="id", readonly=True)
     refno = fields.Char(string="Ref Number", readonly=True, index=True)
     valuedate = fields.Char(string="Value Date", readonly=True, index=True)
@@ -25,9 +40,18 @@ class TransactionMonitoring(models.Model):
                               string='Dept. Code', index=True)
     status = fields.Many2one(comodel_name='res.transaction.status',
                               string='Trans. Status', index=True)
-    tran_channel = fields.Char(string="Transaction Channel", readonly=True, index=True)
+    tran_channel = fields.Many2one(comodel_name='res_transaction_channel', string="Transaction Channel", readonly=True, index=True)
     request_id = fields.Char(string="Request ID", readonly=True, index=True)
     trans_id = fields.Char(string="Transaction ID", readonly=True, index=True)
+    account_group = fields.Char(string="Account Group", index=True)
+    transaction_mode = fields.Char(string="Transaction Mode", index=True)
+    parent_ledger_id = fields.Char(string="Parent Ledger ID", index=True)
+    sub_general_ledger_code = fields.Char(string="Sub General Ledger Code", index=True)
+    source_branch_code = fields.Char(string="Source Branch Code", index=True)
+    posted_by = fields.Char(string="Posted By", index=True)
+    initiated_by = fields.Char(string="Initiated By", index=True)
+    account_name = fields.Char(string="Account Name", index=True)
+
     
     def _sync_transaction_branch_id_sql(self):
         """
@@ -97,16 +121,47 @@ class TransactionMonitoring(models.Model):
             return [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])]
         return []
 
-    def _filter_account_length_10(self, domain):
-        """Helper method to filter records with account number length of 10"""
+    def _filter_customer_accounts(self, domain):
+        """
+        Flexible method to filter customer accounts based on bank structure
+        This method can be configured for different bank requirements
+        """
         records = self.env['res.customer.transaction'].search(domain)
-        return records.filtered(lambda r: len(str(r.account_id.name)) == 10)
+        
+        # Method 1: Length-based filtering
+        # return records.filtered(lambda r: len(str(r.account_id.name)) == 10)
+        
+        # Method 2: Length + customer_id based filtering
+        return records.filtered(lambda r: 
+            len(str(r.account_id.name)) == 10 and 
+            r.customer_id is not None
+        )
     
-    def _filter_account_length_14(self, domain):
-        """Helper method to filter records with account number length of 14"""
+    def _filter_internal_accounts(self, domain):
+        """
+        Flexible method to filter internal accounts based on bank structure
+        This method can be configured for different bank requirements
+        """
         records = self.env['res.customer.transaction'].search(domain)
-        # print(records)
-        return records.filtered(lambda r: len(str(r.account_id.name)) == 14)
+        
+        # Method 1: Length-based filtering
+        # return records.filtered(lambda r: len(str(r.account_id.name)) == 14)
+        
+        # Method 2: Length + customer_id based filtering
+        return records.filtered(lambda r: 
+            len(str(r.account_id.name)) > 10 and 
+            r.customer_id is None
+        )
+    
+    # Keep old methods for backward compatibility
+
+    # def _filter_account_length_10(self, domain):
+    #     """Helper method to filter records with account number length of 10 (legacy)"""
+    #     return self._filter_account_length_10(domain)
+    
+     # def _filter_account_length_14(self, domain):
+     #     """Helper method to filter records with account number length of 14 (legacy)"""
+     #     return self._filter_internal_accounts(domain)
         
 
     def open_customers_all_transactions_today_ngn(self):
@@ -123,7 +178,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
 
    
         
@@ -152,7 +207,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
 
         return {
             'name': _('All Foreign Transactions - Today '),
@@ -183,7 +238,7 @@ class TransactionMonitoring(models.Model):
         domain.extend(self._check_cco_and_get_branch_domain())
 
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('All NGN Transactions - Last 7 Days '),
@@ -210,7 +265,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
 
         return {
             'name': _('All Foreign Transactions - Last 7 Days '),
@@ -236,7 +291,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('NGN Transactions Awaiting Review - Today'),
@@ -263,7 +318,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('Foreign Transactions Awaiting Review - Today'),
@@ -291,7 +346,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('NGN Transactions Awaiting Review - Last 7 Day'),
@@ -318,7 +373,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('Foreign Transactions Awaiting Review - Last 7 Day'),
@@ -344,7 +399,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('NGN Reviewed Transactions - Today'),
@@ -371,7 +426,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('Foreign Reviewed Transactions- Today'),
@@ -399,7 +454,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('NGN Reviewed Transactions - Last 7 Days'),
@@ -426,7 +481,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('Foreign Reviewed Transactions - Last 7 Days'),
@@ -452,7 +507,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
 
         
         
@@ -479,7 +534,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('All Foreign Internal Transactions - Today '),
@@ -507,7 +562,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('All NGN Internal Transactions - Last 7 Days'),
@@ -534,7 +589,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('All Foreign Internal Transactions - Last 7 Days'),
@@ -559,7 +614,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal NGN Transactions Awaiting Review - Today'),
@@ -584,7 +639,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal Foreign Transactions Awaiting Review - Today'),
@@ -612,7 +667,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal NGN Transactions Awaiting Review - Last 7 Days'),
@@ -640,7 +695,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal Foreign Transactions Awaiting Review - Last 7 Days'),
@@ -666,7 +721,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal NGN Transactions Reviewed - Today'),
@@ -691,7 +746,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal Foreign Transactions Reviewed - Today'),
@@ -720,7 +775,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal NGN Transactions Reviewed - Last 7 Days'),
@@ -749,7 +804,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal Foreign Transactions Reviewed - Last 7 Days'),
@@ -799,8 +854,169 @@ class TransactionMonitoring(models.Model):
 
 
     def action_screen(self):
-        super().action_screen()
-        '''
-        Apply additional logic here if needed
-        This method is called when the screen action is triggered.
-        '''             
+     
+        rules = self.env['res.transaction.screening.rule'].search(
+            [('state', '=', 'active')], order='priority')
+
+        if rules:
+            for rule in rules:
+                # try:
+                    query = rule.sql_query
+                    char_to_replace = {'#AMOUNT#': f"{self.amount}",
+                                    '#ACCOUNT_ID#': f"{self.account_id.id}",
+                                    "#CUSTOMER_ID#": f"{self.customer_id.id}",
+                                    "#TRAN_DATE#": f"{self.date_created}",
+                                    "#BRANCH_ID#": f"{self.branch_id.id}",
+                                    "#CURRENCY_ID#": f"{self.currency_id.id}"}
+                    # Iterate over all key-value pairs in dictionary
+                    for key, value in char_to_replace.items():
+                        # Replace key character with value character in string
+                        query = query.replace(key, value)
+                        
+                    self.env.cr.execute(query)
+                   
+                    records = self.env.cr.fetchall()
+                    
+                    
+                    for rec in records: 
+
+                        record = self.env['res.customer.transaction'].browse(rec[0])  # rec[0] contains the ID of the record
+    
+                        # Make sure the record exists and then update it
+                        if record.exists() and not record.rule_id:
+                            record.write({
+                                'rule_id': rule.id,  # Assuming 'rule' is a record
+                                'risk_level': rule.risk_level,
+                            })
+                            print(f"Record {record.id}: rule_id updated to {rule.id}, risk_level updated to {rule.risk_level}, rule name: {rule.name}")
+
+    @api.model
+    def _setup_transaction_indexes(self):
+        """Setup production indexes for transaction operations"""
+        indexes = [
+            """CREATE INDEX IF NOT EXISTS idx_transaction_state_date 
+               ON res_customer_transaction(state, date_created) 
+               WHERE state IS NOT NULL""",
+            
+            """CREATE INDEX IF NOT EXISTS idx_transaction_currency_state 
+               ON res_customer_transaction(currency_id, state, date_created) 
+               WHERE state IS NOT NULL""",
+            
+            """CREATE INDEX IF NOT EXISTS idx_transaction_branch_state 
+               ON res_customer_transaction(branch_id, state, date_created) 
+               WHERE state IS NOT NULL""",
+            
+            """CREATE INDEX IF NOT EXISTS idx_transaction_new_state 
+               ON res_customer_transaction(date_created, currency_id) 
+               WHERE state = 'new'"""
+        ]
+        
+        for index_sql in indexes:
+            try:
+                self.env.cr.execute(index_sql)
+                _logger.info("Transaction index created successfully")
+            except Exception as e:
+                _logger.warning(f"Transaction index creation warning: {str(e)}")
+
+    @api.model
+    def _setup_transaction_triggers(self):
+        """Setup production database triggers for transaction state management"""
+        try:
+            # State Assignment Trigger - Set state to 'new' for new records
+            state_trigger_sql = """
+                CREATE OR REPLACE FUNCTION set_transaction_state_new()
+                RETURNS TRIGGER AS $$
+                BEGIN
+                    IF NEW.state IS NULL OR NEW.state = '' THEN
+                        NEW.state := 'new';
+                    END IF;
+                    RETURN NEW;
+                EXCEPTION 
+                    WHEN OTHERS THEN
+                        RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;
+
+                DROP TRIGGER IF EXISTS trigger_set_transaction_state_new ON res_customer_transaction;
+                CREATE TRIGGER trigger_set_transaction_state_new
+                    BEFORE INSERT
+                    ON res_customer_transaction
+                    FOR EACH ROW
+                    EXECUTE FUNCTION set_transaction_state_new();
+            """
+
+            # Execute trigger creation
+            self.env.cr.execute(state_trigger_sql)
+            
+            _logger.info("Transaction triggers setup completed successfully")
+            
+        except Exception as e:
+            _logger.error(f"Error setting up transaction triggers: {str(e)}")
+            raise
+
+    @api.model
+    def setup_transaction_production_system(self):
+        """Setup complete transaction production system with triggers and indexes"""
+        try:
+            _logger.info("Setting up transaction production system...")
+            
+            # Setup indexes first
+            self._setup_transaction_indexes()
+            
+            # Setup triggers
+            self._setup_transaction_triggers()
+            
+            # Verify installation
+            if self._verify_transaction_triggers():
+                self.env.cr.commit()
+                _logger.info("Transaction production system setup completed successfully")
+                return True
+            else:
+                raise Exception("Transaction trigger verification failed")
+                
+        except Exception as e:
+            self.env.cr.rollback()
+            _logger.error(f"Transaction production setup failed: {str(e)}")
+            raise
+
+    @api.model  
+    def _verify_transaction_triggers(self):
+        """Verify that transaction triggers are properly installed"""
+        try:
+            self.env.cr.execute("""
+                SELECT trigger_name
+                FROM information_schema.triggers 
+                WHERE trigger_name = 'trigger_set_transaction_state_new'
+                AND event_object_table = 'res_customer_transaction'
+            """)
+            
+            active_triggers = [row[0] for row in self.env.cr.fetchall()]
+            expected_triggers = ['trigger_set_transaction_state_new']
+            
+            if len(active_triggers) == 1:
+                _logger.info("Transaction trigger is active and verified")
+                return True
+            else:
+                missing = set(expected_triggers) - set(active_triggers)
+                _logger.warning(f"Missing transaction triggers: {missing}")
+                return False
+        except Exception as e:
+            _logger.warning(f"Transaction trigger verification failed: {str(e)}")
+            return False
+
+    @api.model
+    def remove_transaction_triggers(self):
+        """Remove transaction triggers if needed"""
+        try:
+            cleanup_sql = """
+                DROP TRIGGER IF EXISTS trigger_set_transaction_state_new ON res_customer_transaction;
+                DROP FUNCTION IF EXISTS set_transaction_state_new();
+            """
+            self.env.cr.execute(cleanup_sql)
+            self.env.cr.commit()
+            _logger.info("Transaction triggers removed successfully")
+        except Exception as e:
+            self.env.cr.rollback()
+            _logger.error(f"Failed to remove transaction triggers: {str(e)}")
+            raise
+                     

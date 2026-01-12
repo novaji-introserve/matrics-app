@@ -47,7 +47,7 @@ class PartnerCompositePlanLine(models.Model):
                                               string='Universe Weight %', store=False, readonly=True)
     weighted_score = fields.Float(string='Weighted Score', digits=(10, 2),
                                   compute='_compute_weighted_score', store=False)
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    # active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
 
     @api.depends('risk_score', 'universe_id.weight_percentage')

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Demo Database Connections -->
+        <record id="demo_connection_source_crm" model="etl.database.connection">
+            <field name="name">Demo CRM Database</field>
+            <field name="database_type">postgresql</field>
+            <field name="host">localhost</field>
+            <field name="port">5432</field>
+            <field name="database_name">demo_crm_db</field>
+            <field name="username">etl_user</field>
+            <field name="password">demo_password</field>
+        </record>
+
+        <record id="demo_connection_target_main" model="etl.database.connection">
+            <field name="name">Main Odoo Database</field>
+            <field name="database_type">postgresql</field>
+            <field name="host">localhost</field>
+            <field name="port">5432</field>
+            <field name="database_name">odoo_main</field>
+            <field name="username">odoo</field>
+            <field name="password">demo_password</field>
+        </record>
+
+        <!-- Demo ETL Tables -->
+        <record id="demo_etl_table_customers" model="etl.source.table">
+            <field name="name">customer_data</field>
+            <field name="source_connection_id" ref="demo_connection_source_crm"/>
+            <field name="target_connection_id" ref="demo_connection_target_main"/>
+            <field name="source_table_name">customers</field>
+            <field name="target_table_name">res_partner</field>
+            <field name="primary_key_unique">customer_id</field>
+            <field name="category_id" ref="etl_category_customer"/>
+            <field name="full_sync_enabled">True</field>
+            <field name="full_sync_frequency_id" ref="etl_frequency_daily"/>
+            <field name="incremental_sync_enabled">True</field>
+            <field name="incremental_frequency_minutes">30</field>
+            <field name="incremental_date_column">last_updated</field>
+            <field name="batch_size">1000</field>
+        </record>
+
+        <record id="demo_etl_table_products" model="etl.source.table">
+            <field name="name">product_catalog</field>
+            <field name="source_connection_id" ref="demo_connection_source_crm"/>
+            <field name="target_connection_id" ref="demo_connection_target_main"/>
+            <field name="source_table_name">products</field>
+            <field name="target_table_name">product_template</field>
+            <field name="primary_key_unique">product_id</field>
+            <field name="category_id" ref="etl_category_master"/>
+            <field name="full_sync_enabled">True</field>
+            <field name="full_sync_frequency_id" ref="etl_frequency_weekly"/>
+            <field name="incremental_sync_enabled">False</field>
+            <field name="batch_size">500</field>
+        </record>
+
+        <!-- Demo Column Mappings -->
+        <record id="demo_mapping_customer_id" model="etl.column.mapping">
+            <field name="table_id" ref="demo_etl_table_customers"/>
+            <field name="sequence">10</field>
+            <field name="source_column">customer_id</field>
+            <field name="target_column">ref</field>
+            <field name="mapping_type">direct</field>
+        </record>
+
+        <record id="demo_mapping_customer_name" model="etl.column.mapping">
+            <field name="table_id" ref="demo_etl_table_customers"/>
+            <field name="sequence">20</field>
+            <field name="source_column">customer_name</field>
+            <field name="target_column">name</field>
+            <field name="mapping_type">direct</field>
+        </record>
+
+        <record id="demo_mapping_product_id" model="etl.column.mapping">
+            <field name="table_id" ref="demo_etl_table_products"/>
+            <field name="sequence">10</field>
+            <field name="source_column">product_id</field>
+            <field name="target_column">default_code</field>
+            <field name="mapping_type">direct</field>
+        </record>
+
+    </data>
+</odoo>

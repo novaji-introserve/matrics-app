@@ -32,10 +32,11 @@
         "data/demo_data/location/res.country.state.csv",
         "data/settings/email_smtp.xml",
         "data/demo_data/department/department.xml",
+        "data/demo_data/score/fcra_score.xml",    
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
         "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/region/res.partner.region.csv",#REGION
-        "data/demo_data/industries/customer.industry.csv",#INDUSTRY
+
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -46,11 +47,9 @@
         'data/schedules/run_risk_assessment_cron.xml',
         'data/schedules/clean_cache.xml',
         'data/schedules/refresh_charts_materialized_views.xml',
-
         "data/email_templates/adverse_media_alert_template.xml",
         'data/email_templates/edd_notifications_template.xml',
         "data/email_templates/customer_screening_template.xml",
-
 
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
@@ -63,43 +62,28 @@
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
-        # "data/schedules/queue_job_config.xml",
-        "data/demo_data/score/fcra_score.xml",    
         "data/data.xml",
         "data/demo_data/risk_assessment/category.xml",
         "data/demo_data/risk_assessment/risk_universe.xml",
         "data/demo_data/risk_assessment/risk_type.xml",         
         "data/demo_data/risk_assessment/risk_level.xml",
-        "data/demo_data/risk_assessment/risk_subject.xml",
-        "data/demo_data/risk_assessment/risk_subject_2.xml",
-       
-       
-        "data/demo_data/risk_assessment/jurisdiction.xml",
-        "data/demo_data/risk_assessment/delivery_channel.xml",
-        "data/demo_data/risk_assessment/product_services.xml",
-       
-
-        "data/demo_data/risk_assessment/compliance_history.xml",
-        "data/demo_data/risk_assessment/data_quality.xml",
-        "data/demo_data/risk_assessment/transaction_behavior.xml",
-       
-        "data/demo_data/account/account_type.xml",
-        "data/demo_data/education/educational_level.xml",
+        
+               
         "data/demo_data/tier/customer_tier.xml",
-        "data/demo_data/customer/sector.xml",
-        "data/demo_data/customer/products.xml",
-        "data/demo_data/customer/region.xml",
         "data/demo_data/customer/account_officers.xml",
         "views/risk_assessment.xml",
         "views/sanction_screening.xml",
         "views/open_sanctions.xml",
         # remove unwanted partner/customer actions
-        'views/remove_partner_actions.xml',
+        # 'views/remove_partner_actions.xml',
         "views/customer.xml",
         "views/statistics.xml",
         "views/dashboard.xml",
         "views/card_dashboard_template.xml",
         "views/risk_assessment_plan.xml",
+        "views/risk_assessment_control.xml",
+        "views/risk_assessment_mitigation.xml",
+        "views/risk_assessment_implication.xml",
         "views/settings.xml",
         "views/customer_accounts.xml",
         "views/transaction.xml",
@@ -113,15 +97,13 @@
         'data/demo_data/stat/compliance_stats.xml',
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
-        'data/demo_data/plan/jurisdiction_plan.xml',
-       
-       
-        'data/demo_data/account/customer_product.xml',
-        'data/demo_data/partner/sectors.xml',
-        'data/blacklist.xml',
+        
+        'data/blacklist.xml', 
         "views/customer_screening.xml",
         'views/transaction_screening_history.xml',
         "views/menu_actions.xml",
+        "data/demo_data/chart/charts.xml",
+       
     ],
     # only loaded in demonstration mode
     "demo": [
@@ -167,7 +149,7 @@
             'compliance_management/static/src/js/custom_title_service.js',
             'compliance_management/static/src/js/cache_service.js',
 
-            'compliance_management/static/src/img/logov.png',
+            'compliance_management/static/src/img/matrics-logo.png',
             'compliance_management/static/img/alt_bank_logo.png',
         ]
     },

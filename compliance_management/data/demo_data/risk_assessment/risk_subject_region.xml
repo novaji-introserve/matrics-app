@@ -224,7 +224,4 @@
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_21" />
     </record>
 
-
-    
-
 </odoo>

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import re
 from odoo import fields
 from datetime import timedelta
 
 from ..services.database_service import DatabaseService
 from ..services.query_service import QueryService
-        
+
 _logger = logging.getLogger(__name__)
 
 class MaterializedViewService:
@@ -19,6 +20,28 @@ class MaterializedViewService:
             env (Environment, optional): The Odoo environment. Defaults to None.
         """
         self.env = env
+
+    @staticmethod
+    def sanitize_view_name(code):
+        """Sanitize a stat code for safe use as a database view name.
+
+        Args:
+            code (str): The stat code to sanitize.
+
+        Returns:
+            str: A sanitized version safe for database object names.
+        """
+        # PostgreSQL object names must start with a letter or underscore
+        # and can only contain letters, digits, and underscores
+        # Replace any non-word character (equivalent to [^a-zA-Z0-9_])
+        sanitized = re.sub(r'\W', '_', code)
+
+        # Ensure it starts with a letter or underscore
+        if sanitized and not sanitized[0].isalpha() and sanitized[0] != '_':
+            sanitized = '_' + sanitized
+
+        # Lowercase for consistency (PostgreSQL is case-insensitive but lowercases by default)
+        return sanitized.lower()
 
     def create_chart_materialized_view(self, chart_id):
         """Create or update a materialized view for a chart.
@@ -254,6 +277,7 @@ class MaterializedViewService:
                 _logger.info(f"CONCURRENTLY refresh failed: {e}")
                 
             if not concurrent_success:
+                refresh_failed = False
                 with registry.cursor() as cr:
                     try:
                         if low_priority:
@@ -263,15 +287,35 @@ class MaterializedViewService:
                         if not lock_acquired:
                             _logger.info(f"Another process is refreshing view for chart {chart_id}, skipping")
                             return False
-                            
+
                         _logger.info(f"Refreshing view {view_name} with regular refresh")
                         cr.execute(f"REFRESH MATERIALIZED VIEW {view_name}")
                         cr.commit()
                     except Exception as e:
                         cr.rollback()
                         _logger.error(f"Regular refresh failed: {e}")
-                        raise e
-                        
+                        refresh_failed = True
+
+                # Fallback: If regular refresh failed, drop and recreate
+                if refresh_failed:
+                    _logger.warning(f"Failed to refresh materialized view {view_name}, attempting fallback: drop and recreate")
+                    try:
+                        _logger.info(f"Dropping materialized view {view_name}")
+                        db_service.drop_materialized_view(view_name)
+
+                        _logger.info(f"Recreating materialized view {view_name}")
+                        recreate_success = self.create_chart_materialized_view(chart_id)
+
+                        if recreate_success:
+                            _logger.info(f"Successfully recreated materialized view {view_name}")
+                            return True
+                        else:
+                            _logger.error(f"Failed to recreate materialized view {view_name}")
+                            raise Exception(f"Failed to recreate materialized view {view_name}")
+                    except Exception as fallback_error:
+                        _logger.error(f"Fallback failed for view {view_name}: {fallback_error}")
+                        raise fallback_error
+
             return True
         except Exception as e:
             _logger.error(f"Error refreshing materialized view for chart {chart_id}: {e}")
@@ -302,14 +346,15 @@ class MaterializedViewService:
         """
         if not self.env:
             return False
-            
+
         try:
             stat = self.env["res.compliance.stat"].browse(stat_id)
             if not stat.exists():
                 _logger.error(f"Statistic {stat_id} not found")
                 return False
-                
-            view_name = f"stat_view_{stat_id}"
+
+            sanitized_code = self.sanitize_view_name(stat.code)
+            view_name = f"stat_view_{sanitized_code}"
             
             db_service = DatabaseService(self.env)
             
@@ -351,8 +396,13 @@ class MaterializedViewService:
         """
         if not self.env:
             return False
-            
+
         try:
+            stat = self.env["res.compliance.stat"].browse(stat_id)
+            if not stat.exists():
+                _logger.error(f"Statistic {stat_id} not found")
+                return False
+
             registry = self.env.registry
             with registry.cursor() as cr:
                 if low_priority:
@@ -362,18 +412,39 @@ class MaterializedViewService:
                 if not lock_acquired:
                     _logger.info(f"Another process is refreshing view for statistic {stat_id}, skipping")
                     return False
-                    
-            view_name = f"stat_view_{stat_id}"
-            
+
+            sanitized_code = self.sanitize_view_name(stat.code)
+            view_name = f"stat_view_{sanitized_code}"
+
             db_service = DatabaseService(self.env)
-            
+
             if not db_service.check_view_exists(view_name):
                 return self.create_stat_materialized_view(stat_id)
-                
-            if not db_service.refresh_materialized_view(view_name, concurrently=False):
-                _logger.error(f"Failed to refresh materialized view {view_name}")
-                return False
-                
+
+            # Try to refresh the materialized view
+            refresh_success = db_service.refresh_materialized_view(view_name, concurrently=False)
+
+            if not refresh_success:
+                _logger.warning(f"Failed to refresh materialized view {view_name}, attempting fallback: drop and recreate")
+
+                # Fallback: Drop and recreate the materialized view
+                try:
+                    _logger.info(f"Dropping materialized view {view_name}")
+                    db_service.drop_materialized_view(view_name)
+
+                    _logger.info(f"Recreating materialized view {view_name}")
+                    recreate_success = self.create_stat_materialized_view(stat_id)
+
+                    if recreate_success:
+                        _logger.info(f"Successfully recreated materialized view {view_name}")
+                        return True
+                    else:
+                        _logger.error(f"Failed to recreate materialized view {view_name}")
+                        return False
+                except Exception as fallback_error:
+                    _logger.error(f"Fallback failed for view {view_name}: {fallback_error}")
+                    return False
+
             return True
         except Exception as e:
             _logger.error(f"Error refreshing materialized view for statistic {stat_id}: {e}")
@@ -493,8 +564,9 @@ class MaterializedViewService:
             if stats:
                 _logger.info(f"Found {len(stats)} statistics with materialized views")
                 for stat in stats:
-                    view_name = f"stat_view_{stat.id}"
-                    
+                    sanitized_code = self.sanitize_view_name(stat.code)
+                    view_name = f"stat_view_{sanitized_code}"
+
                     db_service = DatabaseService(self.env)
                     if not db_service.check_view_exists(view_name):
                         _logger.info(f"View for statistic {stat.id} needs creation")

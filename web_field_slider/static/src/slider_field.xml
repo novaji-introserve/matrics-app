@@ -4,17 +4,19 @@
     <t t-name="web_field_slider.SliderField" owl="1">
         <div class="d-flex">
             <input
-                    t-ref="input"
-                    type="range"
-                    class="w-100"
-                    t-att-name="props.name"
-                    t-att-min="eval(props.min)"
-                    t-att-max="eval(props.max)"
-                    t-att-step="eval(props.step)"
-                    t-att="{disabled: props.readonly}"
-                    t-model="state.value"
+                t-ref="input"
+                type="range"
+                class="w-100"
+                t-att-name="props.name"
+                t-att-min="sliderProps.min"
+                t-att-max="sliderProps.max"
+                t-att-step="sliderProps.step"
+                t-att="{disabled: props.readonly}"
+                t-att-value="state.localValue" 
+                t-on-input="_onInput"
+                t-on-change="_onChange"
             />
-            <span t-esc="state.value"
+            <span t-esc="state.localValue.toFixed ? state.localValue.toFixed(1) : state.localValue"
                   class="mb-0 ms-3 text-nowrap"
             />
         </div>

@@ -108,7 +108,7 @@ def log_access(func):
             user_id = request.env.user.id
             endpoint_name = f"{func.__module__}.{func.__name__}"
             
-            _logger.info(f"ACCESS LOG - User {user_id} accessing {endpoint_name}")
+            # _logger.info(f"ACCESS LOG - User {user_id} accessing {endpoint_name}")
         
         return func(self, *args, **kwargs)
     

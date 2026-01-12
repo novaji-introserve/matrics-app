@@ -47,7 +47,8 @@
                     <group>
                         <group>
                             <field name="risk_assessment" nocreate="True" noedit="True" />
-                            <field name="risk_score" widget="slider" step="1" min="1" max="eval()" />
+                            <field name="max_risk_score" invisible="1"/>
+                            <field name="risk_score" widget="slider" step="0.1" min="1" max="max_risk_score" />
                         </group>
                         <group>
                             <field name="compute_score_from" />

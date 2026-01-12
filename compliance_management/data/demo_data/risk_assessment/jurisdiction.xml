@@ -2340,6 +2340,7 @@
     <field name="residual_risk_score">4</field>
     <field name="residual_risk_probability">75</field>
     </record>
+   
     <record id="res_risk_assessment_lagos" model="res.risk.assessment">
     <field name="name">Lagos Jurisdiction</field>
     <field name="narration">Risk assessment for customers or entities located in Lagos.</field>

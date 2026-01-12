@@ -565,26 +565,26 @@ class DynamicChartController(http.Controller):
             actual_is_co = self.security_service.is_co_user()
             
             if actual_is_co:
-                _logger.info(f"CO user {user_id} accessing charts")
+                # _logger.info(f"CO user {user_id} accessing charts")
                 cco = True
             elif actual_is_cco and cco:
-                _logger.warning(f"CCO user {user_id} accessing charts")
+                # _logger.warning(f"CCO user {user_id} accessing charts")
                 cco = True
             elif not actual_is_cco and cco:
-                _logger.warning(f"Non-CCO/CO user {user_id} attempted to use CCO parameter")
+                # _logger.warning(f"Non-CCO/CO user {user_id} attempted to use CCO parameter")
                 cco = False
                 
-            _logger.info(
-                f"Chart data requested - cco={cco}, branches_id={branches_id}, user_id={user_id}, "
-                f"actual_is_cco={actual_is_cco}, actual_is_co={actual_is_co}"
-            )
+            # _logger.info(
+            #     f"Chart data requested - cco={cco}, branches_id={branches_id}, user_id={user_id}, "
+            #     f"actual_is_cco={actual_is_cco}, actual_is_co={actual_is_co}"
+            # )
             
             unique_id = self.get_unique_client_identifier()
             cco_str, branches_str, datepicked_str, unique_id = self.normalize_cache_key_components(
                 cco, branches_id, datepicked, unique_id
             )
             cache_key = f"charts_data_{cco_str}_{branches_str}_{datepicked_str}_{unique_id}"
-            _logger.info(f"This is the charts cache key: {cache_key}")
+            # _logger.info(f"This is the charts cache key: {cache_key}")
             
             cache_service = CacheService(request.env)
             cache_data = cache_service.get_cache(cache_key, user_id)
@@ -598,7 +598,7 @@ class DynamicChartController(http.Controller):
             chart_data_service = ChartDataService(request.env)
             for chart in charts:
                 try:
-                    _logger.info(f"Processing chart {chart.id}: {chart.name}")
+                    # _logger.info(f"Processing chart {chart.id}: {chart.name}")
                     
                     if chart.use_materialized_view:
                         chart_data = chart_data_service.get_chart_data_from_materialized_view(
@@ -628,7 +628,7 @@ class DynamicChartController(http.Controller):
                     )
                     
             cache_service.set_cache(cache_key, results, user_id)
-            _logger.info(f"Returning {len(results)} charts for user {user_id}")
+            # _logger.info(f"Returning {len(results)} charts for user {user_id}")
             
             return results
         except Exception as e:

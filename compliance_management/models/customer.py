@@ -197,10 +197,6 @@ class Customer(models.Model):
 
     formatted_gender = fields.Char(string='Gender', compute='_compute_gender')
 
-    digital_product_view_ids = fields.One2many(
-        'res.partner.digital.product.view', 'partner_id',
-        string='Digital Products', readonly=True, auto_join=True)
-
     channel_subscription_ids = fields.One2many(
         'customer.channel.subscription', 'partner_id',
         string='Channel Subscriptions', readonly=True)
@@ -208,7 +204,7 @@ class Customer(models.Model):
     composite_risk_score = fields.Float(
         string='Composite Risk Score', digits=(10, 2))
 
-    last_risk_calculation = fields.Datetime(string='Last Risk Calculation', readonly=True,
+    last_risk_calculation = fields.Datetime(string='Last Analysis', readonly=True,
                                             help="When the risk score was last calculated")
 
     # universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
@@ -248,7 +244,23 @@ class Customer(models.Model):
     customer_status = fields.Many2one(
         'customer.status',
         string='Customer Status', readonly=True)
+    
+    last_risk_calculation_raw = fields.Char(
+    string="Last Analysis Date",
+    compute='_compute_raw_time',
+    tracking=True
+)
 
+    
+    @api.depends('last_risk_calculation')
+    def _compute_raw_time(self):
+        for record in self:
+            if record.last_risk_calculation:
+                # Convert the stored UTC object directly to a string
+                record.last_risk_calculation_raw = record.last_risk_calculation.strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                record.last_risk_calculation_raw = ""
+    
     @api.depends('customer_id')
     def _compute_is_case_manager_installed(self):
         module = self.env['ir.module.module'].sudo().search([
@@ -261,8 +273,8 @@ class Customer(models.Model):
         for record in self:
             record.show_create_case = has_module
             # Debug logging
-            _logger.info(
-                f"Case module installed: {has_module}")
+            # _logger.info(
+            #     f"Case module installed: {has_module}")
 
     def action_create_customer_case(self):
         self.ensure_one()
@@ -507,6 +519,8 @@ class Customer(models.Model):
         risk_score = records[0] if records is not None else 0.00
         # Store the risk score directly
         self.risk_score = risk_score
+        
+       
         return risk_score
 
     def calculate_risk_batch(self, batch_size=1000):
@@ -784,7 +798,7 @@ class Customer(models.Model):
         if plan_setting not in ['avg', 'max', 'sum']:
             plan_setting = 'avg'
 
-        _logger.info(f"Using risk calculation method: {plan_setting.upper()}")
+        # _logger.info(f"Using risk calculation method: {plan_setting.upper()}")
 
         # Clear previous composite plan lines
         self.env['res.partner.composite.plan.line'].sudo().search(
@@ -892,13 +906,13 @@ class Customer(models.Model):
                 universe_data['total_score'] = 0.0
 
             # Log the calculation details for debugging
-            if subject_scores:
-                _logger.info(
-                    f"Universe {universe_data['name']}: "
-                    f"Subject scores={subject_scores}, "
-                    f"Method={plan_setting.upper()}, "
-                    f"Universe total={universe_data['total_score']:.2f}"
-                )
+            # if subject_scores:
+            #     _logger.info(
+            #         f"Universe {universe_data['name']}: "
+            #         f"Subject scores={subject_scores}, "
+            #         f"Method={plan_setting.upper()}, "
+            #         f"Universe total={universe_data['total_score']:.2f}"
+            #     )
 
         # Create records for ALL universes and ALL subjects and calculate composite score
         for universe_id, universe_data in universe_scores.items():
@@ -909,12 +923,10 @@ class Customer(models.Model):
             # Only add to CCR if there's a violation (score > 0)
             if universe_data['total_score'] > 0:
                 composite_score += weighted_score
-                _logger.info(
-                    f"Universe {universe_data['name']} : Score={universe_data['total_score']:.2f}, "
-                    f"Weight={universe_data['weight']:.2f}, Weighted Score={weighted_score:.2f}")
+                
 
-        _logger.info(
-            f"Final CCR for customer recordid: {record_id} score: {composite_score:.2f}")
+        # _logger.info(
+        #     f"Final CCR for customer recordid: {record_id} score: {composite_score:.2f}")
         return round(composite_score, 2)
 
     def action_sync_channels(self):
@@ -1209,12 +1221,6 @@ class Customer(models.Model):
             'watchlist_updated': len(watchlist_ids)
         }
 
-    def init(self):
-
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
-        
-        self.create_customer_trigger()
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -1768,11 +1774,13 @@ class Customer(models.Model):
         for record in self:
             # Calculate the risk score and level
             score = record._get_risk_score_from_plan()
-            risk_level = self.compute_customer_rating(score)
 
             if record.composite_risk_score and record.composite_risk_score > 0:
                 composite_risk_score = record.composite_risk_score
                 score = composite_risk_score + score
+                
+            risk_level = self.compute_customer_rating(score)
+            
             if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
                 score = float(self.env['res.compliance.settings'].get_setting(
                     'maximum_risk_threshold'))
@@ -1780,7 +1788,9 @@ class Customer(models.Model):
             # Use ORM write method to update and track changes
             record.sudo().write({
                 'risk_score': score,
-                'risk_level': risk_level
+                'risk_level': risk_level,
+                'last_risk_calculation': fields.Datetime.now()
+
             })
 
         return True
@@ -1808,6 +1818,7 @@ class Customer(models.Model):
             'context': {'default_customer_id': self.customer_id}
         }
 
+    @api.model
     def create_customer_trigger(self):
         
         self.change_column_datatype()
@@ -1985,6 +1996,9 @@ class Customer(models.Model):
                 FOR EACH ROW
                 EXECUTE FUNCTION set_partner_defaults_after_func();
             """)
+            
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
     
     def change_column_datatype(self):
         # Check and alter start_date column if not already VARCHAR/TEXT

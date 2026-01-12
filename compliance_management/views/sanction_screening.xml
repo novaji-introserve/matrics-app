@@ -28,7 +28,7 @@
                     <field name="bvn"/>
                     
                     <!-- <field name="nationality"/> -->
-                    <!-- <field name="source"/> -->
+                    <field name="source" />
                 </tree>
             </field>
         </record>
@@ -54,7 +54,7 @@
                                 <!-- <field name="watchlist_id" readonly="1"/> -->
                                 <field name="bvn" readonly="1"/>
                                 <!-- <field name="nationality" readonly="1"/> -->
-                                <!-- <field name="source" readonly="1"/> -->
+                                <field name="source" readonly="1"/>
                             </group>
 
                         </group>

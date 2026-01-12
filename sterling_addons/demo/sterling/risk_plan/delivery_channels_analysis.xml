@@ -1,0 +1,174 @@
+<odoo noupdate="0">
+
+    <record id="risk_plan_ussd" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For USSD Delivery Channel</field>
+        <field name="code">USSD_DELIVERY_CHANNEL</field>
+        <field name="sql_query">
+            SELECT 1 
+            FROM customer_channel_subscription ccs
+            JOIN digital_delivery_channel ddc ON ccs.channel_id = ddc.id
+            WHERE ccs.partner_id::integer = %s
+            AND ccs.value::bool = true and ddc.code = 'ussd';
+        </field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using ussd channel</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_ussd"/>
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
+    </record>
+
+    <record id="risk_plan_alt_bank" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Alt Bank Channel</field>
+        <field name="code">ALT_BANK_CHANNEL</field>
+        <field name="sql_query">
+            SELECT 1 
+            FROM customer_channel_subscription ccs
+            JOIN digital_delivery_channel ddc ON ccs.channel_id = ddc.id
+            WHERE ccs.partner_id::integer = %s
+            AND ccs.value::bool = true and ddc.code = 'alt_bank';
+        </field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using alt bank channel</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_alt"/>
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
+    </record>
+
+    <record id="risk_plan_banca" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Banca Channel</field>
+        <field name="code">BANCA_CHANNEL</field>
+        <field name="sql_query">
+            SELECT 1 
+            FROM customer_channel_subscription ccs
+            JOIN digital_delivery_channel ddc ON ccs.channel_id = ddc.id
+            WHERE ccs.partner_id::integer = %s
+            AND ccs.value::bool = true and ddc.code = 'banca';
+        </field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using banca channel</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_banca"/>
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
+    </record>
+
+    <record id="risk_plan_carded_customer" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Carded Customer Channel</field>
+        <field name="code">CARDED_CUSTOMER_CHANNEL</field>
+        <field name="sql_query">
+            SELECT 1 
+            FROM customer_channel_subscription ccs
+            JOIN digital_delivery_channel ddc ON ccs.channel_id = ddc.id
+            WHERE ccs.partner_id::integer = %s
+            AND ccs.value::bool = true and ddc.code = 'carded_customer';
+        </field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using carded customer channel</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_card"/>
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
+    </record>
+
+    <record id="risk_plan_doubble" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Doubble Channel</field>
+        <field name="code">DOUBBLE_CHANNEL</field>
+        <field name="sql_query">
+            SELECT 1 
+            FROM customer_channel_subscription ccs
+            JOIN digital_delivery_channel ddc ON ccs.channel_id = ddc.id
+            WHERE ccs.partner_id::integer = %s
+            AND ccs.value::bool = true and ddc.code = 'doubble';
+        </field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using doubble channel</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_doubble"/>
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
+    </record>
+
+    <record id="risk_plan_onebank" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Onebank Channel</field>
+        <field name="code">ONEBANK_CHANNEL</field>
+        <field name="sql_query">
+            SELECT 1 
+            FROM customer_channel_subscription ccs
+            JOIN digital_delivery_channel ddc ON ccs.channel_id = ddc.id
+            WHERE ccs.partner_id::integer = %s
+            AND ccs.value::bool = true and ddc.code = 'onebank';
+        </field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using onebank channel</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_onebank"/>
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
+    </record>
+    
+    <record id="risk_plan_specta" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Specta Channel</field>
+        <field name="code">SPECTA_CHANNEL</field>
+        <field name="sql_query">
+            SELECT 1 
+            FROM customer_channel_subscription ccs
+            JOIN digital_delivery_channel ddc ON ccs.channel_id = ddc.id
+            WHERE ccs.partner_id::integer = %s
+            AND ccs.value::bool = true and ddc.code = 'specta';
+        </field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using specta channel</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_specta"/>
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
+    </record>
+
+    <record id="risk_plan_sterling_pro" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Sterling Pro Channel</field>
+        <field name="code">STERLING_PRO_CHANNEL</field>
+        <field name="sql_query">
+            SELECT 1 
+            FROM customer_channel_subscription ccs
+            JOIN digital_delivery_channel ddc ON ccs.channel_id = ddc.id
+            WHERE ccs.partner_id::integer = %s
+            AND ccs.value::bool = true and ddc.code = 'sterling_pro';
+        </field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using sterling pro channel</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_sterling"/>
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
+    </record>
+
+    <record id="risk_plan_swtich" model="res.compliance.risk.assessment.plan">
+        <field name="name">Risk Analysis For Switch Channel</field>
+        <field name="code">SWITCH_CHANNEL</field>
+        <field name="sql_query">
+            SELECT 1 
+            FROM customer_channel_subscription ccs
+            JOIN digital_delivery_channel ddc ON ccs.channel_id = ddc.id
+            WHERE ccs.partner_id::integer = %s
+            AND ccs.value::bool = true and ddc.code = 'switch';
+        </field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="narration">Analysis for customers using switch channel</field>
+        <field name="compute_score_from">risk_assessment</field>
+        <field name="risk_assessment" ref="res_risk_assessment_regulatory_switch"/>
+        <field name="use_composite_calculation">True</field>
+        <field name="universe_id" ref="compliance_management.compliance_inst_fc_risk_univ_23"/>
+    </record>
+    
+</odoo>

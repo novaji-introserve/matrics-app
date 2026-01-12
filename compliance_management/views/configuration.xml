@@ -518,7 +518,7 @@
             <field name="name">digital.delivery.channel.form</field>
             <field name="model">digital.delivery.channel</field>
             <field name="arch" type="xml">
-                <form string="Digital Delivery Channel">
+                <form string="Digital Delivery Channel" create="True">
                     <sheet>
                         <group>
                             <group>
