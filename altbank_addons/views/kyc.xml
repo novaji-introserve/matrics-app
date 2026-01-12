@@ -1,0 +1,44 @@
+<odoo>
+<record id="res_partner_replace_sanctions" model="ir.ui.view">
+    <field name="name">res.partner.form.replace.sanctions</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="compliance_management.partner_inherit_form_view"/>
+    <field name="arch" type="xml">
+
+        <xpath expr="//page[@name='sanction_screening']" position="replace">
+            <page name="sanction_screening" string="Sanction Screening">
+
+                <!-- REQUIRED: fields used in attrs -->
+                <field name="is_pep" invisible="1"/>
+                <field name="is_fep" invisible="1"/>
+                <field name="is_blacklist" invisible="1"/>
+                <field name="is_watchlist" invisible="1"/>
+                <field name="likely_sanction" invisible="1"/>
+                <field name="is_greylist" invisible="1"/>
+                <field name="global_pep" invisible="1"/>
+
+                <group>
+                    <group string="PEP Screening">
+                        <field name="pep_result" readonly="1"/>
+                        <field name="global_pep_result" readonly="1"/>
+                        <field name="global_pep_id" readonly="1"/>
+                    </group>
+
+                    <group string="Others">
+                        <field name="fep_result" readonly="1"/>
+                        <field name="blacklist_result" readonly="1"/>
+                        <field name="watchlist_result" readonly="1"/>
+                        <field name="likely_sanction_result" readonly="1"/>
+                        <field name="greylist_result" readonly="1"/>
+                    </group>
+                </group>
+
+            </page>
+        </xpath>
+
+    </field>
+</record>
+
+
+</odoo>
+
