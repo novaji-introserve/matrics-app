@@ -40,6 +40,7 @@
         "demo/altbank/identification/id_type.xml",
         
         "views/transaction.xml",
+        "views/kyc.xml",
        
     ],
    "assets": {
