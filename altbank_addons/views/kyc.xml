@@ -28,7 +28,7 @@
                         <field name="fep_result" readonly="1"/>
                         <field name="blacklist_result" readonly="1"/>
                         <field name="watchlist_result" readonly="1"/>
-                        <field name="likely_sanction_result" readonly="1"/>
+                        <field name="sanction_result" readonly="1"/>
                         <field name="greylist_result" readonly="1"/>
                     </group>
                 </group>
@@ -39,6 +39,20 @@
     </field>
 </record>
 
+<record id="res_partner_replace_othername" model="ir.ui.view">
+    <field name="name">res.partner.form.replace.othername</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="compliance_management.partner_inherit_form_view"/>
+    <field name="arch" type="xml">
 
+        <xpath expr="//group[@name='personal']/field[@name='othername']" position="attributes">
+            <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <xpath expr="//group[@name='personal']/field[@name='othername']" position="after">
+            <field name="bank_pep_status"/>
+        </xpath>
+
+    </field>
+</record>
 </odoo>
-

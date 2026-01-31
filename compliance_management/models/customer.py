@@ -222,8 +222,8 @@ class Customer(models.Model):
         string='Phone Number(s)', index=True, compute='_compute_formatted_phone')
 
     likely_sanction = fields.Boolean(string='Is Sanctioned', tracking=True)
-    likely_sanction_result = fields.Char(
-        string = "Likely Sanction Result",
+    sanction_result = fields.Char(
+        string = "Sanction Result",
         compute="_compute_screening_results",
         store =False
     )
@@ -312,7 +312,7 @@ class Customer(models.Model):
             #     f"Case module installed: {has_module}")
 
     def _screening_text(self, matched):
-        return "Matched" if matched else "Not Matched"
+        return "Matched" if matched else "No Match"
 
     @api.depends('is_pep','is_watchlist','is_fep','is_blacklist','global_pep','is_greylist','likely_sanction')
     def _compute_screening_results(self):
@@ -323,7 +323,7 @@ class Customer(models.Model):
             rec.blacklist_result = self._screening_text(rec.is_blacklist)
             rec.global_pep_result = self._screening_text(rec.global_pep)
             rec.greylist_result = self._screening_text(rec.is_greylist)
-            rec.likely_sanction_result = self._screening_text(rec.likely_sanction)
+            rec.sanction_result = self._screening_text(rec.likely_sanction)
 
     def action_create_customer_case(self):
         self.ensure_one()
