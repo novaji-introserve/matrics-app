@@ -21,6 +21,7 @@ from . import gender
 from . import risk_level
 from . import users
 from . import customer
+from . import customer_type_config
 from . import customer_account_type
 from . import customer_account
 from . import customer_tier

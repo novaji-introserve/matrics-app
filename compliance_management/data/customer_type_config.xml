@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+        Customer Type Classification Configuration
+        ===========================================
+
+        This data file initializes the classification rules for determining
+        whether a customer_status value represents an Individual or Corporate
+        customer type.
+
+        Business Rule (per client requirement):
+            - Individual: "AltEvolve", "Internal Customer", "Laborer", "Individual"
+            - Corporate: All other status values
+
+        These rules can be modified via the UI without code changes, following
+        the Open/Closed Principle.
+        -->
+
+        <!-- Individual Status Classifications -->
+        <record id="customer_type_config_altevolve" model="customer.type.config">
+            <field name="customer_status">AltEvolve</field>
+            <field name="customer_type">individual</field>
+            <field name="description">AltEvolve customers are classified as Individual accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_internal_customer" model="customer.type.config">
+            <field name="customer_status">Internal Customer</field>
+            <field name="customer_type">individual</field>
+            <field name="description">Internal bank customers are classified as Individual accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_laborer" model="customer.type.config">
+            <field name="customer_status">Laborer</field>
+            <field name="customer_type">individual</field>
+            <field name="description">Laborer customers are classified as Individual accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_individual" model="customer.type.config">
+            <field name="customer_status">Individual</field>
+            <field name="customer_type">individual</field>
+            <field name="description">Individual customers</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Corporate Status Classifications -->
+        <record id="customer_type_config_bank" model="customer.type.config">
+            <field name="customer_status">BANK</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Bank entities are classified as Corporate accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_charity" model="customer.type.config">
+            <field name="customer_status">Charity</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Charity organizations are classified as Corporate accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_corporate" model="customer.type.config">
+            <field name="customer_status">Corporate</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Corporate entities</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_enterprise" model="customer.type.config">
+            <field name="customer_status">Enterprise Customer</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Enterprise customers are classified as Corporate accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_futureme" model="customer.type.config">
+            <field name="customer_status">Future Me Lite</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Future Me Lite accounts are classified as Corporate</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_governmental" model="customer.type.config">
+            <field name="customer_status">Governmental</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Governmental entities are classified as Corporate accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_govt_fgn" model="customer.type.config">
+            <field name="customer_status">Government/MDA Customer (FGN)</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Federal Government MDAs are classified as Corporate accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_govt_lg" model="customer.type.config">
+            <field name="customer_status">Government/MDA Customer (LG)</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Local Government MDAs are classified as Corporate accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_govt_state" model="customer.type.config">
+            <field name="customer_status">Government/MDA Customer (State)</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">State Government MDAs are classified as Corporate accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_joint" model="customer.type.config">
+            <field name="customer_status">Joint</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Joint accounts are classified as Corporate</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_msme" model="customer.type.config">
+            <field name="customer_status">MICRO SMALL AND MEDIUM ENTERPRISE</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">MSME accounts are classified as Corporate</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_minor" model="customer.type.config">
+            <field name="customer_status">Minor</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Minor accounts are classified as Corporate (guardian-managed)</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_ngo" model="customer.type.config">
+            <field name="customer_status">Non Governmental Organizations</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">NGOs are classified as Corporate accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_personal_staff" model="customer.type.config">
+            <field name="customer_status">Personal Staff</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Personal Staff accounts are classified as Corporate</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_personal_stipend" model="customer.type.config">
+            <field name="customer_status">Personal Stipend Recipient</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Personal Stipend Recipients are classified as Corporate</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_personal_teacher" model="customer.type.config">
+            <field name="customer_status">Personal Teacher</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Personal Teacher accounts are classified as Corporate</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_private_banking" model="customer.type.config">
+            <field name="customer_status">Private Banking-Ind</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Private Banking Individual accounts are classified as Corporate</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_religious" model="customer.type.config">
+            <field name="customer_status">Religious Bodies</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Religious Bodies are classified as Corporate accounts</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_unregistered" model="customer.type.config">
+            <field name="customer_status">unregistered Business</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Unregistered Businesses are classified as Corporate</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="customer_type_config_youth_corper" model="customer.type.config">
+            <field name="customer_status">Youth Corper</field>
+            <field name="customer_type">corporate</field>
+            <field name="description">Youth Corper accounts are classified as Corporate</field>
+            <field name="active">True</field>
+        </record>
+
+    </data>
+</odoo>

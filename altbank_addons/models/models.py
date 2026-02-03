@@ -135,3 +135,12 @@ class ResPartner(models.Model):
         help='Declared source of wealth from customer enrichment.'
     )
 
+    # Account Category - used for customer type classification
+    account_category = fields.Char(
+        string='Account Category',
+        index=True,
+        readonly=True,
+        help='Customer status/account category from source system. '
+             'Used to determine if account is Individual or Corporate for enrichment display.'
+    )
+

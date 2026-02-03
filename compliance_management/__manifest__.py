@@ -63,6 +63,7 @@
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
         "data/data.xml",
+        "data/customer_type_config.xml",
         "data/demo_data/risk_assessment/category.xml",
         "data/demo_data/risk_assessment/risk_universe.xml",
         "data/demo_data/risk_assessment/risk_type.xml",         
@@ -77,6 +78,7 @@
         # remove unwanted partner/customer actions
         # 'views/remove_partner_actions.xml',
         "views/customer.xml",
+        "views/customer_type_config_views.xml",
         "views/statistics.xml",
         "views/dashboard.xml",
         "views/card_dashboard_template.xml",

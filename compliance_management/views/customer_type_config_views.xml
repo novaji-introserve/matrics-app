@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Customer Type Config Tree View -->
+        <record id="view_customer_type_config_tree" model="ir.ui.view">
+            <field name="name">customer.type.config.tree</field>
+            <field name="model">customer.type.config</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Type Classifications" create="1" edit="1" delete="1">
+                    <field name="customer_status"/>
+                    <field name="customer_type"/>
+                    <field name="description"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Customer Type Config Form View -->
+        <record id="view_customer_type_config_form" model="ir.ui.view">
+            <field name="name">customer.type.config.form</field>
+            <field name="model">customer.type.config</field>
+            <field name="arch" type="xml">
+                <form string="Customer Type Classification">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                                    attrs="{'invisible': [('active', '=', True)]}"/>
+                        </div>
+                        <group>
+                            <group name="classification_info">
+                                <field name="customer_status" placeholder="e.g., Individual, Corporate, AltEvolve"/>
+                                <field name="customer_type"/>
+                                <field name="active"/>
+                            </group>
+                            <group name="description_info">
+                                <field name="description" placeholder="Optional notes about this classification rule"/>
+                            </group>
+                        </group>
+                        <separator string="Classification Rule"/>
+                        <div class="alert alert-info" role="alert">
+                            <h4 class="alert-heading">How Customer Type Classification Works</h4>
+                            <p>
+                                This configuration determines whether customers with a specific <strong>Customer Status</strong>
+                                should be classified as <strong>Individual</strong> or <strong>Corporate</strong>.
+                            </p>
+                            <p>
+                                <strong>Individual:</strong> Personal accounts where the individual name should be displayed.<br/>
+                                <strong>Corporate:</strong> Business/organizational accounts where the individual behind the account
+                                (beneficial owner, contact person) should be displayed when enrichment data is available.
+                            </p>
+                            <p class="mb-0">
+                                <em>This classification is used to determine which name to display from customer enrichment data.</em>
+                            </p>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Customer Type Config Search View -->
+        <record id="view_customer_type_config_search" model="ir.ui.view">
+            <field name="name">customer.type.config.search</field>
+            <field name="model">customer.type.config</field>
+            <field name="arch" type="xml">
+                <search string="Customer Type Classifications">
+                    <field name="customer_status"/>
+                    <field name="customer_type"/>
+                    <field name="description"/>
+                    <filter string="Individual" name="filter_individual"
+                            domain="[('customer_type', '=', 'individual')]"/>
+                    <filter string="Corporate" name="filter_corporate"
+                            domain="[('customer_type', '=', 'corporate')]"/>
+                    <separator/>
+                    <filter string="Active" name="filter_active"
+                            domain="[('active', '=', True)]"/>
+                    <filter string="Archived" name="filter_archived"
+                            domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Customer Type" name="group_customer_type"
+                                context="{'group_by': 'customer_type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Customer Type Config Action -->
+        <record id="action_customer_type_config" model="ir.actions.act_window">
+            <field name="name">Customer Type Classifications</field>
+            <field name="res_model">customer.type.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_filter_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new customer type classification
+                </p>
+                <p>
+                    Configure how customer status values are classified as Individual or Corporate.
+                    This determines which name to display from enrichment data.
+                </p>
+            </field>
+        </record>
+
+        <!-- Menu Item under Compliance Configuration -->
+        <menuitem id="menu_customer_type_config"
+                  name="Customer Type Classifications"
+                  parent="menu_compliance_configuration"
+                  action="action_customer_type_config"
+                  groups="group_compliance_compliance_officer"
+                  sequence="465"/>
+
+    </data>
+</odoo>

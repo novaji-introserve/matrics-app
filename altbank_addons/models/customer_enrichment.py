@@ -104,11 +104,46 @@ class CustomerEnrichment(models.Model):
         help='The linked customer record computed from customer_id.'
     )
 
+    # Customer Type Classification
+    customer_type = fields.Selection(
+        selection=[
+            ('individual', 'Individual'),
+            ('corporate', 'Corporate')
+        ],
+        string='Customer Type',
+        compute='_compute_customer_type',
+        store=True,
+        help='Automatically classified as Individual or Corporate based on '
+             'the customer\'s status using configured classification rules.'
+    )
+
+    # Display Name Logic
+    display_name_enriched = fields.Char(
+        string='Display Name',
+        compute='_compute_display_name_enriched',
+        store=True,
+        help='The name to display based on customer type. '
+             'Corporate customers show individual_name if available, '
+             'otherwise corporate_name. Individual customers show individual_name.'
+    )
+
     # PEP Identity Information
     pep_name = fields.Char(
         string='PEP Name',
         help='Name of the Politically Exposed Person. This may be the '
              'customer themselves or a related individual.'
+    )
+
+    # Name Fields for Corporate/Individual Display Logic
+    individual_name = fields.Char(
+        string='Individual Name',
+        help='Name of the individual associated with this account. '
+             'For corporate accounts, this is the primary contact or beneficial owner.'
+    )
+
+    corporate_name = fields.Char(
+        string='Corporate Name',
+        help='Name of the corporate entity (for corporate customers only).'
     )
 
     position = fields.Text(
@@ -173,6 +208,56 @@ class CustomerEnrichment(models.Model):
                 record.partner_id = partner.id if partner else False
             else:
                 record.partner_id = False
+
+    @api.depends('partner_id.account_category')
+    def _compute_customer_type(self):
+        """
+        Compute customer type based on partner's account_category.
+
+        Uses the customer.type.config model to classify the account category
+        as either 'individual' or 'corporate'. This follows the Open/Closed
+        principle - classification rules are data (configuration), not code.
+
+        Business Rule:
+            - Delegates classification to customer.type.config model
+            - Defaults to 'corporate' if no partner or account_category exists
+        """
+        CustomerTypeConfig = self.env['customer.type.config']
+
+        for record in self:
+            if record.partner_id and record.partner_id.account_category:
+                # Get the account_category string value
+                category_value = record.partner_id.account_category
+                # Use the configuration model to classify
+                record.customer_type = CustomerTypeConfig.get_customer_type(category_value)
+            else:
+                # Default to corporate if no customer or account_category
+                record.customer_type = 'corporate'
+
+    @api.depends('customer_type', 'individual_name', 'corporate_name')
+    def _compute_display_name_enriched(self):
+        """
+        Compute the display name based on customer type.
+
+        Business Rule (per client requirement):
+            - Corporate customers: Display individual_name if available,
+              otherwise fallback to corporate_name
+            - Individual customers: Display individual_name only
+
+        This ensures corporate PEP customers show the actual individual's name
+        on the dashboard, not just the corporate entity name.
+        """
+        for record in self:
+            if record.customer_type == 'corporate':
+                # Corporate: Prefer individual name, fallback to corporate name
+                record.display_name_enriched = (
+                    record.individual_name or
+                    record.corporate_name or
+                    ''
+                )
+            else:
+                # Individual: Use individual name only
+                record.display_name_enriched = record.individual_name or ''
 
     # -------------------------------------------------------------------------
     # CRUD Overrides - Automatic Partner Linking

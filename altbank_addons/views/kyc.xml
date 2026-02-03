@@ -53,6 +53,14 @@
             <field name="bank_pep_status"/>
         </xpath>
 
+        <!-- Hide date of birth value but keep the field label -->
+        <xpath expr="//group[@name='personal']/field[@name='dob']" position="replace">
+            <label for="dob" string="Date of Birth"/>
+            <div class="o_row">
+                <field name="dob" invisible="1"/>
+            </div>
+        </xpath>
+
     </field>
 </record>
 </odoo>
