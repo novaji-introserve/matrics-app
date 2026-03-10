@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+    
+        <record id="exception_frequency_1" model="exception.frequency">
+            <field name="name">minutes</field>
+            <field name="period">5</field>
+        </record>
+        <record id="exception_frequency_2" model="exception.frequency">
+            <field name="name">minutes</field>
+            <field name="period">30</field>
+        </record>
+        <record id="exception_frequency_3" model="exception.frequency">
+            <field name="name">hourly</field>
+            <field name="period">1</field>
+        </record>
+        <record id="exception_frequency_4" model="exception.frequency">
+            <field name="name">daily</field>
+            <field name="period">1</field>
+        </record>
+        <!-- Alert Groups -->
+        <record id="alert_group_branch_control" model="alert.group">
+            <field name="name">Branch Control</field>
+            <field name="tag">branch_control</field>
+        </record>
+         <record id="alert_group_branch_compliance" model="alert.group">
+            <field name="name">Branch Compliance</field>
+            <field name="tag">branch_control</field>
+        </record>
+         <record id="alert_group_compliance" model="alert.group">
+            <field name="name">Compliance</field>
+            <field name="tag">compliance</field>
+        </record>
+        <record id="alert_group_internal_control" model="alert.group">
+            <field name="name">Internal Control</field>
+            <field name="tag">internal_control</field>
+        </record>
+        <record id="alert_group_internal_audit" model="alert.group">
+            <field name="name">Internal Audit</field>
+            <field name="tag">internal_audit</field>
+        </record>
+        <record id="sql_process_system_users" model="process.sql">
+            <field name="name">System Users</field>
+            <field name="query">select b.id branch_id,b.name branch,u.login login_username,p.name description,u.active,
+to_char(u.create_date,'yyyy-mm-dd hh:mi AM') create_at
+from res_users u
+left join res_branch_users_rel rb ON u.id = rb.user_id 
+left join res_branch b on rb.branch_id=b.id 
+join res_partner p on u.partner_id=p.id 
+where rb.branch_id = 1</field>
+        </record>
+        
+        <record id="alert_rule_system_users" model="alert.rules">
+            <field name="name">Daily System Users Alert</field>
+            <field name="narration">Daily Email Alert of Users</field>
+            <field name="risk_rating">medium</field>
+            <field name="sql_text" ref="sql_process_system_users" />
+            <field name="frequency_id" ref="exception_frequency_4" />
+            <field name="alert_id" ref="alert_group_internal_control" />
+        </record>
+    </data>
+</odoo>

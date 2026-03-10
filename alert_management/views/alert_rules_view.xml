@@ -8,16 +8,14 @@
                 <field name="name" />
                 <field name="alert_id" />
                 <field name="frequency_id" />
-                <field name="first_owner" />
-                <field name="second_owner" />
-                <field name="specific_email_recipients" />
-
-                <field name="process_id" string="Process" />
+                <field name="first_owner" optional="hide" />
+                <field name="second_owner" optional="hide"/>
+                <field name="specific_email_recipients" optional="hide"/>
+                <field name="process_id" string="Process" optional="hide" />
                 <field name="status" widget="selection" string="Status" />
-                <field name="risk_rating" decoration-success="risk_rating == 'low'"
-                    decoration-warning="risk_rating == 'medium'" decoration-danger="risk_rating == 'high'"
-                    widget="badge" />
-                <field name="last_checked" string="Last Checked" widget="datetime" />
+                <field name="risk_rating" decoration-success="risk_rating == 'low'" decoration-warning="risk_rating == 'medium'" decoration-danger="risk_rating == 'high'" widget="badge" />
+                <field name="initialization_complete" widget="boolean_toggle" string="Initialized" optional="show" />
+                <field name="last_checked" string="Last Checked" widget="datetime" optional="hide" />
                 <field name="date_created" string="Date Created" />
             </tree>
         </field>
@@ -30,11 +28,14 @@
         <field name="arch" type="xml">
             <form string="Alert Rule" create="False">
                 <header>
-                   
-                    <field name="status" widget="statusbar" options="{'clickable':'1'}" />
+                    <button name="test_smart_rule" string="Test Rule" type="object" class="btn-primary" icon="fa-play" help="Test this rule immediately" />
+                    <!-- <button name="seed_signatures_optimized" string="Seed Signatures" type="object" class="btn-secondary" icon="fa-database" help="Initialize signatures without sending emails" /> -->
+                    <!-- <button name="clear_all_signatures" string="Clear Signatures" type="object" class="btn-warning" icon="fa-trash" help="Clear all signatures for this rule" confirm="Are you sure you want to clear all signatures? This will reset the rule." /> -->
+                    <!-- <button name="reset_initialization" string="Reset Initialization" type="object" class="btn-info" icon="fa-refresh" help="Reset rule to initialization state" />
+                    <field name="status" widget="statusbar" options="{'clickable':'1'}" /> -->
                 </header>
                 <sheet>
-                    
+
                     <div class="oe_title">
                         <label for="name" class="oe-edit-only" />
                         <h1>
@@ -42,43 +43,84 @@
                         </h1>
                     </div>
 
+                    <!-- Smart Initialization Status Banner -->
+                    <!-- <div class="alert alert-info" role="status" attrs="{'invisible': [('initialization_complete', '=', True)]}">
+                        <strong> Initialization Pending:</strong> This rule will use the initialization strategy on its first run.
+                    </div>
+                    <div class="alert alert-success" role="status" attrs="{'invisible': [('initialization_complete', '=', False)]}">
+                        <strong> Initialization Complete:</strong> This rule is now using the processing window for ongoing monitoring.
+                    </div> -->
+
                     <group string="PROCESS DETAILS">
+                        <field name="process_id" string="Process" colspan="2" />
+                        <div colspan="2" style="display: flex; gap: 20px; width: 100%;">
+                            <div style="flex: 1;">
+                                <label for="frequency_id" string="Frequency" />
+                                <field name="frequency_id" />
+                            </div>
 
-                        <group colspan="2">
-                            <field name="process_id" string="Process" />
+                            <div style="flex: 1;">
+                                <label for="risk_rating" string="Rating" />
+                                <field name="risk_rating" />
+                            </div>
+                            <div style="flex: 1;">
+                                <label for="priority_level" string="Priority Level" />
+                                <field name="priority_level" />
+                            </div>
+
+                        </div>
+                        <label for="sql_text" string="SQL" colspan="2" />
+                        <field name="sql_text" nolabel="1" colspan="2" />
+                    </group>
+                    <!-- Smart Initialization Configuration -->
+                    <!-- <group string="SMART INITIALIZATION SETTINGS">
+                        <group string="Initialization Strategy">
+                            <field name="initialization_strategy" widget="radio" help="How much historical data to process on first run" />
+                            <field name="custom_initialization_months" attrs="{'invisible': [('initialization_strategy', '!=', 'custom_period')], 'required': [('initialization_strategy', '=', 'custom_period')]}" help="Number of months for custom initialization period" />
+                        </group>
+                        <group string="Processing Configuration">
+                            <field name="processing_window_hours" help="Hours to look back for ongoing processing after initialization" />
+                            <field name="initialization_complete" readonly="1" widget="boolean_toggle" help="Whether this rule has completed its first initialization run" />
+                        </group>
+                    </group> -->
+
+                    <!-- Legacy Date Filter Settings (for backward compatibility) -->
+                    <!-- <group string="LEGACY DATE FILTER SETTINGS (Backward Compatibility)" groups="base.group_no_one">
+                        <group>
+                            <field name="query_date_column" help="Column name used for date filtering (legacy)" />
                         </group>
                         <group>
-                            <field name="frequency_id" />
+                            <field name="date_filter_months" help="Number of months to look back (legacy)" />
                         </group>
+                    </group> -->
 
-                        <group>
-                            <field name="risk_rating" string="Rating" />
+                    <!-- Statistics and Monitoring -->
+                    <!-- <group string="PROCESSING STATISTICS">
+                        <group string="Email Statistics">
+                            <field name="last_email_count" readonly="1" />
+                            <field name="total_emails_sent" readonly="1" />
                         </group>
-        
-                        <group string="SQL" colspan="2">
-                            <field name="sql_text" />
+                        <group string="Signature Statistics">
+                            <field name="last_record_count" readonly="1" help="Total records found in last run" />
+                            <field name="last_new_record_count" readonly="1" help="New records found in last run" />
+                            <field name="total_signatures_stored" readonly="1" help="Total signatures stored for this rule" />
                         </group>
-      
-
-                    </group>
-
-                    <group>
-
-                       
-                    </group>
-                    <group>
-
-                        <group string="LAST CHECKED">
-                            <field name="last_checked" string="Last Checked" widget="datetime" />
+                        <group string="Processing Status">
+                            <field name="is_processing" readonly="1" widget="boolean_toggle" />
+                            <field name="next_scheduled_run" readonly="1" widget="datetime" />
+                            <field name="processing_duration" readonly="1" help="Duration of last processing run in seconds" />
                         </group>
-                    </group>
+                        <group string="Last Checked">
+                            <field name="last_checked" string="Last Checked" widget="datetime" readonly="1" />
+                            <field name="last_error" readonly="1" attrs="{'invisible': [('last_error', '=', False)]}" />
+                        </group>
+                    </group> -->
 
                     <notebook>
                         <page string="Narration">
-                            <field name="narration" string="Narration" style="padding: 2rem;"
-                                placeholder="Enter narration here..." />
+                            <field name="narration" string="Narration" style="padding: 2rem;" placeholder="Enter narration here..." />
                         </page>
-                        <page string="Receipients">
+                        <page string="Recipients">
                             <group>
                                 <group class="">
                                     <field name="specific_email_recipients" widget="many2many_tags" />
@@ -86,16 +128,31 @@
                                 <group>
                                     <field name="alert_id" />
                                 </group>
-                            
                                 <group class="">
                                     <field name="first_owner" />
                                 </group>
-                            
                                 <group class="">
                                     <field name="second_owner" />
                                 </group>
                             </group>
                         </page>
+                        <!-- <page string="Advanced Settings">
+                            <group string="Initialization Strategy Details">
+                                <div class="o_form_field">
+                                    <h4>Initialization Strategy Guide:</h4>
+                                    <ul style="margin-left: 20px;">
+                                        <li><strong>Current Year Only (2025):</strong> Process only records from 2025 onwards. Best for new banking systems or when you only care about recent data.</li>
+                                        <li><strong>Full Historical Data:</strong> Process all available historical data. Use with caution - may take a long time and create many signatures.</li>
+                                        <li><strong>Last 6 Months:</strong> Process data from the last 6 months. Good balance between coverage and performance.</li>
+                                        <li><strong>Last 12 Months:</strong> Process data from the last 12 months. More comprehensive historical coverage.</li>
+                                        <li><strong>Custom Period:</strong> Specify your own period in months. Flexible option for specific requirements.</li>
+                                    </ul>
+                                    <br/>
+                                    <h4>Processing Window:</h4>
+                                    <p>After initialization, the system will only look back this many hours for new records. Default is 72 hours (3 days) which provides good coverage while maintaining performance.</p>
+                                </div>
+                            </group>
+                        </page> -->
                     </notebook>
                 </sheet>
                 <!-- Add the chatter here -->

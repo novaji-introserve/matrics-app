@@ -1,755 +1,1341 @@
 from odoo import models, fields, api
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import pytz
-from pytz import timezone
 import csv
 import io
-import base64, time, uuid
-import smtplib
-from time import sleep
+import base64
+import time
+import uuid
 import logging
-import smtplib
-from time import sleep
-import logging
-from collections import defaultdict
 import re
 import hashlib
 import json
+from collections import defaultdict
+
+# Smart SQL Analysis
+try:
+    from sql_metadata import get_query_tables, get_query_columns
+    SQL_METADATA_AVAILABLE = True
+except ImportError:
+    SQL_METADATA_AVAILABLE = False
+    logging.warning("sql-metadata package not installed. Falling back to pattern matching.")
 
 _logger = logging.getLogger(__name__)
 
 
-class alert_rules(models.Model):
+class SmartSQLAnalyzer:
+    """
+    Intelligent SQL Query Analyzer for Alert Rules
+    Uses sql_metadata with pattern matching fallback
+    """
+    
+    def __init__(self):
+        self.date_column_patterns = [
+            'date_created', 'created_at', 'transaction_date', 'posting_date', 
+            'value_date', 'entry_date', 'process_date', 'tran_date'
+        ]
+        
+        self.date_keywords = ['date', 'time', 'created', 'updated', 'posted']
+    
+    def analyze_query(self, sql_query):
+        """
+        Main analysis method - tries sql_metadata first, falls back to patterns
+        """
+        try:
+            if SQL_METADATA_AVAILABLE:
+                return self._sql_metadata_analysis(sql_query)
+            else:
+                return self._pattern_analysis(sql_query)
+        except Exception as e:
+            _logger.warning(f"SQL analysis failed, using pattern fallback: {str(e)}")
+            return self._pattern_analysis(sql_query)
+    
+    def _sql_metadata_analysis(self, sql_query):
+        """
+        Advanced analysis using sql_metadata package
+        """
+        try:
+            # Extract tables and columns
+            tables = get_query_tables(sql_query)
+            columns = get_query_columns(sql_query)
+            
+            # Detect table aliases
+            aliases = self._extract_table_aliases(sql_query, tables)
+            
+            # Find potential date columns
+            date_columns = self._detect_date_columns(columns, sql_query)
+            
+            # Check if query already has date filtering
+            has_date_filter = self._has_existing_date_filter(sql_query)
+            
+            # Determine main table and its alias
+            main_table_info = self._get_main_table_info(sql_query, tables, aliases)
+            
+            return {
+                'success': True,
+                'method': 'sql_metadata',
+                'tables': tables,
+                'columns': columns,
+                'aliases': aliases,
+                'date_columns': date_columns,
+                'has_date_filter': has_date_filter,
+                'main_table': main_table_info['table'],
+                'main_alias': main_table_info['alias'],
+                'confidence': 'high'
+            }
+            
+        except Exception as e:
+            _logger.warning(f"sql_metadata analysis failed: {str(e)}")
+            raise
+    
+    def _pattern_analysis(self, sql_query):
+        """
+        Fallback pattern matching analysis
+        """
+        try:
+            # Extract tables and aliases using regex
+            tables, aliases = self._extract_tables_and_aliases_pattern(sql_query)
+            
+            # Find date columns in SELECT clause
+            date_columns = self._detect_date_columns_pattern(sql_query)
+            
+            # Check for existing date filters
+            has_date_filter = self._has_existing_date_filter(sql_query)
+            
+            # Determine main table
+            main_table = tables[0] if tables else None
+            main_alias = aliases.get(main_table) if main_table else None
+            
+            return {
+                'success': True,
+                'method': 'pattern_matching',
+                'tables': tables,
+                'columns': [],  # Hard to extract reliably with patterns
+                'aliases': aliases,
+                'date_columns': date_columns,
+                'has_date_filter': has_date_filter,
+                'main_table': main_table,
+                'main_alias': main_alias,
+                'confidence': 'medium'
+            }
+            
+        except Exception as e:
+            _logger.error(f"Pattern analysis failed: {str(e)}")
+            return {
+                'success': False,
+                'method': 'failed',
+                'confidence': 'none',
+                'error': str(e)
+            }
+    
+    def _extract_table_aliases(self, sql_query, tables):
+        """
+        Extract table to alias mapping
+        """
+        aliases = {}
+        
+        # Pattern to match: FROM table_name alias
+        pattern = r'FROM\s+(\w+)\s+(\w+)(?:\s|,|$)'
+        matches = re.findall(pattern, sql_query, re.IGNORECASE)
+        
+        for table, alias in matches:
+            if table in tables:
+                aliases[table] = alias
+        
+        # Pattern to match: JOIN table_name alias
+        join_pattern = r'JOIN\s+(\w+)\s+(\w+)(?:\s|,|$)'
+        join_matches = re.findall(join_pattern, sql_query, re.IGNORECASE)
+        
+        for table, alias in join_matches:
+            if table in tables:
+                aliases[table] = alias
+        
+        return aliases
+    
+    def _detect_date_columns(self, columns, sql_query):
+        """
+        Intelligent date column detection
+        """
+        detected_dates = []
+        
+        # Priority-based detection
+        for priority_col in self.date_column_patterns:
+            if priority_col in columns:
+                detected_dates.append(priority_col)
+        
+        # Keyword-based detection for remaining columns
+        for col in columns:
+            if col not in detected_dates:
+                col_lower = col.lower()
+                if any(keyword in col_lower for keyword in self.date_keywords):
+                    detected_dates.append(col)
+        
+        # If no date columns found, look in SQL for common patterns
+        if not detected_dates:
+            date_pattern = r'\b(\w*date\w*|\w*time\w*|\w*created\w*)\b'
+            matches = re.findall(date_pattern, sql_query, re.IGNORECASE)
+            detected_dates.extend(list(set(matches)))
+        
+        return detected_dates
+    
+    def _has_existing_date_filter(self, sql_query):
+        """
+        Check if query already has date filtering
+        """
+        date_filter_patterns = [
+            r'\bdate_created\s*>=',
+            r'\bcreated_at\s*>=',
+            r'\btransaction_date\s*>=',
+            r'\bposting_date\s*>=',
+            r'\bvalue_date\s*>=',
+            r'\bwhere\s+.*date.*\s*>=',
+            r'CURRENT_TIMESTAMP',
+            r'CURRENT_DATE',
+            r'INTERVAL',
+            r'>=\s*[\'\"]\d{4}-\d{2}-\d{2}',
+        ]
+        
+        for pattern in date_filter_patterns:
+            if re.search(pattern, sql_query, re.IGNORECASE):
+                return True
+        
+        return False
+    
+    def _get_main_table_info(self, sql_query, tables, aliases):
+        """
+        Determine the main table and its alias
+        """
+        if not tables:
+            return {'table': None, 'alias': None}
+        
+        # The first table in FROM clause is usually the main table
+        main_table = tables[0]
+        main_alias = aliases.get(main_table)
+        
+        return {'table': main_table, 'alias': main_alias}
+    
+    def _extract_tables_and_aliases_pattern(self, sql_query):
+        """
+        Pattern-based table and alias extraction
+        """
+        tables = []
+        aliases = {}
+        
+        # Match FROM table alias pattern
+        from_pattern = r'FROM\s+(\w+)(?:\s+(\w+))?'
+        from_match = re.search(from_pattern, sql_query, re.IGNORECASE)
+        
+        if from_match:
+            table = from_match.group(1)
+            alias = from_match.group(2)
+            tables.append(table)
+            if alias and alias.upper() not in ['WHERE', 'ORDER', 'GROUP', 'HAVING']:
+                aliases[table] = alias
+        
+        # Match JOIN table alias patterns
+        join_pattern = r'JOIN\s+(\w+)(?:\s+(\w+))?'
+        join_matches = re.findall(join_pattern, sql_query, re.IGNORECASE)
+        
+        for table, alias in join_matches:
+            if table not in tables:
+                tables.append(table)
+            if alias and alias.upper() not in ['ON', 'WHERE', 'ORDER', 'GROUP']:
+                aliases[table] = alias
+        
+        return tables, aliases
+    
+    def _detect_date_columns_pattern(self, sql_query):
+        """
+        Pattern-based date column detection from SELECT clause
+        """
+        # Extract SELECT clause
+        select_match = re.search(r'SELECT\s+(.*?)\s+FROM', sql_query, re.IGNORECASE | re.DOTALL)
+        if not select_match:
+            return []
+        
+        select_clause = select_match.group(1)
+        
+        # Find date-related columns
+        date_columns = []
+        for pattern in self.date_column_patterns:
+            if pattern in select_clause.lower():
+                date_columns.append(pattern)
+        
+        # Find columns with date keywords
+        words = re.findall(r'\b\w+\b', select_clause)
+        for word in words:
+            if any(keyword in word.lower() for keyword in self.date_keywords):
+                if word not in date_columns:
+                    date_columns.append(word)
+        
+        return date_columns
+
+
+class SmartTimeFilterEngine:
+    """
+    Intelligent time filter application
+    """
+    
+    def __init__(self, analyzer_result):
+        self.analysis = analyzer_result
+    
+    def add_smart_time_filter(self, query, rule):
+        """
+        Add intelligent time filter based on analysis
+        """
+        if not self.analysis['success']:
+            return self._fallback_filter(query, rule)
+        
+        # Skip if query already has date filtering
+        if self.analysis['has_date_filter']:
+            _logger.info(f"Rule {rule.id} - Query already has date filter, skipping")
+            return query
+        
+        # Generate appropriate filter
+        time_filter = self._generate_time_filter(rule)
+        if not time_filter:
+            _logger.info(f"Rule {rule.id} - Could not generate time filter, returning raw query")
+            return query
+        
+        # Apply filter intelligently
+        enhanced_query = self._apply_filter_intelligently(query, time_filter)
+        
+        # Safety check: if the enhancement failed, return the raw query
+        return enhanced_query if enhanced_query else query
+    
+    def _generate_time_filter(self, rule):
+        """
+        Generate time filter based on rule configuration - FIXED to use configurable hours
+        """
+        try:
+            # Determine date column to use
+            date_column = self._select_best_date_column(rule)
+            if not date_column:
+                return None
+            
+            # Generate filter based on initialization status
+            if not rule.initialization_complete:
+                return self._get_initialization_filter(rule, date_column)
+            else:
+                # FIXED: Use configurable hours instead of hardcoded 72
+                hours = rule.processing_window_hours or 72
+                return f"{date_column} >= (CURRENT_TIMESTAMP - INTERVAL '{hours} hours')"
+        
+        except Exception as e:
+            _logger.error(f"Error generating time filter: {str(e)}")
+            return None
+    
+    def _select_best_date_column(self, rule):
+        """
+        Select the best date column to use for filtering
+        """
+        # Priority 1: User configured column
+        if hasattr(rule, 'query_date_column') and rule.query_date_column:
+            configured_col = rule.query_date_column
+            if configured_col != "a.date_created":  # Not the default
+                return configured_col
+        
+        # Priority 2: Detected date columns
+        date_columns = self.analysis.get('date_columns', [])
+        if date_columns:
+            # Use first priority date column
+            for priority_col in ['date_created', 'created_at', 'transaction_date']:
+                if priority_col in date_columns:
+                    return self._format_column_with_alias(priority_col)
+            
+            # Use first detected date column
+            return self._format_column_with_alias(date_columns[0])
+        
+        # Priority 3: Default with smart alias
+        return self._format_column_with_alias('date_created')
+    
+    def _format_column_with_alias(self, column):
+        """
+        Format column with appropriate alias
+        """
+        main_alias = self.analysis.get('main_alias')
+        if main_alias:
+            return f"{main_alias}.{column}"
+        else:
+            return column
+    
+    def _get_initialization_filter(self, rule, date_column):
+        """
+        Get initialization filter based on strategy
+        """
+        try:
+            if rule.initialization_strategy == 'current_year':
+                return f"{date_column} >= '2025-01-01'"
+            elif rule.initialization_strategy == 'full_history':
+                return "1=1"
+            elif rule.initialization_strategy == 'last_6_months':
+                return f"{date_column} >= (CURRENT_DATE - INTERVAL '6 months')"
+            elif rule.initialization_strategy == 'last_12_months':
+                return f"{date_column} >= (CURRENT_DATE - INTERVAL '12 months')"
+            elif rule.initialization_strategy == 'custom_period':
+                months = rule.custom_initialization_months or 6
+                return f"{date_column} >= (CURRENT_DATE - INTERVAL '{months} months')"
+            else:
+                return f"{date_column} >= '2025-01-01'"
+        except Exception as e:
+            _logger.error(f"Error getting initialization filter: {str(e)}")
+            return f"{date_column} >= '2025-01-01'"
+    
+    def _apply_filter_intelligently(self, query, time_filter):
+        """
+        Apply filter to query intelligently
+        """
+        try:
+            # Handle ORDER BY clause properly
+            query_upper = query.upper()
+            order_by_pos = query_upper.rfind('ORDER BY')
+            
+            if order_by_pos != -1:
+                main_query = query[:order_by_pos].strip()
+                order_by_clause = query[order_by_pos:].strip()
+                
+                if "WHERE" in main_query.upper():
+                    main_query += f" AND {time_filter}"
+                else:
+                    main_query += f" WHERE {time_filter}"
+                
+                return f"{main_query} {order_by_clause}"
+            else:
+                if "WHERE" in query_upper:
+                    return f"{query} AND {time_filter}"
+                else:
+                    return f"{query} WHERE {time_filter}"
+        
+        except Exception as e:
+            _logger.error(f"Error applying filter: {str(e)}")
+            return query
+    
+    def _fallback_filter(self, query, rule):
+        """
+        Fallback filter when analysis fails.
+        Safest approach is to return the raw query to avoid breaking valid SQL.
+        """
+        _logger.info(f"Rule {rule.id} - SQL analysis failed, skipping auto-date filter to prevent SQL errors.")
+        return query
+
+
+class AlertSignature(models.Model):
+    """
+    OPTIMIZED: Database table for storing alert signatures
+    Designed for date-filtered queries (4-5 months of data)
+    """
+    _name = 'alert.signature'
+    _description = 'Alert Rule Signatures for Duplicate Detection'
+    _order = 'created_date desc'
+    _rec_name = 'signature_hash'
+    
+    alert_rule_id = fields.Many2one(
+        'alert.rules', 
+        string='Alert Rule', 
+        required=True, 
+        ondelete='cascade',
+        index=True
+    )
+    signature_hash = fields.Char(
+        string='Signature Hash', 
+        size=32, 
+        required=True, 
+        index=True,
+        help="sha256 hash of the record data"
+    )
+    created_date = fields.Datetime(
+        string='Created Date', 
+        default=fields.Datetime.now, 
+        required=True,
+        index=True
+    )
+    last_seen_date = fields.Datetime(
+        string='Last Seen Date',
+        default=fields.Datetime.now,
+        help="When this signature was last encountered"
+    )
+    
+    #fields for date-filtered queries
+    record_date = fields.Date(
+        string='Record Date',
+        help="Date from the actual record (for cleanup purposes)",
+        index=True
+    )
+    
+    _sql_constraints = [
+        ('unique_signature_per_rule', 
+         'unique(alert_rule_id, signature_hash)', 
+         'Signature must be unique per alert rule')
+    ]
+    
+    @api.model
+    def cleanup_old_signatures_by_date(self, rule_id, older_than_months=6):
+        """
+        OPTIMIZED CLEANUP: Remove signatures for records older than X months
+        Safe for date-filtered queries since old records won't appear again
+        """
+        cutoff_date = fields.Date.today() - relativedelta(months=older_than_months)
+        
+        old_signatures = self.search([
+            ('alert_rule_id', '=', rule_id),
+            ('record_date', '<', cutoff_date)
+        ])
+        
+        return {
+            'count': len(old_signatures),
+            'cutoff_date': cutoff_date,
+            'signatures': old_signatures
+        }
+    
+    @api.model
+    def get_signature_stats_optimized(self):
+        """Optimized signature statistics"""
+        query = """
+            SELECT 
+                ar.name,
+                ar.id,
+                COUNT(asig.id) as signature_count,
+                MIN(asig.record_date) as oldest_record_date,
+                MAX(asig.record_date) as newest_record_date,
+                MIN(asig.created_date) as oldest_signature,
+                MAX(asig.created_date) as newest_signature
+            FROM alert_rules ar
+            LEFT JOIN alert_signature asig ON ar.id = asig.alert_rule_id
+            WHERE ar.status = '1'
+            GROUP BY ar.id, ar.name
+            ORDER BY signature_count DESC
+        """
+        
+        self.env.cr.execute(query)
+        results = self.env.cr.dictfetchall()
+        
+        stats = {}
+        for row in results:
+            stats[row['name']] = {
+                'rule_id': row['id'],
+                'signature_count': row['signature_count'] or 0,
+                'oldest_record_date': row['oldest_record_date'],
+                'newest_record_date': row['newest_record_date'],
+                'oldest_signature': row['oldest_signature'],
+                'newest_signature': row['newest_signature']
+            }
+        
+        return stats
+
+
+class AlertRules(models.Model):
     _name = 'alert.rules'
-    _description = "Alert Rules"
+    _description = "Alert Rules - Smart Banking Initialization System"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
     
-    name = fields.Char(string="Name", required=True, Tracking=True)
-    narration = fields.Html(string="narration", required=True, tracking=True)
-    sql_text = fields.Many2one("process.sql",string="SQL Query", required=True, tracking=True)
+    name = fields.Char(string="Name", required=True, tracking=True)
+    narration = fields.Html(string="Narration", required=True, tracking=True)
+    sql_text = fields.Many2one("process.sql", string="SQL Query", required=True, tracking=True)
     frequency_id = fields.Many2one('exception.frequency', string="Frequency", required=True, tracking=True)
-    # process_category_id = fields.Many2one('process.category', string="Process Category", required=True)
-    status = fields.Selection(
-    [("1", "Active"), ("0", "Inactive")],
-    default="1",  # The default value is an integer (1)
-    string="Alert Status",
-    tracking=True
+    
+    status = fields.Selection([
+        ("1", "Active"), 
+        ("0", "Inactive")
+    ], default="1", string="Alert Status", tracking=True)
+    
+    specific_email_recipients = fields.Many2many(
+        'res.users', "alert_rules_email_rel", "alert_rules_id", "user_id", 
+        string="Specific Recipients", required=True, tracking=True
     )
-    specific_email_recipients = fields.Many2many('res.users', "alert_rules_email_rel", "alert_rules_id", "user_id", string="Specific Recipients", required=True, tracking=True)
+    
     alert_id = fields.Many2one("alert.group", string="Alert Group")
-    first_owner = fields.Many2one("res.users",string="First Line Owner") 
+    first_owner = fields.Many2one("res.users", string="First Line Owner") 
     second_owner = fields.Many2one("res.users", string="Second Line Owner") 
     process_id = fields.Char(string="Process", tracking=True)
-    risk_rating = fields.Selection(
-        selection=[("low", "Low"),("medium", "Medium"), ("high", "High")],
-        default= "low",  # The default value is the first risk rating
-        string="Risk Rating"
-    )
-    date_created = fields.Datetime(
-        string="Created_Date",
-        read_only=True)
-    last_checked = fields.Datetime(string="Last_Checked", read_only=True)
-
-            
-        
-
-    @api.model
-    def create(self,vals_list):
-       
-        vals_list['last_checked'] = fields.Datetime.now()
-        
-        if 'date_created' not in vals_list:
-           vals_list['date_created'] = fields.Datetime.now()
-        
-
-            
-        res = super(alert_rules, self).create(vals_list)
-        return res
     
-   
+    risk_rating = fields.Selection([
+        ("low", "Low"),
+        ("medium", "Medium"), 
+        ("high", "High")
+    ], default="low", string="Risk Rating")
+
+    priority_level = fields.Selection([
+        ("critical", "Critical"),
+        ("high", "High"),
+        ("medium", "Medium"),
+        ("low", "Low"),
+    ], default="medium", string="Priority Level", tracking=True)
+    
+    date_created = fields.Datetime(string="Created Date", readonly=True)
+    last_checked = fields.Datetime(string="Last Checked", readonly=True)
+    
+    # ========================================
+    # TRACKING FIELDS
+    # ========================================
+    last_email_count = fields.Integer(string="Last Email Count", readonly=True, default=0)
+    total_emails_sent = fields.Integer(string="Total Emails Sent", readonly=True, default=0)
+    last_error = fields.Text(string="Last Error", readonly=True)
+    is_processing = fields.Boolean(string="Is Processing", default=False, readonly=True)
+    next_scheduled_run = fields.Datetime(string="Next Scheduled Run", readonly=True)
+    processing_duration = fields.Float(string="Last Processing Duration (seconds)", readonly=True)
+    
+    # signature tracking
+    last_record_count = fields.Integer(string="Last Record Count", readonly=True, default=0)
+    last_new_record_count = fields.Integer(string="Last New Record Count", readonly=True, default=0)
+    total_signatures_stored = fields.Integer(string="Total Signatures Stored", readonly=True, default=0)
+    
+    # Smart SQL fields
+    query_date_column = fields.Char(
+        string="Date Column in Query",
+        help="Column name used for date filtering. Leave blank for auto-detection.",
+        default=""
+    )
+    date_filter_months = fields.Integer(
+        string="Date Filter (Months)",
+        help="Number of months to look back for records",
+        default=5
+    )
+
+    # ========================================
+    # INITIALIZATION FIELDS
+    # ========================================
+    initialization_strategy = fields.Selection([
+        ('current_year', 'Current Year Only (2025)'),
+        ('full_history', 'Full Historical Data'),  
+        ('last_6_months', 'Last 6 Months'),
+        ('last_12_months', 'Last 12 Months'),
+        ('custom_period', 'Custom Period')
+    ], default='current_year', required=True, string="Initialization Strategy",
+       help="How much historical data to process on first run")
+    
+    custom_initialization_months = fields.Integer(
+        string="Custom Period (Months)",
+        default=6,
+        help="Only used if 'Custom Period' is selected"
+    )
+    
+    processing_window_hours = fields.Integer(
+        string="Processing Window (Hours)",
+        default=72,
+        help="Hours to look back for ongoing processing after initialization"
+    )
+    
+    initialization_complete = fields.Boolean(
+        string="Initialization Complete", 
+        default=False, 
+        readonly=True,
+        help="Whether this rule has completed its first initialization run"
+    )
+
+    # ========================================
+    # LIFECYCLE METHODS
+    # ========================================
+    @api.model
+    def create(self, vals_list):
+        """Enhanced create method with smart initialization"""
+        current_time = fields.Datetime.now()
+        vals_list.update({
+            'last_checked': current_time,
+            'date_created': vals_list.get('date_created', current_time),
+            'total_emails_sent': 0,
+            'last_email_count': 0,
+            'is_processing': False,
+            'last_record_count': 0,
+            'last_new_record_count': 0,
+            'total_signatures_stored': 0,
+            'initialization_complete': False  # Always start with initialization
+        })
+        
+        # Calculate initial next run time
+        if vals_list.get('frequency_id'):
+            frequency = self.env['exception.frequency'].browse(vals_list['frequency_id'])
+            next_run = self._calculate_next_check_time(current_time, frequency.name, frequency.period)
+            vals_list['next_scheduled_run'] = next_run
+        
+        return super(AlertRules, self).create(vals_list)
+
     @api.onchange('sql_text')
     def onchange_sql_text(self):
+        """Improved validation to prevent duplicate SQL queries"""
         if self.sql_text:
-            row = self.search([("sql_text.id", "=", self.sql_text.id)])
-            
-            if len(row) > 0:
-                raise ValidationError(f"alert rules for {self.sql_text.name} already exist")
-            
-    
+            existing = self.search([
+                ("sql_text", "=", self.sql_text.id),
+                ("id", "!=", self.id if self.id else 0)
+            ])
+            if existing:
+                raise ValidationError(
+                    f"Alert rule for SQL query '{self.sql_text.name}' already exists!\n"
+                    f"Existing rule: '{existing[0].name}' (ID: {existing[0].id})\n"
+                    f"Please use a different SQL query or modify the existing rule."
+                )
+
+    # ========================================
+    # MAIN PROCESSING METHODS
+    # ========================================
     @api.model
     def process_alert_rules(self):
-    
-        alert_rules = self.search([("status", "=", "1")])
-    
-        if len(alert_rules) > 0:
+        """MAIN ENTRY POINT: Process all active alert rules with smart initialization"""
+        start_time = time.time()
+        _logger.info("Starting smart alert processing cycle")
+        
+        try:
+            # Get all active rules that are not currently being processed
+            alert_rules = self.search([
+                ("status", "=", "1"),
+                ("is_processing", "=", False)
+            ])
+            
+            total_rules = len(alert_rules)
+            
+            if not alert_rules:
+                _logger.info("No active alert rules found")
+                return {'status': 'success', 'message': 'No active alert rules found', 'processed': 0}
+            
+            processed_count = 0
+            sent_count = 0
+            error_count = 0
+            total_signatures_created = 0
+            initialization_count = 0
+            
+            # Process each rule individually with full isolation
             for rule in alert_rules:
-               
-                self.process(rule)
-        else:
-            pass
-            
-    
-    def process(self, rule):
-
-        last_checked = rule.last_checked
-        unit = rule.frequency_id.name
-        period = rule.frequency_id.period
-        next_check = self.calculate_next_check(last_checked, unit, period)
-        current_time_lagos = fields.Datetime.now()
-
-        _logger.info("------------date info")
-        _logger.info(f"last time checked {last_checked}")
-        _logger.info(f"current time checked {current_time_lagos}")
-        _logger.info(f"next checked {next_check}")
-        if last_checked and current_time_lagos.year == next_check.year and current_time_lagos.month == next_check.month and current_time_lagos.day == next_check.day and current_time_lagos.hour == next_check.hour and current_time_lagos.minute == next_check.minute:
-            rule.write({'last_checked': fields.Datetime.now()})
-            _logger.info("sending now....")
-            self.send_alert(rule)
-            return
-
-        # Check if scheduled time has elapsed, handling potential misses
-    
-    
-        calculated_time = next_check
-        _logger.info(calculated_time)
-        if calculated_time < current_time_lagos:
-            _logger.info("------------sending as time elapse")
-            rule.write({'last_checked': fields.Datetime.now()})
-            self.send_alert(rule)
-            return
-        else:
-            # Handle the case where last_checked is None
-            calculated_time = self.calculate_next_check(current_time_lagos - timedelta(minutes=1), unit, period) #uses current time - 1 minute as the base.
-            if calculated_time <= current_time_lagos:
-                self.send_alert(rule)
-                rule.write({'last_checked': fields.Datetime.now()})
-                return
-
-    
-    def calculate_next_check(self, last_checked, unit, period):
-        if unit == 'minutes':
-            return last_checked + timedelta(minutes=period)
-        elif unit == 'hourly':
-            return last_checked + timedelta(hours=period)
-        elif unit == 'daily':
-            return last_checked + timedelta(days=period)
-        elif unit == 'weekly':
-            return last_checked + timedelta(weeks=period)
-        elif unit == 'monthly':
-            return last_checked + relativedelta(months=period)
-        elif unit == 'yearly':
-            return last_checked + relativedelta(years=period)
-        else:
-            raise ValidationError("Unsupported Unit")
-    
-    def format_currency(self, cell):
-        if cell is not None and isinstance(cell, (int, float, str)):
-            try:
-                if re.match(r'[\$\d,.]+', str(cell)):
-                    return f"{float(cell):,.2f}" 
-                else:
-                    return cell
-            except (ValueError, TypeError):
-                return cell
-        else:
-            return cell
-    
-    def has_sql_aliases(self, query):
-        # Strip unnecessary whitespace
-        query = query.strip()
-        
-        # Patterns to detect various forms of SQL aliases
-        patterns = [
-            # Table alias pattern: "table alias" or "table as alias" (case insensitive for AS)
-            r'\b\w+\b\s+(?!ON|JOIN|WHERE|FROM|SELECT|GROUP|ORDER|HAVING|UNION|EXCEPT|INTERSECT)\b\w+\b',
-            r'\b\w+\b\s+(?i:AS)\s+\b\w+\b'
-        ]
-        
-        # Check each pattern
-        for pattern in patterns:
-            if re.search(pattern, query):
-                return True
-                
-        return False
-    
-    def append_branch_condition(self, query, branch_id):
-        # Check if query uses aliases
-        has_aliases = self.has_sql_aliases(query)
-        
-        # Process query based on presence of WHERE clause
-        if " WHERE " in query.upper():
-            # Fix multiple WHERE clauses if present
-            parts = query.split(';')
-            cleaned_parts = []
-            
-            first_where_found = False
-            for part in parts:
-                part = part.strip()
-                if not part:
+                try:
+                    # Check if it's actually time to process this rule
+                    if not self._is_time_to_process(rule):
+                        continue
+                    
+                    # Track initialization vs normal processing
+                    if not rule.initialization_complete:
+                        initialization_count += 1
+                    
+                    # Process the rule safely
+                    result = self._process_single_rule_safely(rule)
+                    emails_sent = result['emails_sent']
+                    signatures_created = result['signatures_created']
+                    
+                    processed_count += 1
+                    sent_count += emails_sent
+                    total_signatures_created += signatures_created
+                    
+                    # Commit after each successful rule processing
+                    # This ensures all data (alert history, rule updates) are immediately visible
+                    self.env.cr.commit()
+                    _logger.info(f"Rule {rule.id} - All data committed to database")
+                    
+                except Exception as e:
+                    error_count += 1
+                    _logger.error(f"Error processing rule {rule.id} '{rule.name}': {str(e)}")
+                    
+                    # Update rule with error info and unlock it
+                    try:
+                        rule.write({
+                            'last_error': f"Error at {fields.Datetime.now()}: {str(e)}",
+                            'is_processing': False
+                        })
+                    except:
+                        _logger.error(f"Failed to update error status for rule {rule.id}")
                     continue
-                    
-                if " WHERE " in part.upper() and first_where_found:
-                    # Replace second WHERE with AND
-                    part = " AND " + part.split(" WHERE ", 1)[1]
-                elif " WHERE " in part.upper():
-                    first_where_found = True
-                    
-                cleaned_parts.append(part)
             
-            query = " ".join(cleaned_parts)
+            duration = time.time() - start_time
+            _logger.info(f"Smart alert cycle complete: {processed_count}/{total_rules} processed, {sent_count} emails, {error_count} errors in {duration:.1f}s")
             
-            # Now append our condition - use appropriate table reference
-            if has_aliases:
-                # If using aliases, we need to use the correct one
-                query += " AND branch_id = %s"  # You'll need logic to determine correct alias
-            else:
-                query += " AND branch_id = %s"
-        else:
-            # No WHERE clause, add one
-            if has_aliases:
-                query += " WHERE branch_id = %s"  # You'll need logic to determine correct alias
-            else:
-                query += " WHERE branch_id = %s"
-            
-        return query, [branch_id]
-
-
-    def format_query(self, rule):
-        """
-        Format SQL query to ensure it has a 'branch_id' column properly defined.
-        
-        This function identifies if branch_id already exists in the query (either directly or as an alias),
-        and modifies the query as needed to ensure the column is properly present as 'branch_id'.
-        
-        If no branch_id can be added, returns the original query unchanged to avoid SQL errors.
-
-        Returns:
-            str: Modified SQL query with proper branch_id handling, or original query if modification fails
-        """
-        
-        query = rule.sql_text.query
-
-        # If query is empty or None, return empty string
-        if not query:
-            return ""
-        
-        # If the query uses * wildcard, return it unchanged
-        if "*" in query:
-            return query
-        
-        # Create a working copy to preserve case in the original query
-        original_query = query.strip()
-        query_lower = original_query.lower()
-        
-        # Handle queries that don't have a direct 'SELECT...FROM' structure
-        if "select " not in query_lower or " from " not in query_lower:
-            return original_query
-        
-        try:
-            # Split the query into parts
-            select_part_lower = query_lower.split(" from ")[0].replace("select ", "").strip()
-            from_part_lower = "from " + query_lower.split(" from ", 1)[1].strip()
-
-            # Check for various branch_id patterns in the SELECT clause
-            # Case 1: column named exactly branch_id with no alias
-            has_branch_id_column = re.search(r"\bbranch_id\b(?!\s+as)", select_part_lower)
-            
-            # Case 2: column.branch_id AS branch_id
-            has_branch_id_alias = re.search(r"(\w+)\.branch_id\b\s+as\s+branch_id\b", select_part_lower)
-            
-            # Case 3: column.branch_id AS something_else
-            other_branch_id_alias = re.search(r"(\w+)\.branch_id\b\s+as\s+(\w+)(?!\bbranch_id\b)", select_part_lower)
-            
-            # Case 4: column.branch_id with no AS (implicit naming)
-            implicit_branch_id = re.search(r"(\w+)\.branch_id\b(?!\s+as)", select_part_lower)
-
-            # If branch_id already exists with correct alias, return query unchanged
-            if has_branch_id_column or has_branch_id_alias:
-                return original_query
-                
-            # If branch_id exists with wrong alias, replace the alias
-            elif other_branch_id_alias:
-                table_alias = other_branch_id_alias.group(1)
-                wrong_alias = other_branch_id_alias.group(2)
-                
-                # Find the actual case-sensitive version in the original query
-                pattern = re.compile(f"{re.escape(table_alias)}\\.branch_id\\s+as\\s+{re.escape(wrong_alias)}", 
-                                    re.IGNORECASE)
-                match = pattern.search(original_query)
-                if match:
-                    original_text = match.group(0)
-                    replacement = f"{table_alias}.branch_id AS branch_id"
-                    return original_query.replace(original_text, replacement)
-                    
-            # If branch_id column exists without explicit alias, add AS branch_id
-            elif implicit_branch_id:
-                table_alias = implicit_branch_id.group(1)
-                
-                # Find the actual case-sensitive version in the original query
-                pattern = re.compile(f"{re.escape(table_alias)}\\.branch_id\\b(?!\\s+as)", re.IGNORECASE)
-                match = pattern.search(original_query)
-                if match:
-                    original_text = match.group(0)
-                    replacement = f"{original_text} AS branch_id"
-                    return original_query.replace(original_text, replacement)
-                    
-            # If no branch_id found, try to add it from a branch table
-            else:
-                return self._add_branch_id_from_table(original_query, select_part_lower, from_part_lower)
-        
-        except Exception as e:
-            # Log the error but return original query to avoid breaking the system
-            _logger.warning(f"Error formatting SQL query: {e}. Using original query.")
-            return original_query
-
-    def _add_branch_id_from_table(self, original_query, select_part_lower, from_part_lower):
-        """
-        Attempt to add branch_id column by finding a branch table in the FROM clause.
-        Returns original query if no suitable branch table is found.
-        """
-        try:
-            # Look for potential branch tables in different patterns
-            branch_patterns = [
-                r"\b(\w*res_branch\w*)\s+(\w+)",  # branch_table alias
-                r"\b(\w*res_branch\w*)\b(?!\s+\w)",  # branch_table without alias
-                r"join\s+(\w*res_branch\w*)\s+(\w+)",  # JOIN branch_table alias
-                r"join\s+(\w*res_branch\w*)\b(?!\s+\w)",  # JOIN branch_table without alias
-            ]
-            
-            branch_reference = None
-            
-            for pattern in branch_patterns:
-                match = re.search(pattern, from_part_lower)
-                if match:
-                    if len(match.groups()) >= 2 and match.group(2):
-                        # Has alias
-                        branch_reference = f"{match.group(2)}.id"
-                    else:
-                        # No alias, use table name
-                        branch_reference = f"{match.group(1)}.id"
-                    break
-            
-            # If we found a branch table reference, add it to the SELECT
-            if branch_reference:
-                # Find the original SELECT part to preserve casing
-                select_start = original_query.lower().find("select")
-                from_start = original_query.lower().find(" from ")
-                original_select_part = original_query[select_start + 6:from_start].strip()
-                
-                # Add branch_id to the SELECT clause
-                if original_select_part.endswith(","):
-                    modified_select = f"{original_select_part} {branch_reference} AS branch_id"
-                else:
-                    modified_select = f"{original_select_part}, {branch_reference} AS branch_id"
-                
-                # Preserve original SELECT keyword casing
-                select_keyword = original_query[select_start:select_start + 6]
-                from_part_original = original_query[from_start:]
-                
-                return f"{select_keyword} {modified_select} {from_part_original}"
-            
-            # If no branch table found, return original query unchanged
-            # This prevents SQL errors from adding non-existent columns
-            else:
-                _logger.info("No branch table found in query. Returning original query unchanged.")
-                return original_query
-                
-        except Exception as e:
-            _logger.warning(f"Error adding branch_id from table: {e}. Using original query.")
-            return original_query
-    
-    
-    def create_csv(self, columns, rows):
-                         
-        # check if branch_id is in cloumn and store the index
-        pattern = re.compile(r'\bbranch\s*_?\s*id\b', re.IGNORECASE)
-        branch_id_indices = [i for i, col in enumerate(columns) if pattern.fullmatch(col)]
-        
-        # currency pattern
-        currency_pattern = r"^-?\d+\.\d{2}$"
-    
-        # Create a CSV in memory
-        csv_buffer = io.StringIO()
-        csv_writer = csv.writer(csv_buffer)
-        # Filter columns
-        filtered_columns = [" ".join(th.split("_")).title() for th in columns if th.lower() != 'branch_id']
-                            
-        # Write headers to the CSV
-        csv_writer.writerow(filtered_columns)
-         # Write data rows to the CSV
-        for row in rows:
-            filtered_row = [cell for index, cell in enumerate(row) if index not in branch_id_indices]
-            # Format currency values in the filtered row
-            formatted_row = [ self.format_currency(cell) for cell in filtered_row]
-            csv_writer.writerow(formatted_row)
-            
-        
-        csv_content = csv_buffer.getvalue()
-        csv_buffer.close()
-        
-        
-           # Step 3: Base64 encode the CSV content
-        encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
-
-        return encoded_content
-    
-    
-    def generate_table(self, columns, rows):
-
-                            
-        # check if branch_id is in cloumn and store the index
-        pattern = re.compile(r'\bbranch\s*_?\s*id\b', re.IGNORECASE)
-        branch_id_indices = [i for i, col in enumerate(columns) if pattern.fullmatch(col)]
-        
-        # check if currency_id is in cloumn and store the index
-        currency_pattern = r"^-?\d+\.\d{2}$"
-        
-        # Create the HTML table for the email
-                            
-        table_html = """
-            <table class="table table-bordered table-hover container-fluid" style="min-width: 100vw; max-width: 100vw; border-collapse: collapse; font-family: Arial, sans-serif; border: none; overflow:auto;">
-                <thead style="background-color: #007046; color: #fff; padding: 12px;">
-                    <tr>
-                        <!-- Table headers -->
-                        {header_columns}
-                    </tr>
-                </thead>
-                <tbody>
-                    {table_rows}
-                </tbody>
-            </table>
-            """
-                    
-        # Generate the table header
-        header_html = "".join([f"<th style='padding: 8px;'>{' '.join(header.split('_')).title()}</th>" for header in columns if header != 'branch_id'])
-        # Create the HTML table for the email
-        
-        
-        # Generate the table rows
-        rows_html = ""
-        for row in rows[:10]:
-            rows_html += "<tr>"
-            for index, cell in enumerate(row):
-                 # Check currency
-                if bool(re.search(currency_pattern, str(cell))) and cell is not None:
-                # Format the currency value
-                    cell = f"{float(cell):,.2f}"  # Format with commas and two decimal places
-               
-                if index not in branch_id_indices:
-                    
-                    rows_html += f"<td style='padding: 8px; border: 1px solid #ddd;'>{cell if cell is not None else ''}</td>"
-            rows_html += "</tr>"
-        
-        # Insert the generated HTML into the main table structure
-        table_html = table_html.format(header_columns=header_html, table_rows=rows_html)
-                    
-            
-        return table_html
-
-    
-    def prepare_email(self, rule, table_html, encoded_content, email, emailcc):
-        _logger.info(f"emailcc is {emailcc}")
-
-        template = self.env.ref('alert_management.alert_rules_mail_template')
-        
-        if template:
-                
-                    
-            # generate random string attached for each alert to be send
-            alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
-                    
-                
-                    
-            attachment = {
-                        'name': 'report.csv',
-                        'mimetype': 'text/csv',  # The MIME type for CSV files
-                        'type': 'binary',
-                        'datas': encoded_content,
-                        
+            return {
+                'status': 'success',
+                'processed': processed_count,
+                'total_rules': total_rules,
+                'emails_sent': sent_count,
+                'errors': error_count,
+                'duration': duration
             }
-                    
-            attachment_id = self.env['ir.attachment'].create(attachment)
-
             
-                    
-                        
-            # record the history
-            new_alert_history = self.env['alert.history'].create({
-                        "alert_id": alert_id,
-                        "attachment_data": attachment_id.id,
-                        "attachment_link": f"/web/content/{attachment_id.id}?download=true",
-                        "html_body": table_html,
-                        "alert_rule_id": rule.id,
-                        "process_id": rule.process_id,
-                        "risk_rating": rule.risk_rating,
-                        "last_checked": rule.last_checked,
-                        "email": ",".join([str(e) for e in email]) if email else "techsupport@novajii.com",
-                        # "email_cc": ",".join(list(emailcc)),
-                        "email_cc": ",".join([str(e) for e in emailcc]) if emailcc else "",
-                        "narration": rule.narration,
-                        "name": rule.name                    
+        except Exception as e:
+            _logger.error(f"CRITICAL ERROR in alert processing cycle: {str(e)}")
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
+
+    def _is_time_to_process(self, rule):
+        """Optimized timing logic"""
+        current_time = fields.Datetime.now()
+        
+        if not rule.next_scheduled_run:
+            if not rule.last_checked:
+                return True
+            else:
+                next_run = self._calculate_next_check_time(
+                    rule.last_checked, 
+                    rule.frequency_id.name, 
+                    rule.frequency_id.period
+                )
+                rule.write({'next_scheduled_run': next_run})
+        
+        return current_time >= rule.next_scheduled_run
+
+    def _calculate_next_check_time(self, last_checked, unit, period):
+        """Calculate next check time based on frequency"""
+        try:
+            if unit == 'minutes':
+                return last_checked + timedelta(minutes=period)
+            elif unit == 'hourly':
+                return last_checked + timedelta(hours=period)
+            elif unit == 'daily':
+                return last_checked + timedelta(days=period)
+            elif unit == 'weekly':
+                return last_checked + timedelta(weeks=period)
+            elif unit == 'monthly':
+                return last_checked + relativedelta(months=period)
+            elif unit == 'yearly':
+                return last_checked + relativedelta(years=period)
+            else:
+                _logger.error(f"Unsupported frequency unit: {unit}")
+                return last_checked + timedelta(hours=1)
+        except Exception as e:
+            _logger.error(f"Error calculating next check time: {str(e)}")
+            return last_checked + timedelta(hours=1)
+
+    def _process_single_rule_safely(self, rule):
+        """Process a single rule with comprehensive safety measures"""
+        start_time = time.time()
+        
+        try:
+            # Lock the rule for processing
+            rule.write({
+                'is_processing': True,
+                'last_error': False
             })
-                    
-                    
+            
+            # Execute the main alert logic
+            result = self._execute_smart_alert_logic(rule)
+            
+            # Mark initialization as complete if this was first run
+            if not rule.initialization_complete:
+                rule.write({'initialization_complete': True})
+            
+            # Calculate next run time
+            current_time = fields.Datetime.now()
+            next_run = self._calculate_next_check_time(
+                current_time, 
+                rule.frequency_id.name, 
+                rule.frequency_id.period
+            )
+            
+            processing_duration = time.time() - start_time
+            
+            # Update all rule fields atomically
+            rule.write({
+                'last_checked': current_time,
+                'next_scheduled_run': next_run,
+                'is_processing': False,
+                'last_email_count': result['emails_sent'],
+                'total_emails_sent': rule.total_emails_sent + result['emails_sent'],
+                'processing_duration': processing_duration,
+                'last_error': False
+            })
+            
+            # Commit rule updates immediately so they're visible in UI
+            self.env.cr.commit()
+            
+            return result
+            
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} processing failed: {str(e)}")
+            
             try:
-                mail_id =  template.send_mail(new_alert_history.id, force_send=True)
-
-                # mail_for_novajii = template.mail()
+                rule.write({
+                    'is_processing': False,
+                    'last_error': f"Error at {fields.Datetime.now()}: {str(e)}"
+                })
+            except:
+                _logger.error(f"Failed to unlock rule {rule.id} after error")
             
-                mail_record = self.env['mail.mail'].browse(mail_id)
+            return {'emails_sent': 0, 'signatures_created': 0}
 
-                if mail_record.state in ["exception", "cancel"]:
-                    # Log the failure reason
-                    _logger.error(f"Failed to send alert email: {mail_record.failure_reason}")
-                    history = self.env['alert.history'].browse(new_alert_history.id)
-                    if history.exists():
-                        history.unlink()
-                else:
-                    history = self.env['alert.history'].browse(new_alert_history.id).write({"html_body": mail_record.body_html})
-                
-                    
+    def _execute_smart_alert_logic(self, rule):
+        """SMART: Main alert execution logic with intelligent SQL analysis"""
+        try:
+            # Get the smart query with intelligent analysis
+            query = self._get_smart_banking_query(rule)
+            if not query:
+                _logger.warning(f"Rule {rule.id} - Empty or invalid query")
+                return {'emails_sent': 0, 'signatures_created': 0}
+            
+            # Execute query with proper error handling
+            try:
+                with self.env.cr.savepoint():
+                    self.env.cr.execute(query)
+                    rows = self.env.cr.fetchall()
+                    columns = [desc[0] for desc in self.env.cr.description]
             except Exception as e:
-                history = self.env['alert.history'].browse(new_alert_history.id)
-                    
-                if history.exists():
-                    history.unlink()
-
-                
+                _logger.error(f"Rule {rule.id} SQL execution error: {str(e)}")
+                return {'emails_sent': 0, 'signatures_created': 0}
             
+            total_records = len(rows)
+            
+            # Update rule with record count
+            rule.write({'last_record_count': total_records})
+            
+            # Early return if no records
+            if not rows:
+                return {'emails_sent': 0, 'signatures_created': 0}
+            
+            # Get only truly new records
+            new_records_result = self._get_new_records_optimized(rule, rows, columns)
+            new_records = new_records_result['new_records']
+            signatures_created = new_records_result['signatures_created']
+            
+            new_record_count = len(new_records)
+            
+            # Update rule with new record count and signature count
+            rule.write({
+                'last_new_record_count': new_record_count,
+                'total_signatures_stored': rule.total_signatures_stored + signatures_created
+            })
+            
+            if not new_records:
+                return {'emails_sent': 0, 'signatures_created': signatures_created}
+            
+            # Send alerts for new records with smart routing
+            emails_sent = self._smart_route_alert_by_type(rule, new_records, columns)
+            
+            return {'emails_sent': emails_sent, 'signatures_created': signatures_created}
+            
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} execution error: {str(e)}")
+            return {'emails_sent': 0, 'signatures_created': 0}
+
+    # ========================================
+    # SMART QUERY METHODS
+    # ========================================
+    def _get_smart_banking_query(self, rule):
+        """
+        SMART BANKING QUERY: Intelligent SQL analysis and time filter application
+        """
+        try:
+            if not rule.sql_text or not rule.sql_text.query:
+                return ""
+            
+            query = rule.sql_text.query.strip()
+            
+            # Basic validation
+            if not query.upper().startswith('SELECT'):
+                _logger.warning(f"Rule {rule.id} - Query doesn't start with SELECT")
+                return ""
+            
+            # Remove trailing semicolon if present
+            if query.endswith(";"):
+                query = query[:-1]
+            
+            # SMART ANALYSIS
+            analyzer = SmartSQLAnalyzer()
+            analysis_result = analyzer.analyze_query(query)
+            
+            _logger.info(f"Rule {rule.id} - SQL analysis: {analysis_result['method']} (confidence: {analysis_result['confidence']})")
+            
+            # SMART TIME FILTER APPLICATION
+            filter_engine = SmartTimeFilterEngine(analysis_result)
+            enhanced_query = filter_engine.add_smart_time_filter(query, rule)
+            
+            # Add ORDER BY if not present
+            if "ORDER BY" not in enhanced_query.upper():
+                try:
+                    main_alias = analysis_result.get('main_alias')
+                    if main_alias:
+                        enhanced_query += f" ORDER BY {main_alias}.id DESC"
+                    elif analysis_result.get('main_table'):
+                        enhanced_query += f" ORDER BY id DESC"
+                except Exception:
+                    pass
+            
+            return enhanced_query
+            
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} smart query generation error: {str(e)}")
+            # Fallback to basic logic
+            return self._fallback_query_logic(rule)
     
-        else:
-            raise ValidationError("Mail Template Not Found")
-                                        
-                                    
-                            
-    def get_first_table_alias(self, query):
-        pattern = r'FROM\s+[a-zA-Z0-9_"]+\s+([a-zA-Z0-9_"]+)'
-        match = re.search(pattern, query, re.IGNORECASE)
-        if match:
-            return match.group(1)  # Only the alias is captured
-        return None
-
-    def _generate_record_signatures(self, rows, columns):
-        """Generate unique signatures for each record to track individual changes"""
-        try:
-            signatures = set()
-            
-            for row in rows:
-                # Create a normalized version of the row
-                normalized_row = tuple(["<NULL>" if cell is None else str(cell) for cell in row])
-                
-                # Generate a signature for this specific record
-                record_string = json.dumps(normalized_row, sort_keys=True)
-                signature = hashlib.md5(record_string.encode()).hexdigest()
-                signatures.add(signature)
-            
-            return signatures
-        
-        except Exception as e:
-            _logger.warning(f"Error generating record signatures: {e}")
-            return set()
-
-    def _get_previous_record_signatures(self, rule, branch_id=None):
-        """Get the previous record signatures for this rule/branch combination"""
-        hash_key = f"alert_records_{rule.id}"
-        if branch_id:
-            hash_key += f"_branch_{branch_id}"
-        
-        try:
-            stored_signatures = self.env['ir.config_parameter'].sudo().get_param(hash_key, default="")
-            if stored_signatures:
-                return set(json.loads(stored_signatures))
-            return set()
-        except:
-            return set()
-
-    def _store_record_signatures(self, rule, signatures, branch_id=None):
-        """Store the current record signatures for future comparison"""
-        hash_key = f"alert_records_{rule.id}"
-        if branch_id:
-            hash_key += f"_branch_{branch_id}"
-        
-        try:
-            signatures_json = json.dumps(list(signatures))
-            self.env['ir.config_parameter'].sudo().set_param(hash_key, signatures_json)
-        except Exception as e:
-            _logger.warning(f"Error storing record signatures: {e}")
-
-    def _get_new_records_only(self, rule, current_rows, columns, branch_id=None):
+    def _fallback_query_logic(self, rule):
         """
-        Compare current data with previous data and return only new records
-        Returns: (new_records, has_new_records)
+        Fallback to returning the exact raw query string when smart analysis fails entirely.
+        This prevents silent failures and ensures the user's raw SQL is respected.
         """
+        try:
+            query = rule.sql_text.query.strip()
+            if query.endswith(";"):
+                query = query[:-1]
+            return query
+            
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} fallback query error: {str(e)}")
+            return ""
+
+    # ========================================
+    # SIGNATURE DETECTION METHODS (PRESERVED)
+    # ========================================
+    def _get_new_records_optimized(self, rule, current_rows, columns):
+        """Get new records with enhanced signature management"""
         if not current_rows:
-            return [], False
-        
-        # Generate signatures for current records
-        current_signatures = self._generate_record_signatures(current_rows, columns)
-        
-        # Get previously seen signatures  
-        previous_signatures = self._get_previous_record_signatures(rule, branch_id)
-
-        # Find new signatures (records we haven't seen before)
-        new_signatures = current_signatures - previous_signatures
-    
-        if not new_signatures:
-            _logger.info(f"No new records found for rule {rule.id}" + 
-                        (f" branch {branch_id}" if branch_id else ""))
-            return [], False
-        
-        # Filter current_rows to only include new records
-        new_records = []
-        for row in current_rows:
-            # Generate signature for this row
-            normalized_row = tuple(["<NULL>" if cell is None else str(cell) for cell in row])
-            record_string = json.dumps(normalized_row, sort_keys=True)
-            signature = hashlib.md5(record_string.encode()).hexdigest()
-            
-            # If this signature is new, include the record
-            if signature in new_signatures:
-                new_records.append(row)
-        
-        _logger.info(f"Found {len(new_records)} new records out of {len(current_rows)} total records for rule {rule.id}" + 
-                    (f" branch {branch_id}" if branch_id else ""))
-        
-        # Store all current signatures (including old ones) for next comparison
-        self._store_record_signatures(rule, current_signatures, branch_id)
-        
-        return new_records, True
-
-    def _clear_alert_record_signatures(self, rule, branch_id=None):
-        """Clear the stored signatures when no data exists"""
-        hash_key = f"alert_records_{rule.id}"
-        if branch_id:
-            hash_key += f"_branch_{branch_id}"
+            return {'new_records': [], 'signatures_created': 0}
         
         try:
-            self.env['ir.config_parameter'].sudo().set_param(hash_key, "")
+            # Generate signatures for current records
+            current_signatures_data = self._generate_signatures_with_dates(current_rows, columns)
+            current_signatures = set(sig['hash'] for sig in current_signatures_data)
+            
+            # Get existing signatures from database
+            existing_signatures = self._get_existing_signatures_optimized(rule)
+            
+            # Find new signatures
+            new_signatures = current_signatures - existing_signatures
+            
+            if not new_signatures:
+                # Update last_seen_date for existing signatures
+                self._update_existing_signatures_last_seen(rule, existing_signatures)
+                return {'new_records': [], 'signatures_created': 0}
+            
+            # Get new records and their data
+            new_records = []
+            new_signature_data = []
+            
+            for i, row in enumerate(current_rows):
+                sig_data = current_signatures_data[i]
+                if sig_data['hash'] in new_signatures:
+                    new_records.append(row)
+                    new_signature_data.append(sig_data)
+            
+            # Store new signatures in database
+            signatures_created = self._store_new_signatures_optimized(rule, new_signature_data)
+            
+            # Update existing signatures
+            self._update_existing_signatures_last_seen(rule, existing_signatures)
+            
+            return {'new_records': new_records, 'signatures_created': signatures_created}
+            
         except Exception as e:
-            _logger.warning(f"Error clearing record signatures: {e}")
+            _logger.error(f"Rule {rule.id} signature detection error: {str(e)}")
+            return {'new_records': [], 'signatures_created': 0}
 
-    def _find_branch_column_index(self, columns):
-        """Find the index of branch_id column dynamically"""
+    def _generate_signatures_with_dates(self, rows, columns):
+        """Generate signatures with associated record dates"""
+        signatures_data = []
+        
+        # Try to find date column in results
+        date_column_index = self._find_date_column_index(columns)
+        
+        for row in rows:
+            try:
+                # Generate signature
+                signature_hash = self._generate_single_record_signature(row)
+                if not signature_hash:
+                    continue
+                
+                # Extract record date
+                record_date = None
+                if date_column_index is not None:
+                    try:
+                        date_value = row[date_column_index]
+                        if isinstance(date_value, str):
+                            record_date = datetime.strptime(date_value, '%Y-%m-%d').date()
+                        elif isinstance(date_value, datetime):
+                            record_date = date_value.date()
+                        elif hasattr(date_value, 'date'):
+                            record_date = date_value.date()
+                    except:
+                        record_date = fields.Date.today()
+                else:
+                    record_date = fields.Date.today()
+                
+                signatures_data.append({
+                    'hash': signature_hash,
+                    'record_date': record_date
+                })
+                
+            except Exception:
+                continue
+        
+        return signatures_data
+
+    def _find_date_column_index(self, columns):
+        """Find date column index in query results"""
+        date_patterns = ['date_created', 'created_at', 'date', 'created']
+        
         for i, column in enumerate(columns):
-            if 'branch_id' in column.lower():
+            if any(pattern in column.lower() for pattern in date_patterns):
                 return i
         return None
 
-    def _get_distinct_branches(self, rows, branchcode_index):
-        """Extract distinct non-null branch codes from rows"""
-        branches = []
-        for row in rows:
-            branchcode = row[branchcode_index]
-            if branchcode and branchcode != "" and branchcode not in branches:
-                branches.append(branchcode)
-        return branches
+    def _generate_single_record_signature(self, row):
+        """Generate sha256 signature for a single record"""
+        try:
+            # Normalize the row data
+            normalized_row = []
+            for cell in row:
+                if cell is None:
+                    normalized_row.append("<NULL>")
+                elif isinstance(cell, (str, int, float, bool)):
+                    normalized_row.append(str(cell))
+                elif isinstance(cell, datetime):
+                    normalized_row.append(cell.isoformat())
+                else:
+                    normalized_row.append(str(cell))
+            
+            # Create JSON string and hash
+            normalized_tuple = tuple(normalized_row)
+            record_string = json.dumps(normalized_tuple, sort_keys=True, ensure_ascii=True)
+            
+            return hashlib.sha256(record_string.encode('utf-8')).hexdigest()
+            
+        except Exception:
+            return None
 
-    def _send_general_alert_with_new_records_only(self, rule, query, rows, columns):
-        """Send alert to general alert group with only new records"""
-        # Get only new records
-        new_records, has_new_records = self._get_new_records_only(rule, rows, columns)
+    def _get_existing_signatures_optimized(self, rule):
+        """Get existing signatures from database"""
+        try:
+            existing_signatures = self.env['alert.signature'].search([
+                ('alert_rule_id', '=', rule.id)
+            ])
+            
+            return set(sig.signature_hash for sig in existing_signatures)
+            
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} - Error getting existing signatures: {str(e)}")
+            return set()
+
+    def _store_new_signatures_optimized(self, rule, signature_data):
+        """Store new signatures with deduplication and error handling"""
+        try:
+            if not signature_data:
+                return 0
+            
+            current_time = fields.Datetime.now()
+            
+            # Remove duplicates within the same batch
+            unique_signatures = {}
+            for sig_data in signature_data:
+                # Use signature hash as key to automatically deduplicate
+                unique_signatures[sig_data['hash']] = sig_data
+            
+            # Batch insert with duplicate handling
+            batch_size = 1000  # Process in smaller batches
+            total_created = 0
+            
+            unique_sig_list = list(unique_signatures.values())
+            
+            for i in range(0, len(unique_sig_list), batch_size):
+                batch = unique_sig_list[i:i + batch_size]
+                
+                try:
+                    # Prepare batch data
+                    create_data = []
+                    for sig_data in batch:
+                        create_data.append({
+                            'alert_rule_id': rule.id,
+                            'signature_hash': sig_data['hash'],
+                            'record_date': sig_data['record_date'],
+                            'created_date': current_time,
+                            'last_seen_date': current_time
+                        })
+                    
+                    # Use individual inserts for safety with constraint handling
+                    for record_data in create_data:
+                        try:
+                            with self.env.cr.savepoint():
+                                self.env['alert.signature'].create(record_data)
+                                total_created += 1
+                        except Exception as e:
+                            if 'duplicate key value violates unique constraint' in str(e):
+                                # Signature already exists, skip it
+                                continue
+                            else:
+                                # Some other error, log and continue
+                                _logger.warning(f"Rule {rule.id} - Error creating signature: {str(e)}")
+                                continue
+                    
+                except Exception as e:
+                    _logger.error(f"Rule {rule.id} - Error in signature batch: {str(e)}")
+                    continue
+            
+            return total_created
+            
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} - Failed to store signatures: {str(e)}")
+            return 0
+
+    def _update_existing_signatures_last_seen(self, rule, existing_signatures):
+        """Update last_seen_date for existing signatures"""
+        try:
+            if not existing_signatures:
+                return
+            
+            # Find signature records to update
+            signature_records = self.env['alert.signature'].search([
+                ('alert_rule_id', '=', rule.id),
+                ('signature_hash', 'in', list(existing_signatures))
+            ])
+            
+            if signature_records:
+                signature_records.write({
+                    'last_seen_date': fields.Datetime.now()
+                })
+            
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} - Error updating last_seen_date: {str(e)}")
+
+    # ========================================
+    # EMAIL TEMPLATE CONFIGURATION METHODS
+    # ========================================
+    def _get_template_config_for_email(self):
+        """Get active template configuration for email generation - FIXED VERSION"""
+        try:
+            template_config = self.env['email.template.config'].get_active_template()
+            if template_config:
+                # FIXED: Proper logo handling
+                logo_data = None
+                if template_config.effective_logo:
+                    # Convert logo to proper format for email embedding
+                    logo_data = template_config.effective_logo
+                
+                return {
+                    'config': template_config,
+                    'button_color': template_config.button_bg_color or '#28a745',
+                    'button_text_color': template_config.button_text_color or '#ffffff',
+                    'button_radius': template_config.button_border_radius or 8,
+                    'primary_color': template_config.primary_brand_color or '#007046',
+                    'font_family': dict(template_config._fields['font_family'].selection)[template_config.font_family] if template_config.font_family else 'Arial, sans-serif',
+                    'email_width': template_config.email_width or 590,
+                    'content_padding': template_config.content_padding or 16,
+                    'logo_data': logo_data,
+                    'logo_width': template_config.logo_width or 192,
+                    'logo_height': template_config.logo_height or 192,
+                    'show_footer': template_config.show_footer,
+                    'footer_bg_color': template_config.footer_bg_color or '#ffffff',
+                    'footer_text_color': template_config.footer_text_color or '#454748',
+                    'company_name': template_config.effective_company_name,
+                    'has_config': True
+                }
+            else:
+                return {
+                    'config': None,
+                    'button_color': '#28a745',
+                    'button_text_color': '#ffffff', 
+                    'button_radius': 8,
+                    'primary_color': '#007046',
+                    'font_family': 'Arial, sans-serif',
+                    'email_width': 590,
+                    'content_padding': 16,
+                    'logo_data': None,
+                    'show_footer': True,
+                    'has_config': False
+                }
+        except Exception as e:
+            _logger.error(f"Error getting template config: {str(e)}")
+            return {
+                'config': None,
+                'has_config': False,
+                'email_width': 590,
+            }
+
+    
+    def _generate_html_table_with_template_config(self, columns, rows):
+        """Generate PROPERLY RESPONSIVE HTML table - FIXED VERSION"""
+        try:
+            # Get active template configuration
+            template_config = self.env['email.template.config'].get_active_template()
+            
+            if template_config:
+                # Use template config colors
+                header_bg = template_config.table_header_bg_color or '#007046'
+                header_text = template_config.table_header_text_color or '#ffffff'
+                border_color = template_config.table_border_color or '#dddddd'
+                even_row_color = template_config.table_row_even_color or '#f9f9f9'
+                odd_row_color = template_config.table_row_odd_color or '#ffffff'
+                font_family = dict(template_config._fields['font_family'].selection)[template_config.font_family] if template_config.font_family else 'Arial, sans-serif'
+            else:
+                # Fallback to default colors
+                header_bg = '#007046'
+                header_text = '#ffffff'
+                border_color = '#dddddd'
+                even_row_color = '#f9f9f9'
+                odd_row_color = '#ffffff'
+                font_family = 'Arial, sans-serif'
+            
+            # Filter out branch_id columns
+            pattern = re.compile(r'\bbranch\s*_?\s*id\b', re.IGNORECASE)
+            branch_id_indices = [i for i, col in enumerate(columns) if pattern.fullmatch(col)]
+            
+            # Generate headers
+            header_html = ""
+            for i, col in enumerate(columns):
+                if i not in branch_id_indices:
+                    header_html += f"""<th style='padding: 8px; background-color: {header_bg}; color: {header_text}; border: 1px solid {border_color}; font-family: {font_family}; font-size: 14px; text-align: left;'>{' '.join(col.split('_')).title()}</th>"""
+            
+            # Generate rows (limit for email)
+            max_rows = 20
+            rows_html = ""
+            
+            for row_index, row in enumerate(rows[:max_rows]):
+                bg_color = even_row_color if row_index % 2 == 0 else odd_row_color
+                rows_html += "<tr>"
+                for i, cell in enumerate(row):
+                    if i not in branch_id_indices:
+                        formatted_cell = self._format_cell_for_html(cell)
+                        rows_html += f"""<td style='padding: 8px; border: 1px solid {border_color}; background-color: {bg_color}; font-family: {font_family}; font-size: 14px;'>{formatted_cell}</td>"""
+                rows_html += "</tr>"
+            
+            # Truncation message
+            if len(rows) > max_rows:
+                colspan = len([col for i, col in enumerate(columns) if i not in branch_id_indices])
+                rows_html += f"""
+                <tr>
+                    <td colspan='{colspan}' style='padding: 8px; font-style: italic; text-align: center; background-color: #fffacd; border: 1px solid {border_color}; font-family: {font_family}; font-size: 12px;'>
+                        ... and {len(rows) - max_rows} more record(s). See attached CSV for complete data.
+                    </td>
+                </tr>
+                """
+            
+            # FIXED: PROPERLY RESPONSIVE TABLE
+            # Takes full width first, only scrolls when actually needed
+            return f"""
+            <div style="width: 100%; margin: 10px 0; overflow-x: auto;">
+                <table style="
+                    border-collapse: collapse; 
+                    font-family: {font_family}; 
+                    width: 100%;
+                    font-size: 14px;
+                ">
+                    <thead><tr>{header_html}</tr></thead>
+                    <tbody>{rows_html}</tbody>
+                </table>
+            </div>
+            """
+            
+        except Exception as e:
+            _logger.error(f"Error generating HTML table with template config: {str(e)}")
+            # Fallback to original method
+            return self._generate_html_table_optimized(columns, rows)
+
+    # ========================================
+    # SMART ALERT ROUTING METHODS WITH TEMPLATE CONFIG
+    # ========================================
+    def _smart_route_alert_by_type(self, rule, new_records, columns):
+        """SMART: Enhanced alert routing with template configuration support"""
+        if not rule.alert_id:
+            _logger.warning(f"Rule {rule.id} - No alert group configured")
+            return 0
         
-        if not has_new_records:
-            return
-        
+        try:
+            if rule.alert_id.tag == "internal":
+                return self._send_smart_internal_alert_with_config(rule, new_records, columns)
+            else:
+                return self._send_smart_external_alert_with_config(rule, new_records, columns)
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} smart alert routing error: {str(e)}")
+            return 0
+
+    def _send_smart_internal_alert_with_config(self, rule, new_records, columns):
+        """Send smart internal alert with template configuration"""
+        # Build recipient lists (same as before)
         mailto = set()
         mailcc = set()
-
-        # Build recipient lists
-        for user in rule.alert_id.email:
-            mailto.add(user.login)
         
-        for user in rule.alert_id.email_cc:
-            mailcc.add(user.login)
-        
-        for user in rule.specific_email_recipients:
-            mailcc.add(user.login)
-        
-        # Only send if there are recipients and new records
-        if (len(mailto) > 0 or len(mailcc) > 0) and new_records:
-            encoded_content = self.create_csv(columns, new_records)
-            table_html = self.generate_table(columns, new_records)
-            
-            # Add info about new records count to the email
-            info_html = f"<p><strong>Alert Summary:</strong> {len(new_records)} new record(s) found</p>"
-            table_html = info_html + table_html
-            
-            self.prepare_email(rule, table_html, encoded_content, mailto, mailcc)
-
-    def _send_branch_officer_alert_with_new_records_only(self, rule, query, branch_officer, branch_id):
-        """Send alert to specific branch officer with only new records"""
-        # Modify query to filter by branch
-        if query.endswith(';'):
-            query = query[:-1]
-
-        # --- STEP 1: Extract and remove existing ORDER BY ---
-        order_by_clause = ""
-        query_upper = query.upper()
-        
-        if "ORDER BY" in query_upper:
-            order_by_index = query_upper.rindex("ORDER BY")
-            order_by_clause = query[order_by_index:]  # Keep the ORDER BY part
-            query = query[:order_by_index]            # Remove it from main query
-            query_upper = query_upper[:order_by_index]
-
-        # --- STEP 2: Add WHERE / AND clause ---
-        if "WHERE" in query_upper:
-            updated_query = f"{query} AND branch_id = '{branch_officer.branch_id.id}'"
-        else:
-            updated_query = f"{query} WHERE branch_id = '{branch_officer.branch_id.id}'"
-
-        # --- STEP 3: Re-add ORDER BY at the end ---
-        if order_by_clause:
-            updated_query += " " + order_by_clause
-
-        _logger.info(f"Branch-specific query for branch {branch_id}: {updated_query}")
-        
-        # Execute branch-specific query
-        self.env.cr.execute(updated_query)
-        branch_rows = self.env.cr.fetchall()
-        branch_columns = [desc[0] for desc in self.env.cr.description]
-        
-        # Skip if no records for this branch
-        if len(branch_rows) == 0:
-            _logger.info(f"No records found for branch {branch_id}, clearing signatures")
-            self._clear_alert_record_signatures(rule, branch_id)
-            return
-        
-        # Get only new records for this branch
-        new_records, has_new_records = self._get_new_records_only(rule, branch_rows, branch_columns, branch_id)
-        
-        if not has_new_records:
-            return
-        
-        encoded_content = self.create_csv(branch_columns, new_records)
-        table_html = self.generate_table(branch_columns, new_records)
-        
-        # Add info about new records count
-        info_html = f"<p><strong>Branch Alert Summary:</strong> {len(new_records)} new record(s) found for {branch_officer.branch_id.name}</p>"
-        table_html = info_html + table_html
-        
-        self.prepare_email(rule, table_html, encoded_content, 
-                        [branch_officer.officer.login], "")
-
-    def _send_internal_alert_with_new_records_only(self, rule, query, rows, columns):
-        """Send internal alert with only new records"""
-        # Get only new records
-        new_records, has_new_records = self._get_new_records_only(rule, rows, columns)
-
-        _logger.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        _logger.info(has_new_records)
-        _logger.info(new_records)
-        
-        if not has_new_records:
-            return
-        
-        mailto = set()
-        mailcc = set()
-        
-        # Build recipient lists for internal alerts
         if rule.first_owner:
             mailto.add(rule.first_owner.login)
         if rule.second_owner:
@@ -758,104 +1344,666 @@ class alert_rules(models.Model):
         for user in rule.specific_email_recipients:
             mailto.add(user.login)
         
-        for user in rule.alert_id.email_cc:
+        if rule.alert_id:
+            try:
+                for user in rule.alert_id.email_cc:
+                    mailcc.add(user.login)
+            except AttributeError:
+                pass
+        
+        # Remove duplicates
+        mailcc = mailcc - mailto
+        
+        if not mailto and not mailcc:
+            _logger.warning(f"Rule {rule.id} - No recipients configured")
+            return 0
+        
+        # Create email content with template configuration
+        encoded_content = self._create_csv_attachment_optimized(columns, new_records)
+        table_html = self._generate_html_table_with_template_config(columns, new_records)
+        
+        # Send email
+        return self._send_email_optimized(rule, table_html, encoded_content, mailto, mailcc)
+
+    def _send_smart_external_alert_with_config(self, rule, new_records, columns):
+        """Send smart external alert with template configuration"""
+        # Check for branch-specific routing
+        branch_column_index = self._find_branch_column_index(columns)
+        
+        if branch_column_index is not None:
+            return self._handle_smart_branch_alerts_with_config(rule, new_records, columns, branch_column_index)
+        else:
+            return self._send_general_external_alert_with_config(rule, new_records, columns)
+
+    def _handle_smart_branch_alerts_with_config(self, rule, new_records, columns, branch_column_index):
+        """Handle branch alerts with template configuration"""
+        # Separate records by branch vs NULL
+        branch_records = {}
+        null_branch_records = []
+        
+        for record in new_records:
+            try:
+                branch_id = record[branch_column_index]
+                if branch_id and str(branch_id).strip():
+                    if branch_id not in branch_records:
+                        branch_records[branch_id] = []
+                    branch_records[branch_id].append(record)
+                else:
+                    null_branch_records.append(record)
+            except (IndexError, TypeError):
+                null_branch_records.append(record)
+        
+        total_emails = 0
+        
+        # Process branch-specific records
+        for branch_id, branch_recs in branch_records.items():
+            try:
+                emails_sent = self._send_general_external_alert_with_config(rule, branch_recs, columns)
+                total_emails += emails_sent
+                _logger.info(f"Rule {rule.id} - Branch {branch_id}: {emails_sent} emails sent")
+            except Exception as e:
+                _logger.error(f"Rule {rule.id} - Error processing branch {branch_id}: {str(e)}")
+                continue
+        
+        # Handle NULL branch_id records with control officer
+        if null_branch_records:
+            try:
+                emails_sent = self._send_to_control_officer_with_config(rule, null_branch_records, columns)
+                total_emails += emails_sent
+                _logger.info(f"Rule {rule.id} - NULL branch records sent to control officer: {emails_sent} emails")
+            except Exception as e:
+                _logger.error(f"Rule {rule.id} - Error sending to control officer: {str(e)}")
+        
+        return total_emails
+
+    def _send_general_external_alert_with_config(self, rule, new_records, columns):
+        """Send general external alert with template configuration"""
+        mailto = set()
+        mailcc = set()
+        
+        if rule.alert_id:
+            try:
+                for user in rule.alert_id.email:
+                    mailto.add(user.login)
+            except AttributeError:
+                pass
+            
+            try:
+                for user in rule.alert_id.email_cc:
+                    mailcc.add(user.login)
+            except AttributeError:
+                pass
+        
+        for user in rule.specific_email_recipients:
             mailcc.add(user.login)
         
-        # Remove duplicates: if email exists in mailto, exclude from mailcc
-        mailcc = mailcc - mailto
-
+        if not mailto and not mailcc:
+            _logger.warning(f"Rule {rule.id} - No external recipients configured")
+            return 0
         
-        # encoded_content = self.create_csv(columns, new_records)
-        encoded_content = self.create_csv(columns, rows)
-        # table_html = self.generate_table(columns, new_records)
-        table_html = self.generate_table(columns, rows)
+        encoded_content = self._create_csv_attachment_optimized(columns, new_records)
+        table_html = self._generate_html_table_with_template_config(columns, new_records)
         
-        # Add info about new records count
-        # info_html = f"<p><strong>Internal Alert Summary:</strong> {len(new_records)} new record(s) found</p>"
-        # table_html = info_html + table_html
-        
-        self.prepare_email(rule, table_html, encoded_content, mailto, mailcc)
+        return self._send_email_optimized(rule, table_html, encoded_content, mailto, mailcc)
 
-    def _handle_branch_specific_alerts_with_new_records_only(self, rule, query, rows, columns, branchcode_index):
-        """Handle alerts that need to be partitioned by branch with new records only"""
-        branches = self._get_distinct_branches(rows, branchcode_index)
-        general_alert_sent = False
-
-        _logger.info(f"Found {len(branches)} distinct branches: {branches}")
-        
-        for branch in branches:
-            branch_officer = self.env['control.officer'].sudo().search([
-                ("branch_id", '=', int(branch))
-            ])
-            
-            if branch_officer and rule.alert_id.id == branch_officer.alert_id.id:
-                _logger.info(f"Sending branch-specific alert to {branch_officer.officer.name} for branch {branch}")
-                # Send branch-specific alert to branch officer with new records only
-                self._send_branch_officer_alert_with_new_records_only(rule, query, branch_officer, int(branch))
-            else:
-                # No specific branch officer, send to general alert group (only once)
-                if not general_alert_sent:
-                    _logger.info(f"No specific branch officer found for branch {branch}, sending to general alert group")
-                    self._send_general_alert_with_new_records_only(rule, query, rows, columns)
-                    general_alert_sent = True
-
-    def send_alert(self, rule):
-        """
-        Main method to send alerts with new records only detection
-        This prevents duplicate notifications by only sending records that haven't been seen before
-        """
+    def _send_to_control_officer_with_config(self, rule, null_records, columns):
+        """Send NULL branch_id records to control officer with template configuration"""
         try:
-            query: str = self.format_query(rule)
-
-            # Get alias for safe ORDER BY
-            alias = self.get_first_table_alias(query)
-
-            # Add ORDER BY safely if not already present
-            if "ORDER BY" not in query.upper():
-                if query.endswith(";"):
-                    query = query[:-1]
-                if alias:
-                    query += f" ORDER BY {alias}.id DESC;"
-                else:
-                    query += " ORDER BY id DESC;"
-
-            _logger.info(f"Processing alert rule: {rule.name}")
-            _logger.info(f"Final query: {query}")
-
-            # Execute initial query to get all data
-            self.env.cr.execute(f'{query}')
-            rows = self.env.cr.fetchall()
-            columns = [desc[0] for desc in self.env.cr.description]
+            # Find control officer for this alert group
+            control_officer = self.env['control.officer'].search([
+                ('alert_id', '=', rule.alert_id.id)
+            ], limit=1)
             
-            # Early return if no records found
-            if len(rows) == 0:
-                _logger.info("No records found, clearing stored signatures")
-                # Clear previous signatures since no data exists
-                self._clear_alert_record_signatures(rule)
-                return
+            if not control_officer:
+                _logger.warning(f"Rule {rule.id} - No control officer found for alert group {rule.alert_id.name}")
+                return self._send_general_external_alert_with_config(rule, null_records, columns)
             
-
-
-            # Determine alert routing based on alert type
-            if rule.alert_id.tag != "internal":
-                # External alert handling - check for branch partitioning
-                branchcode_index = self._find_branch_column_index(columns)
-                
-                if branchcode_index is not None:
-                    _logger.info("Branch column found, handling branch-specific alerts")
-                    # Handle branch-specific alerts with new records only
-                    self._handle_branch_specific_alerts_with_new_records_only(rule, query, rows, columns, branchcode_index)
-                else:
-                    _logger.info("No branch column found, sending to general alert group")
-                    # No branch column found, send to general alert group with new records only
-                    self._send_general_alert_with_new_records_only(rule, query, rows, columns)
-            else:
-                _logger.info("Internal alert type, sending to internal recipients")
-                # Internal alert handling with new records only
-                self._send_internal_alert_with_new_records_only(rule, query, rows, columns)
-
-            _logger.info(f"Alert processing completed for rule: {rule.name}")
-
+            # Build recipient list
+            mailto = {control_officer.officer.login}
+            mailcc = set()
+            
+            for user in rule.specific_email_recipients:
+                mailcc.add(user.login)
+            
+            if rule.alert_id:
+                try:
+                    for user in rule.alert_id.email_cc:
+                        mailcc.add(user.login)
+                except AttributeError:
+                    pass
+            
+            mailcc = mailcc - mailto
+            
+            # Create email content with template configuration
+            encoded_content = self._create_csv_attachment_optimized(columns, null_records)
+            table_html = self._generate_html_table_with_template_config(columns, null_records)
+            
+            # Get template config for styling the control officer note
+            template_info = self._get_template_config_for_email()
+            primary_color = template_info.get('primary_color', '#007046')
+            
+            # Add control officer note with dynamic styling
+            control_note = f"""
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-family: {template_info.get('font_family', 'Arial, sans-serif')};">
+                <strong style="color: {primary_color};">Control Officer Alert:</strong> These records have NULL/missing branch_id and require your attention.
+                <br><strong>Control Officer:</strong> {control_officer.officer.name}
+                <br><strong>Branch:</strong> {control_officer.branch_id.name if control_officer.branch_id else 'N/A'}
+            </div>
+            """
+            table_html = control_note + table_html
+            
+            return self._send_email_optimized(rule, table_html, encoded_content, mailto, mailcc)
+            
         except Exception as e:
-            _logger.error(f"Error processing alert rule {rule.name}: {str(e)}")
-            raise ValueError(f"Alert processing failed: {str(e)}")
+            _logger.error(f"Rule {rule.id} - Error in control officer routing: {str(e)}")
+            return self._send_general_external_alert_with_config(rule, null_records, columns)
+
+    def _find_branch_column_index(self, columns):
+        """Find branch_id column index"""
+        for i, column in enumerate(columns):
+            if 'branch_id' in column.lower():
+                return i
+        return None
+
+    # ========================================
+    # EMAIL UTILITIES (UPDATED WITH TEMPLATE CONFIG SUPPORT)
+    # ========================================
+    
+    def _send_email_optimized(self, rule, table_html, encoded_content, mailto, mailcc):
+        """Send email with dynamic template integration"""
+        _logger.info(f"Rule {rule.id} - Sending email to {len(mailto)} TO, {len(mailcc)} CC")
+        
+        try:
+            # Get template (updated reference path)
+            template = self.env.ref('alert_management.alert_rules_mail_template', raise_if_not_found=False)
+            if not template:
+                # Fallback search
+                template = self.env['mail.template'].search([
+                    ('name', '=', 'Alert Mailing System')
+                ], limit=1)
+            
+            if not template:
+                _logger.error(f"Rule {rule.id} - Mail template not found")
+                return 0
+            
+            # Create attachment
+            attachment_id = self._create_attachment_optimized(encoded_content)
+            
+            # Generate alert ID
+            alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
+            
+            # Get template configuration for email context
+            template_config = self.env['email.template.config'].get_active_template()
+            
+            # Create alert history with template context
+            alert_history = self.env['alert.history'].create({
+                "alert_id": alert_id,
+                "attachment_data": attachment_id.id,
+                "attachment_link": f"/web/content/{attachment_id.id}?download=true",
+                "html_body": table_html,
+                "ref_id": f"alert.rules,{rule.id}",
+                "process_id": rule.process_id or "",
+                "risk_rating": rule.risk_rating,
+                "priority_level": rule.priority_level or "medium",
+                "last_checked": rule.last_checked,
+                "email": ",".join(list(mailto)) if mailto else "",
+                "email_cc": ",".join(list(mailcc)) if mailcc else "",
+                "narration": rule.narration or "",
+                "name": rule.name,
+                # "source": "alert_rules",
+                "source": "alert rules",
+                # Add template config to context
+                "template_config_id": template_config.id if template_config else False
+            })
+            
+            # Send email
+            mail_id = template.send_mail(alert_history.id, force_send=True)
+            
+            # CRITICAL: Commit immediately so alert history shows in UI right away
+            # Without this, alert history only commits when entire process_alert_rules() completes
+            # which can cause delays of hours/days if multiple rules are processing
+            self.env.cr.commit()
+            _logger.info(f"Rule {rule.id} - Alert history committed to database")
+            
+            # Check status
+            mail_record = self.env['mail.mail'].browse(mail_id)
+            if mail_record.state in ["exception", "cancel"]:
+                _logger.error(f"Rule {rule.id} - Email failed: {mail_record.failure_reason}")
+                return 0
+            else:
+                _logger.info(f"Rule {rule.id} - Email sent successfully")
+                return 1
+                
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} - Email sending failed: {str(e)}")
+            return 0
+        
+    def _create_enhanced_email_html(self, table_html, template_info, rule):
+        """Create enhanced email HTML - FIXED VERSION (No 'Company Logo' text)"""
+        try:
+            if not template_info.get('has_config'):
+                return table_html  # Return simple table if no config
+            
+            email_width = template_info.get('email_width', 590)
+            content_padding = template_info.get('content_padding', 16)
+            font_family = template_info.get('font_family', 'Arial, sans-serif')
+            primary_color = template_info.get('primary_color', '#007046')
+            
+            # FIXED: Logo handling - NO PLACEHOLDER TEXT
+            logo_section = ""
+            if template_info.get('logo_data'):
+                logo_width = template_info.get('logo_width', 192)
+                logo_height = template_info.get('logo_height', 192)
+                # Only show logo if we actually have logo data, no placeholder text
+                logo_section = f"""
+                <div style="text-align: center; margin-bottom: 20px; padding: 10px;">
+                    <img src="data:image/png;base64,{template_info['logo_data']}" 
+                        style="max-width: {logo_width}px; max-height: {logo_height}px; height: auto;" 
+                        alt="" />
+                </div>
+                """
+            # If no logo data, logo_section stays empty (no placeholder text)
+            
+            # FIXED: Proper footer (only if enabled, no logo duplication)
+            footer_section = ""
+            if template_info.get('show_footer', True):
+                footer_bg = template_info.get('footer_bg_color', '#ffffff')
+                footer_text_color = template_info.get('footer_text_color', '#454748')
+                company_name = template_info.get('company_name', 'Company')
+                
+                footer_section = f"""
+                <div style="
+                    background-color: {footer_bg}; 
+                    color: {footer_text_color}; 
+                    padding: 15px; 
+                    margin-top: 20px; 
+                    border-radius: 4px; 
+                    font-size: 12px; 
+                    text-align: center;
+                    font-family: {font_family};
+                    border-top: 1px solid #eeeeee;
+                ">
+                    <p style="margin: 0; font-weight: bold;">{company_name}</p>
+                    <p style="margin: 5px 0 0 0; font-size: 11px;">Automated Alert System</p>
+                </div>
+                """
+            
+            # Determine Priority Level and Color
+            priority_level = rule.priority_level or 'medium'
+            priority_label = dict(rule._fields['priority_level'].selection).get(priority_level, 'Medium')
+            
+            if priority_level == 'critical':
+                priority_color = '#DC2626' # Red
+                priority_bg = '#FEE2E2'
+            elif priority_level == 'high':
+                priority_color = '#EA580C' # Orange
+                priority_bg = '#FFEDD5'
+            elif priority_level == 'low':
+                priority_color = '#2563EB' # Blue
+                priority_bg = '#DBEAFE'
+            else: # Medium
+                priority_color = '#CA8A04' # Yellow/Amber
+                priority_bg = '#FEF9C3'
+                
+            priority_badge = f"""
+            <div style="margin-top: 10px; margin-bottom: 5px;">
+                <span style="
+                    background-color: {priority_bg};
+                    color: {priority_color};
+                    border: 1px solid {priority_color};
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-size: 13px;
+                    font-weight: bold;
+                    display: inline-block;
+                ">Priority: {priority_label}</span>
+            </div>
+            """
+            
+            # FIXED: Email HTML with proper responsive table container
+            enhanced_html = f"""
+            <div style="
+                font-family: {font_family}; 
+                max-width: {email_width}px; 
+                margin: 0 auto; 
+                padding: {content_padding}px;
+                background-color: #ffffff;
+            ">
+                {logo_section}
+                
+                <div style="margin-bottom: 20px;">
+                    <h2 style="
+                        color: {primary_color}; 
+                        font-size: 20px; 
+                        margin: 0 0 5px 0;
+                        font-family: {font_family};
+                    ">Alert: {rule.name}</h2>
+                    {priority_badge}
+                    <p style="
+                        color: #666666; 
+                        font-size: 14px; 
+                        margin: 5px 0 0 0;
+                        font-family: {font_family};
+                    ">Generated on {fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                </div>
+                
+                <div style="width: 100%; overflow-x: auto;">
+                    {table_html}
+                </div>
+                
+                {footer_section}
+            </div>
+            """
+            
+            return enhanced_html
+            
+        except Exception as e:
+            _logger.error(f"Error creating enhanced email HTML: {str(e)}")
+            return table_html  # Fallback to simple table
+    
+    
+    def _create_attachment_optimized(self, encoded_content):
+        """Create optimized attachment - FIXED to prevent logo conflicts"""
+        try:
+            # Generate unique filename to avoid conflicts
+            timestamp = int(time.time())
+            attachment = {
+                'name': f'alert_report_{timestamp}.csv',
+                'mimetype': 'text/csv',
+                'type': 'binary',
+                'datas': encoded_content,
+                'res_model': 'alert.history',  # Link to specific model
+                'public': False,  # Don't make it public to avoid showing in email
+            }
+            return self.env['ir.attachment'].create(attachment)
+        except Exception as e:
+            _logger.error(f"Failed to create attachment: {str(e)}")
+            raise
+
+    def _create_csv_attachment_optimized(self, columns, rows):
+        """Create optimized CSV attachment"""
+        try:
+            # Filter out branch_id columns
+            pattern = re.compile(r'\bbranch\s*_?\s*id\b', re.IGNORECASE)
+            branch_id_indices = [i for i, col in enumerate(columns) if pattern.fullmatch(col)]
+            
+            csv_buffer = io.StringIO()
+            csv_writer = csv.writer(csv_buffer)
+            
+            # Write headers
+            filtered_columns = [
+                " ".join(col.split("_")).title() 
+                for i, col in enumerate(columns) 
+                if i not in branch_id_indices
+            ]
+            csv_writer.writerow(filtered_columns)
+            
+            # Write data rows
+            for row in rows:
+                filtered_row = []
+                for i, cell in enumerate(row):
+                    if i not in branch_id_indices:
+                        formatted_cell = self._format_cell_for_csv(cell)
+                        filtered_row.append(formatted_cell)
+                csv_writer.writerow(filtered_row)
+            
+            csv_content = csv_buffer.getvalue()
+            csv_buffer.close()
+            
+            return base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
+            
+        except Exception as e:
+            _logger.error(f"Error creating CSV: {str(e)}")
+            raise
+
+    def _format_cell_for_csv(self, cell):
+        """Format cell for CSV"""
+        if cell is None:
+            return ""
+        elif isinstance(cell, (int, float)):
+            return str(int(cell)) if isinstance(cell, float) and cell == int(cell) else str(cell)
+        else:
+            return str(cell)
+
+    def _generate_html_table_optimized(self, columns, rows):
+        """Generate responsive HTML table with dynamic template configuration"""
+        try:
+            # Get template configuration
+            template_config = self.env['email.template.config'].get_active_template()
+            
+            if template_config:
+                # Use dynamic colors from template
+                header_bg = template_config.table_header_bg_color or '#007046'
+                header_text = template_config.table_header_text_color or '#fff'
+                border_color = template_config.table_border_color or '#ddd'
+                even_row_color = template_config.table_row_even_color or '#f9f9f9'
+                odd_row_color = template_config.table_row_odd_color or '#ffffff'
+                font_family = dict(template_config._fields['font_family'].selection)[template_config.font_family] if template_config.font_family else 'Arial, sans-serif'
+            else:
+                # Safe fallbacks if no template exists
+                header_bg = '#007046'
+                header_text = '#fff'
+                border_color = '#ddd'
+                even_row_color = '#f9f9f9'
+                odd_row_color = '#ffffff'
+                font_family = 'Arial, sans-serif'
+            
+            # Filter out branch_id columns (UNCHANGED from old code)
+            pattern = re.compile(r'\bbranch\s*_?\s*id\b', re.IGNORECASE)
+            branch_id_indices = [i for i, col in enumerate(columns) if pattern.fullmatch(col)]
+            
+            # Generate headers with dynamic styling
+            header_html = ""
+            for i, col in enumerate(columns):
+                if i not in branch_id_indices:
+                    header_html += f"<th style='padding: 8px; background-color: {header_bg}; color: {header_text}; border: 1px solid {border_color}; font-family: {font_family}; font-size: 14px;'>{' '.join(col.split('_')).title()}</th>"
+            
+            # Generate rows with dynamic styling (limit for email)
+            max_rows = 20
+            rows_html = ""
+            
+            for row_index, row in enumerate(rows[:max_rows]):
+                bg_color = even_row_color if row_index % 2 == 0 else odd_row_color
+                rows_html += "<tr>"
+                for i, cell in enumerate(row):
+                    if i not in branch_id_indices:
+                        formatted_cell = self._format_cell_for_html(cell)
+                        rows_html += f"<td style='padding: 8px; border: 1px solid {border_color}; background-color: {bg_color}; font-family: {font_family}; font-size: 14px;'>{formatted_cell}</td>"
+                rows_html += "</tr>"
+            
+            # Truncation message
+            if len(rows) > max_rows:
+                colspan = len([col for i, col in enumerate(columns) if i not in branch_id_indices])
+                rows_html += f"""
+                <tr>
+                    <td colspan='{colspan}' style='padding: 8px; font-style: italic; text-align: center; background-color: #fffacd; border: 1px solid {border_color}; font-family: {font_family}; font-size: 12px;'>
+                        ... and {len(rows) - max_rows} more record(s). See attached CSV for complete data.
+                    </td>
+                </tr>
+                """
+            
+            # KEEP EXACT OLD RESPONSIVE STRUCTURE - just with dynamic font
+            return f"""
+            <div style="overflow-x: auto; margin: 10px 0;">
+                <table style="border-collapse: collapse; font-family: {font_family}; width: 100%;">
+                    <thead><tr>{header_html}</tr></thead>
+                    <tbody>{rows_html}</tbody>
+                </table>
+            </div>
+            """
+            
+        except Exception as e:
+            _logger.error(f"Error generating HTML table: {str(e)}")
+            return f"<p>Error generating table: {str(e)}</p>"
+
+    def _format_cell_for_html(self, cell):
+        """Format cell for HTML"""
+        if cell is None:
+            return ""
+        elif isinstance(cell, (int, float)):
+            return f"{cell:,.2f}" if isinstance(cell, float) and abs(cell) > 0.01 else str(cell)
+        elif isinstance(cell, str):
+            return cell.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        else:
+            return str(cell)
+
+    # ========================================
+    # MANAGEMENT METHODS WITH UI BUTTONS
+    # ========================================
+    def clear_all_signatures(self):
+        """Clear all signatures for this rule"""
+        self.ensure_one()
+        
+        signatures = self.env['alert.signature'].search([
+            ('alert_rule_id', '=', self.id)
+        ])
+        
+        count = len(signatures)
+        signatures.unlink()
+        
+        self.write({
+            'total_signatures_stored': 0,
+            'initialization_complete': False
+        })
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Signatures Cleared',
+                'message': f'Cleared {count} signatures for rule "{self.name}". Initialization will run on next processing.',
+                'type': 'success'
+            }
+        }
+
+    def test_smart_rule(self):
+        """Test rule with smart processing"""
+        self.ensure_one()
+        
+        try:
+            # Override timing
+            original_next_run = self.next_scheduled_run
+            self.write({'next_scheduled_run': fields.Datetime.now() - timedelta(minutes=1)})
+            
+            # Test processing
+            result = self._process_single_rule_safely(self)
+            
+            # Restore
+            self.write({'next_scheduled_run': original_next_run})
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Smart Test Complete',
+                    'message': f'✅ Emails sent: {result["emails_sent"]}\n📊 Signatures created: {result["signatures_created"]}\n🔍 Records found: {self.last_record_count}\n📧 New records: {self.last_new_record_count}',
+                    'type': 'success',
+                    'sticky': True
+                }
+            }
+            
+        except Exception as e:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Test Failed',
+                    'message': f'❌ Error: {str(e)}',
+                    'type': 'danger',
+                    'sticky': True
+                }
+            }
+
+    def reset_initialization(self):
+        """Reset rule to initialization state"""
+        self.ensure_one()
+        self.write({
+            'initialization_complete': False,
+            'total_signatures_stored': 0,
+            'is_processing': False,
+            'next_scheduled_run': False,
+            'last_error': False,
+            'last_record_count': 0,
+            'last_new_record_count': 0,
+            'last_email_count': 0
+        })
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Initialization Reset',
+                'message': f'✅ Rule "{self.name}" reset to initialization mode\n📅 Will use {self.initialization_strategy} strategy on next run\n⏰ Processing window: {self.processing_window_hours or 72} hours',
+                'type': 'success',
+                'sticky': True
+            }
+        }
+
+    def seed_signatures_optimized(self):
+        """Placeholder method for seed signatures button"""
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Seed Signatures',
+                'message': 'Seed signatures functionality not implemented.',
+                'type': 'info'
+            }
+        }
+
+    @api.model
+    def get_smart_system_statistics(self):
+        """Get smart system statistics"""
+        try:
+            stats = self.env['alert.signature'].get_signature_stats_optimized()
+            
+            total_signatures = sum(data['signature_count'] for data in stats.values())
+            active_rules = len([data for data in stats.values() if data['signature_count'] > 0])
+            
+            # Get initialization statistics
+            all_rules = self.search([('status', '=', '1')])
+            initialized_rules = self.search([('status', '=', '1'), ('initialization_complete', '=', True)])
+            pending_init = len(all_rules) - len(initialized_rules)
+            
+            # Check smart analysis availability
+            analysis_status = "Available" if SQL_METADATA_AVAILABLE else "Pattern Fallback Only"
+            
+            message = f"🎯 Smart Banking Alert System Statistics:\n\n"
+            message += f"📊 SMART ANALYSIS:\n"
+            message += f"• SQL Intelligence: {analysis_status}\n"
+            message += f"• Control Officer Support: Active\n"
+            message += f"• Email Template Config: Available\n\n"
+            message += f"📊 RULES STATUS:\n"
+            message += f"• Total active rules: {len(all_rules)}\n"
+            message += f"• Initialized rules: {len(initialized_rules)}\n"
+            message += f"• Pending initialization: {pending_init}\n\n"
+            message += f"📧 SIGNATURES:\n"
+            message += f"• Total signatures: {total_signatures:,}\n"
+            message += f"• Rules with signatures: {active_rules}\n\n"
+            
+            message += "🏆 Top 5 rules by activity:\n"
+            sorted_stats = sorted(stats.items(), key=lambda x: x[1]['signature_count'], reverse=True)
+            for rule_name, data in sorted_stats[:5]:
+                message += f"• {rule_name}: {data['signature_count']:,} signatures\n"
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Smart System Statistics',
+                    'message': message,
+                    'type': 'info',
+                    'sticky': True
+                }
+            }
+            
+        except Exception as e:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Statistics Error',
+                    'message': f'❌ Error getting statistics: {str(e)}',
+                    'type': 'danger'
+                }
+            }

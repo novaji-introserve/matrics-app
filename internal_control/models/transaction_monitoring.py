@@ -798,9 +798,17 @@ class TransactionMonitoring(models.Model):
             raise
 
 
+    @api.model
     def action_screen(self):
-        super().action_screen()
         '''
         Apply additional logic here if needed
         This method is called when the screen action is triggered.
-        '''             
+        '''
+        # Only call super if there are records to process (avoids ensure_one() on empty set)
+        records = self.search([])
+        for record in records:
+            try:
+                super(TransactionMonitoring, record).action_screen()
+            except Exception as e:
+                _logger.error(f"Error screening transaction {record.id}: {str(e)}")
+                continue

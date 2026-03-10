@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="employee_uche" model="hr.employee">
+            <field name="name">Chimma Ikenna</field>
+            <field name="job_title">Account Officer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_cto"/>
+            <field name="work_email">uche.i@novajii.com</field>
+            <field name="work_phone">+23412345601</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_hanson" model="hr.employee">
+            <field name="name">Hanson Edet</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">hanson.e@novajii.com</field>
+            <field name="work_phone">+23412345602</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_olumide" model="hr.employee">
+            <field name="name">Olumide Olatunji</field>
+            <field name="job_title">Chief Executive Officer</field>
+            <field name="department_id" ref="department_administration"/>
+            <field name="job_id" ref="job_ceo"/>
+            <field name="work_email">olumide.o@novajii.com</field>
+            <field name="work_phone">+23412345603</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_timson" model="hr.employee">
+            <field name="name">Timson Femi</field>
+            <field name="job_title">Chief Financial Officer</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_cfo"/>
+            <field name="work_email">timson.f@novajii.com</field>
+            <field name="work_phone">+23412345604</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_peace" model="hr.employee">
+            <field name="name">Peace Obinna</field>
+            <field name="job_title">HR Manager</field>
+            <field name="department_id" ref="department_hr"/>
+            <field name="job_id" ref="job_hr_manager"/>
+            <field name="work_email">peace.o@novajii.com</field>
+            <field name="work_phone">+23412345605</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_omowunmi" model="hr.employee">
+            <field name="name">Omowunmi Oladele</field>
+            <field name="job_title">Marketing Manager</field>
+            <field name="department_id" ref="department_marketing"/>
+            <field name="job_id" ref="job_marketing_manager"/>
+            <field name="work_email">omowunmi.o@novajii.com</field>
+            <field name="work_phone">+23412345606</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_kayode" model="hr.employee">
+            <field name="name">Kayode Ogunleye</field>
+            <field name="job_title">Sales Manager</field>
+            <field name="department_id" ref="department_sales"/>
+            <field name="job_id" ref="job_sales_manager"/>
+            <field name="work_email">kayode.o@novajii.com</field>
+            <field name="work_phone">+23412345607</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_adebayo" model="hr.employee">
+            <field name="name">Adebayo Olawale</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">adebayo.o@novajii.com</field>
+            <field name="work_phone">+23412345608</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_chioma" model="hr.employee">
+            <field name="name">Chioma Nwosu</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">chioma.n@novajii.com</field>
+            <field name="work_phone">+23412345609</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_emeka" model="hr.employee">
+            <field name="name">Emeka Okafor</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">emeka.o@novajii.com</field>
+            <field name="work_phone">+23412345610</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_tunde" model="hr.employee">
+            <field name="name">Tunde Bakare</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">tunde.b@novajii.com</field>
+            <field name="work_phone">+23412345611</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_folake" model="hr.employee">
+            <field name="name">Folake Adeyemi</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">folake.a@novajii.com</field>
+            <field name="work_phone">+23412345612</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_segun" model="hr.employee">
+            <field name="name">Segun Ogunbanjo</field>
+            <field name="job_title">Operations Manager</field>
+            <field name="department_id" ref="department_operations"/>
+            <field name="job_id" ref="job_operations_manager"/>
+            <field name="work_email">segun.o@novajii.com</field>
+            <field name="work_phone">+23412345613</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_funke" model="hr.employee">
+            <field name="name">Funke Akindele</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">funke.a@novajii.com</field>
+            <field name="work_phone">+23412345614</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_biodun" model="hr.employee">
+            <field name="name">Biodun Shobanjo</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">biodun.s@novajii.com</field>
+            <field name="work_phone">+23412345615</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_yetunde" model="hr.employee">
+            <field name="name">Yetunde Alabi</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">yetunde.a@novajii.com</field>
+            <field name="work_phone">+23412345616</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_damilola" model="hr.employee">
+            <field name="name">Damilola Adeniyi</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">damilola.a@novajii.com</field>
+            <field name="work_phone">+23412345617</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_ngozi" model="hr.employee">
+            <field name="name">Ngozi Ekezie</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">ngozi.e@novajii.com</field>
+            <field name="work_phone">+23412345618</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_chinedu" model="hr.employee">
+            <field name="name">Chinedu Eze</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">chinedu.e@novajii.com</field>
+            <field name="work_phone">+23412345619</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_victoria" model="hr.employee">
+            <field name="name">Victoria Adekunle</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">victoria.a@novajii.com</field>
+            <field name="work_phone">+23412345620</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_samuel" model="hr.employee">
+            <field name="name">Samuel Ojo</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">samuel.o@novajii.com</field>
+            <field name="work_phone">+23412345621</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_blessing" model="hr.employee">
+            <field name="name">Blessing Okonkwo</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">blessing.o@novajii.com</field>
+            <field name="work_phone">+23412345622</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_tosin" model="hr.employee">
+            <field name="name">Tosin Adegbite</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">tosin.a@novajii.com</field>
+            <field name="work_phone">+23412345623</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_aisha" model="hr.employee">
+            <field name="name">Aisha Bello</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">aisha.b@novajii.com</field>
+            <field name="work_phone">+23412345624</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_kunle" model="hr.employee">
+            <field name="name">Kunle Adeleke</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">kunle.a@novajii.com</field>
+            <field name="work_phone">+23412345625</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_nneka" model="hr.employee">
+            <field name="name">Nneka Igwe</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">nneka.i@novajii.com</field>
+            <field name="work_phone">+23412345626</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_yemi" model="hr.employee">
+            <field name="name">Yemi Adekunle</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">yemi.a@novajii.com</field>
+            <field name="work_phone">+23412345627</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_bola" model="hr.employee">
+            <field name="name">Bola Tinubu</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">bola.t@novajii.com</field>
+            <field name="work_phone">+23412345628</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_wale" model="hr.employee">
+            <field name="name">Wale Johnson</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">wale.j@novajii.com</field>
+            <field name="work_phone">+23412345629</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_amina" model="hr.employee">
+            <field name="name">Amina Ibrahim</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">amina.i@novajii.com</field>
+            <field name="work_phone">+23412345630</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_femi" model="hr.employee">
+            <field name="name">Femi Adesina</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">femi.a@novajii.com</field>
+            <field name="work_phone">+23412345631</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_habiba" model="hr.employee">
+            <field name="name">Habiba Mohammed</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">habiba.m@novajii.com</field>
+            <field name="work_phone">+23412345632</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_kehinde" model="hr.employee">
+            <field name="name">Kehinde Ogunlana</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">kehinde.o@novajii.com</field>
+            <field name="work_phone">+23412345633</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_zainab" model="hr.employee">
+            <field name="name">Zainab Usman</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">zainab.u@novajii.com</field>
+            <field name="work_phone">+23412345634</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_gbenga" model="hr.employee">
+            <field name="name">Gbenga Adeboye</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">gbenga.a@novajii.com</field>
+            <field name="work_phone">+23412345635</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_kemi" model="hr.employee">
+            <field name="name">Kemi Olunloyo</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">kemi.o@novajii.com</field>
+            <field name="work_phone">+23412345636</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_taiwo" model="hr.employee">
+            <field name="name">Taiwo Ogunlana</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">taiwo.o@novajii.com</field>
+            <field name="work_phone">+23412345637</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_halima" model="hr.employee">
+            <field name="name">Halima Abubakar</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">halima.a@novajii.com</field>
+            <field name="work_phone">+23412345638</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_tola" model="hr.employee">
+            <field name="name">Tola Odutola</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">tola.o@novajii.com</field>
+            <field name="work_phone">+23412345639</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_hassan" model="hr.employee">
+            <field name="name">Hassan Suleiman</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">hassan.s@novajii.com</field>
+            <field name="work_phone">+23412345640</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_mary" model="hr.employee">
+            <field name="name">Mary Okonkwo</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">mary.o@novajii.com</field>
+            <field name="work_phone">+23412345641</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_ibrahim" model="hr.employee">
+            <field name="name">Ibrahim Musa</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">ibrahim.m@novajii.com</field>
+            <field name="work_phone">+23412345642</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_fatima" model="hr.employee">
+            <field name="name">Fatima Aliyu</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">fatima.a@novajii.com</field>
+            <field name="work_phone">+23412345643</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_david" model="hr.employee">
+            <field name="name">David Oyelowo</field>
+            <field name="job_title">Customer Service Representative</field>
+            <field name="department_id" ref="department_customer_service"/>
+            <field name="job_id" ref="job_customer_service_rep"/>
+            <field name="work_email">david.o@novajii.com</field>
+            <field name="work_phone">+23412345644</field>
+            <field name="gender">male</field>
+        </record>
+
+        <record id="employee_grace" model="hr.employee">
+            <field name="name">Grace Okafor</field>
+            <field name="job_title">Software Developer</field>
+            <field name="department_id" ref="department_it"/>
+            <field name="job_id" ref="job_developer"/>
+            <field name="work_email">grace.o@novajii.com</field>
+            <field name="work_phone">+23412345645</field>
+            <field name="gender">female</field>
+        </record>
+
+        <record id="employee_umar" model="hr.employee">
+            <field name="name">Umar Abdullahi</field>
+            <field name="job_title">Accountant</field>
+            <field name="department_id" ref="department_finance"/>
+            <field name="job_id" ref="job_accountant"/>
+            <field name="work_email">umar</field>
+            <field name="work_phone">+2341234545</field>
+            <field name="gender">female</field>
+        </record>
+    </data>
+</odoo>
